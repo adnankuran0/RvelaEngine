@@ -1,6 +1,7 @@
-#include "Core/Core.h"
+#include "Core/Engine.h"
 
 int main()
 {
-	Core::PrintHelloWorld();
+	Engine engine;
+	engine.Run();
 }

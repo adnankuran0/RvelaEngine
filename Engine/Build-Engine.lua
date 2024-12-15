@@ -9,7 +9,22 @@ project "Engine"
 
    includedirs
    {
-      "Source"
+      "Source",
+      "../Vendor/GLFW/include",
+      "../Vendor/glm",
+      "../Vendor/GLEW/include"
+   }
+
+   libdirs
+   {
+      "../Vendor/GLFW/lib",
+      "../Vendor/GLEW/lib"
+   }
+
+   links
+   {
+      "glfw3",
+      "glew32s"
    }
 
    targetdir ("../Binaries/" .. OutputDir .. "/%{prj.name}")
@@ -17,7 +32,7 @@ project "Engine"
 
    filter "system:windows"
        systemversion "latest"
-       defines { }
+       defines { "GLFW_INCLUDE_NONE" }
 
    filter "configurations:Debug"
        defines { "DEBUG" }
