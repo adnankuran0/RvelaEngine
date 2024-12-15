@@ -28,12 +28,7 @@ void Window::Init()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#if defined(_WIN32)
-    // Add Windows-specific configuration if needed
-#elif defined(__linux__)
-    glfwWindowHintString(GLFW_X11_CLASS_NAME, "ferx");
-    glfwWindowHintString(GLFW_X11_INSTANCE_NAME, "Ferx");
-#endif
+
 
     m_Window = glfwCreateWindow(m_WindowData.size.width, m_WindowData.size.height, m_WindowData.title.c_str(), nullptr, nullptr);
     if (!m_Window) {
@@ -47,6 +42,11 @@ void Window::Init()
     {
         std::cerr << "Failed to initialize GLEW" << std::endl;
     }
+    else
+    {
+        std::cout << "GLEW Initialized" << std::endl;
+    }
+    std::cout << glGetString(GL_VERSION) << std::endl;
 }
 
 Window Window::Create()
