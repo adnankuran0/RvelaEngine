@@ -11,7 +11,7 @@ workspace "Rvela"
 OutputDir = "%{cfg.system}-%{cfg.architecture}/%{cfg.buildcfg}"
 
 group "Engine"
-	include "Core/Build-Engine.lua"
+	include "Engine/Build-Engine.lua"
 group ""
 
-include "App/Build-Editor.lua"
+include "Editor/Build-Editor.lua"
