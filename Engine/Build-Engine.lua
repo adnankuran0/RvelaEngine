@@ -12,7 +12,8 @@ project "Engine"
       "Source",
       "../Vendor/GLFW/include",
       "../Vendor/glm",
-      "../Vendor/GLEW/include"
+      "../Vendor/GLEW/include",
+      "../Vendor/plog"
    }
 
    libdirs

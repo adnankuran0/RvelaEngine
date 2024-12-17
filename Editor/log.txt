@@ -1,0 +1,17 @@
+﻿2024-12-18 00:39:24.976 DEBUG [17944] [Engine::Engine@27] Bu bir debug mesajıdır.
+2024-12-18 00:39:24.977 INFO  [17944] [Engine::Engine@28] Bu bir bilgi mesajıdır.
+2024-12-18 00:39:24.978 WARN  [17944] [Engine::Engine@29] Bu bir uyarı mesajıdır.
+2024-12-18 00:39:24.978 ERROR [17944] [Engine::Engine@30] Bu bir hata mesajıdır.
+2024-12-18 00:39:24.978 FATAL [17944] [Engine::Engine@31] Bu bir kritik hata mesajıdır.
+2024-12-18 00:40:00.129 DEBUG [18088] [Engine::Run@40] Bu bir debug mesajıdır.
+2024-12-18 00:40:00.129 INFO  [18088] [Engine::Run@41] Bu bir bilgi mesajıdır.
+2024-12-18 00:40:00.129 WARN  [18088] [Engine::Run@42] Bu bir uyarı mesajıdır.
+2024-12-18 00:40:00.129 ERROR [18088] [Engine::Run@43] Bu bir hata mesajıdır.
+2024-12-18 00:40:00.129 FATAL [18088] [Engine::Run@44] Bu bir kritik hata mesajıdır.
+2024-12-18 00:52:41.494 DEBUG [28536] [Engine::Engine@26] Bu bir DEBUG mesajıdır.
+2024-12-18 00:53:14.332 DEBUG [27864] [Engine::Engine@26] Bu bir DEBUG mesajıdır.
+2024-12-18 00:53:14.333 INFO  [27864] [Engine::Engine@27] Bu bir INFO mesajıdır.
+2024-12-18 00:53:14.333 WARN  [27864] [Engine::Engine@28] Bu bir WARNING mesajıdır.
+2024-12-18 00:53:14.333 ERROR [27864] [Engine::Engine@29] Bu bir ERROR mesajıdır.
+2024-12-18 00:53:14.334 FATAL [27864] [Engine::Engine@30] Bu bir FATAL mesajıdır.
+2024-12-18 01:02:32.379 DEBUG [30656] [Engine::Engine@26] Porno
