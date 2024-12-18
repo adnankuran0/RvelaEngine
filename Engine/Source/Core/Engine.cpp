@@ -1,11 +1,6 @@
 
 #include "Engine.h"
-#include "Input/Input.h"
 #include "RvelaLog.h"
-#include "Event/EventManager.h"
-#include <iostream>
-
-
 
 Engine* Engine::s_Instance = nullptr;
 
@@ -37,6 +32,7 @@ Engine::~Engine()
 
 void Engine::Run()
 {
+
 	while (!glfwWindowShouldClose(m_Window->GetWindow()))
 	{
 		glfwPollEvents();
@@ -44,9 +40,8 @@ void Engine::Run()
 			if (event.GetEventType() == EventType::KeyPressed) {
 				KeyPressedEvent& keyEvent = static_cast<KeyPressedEvent&>(event);
 
-				// 'E' tuþuna basýldýðýnda çýktý vereceðiz
-				if (keyEvent.GetKeycode() == KeyCode::E) {
-					LOG_INFO << "E tuþuna basýldý!";
+				if (keyEvent.GetKeycode() == KeyCode::S) {
+					LOG_INFO << "S tuþuna basýldý!";
 				}
 			}
 			});
@@ -55,10 +50,9 @@ void Engine::Run()
 		Render();
 		if (Input::IsKeyPressed(KeyCode::A))
 		{
-			std::cout << "A key is pressed" << std::endl;
+			LOG_INFO << "A key is pressed";
 		}
 
-		EventManager::clearEvents();
 	}
 
 	Shutdown();
