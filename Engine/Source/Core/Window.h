@@ -43,4 +43,5 @@ public:
 private:
 	GLFWwindow* m_Window;
 	WindowData m_WindowData;
+	static void m_KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 };

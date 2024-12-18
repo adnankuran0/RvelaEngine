@@ -15,3 +15,138 @@
 2024-12-18 00:53:14.333 ERROR [27864] [Engine::Engine@29] Bu bir ERROR mesajıdır.
 2024-12-18 00:53:14.334 FATAL [27864] [Engine::Engine@30] Bu bir FATAL mesajıdır.
 2024-12-18 01:02:32.379 DEBUG [30656] [Engine::Engine@26] Porno
+2024-12-18 01:04:12.026 DEBUG [17800] [Engine::Run@38] Porno
+2024-12-18 01:04:33.996 WARN  [2936] [Engine::Run@38] Porno
+2024-12-18 01:07:07.720 INFO  [29852] [Window::Init@28] GLFW Initialized
+2024-12-18 01:07:07.877 INFO  [29852] [Window::Init@51] GLEW Initialized
+2024-12-18 01:07:07.877 INFO  [29852] [Window::Init@53] 3.3.0 NVIDIA 561.09
+2024-12-18 01:07:38.014 INFO  [7404] [Window::Init@28] GLFW Initialized
+2024-12-18 01:07:38.167 ERROR [7404] [Window::Init@46] Failed to initialize GLEW
+2024-12-18 01:07:38.168 INFO  [7404] [Window::Init@53] 3.3.0 NVIDIA 561.09
+2024-12-18 01:08:02.115 INFO  [30060] [Window::Init@28] GLFW Initialized
+2024-12-18 01:08:02.274 ERROR [30060] [Window::Init@46] Failed to initialize GLEW
+2024-12-18 01:08:02.275 INFO  [30060] [Window::Init@53] 3.3.0 NVIDIA 561.09
+2024-12-18 01:08:18.398 INFO  [13736] [Window::Init@27] GLFW Initialized
+2024-12-18 01:08:18.534 ERROR [13736] [Window::Init@44] Failed to initialize GLEW
+2024-12-18 01:08:18.535 INFO  [13736] [Window::Init@50] 3.3.0 NVIDIA 561.09
+2024-12-18 01:08:28.590 INFO  [24728] [Window::Init@27] GLFW Initialized
+2024-12-18 01:08:28.734 INFO  [24728] [Window::Init@48] GLEW Initialized
+2024-12-18 01:08:28.734 INFO  [24728] [Window::Init@50] 3.3.0 NVIDIA 561.09
+2024-12-18 03:22:26.065 INFO  [28244] [Window::Init@27] GLFW Initialized
+2024-12-18 03:22:26.229 INFO  [28244] [Window::Init@48] GLEW Initialized
+2024-12-18 03:22:26.229 INFO  [28244] [Window::Init@50] 3.3.0 NVIDIA 561.09
+2024-12-18 03:39:06.279 INFO  [29976] [Window::Init@28] GLFW Initialized
+2024-12-18 03:39:06.514 INFO  [29976] [Window::Init@49] GLEW Initialized
+2024-12-18 03:39:06.514 INFO  [29976] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-18 03:39:17.382 INFO  [11156] [Window::Init@28] GLFW Initialized
+2024-12-18 03:39:17.531 INFO  [11156] [Window::Init@49] GLEW Initialized
+2024-12-18 03:39:17.532 INFO  [11156] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-18 03:47:36.506 INFO  [30420] [Window::Init@28] GLFW Initialized
+2024-12-18 03:47:36.664 INFO  [30420] [Window::Init@49] GLEW Initialized
+2024-12-18 03:47:36.664 INFO  [30420] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-18 03:49:25.007 INFO  [27792] [Window::Init@28] GLFW Initialized
+2024-12-18 03:49:25.183 INFO  [27792] [Window::Init@49] GLEW Initialized
+2024-12-18 03:49:25.184 INFO  [27792] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-18 03:49:54.464 INFO  [15008] [Window::Init@28] GLFW Initialized
+2024-12-18 03:49:54.626 INFO  [15008] [Window::Init@49] GLEW Initialized
+2024-12-18 03:49:54.626 INFO  [15008] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-18 03:49:55.445 INFO  [15008] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:49:55.662 INFO  [15008] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:49:55.940 INFO  [15008] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:49:57.051 INFO  [15008] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:49:57.251 INFO  [15008] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:49:57.627 INFO  [15008] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:49:58.212 INFO  [15008] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:49:58.803 INFO  [15008] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:50:07.108 INFO  [15008] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:50:07.451 INFO  [15008] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:58:55.569 INFO  [21400] [Window::Init@28] GLFW Initialized
+2024-12-18 03:58:55.733 INFO  [21400] [Window::Init@49] GLEW Initialized
+2024-12-18 03:58:55.734 INFO  [21400] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-18 03:58:57.548 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:58:57.867 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:58:58.885 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:58:59.187 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:58:59.372 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:58:59.580 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:00.268 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:00.643 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:00.908 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:01.131 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:01.733 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:01.933 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:02.140 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:02.323 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:02.507 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:02.668 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:03.734 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:03.934 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:04.139 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:04.323 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:04.940 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:05.221 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:05.483 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:06.708 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:06.990 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:07.252 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:07.535 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:08.100 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:08.403 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:08.691 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:08.947 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:09.251 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:09.549 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:09.867 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:10.171 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:10.459 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:10.718 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:10.981 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:11.244 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:11.509 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:11.771 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:11.979 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:12.220 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:13.651 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:14.300 INFO  [21400] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:27.625 INFO  [20836] [Window::Init@28] GLFW Initialized
+2024-12-18 03:59:27.792 INFO  [20836] [Window::Init@49] GLEW Initialized
+2024-12-18 03:59:27.792 INFO  [20836] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-18 03:59:29.764 INFO  [20836] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:31.502 INFO  [20836] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 03:59:31.995 INFO  [20836] [Engine::Run::<lambda_1>::operator ()@53] E tuşuna basıldı!
+2024-12-18 04:09:03.047 INFO  [28676] [Window::Init@28] GLFW Initialized
+2024-12-18 04:09:03.199 INFO  [28676] [Window::Init@49] GLEW Initialized
+2024-12-18 04:09:03.199 INFO  [28676] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-18 04:09:56.382 INFO  [33212] [Window::Init@28] GLFW Initialized
+2024-12-18 04:09:56.523 INFO  [33212] [Window::Init@49] GLEW Initialized
+2024-12-18 04:09:56.523 INFO  [33212] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-18 04:09:57.803 INFO  [33212] [Engine::Run::<lambda_1>::operator ()@52] E tuşuna basıldı!
+2024-12-18 04:09:58.108 INFO  [33212] [Engine::Run::<lambda_1>::operator ()@52] E tuşuna basıldı!
+2024-12-18 04:09:58.395 INFO  [33212] [Engine::Run::<lambda_1>::operator ()@52] E tuşuna basıldı!
+2024-12-18 04:09:59.523 INFO  [33212] [Engine::Run::<lambda_1>::operator ()@52] E tuşuna basıldı!
+2024-12-18 04:09:59.707 INFO  [33212] [Engine::Run::<lambda_1>::operator ()@52] E tuşuna basıldı!
+2024-12-18 04:09:59.870 INFO  [33212] [Engine::Run::<lambda_1>::operator ()@52] E tuşuna basıldı!
+2024-12-18 04:10:00.035 INFO  [33212] [Engine::Run::<lambda_1>::operator ()@52] E tuşuna basıldı!
+2024-12-18 04:13:29.180 INFO  [33392] [Window::Init@28] GLFW Initialized
+2024-12-18 04:13:29.334 INFO  [33392] [Window::Init@49] GLEW Initialized
+2024-12-18 04:13:29.334 INFO  [33392] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-18 04:13:30.214 INFO  [33392] [Engine::Run::<lambda_1>::operator ()@52] E tuşuna basıldı!
+2024-12-18 04:13:30.517 INFO  [33392] [Engine::Run::<lambda_1>::operator ()@52] E tuşuna basıldı!
+2024-12-18 04:13:30.683 INFO  [33392] [Engine::Run::<lambda_1>::operator ()@52] E tuşuna basıldı!
+2024-12-18 04:13:31.579 INFO  [33392] [Engine::Run::<lambda_1>::operator ()@52] E tuşuna basıldı!
+2024-12-18 04:13:31.827 INFO  [33392] [Engine::Run::<lambda_1>::operator ()@52] E tuşuna basıldı!
+2024-12-18 04:13:32.012 INFO  [33392] [Engine::Run::<lambda_1>::operator ()@52] E tuşuna basıldı!
+2024-12-18 04:14:11.018 INFO  [17060] [Window::Init@28] GLFW Initialized
+2024-12-18 04:14:11.156 INFO  [17060] [Window::Init@49] GLEW Initialized
+2024-12-18 04:14:11.156 INFO  [17060] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-18 04:14:11.932 INFO  [17060] [Engine::Run::<lambda_1>::operator ()@52] E tuşuna basıldı!
+2024-12-18 04:14:12.172 INFO  [17060] [Engine::Run::<lambda_1>::operator ()@52] E tuşuna basıldı!
+2024-12-18 04:14:12.340 INFO  [17060] [Engine::Run::<lambda_1>::operator ()@52] E tuşuna basıldı!
+2024-12-18 04:14:12.996 INFO  [17060] [Engine::Run::<lambda_1>::operator ()@52] E tuşuna basıldı!
+2024-12-18 04:18:29.995 INFO  [17256] [Window::Init@28] GLFW Initialized
+2024-12-18 04:18:30.132 INFO  [17256] [Window::Init@49] GLEW Initialized
+2024-12-18 04:18:30.132 INFO  [17256] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-18 04:18:31.844 INFO  [17256] [Engine::Run::<lambda_1>::operator ()@52] E tuşuna basıldı!
+2024-12-18 04:18:32.172 INFO  [17256] [Engine::Run::<lambda_1>::operator ()@52] E tuşuna basıldı!
+2024-12-18 04:18:32.396 INFO  [17256] [Engine::Run::<lambda_1>::operator ()@52] E tuşuna basıldı!
+2024-12-18 04:18:32.989 INFO  [17256] [Engine::Run::<lambda_1>::operator ()@52] E tuşuna basıldı!

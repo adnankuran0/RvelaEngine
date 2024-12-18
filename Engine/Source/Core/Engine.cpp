@@ -2,6 +2,7 @@
 #include "Engine.h"
 #include "Input/Input.h"
 #include "RvelaLog.h"
+#include "Event/EventManager.h"
 #include <iostream>
 
 
@@ -10,6 +11,8 @@ Engine* Engine::s_Instance = nullptr;
 
 Engine::Engine()
 {
+	RvelaLog::Init("log.txt");
+
 	//TODO: try to make initialization of the window with stack allocation
 	m_Window = new Window();
 	if (s_Instance == nullptr)
@@ -19,10 +22,9 @@ Engine::Engine()
 	}
 	else
 	{
-		std::cout << "Another instance is already created!" << std::endl;
+		LOG_WARNING << "Another instance is already created!";
 	}
 
-	RvelaLog::Init("log.txt");
 
 }
 
@@ -35,19 +37,28 @@ Engine::~Engine()
 
 void Engine::Run()
 {
-	LOG_DEBUG << "Porno";
-
-	
 	while (!glfwWindowShouldClose(m_Window->GetWindow()))
 	{
+		glfwPollEvents();
+		EventManager::dispatchEvents([](Event& event) {
+			if (event.GetEventType() == EventType::KeyPressed) {
+				KeyPressedEvent& keyEvent = static_cast<KeyPressedEvent&>(event);
+
+				// 'E' tuþuna basýldýðýnda çýktý vereceðiz
+				if (keyEvent.GetKeycode() == KeyCode::E) {
+					LOG_INFO << "E tuþuna basýldý!";
+				}
+			}
+			});
+
+
 		Render();
 		if (Input::IsKeyPressed(KeyCode::A))
 		{
 			std::cout << "A key is pressed" << std::endl;
 		}
 
-		/* Poll for and process events */
-		glfwPollEvents();
+		EventManager::clearEvents();
 	}
 
 	Shutdown();

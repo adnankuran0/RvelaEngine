@@ -1,14 +1,22 @@
 #include "EventManager.h"
+std::vector<Event*> EventManager::m_EventQueue = std::vector<Event*>();
 
-void EventManager::Subscribe(const std::string& eventName, Callback callback) {
-    listeners[eventName].push_back(callback);
+std::vector<Event*>& EventManager::getEventQueue()
+{
+	return m_EventQueue;
 }
 
+void EventManager::pushEvent(Event* event)
+{
+	m_EventQueue.push_back(event);
+}
 
-void EventManager::Dispatch(const std::string& eventName) {
-    if (listeners.find(eventName) != listeners.end()) {
-        for (const auto& callback : listeners[eventName]) {
-            callback();
-        }
-    }
+void EventManager::clearEvents()
+{
+	m_EventQueue.clear();
+}
+
+void EventManager::dispatchEvents(const std::function<void(Event&)>& handler)
+{ 
+	EventDispatcher::Dispatch(m_EventQueue, handler); 
 }

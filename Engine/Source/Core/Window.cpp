@@ -1,4 +1,6 @@
 #include "Window.h"
+#include "RvelaLog.h"
+#include "Event/EventManager.h"
 
 Window::Window()
 {
@@ -19,11 +21,11 @@ Window::~Window()
 void Window::Init()
 {
     if (!glfwInit()) {
-        std::cerr << "Failed to initialize GLFW" << std::endl;
+        LOG_ERROR << "Failed to initialize GLFW";
         return;
     }
 
-    std::cout << "GLFW Initialized" << std::endl;
+    LOG_INFO << "GLFW Initialized";
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -32,7 +34,7 @@ void Window::Init()
 
     m_Window = glfwCreateWindow(m_WindowData.size.width, m_WindowData.size.height, m_WindowData.title.c_str(), nullptr, nullptr);
     if (!m_Window) {
-        std::cerr << "Failed to create GLFW window" << std::endl;
+        LOG_ERROR << "Failed to create GLFW window";
         glfwTerminate();
         return;
     }
@@ -40,13 +42,15 @@ void Window::Init()
     glfwMakeContextCurrent(m_Window);
     if (glewInit() != GLEW_OK)
     {
-        std::cerr << "Failed to initialize GLEW" << std::endl;
+        LOG_ERROR << "Failed to initialize GLEW";
     }
     else
     {
-        std::cout << "GLEW Initialized" << std::endl;
+        LOG_INFO << "GLEW Initialized";
     }
-    std::cout << glGetString(GL_VERSION) << std::endl;
+    LOG_INFO << glGetString(GL_VERSION);
+
+    glfwSetKeyCallback(m_Window, m_KeyCallback);
 }
 
 Window Window::Create()
@@ -78,4 +82,13 @@ WindowSize Window::GetSize()
 void Window::Shutdown() const
 {
     glfwDestroyWindow(m_Window);
+}
+
+void Window::m_KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (action == GLFW_PRESS) {
+        KeyCode keyCode = static_cast<KeyCode>(key);
+        KeyPressedEvent* event = new KeyPressedEvent(keyCode);
+        EventManager::pushEvent(event); // Event'i EventManager'a ekliyoruz
+    }
 }

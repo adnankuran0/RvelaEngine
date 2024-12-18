@@ -1,17 +1,21 @@
 #pragma once
-#include <unordered_map>
+
+#include "Event.h"
+#include "Events.h"
+#include "EventDispatcher.h"
+#include "KeyEvents.h"
 #include <vector>
-#include <functional>
-#include <string>
 
 class EventManager
 {
 public:
-	using Callback = std::function<void()>;
-
-	void Subscribe(const std::string& eventName, Callback callback);
-	void Dispatch(const std::string& eventName);
+	static std::vector<Event*>& getEventQueue(); 
+	static void pushEvent(Event* event); 
+	static void clearEvents();
+	static void dispatchEvents(const std::function<void(Event&)>& handler); 
 private:
-	std::unordered_map<std::string, std::vector<Callback>> listeners;
+	static std::vector<Event*> m_EventQueue;
 
+	
 };
+
