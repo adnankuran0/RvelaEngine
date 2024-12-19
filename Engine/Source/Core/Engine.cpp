@@ -6,6 +6,7 @@
 
 Engine* Engine::s_Instance = nullptr;
 
+
 Engine::Engine()
 {
 	RvelaLog::Init("log.txt");
@@ -41,6 +42,7 @@ void Engine::Run()
 
 	while (!glfwWindowShouldClose(m_Window->GetWindow()))
 	{
+		Time::update();
 		glfwPollEvents();
 		EventManager::dispatchEvents([](Event& event) {
 			if (event.GetEventType() == EventType::KeyPressed) {
@@ -51,13 +53,14 @@ void Engine::Run()
 				}
 			}
 			});
-		Render();
 
+		Render();
 
 		if (Input::IsKeyPressed(KeyCode::A))
 		{
 			LOG_INFO << "A key is pressed";
 		}
+
 
 	}
 

@@ -6,6 +6,7 @@
 #include "Input/Input.h"
 #include "Event/EventManager.h"
 #include "../Renderer/Renderer.h"
+#include "Time.h"
 #include <iostream>
 
 class Engine

@@ -4,9 +4,11 @@
 #include "VertexBuffer.h"
 #include "ElementBuffer.h"
 #include "BufferLayout.h"
+#include "Texture.h"
 #include "Shader.h"
 #include "Camera.h"
 #include "GLFW/glfw3.h"
+#include "../Core/Time.h"
 
 struct RendererData
 {
@@ -15,6 +17,7 @@ struct RendererData
     ElementBuffer* m_EBO;
     BufferLayout* m_Layout;
     Shader* m_Shader;
+    Texture* m_Texture;
     Camera* m_Camera;
 };
 
