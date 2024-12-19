@@ -5,6 +5,7 @@
 #include "Window.h"
 #include "Input/Input.h"
 #include "Event/EventManager.h"
+#include "../Renderer/Renderer.h"
 #include <iostream>
 
 class Engine
@@ -24,4 +25,5 @@ public:
 private:
 	static Engine* s_Instance;
 	Window* m_Window;
+	Renderer* m_Renderer;
 };

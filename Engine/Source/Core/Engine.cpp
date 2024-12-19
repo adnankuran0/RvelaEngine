@@ -1,6 +1,8 @@
 
 #include "Engine.h"
 #include "RvelaLog.h"
+#include <fstream>
+#include <filesystem>
 
 Engine* Engine::s_Instance = nullptr;
 
@@ -19,6 +21,10 @@ Engine::Engine()
 	{
 		LOG_WARNING << "Another instance is already created!";
 	}
+
+	m_Renderer = new Renderer();
+	m_Renderer->Init();
+
 
 
 }
@@ -45,9 +51,9 @@ void Engine::Run()
 				}
 			}
 			});
-
-
 		Render();
+
+
 		if (Input::IsKeyPressed(KeyCode::A))
 		{
 			LOG_INFO << "A key is pressed";
@@ -61,17 +67,13 @@ void Engine::Run()
 
 void Engine::Render()
 {
-	glClearColor(0.05, 0.0, 0.1, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	/* Swap front and back buffers */
-	glfwSwapBuffers(m_Window->GetWindow());
-
+	m_Renderer->Render(m_Window->GetWindow());
 }
 
 void Engine::Shutdown()
 {
 	glfwTerminate();
+	m_Renderer->Shutdown();
 	delete m_Window;
 }
 

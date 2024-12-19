@@ -13,7 +13,8 @@ project "Engine"
       "../Vendor/GLFW/include",
       "../Vendor/glm",
       "../Vendor/GLEW/include",
-      "../Vendor/plog"
+      "../Vendor/plog",
+      "../Vendor/stb_image"
    }
 
    libdirs
