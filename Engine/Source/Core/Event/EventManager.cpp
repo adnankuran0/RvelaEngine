@@ -19,5 +19,4 @@ void EventManager::clearEvents()
 void EventManager::dispatchEvents(const std::function<void(Event&)>& handler)
 { 
 	EventDispatcher::Dispatch(m_EventQueue, handler); 
-	clearEvents();
 }

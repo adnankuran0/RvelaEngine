@@ -1,11 +1,9 @@
 
 #include "Engine.h"
 #include "RvelaLog.h"
-#include <fstream>
-#include <filesystem>
+
 
 Engine* Engine::s_Instance = nullptr;
-
 
 Engine::Engine()
 {
@@ -16,7 +14,6 @@ Engine::Engine()
 	if (s_Instance == nullptr)
 	{
 		s_Instance = this;
-		
 	}
 	else
 	{
@@ -25,9 +22,6 @@ Engine::Engine()
 
 	m_Renderer = new Renderer();
 	m_Renderer->Init();
-
-
-
 }
 
 Engine::~Engine()
@@ -40,7 +34,7 @@ Engine::~Engine()
 void Engine::Run()
 {
 
-	while (!glfwWindowShouldClose(m_Window->GetWindow()))
+	while (!glfwWindowShouldClose(m_Window->GetGLFWWindow()))
 	{
 		Time::update();
 		glfwPollEvents();
@@ -49,18 +43,46 @@ void Engine::Run()
 				KeyPressedEvent& keyEvent = static_cast<KeyPressedEvent&>(event);
 
 				if (keyEvent.GetKeycode() == KeyCode::S) {
-					LOG_INFO << "S tuþuna basýldý!";
+					LOG_INFO << "S is pressed!";
 				}
 			}
+			if (event.GetEventType() == EventType::KeyReleased) {
+				KeyReleasedEvent& keyEvent = static_cast<KeyReleasedEvent&>(event);
+
+				if (keyEvent.GetKeycode() == KeyCode::S) {
+					LOG_INFO << "S is released!";
+				}
+			}
+			if (event.GetEventType() == EventType::MouseButtonReleased)
+			{
+				MouseButtonPressedEvent& mouseEvent = static_cast<MouseButtonPressedEvent&>(event);
+
+				if (mouseEvent.GetMouseCode() == MouseCode::Button0)
+				{
+					LOG_INFO << "Left Click released!";
+				}
+			}
+			if (event.GetEventType() == EventType::MouseScrolled)
+			{
+				MouseScrolledEvent& mouseEvent = static_cast<MouseScrolledEvent&>(event);
+				LOG_INFO << "Mouse scrolled " << mouseEvent.GetOffset();
+			}
+			if (event.GetEventType() == EventType::WindowResized)
+			{
+				WindowResizedEvent& windowEvent = static_cast<WindowResizedEvent&>(event);
+				LOG_INFO << windowEvent.GetWidth() << " " << windowEvent.GetHeight();
+			}
+
 			});
 
 		Render();
 
 		if (Input::IsKeyPressed(KeyCode::A))
 		{
-			LOG_INFO << "A key is pressed";
+			LOG_INFO << "A key is holding";
 		}
 
+		EventManager::clearEvents();
 
 	}
 
@@ -70,7 +92,7 @@ void Engine::Run()
 
 void Engine::Render()
 {
-	m_Renderer->Render(m_Window->GetWindow());
+	m_Renderer->Render(m_Window->GetGLFWWindow());
 }
 
 void Engine::Shutdown()

@@ -34,7 +34,7 @@ public:
 
 	void Init();
 
-	GLFWwindow* GetWindow() const;
+	GLFWwindow* GetGLFWWindow() const;
 	const std::string& GetTitle() const;
 	WindowSize GetSize();
 
@@ -44,4 +44,9 @@ private:
 	GLFWwindow* m_Window;
 	WindowData m_WindowData;
 	static void m_KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+	static void m_MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
+	static void m_MouseMovedCallback(GLFWwindow* window, double xpos, double ypos);
+	static void m_MouseScrolledCallback(GLFWwindow* window, double xoffset, double yoffset);
+	static void m_FramebufferSizeCallback(GLFWwindow* window, int width, int height);
+
 };

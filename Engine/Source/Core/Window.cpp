@@ -51,6 +51,10 @@ void Window::Init()
     LOG_INFO << glGetString(GL_VERSION);
 
     glfwSetKeyCallback(m_Window, m_KeyCallback);
+    glfwSetMouseButtonCallback(m_Window, m_MouseButtonCallback);
+    glfwSetCursorPosCallback(m_Window, m_MouseMovedCallback);
+    glfwSetScrollCallback(m_Window, m_MouseScrolledCallback);
+    glfwSetFramebufferSizeCallback(m_Window, m_FramebufferSizeCallback);
 }
 
 Window Window::Create()
@@ -63,7 +67,7 @@ Window Window::Create(const std::string& title, int width, int height)
     return Window{ title, width, height };
 }
 
-GLFWwindow* Window::GetWindow() const
+GLFWwindow* Window::GetGLFWWindow() const
 {
     return m_Window;
 }
@@ -89,6 +93,42 @@ void Window::m_KeyCallback(GLFWwindow* window, int key, int scancode, int action
     if (action == GLFW_PRESS) {
         KeyCode keyCode = static_cast<KeyCode>(key);
         KeyPressedEvent* event = new KeyPressedEvent(keyCode);
-        EventManager::pushEvent(event); // Event'i EventManager'a ekliyoruz
+        EventManager::pushEvent(event); 
     }
+    else if (action == GLFW_RELEASE) {
+        KeyCode keyCode = static_cast<KeyCode>(key);
+        KeyReleasedEvent* event = new KeyReleasedEvent(keyCode);
+        EventManager::pushEvent(event);
+    }
+}
+
+void Window::m_MouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+    if (action == GLFW_PRESS) {
+        MouseCode mouseCode = static_cast<MouseCode>(button);
+        MouseButtonPressedEvent* event = new MouseButtonPressedEvent(mouseCode);
+        EventManager::pushEvent(event);
+    }
+    else if (action == GLFW_RELEASE) {
+        MouseCode mouseCode = static_cast<MouseCode>(button);
+        MouseButtonReleasedEvent* event = new MouseButtonReleasedEvent(mouseCode);
+        EventManager::pushEvent(event);
+    }
+}
+
+void Window::m_MouseMovedCallback(GLFWwindow* window, double xpos, double ypos)
+{
+    MouseMovedEvent* event = new MouseMovedEvent(xpos,ypos);
+    EventManager::pushEvent(event);
+}
+
+void Window::m_MouseScrolledCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    MouseScrolledEvent* event = new MouseScrolledEvent(xoffset, yoffset);
+    EventManager::pushEvent(event);
+}
+
+void Window::m_FramebufferSizeCallback(GLFWwindow* window, int width, int height)
+{
+    WindowResizedEvent* event = new WindowResizedEvent(width, height);
+    EventManager::pushEvent(event);
 }

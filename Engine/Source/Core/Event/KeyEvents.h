@@ -17,3 +17,20 @@ public:
 private:
     KeyCode m_Keycode;
 };
+
+
+class KeyReleasedEvent : public Event {
+public:
+    KeyReleasedEvent(KeyCode keycode) : m_Keycode(keycode) {}
+
+    EventType GetEventType() const override { return EventType::KeyReleased; }
+    const char* GetName() const override { return "KeyReleased"; }
+    KeyCode GetKeycode() const { return m_Keycode; }
+
+
+
+    static EventType GetStaticType() { return EventType::KeyReleased; }
+
+private:
+    KeyCode m_Keycode;
+};

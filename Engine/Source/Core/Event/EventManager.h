@@ -4,6 +4,8 @@
 #include "Events.h"
 #include "EventDispatcher.h"
 #include "KeyEvents.h"
+#include "MouseEvents.h"
+#include "WindowEvents.h"
 #include <vector>
 
 class EventManager

@@ -2,6 +2,8 @@
 
 #include "../Resources/cube.h"
 #include "../RvelaLog.h"
+#include "Core/Input/Input.h"
+#include "Core/Time.h"
 
 RendererData Renderer::s_Data;
 
@@ -53,9 +55,15 @@ void Renderer::SetupBuffers()
 
 }
 
+glm::vec3 pos(0.0f);
+
+
 void Renderer::Render(GLFWwindow* window) {
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CCW);
 
     glClearColor(0.05, 0.0, 0.1, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -64,6 +72,31 @@ void Renderer::Render(GLFWwindow* window) {
     s_Data.m_Shader->setInt("texture1",0);
     s_Data.m_Shader->setMat4("view", s_Data.m_Camera->GetViewMatrix());
     glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, pos);
+    if (Input::IsKeyPressed(KeyCode::A))
+    {
+        pos.x -= 2 * Time::getDeltaTime();
+    }
+    if (Input::IsKeyPressed(KeyCode::D))
+    {
+        pos.x += 2 * Time::getDeltaTime();
+    }
+    if (Input::IsKeyPressed(KeyCode::W))
+    {
+        pos.z -= 2 * Time::getDeltaTime();
+    }
+    if (Input::IsKeyPressed(KeyCode::S))
+    {
+        pos.z += 2 * Time::getDeltaTime();
+    }
+    if (Input::IsKeyPressed(KeyCode::Space))
+    {
+        pos.y += 2 * Time::getDeltaTime();
+    }
+    if (Input::IsKeyPressed(KeyCode::LeftShift))
+    {
+        pos.y -= 2 * Time::getDeltaTime();
+    }
     model = glm::rotate(model, glm::radians(Time::getTime()*20), glm::vec3(0.5f, 1.0f, 0.0f));
     s_Data.m_Shader->setMat4("model", model);
     glm::mat4 projection = glm::perspective(
