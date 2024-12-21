@@ -15,6 +15,8 @@ uniform sampler2D heightMap;
 // parallax mapping parameters
 uniform float heightScale;
 
+uniform float lightIntensity;
+
 // lights
 uniform vec3 lightPosition;
 uniform vec3 lightColor;
@@ -116,7 +118,7 @@ void main()
     vec3 H = normalize(V + L);
     float distance = length(lightPosition - FragPos);
     float attenuation = 1.0 / (distance * distance);
-    vec3 radiance = lightColor * attenuation * 20;
+    vec3 radiance = lightColor * attenuation * lightIntensity;
 
     // Cook-Torrance BRDF
     float NDF = DistributionGGX(N, H, roughness);   

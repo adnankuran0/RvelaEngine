@@ -129,6 +129,7 @@ void Window::m_MouseScrolledCallback(GLFWwindow* window, double xoffset, double 
 
 void Window::m_FramebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
+    glViewport(0, 0, width, height);
     WindowResizedEvent* event = new WindowResizedEvent(width, height);
     EventManager::pushEvent(event);
 }

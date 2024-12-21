@@ -1,48 +1,40 @@
 #pragma once
-#include "EntityManager.h"
-#include "ComponentManager.h"
-#include "System.h"
-#include <vector>
-#include <memory>
+
+#include <entt/entt.h>
+#include <string>
+#include "Components.h"
 
 class Scene {
 public:
-    Entity createEntity() {
-        return entityManager.createEntity();
+    Scene();
+
+    entt::entity createEntity(const std::string& name);
+    void destroyEntity(entt::entity entity);
+
+    template<typename Component, typename... Args>
+    void addComponent(entt::entity entity, Args&&... args) {
+        registry.emplace<Component>(entity, std::forward<Args>(args)...);
     }
 
-    void destroyEntity(Entity entity) {
-        entityManager.destroyEntity(entity);
-        // Component temizleme yapýlabilir.
+    template<typename Component>
+    Component& getComponent(entt::entity entity) {
+        return registry.get<Component>(entity);
     }
 
-    template<typename T, typename... Args>
-    void addComponent(Entity entity, Args&&... args) {
-        componentManager.addComponent<T>(entity, T(std::forward<Args>(args)...));
+    template<typename Component>
+    bool hasComponent(entt::entity entity) {
+        return registry.any_of<Component>(entity);
     }
 
-    template<typename T>
-    T& getComponent(Entity entity) {
-        return componentManager.getComponent<T>(entity);
+    template<typename Component>
+    void removeComponent(entt::entity entity) {
+        registry.remove<Component>(entity);
     }
 
-    template<typename T>
-    bool hasComponent(Entity entity) {
-        return componentManager.hasComponent<T>(entity);
-    }
+    void update();
 
-    void addSystem(std::unique_ptr<System> system) {
-        systems.emplace_back(std::move(system));
-    }
-
-    void update(float deltaTime) {
-        for (auto& system : systems) {
-            system->update(*this, deltaTime);
-        }
-    }
+    entt::registry& getRegistry();
 
 private:
-    EntityManager entityManager;
-    ComponentManager componentManager;
-    std::vector<std::unique_ptr<System>> systems;
+    entt::registry registry;
 };

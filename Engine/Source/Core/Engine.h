@@ -8,6 +8,8 @@
 #include "../Renderer/Renderer.h"
 #include "Time.h"
 #include <iostream>
+#include "../Scene/Scene.h"
+#include "../Scene/Components.h"
 
 
 class Engine

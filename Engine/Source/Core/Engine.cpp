@@ -21,10 +21,7 @@ Engine::Engine()
 	}
 
 	m_Renderer = new Renderer();
-	m_Renderer->Init();
-
-
-
+	m_Renderer->Init(m_Window->GetGLFWWindow());
 
 }
 
@@ -52,9 +49,6 @@ void Engine::Run()
 
 		Render();
 
-
-
-
 		EventManager::clearEvents();
 	}
 
@@ -64,7 +58,7 @@ void Engine::Run()
 
 void Engine::Render()
 {
-	m_Renderer->Render(m_Window->GetGLFWWindow());
+	m_Renderer->Render();
 }
 
 void Engine::Shutdown()

@@ -6,11 +6,11 @@
 #include "Core/Time.h"
 
 RendererData Renderer::s_Data;
+GLFWwindow* Renderer::activeWindow = nullptr;
 
 
 Renderer::Renderer() 
 {
-    Init();
 };
 
 Renderer::~Renderer()
@@ -18,8 +18,9 @@ Renderer::~Renderer()
     Shutdown();
 }
 
-void Renderer::Init()
+void Renderer::Init(GLFWwindow* window)
 {
+    Renderer::activeWindow = window;
     LoadShaders();
     SetupBuffers();
 }
@@ -65,17 +66,17 @@ void Renderer::SetupBuffers()
 
 }
 
-glm::vec3 pos(0.0f);
+glm::vec3 pos(0.0f,-1.0f,-1.0f);
 
 
-void Renderer::Render(GLFWwindow* window) {
+void Renderer::Render() {
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
 
-    glClearColor(0.05, 0.0, 0.1, 1.0);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     s_Data.m_Shader->use();
@@ -85,11 +86,12 @@ void Renderer::Render(GLFWwindow* window) {
     s_Data.m_Shader->setInt("roughnessMap",3);
     s_Data.m_Shader->setInt("aoMap",4);
     s_Data.m_Shader->setInt("heightMap",5);
-    s_Data.m_Shader->setFloat("heightScale",0.1f);
+    s_Data.m_Shader->setFloat("heightScale",0.0f);
+    s_Data.m_Shader->setFloat("lightIntensity",100.0f);
     s_Data.m_Shader->setMat4("view", s_Data.m_Camera->GetViewMatrix());
 
     s_Data.m_Shader->setVec3("camPos", s_Data.m_Camera->Position);
-    s_Data.m_Shader->setVec3("lightPosition", glm::vec3(1.0f, 0.8f, 1.0f));
+    s_Data.m_Shader->setVec3("lightPosition", glm::vec3(0.5f, 2.0f, 1.0f));
     s_Data.m_Shader->setVec3("lightColor", glm::vec3(1.0f));
 
 
@@ -99,6 +101,7 @@ void Renderer::Render(GLFWwindow* window) {
     */
 
     glm::mat4 model = glm::mat4(1.0f);
+    model = glm::scale(model, glm::vec3(3.0f));
     model = glm::translate(model, pos);
     if (Input::IsKeyPressed(KeyCode::A))
     {
@@ -124,7 +127,9 @@ void Renderer::Render(GLFWwindow* window) {
     {
         pos.y -= 2 * Time::getDeltaTime();
     }
-    model = glm::rotate(model, glm::radians(Time::getTime()*20), glm::vec3(0.75f, 1.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(Time::getTime()*20), glm::vec3(0.0f, 0.1f, 0.0f));
+    model = glm::rotate(model, glm::radians(20.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
     s_Data.m_Shader->setMat4("model", model);
     glm::mat4 projection = glm::perspective(
         glm::radians(45.0f),
@@ -147,7 +152,7 @@ void Renderer::Render(GLFWwindow* window) {
         LOG_ERROR << "OpenGL Error: " << err;
     }
 
-    glfwSwapBuffers(window);
+    glfwSwapBuffers(activeWindow);
 
 
 }

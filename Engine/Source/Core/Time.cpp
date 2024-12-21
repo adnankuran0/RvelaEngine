@@ -1,5 +1,7 @@
 #include "Time.h"
 
+//TODO: max FPS system
+
 double Time::deltaTime = 0.0;
 double Time::lastFrameTime = 0.0;
 double Time::fpsUpdateTime = 0.0;

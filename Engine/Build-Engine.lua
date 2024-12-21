@@ -14,7 +14,8 @@ project "Engine"
       "../Vendor/glm",
       "../Vendor/GLEW/include",
       "../Vendor/plog",
-      "../Vendor/stb_image"
+      "../Vendor/stb_image",
+      "../Vendor/entt"
    }
 
    libdirs

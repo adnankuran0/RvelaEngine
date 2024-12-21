@@ -12,7 +12,8 @@ project "Editor"
       "Source",
 
 	  -- Include Core
-	  "../Engine/Source"
+	  "../Engine/Source",
+      "../Vendor/entt"
    }
 
    links

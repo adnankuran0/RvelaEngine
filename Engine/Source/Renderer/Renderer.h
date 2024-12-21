@@ -33,8 +33,8 @@ public:
     Renderer();
     ~Renderer();
 
-    static void Init();
-    static void Render(GLFWwindow* window);
+    static void Init(GLFWwindow* window);
+    static void Render();
     static void Shutdown();
 
     static RendererData& GetData();
@@ -45,4 +45,5 @@ private:
     
     static void LoadShaders();
     static void SetupBuffers();
+    static GLFWwindow* activeWindow;
 };
