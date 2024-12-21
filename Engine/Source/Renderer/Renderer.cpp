@@ -48,9 +48,19 @@ void Renderer::SetupBuffers()
     s_Data.m_EBO = new ElementBuffer(indices,sizeof(indices));
 
     
-    s_Data.m_Texture = new Texture();
-    s_Data.m_Texture->GenerateFromImage("D:/GitHub/RvelaEngine/Engine/Source/Resources/Textures/wall.jpg");
-    
+    s_Data.m_Albedo = new Texture();
+    s_Data.m_Albedo->GenerateFromImage("D:/GitHub/RvelaEngine/Engine/Source/Resources/Textures/albedo.png");
+    s_Data.m_Normal = new Texture();
+    s_Data.m_Normal->GenerateFromImage("D:/GitHub/RvelaEngine/Engine/Source/Resources/Textures/normal.png");
+    s_Data.m_Metallic = new Texture();
+    s_Data.m_Metallic->GenerateFromImage("D:/GitHub/RvelaEngine/Engine/Source/Resources/Textures/metallic.png");
+    s_Data.m_Roughness = new Texture();
+    s_Data.m_Roughness->GenerateFromImage("D:/GitHub/RvelaEngine/Engine/Source/Resources/Textures/roughness.png");
+    s_Data.m_Ao = new Texture();
+    s_Data.m_Ao->GenerateFromImage("D:/GitHub/RvelaEngine/Engine/Source/Resources/Textures/ao.png");
+    s_Data.m_Height = new Texture();
+    s_Data.m_Height->GenerateFromImage("D:/GitHub/RvelaEngine/Engine/Source/Resources/Textures/height.png");
+
     s_Data.m_Camera = new Camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
 }
@@ -69,10 +79,18 @@ void Renderer::Render(GLFWwindow* window) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     s_Data.m_Shader->use();
-    s_Data.m_Shader->setInt("texture1",0);
+    s_Data.m_Shader->setInt("albedoMap",0);
+    s_Data.m_Shader->setInt("normalMap",1);
+    s_Data.m_Shader->setInt("metallicMap",2);
+    s_Data.m_Shader->setInt("roughnessMap",3);
+    s_Data.m_Shader->setInt("aoMap",4);
+    s_Data.m_Shader->setInt("heightMap",5);
+    s_Data.m_Shader->setFloat("heightScale",0.1f);
     s_Data.m_Shader->setMat4("view", s_Data.m_Camera->GetViewMatrix());
-    s_Data.m_Shader->setVec3("viewPos", s_Data.m_Camera->Position);
-    s_Data.m_Shader->setVec3("lightPos", glm::vec3(1.2f, 1.0f, 2.0f));
+
+    s_Data.m_Shader->setVec3("camPos", s_Data.m_Camera->Position);
+    s_Data.m_Shader->setVec3("lightPosition", glm::vec3(1.0f, 0.8f, 1.0f));
+    s_Data.m_Shader->setVec3("lightColor", glm::vec3(1.0f));
 
 
     /*
@@ -116,7 +134,12 @@ void Renderer::Render(GLFWwindow* window) {
     s_Data.m_Shader->setMat4("projection", projection);
 
     s_Data.m_VAO->Bind();
-    s_Data.m_Texture->Bind();
+    s_Data.m_Albedo->Bind(0);
+    s_Data.m_Normal->Bind(1);
+    s_Data.m_Metallic->Bind(2);
+    s_Data.m_Roughness->Bind(3);
+    s_Data.m_Ao->Bind(4);
+    s_Data.m_Height->Bind(5);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
     GLenum err;

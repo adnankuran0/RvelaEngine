@@ -17,8 +17,14 @@ struct RendererData
     ElementBuffer* m_EBO;
     BufferLayout* m_Layout;
     Shader* m_Shader;
-    Texture* m_Texture;
+    Texture* m_Albedo;
+    Texture* m_Normal;
+    Texture* m_Metallic;
+    Texture* m_Roughness;
+    Texture* m_Ao;
+    Texture* m_Height;
     Camera* m_Camera;
+
 };
 
 class Renderer

@@ -5357,3 +5357,132 @@ Fragment info
 2024-12-21 02:10:52.724 INFO  [25364] [Window::Init@28] GLFW Initialized
 2024-12-21 02:10:52.868 INFO  [25364] [Window::Init@49] GLEW Initialized
 2024-12-21 02:10:52.868 INFO  [25364] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-21 03:53:23.195 INFO  [13400] [Window::Init@28] GLFW Initialized
+2024-12-21 03:53:23.349 INFO  [13400] [Window::Init@49] GLEW Initialized
+2024-12-21 03:53:23.350 INFO  [13400] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-21 05:00:10.619 INFO  [25720] [Window::Init@28] GLFW Initialized
+2024-12-21 05:00:10.761 INFO  [25720] [Window::Init@49] GLEW Initialized
+2024-12-21 05:00:10.761 INFO  [25720] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-21 05:00:10.782 ERROR [25720] [Shader::checkCompileErrors@98] ERROR::SHADER_COMPILATION_ERROR of type: VERTEX
+0(20) : error C1503: undefined variable "TexCoord"
+
+ -- --------------------------------------------------- -- 
+
+2024-12-21 05:00:10.786 ERROR [25720] [Shader::checkCompileErrors@98] ERROR::SHADER_COMPILATION_ERROR of type: FRAGMENT
+0(106) : error C1503: undefined variable "lightColors"
+0(106) : error C1503: undefined variable "i"
+
+ -- --------------------------------------------------- -- 
+
+2024-12-21 05:00:10.795 ERROR [25720] [Shader::checkCompileErrors@107] ERROR::PROGRAM_LINKING_ERROR of type: PROGRAM
+Vertex info
+-----------
+0(20) : error C1503: undefined variable "TexCoord"
+(0) : error C2003: incompatible options for link
+
+Fragment info
+-------------
+0(106) : error C1503: undefined variable "lightColors"
+0(106) : error C1503: undefined variable "i"
+(0) : error C2003: incompatible options for link
+
+ -- --------------------------------------------------- -- 
+
+2024-12-21 05:00:25.617 INFO  [17568] [Window::Init@28] GLFW Initialized
+2024-12-21 05:00:25.745 INFO  [17568] [Window::Init@49] GLEW Initialized
+2024-12-21 05:00:25.745 INFO  [17568] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-21 05:00:25.762 ERROR [17568] [Shader::checkCompileErrors@98] ERROR::SHADER_COMPILATION_ERROR of type: FRAGMENT
+0(106) : error C1503: undefined variable "lightColors"
+0(106) : error C1503: undefined variable "i"
+
+ -- --------------------------------------------------- -- 
+
+2024-12-21 05:00:25.776 ERROR [17568] [Shader::checkCompileErrors@107] ERROR::PROGRAM_LINKING_ERROR of type: PROGRAM
+Fragment info
+-------------
+0(106) : error C1503: undefined variable "lightColors"
+0(106) : error C1503: undefined variable "i"
+(0) : error C2003: incompatible options for link
+
+ -- --------------------------------------------------- -- 
+
+2024-12-21 05:00:45.365 INFO  [24616] [Window::Init@28] GLFW Initialized
+2024-12-21 05:00:45.513 INFO  [24616] [Window::Init@49] GLEW Initialized
+2024-12-21 05:00:45.513 INFO  [24616] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-21 05:00:56.319 INFO  [18412] [Window::Init@28] GLFW Initialized
+2024-12-21 05:00:56.467 INFO  [18412] [Window::Init@49] GLEW Initialized
+2024-12-21 05:00:56.467 INFO  [18412] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-21 05:01:25.043 INFO  [15372] [Window::Init@28] GLFW Initialized
+2024-12-21 05:01:25.192 INFO  [15372] [Window::Init@49] GLEW Initialized
+2024-12-21 05:01:25.192 INFO  [15372] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-21 05:02:38.905 INFO  [16948] [Window::Init@28] GLFW Initialized
+2024-12-21 05:02:39.046 INFO  [16948] [Window::Init@49] GLEW Initialized
+2024-12-21 05:02:39.047 INFO  [16948] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-21 05:04:00.639 INFO  [25396] [Window::Init@28] GLFW Initialized
+2024-12-21 05:04:00.894 INFO  [25396] [Window::Init@49] GLEW Initialized
+2024-12-21 05:04:00.894 INFO  [25396] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-21 05:04:57.006 INFO  [3356] [Window::Init@28] GLFW Initialized
+2024-12-21 05:04:57.173 INFO  [3356] [Window::Init@49] GLEW Initialized
+2024-12-21 05:04:57.173 INFO  [3356] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-21 05:05:36.999 INFO  [19888] [Window::Init@28] GLFW Initialized
+2024-12-21 05:05:37.177 INFO  [19888] [Window::Init@49] GLEW Initialized
+2024-12-21 05:05:37.177 INFO  [19888] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-21 05:06:11.601 INFO  [27324] [Window::Init@28] GLFW Initialized
+2024-12-21 05:06:11.729 INFO  [27324] [Window::Init@49] GLEW Initialized
+2024-12-21 05:06:11.729 INFO  [27324] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-21 05:06:16.817 INFO  [27324] [Engine::Run::<lambda_1>::operator ()@49] 1920 1009
+2024-12-21 05:06:18.111 INFO  [27324] [Engine::Run::<lambda_1>::operator ()@49] 1280 720
+2024-12-21 05:09:53.299 INFO  [22948] [Window::Init@28] GLFW Initialized
+2024-12-21 05:09:53.439 INFO  [22948] [Window::Init@49] GLEW Initialized
+2024-12-21 05:09:53.439 INFO  [22948] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-21 05:10:31.365 INFO  [2872] [Window::Init@28] GLFW Initialized
+2024-12-21 05:10:31.537 INFO  [2872] [Window::Init@49] GLEW Initialized
+2024-12-21 05:10:31.538 INFO  [2872] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-21 05:10:50.492 INFO  [27232] [Window::Init@28] GLFW Initialized
+2024-12-21 05:10:50.724 INFO  [27232] [Window::Init@49] GLEW Initialized
+2024-12-21 05:10:50.724 INFO  [27232] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-21 05:11:37.387 INFO  [21348] [Window::Init@28] GLFW Initialized
+2024-12-21 05:11:37.580 INFO  [21348] [Window::Init@49] GLEW Initialized
+2024-12-21 05:11:37.580 INFO  [21348] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-21 05:12:00.030 INFO  [14612] [Window::Init@28] GLFW Initialized
+2024-12-21 05:12:00.233 INFO  [14612] [Window::Init@49] GLEW Initialized
+2024-12-21 05:12:00.233 INFO  [14612] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-21 05:13:02.542 INFO  [8088] [Window::Init@28] GLFW Initialized
+2024-12-21 05:13:02.680 INFO  [8088] [Window::Init@49] GLEW Initialized
+2024-12-21 05:13:02.680 INFO  [8088] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-21 05:13:25.239 INFO  [23272] [Window::Init@28] GLFW Initialized
+2024-12-21 05:13:25.372 INFO  [23272] [Window::Init@49] GLEW Initialized
+2024-12-21 05:13:25.372 INFO  [23272] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-21 05:13:58.926 INFO  [25616] [Window::Init@28] GLFW Initialized
+2024-12-21 05:13:59.079 INFO  [25616] [Window::Init@49] GLEW Initialized
+2024-12-21 05:13:59.079 INFO  [25616] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-21 05:15:06.583 INFO  [22160] [Window::Init@28] GLFW Initialized
+2024-12-21 05:15:06.781 INFO  [22160] [Window::Init@49] GLEW Initialized
+2024-12-21 05:15:06.781 INFO  [22160] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-21 05:15:39.959 INFO  [25464] [Window::Init@28] GLFW Initialized
+2024-12-21 05:15:40.094 INFO  [25464] [Window::Init@49] GLEW Initialized
+2024-12-21 05:15:40.095 INFO  [25464] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-21 05:16:00.246 INFO  [22948] [Window::Init@28] GLFW Initialized
+2024-12-21 05:16:00.384 INFO  [22948] [Window::Init@49] GLEW Initialized
+2024-12-21 05:16:00.384 INFO  [22948] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-21 05:17:53.270 INFO  [15788] [Window::Init@28] GLFW Initialized
+2024-12-21 05:17:53.406 INFO  [15788] [Window::Init@49] GLEW Initialized
+2024-12-21 05:17:53.406 INFO  [15788] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-21 05:18:26.976 INFO  [9964] [Window::Init@28] GLFW Initialized
+2024-12-21 05:18:27.461 INFO  [9964] [Window::Init@49] GLEW Initialized
+2024-12-21 05:18:27.461 INFO  [9964] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-21 05:18:59.137 INFO  [21924] [Window::Init@28] GLFW Initialized
+2024-12-21 05:18:59.300 INFO  [21924] [Window::Init@49] GLEW Initialized
+2024-12-21 05:18:59.300 INFO  [21924] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-21 05:21:31.175 INFO  [25492] [Window::Init@28] GLFW Initialized
+2024-12-21 05:21:31.325 INFO  [25492] [Window::Init@49] GLEW Initialized
+2024-12-21 05:21:31.325 INFO  [25492] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-21 05:21:58.724 INFO  [19552] [Window::Init@28] GLFW Initialized
+2024-12-21 05:21:58.903 INFO  [19552] [Window::Init@49] GLEW Initialized
+2024-12-21 05:21:58.903 INFO  [19552] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-21 05:23:55.992 INFO  [13952] [Window::Init@28] GLFW Initialized
+2024-12-21 05:23:56.173 INFO  [13952] [Window::Init@49] GLEW Initialized
+2024-12-21 05:23:56.173 INFO  [13952] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-21 05:24:25.545 INFO  [22104] [Window::Init@28] GLFW Initialized
+2024-12-21 05:24:25.720 INFO  [22104] [Window::Init@49] GLEW Initialized
+2024-12-21 05:24:25.720 INFO  [22104] [Window::Init@51] 3.3.0 NVIDIA 561.09

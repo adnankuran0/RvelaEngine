@@ -11,6 +11,7 @@ public:
 
     void Init();
     void Shutdown() const;
+    void Bind(unsigned int activeTexture) const;
     void Bind() const;
     void GenerateFromImage(const std::string& path);
 
