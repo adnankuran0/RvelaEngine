@@ -71,6 +71,15 @@ void Renderer::Render(GLFWwindow* window) {
     s_Data.m_Shader->use();
     s_Data.m_Shader->setInt("texture1",0);
     s_Data.m_Shader->setMat4("view", s_Data.m_Camera->GetViewMatrix());
+    s_Data.m_Shader->setVec3("viewPos", s_Data.m_Camera->Position);
+    s_Data.m_Shader->setVec3("lightPos", glm::vec3(1.2f, 1.0f, 2.0f));
+
+
+    /*
+    
+    s_Data.m_Shader->setVec3("lightColor", glm::vec3(0.0f,0.0f,0.0f));
+    */
+
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, pos);
     if (Input::IsKeyPressed(KeyCode::A))
@@ -97,7 +106,7 @@ void Renderer::Render(GLFWwindow* window) {
     {
         pos.y -= 2 * Time::getDeltaTime();
     }
-    model = glm::rotate(model, glm::radians(Time::getTime()*20), glm::vec3(0.5f, 1.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(Time::getTime()*20), glm::vec3(0.75f, 1.0f, 0.0f));
     s_Data.m_Shader->setMat4("model", model);
     glm::mat4 projection = glm::perspective(
         glm::radians(45.0f),
