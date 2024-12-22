@@ -21,6 +21,16 @@ struct TransformComponent {
         rotation = rot;
         scale = scl;
     }
+    glm::mat4 GetMatrix()
+    {
+        glm::mat4 mat = glm::mat4(1.0f);
+        mat = glm::translate(mat, position);
+        mat = glm::rotate(mat, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+        mat = glm::rotate(mat, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+        mat = glm::rotate(mat, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+        mat = glm::scale(mat, scale);
+        return mat;
+    }
 };
 
 struct TagComponent {

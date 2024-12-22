@@ -35,6 +35,9 @@ public:
     float lastY = 0.0f;
     bool firstMouse = true;
 
+
+    glm::mat4 projection;
+
     // constructor with vectors
     Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f),int width = 1280,int height = 720) : Front(glm::vec3(0.0f, 0.0f, -1.0f))
     {
@@ -43,6 +46,12 @@ public:
         updateCameraVectors();
         lastX = width / 2.0f;
         lastY = height / 2.0f;
+
+        projection = glm::perspective(
+            glm::radians(60.0f),
+            (float)width / (float)height,
+            0.1f, 100.0f
+        );
     }
     // constructor with scalar values
     Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch, int width, int height) : Front(glm::vec3(0.0f, 0.0f, -1.0f))
@@ -54,6 +63,12 @@ public:
         updateCameraVectors();
         lastX = width / 2.0f;
         lastY = height / 2.0f;
+
+        projection = glm::perspective(
+            glm::radians(60.0f),
+            (float)width / (float)height,
+            0.1f, 100.0f
+        );
     }
 
     // returns the view matrix calculated using Euler Angles and the LookAt Matrix

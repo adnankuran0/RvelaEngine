@@ -24,13 +24,13 @@ public:
 	
 
 	static Engine* Get() { return s_Instance; }
-	Window* GetWindow() const { return m_Window; }
+	Window* GetWindow() const { return m_Window.get(); }
 
 
 
 private:
 	static Engine* s_Instance;
-	Window* m_Window;
-	Renderer* m_Renderer;
+	std::unique_ptr<Window> m_Window;
+	std::unique_ptr<Renderer> m_Renderer;
 
 };

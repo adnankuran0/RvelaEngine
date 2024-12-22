@@ -5,20 +5,30 @@ project "Editor"
    targetdir "Binaries/%{cfg.buildcfg}"
    staticruntime "off"
 
-   files { "Source/**.h", "Source/**.cpp" }
+   files { "Source/**.h", "Source/**.cpp","Vendor/ImGui/*.cpp" }
 
    includedirs
    {
       "Source",
-
+      "Vendor",
+      "../Vendor/GLFW/include",
+      "../Vendor/GLEW/include",
 	  -- Include Core
 	  "../Engine/Source",
       "../Vendor/entt"
    }
 
+   libdirs
+   {
+      "../Vendor/GLFW/lib",
+      "../Vendor/GLEW/lib"
+   }
+
    links
    {
-      "Engine"
+      "Engine",
+        "glfw3",
+      "glew32s"
    }
 
    targetdir ("../Binaries/" .. OutputDir .. "/%{prj.name}")
@@ -26,7 +36,7 @@ project "Editor"
 
    filter "system:windows"
        systemversion "latest"
-       defines { "WINDOWS" }
+       defines { "WINDOWS","GLFW_INCLUDE_NONE" }
 
    filter "configurations:Debug"
        defines { "DEBUG" }

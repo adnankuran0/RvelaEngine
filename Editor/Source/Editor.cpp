@@ -1,31 +1,26 @@
 #include "Editor.h"
 
-
 Editor::Editor()
 {
-    if (s_Instance == nullptr)
-    {
-        s_Instance = this;
         s_Engine = new Engine();
-    }
-    else
-    {
-        std::cout << "Another Editor instance is already created!";
-    }
-    
-
-    Run();
+        m_ImGuiLayer = new ImGuiLayer(s_Engine);
 }
 
 void Editor::Run()
 {
-    s_Engine->Run();
+    std::cout << "Engine has started!" << std::endl;
+    m_ImGuiLayer->OnAttach();
+    while (!glfwWindowShouldClose(s_Engine->GetWindow()->GetGLFWWindow()))
+    {
+        m_ImGuiLayer->OnUpdate();
+        s_Engine->Run();
+        m_ImGuiLayer->OnRender();
+        glfwSwapBuffers(s_Engine->GetWindow()->GetGLFWWindow());
+    }
+    m_ImGuiLayer->OnDetach();
+    std::cout << "Engine has stopped!" << std::endl;
 }
 
-Editor* Editor::GetInstance()
-{
-    return s_Instance;
-}
 
 Engine* Editor::GetEngine()
 {

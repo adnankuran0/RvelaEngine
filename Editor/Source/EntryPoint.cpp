@@ -2,6 +2,6 @@
 
 int main()
 {
-	Engine engine;
-	engine.Run();
+	Editor editor;
+	editor.Run();
 }

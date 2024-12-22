@@ -16,7 +16,7 @@ Engine::Engine()
 	RvelaLog::Init("log.txt");
 
 	//TODO: try to make initialization of the window with stack allocation
-	m_Window = new Window();
+	m_Window = std::make_unique<Window>();
 	if (s_Instance == nullptr)
 	{
 		s_Instance = this;
@@ -25,9 +25,8 @@ Engine::Engine()
 	{
 		LOG_WARNING << "Another instance is already created!";
 	}
-	m_Renderer = new Renderer();
+	m_Renderer = std::make_unique<Renderer>();
 	m_Renderer->Init(m_Window->GetGLFWWindow());
-
 
 	entt::entity entity = scene.createEntity("test");
 	scene.addComponent<MeshComponent>(entity,  vertices, sizeof(vertices), indices, sizeof(indices) );
@@ -53,64 +52,51 @@ Engine::~Engine()
 void Engine::Run()
 {
 
-	while (!glfwWindowShouldClose(m_Window->GetGLFWWindow()))
+	Time::update();
+	glfwPollEvents();
+	EventManager::dispatchEvents([this](Event& event) {
+
+		if (event.GetEventType() == EventType::MouseMoved)
+		{
+			MouseMovedEvent& mouseEvent = static_cast<MouseMovedEvent&>(event);
+			editorCamera.onMouseMoved(mouseEvent.GetX(), mouseEvent.GetY(),m_Window->GetGLFWWindow());
+		}
+		});
+
+	auto& transform1 = scene.getComponent<TransformComponent>(entt::entity(0));
+	transform1.rotation.x += 10.0f * Time::getDeltaTime();
+
+
+	auto& transform2 = scene.getComponent<TransformComponent>(entt::entity(1));
+	transform2.rotation.z += 10.0f * Time::getDeltaTime();
+
+	if (Input::IsKeyPressed(KeyCode::Left))
 	{
-		Time::update();
-		glfwPollEvents();
-		EventManager::dispatchEvents([this](Event& event) {
-			if (event.GetEventType() == EventType::WindowResized)
-			{
-				WindowResizedEvent& windowEvent = static_cast<WindowResizedEvent&>(event);
-				LOG_INFO << windowEvent.GetWidth() << " " << windowEvent.GetHeight();
-			}
-			if (event.GetEventType() == EventType::MouseMoved)
-			{
-				MouseMovedEvent& mouseEvent = static_cast<MouseMovedEvent&>(event);
-				editorCamera.onMouseMoved(mouseEvent.GetX(), mouseEvent.GetY(),m_Window->GetGLFWWindow());
-			}
-			if (event.GetEventType() == EventType::KeyPressed)
-			{
-				KeyPressedEvent& keyEvent = static_cast<KeyPressedEvent&>(event);
-				if (keyEvent.GetKeycode() == KeyCode::P)
-				{
-					
-				}
-			}
-			});
-
-		auto& transform1 = scene.getComponent<TransformComponent>(entt::entity(0));
-		transform1.rotation.x += 10.0f * Time::getDeltaTime();
-
-
-		auto& transform2 = scene.getComponent<TransformComponent>(entt::entity(1));
-		transform2.rotation.z += 10.0f * Time::getDeltaTime();
-
-		if (Input::IsKeyPressed(KeyCode::Left))
-		{
-			transform2.position.x -= 1.0f * Time::getDeltaTime();
-		}
-		if (Input::IsKeyPressed(KeyCode::Right))
-		{
-			transform2.position.x += 1.0f * Time::getDeltaTime();
-		}
-		if (Input::IsKeyPressed(KeyCode::Down))
-		{
-			transform2.position.z += 1.0f * Time::getDeltaTime();
-		}
-		if (Input::IsKeyPressed(KeyCode::Up))
-		{
-			transform2.position.z -= 1.0f * Time::getDeltaTime();
-		}
-		
-		editorCamera.Update();
-		
-
-		Render();
-
-		EventManager::clearEvents();
+		transform2.position.x -= 1.0f * Time::getDeltaTime();
 	}
+	if (Input::IsKeyPressed(KeyCode::Right))
+	{
+		transform2.position.x += 1.0f * Time::getDeltaTime();
+	}
+	if (Input::IsKeyPressed(KeyCode::Down))
+	{
+		transform2.position.z += 1.0f * Time::getDeltaTime();
+	}
+	if (Input::IsKeyPressed(KeyCode::Up))
+	{
+		transform2.position.z -= 1.0f * Time::getDeltaTime();
+	}
+		
 
-	Shutdown();
+	editorCamera.Update();
+		
+
+	Render();
+
+	EventManager::clearEvents();
+
+
+
 	
 }
 
@@ -133,7 +119,6 @@ void Engine::Shutdown()
 {
 	glfwTerminate();
 	m_Renderer->Shutdown();
-	delete m_Window;
 }
 
 

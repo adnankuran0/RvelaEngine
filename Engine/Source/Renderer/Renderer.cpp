@@ -35,7 +35,7 @@ void Renderer::StartFrame()
 
 void Renderer::EndFrame()
 {
-    glfwSwapBuffers(activeWindow);
+    
 
 }
 
@@ -56,20 +56,10 @@ void Renderer::Render(TransformComponent& transform, MeshComponent& data, Metari
     metarial.shader.setVec3("lightColor", glm::vec3(1.0f));
  
 
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, transform.position);
-    model = glm::rotate(model, glm::radians(transform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)); 
-    model = glm::rotate(model, glm::radians(transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)); 
-    model = glm::rotate(model, glm::radians(transform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-    model = glm::scale(model, transform.scale);
-    metarial.shader.setMat4("model", model);
+    
+    metarial.shader.setMat4("model", transform.GetMatrix());
 
-    glm::mat4 projection = glm::perspective(
-        glm::radians(60.0f),
-        (float)1280 / (float)720,
-        0.1f, 100.0f
-    );
-    metarial.shader.setMat4("projection", projection);
+    metarial.shader.setMat4("projection", camera.projection);
 
     data.VAO.Bind();
     metarial.Albedo.Bind(0);

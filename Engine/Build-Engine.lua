@@ -11,8 +11,8 @@ project "Engine"
    {
       "Source",
       "../Vendor/GLFW/include",
-      "../Vendor/glm",
       "../Vendor/GLEW/include",
+      "../Vendor/glm",
       "../Vendor/plog",
       "../Vendor/stb_image",
       "../Vendor/entt"
