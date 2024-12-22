@@ -5,7 +5,6 @@
 #include "Core/Input/Input.h"
 #include "Core/Time.h"
 
-RendererData Renderer::s_Data;
 GLFWwindow* Renderer::activeWindow = nullptr;
 
 
@@ -21,130 +20,65 @@ Renderer::~Renderer()
 void Renderer::Init(GLFWwindow* window)
 {
     Renderer::activeWindow = window;
-    LoadShaders();
-    SetupBuffers();
 }
 
-RendererData& Renderer::GetData()
+void Renderer::StartFrame()
 {
-    return s_Data;
-}
-
-void Renderer::LoadShaders()
-{
-    s_Data.m_Shader = new Shader("D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/vertex.glsl", "D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/fragment.glsl");
-}
-
-void Renderer::SetupBuffers()
-{
-    s_Data.m_VAO = new VertexArray();
-    s_Data.m_VBO = new VertexBuffer(vertices,sizeof(vertices));
-    s_Data.m_Layout = new BufferLayout();
-    s_Data.m_Layout->BindVertexBuffer(s_Data.m_VBO->getID());
-    s_Data.m_Layout->Push<float>(3);
-    s_Data.m_Layout->Push<float>(3);
-    s_Data.m_Layout->Push<float>(2);
-    s_Data.m_VAO->SetBufferLayout(s_Data.m_Layout);
-
-    s_Data.m_EBO = new ElementBuffer(indices,sizeof(indices));
-
-    
-    s_Data.m_Albedo = new Texture();
-    s_Data.m_Albedo->GenerateFromImage("D:/GitHub/RvelaEngine/Engine/Source/Resources/Textures/albedo.png");
-    s_Data.m_Normal = new Texture();
-    s_Data.m_Normal->GenerateFromImage("D:/GitHub/RvelaEngine/Engine/Source/Resources/Textures/normal.png");
-    s_Data.m_Metallic = new Texture();
-    s_Data.m_Metallic->GenerateFromImage("D:/GitHub/RvelaEngine/Engine/Source/Resources/Textures/metallic.png");
-    s_Data.m_Roughness = new Texture();
-    s_Data.m_Roughness->GenerateFromImage("D:/GitHub/RvelaEngine/Engine/Source/Resources/Textures/roughness.png");
-    s_Data.m_Ao = new Texture();
-    s_Data.m_Ao->GenerateFromImage("D:/GitHub/RvelaEngine/Engine/Source/Resources/Textures/ao.png");
-    s_Data.m_Height = new Texture();
-    s_Data.m_Height->GenerateFromImage("D:/GitHub/RvelaEngine/Engine/Source/Resources/Textures/height.png");
-
-    s_Data.m_Camera = new Camera(glm::vec3(0.0f, 0.0f, 3.0f));
-
-}
-
-glm::vec3 pos(0.0f,-1.0f,-1.0f);
-
-
-void Renderer::Render() {
-
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
 
-    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClearColor(0.1, 0.1, 0.1, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    s_Data.m_Shader->use();
-    s_Data.m_Shader->setInt("albedoMap",0);
-    s_Data.m_Shader->setInt("normalMap",1);
-    s_Data.m_Shader->setInt("metallicMap",2);
-    s_Data.m_Shader->setInt("roughnessMap",3);
-    s_Data.m_Shader->setInt("aoMap",4);
-    s_Data.m_Shader->setInt("heightMap",5);
-    s_Data.m_Shader->setFloat("heightScale",0.0f);
-    s_Data.m_Shader->setFloat("lightIntensity",100.0f);
-    s_Data.m_Shader->setMat4("view", s_Data.m_Camera->GetViewMatrix());
+}
 
-    s_Data.m_Shader->setVec3("camPos", s_Data.m_Camera->Position);
-    s_Data.m_Shader->setVec3("lightPosition", glm::vec3(0.5f, 2.0f, 1.0f));
-    s_Data.m_Shader->setVec3("lightColor", glm::vec3(1.0f));
+void Renderer::EndFrame()
+{
+    glfwSwapBuffers(activeWindow);
 
+}
 
-    /*
-    
-    s_Data.m_Shader->setVec3("lightColor", glm::vec3(0.0f,0.0f,0.0f));
-    */
+void Renderer::Render(TransformComponent& transform, MeshComponent& data, MetarialComponent& metarial, Camera& camera) {
+
+    metarial.shader.use();
+    metarial.shader.setInt("albedoMap", 0);
+    metarial.shader.setInt("normalMap", 1);
+    metarial.shader.setInt("metallicMap", 2);
+    metarial.shader.setInt("roughnessMap", 3);
+    metarial.shader.setInt("aoMap", 4);
+    metarial.shader.setInt("heightMap", 5);
+    metarial.shader.setFloat("heightScale", 0.0f);
+    metarial.shader.setFloat("lightIntensity", 100.0f);
+    metarial.shader.setMat4("view", camera.GetViewMatrix());
+    metarial.shader.setVec3("camPos", camera.Position);
+    metarial.shader.setVec3("lightPosition", glm::vec3(0.5f, 2.0f, 1.0f));
+    metarial.shader.setVec3("lightColor", glm::vec3(1.0f));
+ 
 
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::scale(model, glm::vec3(3.0f));
-    model = glm::translate(model, pos);
-    if (Input::IsKeyPressed(KeyCode::A))
-    {
-        pos.x -= 2 * Time::getDeltaTime();
-    }
-    if (Input::IsKeyPressed(KeyCode::D))
-    {
-        pos.x += 2 * Time::getDeltaTime();
-    }
-    if (Input::IsKeyPressed(KeyCode::W))
-    {
-        pos.z -= 2 * Time::getDeltaTime();
-    }
-    if (Input::IsKeyPressed(KeyCode::S))
-    {
-        pos.z += 2 * Time::getDeltaTime();
-    }
-    if (Input::IsKeyPressed(KeyCode::Space))
-    {
-        pos.y += 2 * Time::getDeltaTime();
-    }
-    if (Input::IsKeyPressed(KeyCode::LeftShift))
-    {
-        pos.y -= 2 * Time::getDeltaTime();
-    }
-    model = glm::rotate(model, glm::radians(Time::getTime()*20), glm::vec3(0.0f, 0.1f, 0.0f));
-    model = glm::rotate(model, glm::radians(20.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    model = glm::translate(model, transform.position);
+    model = glm::rotate(model, glm::radians(transform.rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)); 
+    model = glm::rotate(model, glm::radians(transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)); 
+    model = glm::rotate(model, glm::radians(transform.rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+    model = glm::scale(model, transform.scale);
+    metarial.shader.setMat4("model", model);
 
-    s_Data.m_Shader->setMat4("model", model);
     glm::mat4 projection = glm::perspective(
-        glm::radians(45.0f),
+        glm::radians(60.0f),
         (float)1280 / (float)720,
-        0.1f, 100.0f 
+        0.1f, 100.0f
     );
-    s_Data.m_Shader->setMat4("projection", projection);
+    metarial.shader.setMat4("projection", projection);
 
-    s_Data.m_VAO->Bind();
-    s_Data.m_Albedo->Bind(0);
-    s_Data.m_Normal->Bind(1);
-    s_Data.m_Metallic->Bind(2);
-    s_Data.m_Roughness->Bind(3);
-    s_Data.m_Ao->Bind(4);
-    s_Data.m_Height->Bind(5);
+    data.VAO.Bind();
+    metarial.Albedo.Bind(0);
+    metarial.Normal.Bind(1);
+    metarial.Metallic.Bind(2);
+    metarial.Roughness.Bind(3);
+    metarial.Ao.Bind(4);
+    metarial.Height.Bind(5);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
     GLenum err;
@@ -152,7 +86,7 @@ void Renderer::Render() {
         LOG_ERROR << "OpenGL Error: " << err;
     }
 
-    glfwSwapBuffers(activeWindow);
+    
 
 
 }
@@ -161,9 +95,4 @@ void Renderer::Render() {
 
 void Renderer::Shutdown()
 {
-    delete s_Data.m_VAO;
-    delete s_Data.m_VBO;
-    delete s_Data.m_EBO;
-    delete s_Data.m_Shader;
-    delete s_Data.m_Layout;
 }

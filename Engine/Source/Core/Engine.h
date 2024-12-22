@@ -26,6 +26,8 @@ public:
 	static Engine* Get() { return s_Instance; }
 	Window* GetWindow() const { return m_Window; }
 
+
+
 private:
 	static Engine* s_Instance;
 	Window* m_Window;

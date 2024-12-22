@@ -3,6 +3,11 @@
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath)
 {
+    Init(vertexPath, fragmentPath);
+}
+
+void Shader::Init(const char* vertexPath, const char* fragmentPath)
+{
     std::string vertexCode;
     std::string fragmentCode;
     std::ifstream vShaderFile;
@@ -23,7 +28,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
     }
     catch (std::ifstream::failure& e)
     {
-        LOG_ERROR << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: " << e.what() ;
+        LOG_ERROR << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: " << e.what();
     }
     const char* vShaderCode = vertexCode.c_str();
     const char* fShaderCode = fragmentCode.c_str();
