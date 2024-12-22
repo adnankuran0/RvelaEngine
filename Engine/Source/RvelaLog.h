@@ -12,8 +12,4 @@ public:
     static void Init(const std::string& filePath);
 };
 
-#define LOG_DEBUG PLOGD
-#define LOG_INFO PLOGI
-#define LOG_WARNING PLOGW
-#define LOG_ERROR PLOGE
-#define LOG_FATAL PLOGF
+

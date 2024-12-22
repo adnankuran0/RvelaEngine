@@ -1,5 +1,7 @@
 #include "RvelaLog.h"
 
+
+
 void RvelaLog::Init(const std::string& filePath)
 {
     static plog::ColorConsoleAppender<plog::TxtFormatter> consoleAppender;

@@ -23,9 +23,9 @@ void Time::update()
     }
 }
 
-double Time::getDeltaTime()
+float Time::getDeltaTime()
 {
-    return deltaTime;
+    return static_cast<float>(deltaTime);
 }
 
 float Time::getFPS()

@@ -1,5 +1,4 @@
 #pragma once
-#define GLFW_INCLUDE_NONE
 #include "GL/glew.h"
 #include <GLFW/glfw3.h>
 #include "Window.h"
@@ -10,6 +9,7 @@
 #include <iostream>
 #include "../Scene/Scene.h"
 #include "../Scene/Components.h"
+
 
 
 class Engine

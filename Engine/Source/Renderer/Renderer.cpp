@@ -1,6 +1,5 @@
 #include "Renderer.h"
 
-#include "../Resources/cube.h"
 #include "../RvelaLog.h"
 #include "Core/Input/Input.h"
 #include "Core/Time.h"
@@ -29,7 +28,7 @@ void Renderer::StartFrame()
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
 
-    glClearColor(0.1, 0.1, 0.1, 1.0);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 }

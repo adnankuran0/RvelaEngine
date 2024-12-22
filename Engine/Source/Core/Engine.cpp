@@ -1,53 +1,13 @@
 
 #include "Engine.h"
 #include "RvelaLog.h"
+#include "../Resources/cube.h"
 
 
 Engine* Engine::s_Instance = nullptr;
 Scene scene;
 
 
-static float vertices[] = {
-	//   Position             Normal             UV
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 1.0f,  1.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f,
-
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f, -1.0f,  0.0f, 0.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, 0.0f, -1.0f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  0.0f, 0.0f, -1.0f,  1.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 0.0f, -1.0f,  0.0f, 1.0f,
-
-		-0.5f, -0.5f, -0.5f,  -1.0f, 0.0f, 0.0f,  0.0f, 0.0f,
-		-0.5f, -0.5f,  0.5f,  -1.0f, 0.0f, 0.0f,  1.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  -1.0f, 0.0f, 0.0f,  1.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f,  -1.0f, 0.0f, 0.0f,  0.0f, 1.0f,
-
-		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 0.0f,  0.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,  1.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 0.0f, 0.0f,  0.0f, 1.0f,
-
-		 -0.5f, -0.5f, -0.5f,  0.0f, -1.0f, 0.0f,  0.0f, 0.0f,
-		  0.5f, -0.5f, -0.5f,  0.0f, -1.0f, 0.0f,  1.0f, 0.0f,
-		  0.5f, -0.5f,  0.5f,  0.0f, -1.0f, 0.0f,  1.0f, 1.0f,
-		 -0.5f, -0.5f,  0.5f,  0.0f, -1.0f, 0.0f,  0.0f, 1.0f,
-
-		 -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f,
-		  0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f,
-		  0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 0.0f,  1.0f, 1.0f,
-		 -0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f,
-};
-
-static unsigned int indices[] = {
-	0, 1, 2, 0, 2, 3,
-	4, 6, 5, 4, 7, 6,
-	8, 9, 10, 8, 10, 11,
-	12, 14, 13, 12, 15, 14,
-	16, 17, 18, 16, 18, 19,
-	20, 22, 21, 20, 23, 22
-};
 
 Camera editorCamera(glm::vec3(0.0f, 0.0f, 3.0f));
 
@@ -80,6 +40,7 @@ Engine::Engine()
 		"D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/fragment.glsl", "D:/GitHub/RvelaEngine/Engine/Source/Resources/Textures/terrain");
 
 
+
 }
 
 Engine::~Engine()
@@ -107,14 +68,22 @@ void Engine::Run()
 				MouseMovedEvent& mouseEvent = static_cast<MouseMovedEvent&>(event);
 				editorCamera.onMouseMoved(mouseEvent.GetX(), mouseEvent.GetY(),m_Window->GetGLFWWindow());
 			}
+			if (event.GetEventType() == EventType::KeyPressed)
+			{
+				KeyPressedEvent& keyEvent = static_cast<KeyPressedEvent&>(event);
+				if (keyEvent.GetKeycode() == KeyCode::P)
+				{
+					
+				}
+			}
 			});
 
 		auto& transform1 = scene.getComponent<TransformComponent>(entt::entity(0));
-		transform1.rotation.x += 10.0 * Time::getDeltaTime();
+		transform1.rotation.x += 10.0f * Time::getDeltaTime();
 
 
 		auto& transform2 = scene.getComponent<TransformComponent>(entt::entity(1));
-		transform2.rotation.z += 10.0 * Time::getDeltaTime();
+		transform2.rotation.z += 10.0f * Time::getDeltaTime();
 
 		if (Input::IsKeyPressed(KeyCode::Left))
 		{

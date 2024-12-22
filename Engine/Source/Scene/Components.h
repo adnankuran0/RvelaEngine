@@ -23,8 +23,8 @@ struct TransformComponent {
     }
 };
 
-struct NameComponent {
-    std::string name;
+struct TagComponent {
+    std::string tag;
 };
 
 struct MeshComponent {

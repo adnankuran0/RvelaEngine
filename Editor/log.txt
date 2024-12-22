@@ -11142,3 +11142,120 @@
 2024-12-22 03:28:01.305 INFO  [17208] [Window::Init@49] GLEW Initialized
 2024-12-22 03:28:01.306 INFO  [17208] [Window::Init@51] 3.3.0 NVIDIA 561.09
 2024-12-22 03:28:37.530 INFO  [17208] [Engine::Run::<lambda_1>::operator ()@103] 1920 1009
+2024-12-22 03:45:17.203 INFO  [21684] [Window::Init@28] GLFW Initialized
+2024-12-22 03:45:17.365 INFO  [21684] [Window::Init@49] GLEW Initialized
+2024-12-22 03:45:17.365 INFO  [21684] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-22 03:46:35.445 INFO  [10292] [Window::Init@28] GLFW Initialized
+2024-12-22 03:46:35.650 INFO  [10292] [Window::Init@49] GLEW Initialized
+2024-12-22 03:46:35.650 INFO  [10292] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-22 03:46:59.841 INFO  [19932] [Window::Init@28] GLFW Initialized
+2024-12-22 03:46:59.982 INFO  [19932] [Window::Init@49] GLEW Initialized
+2024-12-22 03:46:59.983 INFO  [19932] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-22 03:47:17.038 INFO  [19932] [Engine::Run::<lambda_1>::operator ()@63] 1920 1009
+2024-12-22 03:53:16.668 INFO  [26940] [Window::Init@28] GLFW Initialized
+2024-12-22 03:53:16.820 INFO  [26940] [Window::Init@49] GLEW Initialized
+2024-12-22 03:53:16.820 INFO  [26940] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-22 03:54:16.380 INFO  [16256] [Window::Init@28] GLFW Initialized
+2024-12-22 03:54:16.529 INFO  [16256] [Window::Init@49] GLEW Initialized
+2024-12-22 03:54:16.529 INFO  [16256] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-22 03:57:01.580 INFO  [15732] [Window::Init@28] GLFW Initialized
+2024-12-22 03:57:01.738 INFO  [15732] [Window::Init@49] GLEW Initialized
+2024-12-22 03:57:01.738 INFO  [15732] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-22 03:57:28.176 INFO  [31380] [Window::Init@28] GLFW Initialized
+2024-12-22 03:57:28.331 INFO  [31380] [Window::Init@49] GLEW Initialized
+2024-12-22 03:57:28.331 INFO  [31380] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-22 04:02:35.334 INFO  [23268] [Window::Init@28] GLFW Initialized
+2024-12-22 04:02:35.505 INFO  [23268] [Window::Init@49] GLEW Initialized
+2024-12-22 04:02:35.506 INFO  [23268] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-22 04:04:18.252 INFO  [28340] [Window::Init@28] GLFW Initialized
+2024-12-22 04:04:18.408 INFO  [28340] [Window::Init@49] GLEW Initialized
+2024-12-22 04:04:18.408 INFO  [28340] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-22 04:06:02.613 INFO  [13924] [Window::Init@28] GLFW Initialized
+2024-12-22 04:06:02.792 INFO  [13924] [Window::Init@49] GLEW Initialized
+2024-12-22 04:06:02.793 INFO  [13924] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-22 04:06:07.892 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 719
+2024-12-22 04:06:07.892 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 718
+2024-12-22 04:06:07.892 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 717
+2024-12-22 04:06:07.892 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 716
+2024-12-22 04:06:07.892 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 714
+2024-12-22 04:06:07.892 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 713
+2024-12-22 04:06:07.892 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 709
+2024-12-22 04:06:07.892 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 707
+2024-12-22 04:06:07.892 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 702
+2024-12-22 04:06:07.892 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 698
+2024-12-22 04:06:07.892 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 694
+2024-12-22 04:06:07.892 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 689
+2024-12-22 04:06:07.892 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 685
+2024-12-22 04:06:07.893 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 678
+2024-12-22 04:06:07.893 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 674
+2024-12-22 04:06:07.893 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 669
+2024-12-22 04:06:07.893 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 661
+2024-12-22 04:06:07.893 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 657
+2024-12-22 04:06:07.893 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 651
+2024-12-22 04:06:07.893 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 646
+2024-12-22 04:06:07.893 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 639
+2024-12-22 04:06:07.893 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 635
+2024-12-22 04:06:07.893 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 628
+2024-12-22 04:06:07.893 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 622
+2024-12-22 04:06:07.893 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 618
+2024-12-22 04:06:07.893 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 612
+2024-12-22 04:06:07.893 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 607
+2024-12-22 04:06:07.894 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 603
+2024-12-22 04:06:07.894 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 598
+2024-12-22 04:06:07.894 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 595
+2024-12-22 04:06:07.894 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 592
+2024-12-22 04:06:07.894 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 590
+2024-12-22 04:06:07.895 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 588
+2024-12-22 04:06:07.895 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 586
+2024-12-22 04:06:07.895 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 585
+2024-12-22 04:06:07.895 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 584
+2024-12-22 04:06:07.895 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 583
+2024-12-22 04:06:07.895 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 582
+2024-12-22 04:06:07.895 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 581
+2024-12-22 04:06:07.895 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 580
+2024-12-22 04:06:07.895 INFO  [13924] [Engine::Run::<lambda_1>::operator ()@65] 1280 581
+2024-12-22 04:06:20.206 INFO  [27828] [Window::Init@28] GLFW Initialized
+2024-12-22 04:06:20.360 INFO  [27828] [Window::Init@49] GLEW Initialized
+2024-12-22 04:06:20.360 INFO  [27828] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-22 04:08:37.281 INFO  [31644] [Window::Init@28] GLFW Initialized
+2024-12-22 04:08:37.454 INFO  [31644] [Window::Init@49] GLEW Initialized
+2024-12-22 04:08:37.455 INFO  [31644] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-22 05:11:50.984 INFO  [18868] [Window::Init@28] GLFW Initialized
+2024-12-22 05:11:51.207 INFO  [18868] [Window::Init@49] GLEW Initialized
+2024-12-22 05:11:51.207 INFO  [18868] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-22 05:25:16.062 INFO  [30768] [Window::Init@28] GLFW Initialized
+2024-12-22 05:25:16.221 INFO  [30768] [Window::Init@49] GLEW Initialized
+2024-12-22 05:25:16.221 INFO  [30768] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-22 05:27:08.906 INFO  [29120] [Window::Init@28] GLFW Initialized
+2024-12-22 05:27:09.059 INFO  [29120] [Window::Init@49] GLEW Initialized
+2024-12-22 05:27:09.059 INFO  [29120] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-22 05:28:07.538 INFO  [24500] [Window::Init@28] GLFW Initialized
+2024-12-22 05:28:07.683 INFO  [24500] [Window::Init@49] GLEW Initialized
+2024-12-22 05:28:07.683 INFO  [24500] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-22 05:29:55.383 INFO  [20164] [Window::Init@28] GLFW Initialized
+2024-12-22 05:29:55.525 INFO  [20164] [Window::Init@49] GLEW Initialized
+2024-12-22 05:29:55.526 INFO  [20164] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-22 05:30:51.683 INFO  [20164] [Window::Init@28] GLFW Initialized
+2024-12-22 05:30:51.835 INFO  [20164] [Window::Init@49] GLEW Initialized
+2024-12-22 05:30:51.835 INFO  [20164] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-22 05:31:52.434 INFO  [29556] [Window::Init@28] GLFW Initialized
+2024-12-22 05:31:52.584 INFO  [29556] [Window::Init@49] GLEW Initialized
+2024-12-22 05:31:52.585 INFO  [29556] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-22 05:32:33.976 INFO  [28568] [Window::Init@28] GLFW Initialized
+2024-12-22 05:32:34.153 INFO  [28568] [Window::Init@49] GLEW Initialized
+2024-12-22 05:32:34.153 INFO  [28568] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-22 05:32:51.358 INFO  [31504] [Window::Init@28] GLFW Initialized
+2024-12-22 05:32:51.492 INFO  [31504] [Window::Init@49] GLEW Initialized
+2024-12-22 05:32:51.493 INFO  [31504] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-22 05:32:54.221 INFO  [31504] [Engine::Run::<lambda_1>::operator ()@64] 0 0
+2024-12-22 05:33:00.097 INFO  [31504] [Engine::Run::<lambda_1>::operator ()@64] 1280 720
+2024-12-22 05:33:10.536 INFO  [7700] [Window::Init@28] GLFW Initialized
+2024-12-22 05:33:10.694 INFO  [7700] [Window::Init@49] GLEW Initialized
+2024-12-22 05:33:10.694 INFO  [7700] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-22 05:33:23.477 INFO  [27808] [Window::Init@28] GLFW Initialized
+2024-12-22 05:33:23.664 INFO  [27808] [Window::Init@49] GLEW Initialized
+2024-12-22 05:33:23.664 INFO  [27808] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-22 05:33:31.626 INFO  [3280] [Window::Init@28] GLFW Initialized
+2024-12-22 05:33:31.807 INFO  [3280] [Window::Init@49] GLEW Initialized
+2024-12-22 05:33:31.807 INFO  [3280] [Window::Init@51] 3.3.0 NVIDIA 561.09
+2024-12-22 05:33:41.352 INFO  [3280] [Engine::Run::<lambda_1>::operator ()@64] 1920 1009

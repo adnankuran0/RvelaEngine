@@ -3,7 +3,7 @@
 
 
 
-VertexBuffer::VertexBuffer(const void* data, unsigned int size)
+VertexBuffer::VertexBuffer(const void* data, size_t size)
 {
 	Init(data, size);
 }
@@ -23,7 +23,7 @@ void VertexBuffer::Bind() const
 	glBindBuffer(GL_ARRAY_BUFFER, ID);
 }
 
-void VertexBuffer::Init(const void* data, unsigned int size)
+void VertexBuffer::Init(const void* data, size_t size)
 {
 	ID = 0;
 	glGenBuffers(1, &ID);

@@ -13,7 +13,7 @@ public:
 
     static void update(); 
 
-    static double getDeltaTime();
+    static float getDeltaTime();
 
     static float getFPS();
 

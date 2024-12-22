@@ -4,6 +4,8 @@
 #include <string>
 #include "Components.h"
 
+
+
 class Scene {
 public:
     Scene();
@@ -13,22 +15,22 @@ public:
 
     template<typename Component, typename... Args>
     void addComponent(entt::entity entity, Args&&... args) {
-        registry.emplace<Component>(entity, std::forward<Args>(args)...);
+        m_Registry.emplace<Component>(entity, std::forward<Args>(args)...);
     }
 
     template<typename Component>
     Component& getComponent(entt::entity entity) {
-        return registry.get<Component>(entity);
+        return m_Registry.get<Component>(entity);
     }
 
     template<typename Component>
     bool hasComponent(entt::entity entity) {
-        return registry.any_of<Component>(entity);
+        return m_Registry.any_of<Component>(entity);
     }
 
     template<typename Component>
     void removeComponent(entt::entity entity) {
-        registry.remove<Component>(entity);
+        m_Registry.remove<Component>(entity);
     }
 
     void update();
@@ -36,5 +38,6 @@ public:
     entt::registry& getRegistry();
 
 private:
-    entt::registry registry;
+    entt::registry m_Registry;
+    friend class Entity;
 };
