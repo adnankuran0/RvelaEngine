@@ -2,11 +2,16 @@
 #include "Engine.h"
 #include "RvelaLog.h"
 #include "../Resources/cube.h"
+#include "Scene/Entity.h"
 
 
 Engine* Engine::s_Instance = nullptr;
 Scene scene;
 
+Entity entity = scene.CreateEntity("test");
+
+
+Entity entity2 = scene.CreateEntity("test2");
 
 
 Camera editorCamera(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -28,16 +33,13 @@ Engine::Engine()
 	m_Renderer = std::make_unique<Renderer>();
 	m_Renderer->Init(m_Window->GetGLFWWindow());
 
-	entt::entity entity = scene.createEntity("test");
-	scene.addComponent<MeshComponent>(entity,  vertices, sizeof(vertices), indices, sizeof(indices) );
-	scene.addComponent<MetarialComponent>(entity, "D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/vertex.glsl",
-		"D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/fragment.glsl","D:/GitHub/RvelaEngine/Engine/Source/Resources/Textures/metal");
+	entity.AddComponent<MeshComponent>(vertices, sizeof(vertices), indices, sizeof(indices));
+	entity.AddComponent<MetarialComponent>("D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/vertex.glsl",
+		"D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/fragment.glsl", "D:/GitHub/RvelaEngine/Engine/Source/Resources/Textures/metal");
 
-	entt::entity entity2 = scene.createEntity("test2");
-	scene.addComponent<MeshComponent>(entity2, vertices, sizeof(vertices), indices, sizeof(indices));
-	scene.addComponent<MetarialComponent>(entity2, "D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/vertex.glsl",
+	entity2.AddComponent<MeshComponent>(vertices, sizeof(vertices), indices, sizeof(indices));
+	entity2.AddComponent<MetarialComponent>("D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/vertex.glsl",
 		"D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/fragment.glsl", "D:/GitHub/RvelaEngine/Engine/Source/Resources/Textures/terrain");
-
 
 
 }
@@ -63,12 +65,13 @@ void Engine::Run()
 		}
 		});
 
-	auto& transform1 = scene.getComponent<TransformComponent>(entt::entity(0));
+	auto& transform1 = entity.GetComponent<TransformComponent>();
 	transform1.rotation.x += 10.0f * Time::getDeltaTime();
 
 
-	auto& transform2 = scene.getComponent<TransformComponent>(entt::entity(1));
+	auto& transform2 = entity2.GetComponent<TransformComponent>();
 	transform2.rotation.z += 10.0f * Time::getDeltaTime();
+
 
 	if (Input::IsKeyPressed(KeyCode::Left))
 	{
@@ -103,13 +106,13 @@ void Engine::Run()
 void Engine::Render()
 {
 	Renderer::StartFrame();
-	auto view = scene.getRegistry().view<MeshComponent, MetarialComponent>();
+	auto view = scene.GetRegistry().view<MeshComponent, MetarialComponent>();
 	
 	for (auto entity : view)
 	{
-		auto& mesh = scene.getComponent<MeshComponent>(entity);
-		auto& metarial = scene.getComponent<MetarialComponent>(entity);
-		auto& transform = scene.getComponent<TransformComponent>(entity);
+		auto& mesh = scene.GetComponent<MeshComponent>(entity);
+		auto& metarial = scene.GetComponent<MetarialComponent>(entity);
+		auto& transform = scene.GetComponent<TransformComponent>(entity);
 		Renderer::Render(transform, mesh,metarial, editorCamera);
 	}
 	Renderer::EndFrame();

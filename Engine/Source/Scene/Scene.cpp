@@ -1,25 +1,31 @@
 #include "Scene.h"
+#include "Entity.h"
 #include "../Core/Time.h"
 #include <iostream>
 
+
+
 Scene::Scene() : m_Registry() {}
 
-entt::entity Scene::createEntity(const std::string& name) {
-    entt::entity entity = m_Registry.create();
-    addComponent<TransformComponent>(entity,glm::vec3(0.0f),glm::vec3(0.0f),glm::vec3(1.0f));
-    addComponent<TagComponent>(entity, name);
+Entity Scene::CreateEntity(const std::string& name) {
+    Entity entity(m_Registry.create(),this);
+    
+    entity.AddComponent<TransformComponent>(glm::vec3(0.0f),glm::vec3(0.0f),glm::vec3(1.0f));
+    entity.AddComponent<TagComponent>(name);
     return entity;
 }
 
-void Scene::destroyEntity(entt::entity entity) {
+void Scene::DestroyEntity(Entity entity) {
     m_Registry.destroy(entity);
 }
 
-void Scene::update() {
+
+
+void Scene::Update() {
     
 }
 
-entt::registry& Scene::getRegistry()
+entt::registry& Scene::GetRegistry()
 {
     return m_Registry;
 }

@@ -9,7 +9,7 @@ public:
 
 	Engine* GetEngine();
 private:
-	Engine* s_Engine;
+	Engine* m_Engine;
 	ImGuiLayer* m_ImGuiLayer;
 
 };

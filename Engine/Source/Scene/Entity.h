@@ -1,8 +1,6 @@
 #pragma once
 
 #include "Scene/Scene.h"
-#include "Scene/Components.h"
-
 #include "entt/entt.h"
 
 
@@ -17,33 +15,33 @@ public:
 	template<typename T, typename... Args>
 	T& AddComponent(Args&&... args)
 	{
-		T& component = m_Scene->m_Registry.emplace<T>(m_EntityHandle, std::forward<Args>(args)...);
+		T& component = m_Scene->GetRegistry().emplace<T>(m_EntityHandle, std::forward<Args>(args)...);
 		return component;
 	}
 
 	template<typename T, typename... Args>
 	T& AddOrReplaceComponent(Args&&... args)
 	{
-		T& component = m_Scene->m_Registry.emplace_or_replace<T>(m_EntityHandle, std::forward<Args>(args)...);
+		T& component = m_Scene->GetRegistry().emplace_or_replace<T>(m_EntityHandle, std::forward<Args>(args)...);
 		return component;
 	}
 
 	template<typename T>
 	T& GetComponent()
 	{
-		return m_Scene->m_Registry.get<T>(m_EntityHandle);
+		return m_Scene->GetRegistry().get<T>(m_EntityHandle);
 	}
 
 	template<typename T>
 	bool HasComponent()
 	{
-		return m_Scene->m_Registry.try_get<T>(m_EntityHandle) != nullptr;
+		return m_Scene->GetRegistry().try_get<T>(m_EntityHandle) != nullptr;
 	}
 
 	template<typename T>
 	void RemoveComponent()
 	{
-		m_Scene->m_Registry.remove<T>(m_EntityHandle);
+		m_Scene->GetRegistry().remove<T>(m_EntityHandle);
 	}
 
 	operator bool() const { return m_EntityHandle != entt::null; }
@@ -51,6 +49,7 @@ public:
 	operator uint32_t() const { return (uint32_t)m_EntityHandle; }
 
 	const std::string& GetName() { return GetComponent<TagComponent>().tag; }
+
 
 	bool operator==(const Entity& other) const
 	{

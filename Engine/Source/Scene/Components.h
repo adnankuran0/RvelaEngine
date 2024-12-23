@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <vector>
 #include "glm/glm.hpp"
 #include "../Renderer/VertexArray.h"
 #include "../Renderer/VertexBuffer.h"
@@ -7,7 +8,7 @@
 #include "../Renderer/BufferLayout.h"
 #include "../Renderer/Texture.h"
 #include "../Renderer/Shader.h"
-
+#include "entt/entt.h"
 
 
 struct TransformComponent {
@@ -84,4 +85,15 @@ struct MetarialComponent {
         Height.Init();
         Height.GenerateFromImage(texturesPath + "/height.png");
     }
+};
+
+
+struct ParentComponent
+{
+    entt::entity parent;
+};
+
+struct ChildComponent
+{
+    std::vector<entt::entity> children;
 };

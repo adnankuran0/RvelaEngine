@@ -2,20 +2,20 @@
 
 Editor::Editor()
 {
-        s_Engine = new Engine();
-        m_ImGuiLayer = new ImGuiLayer(s_Engine);
+        m_Engine = new Engine();
+        m_ImGuiLayer = new ImGuiLayer(m_Engine);
 }
 
 void Editor::Run()
 {
     std::cout << "Engine has started!" << std::endl;
     m_ImGuiLayer->OnAttach();
-    while (!glfwWindowShouldClose(s_Engine->GetWindow()->GetGLFWWindow()))
+    while (!glfwWindowShouldClose(m_Engine->GetWindow()->GetGLFWWindow()))
     {
         m_ImGuiLayer->OnUpdate();
-        s_Engine->Run();
+        m_Engine->Run();
         m_ImGuiLayer->OnRender();
-        glfwSwapBuffers(s_Engine->GetWindow()->GetGLFWWindow());
+        glfwSwapBuffers(m_Engine->GetWindow()->GetGLFWWindow());
     }
     m_ImGuiLayer->OnDetach();
     std::cout << "Engine has stopped!" << std::endl;
@@ -24,7 +24,7 @@ void Editor::Run()
 
 Engine* Editor::GetEngine()
 {
-    return s_Engine;
+    return m_Engine;
 }
 
 
