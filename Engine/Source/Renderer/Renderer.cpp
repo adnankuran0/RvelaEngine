@@ -39,7 +39,7 @@ void Renderer::EndFrame()
 
 }
 
-void Renderer::Render(TransformComponent& transform, MeshComponent& data, MetarialComponent& metarial, Camera& camera) {
+void Renderer::Render(WorldTransformComponent& transform, MeshComponent& data, MetarialComponent& metarial, Camera& camera) {
 
     metarial.shader.use();
     metarial.shader.setInt("albedoMap", 0);

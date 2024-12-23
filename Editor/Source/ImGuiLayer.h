@@ -18,4 +18,8 @@ public:
 
 private:
     Engine* m_Engine;
+    void DrawSceneHierarchyPanel(entt::registry& registry, entt::entity& selectedEntity);
+    void DrawEntityCreationPanel(entt::registry& registry, entt::entity& selectedEntity);
+    void DrawTransformEditor(entt::registry& registry, entt::entity selectedEntity);
+    void DrawParentChildEditor(entt::registry& registry, entt::entity selectedEntity);
 };

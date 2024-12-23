@@ -13,6 +13,7 @@ public:
 	void Init(const void* data, size_t size);
 	void Bind() const;
 	void Unbind() const;
+	void Destroy() const;
 	void Data(const void* data, unsigned int size) const;
 	unsigned int getID();
 };

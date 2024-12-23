@@ -15,6 +15,12 @@ void ElementBuffer::Unbind() const
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
+void ElementBuffer::Destroy() const
+{
+	Unbind();
+	glDeleteBuffers(1, &ID);
+}
+
 unsigned int ElementBuffer::getID() const
 {
 	return ID;

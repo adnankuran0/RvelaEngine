@@ -25,6 +25,7 @@ public:
 
 	static Engine* Get() { return s_Instance; }
 	Window* GetWindow() const { return m_Window.get(); }
+	Scene* GetScene() const { return m_Scene.get(); }
 
 
 
@@ -32,5 +33,6 @@ private:
 	static Engine* s_Instance;
 	std::unique_ptr<Window> m_Window;
 	std::unique_ptr<Renderer> m_Renderer;
+	std::unique_ptr<Scene> m_Scene;
 
 };

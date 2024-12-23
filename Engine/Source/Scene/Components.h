@@ -11,6 +11,34 @@
 #include "entt/entt.h"
 
 
+struct WorldTransformComponent {
+    glm::vec3 position;
+    glm::vec3 rotation;
+    glm::vec3 scale;
+    WorldTransformComponent() = default;
+    WorldTransformComponent(glm::vec3 pos, glm::vec3 rot, glm::vec3 scl)
+    {
+        position = pos;
+        rotation = rot;
+        scale = scl;
+    }
+    glm::mat4 GetMatrix()
+    {
+        glm::mat4 mat = glm::mat4(1.0f);
+
+        mat = glm::translate(mat, position);
+
+        mat = glm::rotate(mat, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)); // X ekseni etrafýnda
+        mat = glm::rotate(mat, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)); // Y ekseni etrafýnda
+        mat = glm::rotate(mat, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f)); // Z ekseni etrafýnda
+
+        mat = glm::scale(mat, scale);
+
+        return mat;
+    }
+};
+
+
 struct TransformComponent {
     glm::vec3 position;
     glm::vec3 rotation;
@@ -25,11 +53,15 @@ struct TransformComponent {
     glm::mat4 GetMatrix()
     {
         glm::mat4 mat = glm::mat4(1.0f);
+
         mat = glm::translate(mat, position);
-        mat = glm::rotate(mat, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-        mat = glm::rotate(mat, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-        mat = glm::rotate(mat, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+
+        mat = glm::rotate(mat, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)); // X ekseni etrafýnda
+        mat = glm::rotate(mat, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)); // Y ekseni etrafýnda
+        mat = glm::rotate(mat, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f)); // Z ekseni etrafýnda
+
         mat = glm::scale(mat, scale);
+
         return mat;
     }
 };
@@ -56,6 +88,13 @@ struct MeshComponent {
         VAO.SetBufferLayout(&Layout);
         EBO.Init(indices, sizeOfIndices);
         EBO.Bind();
+    }
+
+    void Destroy()
+    {
+        VAO.Destroy();
+        VBO.Destroy();
+        EBO.Destroy();
     }
 };
 
@@ -85,15 +124,17 @@ struct MetarialComponent {
         Height.Init();
         Height.GenerateFromImage(texturesPath + "/height.png");
     }
+    void Destroy()
+    {
+        Albedo.Shutdown();
+        Normal.Shutdown();
+        Metallic.Shutdown();
+        Roughness.Shutdown();
+        Ao.Shutdown();
+    }
 };
 
-
-struct ParentComponent
-{
-    entt::entity parent;
-};
-
-struct ChildComponent
-{
+struct SceneTreeComponent {
+    entt::entity parent = entt::null;
     std::vector<entt::entity> children;
 };

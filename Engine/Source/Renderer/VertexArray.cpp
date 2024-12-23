@@ -17,6 +17,12 @@ void VertexArray::Unbind() const
 	glBindVertexArray(0);
 }
 
+void VertexArray::Destroy() const
+{
+	Unbind();
+	glDeleteVertexArrays(1, &ID);
+}
+
 void VertexArray::SetBufferLayout(const BufferLayout* layout)
 {
 	unsigned int currentBuffer = 0;
