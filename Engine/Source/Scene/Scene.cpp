@@ -17,21 +17,22 @@ Entity Scene::CreateEntity(const std::string& name) {
     entity.AddComponent<SceneTreeComponent>();
     entity.AddComponent<TagComponent>(name);
     entity.AddComponent<MeshComponent>(vertices, sizeof(vertices), indices, sizeof(indices));
-    entity.AddComponent<MetarialComponent>("D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/vertex.glsl",
-        "D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/fragment.glsl", "D:/GitHub/RvelaEngine/Engine/Source/Resources/Textures/terrain");
+    entity.AddComponent<MaterialComponent>("D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/vertex.glsl",
+        "D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/fragment.glsl", "D:/GitHub/RvelaEngine/Engine/Source/Resources/Textures/metal");
     return entity;
 }
 
 void Scene::DestroyEntity(entt::entity entity) {
 
     GetComponent<MeshComponent>(entity).Destroy();
-    GetComponent<MetarialComponent>(entity).Destroy();
+    GetComponent<MaterialComponent>(entity).Destroy();
     m_Registry.destroy(entity);
 }
 
 
 
 void Scene::Update() {
+    UpdateHierarchy();
 }
 
 entt::registry& Scene::GetRegistry()

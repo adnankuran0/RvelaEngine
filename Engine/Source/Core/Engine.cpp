@@ -10,7 +10,6 @@ Engine* Engine::s_Instance = nullptr;
 
 
 
-
 Camera editorCamera(glm::vec3(0.0f, 0.0f, 3.0f));
 
 Engine::Engine()
@@ -31,6 +30,7 @@ Engine::Engine()
 	m_Renderer->Init(m_Window->GetGLFWWindow());
 
 	m_Scene = std::make_unique<Scene>();
+
 	/*
 	entity.AddComponent<MeshComponent>(vertices, sizeof(vertices), indices, sizeof(indices));
 	entity.AddComponent<MetarialComponent>("D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/vertex.glsl",
@@ -80,8 +80,7 @@ void Engine::Run()
 
 	EventManager::clearEvents();
 
-	m_Scene->UpdateHierarchy();
-
+	m_Scene->Update();
 
 
 
@@ -91,12 +90,12 @@ void Engine::Run()
 void Engine::Render()
 {
 	Renderer::StartFrame();
-	auto view = m_Scene->GetRegistry().view<MeshComponent, MetarialComponent>();
+	auto view = m_Scene->GetRegistry().view<MeshComponent, MaterialComponent>();
 	
 	for (auto entity : view)
 	{
 		auto& mesh = m_Scene->GetComponent<MeshComponent>(entity);
-		auto& metarial = m_Scene->GetComponent<MetarialComponent>(entity);
+		auto& metarial = m_Scene->GetComponent<MaterialComponent>(entity);
 		auto& transform = m_Scene->GetComponent<WorldTransformComponent>(entity);
 		Renderer::Render(transform, mesh,metarial, editorCamera);
 	}

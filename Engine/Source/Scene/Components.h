@@ -98,7 +98,7 @@ struct MeshComponent {
     }
 };
 
-struct MetarialComponent {
+struct MaterialComponent {
     Shader  shader;
     Texture Albedo;
     Texture Normal;
@@ -107,8 +107,8 @@ struct MetarialComponent {
     Texture Ao;
     Texture Height;
 
-    MetarialComponent() = default;
-    MetarialComponent(const std::string& vertexShaderPath, const std::string& fragmentShaderPath, const std::string texturesPath)
+    MaterialComponent() = default;
+    MaterialComponent(const std::string& vertexShaderPath, const std::string& fragmentShaderPath, const std::string texturesPath)
     {
         shader.Init(vertexShaderPath.c_str(), fragmentShaderPath.c_str());
         Albedo.Init();
@@ -137,4 +137,11 @@ struct MetarialComponent {
 struct SceneTreeComponent {
     entt::entity parent = entt::null;
     std::vector<entt::entity> children;
+};
+
+struct PointLightComponent
+{
+    float intensity;
+    glm::vec3 color;
+    PointLightComponent(float intensinty, glm::vec3 color) { intensity = intensinty; color = color; }
 };

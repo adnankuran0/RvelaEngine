@@ -19,8 +19,12 @@ void Texture::Init()
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    float maxAniso = 0.0f;
+    glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &maxAniso);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, maxAniso);
 }
 
 void Texture::Bind(unsigned int activeTexture) const
@@ -45,7 +49,7 @@ void Texture::GenerateFromImage(const std::string& path)
 
     if (m_Data)
     {
-        ToImage(m_Width, m_Height, m_Data);
+        ToImage(m_Width, m_Height, m_Data, m_NrChannels);
         GenerateMipmaps();
     }
     else
@@ -57,16 +61,29 @@ void Texture::GenerateFromImage(const std::string& path)
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Texture::ToImage(int width, int height, const unsigned char* data)
+void Texture::ToImage(int width, int height, const unsigned char* data, int nrChannels)
 {
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    GLenum format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 }
 
 void Texture::GenerateMipmaps()
 {
     glGenerateMipmap(GL_TEXTURE_2D);
 
+    // Minification filtresi: Trilinear filtering
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+    // Magnification filtresi: Linear filtering
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // Anisotropic Filtering için kontrol ve ayar
+    float maxAniso = 0.0f;
+    glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &maxAniso);
+    if (maxAniso > 0.0f)
+    {
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, maxAniso);
+    }
 }
 
 Texture Texture::Create()

@@ -22,7 +22,7 @@ public:
     static void Init(GLFWwindow* window);
     static void StartFrame();
     static void EndFrame();
-    static void Render(WorldTransformComponent& transform,MeshComponent& data,MetarialComponent& metarial, Camera& camera);
+    static void Render(WorldTransformComponent& transform,MeshComponent& data, MaterialComponent& metarial, Camera& camera);
     static void Shutdown();
 
 private:

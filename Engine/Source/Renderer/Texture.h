@@ -16,7 +16,7 @@ public:
     void GenerateFromImage(const std::string& path);
 
     static Texture Create();
-    static void ToImage(int width, int height, const unsigned char* data);
+    static void ToImage(int width, int height, const unsigned char* data,int nrChannels);
     static void GenerateMipmaps();
 
     unsigned int GetID() const;
