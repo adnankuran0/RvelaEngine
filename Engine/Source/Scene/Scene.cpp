@@ -52,7 +52,7 @@ void Scene::UpdateHierarchy()
             glm::mat4 parentMatrix = parentTransform.GetMatrix();
             glm::mat4 localMatrix = transform.GetMatrix();
 
-            glm::mat4 worldMatrix = parentMatrix * localMatrix;
+            glm::mat4 worldMatrix =  parentMatrix * localMatrix;
             glm::vec3 worldPosition = glm::vec3(worldMatrix[3]);
 
             glm::vec3 scale, rotationEuler, translation;

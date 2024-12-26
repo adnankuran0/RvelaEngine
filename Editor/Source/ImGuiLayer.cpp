@@ -115,6 +115,12 @@ void ImGuiLayer::DrawTransformEditor(entt::registry& registry, entt::entity sele
     ImGui::Text("Scale");
     ImGui::DragFloat3("##Scale", &transform.scale[0], 0.1f, 0.1f, 10.0f);
 
+    if (ImGui::Button("Reset Transform")) {
+        transform.position = { 0.0f, 0.0f, 0.0f };
+        transform.rotation = { 0.0f, 0.0f, 0.0f };
+        transform.scale = { 1.0f, 1.0f, 1.0f };
+    }
+
     ImGui::End();
 }
 

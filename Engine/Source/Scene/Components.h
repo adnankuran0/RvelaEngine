@@ -28,9 +28,9 @@ struct WorldTransformComponent {
 
         mat = glm::translate(mat, position);
 
-        mat = glm::rotate(mat, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)); // X ekseni etrafýnda
-        mat = glm::rotate(mat, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)); // Y ekseni etrafýnda
         mat = glm::rotate(mat, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f)); // Z ekseni etrafýnda
+        mat = glm::rotate(mat, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)); // Y ekseni etrafýnda
+        mat = glm::rotate(mat, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)); // X ekseni etrafýnda
 
         mat = glm::scale(mat, scale);
 
@@ -56,9 +56,9 @@ struct TransformComponent {
 
         mat = glm::translate(mat, position);
 
-        mat = glm::rotate(mat, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)); // X ekseni etrafýnda
-        mat = glm::rotate(mat, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)); // Y ekseni etrafýnda
         mat = glm::rotate(mat, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f)); // Z ekseni etrafýnda
+        mat = glm::rotate(mat, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)); // Y ekseni etrafýnda
+        mat = glm::rotate(mat, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)); // X ekseni etrafýnda
 
         mat = glm::scale(mat, scale);
 
