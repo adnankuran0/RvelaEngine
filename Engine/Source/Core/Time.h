@@ -1,4 +1,6 @@
 #include "GLFW/glfw3.h"
+#include <thread>
+#include <chrono>
 #pragma once
 class Time {
 private:
@@ -8,6 +10,8 @@ private:
     static int frameCount;
     static float fps;
     static float timeScale;
+    static double maxFPS;
+
 
 public:
 
@@ -22,5 +26,13 @@ public:
     static float getTimeScale();
 
     static float getTime();
+
+    static float getMaxFPS();
+    
+    static void setMaxFPS(float maxFPS);
+
+    static double getCurrentTime();
+
+
 
 };

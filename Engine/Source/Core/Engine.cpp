@@ -58,7 +58,6 @@ Engine::~Engine()
 
 void Engine::Run()
 {
-	Time::update();
 	glfwPollEvents();
 	EventManager::dispatchEvents([this](Event& event) {
 

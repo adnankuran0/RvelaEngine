@@ -12,6 +12,7 @@ void Editor::Run()
     m_ImGuiLayer->OnAttach();
     while (!glfwWindowShouldClose(m_Engine->GetWindow()->GetGLFWWindow()))
     {
+        Time::update();
         m_ImGuiLayer->OnUpdate();
         m_Engine->Run();
         m_ImGuiLayer->OnRender();
