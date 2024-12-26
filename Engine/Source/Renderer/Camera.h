@@ -1,16 +1,10 @@
 #pragma once
-#ifndef CAMERA_H
-#define CAMERA_H
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include "../Core/Input/Input.h"
 #include "../Core/Time.h"
-
-
-
-
 
 // An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL
 class Camera
@@ -185,4 +179,3 @@ private:
         Up = glm::normalize(glm::cross(Right, Front));
     }
 };
-#endif

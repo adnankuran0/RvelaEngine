@@ -9,8 +9,6 @@ public:
         for (auto& event : events) {
             handler(*event);
         }
-        
     }
-
 };
 

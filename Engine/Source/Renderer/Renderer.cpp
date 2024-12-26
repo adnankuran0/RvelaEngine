@@ -6,7 +6,6 @@
 
 GLFWwindow* Renderer::activeWindow = nullptr;
 
-
 Renderer::Renderer() 
 {
 };
@@ -35,7 +34,6 @@ void Renderer::StartFrame()
 
 void Renderer::EndFrame()
 {
-    
 
 }
 
@@ -54,8 +52,6 @@ void Renderer::Render(WorldTransformComponent& transform, MeshComponent& data, M
     metarial.shader.setVec3("camPos", camera.Position);
     metarial.shader.setVec3("lightPosition", glm::vec3(0.5f, 2.0f, 1.0f));
     metarial.shader.setVec3("lightColor", glm::vec3(1.0f));
- 
-
     
     metarial.shader.setMat4("model", transform.GetMatrix());
 

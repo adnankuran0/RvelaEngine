@@ -12,7 +12,6 @@ private:
     static float timeScale;
     static double maxFPS;
 
-
 public:
 
     static void update(); 
@@ -32,7 +31,5 @@ public:
     static void setMaxFPS(float maxFPS);
 
     static double getCurrentTime();
-
-
 
 };

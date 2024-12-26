@@ -71,13 +71,10 @@ void Texture::GenerateMipmaps()
 {
     glGenerateMipmap(GL_TEXTURE_2D);
 
-    // Minification filtresi: Trilinear filtering
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
-    // Magnification filtresi: Linear filtering
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    // Anisotropic Filtering için kontrol ve ayar
     float maxAniso = 0.0f;
     glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &maxAniso);
     if (maxAniso > 0.0f)

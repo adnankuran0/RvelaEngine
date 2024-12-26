@@ -11,8 +11,6 @@
 #include "../Core/Time.h"
 #include "Scene/Components.h"
 
-
-
 class Renderer
 {
 public:

@@ -17,7 +17,5 @@ public:
 	static void dispatchEvents(const std::function<void(Event&)>& handler); 
 private:
 	static std::vector<Event*> m_EventQueue;
-
-	
 };
 
