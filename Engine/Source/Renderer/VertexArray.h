@@ -11,7 +11,7 @@ public:
 	void Unbind() const;
 	void Destroy() const;
 	unsigned int getID();
-	void SetBufferLayout(const BufferLayout* layout);
+	void SetBufferLayout(const BufferLayout& layout);
 private:
 	unsigned int ID;
 };

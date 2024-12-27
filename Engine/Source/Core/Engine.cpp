@@ -59,7 +59,7 @@ Engine::~Engine()
 void Engine::Run()
 {
 	glfwPollEvents();
-	std::cout << EventManager::getEventQueue()[0] << std::endl;
+	
 	EventManager::dispatchEvents([this](Event& event) {
 
 		if (event.GetEventType() == EventType::MouseMoved)

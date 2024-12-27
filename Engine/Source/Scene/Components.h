@@ -85,7 +85,7 @@ struct MeshComponent {
         Layout.Push<float>(3);
         Layout.Push<float>(3);
         Layout.Push<float>(2);
-        VAO.SetBufferLayout(&Layout);
+        VAO.SetBufferLayout(Layout);
         EBO.Init(indices, sizeOfIndices);
         EBO.Bind();
     }

@@ -7,7 +7,6 @@ void BufferLayout::AddVertexBuffer(unsigned int newVBO)
 	m_StrideIndex += 1;
 	bufferStartIndex.push_back(elements.size());
 	buffers.push_back(newVBO);
-
 }
 
 void BufferLayout::BindVertexBuffer(unsigned int ID)
