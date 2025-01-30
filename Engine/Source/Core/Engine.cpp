@@ -1,3 +1,4 @@
+#include "rvelapch.h"
 
 #include "Engine.h"
 #include "RvelaLog.h"
@@ -31,21 +32,6 @@ Engine::Engine()
 
 	m_Scene = std::make_unique<Scene>();
 
-	/*
-	entity.AddComponent<MeshComponent>(vertices, sizeof(vertices), indices, sizeof(indices));
-	entity.AddComponent<MetarialComponent>("D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/vertex.glsl",
-		"D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/fragment.glsl", "D:/GitHub/RvelaEngine/Engine/Source/Resources/Textures/metal");
-
-
-
-	entity2.AddComponent<MeshComponent>(vertices, sizeof(vertices), indices, sizeof(indices));
-	entity2.AddComponent<MetarialComponent>("D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/vertex.glsl",
-		"D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/fragment.glsl", "D:/GitHub/RvelaEngine/Engine/Source/Resources/Textures/terrain");
-		*/
-
-	
-
-
 
 }
 
@@ -53,7 +39,6 @@ Engine::~Engine()
 {		
 	Shutdown();
 }
-
 
 
 void Engine::Run()
@@ -70,20 +55,13 @@ void Engine::Run()
 	
 		});
 
-
-	
-
 	editorCamera.Update();
-		
 
 	Render();
 
 	EventManager::clearEvents();
 
 	m_Scene->Update();
-
-
-
 	
 }
 
@@ -91,13 +69,15 @@ void Engine::Render()
 {
 	Renderer::StartFrame();
 	auto view = m_Scene->GetRegistry().view<MeshComponent, MaterialComponent>();
-	
+
 	for (auto entity : view)
 	{
 		auto& mesh = m_Scene->GetComponent<MeshComponent>(entity);
 		auto& metarial = m_Scene->GetComponent<MaterialComponent>(entity);
 		auto& transform = m_Scene->GetComponent<WorldTransformComponent>(entity);
-		Renderer::Render(transform, mesh,metarial, editorCamera);
+
+		Renderer::Render(transform, mesh, metarial, editorCamera);
+
 	}
 	Renderer::EndFrame();
 }

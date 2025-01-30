@@ -7,6 +7,9 @@ project "Engine"
 
    files { "Source/**.h", "Source/**.cpp" }
 
+   pchheader "rvelapch.h"
+    pchsource "Source/rvelapch.cpp"
+
    includedirs
    {
       "Source",
@@ -15,7 +18,8 @@ project "Engine"
       "../Vendor/glm",
       "../Vendor/plog",
       "../Vendor/stb_image",
-      "../Vendor/entt"
+      "../Vendor/entt",
+      "../Vendor/tiny_obj_loader"
    }
 
    libdirs

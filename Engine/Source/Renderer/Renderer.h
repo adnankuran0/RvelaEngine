@@ -16,7 +16,6 @@ class Renderer
 public:
     Renderer();
     ~Renderer();
-
     static void Init(GLFWwindow* window);
     static void StartFrame();
     static void EndFrame();

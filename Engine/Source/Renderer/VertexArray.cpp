@@ -19,8 +19,8 @@ void VertexArray::Unbind() const
 
 void VertexArray::Destroy() const
 {
-	Unbind();
 	glDeleteVertexArrays(1, &ID);
+	
 }
 
 void VertexArray::SetBufferLayout(const BufferLayout& layout)
@@ -46,10 +46,7 @@ void VertexArray::SetBufferLayout(const BufferLayout& layout)
 
 }
 
-VertexArray::~VertexArray()
-{
-	glDeleteVertexArrays(1, &ID);
-}
+
 
 unsigned int VertexArray::getID()
 {

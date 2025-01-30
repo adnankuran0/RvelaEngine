@@ -7,10 +7,7 @@ Texture::Texture()
 	Init();
 }
 
-Texture::~Texture()
-{
-	Shutdown();
-}
+
 
 void Texture::Init()
 {
@@ -38,7 +35,7 @@ void Texture::Bind() const
     glBindTexture(GL_TEXTURE_2D, m_Texture);
 }
 
-void Texture::Shutdown() const
+void Texture::Destroy() const
 {
     glDeleteTextures(1, &m_Texture);
 }

@@ -2,7 +2,6 @@
 #include "Scene/Components.h"
 #include "Scene/Entity.h"
 
-//BUG: If you delete an entity other than the last one you created, it gives OPENGL 1282 error.
 
 ImGuiLayer::ImGuiLayer(Engine* engine)
     : m_Engine(engine)
@@ -110,7 +109,7 @@ void ImGuiLayer::DrawTransformEditor(entt::registry& registry, entt::entity sele
     ImGui::DragFloat3("##Position", &transform.position[0], 0.1f);
 
     ImGui::Text("Rotation");
-    ImGui::DragFloat3("##Rotation", &transform.rotation[0], 0.1f);
+    ImGui::DragFloat3("##Rotation", &transform.rotation[0], 0.1f,-360.0f,360.0f);
 
     ImGui::Text("Scale");
     ImGui::DragFloat3("##Scale", &transform.scale[0], 0.1f, 0.1f, 10.0f);

@@ -15,7 +15,8 @@ project "Editor"
       "../Vendor/GLEW/include",
 	  -- Include Core
 	  "../Engine/Source",
-      "../Vendor/entt"
+      "../Vendor/entt",
+      "../Vendor/tiny_obj_loader"
    }
 
    libdirs

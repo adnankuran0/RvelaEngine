@@ -17,7 +17,7 @@ void ElementBuffer::Unbind() const
 
 void ElementBuffer::Destroy() const
 {
-	Unbind();
+	
 	glDeleteBuffers(1, &ID);
 }
 
@@ -26,10 +26,6 @@ unsigned int ElementBuffer::getID() const
 	return ID;
 }
 
-ElementBuffer::~ElementBuffer()
-{
-	glDeleteBuffers(1, &ID);
-}
 
 void ElementBuffer::Init(const void* data, size_t size)
 {
@@ -37,4 +33,5 @@ void ElementBuffer::Init(const void* data, size_t size)
 	glGenBuffers(1, &ID);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ID);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+
 }

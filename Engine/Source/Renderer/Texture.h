@@ -1,16 +1,14 @@
 #pragma once
 #include "GL/glew.h"
-#include <iostream>
-#include <string>
+
 
 class Texture
 {
 public:
     Texture();
-    ~Texture();
 
     void Init();
-    void Shutdown() const;
+    void Destroy() const;
     void Bind(unsigned int activeTexture) const;
     void Bind() const;
     void GenerateFromImage(const std::string& path);

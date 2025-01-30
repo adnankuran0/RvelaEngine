@@ -1,18 +1,13 @@
 #include "VertexBuffer.h"
 
-
-
-
 VertexBuffer::VertexBuffer(const void* data, size_t size)
 {
 	Init(data, size);
 }
-
 VertexBuffer::~VertexBuffer()
 {
 	glDeleteBuffers(1, &ID);
 }
-
 unsigned int VertexBuffer::getID()
 {
 	return ID;
@@ -38,7 +33,6 @@ void VertexBuffer::Init(const void* data, size_t size)
 
 void VertexBuffer::Unbind() const
 {
-	Unbind();
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
