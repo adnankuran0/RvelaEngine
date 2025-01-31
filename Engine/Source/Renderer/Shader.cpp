@@ -1,3 +1,5 @@
+#include "rvelapch.h"
+#include <fstream>
 #include "Shader.h"
 #include "RvelaLog.h"
 

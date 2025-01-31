@@ -31,7 +31,8 @@ project "Engine"
    links
    {
       "glfw3",
-      "glew32s"
+      "glew32s",
+      "opengl32"
    }
 
    targetdir ("../Binaries/" .. OutputDir .. "/%{prj.name}")
@@ -39,7 +40,7 @@ project "Engine"
 
    filter "system:windows"
        systemversion "latest"
-       defines { "GLFW_INCLUDE_NONE" }
+       defines { "GLFW_INCLUDE_NONE", "GLEW_STATIC" }
 
    filter "configurations:Debug"
        defines { "DEBUG" }

@@ -1,3 +1,5 @@
+#include "rvelapch.h"
+
 #include "UniformBuffer.h"
 
 UniformBuffer::UniformBuffer(GLsizeiptr size, unsigned int bindingPoint)

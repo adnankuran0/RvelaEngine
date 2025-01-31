@@ -1,3 +1,4 @@
+#include "rvelapch.h"
 #include "VertexBuffer.h"
 
 VertexBuffer::VertexBuffer(const void* data, size_t size)

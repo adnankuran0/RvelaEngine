@@ -1,3 +1,4 @@
+#include "rvelapch.h"
 #include "BufferLayout.h"
 
 void BufferLayout::AddVertexBuffer(unsigned int newVBO)

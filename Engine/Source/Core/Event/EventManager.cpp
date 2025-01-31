@@ -1,3 +1,4 @@
+#include "rvelapch.h"
 #include "EventManager.h"
 std::vector<Event*> EventManager::m_EventQueue = std::vector<Event*>();
 

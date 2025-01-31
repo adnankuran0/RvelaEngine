@@ -1,3 +1,5 @@
+#include "rvelapch.h"
+
 #include "VertexArray.h"
 
 VertexArray::VertexArray()

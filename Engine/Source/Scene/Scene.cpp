@@ -15,8 +15,8 @@ Entity Scene::CreateEntity(const std::string& name) {
     entity.AddComponent<SceneTreeComponent>();
     entity.AddComponent<TagComponent>(name);
     entity.AddComponent<MeshComponent>(vertices, sizeof(vertices), indices, sizeof(indices));
-    entity.AddComponent<MaterialComponent>("D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/vertex.glsl",
-        "D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/fragment.glsl","D:/GitHub/RvelaEngine/Engine/Source/Resources/Textures/metal");
+    entity.AddComponent<MaterialComponent>("C:/RvelaEngine/Engine/Source/Resources/Shaders/vertex.glsl",
+        "C:/RvelaEngine/Engine/Source/Resources/Shaders/fragment.glsl","C:/RvelaEngine/Engine/Source/Resources/Textures/metal");
     return entity;
 }
 

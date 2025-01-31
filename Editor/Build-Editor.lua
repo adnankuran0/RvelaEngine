@@ -16,7 +16,8 @@ project "Editor"
 	  -- Include Core
 	  "../Engine/Source",
       "../Vendor/entt",
-      "../Vendor/tiny_obj_loader"
+      "../Vendor/tiny_obj_loader",
+      "../Vendor/glm"
    }
 
    libdirs
