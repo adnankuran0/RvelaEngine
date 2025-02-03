@@ -15,8 +15,8 @@ Entity Scene::CreateEntity(const std::string& name) {
     entity.AddComponent<SceneTreeComponent>();
     entity.AddComponent<TagComponent>(name);
     entity.AddComponent<MeshComponent>(vertices, sizeof(vertices), indices, sizeof(indices));
-    entity.AddComponent<MaterialComponent>("C:/RvelaEngine/Engine/Source/Resources/Shaders/vertex.glsl",
-        "C:/RvelaEngine/Engine/Source/Resources/Shaders/fragment.glsl","C:/RvelaEngine/Engine/Source/Resources/Textures/metal");
+    entity.AddComponent<MaterialComponent>("D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/vertex.glsl",
+        "D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/fragment.glsl","D:/GitHub/RvelaEngine/Engine/Source/Resources/Textures/metal");
     return entity;
 }
 
@@ -40,11 +40,9 @@ entt::registry& Scene::GetRegistry()
     return m_Registry;
 }
 
-void Scene::UpdateHierarchy()
-{
+void Scene::UpdateHierarchy() {
     auto view = m_Registry.view<SceneTreeComponent, TransformComponent, WorldTransformComponent>();
 
-    // Root nodelarý bul (ebeveyni olmayan entity’ler)
     std::vector<entt::entity> rootEntities;
     for (auto entity : view) {
         auto& node = m_Registry.get<SceneTreeComponent>(entity);
@@ -53,34 +51,35 @@ void Scene::UpdateHierarchy()
         }
     }
 
-    // Her root'tan itibaren rekürsif güncelleme baþlat
     for (auto root : rootEntities) {
-        auto& transform = m_Registry.get<TransformComponent>(root);
-        UpdateNodeRecursive(root, glm::mat4(1.0f), transform.rotation);
+        UpdateNodeRecursive(root, { 0, 0, 0 }, glm::quat(1, 0, 0, 0), { 1, 1, 1 });
     }
 }
 
-// Rekürsif güncelleme fonksiyonu
-void Scene::UpdateNodeRecursive(entt::entity entity, const glm::mat4& parentWorldMatrix, glm::vec3 parentRotation)
-{
+void Scene::UpdateNodeRecursive(entt::entity entity,
+    const glm::vec3& parentPos,
+    const glm::quat& parentRot,
+    const glm::vec3& parentScale) {
     if (!m_Registry.valid(entity)) return;
 
     auto& transform = m_Registry.get<TransformComponent>(entity);
     auto& worldTransform = m_Registry.get<WorldTransformComponent>(entity);
 
-    glm::mat4 localMatrix = transform.GetMatrix();
-    glm::mat4 worldMatrix = parentWorldMatrix * localMatrix;
+    glm::quat localRot = transform.GetQuaternion();
+    glm::quat worldRot = parentRot * localRot;
 
-    glm::vec3 scale, rotationEuler, translation;
-    DecomposeToEulerAngles(worldMatrix, scale, rotationEuler, translation);
+    glm::vec3 scaledPos = transform.position * parentScale;
+    glm::vec3 worldPos = parentPos + parentRot * scaledPos;
 
-    worldTransform.scale = scale;
-    worldTransform.position = translation;
-    worldTransform.rotation = parentRotation;
+    glm::vec3 worldScale = parentScale * transform.scale;
+
+    worldTransform.position = worldPos;
+    worldTransform.rotation = glm::degrees(glm::eulerAngles(worldRot));
+    worldTransform.scale = worldScale;
 
     auto& node = m_Registry.get<SceneTreeComponent>(entity);
     for (auto child : node.children) {
-        UpdateNodeRecursive(child, worldMatrix, worldTransform.rotation);
+        UpdateNodeRecursive(child, worldPos, worldRot, worldScale);
     }
 }
 
@@ -147,7 +146,7 @@ void Scene::RemoveParent(entt::entity child) {
 
     auto& childNode = GetComponent<SceneTreeComponent>(child);
 
-    glm::mat4 childWorldMatrix;
+    glm::mat4 childWorldMatrix(1.0f);
     if (HasComponent<WorldTransformComponent>(child)) {
         auto& childWorldTransform = GetComponent<WorldTransformComponent>(child);
         childWorldMatrix = childWorldTransform.GetMatrix();
@@ -164,14 +163,13 @@ void Scene::RemoveParent(entt::entity child) {
             parentNode.children.end()
         );
     }
-
     childNode.parent = entt::null;
 
-    glm::vec3 scale, rotation, position;
-    DecomposeToEulerAngles(childWorldMatrix, scale, rotation, position);
+    glm::vec3 newScale, newRotation, newPosition;
+    DecomposeToEulerAngles(childWorldMatrix, newScale, newRotation, newPosition);
 
     auto& childTransform = GetComponent<TransformComponent>(child);
-    childTransform.scale = scale;
-    childTransform.rotation = rotation;
-    childTransform.position = position;
+    childTransform.position = newPosition;
+    childTransform.rotation = newRotation;
+    childTransform.scale = newScale;
 }

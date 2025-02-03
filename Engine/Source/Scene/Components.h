@@ -12,71 +12,56 @@
 #include "../Renderer/Shader.h"
 #include "entt/entt.h"
 
+
+
 struct WorldTransformComponent {
     glm::vec3 position;
     glm::vec3 rotation;
     glm::vec3 scale;
+
     WorldTransformComponent() = default;
     WorldTransformComponent(glm::vec3 pos, glm::vec3 rot, glm::vec3 scl)
-    {
-        position = pos;
-        rotation = rot;
-        scale = scl;
+        : position(pos), rotation(rot), scale(scl) {
     }
-    glm::mat4 GetMatrix()
-    {
-        glm::mat4 mat = glm::mat4(1.0f);
 
-        float roll_rad = glm::radians(rotation.x);
-        float pitch_rad = glm::radians(rotation.y);
-        float yaw_rad = glm::radians(rotation.z);
+    glm::quat GetQuaternion() const {
+        glm::quat qz = glm::angleAxis(glm::radians(rotation.z), glm::vec3(0, 0, 1));
+        glm::quat qy = glm::angleAxis(glm::radians(rotation.y), glm::vec3(0, 1, 0));
+        glm::quat qx = glm::angleAxis(glm::radians(rotation.x), glm::vec3(1, 0, 0));
+        return qz * qy * qx;
+    }
 
-        glm::quat qx = glm::angleAxis(roll_rad, glm::vec3(1, 0, 0));
-        glm::quat qy = glm::angleAxis(pitch_rad, glm::vec3(0, 1, 0));
-        glm::quat qz = glm::angleAxis(yaw_rad, glm::vec3(0, 0, 1));
-
-        glm::quat quat = qy * qx * qz;
-
-        mat = glm::translate(mat, position);
-        mat *= glm::mat4_cast(quat);
-        mat = glm::scale(mat, scale);
-        return mat;
+    glm::mat4 GetMatrix() const {
+        return glm::translate(glm::mat4(1.0f), position) *
+            glm::mat4_cast(GetQuaternion()) *
+            glm::scale(glm::mat4(1.0f), scale);
     }
 };
-
 
 struct TransformComponent {
     glm::vec3 position;
     glm::vec3 rotation;
     glm::vec3 scale;
-    
+
     TransformComponent() = default;
     TransformComponent(glm::vec3 pos, glm::vec3 rot, glm::vec3 scl)
-    {
-        position = pos;
-        rotation = rot;
-        scale = scl;
+        : position(pos), rotation(rot), scale(scl) {
     }
-    glm::mat4 GetMatrix()
-    {
-        glm::mat4 mat = glm::mat4(1.0f);
 
-        float roll_rad = glm::radians(rotation.x);
-        float pitch_rad = glm::radians(rotation.y);
-        float yaw_rad = glm::radians(rotation.z);
+    glm::quat GetQuaternion() const {
+        glm::quat qz = glm::angleAxis(glm::radians(rotation.z), glm::vec3(0, 0, 1));
+        glm::quat qy = glm::angleAxis(glm::radians(rotation.y), glm::vec3(0, 1, 0));
+        glm::quat qx = glm::angleAxis(glm::radians(rotation.x), glm::vec3(1, 0, 0));
+        return qz * qy * qx;
+    }
 
-        glm::quat qx = glm::angleAxis(roll_rad, glm::vec3(1, 0, 0));
-        glm::quat qy = glm::angleAxis(pitch_rad, glm::vec3(0, 1, 0));
-        glm::quat qz = glm::angleAxis(yaw_rad, glm::vec3(0, 0, 1));
-
-        glm::quat quat = qy * qx * qz;
-
-        mat = glm::translate(mat, position);
-        mat *= glm::mat4_cast(quat);
-        mat = glm::scale(mat, scale);
-        return mat;
+    glm::mat4 GetMatrix() const {
+        return glm::translate(glm::mat4(1.0f), position) *
+            glm::mat4_cast(GetQuaternion()) *
+            glm::scale(glm::mat4(1.0f), scale);
     }
 };
+
 
 struct TagComponent {
     std::string tag;
