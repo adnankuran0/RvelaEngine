@@ -4,6 +4,7 @@
 #include "../Core/Time.h"
 #include "RvelaLog.h"
 #include "../Resources/cube.h"
+#include "../Core/AssetManager.h"
 
 Scene::Scene() : m_Registry() {}
 
@@ -14,9 +15,13 @@ Entity Scene::CreateEntity(const std::string& name) {
     entity.AddComponent<WorldTransformComponent>(glm::vec3(0.0f),glm::vec3(0.0f),glm::vec3(1.0f));
     entity.AddComponent<SceneTreeComponent>();
     entity.AddComponent<TagComponent>(name);
-    entity.AddComponent<MeshComponent>(vertices, sizeof(vertices), indices, sizeof(indices));
+    AssetManager assetManager;
+    //entity.AddComponent<MeshComponent>(vertices, sizeof(vertices), indices, sizeof(indices));
+    entity.AddComponent<ModelComponent>();
+    auto& modelComponent = entity.GetComponent<ModelComponent>();
+    assetManager.LoadAsset("C:/Users/adnan/Desktop/plane.fbx", modelComponent);
     entity.AddComponent<MaterialComponent>("D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/vertex.glsl",
-        "D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/fragment.glsl","D:/GitHub/RvelaEngine/Engine/Source/Resources/Textures/metal");
+        "D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/fragment.glsl","D:/GitHub/RvelaEngine/Engine/Source/Resources/Textures/terrain");
     return entity;
 }
 

@@ -10,14 +10,14 @@
 #include "../Renderer/BufferLayout.h"
 #include "../Renderer/Texture.h"
 #include "../Renderer/Shader.h"
+#include "Core/RvelaMath.h"
 #include "entt/entt.h"
-
-
 
 struct WorldTransformComponent {
     glm::vec3 position;
     glm::vec3 rotation;
     glm::vec3 scale;
+    glm::mat4 fixRotation = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1, 0, 0));
 
     WorldTransformComponent() = default;
     WorldTransformComponent(glm::vec3 pos, glm::vec3 rot, glm::vec3 scl)
@@ -25,16 +25,13 @@ struct WorldTransformComponent {
     }
 
     glm::quat GetQuaternion() const {
-        glm::quat qz = glm::angleAxis(glm::radians(rotation.z), glm::vec3(0, 0, 1));
-        glm::quat qy = glm::angleAxis(glm::radians(rotation.y), glm::vec3(0, 1, 0));
-        glm::quat qx = glm::angleAxis(glm::radians(rotation.x), glm::vec3(1, 0, 0));
-        return qz * qy * qx;
+        return EulerToQuat(rotation);
     }
 
     glm::mat4 GetMatrix() const {
-        return glm::translate(glm::mat4(1.0f), position) *
+        return (glm::translate(glm::mat4(1.0f), position) *
             glm::mat4_cast(GetQuaternion()) *
-            glm::scale(glm::mat4(1.0f), scale);
+            glm::scale(glm::mat4(1.0f), scale))*fixRotation;
     }
 };
 
@@ -42,6 +39,7 @@ struct TransformComponent {
     glm::vec3 position;
     glm::vec3 rotation;
     glm::vec3 scale;
+    glm::mat4 fixRotation = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1, 0, 0));
 
     TransformComponent() = default;
     TransformComponent(glm::vec3 pos, glm::vec3 rot, glm::vec3 scl)
@@ -49,16 +47,13 @@ struct TransformComponent {
     }
 
     glm::quat GetQuaternion() const {
-        glm::quat qz = glm::angleAxis(glm::radians(rotation.z), glm::vec3(0, 0, 1));
-        glm::quat qy = glm::angleAxis(glm::radians(rotation.y), glm::vec3(0, 1, 0));
-        glm::quat qx = glm::angleAxis(glm::radians(rotation.x), glm::vec3(1, 0, 0));
-        return qz * qy * qx;
+        return EulerToQuat(rotation);
     }
 
     glm::mat4 GetMatrix() const {
-        return glm::translate(glm::mat4(1.0f), position) *
+        return (glm::translate(glm::mat4(1.0f), position) *
             glm::mat4_cast(GetQuaternion()) *
-            glm::scale(glm::mat4(1.0f), scale);
+            glm::scale(glm::mat4(1.0f), scale))*fixRotation;
     }
 };
 
@@ -97,6 +92,30 @@ struct MeshComponent {
         VBO.Destroy();
         EBO.Destroy();
     }
+};
+
+struct ModelComponent
+{
+    std::vector<MeshComponent> meshes;
+    
+    ModelComponent() = default;
+    ModelComponent(const ModelComponent&) = delete;
+    ModelComponent& operator=(const ModelComponent&) = delete;
+    ModelComponent(ModelComponent&&) = default;
+    ModelComponent& operator=(ModelComponent&&) = default;
+    ModelComponent(const std::string& path)
+    {
+    }
+
+    void Destroy()
+    {
+        for (auto& mesh : meshes)
+        {
+            mesh.Destroy();
+        }
+        meshes.clear();
+    }
+
 };
 
 struct MaterialComponent {

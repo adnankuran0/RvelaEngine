@@ -46,3 +46,11 @@ void DecomposeToEulerAngles(const glm::mat4& worldMatrix, glm::vec3& scale, glm:
     rotation = degrees(rotation);
 }
 
+glm::quat EulerToQuat(const glm::vec3& eulerAngles)
+{
+    glm::quat qz = glm::angleAxis(glm::radians(eulerAngles.z), glm::vec3(0, 0, 1));
+    glm::quat qy = glm::angleAxis(glm::radians(eulerAngles.y), glm::vec3(0, 1, 0));
+    glm::quat qx = glm::angleAxis(glm::radians(eulerAngles.x), glm::vec3(1, 0, 0));
+    return qz * qy * qx;
+}
+

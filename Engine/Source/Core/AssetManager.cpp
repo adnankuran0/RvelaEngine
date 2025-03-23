@@ -1,60 +1,85 @@
-#include "rvelapch.h"
+ï»¿#include "rvelapch.h"
 #include "AssetManager.h"
-#define TINYOBJLOADER_IMPLEMENTATION
-#include "tiny_obj_loader.h"
+#include "assimp/Importer.hpp"
+#include "assimp/scene.h"
+#include "assimp/postprocess.h"
 
-bool LoadObjModel(const std::string& filepath, std::vector<float>& vertices, std::vector<unsigned int>& indices)
+void AssetManager::LoadAsset(const std::string& path, ModelComponent& model)
 {
-    tinyobj::attrib_t attrib;
-    std::vector<tinyobj::shape_t> shapes;
-    std::vector<tinyobj::material_t> materials;
-    std::string warn, err;
+    Assimp::Importer importer;
+    const aiScene* scene = importer.ReadFile(path,
+        aiProcess_Triangulate
+        | aiProcess_FlipUVs
+        | aiProcess_GenSmoothNormals
+        );
 
-    if (!tinyobj::LoadObj(&attrib,&shapes,&materials,&err, filepath.c_str())) {
-        if (!warn.empty()) {
-            std::cerr << "Warning: " << warn << std::endl;
-        }
-        if (!err.empty()) {
-            std::cerr << "Error: " << err << std::endl;
-        }
-        return false;
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+    {
+        std::cout << "Model could not loaded!\n";
+        return;
     }
 
-    std::unordered_map<Vertex, unsigned int, VertexHash> uniqueVertices;
+    std::cout << "model has " << scene->mNumMeshes << " meshes\n";
 
-    for (const auto& shape : shapes) {
-        for (const auto& index : shape.mesh.indices) {
-            Vertex vertex = {};
+    for (unsigned int i = 0; i < scene->mNumMeshes; i++)
+    {
+        aiMesh* mesh = scene->mMeshes[i];
+        
+        std::vector<float> vertices;
+        //vertices.reserve(mesh->mNumVertices * 8); 
 
-            // Vertex pozisyonlarý
-            vertex.position[0] = attrib.vertices[3 * index.vertex_index + 0];
-            vertex.position[1] = attrib.vertices[3 * index.vertex_index + 1];
-            vertex.position[2] = attrib.vertices[3 * index.vertex_index + 2];
+        for (unsigned int j = 0; j < mesh->mNumVertices; j++)
+        {
+            vertices.push_back(mesh->mVertices[j].x);
+            vertices.push_back(mesh->mVertices[j].y);
+            vertices.push_back(mesh->mVertices[j].z);
 
-            // Normaller
-            if (index.normal_index >= 0) {
-                vertex.normal[0] = attrib.normals[3 * index.normal_index + 0];
-                vertex.normal[1] = attrib.normals[3 * index.normal_index + 1];
-                vertex.normal[2] = attrib.normals[3 * index.normal_index + 2];
+            if (mesh->HasNormals())
+            {
+                vertices.push_back(mesh->mNormals[j].x);
+                vertices.push_back(mesh->mNormals[j].y);
+                vertices.push_back(mesh->mNormals[j].z);
+            }
+            else
+            {
+                vertices.push_back(0.0f);
+                vertices.push_back(0.0f);
+                vertices.push_back(0.0f);
             }
 
-            // UV koordinatlarý
-            if (index.texcoord_index >= 0) {
-                vertex.texcoord[0] = attrib.texcoords[2 * index.texcoord_index + 0];
-                vertex.texcoord[1] = attrib.texcoords[2 * index.texcoord_index + 1];
+            if (mesh->mTextureCoords[0])
+            {
+                vertices.push_back(mesh->mTextureCoords[0][j].x);
+                vertices.push_back(mesh->mTextureCoords[0][j].y);
             }
-
-            // Benzersiz vertexleri kontrol et ve ekle
-            if (uniqueVertices.count(vertex) == 0) {
-                uniqueVertices[vertex] = static_cast<unsigned int>(vertices.size() / 8);
-                vertices.insert(vertices.end(), { vertex.position[0], vertex.position[1], vertex.position[2],
-                                                  vertex.normal[0], vertex.normal[1], vertex.normal[2],
-                                                  vertex.texcoord[0], vertex.texcoord[1] });
+            else
+            {
+                vertices.push_back(0.0f);
+                vertices.push_back(0.0f);
             }
-
-            indices.push_back(uniqueVertices[vertex]);
         }
-    }
 
-    return true;
+        std::vector<unsigned int> indices;
+        indices.reserve(mesh->mNumFaces * 3); 
+
+        
+
+        for (unsigned int j = 0; j < mesh->mNumFaces; j++)
+        {
+            aiFace face = mesh->mFaces[j];
+            for (unsigned int k = 0; k < face.mNumIndices; k++)
+            {
+                indices.push_back(face.mIndices[k]);
+            }
+        }
+
+        std::cout << "Asset loaded with " << mesh->mNumVertices << " unique vertices and "
+            << indices.size() << " indices.\n";
+
+        model.meshes.emplace_back(vertices.data(), vertices.size() * sizeof(float),
+            indices.data(), indices.size() * sizeof(unsigned int));
+    
+	}
+
 }
+

@@ -6977,3 +6977,2198 @@ Vertex info
 2025-02-03 22:39:58.796 INFO  [12096] [Window::Init@29] GLFW Initialized
 2025-02-03 22:39:58.896 INFO  [12096] [Window::Init@50] GLEW Initialized
 2025-02-03 22:39:58.896 INFO  [12096] [Window::Init@52] 3.3.0 - Build 31.0.101.5590
+2025-02-04 02:10:21.623 INFO  [11852] [Window::Init@29] GLFW Initialized
+2025-02-04 02:10:21.726 INFO  [11852] [Window::Init@50] GLEW Initialized
+2025-02-04 02:10:21.727 INFO  [11852] [Window::Init@52] 3.3.0 - Build 31.0.101.5590
+2025-02-04 02:18:42.332 INFO  [16052] [Window::Init@29] GLFW Initialized
+2025-02-04 02:18:42.431 INFO  [16052] [Window::Init@50] GLEW Initialized
+2025-02-04 02:18:42.431 INFO  [16052] [Window::Init@52] 3.3.0 - Build 31.0.101.5590
+2025-02-05 13:37:22.252 INFO  [17212] [Window::Init@29] GLFW Initialized
+2025-02-05 13:37:22.419 INFO  [17212] [Window::Init@50] GLEW Initialized
+2025-02-05 13:37:22.419 INFO  [17212] [Window::Init@52] 3.3.0 - Build 31.0.101.5590
+2025-02-15 00:59:08.385 INFO  [22160] [Window::Init@29] GLFW Initialized
+2025-02-15 00:59:08.564 INFO  [22160] [Window::Init@50] GLEW Initialized
+2025-02-15 00:59:08.564 INFO  [22160] [Window::Init@52] 3.3.0 - Build 31.0.101.5590
+2025-02-15 01:13:12.471 INFO  [5272] [Window::Init@29] GLFW Initialized
+2025-02-15 01:13:12.563 INFO  [5272] [Window::Init@50] GLEW Initialized
+2025-02-15 01:13:12.563 INFO  [5272] [Window::Init@52] 3.3.0 - Build 31.0.101.5590
+2025-03-13 19:07:41.869 INFO  [24008] [Window::Init@29] GLFW Initialized
+2025-03-13 19:07:42.059 INFO  [24008] [Window::Init@50] GLEW Initialized
+2025-03-13 19:07:42.059 INFO  [24008] [Window::Init@52] 3.3.0 NVIDIA 572.16
+2025-03-19 19:53:43.930 INFO  [3304] [Window::Init@29] GLFW Initialized
+2025-03-19 19:53:44.159 INFO  [3304] [Window::Init@50] GLEW Initialized
+2025-03-19 19:53:44.159 INFO  [3304] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-20 01:48:46.686 INFO  [1504] [Window::Init@29] GLFW Initialized
+2025-03-20 01:48:46.883 INFO  [1504] [Window::Init@50] GLEW Initialized
+2025-03-20 01:48:46.884 INFO  [1504] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-20 02:11:03.640 INFO  [22096] [Window::Init@29] GLFW Initialized
+2025-03-20 02:11:03.799 INFO  [22096] [Window::Init@50] GLEW Initialized
+2025-03-20 02:11:03.800 INFO  [22096] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-20 02:13:06.645 INFO  [20664] [Window::Init@29] GLFW Initialized
+2025-03-20 02:13:06.807 INFO  [20664] [Window::Init@50] GLEW Initialized
+2025-03-20 02:13:06.807 INFO  [20664] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-20 02:18:07.389 INFO  [8120] [Window::Init@29] GLFW Initialized
+2025-03-20 02:18:07.582 INFO  [8120] [Window::Init@50] GLEW Initialized
+2025-03-20 02:18:07.582 INFO  [8120] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-20 02:21:51.338 INFO  [19700] [Window::Init@29] GLFW Initialized
+2025-03-20 02:21:51.524 INFO  [19700] [Window::Init@50] GLEW Initialized
+2025-03-20 02:21:51.524 INFO  [19700] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-20 02:22:06.558 INFO  [3792] [Window::Init@29] GLFW Initialized
+2025-03-20 02:22:06.729 INFO  [3792] [Window::Init@50] GLEW Initialized
+2025-03-20 02:22:06.729 INFO  [3792] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-20 20:15:40.108 INFO  [21020] [Window::Init@29] GLFW Initialized
+2025-03-20 20:15:40.269 INFO  [21020] [Window::Init@50] GLEW Initialized
+2025-03-20 20:15:40.269 INFO  [21020] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-20 20:30:38.189 INFO  [7164] [Window::Init@29] GLFW Initialized
+2025-03-20 20:30:38.340 INFO  [7164] [Window::Init@50] GLEW Initialized
+2025-03-20 20:30:38.340 INFO  [7164] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-20 22:14:49.631 INFO  [20200] [Window::Init@29] GLFW Initialized
+2025-03-20 22:14:49.803 INFO  [20200] [Window::Init@50] GLEW Initialized
+2025-03-20 22:14:49.803 INFO  [20200] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-20 23:32:25.524 INFO  [20776] [Window::Init@29] GLFW Initialized
+2025-03-20 23:32:25.703 INFO  [20776] [Window::Init@50] GLEW Initialized
+2025-03-20 23:32:25.704 INFO  [20776] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-21 14:01:46.898 INFO  [16336] [Window::Init@29] GLFW Initialized
+2025-03-21 14:01:47.180 INFO  [16336] [Window::Init@50] GLEW Initialized
+2025-03-21 14:01:47.180 INFO  [16336] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-21 14:30:51.160 INFO  [2640] [Window::Init@29] GLFW Initialized
+2025-03-21 14:30:51.353 INFO  [2640] [Window::Init@50] GLEW Initialized
+2025-03-21 14:30:51.353 INFO  [2640] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-21 14:31:10.637 INFO  [21216] [Window::Init@29] GLFW Initialized
+2025-03-21 14:31:10.828 INFO  [21216] [Window::Init@50] GLEW Initialized
+2025-03-21 14:31:10.828 INFO  [21216] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-21 14:35:03.410 INFO  [18944] [Window::Init@29] GLFW Initialized
+2025-03-21 14:35:03.581 INFO  [18944] [Window::Init@50] GLEW Initialized
+2025-03-21 14:35:03.581 INFO  [18944] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-21 21:44:09.490 INFO  [13528] [Window::Init@29] GLFW Initialized
+2025-03-21 21:44:09.680 INFO  [13528] [Window::Init@50] GLEW Initialized
+2025-03-21 21:44:09.681 INFO  [13528] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-21 21:44:25.824 INFO  [1620] [Window::Init@29] GLFW Initialized
+2025-03-21 21:44:25.991 INFO  [1620] [Window::Init@50] GLEW Initialized
+2025-03-21 21:44:25.991 INFO  [1620] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-21 21:47:30.936 INFO  [20280] [Window::Init@29] GLFW Initialized
+2025-03-21 21:47:31.114 INFO  [20280] [Window::Init@50] GLEW Initialized
+2025-03-21 21:47:31.114 INFO  [20280] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-21 21:51:39.123 INFO  [20840] [Window::Init@29] GLFW Initialized
+2025-03-21 21:51:39.283 INFO  [20840] [Window::Init@50] GLEW Initialized
+2025-03-21 21:51:39.283 INFO  [20840] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-21 21:52:40.248 INFO  [10604] [Window::Init@29] GLFW Initialized
+2025-03-21 21:52:40.413 INFO  [10604] [Window::Init@50] GLEW Initialized
+2025-03-21 21:52:40.413 INFO  [10604] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-21 21:57:03.797 INFO  [11132] [Window::Init@29] GLFW Initialized
+2025-03-21 21:57:03.964 INFO  [11132] [Window::Init@50] GLEW Initialized
+2025-03-21 21:57:03.964 INFO  [11132] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-21 22:00:42.851 INFO  [21144] [Window::Init@29] GLFW Initialized
+2025-03-21 22:00:43.036 INFO  [21144] [Window::Init@50] GLEW Initialized
+2025-03-21 22:00:43.036 INFO  [21144] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-21 22:01:43.037 INFO  [4864] [Window::Init@29] GLFW Initialized
+2025-03-21 22:01:43.215 INFO  [4864] [Window::Init@50] GLEW Initialized
+2025-03-21 22:01:43.215 INFO  [4864] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 03:03:37.147 INFO  [16380] [Window::Init@29] GLFW Initialized
+2025-03-22 03:03:37.324 INFO  [16380] [Window::Init@50] GLEW Initialized
+2025-03-22 03:03:37.324 INFO  [16380] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 03:10:13.264 INFO  [18792] [Window::Init@29] GLFW Initialized
+2025-03-22 03:10:13.440 INFO  [18792] [Window::Init@50] GLEW Initialized
+2025-03-22 03:10:13.440 INFO  [18792] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 03:10:29.001 INFO  [9644] [Window::Init@29] GLFW Initialized
+2025-03-22 03:10:29.175 INFO  [9644] [Window::Init@50] GLEW Initialized
+2025-03-22 03:10:29.175 INFO  [9644] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 03:10:44.873 INFO  [9388] [Window::Init@29] GLFW Initialized
+2025-03-22 03:10:45.092 INFO  [9388] [Window::Init@50] GLEW Initialized
+2025-03-22 03:10:45.092 INFO  [9388] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 03:17:37.364 INFO  [6292] [Window::Init@29] GLFW Initialized
+2025-03-22 03:17:37.534 INFO  [6292] [Window::Init@50] GLEW Initialized
+2025-03-22 03:17:37.534 INFO  [6292] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 03:57:26.878 INFO  [15904] [Window::Init@29] GLFW Initialized
+2025-03-22 03:57:27.032 INFO  [15904] [Window::Init@50] GLEW Initialized
+2025-03-22 03:57:27.032 INFO  [15904] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 16:02:33.451 INFO  [22612] [Window::Init@29] GLFW Initialized
+2025-03-22 16:02:33.644 INFO  [22612] [Window::Init@50] GLEW Initialized
+2025-03-22 16:02:33.644 INFO  [22612] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 19:54:51.869 INFO  [20784] [Window::Init@29] GLFW Initialized
+2025-03-22 19:54:52.054 INFO  [20784] [Window::Init@50] GLEW Initialized
+2025-03-22 19:54:52.054 INFO  [20784] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 19:55:19.745 INFO  [24616] [Window::Init@29] GLFW Initialized
+2025-03-22 19:55:19.953 INFO  [24616] [Window::Init@50] GLEW Initialized
+2025-03-22 19:55:19.954 INFO  [24616] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 19:55:32.640 INFO  [16388] [Window::Init@29] GLFW Initialized
+2025-03-22 19:55:32.874 INFO  [16388] [Window::Init@50] GLEW Initialized
+2025-03-22 19:55:32.874 INFO  [16388] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 19:55:53.675 INFO  [18792] [Window::Init@29] GLFW Initialized
+2025-03-22 19:55:53.841 INFO  [18792] [Window::Init@50] GLEW Initialized
+2025-03-22 19:55:53.842 INFO  [18792] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 19:56:19.707 INFO  [25560] [Window::Init@29] GLFW Initialized
+2025-03-22 19:56:19.872 INFO  [25560] [Window::Init@50] GLEW Initialized
+2025-03-22 19:56:19.872 INFO  [25560] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 19:57:55.098 INFO  [5884] [Window::Init@29] GLFW Initialized
+2025-03-22 19:57:55.256 INFO  [5884] [Window::Init@50] GLEW Initialized
+2025-03-22 19:57:55.256 INFO  [5884] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 19:58:50.209 INFO  [10492] [Window::Init@29] GLFW Initialized
+2025-03-22 19:58:50.380 INFO  [10492] [Window::Init@50] GLEW Initialized
+2025-03-22 19:58:50.380 INFO  [10492] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:00:41.412 INFO  [16508] [Window::Init@29] GLFW Initialized
+2025-03-22 20:00:41.581 INFO  [16508] [Window::Init@50] GLEW Initialized
+2025-03-22 20:00:41.581 INFO  [16508] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:01:16.522 INFO  [16352] [Window::Init@29] GLFW Initialized
+2025-03-22 20:01:16.693 INFO  [16352] [Window::Init@50] GLEW Initialized
+2025-03-22 20:01:16.693 INFO  [16352] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:02:02.639 INFO  [13052] [Window::Init@29] GLFW Initialized
+2025-03-22 20:02:02.797 INFO  [13052] [Window::Init@50] GLEW Initialized
+2025-03-22 20:02:02.797 INFO  [13052] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:05:23.694 INFO  [15460] [Window::Init@29] GLFW Initialized
+2025-03-22 20:05:23.847 INFO  [15460] [Window::Init@50] GLEW Initialized
+2025-03-22 20:05:23.847 INFO  [15460] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:05:45.538 INFO  [15168] [Window::Init@29] GLFW Initialized
+2025-03-22 20:05:45.761 INFO  [15168] [Window::Init@50] GLEW Initialized
+2025-03-22 20:05:45.761 INFO  [15168] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:06:35.118 INFO  [3492] [Window::Init@29] GLFW Initialized
+2025-03-22 20:06:35.286 INFO  [3492] [Window::Init@50] GLEW Initialized
+2025-03-22 20:06:35.286 INFO  [3492] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:07:05.113 INFO  [14260] [Window::Init@29] GLFW Initialized
+2025-03-22 20:07:05.349 INFO  [14260] [Window::Init@50] GLEW Initialized
+2025-03-22 20:07:05.349 INFO  [14260] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:08:51.585 INFO  [21044] [Window::Init@29] GLFW Initialized
+2025-03-22 20:08:52.080 INFO  [21044] [Window::Init@50] GLEW Initialized
+2025-03-22 20:08:52.080 INFO  [21044] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:08:52.844 ERROR [21044] [Shader::checkCompileErrors@111] ERROR::SHADER_COMPILATION_ERROR of type: FRAGMENT
+0(102) : error C1503: undefined variable "adjustedTexCoords"
+0(103) : error C1503: undefined variable "adjustedTexCoords"
+0(104) : error C1503: undefined variable "adjustedTexCoords"
+0(105) : error C1503: undefined variable "adjustedTexCoords"
+
+ -- --------------------------------------------------- -- 
+
+2025-03-22 20:08:52.858 ERROR [21044] [Shader::checkCompileErrors@120] ERROR::PROGRAM_LINKING_ERROR of type: PROGRAM
+Fragment info
+-------------
+0(102) : error C1503: undefined variable "adjustedTexCoords"
+0(103) : error C1503: undefined variable "adjustedTexCoords"
+0(104) : error C1503: undefined variable "adjustedTexCoords"
+0(105) : error C1503: undefined variable "adjustedTexCoords"
+(0) : error C2003: incompatible options for link
+
+ -- --------------------------------------------------- -- 
+
+2025-03-22 20:08:53.096 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.098 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.101 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.104 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.106 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.109 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.112 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.115 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.118 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.120 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.123 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.126 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.129 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.131 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.134 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.137 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.140 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.143 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.145 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.148 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.151 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.154 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.156 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.159 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.162 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.165 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.168 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.170 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.173 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.176 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.179 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.181 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.184 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.187 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.190 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.193 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.195 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.198 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.201 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.204 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.207 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.209 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.212 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.215 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.218 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.220 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.223 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.226 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.229 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.231 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.234 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.237 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.240 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.243 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.245 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.248 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.251 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.254 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.256 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.259 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.262 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.265 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.268 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.270 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.273 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.276 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.279 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.281 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.284 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.287 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.290 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.293 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.295 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.298 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.301 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.304 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.307 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.309 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.312 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.315 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.318 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.320 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.323 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.326 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.329 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.331 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.334 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.337 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.340 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.343 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.345 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.348 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.351 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.354 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.356 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.359 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.362 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.365 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.368 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.370 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.373 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.376 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.379 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.381 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.384 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.387 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.390 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.393 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.395 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.398 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.401 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.404 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.407 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.409 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.412 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.415 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.417 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.420 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.423 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.426 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.429 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.431 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.434 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.437 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.440 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.442 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.445 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.448 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.451 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.454 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.457 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.459 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.462 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.465 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.468 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.470 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.473 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.476 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.479 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.481 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.484 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.487 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.490 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.493 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.495 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.498 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.501 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.504 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.506 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.509 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.512 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.515 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.518 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.520 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.523 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.526 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.529 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.532 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.534 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.537 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.540 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.543 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.545 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.548 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.551 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.554 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.556 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.559 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.562 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.565 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.568 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.571 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.573 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.576 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.579 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.581 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.584 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.587 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.590 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.593 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.595 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.598 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.601 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.604 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.606 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.609 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.612 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.615 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.618 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.620 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.623 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.626 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.629 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.631 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.634 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.637 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.640 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.643 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.645 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.648 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.651 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.654 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.656 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.659 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.662 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.665 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.667 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.670 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.673 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.676 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.679 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.681 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.684 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.687 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.690 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.692 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.695 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.698 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.701 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.703 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.706 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.709 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.712 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.715 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.717 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.720 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.723 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.726 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.728 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.731 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.734 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.737 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.740 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.742 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.745 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.748 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.751 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.753 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.757 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.759 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.762 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.765 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.767 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.770 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.773 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.776 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.779 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.781 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.784 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.788 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.790 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.792 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.795 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.798 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.801 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.804 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.806 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.809 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.812 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.815 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.818 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.820 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.823 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.826 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.829 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.831 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.834 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.837 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.840 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.842 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.845 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.848 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.851 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.854 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.856 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.859 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.862 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.865 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.867 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.870 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.873 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.876 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.879 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.881 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.884 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.887 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.890 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.893 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.895 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.898 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.901 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.903 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.906 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.909 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.912 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.915 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.918 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.920 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.923 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.926 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.929 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.931 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.934 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.937 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.940 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.943 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.945 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.948 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.951 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.954 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.956 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.959 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.962 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.965 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.967 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.970 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.973 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.976 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.979 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.981 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.984 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.987 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.990 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.993 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.995 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:53.998 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.001 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.004 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.006 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.009 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.012 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.015 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.017 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.020 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.023 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.026 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.029 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.031 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.034 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.037 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.040 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.043 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.045 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.048 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.051 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.054 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.056 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.059 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.062 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.065 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.067 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.070 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.073 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.076 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.078 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.081 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.084 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.087 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.090 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.092 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.095 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.098 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.101 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.104 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.106 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.109 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.112 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.115 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.117 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.120 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.123 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.126 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.128 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.131 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.134 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.137 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.140 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.142 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.145 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.148 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.151 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.154 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.156 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.159 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.162 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.165 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.167 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.170 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.173 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.176 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.179 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.181 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.184 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.187 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.190 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.192 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.195 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.198 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.201 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.203 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.206 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.209 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.212 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.215 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.217 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.220 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.223 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.226 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.228 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.231 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.234 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.237 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.240 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.242 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.245 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.248 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.251 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.254 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.256 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.259 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.262 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.265 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.267 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.270 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.273 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.276 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.279 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.281 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.284 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.287 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.290 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.292 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.295 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.298 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.301 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.304 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.306 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.309 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.312 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.315 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.318 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.323 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.325 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.330 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.332 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.335 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.338 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.341 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.344 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.347 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.349 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.352 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.355 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.357 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.360 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.363 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.366 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.369 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.371 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.374 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.377 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.380 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.382 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.385 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.388 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.391 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.394 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.396 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.399 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.402 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.405 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.408 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.410 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.413 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.416 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.419 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.421 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.424 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.427 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.430 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.433 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.435 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.438 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.441 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.444 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.446 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.449 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.452 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.455 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.458 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.460 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.463 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.466 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.469 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.472 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.474 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.477 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.480 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.483 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.485 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.488 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.491 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.494 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.496 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.499 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.502 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.505 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.508 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.510 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.513 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.516 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.519 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.521 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.524 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.527 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.530 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.533 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.535 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.538 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.541 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.544 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.546 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.549 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.552 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.555 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.558 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.560 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.563 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.566 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.569 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.571 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.574 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.577 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.580 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.583 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.585 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.588 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.591 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.594 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.596 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.599 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.602 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.605 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.608 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.611 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.613 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.616 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.619 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.621 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.624 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.627 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.630 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.633 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.635 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.638 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.641 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.644 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.646 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.649 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.652 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.655 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.658 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.660 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.663 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.666 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.669 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.671 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.674 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.677 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.680 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.683 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.685 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.688 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.691 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.694 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.696 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.699 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.702 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.705 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.708 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.710 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.713 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.716 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.719 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.721 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.724 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.727 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.730 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.732 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.735 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.738 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.741 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.744 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.747 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.749 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.752 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.755 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.758 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.760 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.763 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.766 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.769 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.771 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.774 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.777 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.780 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.783 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.785 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.788 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.791 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.794 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.796 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.799 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.802 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.805 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.808 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.810 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.813 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.816 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.819 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.821 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.824 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.827 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.830 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.833 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.835 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.838 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.841 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.844 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.846 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.849 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.852 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.855 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.858 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.861 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.863 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.866 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.869 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.871 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.874 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.877 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.880 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.883 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.885 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.888 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.891 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.894 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.896 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.899 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.902 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.905 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.908 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.910 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.913 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.916 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.919 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.921 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.924 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.927 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.930 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.933 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.935 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.938 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.941 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.944 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.946 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.949 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.952 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.955 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.958 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.960 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.963 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.966 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.969 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.971 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.974 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.977 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.980 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.983 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.985 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.988 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.991 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.994 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.996 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:54.999 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.002 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.005 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.008 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.010 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.013 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.016 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.019 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.021 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.024 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.027 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.030 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.033 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.035 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.038 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.041 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.044 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.046 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.049 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.052 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.055 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.057 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.060 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.063 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.066 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.069 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.071 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.074 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.077 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.080 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.083 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.085 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.088 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.091 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.094 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.097 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.099 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.102 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.105 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.108 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.110 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.113 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.116 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.119 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.122 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.124 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.127 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.130 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.133 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.136 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.138 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.141 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.144 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.146 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.149 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.152 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.157 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.158 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.161 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.164 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.166 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.169 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.172 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.175 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.177 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.180 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.183 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.186 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.188 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.191 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.194 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.197 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.200 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.202 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.205 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.208 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.211 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.214 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.216 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.219 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.222 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.224 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.227 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.230 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.233 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.236 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.239 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.241 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.244 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.247 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.250 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.252 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.255 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.258 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.261 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.264 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.267 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.269 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.272 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.275 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.277 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.280 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.283 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.286 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.289 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.291 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.294 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.297 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.300 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.302 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.305 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.308 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.311 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.313 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.316 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.319 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.322 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.325 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.327 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.330 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.333 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.336 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.338 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.341 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.344 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.347 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.349 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.352 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.355 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.358 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.361 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.364 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.366 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.369 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.372 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.375 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.377 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.380 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.383 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.386 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.388 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.392 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.394 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.397 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.400 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.402 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.405 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.408 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.411 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.413 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.416 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.419 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.422 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.424 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.427 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.430 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.433 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.436 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.438 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.441 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.444 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.447 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.450 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.452 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.455 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.458 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.461 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.464 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.466 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.469 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.472 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.475 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.477 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.480 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.483 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.486 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.488 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.491 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.494 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.497 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.500 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.502 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.505 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.508 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.511 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.513 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.516 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.519 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.522 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.525 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.527 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.530 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.533 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.536 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.538 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.542 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.544 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.547 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.549 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.552 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.555 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.558 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.561 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.563 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.566 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.569 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.572 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.575 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.577 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.580 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.583 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.586 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.588 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.591 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.594 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.597 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.599 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.602 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.605 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.608 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.611 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.613 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.616 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.619 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.622 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.624 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.627 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.630 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.633 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.636 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.638 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.641 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.644 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.647 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.649 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.652 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.655 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.658 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.661 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.663 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.666 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.669 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.672 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.674 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.677 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.680 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.683 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.686 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.688 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.691 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.694 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.697 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.700 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.702 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.705 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.708 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.710 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.714 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.716 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.719 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.722 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.725 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.727 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.730 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.733 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.736 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.738 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.741 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.744 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.747 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.750 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.752 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.755 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.758 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.761 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.763 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.766 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.769 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.772 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.775 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.777 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.780 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.783 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.786 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.788 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.791 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.794 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.797 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.799 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.802 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.805 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.808 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.811 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.813 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.816 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.819 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.822 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.824 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.827 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.830 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.833 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.836 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.838 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.841 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.844 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.847 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.849 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.852 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.855 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.858 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.861 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.863 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.866 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.869 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.872 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.874 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.877 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.880 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.883 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.886 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.888 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.891 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.894 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.897 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.900 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.903 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.905 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.908 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.911 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.914 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.917 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.919 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.922 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.924 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.927 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.930 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.933 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.936 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.938 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.941 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.944 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.947 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.950 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.952 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.955 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.958 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.961 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.964 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.966 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.969 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.972 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.974 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.978 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.980 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.983 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.986 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.989 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.991 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.994 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:55.997 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.000 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.002 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.005 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.008 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.011 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.013 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.016 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.019 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.022 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.025 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.027 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.030 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.033 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.036 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.038 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.041 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.044 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.047 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.050 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.052 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.056 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.058 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.061 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.063 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.066 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.069 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.072 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.075 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.077 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.080 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.083 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.086 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.088 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.091 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.094 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.097 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.099 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.103 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.105 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.108 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.111 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.113 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.116 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.119 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.122 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.124 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.127 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.130 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.133 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.136 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.138 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.141 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.144 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.147 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.150 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.152 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.155 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.158 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.161 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.163 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.166 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.169 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.172 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.175 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.177 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.180 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.183 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.186 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.188 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.191 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.194 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.197 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.199 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.202 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.205 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.208 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.211 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.213 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.216 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.219 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.222 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.224 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.227 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.230 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.233 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.236 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.238 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.241 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.244 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.247 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.249 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.252 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.255 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.258 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.261 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.263 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.266 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.269 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.272 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.275 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.277 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.280 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.283 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.286 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.289 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.291 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.294 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.297 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.300 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.302 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.305 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.308 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.311 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.314 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.316 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.319 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.322 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.324 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.327 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.330 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.333 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.336 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.339 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.341 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.344 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.347 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.350 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.352 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.355 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.358 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.361 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.363 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.366 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.369 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.372 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.374 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.377 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.380 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.383 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.386 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.388 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.391 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.394 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.397 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.399 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.402 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.405 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.408 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.411 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.413 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.416 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.419 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.422 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.424 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.427 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.430 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.433 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.436 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.438 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.441 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.444 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.447 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.449 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.452 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.455 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.458 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.461 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.463 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.466 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.469 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.472 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.474 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.477 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.480 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.483 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.486 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.488 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.491 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.494 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.497 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.499 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.502 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.505 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.508 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.511 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.513 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.516 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.519 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.522 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.524 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.527 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.530 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.533 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.536 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.538 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.541 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.544 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.547 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.549 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.552 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.555 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.558 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.561 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.563 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.566 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.569 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.572 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.575 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.577 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.580 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.583 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.586 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.588 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.591 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.595 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:56.597 ERROR [21044] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:08:59.862 INFO  [23976] [Window::Init@29] GLFW Initialized
+2025-03-22 20:09:00.044 INFO  [23976] [Window::Init@50] GLEW Initialized
+2025-03-22 20:09:00.044 INFO  [23976] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:09:01.765 ERROR [23976] [Shader::checkCompileErrors@111] ERROR::SHADER_COMPILATION_ERROR of type: FRAGMENT
+0(102) : error C1503: undefined variable "adjustedTexCoords"
+0(103) : error C1503: undefined variable "adjustedTexCoords"
+0(104) : error C1503: undefined variable "adjustedTexCoords"
+0(105) : error C1503: undefined variable "adjustedTexCoords"
+
+ -- --------------------------------------------------- -- 
+
+2025-03-22 20:09:01.780 ERROR [23976] [Shader::checkCompileErrors@120] ERROR::PROGRAM_LINKING_ERROR of type: PROGRAM
+Fragment info
+-------------
+0(102) : error C1503: undefined variable "adjustedTexCoords"
+0(103) : error C1503: undefined variable "adjustedTexCoords"
+0(104) : error C1503: undefined variable "adjustedTexCoords"
+0(105) : error C1503: undefined variable "adjustedTexCoords"
+(0) : error C2003: incompatible options for link
+
+ -- --------------------------------------------------- -- 
+
+2025-03-22 20:09:02.020 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.023 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.025 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.028 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.031 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.034 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.037 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.039 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.042 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.045 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.048 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.050 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.053 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.056 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.059 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.061 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.064 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.067 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.070 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.072 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.075 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.078 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.081 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.084 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.086 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.089 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.092 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.095 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.098 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.100 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.103 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.106 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.109 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.111 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.114 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.117 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.120 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.123 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.125 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.128 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.131 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.134 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.137 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.139 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.142 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.145 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.148 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.150 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.153 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.156 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.159 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.162 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.165 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.167 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.170 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.173 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.175 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.178 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.181 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.184 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.186 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.189 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.192 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.195 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.197 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.200 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.203 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.206 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.209 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.211 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.214 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.217 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.220 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.222 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.225 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.228 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.231 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.234 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.236 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.240 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.242 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.245 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.248 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.250 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.253 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.256 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.259 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.261 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.264 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.267 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.270 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.273 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.275 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.278 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.281 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.284 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.286 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.289 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.292 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.295 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.298 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.300 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.303 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.306 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.309 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.312 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.314 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.317 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.320 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.323 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.325 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.328 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.331 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.334 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.336 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.339 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.342 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.345 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.348 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.351 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.353 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.356 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.359 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.361 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.364 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.367 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.370 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.373 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.375 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.378 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.381 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.384 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.387 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.389 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.392 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.395 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.398 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.401 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.403 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.406 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.409 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.412 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.414 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.417 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.420 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.423 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.426 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.428 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.431 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.434 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.437 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.440 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.442 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.445 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.448 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.451 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.453 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.456 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.459 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.462 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.464 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.467 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.470 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.473 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.476 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.478 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.481 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.484 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.487 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.489 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.492 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.495 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.498 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.500 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.503 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.506 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.509 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.512 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.514 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.517 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.520 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.523 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.526 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.528 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.531 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.534 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.537 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.540 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.542 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.545 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.548 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.551 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.553 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.556 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.559 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.562 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.565 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.567 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.570 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.573 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.576 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.578 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.581 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.584 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.587 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.589 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.592 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.595 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.598 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.601 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.603 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.606 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.609 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.612 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.614 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.617 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.620 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.623 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.626 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.628 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.631 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.634 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.636 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.639 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.642 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.645 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.648 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.651 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.653 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.656 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.659 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.662 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.664 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.667 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.670 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.673 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.675 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.678 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.681 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.684 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.687 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.689 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.692 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.695 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.698 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.700 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.703 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.706 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.709 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.712 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.714 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.717 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.720 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.723 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.725 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.728 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.731 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.734 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.737 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.739 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.742 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.745 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.748 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.750 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.754 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.756 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.759 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.762 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.764 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.767 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.770 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.773 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.776 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.778 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.781 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.784 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.787 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.790 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.792 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.795 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.798 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.800 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.803 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.806 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.809 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.811 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:02.814 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.113 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.114 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.116 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.119 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.121 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.124 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.127 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.130 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.152 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.152 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.155 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.158 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.161 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.163 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.166 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.169 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.172 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.174 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.177 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.180 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.183 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.186 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.189 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.192 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.194 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.197 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.200 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.202 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.205 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.208 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.211 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.214 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.216 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.219 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.222 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.225 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.228 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.230 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.233 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.236 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.239 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.241 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.244 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.247 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.250 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.253 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.255 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.258 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.261 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.264 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.266 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.269 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.272 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.275 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.278 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.280 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.283 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.286 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.289 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.291 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.294 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.297 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.300 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.302 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.305 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.308 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.311 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.314 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.316 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.319 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.322 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.325 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.327 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.330 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.333 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.336 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.339 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.341 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.344 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.347 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.350 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.352 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.355 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.358 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.361 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.363 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.366 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.369 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.372 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.375 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.377 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.380 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.383 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.386 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.388 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.391 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.394 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.397 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.400 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.402 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.405 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.408 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.411 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.413 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.416 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.419 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.422 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.425 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.427 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.430 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.433 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.436 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.438 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.441 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.444 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.447 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.450 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.452 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.455 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.458 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.461 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.464 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.466 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.469 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.472 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.475 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.477 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.480 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.483 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.486 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.489 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.491 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.494 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.497 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.500 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.502 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.505 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.508 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.511 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.514 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.517 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.519 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.522 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.525 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.528 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.530 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.533 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.536 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.539 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.541 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.544 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.547 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.550 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.553 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.555 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.558 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.561 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.564 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.566 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.569 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.572 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.575 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.578 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.580 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.583 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.586 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.589 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.591 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.595 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.597 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.600 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.603 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.605 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.608 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.611 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.614 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.616 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:03.688 ERROR [23976] [Renderer::Render@79] OpenGL Error: 1282
+2025-03-22 20:09:24.598 INFO  [14440] [Window::Init@29] GLFW Initialized
+2025-03-22 20:09:24.760 INFO  [14440] [Window::Init@50] GLEW Initialized
+2025-03-22 20:09:24.760 INFO  [14440] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:10:26.595 INFO  [9604] [Window::Init@29] GLFW Initialized
+2025-03-22 20:10:26.772 INFO  [9604] [Window::Init@50] GLEW Initialized
+2025-03-22 20:10:26.772 INFO  [9604] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:11:18.339 INFO  [23480] [Window::Init@29] GLFW Initialized
+2025-03-22 20:11:18.552 INFO  [23480] [Window::Init@50] GLEW Initialized
+2025-03-22 20:11:18.552 INFO  [23480] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:11:33.581 INFO  [19252] [Window::Init@29] GLFW Initialized
+2025-03-22 20:11:33.748 INFO  [19252] [Window::Init@50] GLEW Initialized
+2025-03-22 20:11:33.748 INFO  [19252] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:13:27.231 INFO  [14348] [Window::Init@29] GLFW Initialized
+2025-03-22 20:13:27.382 INFO  [14348] [Window::Init@50] GLEW Initialized
+2025-03-22 20:13:27.382 INFO  [14348] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:13:57.514 INFO  [3004] [Window::Init@29] GLFW Initialized
+2025-03-22 20:13:57.671 INFO  [3004] [Window::Init@50] GLEW Initialized
+2025-03-22 20:13:57.671 INFO  [3004] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:14:21.238 INFO  [24644] [Window::Init@29] GLFW Initialized
+2025-03-22 20:14:21.396 INFO  [24644] [Window::Init@50] GLEW Initialized
+2025-03-22 20:14:21.397 INFO  [24644] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:16:32.296 INFO  [2996] [Window::Init@29] GLFW Initialized
+2025-03-22 20:16:32.465 INFO  [2996] [Window::Init@50] GLEW Initialized
+2025-03-22 20:16:32.465 INFO  [2996] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:17:27.254 INFO  [4408] [Window::Init@29] GLFW Initialized
+2025-03-22 20:17:27.418 INFO  [4408] [Window::Init@50] GLEW Initialized
+2025-03-22 20:17:27.419 INFO  [4408] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:17:41.835 INFO  [25088] [Window::Init@29] GLFW Initialized
+2025-03-22 20:17:42.025 INFO  [25088] [Window::Init@50] GLEW Initialized
+2025-03-22 20:17:42.025 INFO  [25088] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:21:46.925 INFO  [10328] [Window::Init@29] GLFW Initialized
+2025-03-22 20:21:47.105 INFO  [10328] [Window::Init@50] GLEW Initialized
+2025-03-22 20:21:47.105 INFO  [10328] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:22:07.804 INFO  [6916] [Window::Init@29] GLFW Initialized
+2025-03-22 20:22:08.061 INFO  [6916] [Window::Init@50] GLEW Initialized
+2025-03-22 20:22:08.061 INFO  [6916] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:22:20.086 INFO  [1608] [Window::Init@29] GLFW Initialized
+2025-03-22 20:22:20.311 INFO  [1608] [Window::Init@50] GLEW Initialized
+2025-03-22 20:22:20.311 INFO  [1608] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:22:38.000 INFO  [24856] [Window::Init@29] GLFW Initialized
+2025-03-22 20:22:38.159 INFO  [24856] [Window::Init@50] GLEW Initialized
+2025-03-22 20:22:38.159 INFO  [24856] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:27:51.628 INFO  [19256] [Window::Init@29] GLFW Initialized
+2025-03-22 20:27:51.811 INFO  [19256] [Window::Init@50] GLEW Initialized
+2025-03-22 20:27:51.811 INFO  [19256] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:28:31.776 INFO  [20648] [Window::Init@29] GLFW Initialized
+2025-03-22 20:28:31.959 INFO  [20648] [Window::Init@50] GLEW Initialized
+2025-03-22 20:28:31.959 INFO  [20648] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:29:39.585 INFO  [13248] [Window::Init@29] GLFW Initialized
+2025-03-22 20:29:39.750 INFO  [13248] [Window::Init@50] GLEW Initialized
+2025-03-22 20:29:39.750 INFO  [13248] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:30:06.883 INFO  [6812] [Window::Init@29] GLFW Initialized
+2025-03-22 20:30:07.082 INFO  [6812] [Window::Init@50] GLEW Initialized
+2025-03-22 20:30:07.082 INFO  [6812] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:30:31.918 INFO  [2340] [Window::Init@29] GLFW Initialized
+2025-03-22 20:30:32.206 INFO  [2340] [Window::Init@50] GLEW Initialized
+2025-03-22 20:30:32.206 INFO  [2340] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:30:49.202 INFO  [10672] [Window::Init@29] GLFW Initialized
+2025-03-22 20:30:49.446 INFO  [10672] [Window::Init@50] GLEW Initialized
+2025-03-22 20:30:49.446 INFO  [10672] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:31:16.862 INFO  [21956] [Window::Init@29] GLFW Initialized
+2025-03-22 20:31:17.034 INFO  [21956] [Window::Init@50] GLEW Initialized
+2025-03-22 20:31:17.034 INFO  [21956] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:31:54.561 INFO  [8976] [Window::Init@29] GLFW Initialized
+2025-03-22 20:31:54.741 INFO  [8976] [Window::Init@50] GLEW Initialized
+2025-03-22 20:31:54.741 INFO  [8976] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:32:15.091 INFO  [24304] [Window::Init@29] GLFW Initialized
+2025-03-22 20:32:15.264 INFO  [24304] [Window::Init@50] GLEW Initialized
+2025-03-22 20:32:15.264 INFO  [24304] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:34:33.629 INFO  [12668] [Window::Init@29] GLFW Initialized
+2025-03-22 20:34:33.786 INFO  [12668] [Window::Init@50] GLEW Initialized
+2025-03-22 20:34:33.786 INFO  [12668] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:35:32.020 INFO  [25212] [Window::Init@29] GLFW Initialized
+2025-03-22 20:35:32.193 INFO  [25212] [Window::Init@50] GLEW Initialized
+2025-03-22 20:35:32.193 INFO  [25212] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:36:28.866 INFO  [23236] [Window::Init@29] GLFW Initialized
+2025-03-22 20:36:29.051 INFO  [23236] [Window::Init@50] GLEW Initialized
+2025-03-22 20:36:29.051 INFO  [23236] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:36:51.865 INFO  [9080] [Window::Init@29] GLFW Initialized
+2025-03-22 20:36:52.078 INFO  [9080] [Window::Init@50] GLEW Initialized
+2025-03-22 20:36:52.078 INFO  [9080] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:39:41.934 INFO  [23376] [Window::Init@29] GLFW Initialized
+2025-03-22 20:39:42.137 INFO  [23376] [Window::Init@50] GLEW Initialized
+2025-03-22 20:39:42.137 INFO  [23376] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:40:15.979 INFO  [24668] [Window::Init@29] GLFW Initialized
+2025-03-22 20:40:16.168 INFO  [24668] [Window::Init@50] GLEW Initialized
+2025-03-22 20:40:16.168 INFO  [24668] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:40:30.892 INFO  [23196] [Window::Init@29] GLFW Initialized
+2025-03-22 20:40:31.079 INFO  [23196] [Window::Init@50] GLEW Initialized
+2025-03-22 20:40:31.079 INFO  [23196] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:40:47.451 INFO  [22848] [Window::Init@29] GLFW Initialized
+2025-03-22 20:40:47.661 INFO  [22848] [Window::Init@50] GLEW Initialized
+2025-03-22 20:40:47.661 INFO  [22848] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:43:42.817 INFO  [6892] [Window::Init@29] GLFW Initialized
+2025-03-22 20:43:42.973 INFO  [6892] [Window::Init@50] GLEW Initialized
+2025-03-22 20:43:42.973 INFO  [6892] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:44:39.315 INFO  [10436] [Window::Init@29] GLFW Initialized
+2025-03-22 20:44:39.561 INFO  [10436] [Window::Init@50] GLEW Initialized
+2025-03-22 20:44:39.562 INFO  [10436] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:46:34.923 INFO  [16760] [Window::Init@29] GLFW Initialized
+2025-03-22 20:46:35.083 INFO  [16760] [Window::Init@50] GLEW Initialized
+2025-03-22 20:46:35.083 INFO  [16760] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:52:48.848 INFO  [6132] [Window::Init@29] GLFW Initialized
+2025-03-22 20:52:49.019 INFO  [6132] [Window::Init@50] GLEW Initialized
+2025-03-22 20:52:49.020 INFO  [6132] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:53:10.485 INFO  [9940] [Window::Init@29] GLFW Initialized
+2025-03-22 20:53:10.655 INFO  [9940] [Window::Init@50] GLEW Initialized
+2025-03-22 20:53:10.655 INFO  [9940] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-22 20:54:13.513 INFO  [5404] [Window::Init@29] GLFW Initialized
+2025-03-22 20:54:13.694 INFO  [5404] [Window::Init@50] GLEW Initialized
+2025-03-22 20:54:13.694 INFO  [5404] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:19:11.995 INFO  [27428] [Window::Init@29] GLFW Initialized
+2025-03-23 14:19:12.178 INFO  [27428] [Window::Init@50] GLEW Initialized
+2025-03-23 14:19:12.178 INFO  [27428] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:20:12.400 INFO  [27324] [Window::Init@29] GLFW Initialized
+2025-03-23 14:20:12.565 INFO  [27324] [Window::Init@50] GLEW Initialized
+2025-03-23 14:20:12.565 INFO  [27324] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:20:36.593 INFO  [21388] [Window::Init@29] GLFW Initialized
+2025-03-23 14:20:36.757 INFO  [21388] [Window::Init@50] GLEW Initialized
+2025-03-23 14:20:36.757 INFO  [21388] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:21:58.009 INFO  [13172] [Window::Init@29] GLFW Initialized
+2025-03-23 14:21:58.186 INFO  [13172] [Window::Init@50] GLEW Initialized
+2025-03-23 14:21:58.186 INFO  [13172] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:22:31.527 INFO  [4560] [Window::Init@29] GLFW Initialized
+2025-03-23 14:22:31.719 INFO  [4560] [Window::Init@50] GLEW Initialized
+2025-03-23 14:22:31.719 INFO  [4560] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:22:57.492 INFO  [17820] [Window::Init@29] GLFW Initialized
+2025-03-23 14:22:57.701 INFO  [17820] [Window::Init@50] GLEW Initialized
+2025-03-23 14:22:57.701 INFO  [17820] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:23:03.147 INFO  [2576] [Window::Init@29] GLFW Initialized
+2025-03-23 14:23:03.352 INFO  [2576] [Window::Init@50] GLEW Initialized
+2025-03-23 14:23:03.352 INFO  [2576] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:23:41.478 INFO  [23240] [Window::Init@29] GLFW Initialized
+2025-03-23 14:23:41.647 INFO  [23240] [Window::Init@50] GLEW Initialized
+2025-03-23 14:23:41.647 INFO  [23240] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:24:05.891 INFO  [28180] [Window::Init@29] GLFW Initialized
+2025-03-23 14:24:06.091 INFO  [28180] [Window::Init@50] GLEW Initialized
+2025-03-23 14:24:06.091 INFO  [28180] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:24:29.660 INFO  [6984] [Window::Init@29] GLFW Initialized
+2025-03-23 14:24:29.836 INFO  [6984] [Window::Init@50] GLEW Initialized
+2025-03-23 14:24:29.836 INFO  [6984] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:24:36.244 INFO  [24300] [Window::Init@29] GLFW Initialized
+2025-03-23 14:24:36.455 INFO  [24300] [Window::Init@50] GLEW Initialized
+2025-03-23 14:24:36.455 INFO  [24300] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:25:14.995 INFO  [14372] [Window::Init@29] GLFW Initialized
+2025-03-23 14:25:15.219 INFO  [14372] [Window::Init@50] GLEW Initialized
+2025-03-23 14:25:15.219 INFO  [14372] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:25:32.039 INFO  [28036] [Window::Init@29] GLFW Initialized
+2025-03-23 14:25:32.237 INFO  [28036] [Window::Init@50] GLEW Initialized
+2025-03-23 14:25:32.237 INFO  [28036] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:26:35.024 INFO  [22888] [Window::Init@29] GLFW Initialized
+2025-03-23 14:26:35.247 INFO  [22888] [Window::Init@50] GLEW Initialized
+2025-03-23 14:26:35.247 INFO  [22888] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:27:00.529 INFO  [26792] [Window::Init@29] GLFW Initialized
+2025-03-23 14:27:00.716 INFO  [26792] [Window::Init@50] GLEW Initialized
+2025-03-23 14:27:00.716 INFO  [26792] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:30:04.711 INFO  [2496] [Window::Init@29] GLFW Initialized
+2025-03-23 14:30:05.037 INFO  [2496] [Window::Init@50] GLEW Initialized
+2025-03-23 14:30:05.038 INFO  [2496] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:30:56.428 INFO  [11188] [Window::Init@29] GLFW Initialized
+2025-03-23 14:30:56.623 INFO  [11188] [Window::Init@50] GLEW Initialized
+2025-03-23 14:30:56.623 INFO  [11188] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:31:26.077 INFO  [13528] [Window::Init@29] GLFW Initialized
+2025-03-23 14:31:26.249 INFO  [13528] [Window::Init@50] GLEW Initialized
+2025-03-23 14:31:26.249 INFO  [13528] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:32:31.108 INFO  [24484] [Window::Init@29] GLFW Initialized
+2025-03-23 14:32:31.307 INFO  [24484] [Window::Init@50] GLEW Initialized
+2025-03-23 14:32:31.308 INFO  [24484] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:33:40.834 INFO  [18664] [Window::Init@29] GLFW Initialized
+2025-03-23 14:33:41.091 INFO  [18664] [Window::Init@50] GLEW Initialized
+2025-03-23 14:33:41.092 INFO  [18664] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:34:37.602 INFO  [8572] [Window::Init@29] GLFW Initialized
+2025-03-23 14:34:37.807 INFO  [8572] [Window::Init@50] GLEW Initialized
+2025-03-23 14:34:37.807 INFO  [8572] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:36:30.704 INFO  [15708] [Window::Init@29] GLFW Initialized
+2025-03-23 14:36:31.111 INFO  [15708] [Window::Init@50] GLEW Initialized
+2025-03-23 14:36:31.111 INFO  [15708] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:50:03.824 INFO  [5672] [Window::Init@29] GLFW Initialized
+2025-03-23 14:50:04.105 INFO  [5672] [Window::Init@50] GLEW Initialized
+2025-03-23 14:50:04.105 INFO  [5672] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:50:54.499 INFO  [12932] [Window::Init@29] GLFW Initialized
+2025-03-23 14:50:54.643 INFO  [12932] [Window::Init@50] GLEW Initialized
+2025-03-23 14:50:54.644 INFO  [12932] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:53:18.199 INFO  [4992] [Window::Init@29] GLFW Initialized
+2025-03-23 14:53:18.368 INFO  [4992] [Window::Init@50] GLEW Initialized
+2025-03-23 14:53:18.368 INFO  [4992] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:54:31.072 INFO  [9560] [Window::Init@29] GLFW Initialized
+2025-03-23 14:54:31.241 INFO  [9560] [Window::Init@50] GLEW Initialized
+2025-03-23 14:54:31.242 INFO  [9560] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:55:01.836 INFO  [22176] [Window::Init@29] GLFW Initialized
+2025-03-23 14:55:02.030 INFO  [22176] [Window::Init@50] GLEW Initialized
+2025-03-23 14:55:02.030 INFO  [22176] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:56:37.138 INFO  [11392] [Window::Init@29] GLFW Initialized
+2025-03-23 14:56:37.310 INFO  [11392] [Window::Init@50] GLEW Initialized
+2025-03-23 14:56:37.310 INFO  [11392] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:57:21.640 INFO  [19260] [Window::Init@29] GLFW Initialized
+2025-03-23 14:57:21.815 INFO  [19260] [Window::Init@50] GLEW Initialized
+2025-03-23 14:57:21.815 INFO  [19260] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 14:58:32.685 INFO  [23248] [Window::Init@29] GLFW Initialized
+2025-03-23 14:58:32.844 INFO  [23248] [Window::Init@50] GLEW Initialized
+2025-03-23 14:58:32.844 INFO  [23248] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 15:01:59.690 INFO  [12508] [Window::Init@29] GLFW Initialized
+2025-03-23 15:01:59.859 INFO  [12508] [Window::Init@50] GLEW Initialized
+2025-03-23 15:01:59.859 INFO  [12508] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 15:03:41.775 INFO  [12736] [Window::Init@29] GLFW Initialized
+2025-03-23 15:03:41.948 INFO  [12736] [Window::Init@50] GLEW Initialized
+2025-03-23 15:03:41.948 INFO  [12736] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 15:04:34.753 INFO  [26088] [Window::Init@29] GLFW Initialized
+2025-03-23 15:04:34.917 INFO  [26088] [Window::Init@50] GLEW Initialized
+2025-03-23 15:04:34.917 INFO  [26088] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 15:05:34.159 INFO  [24276] [Window::Init@29] GLFW Initialized
+2025-03-23 15:05:34.320 INFO  [24276] [Window::Init@50] GLEW Initialized
+2025-03-23 15:05:34.320 INFO  [24276] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 15:06:02.480 INFO  [4900] [Window::Init@29] GLFW Initialized
+2025-03-23 15:06:02.946 INFO  [4900] [Window::Init@50] GLEW Initialized
+2025-03-23 15:06:02.946 INFO  [4900] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 15:08:05.138 INFO  [3896] [Window::Init@29] GLFW Initialized
+2025-03-23 15:08:05.306 INFO  [3896] [Window::Init@50] GLEW Initialized
+2025-03-23 15:08:05.307 INFO  [3896] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 15:09:11.224 INFO  [6128] [Window::Init@29] GLFW Initialized
+2025-03-23 15:09:11.411 INFO  [6128] [Window::Init@50] GLEW Initialized
+2025-03-23 15:09:11.412 INFO  [6128] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 15:10:42.113 INFO  [24512] [Window::Init@29] GLFW Initialized
+2025-03-23 15:10:42.274 INFO  [24512] [Window::Init@50] GLEW Initialized
+2025-03-23 15:10:42.274 INFO  [24512] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 15:11:46.202 INFO  [2000] [Window::Init@29] GLFW Initialized
+2025-03-23 15:11:46.369 INFO  [2000] [Window::Init@50] GLEW Initialized
+2025-03-23 15:11:46.369 INFO  [2000] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 15:12:27.868 INFO  [24628] [Window::Init@29] GLFW Initialized
+2025-03-23 15:12:28.060 INFO  [24628] [Window::Init@50] GLEW Initialized
+2025-03-23 15:12:28.060 INFO  [24628] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 15:13:08.444 INFO  [16060] [Window::Init@29] GLFW Initialized
+2025-03-23 15:13:08.610 INFO  [16060] [Window::Init@50] GLEW Initialized
+2025-03-23 15:13:08.610 INFO  [16060] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 15:16:54.184 INFO  [25784] [Window::Init@29] GLFW Initialized
+2025-03-23 15:16:54.357 INFO  [25784] [Window::Init@50] GLEW Initialized
+2025-03-23 15:16:54.357 INFO  [25784] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 15:17:10.648 INFO  [12332] [Window::Init@29] GLFW Initialized
+2025-03-23 15:17:10.817 INFO  [12332] [Window::Init@50] GLEW Initialized
+2025-03-23 15:17:10.817 INFO  [12332] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 15:19:50.473 INFO  [15004] [Window::Init@29] GLFW Initialized
+2025-03-23 15:19:50.633 INFO  [15004] [Window::Init@50] GLEW Initialized
+2025-03-23 15:19:50.633 INFO  [15004] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 15:20:33.286 INFO  [9140] [Window::Init@29] GLFW Initialized
+2025-03-23 15:20:33.462 INFO  [9140] [Window::Init@50] GLEW Initialized
+2025-03-23 15:20:33.462 INFO  [9140] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 15:21:00.314 INFO  [10892] [Window::Init@29] GLFW Initialized
+2025-03-23 15:21:00.485 INFO  [10892] [Window::Init@50] GLEW Initialized
+2025-03-23 15:21:00.485 INFO  [10892] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 15:21:30.091 INFO  [18736] [Window::Init@29] GLFW Initialized
+2025-03-23 15:21:30.254 INFO  [18736] [Window::Init@50] GLEW Initialized
+2025-03-23 15:21:30.255 INFO  [18736] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 15:22:23.123 INFO  [9816] [Window::Init@29] GLFW Initialized
+2025-03-23 15:22:23.292 INFO  [9816] [Window::Init@50] GLEW Initialized
+2025-03-23 15:22:23.292 INFO  [9816] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 15:23:04.879 INFO  [25384] [Window::Init@29] GLFW Initialized
+2025-03-23 15:23:05.058 INFO  [25384] [Window::Init@50] GLEW Initialized
+2025-03-23 15:23:05.058 INFO  [25384] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 15:31:30.754 INFO  [21416] [Window::Init@29] GLFW Initialized
+2025-03-23 15:31:30.918 INFO  [21416] [Window::Init@50] GLEW Initialized
+2025-03-23 15:31:30.919 INFO  [21416] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 15:32:55.373 INFO  [19236] [Window::Init@29] GLFW Initialized
+2025-03-23 15:32:55.531 INFO  [19236] [Window::Init@50] GLEW Initialized
+2025-03-23 15:32:55.531 INFO  [19236] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 15:33:13.512 INFO  [15296] [Window::Init@29] GLFW Initialized
+2025-03-23 15:33:13.664 INFO  [15296] [Window::Init@50] GLEW Initialized
+2025-03-23 15:33:13.664 INFO  [15296] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 15:33:37.821 INFO  [8456] [Window::Init@29] GLFW Initialized
+2025-03-23 15:33:37.983 INFO  [8456] [Window::Init@50] GLEW Initialized
+2025-03-23 15:33:37.984 INFO  [8456] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 15:35:06.037 INFO  [18740] [Window::Init@29] GLFW Initialized
+2025-03-23 15:35:06.199 INFO  [18740] [Window::Init@50] GLEW Initialized
+2025-03-23 15:35:06.199 INFO  [18740] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-03-23 15:35:37.153 INFO  [9508] [Window::Init@29] GLFW Initialized
+2025-03-23 15:35:37.317 INFO  [9508] [Window::Init@50] GLEW Initialized
+2025-03-23 15:35:37.317 INFO  [9508] [Window::Init@52] 3.3.0 NVIDIA 572.70

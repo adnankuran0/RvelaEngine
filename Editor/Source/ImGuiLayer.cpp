@@ -1,7 +1,6 @@
-#include "ImGuiLayer.h"
+﻿#include "ImGuiLayer.h"
 #include "Scene/Components.h"
 #include "Scene/Entity.h"
-
 
 ImGuiLayer::ImGuiLayer(Engine* engine)
     : m_Engine(engine)
@@ -14,10 +13,16 @@ ImGuiLayer::~ImGuiLayer()
 
 void ImGuiLayer::OnAttach()
 {
-    
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+    // Docking özelliğini kontrol et ve etkinleştir
+#ifdef ImGuiConfigFlags_DockingEnable
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    std::cout << "Docking özelliği etkinleştirildi." << std::endl;
+#else
+#endif
 
     ImGui_ImplGlfw_InitForOpenGL(m_Engine->GetWindow()->GetGLFWWindow(), true);
     ImGui_ImplOpenGL3_Init("#version 330 core");
@@ -41,6 +46,26 @@ void ImGuiLayer::OnUpdate()
 
 void ImGuiLayer::OnRender()
 {
+    static entt::entity selectedEntity = entt::null;
+
+    // Docking destekleniyorsa dockspace oluştur
+#ifdef ImGuiConfigFlags_DockingEnable
+    ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+#else
+    // Docking yoksa manuel sabitleme
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGui::SetNextWindowSize(ImVec2(ImGui::GetIO().DisplaySize.x * 0.2f, ImGui::GetIO().DisplaySize.y));
+#endif
+
+    DrawSceneHierarchyPanel(m_Engine->GetScene()->GetRegistry(), selectedEntity);
+
+#ifdef ImGuiConfigFlags_DockingEnable
+    // Docking varsa sağa sabitle
+#else
+    ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x * 0.8f, 0));
+    ImGui::SetNextWindowSize(ImVec2(ImGui::GetIO().DisplaySize.x * 0.2f, ImGui::GetIO().DisplaySize.y));
+#endif
+    DrawInspectorPanel(m_Engine->GetScene()->GetRegistry(), selectedEntity);
 
     ImGui::Begin("Engine Debug");
     ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
@@ -49,104 +74,133 @@ void ImGuiLayer::OnRender()
     }
     ImGui::End();
 
-    // Entity Management Panels
-    static entt::entity selectedEntity = entt::null;
-
-    DrawSceneHierarchyPanel(m_Engine->GetScene()->GetRegistry(), selectedEntity);
-    DrawEntityCreationPanel(m_Engine->GetScene()->GetRegistry(), selectedEntity);
-    DrawTransformEditor(m_Engine->GetScene()->GetRegistry(), selectedEntity);
-    DrawParentChildEditor(m_Engine->GetScene()->GetRegistry(), selectedEntity);
-
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 void ImGuiLayer::OnEvent()
 {
-    
+    // Olayları işleyin (gerekirse)
 }
 
-void ImGuiLayer::DrawSceneHierarchyPanel(entt::registry& registry, entt::entity& selectedEntity) {
-    ImGui::Begin("Scene Hierarchy");
+void ImGuiLayer::DrawSceneHierarchyPanel(entt::registry& registry, entt::entity& selectedEntity)
+{
+    ImGui::Begin("Scene Hierarchy", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 
-    registry.view<TransformComponent>().each([&](entt::entity entity, TransformComponent&) {
-        std::string entityName = "Entity " + std::to_string((uint32_t)entity);
-        if (ImGui::Selectable(entityName.c_str(), selectedEntity == entity)) {
-            selectedEntity = entity;
-        }
-        });
-
-    ImGui::End();
-}
-
-void ImGuiLayer::DrawEntityCreationPanel(entt::registry& registry, entt::entity& selectedEntity) {
-    ImGui::Begin("Entity Operations");
-
-    if (ImGui::Button("Create Entity")) {
-        selectedEntity = entt::entity(m_Engine->GetScene()->CreateEntity("test"));
-        
-    }
-
-    if (selectedEntity != entt::null) {
-        if (ImGui::Button("Delete Selected Entity")) {
-            m_Engine->GetScene()->DestroyEntity(selectedEntity);
-            selectedEntity = entt::null;
-        }
-    }
-
-    ImGui::End();
-}
-
-void ImGuiLayer::DrawTransformEditor(entt::registry& registry, entt::entity selectedEntity) {
-    if (selectedEntity == entt::null || !registry.any_of<TransformComponent>(selectedEntity))
-        return;
-
-    auto& transform = registry.get<TransformComponent>(selectedEntity);
-
-    ImGui::Begin("Transform Editor");
-
-    ImGui::Text("Position");
-    ImGui::DragFloat3("##Position", &transform.position[0], 0.1f);
-
-    ImGui::Text("Rotation");
-    ImGui::DragFloat3("##Rotation", &transform.rotation[0], 0.1f,-360.0f,360.0f);
-
-    ImGui::Text("Scale");
-    ImGui::DragFloat3("##Scale", &transform.scale[0], 0.1f, 0.1f, 10.0f);
-
-    if (ImGui::Button("Reset Transform")) {
-        transform.position = { 0.0f, 0.0f, 0.0f };
-        transform.rotation = { 0.0f, 0.0f, 0.0f };
-        transform.scale = { 1.0f, 1.0f, 1.0f };
-    }
-
-    ImGui::End();
-}
-
-void ImGuiLayer::DrawParentChildEditor(entt::registry& registry, entt::entity selectedEntity) {
-    if (selectedEntity == entt::null || !registry.any_of<SceneTreeComponent>(selectedEntity))
-        return;
-
-    auto& selectedNode = registry.get<SceneTreeComponent>(selectedEntity);
-
-    ImGui::Begin("Parent/Child Editor");
-
-    ImGui::Text("Parent");
-
-    if (ImGui::BeginCombo("##Parent", selectedNode.parent == entt::null ? "None" : std::to_string((uint32_t)selectedNode.parent).c_str())) {
-        if (ImGui::Selectable("None", selectedNode.parent == entt::null)) {
-            m_Engine->GetScene()->RemoveParent(selectedEntity);
-        }
-
-        registry.view<SceneTreeComponent>().each([&](entt::entity entity, SceneTreeComponent&) {
-            if (entity != selectedEntity) {
-                if (ImGui::Selectable(std::to_string((uint32_t)entity).c_str(), selectedNode.parent == entity)) {
-                    m_Engine->GetScene()->SetParent(selectedEntity, entity);
-                }
+    // Root entity'leri bul (parent'ı olmayanlar)
+    auto rootEntities = [&registry]() {
+        std::vector<entt::entity> roots;
+        registry.view<SceneTreeComponent>().each([&](entt::entity e, SceneTreeComponent& stc) {
+            if (stc.parent == entt::null) {
+                roots.push_back(e);
             }
             });
+        return roots;
+        };
 
-        ImGui::EndCombo();
+    // Bir entity'nin çocuklarını bulan fonksiyon
+    auto getChildren = [&registry](entt::entity parent) {
+        std::vector<entt::entity> children;
+        registry.view<SceneTreeComponent>().each([&](entt::entity e, SceneTreeComponent& stc) {
+            if (stc.parent == parent) {
+                children.push_back(e);
+            }
+            });
+        return children;
+        };
+
+    // Entity ağaç yapısını çizen rekürsif fonksiyon
+    std::function<void(entt::entity)> DrawEntityNode = [&](entt::entity entity) {
+        auto children = getChildren(entity);
+        bool isLeaf = children.empty(); // Çocuk yoksa yaprak (leaf) düğüm
+        ImGuiTreeNodeFlags flags = isLeaf ? ImGuiTreeNodeFlags_Leaf : 0;
+        flags |= ImGuiTreeNodeFlags_OpenOnArrow; // Okla açma seçeneği
+
+        std::string entityName = "Entity " + std::to_string((uint32_t)entity);
+        bool nodeOpen = ImGui::TreeNodeEx(entityName.c_str(), flags);
+
+        // Sol veya sağ tıkla entity seçimi
+        if (ImGui::IsItemClicked(ImGuiMouseButton_Left) || ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
+            selectedEntity = entity;
+        }
+
+        // Sağ tıkla açılan entity'ye özel menü
+        if (ImGui::BeginPopupContextItem()) {
+            if (ImGui::MenuItem("Delete Entity")) {
+                m_Engine->GetScene()->DestroyEntity(entity);
+                if (selectedEntity == entity) selectedEntity = entt::null;
+            }
+            ImGui::EndPopup();
+        }
+
+        // Çocukları varsa, açıldığında onları da çiz
+        if (nodeOpen) {
+            for (auto child : children) {
+                DrawEntityNode(child);
+            }
+            ImGui::TreePop();
+        }
+        };
+
+    // Tüm root entity'leri çiz
+    for (auto root : rootEntities()) {
+        DrawEntityNode(root);
+    }
+
+    // Panelin boş alanına sağ tıkla yeni entity oluşturma menüsü
+    if (ImGui::BeginPopupContextWindow()) {
+        if (ImGui::MenuItem("Create Entity")) {
+            selectedEntity = m_Engine->GetScene()->CreateEntity("New Entity");
+        }
+        ImGui::EndPopup();
+    }
+
+    ImGui::End();
+}
+
+void ImGuiLayer::DrawInspectorPanel(entt::registry& registry, entt::entity& selectedEntity)
+{
+    ImGui::Begin("Inspector", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+
+    if (selectedEntity != entt::null) {
+        ImGui::Text("Selected Entity: %u", (uint32_t)selectedEntity);
+
+        // Component'leri alt alta ve açılıp kapanabilir şekilde göster
+        if (registry.any_of<TransformComponent>(selectedEntity)) {
+            if (ImGui::CollapsingHeader("Transform")) {
+                auto& transform = registry.get<TransformComponent>(selectedEntity);
+                ImGui::DragFloat3("Position", &transform.position[0], 0.1f);
+                ImGui::DragFloat3("Rotation", &transform.rotation[0], 0.1f, -360.0f, 360.0f);
+                ImGui::DragFloat3("Scale", &transform.scale[0], 0.1f, 0.1f, 10.0f);
+                if (ImGui::Button("Reset Transform")) {
+                    transform.position = { 0.0f, 0.0f, 0.0f };
+                    transform.rotation = { 0.0f, 0.0f, 0.0f };
+                    transform.scale = { 1.0f, 1.0f, 1.0f };
+                }
+            }
+        }
+
+        if (registry.any_of<SceneTreeComponent>(selectedEntity)) {
+            if (ImGui::CollapsingHeader("Parent/Child")) {
+                auto& selectedNode = registry.get<SceneTreeComponent>(selectedEntity);
+                if (ImGui::BeginCombo("Parent", selectedNode.parent == entt::null ? "None" : std::to_string((uint32_t)selectedNode.parent).c_str())) {
+                    if (ImGui::Selectable("None", selectedNode.parent == entt::null)) {
+                        m_Engine->GetScene()->RemoveParent(selectedEntity);
+                    }
+                    registry.view<SceneTreeComponent>().each([&](entt::entity entity, SceneTreeComponent&) {
+                        if (entity != selectedEntity) {
+                            if (ImGui::Selectable(std::to_string((uint32_t)entity).c_str(), selectedNode.parent == entity)) {
+                                m_Engine->GetScene()->SetParent(selectedEntity, entity);
+                            }
+                        }
+                        });
+                    ImGui::EndCombo();
+                }
+            }
+        }
+    }
+    else {
+        ImGui::Text("No entity selected.");
     }
 
     ImGui::End();

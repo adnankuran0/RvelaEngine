@@ -79,6 +79,24 @@ void Engine::Render()
 		Renderer::Render(transform, mesh, metarial, editorCamera);
 
 	}
+
+	auto models = m_Scene->GetRegistry().view<ModelComponent, MaterialComponent>();
+
+
+	for (auto entity : models)
+	{
+		auto& model = m_Scene->GetComponent<ModelComponent>(entity);
+		auto& metarial = m_Scene->GetComponent<MaterialComponent>(entity);
+		auto& transform = m_Scene->GetComponent<WorldTransformComponent>(entity);
+
+
+		for (auto& mesh : model.meshes)
+		{
+			Renderer::Render(transform, mesh, metarial, editorCamera);
+
+		}
+
+	}
 	Renderer::EndFrame();
 }
 

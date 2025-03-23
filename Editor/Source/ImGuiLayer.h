@@ -22,4 +22,5 @@ private:
     void DrawEntityCreationPanel(entt::registry& registry, entt::entity& selectedEntity);
     void DrawTransformEditor(entt::registry& registry, entt::entity selectedEntity);
     void DrawParentChildEditor(entt::registry& registry, entt::entity selectedEntity);
+    void DrawInspectorPanel(entt::registry& registry, entt::entity& selectedEntity);
 };

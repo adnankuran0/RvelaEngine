@@ -56,6 +56,7 @@ void Renderer::Render(WorldTransformComponent& transform, MeshComponent& data, M
     metarial.shader.setVec3("camPos", camera.Position);
     metarial.shader.setVec3("lightPosition", glm::vec3(0.5f, 2.0f, 1.0f));
     metarial.shader.setVec3("lightColor", glm::vec3(1.0f));
+    metarial.shader.setFloat("UVScale", 2.0f);
     
     
 
@@ -71,7 +72,7 @@ void Renderer::Render(WorldTransformComponent& transform, MeshComponent& data, M
     metarial.Ao.Bind(4);
     metarial.Height.Bind(5);
     
-    glDrawElements(GL_TRIANGLES, 20000, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 485886, GL_UNSIGNED_INT, 0);
 
     GLenum err;
     while ((err = glGetError()) != GL_NO_ERROR) {

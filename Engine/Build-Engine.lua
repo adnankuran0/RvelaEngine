@@ -19,20 +19,24 @@ project "Engine"
       "../Vendor/plog",
       "../Vendor/stb_image",
       "../Vendor/entt",
-      "../Vendor/tiny_obj_loader"
+      "../Vendor/tiny_obj_loader",
+      "../Vendor/Assimp/include"
+      
    }
 
    libdirs
    {
       "../Vendor/GLFW/lib",
-      "../Vendor/GLEW/lib"
+      "../Vendor/GLEW/lib",
+      "../Vendor/Assimp/lib"
    }
 
    links
    {
       "glfw3",
       "glew32s",
-      "opengl32"
+      "opengl32",
+      "assimp-vc143-mt"
    }
 
    targetdir ("../Binaries/" .. OutputDir .. "/%{prj.name}")
