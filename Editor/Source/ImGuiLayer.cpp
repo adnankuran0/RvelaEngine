@@ -2,6 +2,15 @@
 #include "Scene/Components.h"
 #include "Scene/Entity.h"
 
+
+std::string OpenFileDialog()
+{
+    const char* filterPatterns[] = { "*.fbx", "*.obj", "*.glfw" };
+    const char* filePath = tinyfd_openFileDialog("Select a file", "", 3, filterPatterns, NULL, 0);
+
+    return filePath ? std::string(filePath) : "";
+}
+
 ImGuiLayer::ImGuiLayer(Engine* engine)
     : m_Engine(engine)
 {
@@ -116,6 +125,11 @@ void ImGuiLayer::DrawSceneHierarchyPanel(entt::registry& registry, entt::entity&
         ImGuiTreeNodeFlags flags = isLeaf ? ImGuiTreeNodeFlags_Leaf : 0;
         flags |= ImGuiTreeNodeFlags_OpenOnArrow; // Okla açma seçeneği
 
+        // Eğer bu varlık seçiliyse, ImGuiTreeNodeFlags_Selected bayrağını ekle
+        if (entity == selectedEntity) {
+            flags |= ImGuiTreeNodeFlags_Selected;
+        }
+
         std::string entityName = "Entity " + std::to_string((uint32_t)entity);
         bool nodeOpen = ImGui::TreeNodeEx(entityName.c_str(), flags);
 
@@ -152,6 +166,21 @@ void ImGuiLayer::DrawSceneHierarchyPanel(entt::registry& registry, entt::entity&
         if (ImGui::MenuItem("Create Entity")) {
             selectedEntity = m_Engine->GetScene()->CreateEntity("New Entity");
         }
+        if (ImGui::MenuItem("Load Asset")) {
+            std::string file = OpenFileDialog();
+            if (!file.empty())
+            {
+                selectedEntity = m_Engine->GetScene()->LoadAsset(file);
+            }
+        }
+        if (ImGui::MenuItem("Delete Entity")) {
+            
+            m_Engine->GetScene()->DestroyEntity(selectedEntity);
+            selectedEntity = entt::null;
+        }
+
+      
+
         ImGui::EndPopup();
     }
 

@@ -4,7 +4,9 @@
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
 
-void AssetManager::LoadAsset(const std::string& path, ModelComponent& model)
+
+
+std::vector<MeshData> AssetManager::LoadModel(const std::string& path)
 {
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(path,
@@ -16,17 +18,21 @@ void AssetManager::LoadAsset(const std::string& path, ModelComponent& model)
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         std::cout << "Model could not loaded!\n";
-        return;
     }
 
-    std::cout << "model has " << scene->mNumMeshes << " meshes\n";
+    //std::cout << "model has " << scene->mNumMeshes << " meshes\n";
+
+    //model.meshes.reserve(scene->mNumMeshes * sizeof(MeshComponent));
+
+    std::vector<MeshData> meshDatas;
+    meshDatas.reserve(scene->mNumMeshes * sizeof(MeshData));
 
     for (unsigned int i = 0; i < scene->mNumMeshes; i++)
     {
         aiMesh* mesh = scene->mMeshes[i];
         
         std::vector<float> vertices;
-        //vertices.reserve(mesh->mNumVertices * 8); 
+        vertices.reserve(mesh->mNumVertices * 8); 
 
         for (unsigned int j = 0; j < mesh->mNumVertices; j++)
         {
@@ -73,13 +79,22 @@ void AssetManager::LoadAsset(const std::string& path, ModelComponent& model)
             }
         }
 
-        std::cout << "Asset loaded with " << mesh->mNumVertices << " unique vertices and "
-            << indices.size() << " indices.\n";
+        /*std::cout << "Asset loaded with " << mesh->mNumVertices << " unique vertices and "
+            << indices.size() << " indices.\n"; */
 
-        model.meshes.emplace_back(vertices.data(), vertices.size() * sizeof(float),
-            indices.data(), indices.size() * sizeof(unsigned int));
+        MeshData data;
+        data.vertices = vertices;
+        data.indices = indices;
+        data.indexCount = indices.size();
+        meshDatas.push_back(data);
+
+
+        /*model.meshes.emplace_back(vertices.data(), vertices.size() * sizeof(float),
+            indices.data(), indices.size() * sizeof(unsigned int),indices.size()); */
     
 	}
+
+    return meshDatas;
 
 }
 

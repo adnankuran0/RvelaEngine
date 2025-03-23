@@ -67,13 +67,16 @@ struct MeshComponent {
     VertexBuffer VBO;
     ElementBuffer EBO;
     BufferLayout Layout;
+    unsigned int indexCount = 0;
     MeshComponent() = default;
     MeshComponent(const MeshComponent&) = delete;
     MeshComponent& operator=(const MeshComponent&) = delete;
     MeshComponent(MeshComponent&&) = default;
     MeshComponent& operator=(MeshComponent&&) = default;
-    MeshComponent(void* vertices,size_t sizeOfVertices,void* indices,size_t sizeOfIndices) 
+    MeshComponent(void* vertices,size_t sizeOfVertices,void* indices,size_t sizeOfIndices,unsigned int indexCount) 
     { 
+        this->indexCount = indexCount;
+
         VAO.Bind();
         VBO.Init(vertices, sizeOfVertices);
         VBO.Bind();
@@ -94,29 +97,7 @@ struct MeshComponent {
     }
 };
 
-struct ModelComponent
-{
-    std::vector<MeshComponent> meshes;
-    
-    ModelComponent() = default;
-    ModelComponent(const ModelComponent&) = delete;
-    ModelComponent& operator=(const ModelComponent&) = delete;
-    ModelComponent(ModelComponent&&) = default;
-    ModelComponent& operator=(ModelComponent&&) = default;
-    ModelComponent(const std::string& path)
-    {
-    }
 
-    void Destroy()
-    {
-        for (auto& mesh : meshes)
-        {
-            mesh.Destroy();
-        }
-        meshes.clear();
-    }
-
-};
 
 struct MaterialComponent {
     Shader  shader;

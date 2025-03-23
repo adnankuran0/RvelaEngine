@@ -14,6 +14,8 @@ public:
     Entity CreateEntity(const std::string& name);
     void DestroyEntity(entt::entity entity);
 
+    Entity LoadAsset(const std::string& path);
+
     template<typename Component, typename... Args>
     void AddComponent(entt::entity entity, Args&&... args) {
         m_Registry.emplace<Component>(entity, std::forward<Args>(args)...);

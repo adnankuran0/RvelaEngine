@@ -15,18 +15,33 @@ Entity Scene::CreateEntity(const std::string& name) {
     entity.AddComponent<WorldTransformComponent>(glm::vec3(0.0f),glm::vec3(0.0f),glm::vec3(1.0f));
     entity.AddComponent<SceneTreeComponent>();
     entity.AddComponent<TagComponent>(name);
+
+    entity.AddComponent<MaterialComponent>("D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/vertex.glsl",
+        "D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/fragment.glsl", "D:/GitHub/RvelaEngine/Engine/Source/Resources/Textures/metal");
+
+    /*
     AssetManager assetManager;
     //entity.AddComponent<MeshComponent>(vertices, sizeof(vertices), indices, sizeof(indices));
     entity.AddComponent<ModelComponent>();
     auto& modelComponent = entity.GetComponent<ModelComponent>();
-    assetManager.LoadAsset("C:/Users/adnan/Desktop/plane.fbx", modelComponent);
-    entity.AddComponent<MaterialComponent>("D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/vertex.glsl",
-        "D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/fragment.glsl","D:/GitHub/RvelaEngine/Engine/Source/Resources/Textures/terrain");
+    assetManager.LoadAsset("C:/Users/adnan/Desktop/newplane.fbx", modelComponent);
+    
+     */
     return entity;
 }
 
 void Scene::DestroyEntity(entt::entity entity) {
-    
+    if (entity == entt::null) return;
+
+    auto& nodeComponent = GetComponent<SceneTreeComponent>(entity);
+    if (!nodeComponent.children.empty())
+    {
+        for (auto& child : nodeComponent.children)
+        {
+            DestroyEntity(child);
+        }
+    }
+
     if (HasComponent<MeshComponent>(entity))
         GetComponent<MeshComponent>(entity).Destroy();
     if (HasComponent<MaterialComponent>(entity))
@@ -34,6 +49,34 @@ void Scene::DestroyEntity(entt::entity entity) {
     m_Registry.destroy(entity);
 }
 
+
+Entity Scene::LoadAsset(const std::string& path)
+{
+    Entity rootEntity = CreateEntity("root");
+
+    AssetManager assetManager;
+    std::vector<MeshData> meshDatas = assetManager.LoadModel(path);
+    if (meshDatas.size() == 1)
+    {
+        rootEntity.AddComponent<MeshComponent>(meshDatas.back().vertices.data(), meshDatas.back().vertices.size() * sizeof(float),
+            meshDatas.back().indices.data(), meshDatas.back().indices.size() * sizeof(unsigned int), meshDatas.back().indices.size());
+    }
+    else
+    {
+        for (auto& meshData : meshDatas)
+        {
+            Entity meshEntity = CreateEntity("child");
+            SetParent(meshEntity, rootEntity);
+            meshEntity.AddComponent<MeshComponent>(meshData.vertices.data(), meshData.vertices.size() * sizeof(float),
+                meshData.indices.data(), meshData.indices.size() * sizeof(unsigned int), meshData.indices.size());
+
+        }
+    }
+    
+
+    return rootEntity;
+
+}
 
 
 void Scene::Update() {

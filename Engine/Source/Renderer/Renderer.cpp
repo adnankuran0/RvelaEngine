@@ -1,4 +1,4 @@
-#include "rvelapch.h"
+﻿#include "rvelapch.h"
 #include "Renderer.h"
 
 #include "../RvelaLog.h"
@@ -41,10 +41,12 @@ void Renderer::EndFrame()
 
 }
 
-void Renderer::Render(WorldTransformComponent& transform, MeshComponent& data, MaterialComponent& metarial, Camera& camera) {
+void Renderer::Render(WorldTransformComponent& transform, MeshComponent& data, MaterialComponent& metarial, Camera& camera) 
+{
+
 
     metarial.shader.use();
-    
+
     metarial.shader.setInt("albedoMap", 0);
     metarial.shader.setInt("normalMap", 1);
     metarial.shader.setInt("metallicMap", 2);
@@ -56,7 +58,7 @@ void Renderer::Render(WorldTransformComponent& transform, MeshComponent& data, M
     metarial.shader.setVec3("camPos", camera.Position);
     metarial.shader.setVec3("lightPosition", glm::vec3(0.5f, 2.0f, 1.0f));
     metarial.shader.setVec3("lightColor", glm::vec3(1.0f));
-    metarial.shader.setFloat("UVScale", 2.0f);
+    metarial.shader.setFloat("UVScale", 1.0f);
     
     
 
@@ -71,17 +73,15 @@ void Renderer::Render(WorldTransformComponent& transform, MeshComponent& data, M
     metarial.Roughness.Bind(3);
     metarial.Ao.Bind(4);
     metarial.Height.Bind(5);
-    
-    glDrawElements(GL_TRIANGLES, 485886, GL_UNSIGNED_INT, 0);
+
+
+    glDrawElements(GL_TRIANGLES, data.indexCount, GL_UNSIGNED_INT, 0);
 
     GLenum err;
     while ((err = glGetError()) != GL_NO_ERROR) {
         LOG_ERROR << "OpenGL Error: " << err;
 
     }
-
-    
-
 
 }
 
