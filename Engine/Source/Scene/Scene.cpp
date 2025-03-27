@@ -3,7 +3,6 @@
 #include "Entity.h"
 #include "../Core/Time.h"
 #include "RvelaLog.h"
-#include "../Resources/cube.h"
 #include "../Core/AssetManager.h"
 
 Scene::Scene() : m_Registry() {}
@@ -16,8 +15,7 @@ Entity Scene::CreateEntity(const std::string& name) {
     entity.AddComponent<SceneTreeComponent>();
     entity.AddComponent<TagComponent>(name);
 
-    entity.AddComponent<MaterialComponent>("D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/vertex.glsl",
-        "D:/GitHub/RvelaEngine/Engine/Source/Resources/Shaders/fragment.glsl", "D:/GitHub/RvelaEngine/Engine/Source/Resources/Textures/metal");
+    entity.AddComponent<MaterialComponent>("D:/GitHub/RvelaEngine/Resources/Engine/Textures/bull");
 
     /*
     AssetManager assetManager;
@@ -52,14 +50,14 @@ void Scene::DestroyEntity(entt::entity entity) {
 
 Entity Scene::LoadAsset(const std::string& path)
 {
-    Entity rootEntity = CreateEntity("root");
+    Entity rootEntity = CreateEntity("Model");
 
-    AssetManager assetManager;
-    std::vector<MeshData> meshDatas = assetManager.LoadModel(path);
+    std::vector<MeshData> meshDatas = AssetManager::LoadModel(path);
     if (meshDatas.size() == 1)
     {
         rootEntity.AddComponent<MeshComponent>(meshDatas.back().vertices.data(), meshDatas.back().vertices.size() * sizeof(float),
             meshDatas.back().indices.data(), meshDatas.back().indices.size() * sizeof(unsigned int), meshDatas.back().indices.size());
+        rootEntity.GetComponent<TagComponent>().tag = meshDatas.back().name;
     }
     else
     {
@@ -69,6 +67,7 @@ Entity Scene::LoadAsset(const std::string& path)
             SetParent(meshEntity, rootEntity);
             meshEntity.AddComponent<MeshComponent>(meshData.vertices.data(), meshData.vertices.size() * sizeof(float),
                 meshData.indices.data(), meshData.indices.size() * sizeof(unsigned int), meshData.indices.size());
+            meshEntity.GetComponent<TagComponent>().tag = meshData.name;
 
         }
     }

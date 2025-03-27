@@ -46,6 +46,8 @@ void Texture::GenerateFromImage(const std::string& path)
 {
     m_Data = stbi_load(path.c_str(), &m_Width, &m_Height, &m_NrChannels, 0);
 
+
+
     if (m_Data)
     {
         ToImage(m_Width, m_Height, m_Data, m_NrChannels);
@@ -62,7 +64,7 @@ void Texture::GenerateFromImage(const std::string& path)
 
 void Texture::ToImage(int width, int height, const unsigned char* data, int nrChannels)
 {
-    GLenum format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
+    GLenum format = (nrChannels == 1) ? GL_RED : (nrChannels == 3 ? GL_RGB : GL_RGBA);
     glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 }
 

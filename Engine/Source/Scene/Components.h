@@ -100,7 +100,6 @@ struct MeshComponent {
 
 
 struct MaterialComponent {
-    Shader  shader;
     
     Texture Albedo;
     Texture Normal;
@@ -115,10 +114,8 @@ struct MaterialComponent {
     MaterialComponent& operator=(const MaterialComponent&) = delete;
     MaterialComponent(MaterialComponent&&) = default;
     MaterialComponent& operator=(MaterialComponent&&) = default;
-    MaterialComponent(const std::string& vertexShaderPath, const std::string& fragmentShaderPath, const std::string& texturesPath)
+    MaterialComponent(const std::string& texturesPath)
     {
-        shader.Init(vertexShaderPath.c_str(), fragmentShaderPath.c_str());
-        
         Albedo.Init();
         Albedo.GenerateFromImage(texturesPath+"/albedo.png");
         Normal.Init();
@@ -127,10 +124,13 @@ struct MaterialComponent {
         Metallic.GenerateFromImage(texturesPath + "/metallic.png");
         Roughness.Init();
         Roughness.GenerateFromImage(texturesPath + "/roughness.png");
+        std::cout << "Roughness loaded\n";
         Ao.Init();
         Ao.GenerateFromImage(texturesPath + "/ao.png");
+        std::cout << "Ao loaded\n";
         Height.Init();
         Height.GenerateFromImage(texturesPath + "/height.png");
+        std::cout << "Height loaded\n";
         
     }
 
@@ -144,13 +144,8 @@ struct MaterialComponent {
         Height.Destroy();
         Ao.Destroy();
         
-        shader.Destroy();
     }
 
-    void Debug()
-    {
-        std::cout << "Shader ID: " << shader.ID << "\n";
-    }
 };
 
 struct SceneTreeComponent {

@@ -4,7 +4,21 @@
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
 
+void FindNodeForMesh(aiNode* node, unsigned int meshIndex, std::string& meshName)
+{
+    if (!node) return;
 
+    for (unsigned int i = 0; i < node->mNumMeshes; i++) {
+        if (node->mMeshes[i] == meshIndex) {
+            meshName = node->mName.C_Str();
+            return;
+        }
+    }
+
+    for (unsigned int i = 0; i < node->mNumChildren; i++) {
+        FindNodeForMesh(node->mChildren[i], meshIndex, meshName);
+    }
+}
 
 std::vector<MeshData> AssetManager::LoadModel(const std::string& path)
 {
@@ -13,26 +27,34 @@ std::vector<MeshData> AssetManager::LoadModel(const std::string& path)
         aiProcess_Triangulate
         | aiProcess_FlipUVs
         | aiProcess_GenSmoothNormals
-        );
+    );
+
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
-        std::cout << "Model could not loaded!\n";
+        std::cout << "Model could not be loaded!\n";
+    }
+    
+    // MaterialID  MaterialIndex
+    std::unordered_map<unsigned int, unsigned int> materials;
+
+    if (scene->HasMaterials())
+    {
+        for (unsigned int i = 0; i < scene->mNumMaterials; i++)
+        {
+            auto& material = scene->mMaterials[i];
+        }
     }
 
-    //std::cout << "model has " << scene->mNumMeshes << " meshes\n";
-
-    //model.meshes.reserve(scene->mNumMeshes * sizeof(MeshComponent));
-
     std::vector<MeshData> meshDatas;
-    meshDatas.reserve(scene->mNumMeshes * sizeof(MeshData));
+    meshDatas.reserve(scene->mNumMeshes);
 
     for (unsigned int i = 0; i < scene->mNumMeshes; i++)
     {
         aiMesh* mesh = scene->mMeshes[i];
-        
+
         std::vector<float> vertices;
-        vertices.reserve(mesh->mNumVertices * 8); 
+        vertices.reserve(mesh->mNumVertices * 8);
 
         for (unsigned int j = 0; j < mesh->mNumVertices; j++)
         {
@@ -66,9 +88,7 @@ std::vector<MeshData> AssetManager::LoadModel(const std::string& path)
         }
 
         std::vector<unsigned int> indices;
-        indices.reserve(mesh->mNumFaces * 3); 
-
-        
+        indices.reserve(mesh->mNumFaces * 3);
 
         for (unsigned int j = 0; j < mesh->mNumFaces; j++)
         {
@@ -79,22 +99,20 @@ std::vector<MeshData> AssetManager::LoadModel(const std::string& path)
             }
         }
 
-        /*std::cout << "Asset loaded with " << mesh->mNumVertices << " unique vertices and "
-            << indices.size() << " indices.\n"; */
+        
+
+        std::string meshName = "Unnamed"; 
+        FindNodeForMesh(scene->mRootNode, i, meshName); 
 
         MeshData data;
         data.vertices = vertices;
         data.indices = indices;
         data.indexCount = indices.size();
+        data.name = meshName; 
+
+
         meshDatas.push_back(data);
-
-
-        /*model.meshes.emplace_back(vertices.data(), vertices.size() * sizeof(float),
-            indices.data(), indices.size() * sizeof(unsigned int),indices.size()); */
-    
-	}
+    }
 
     return meshDatas;
-
 }
-

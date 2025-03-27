@@ -6,10 +6,11 @@ struct MeshData
 	std::vector<float> vertices;
 	std::vector<unsigned int> indices;
 	unsigned int indexCount;
+	std::string name;
 };
 
 class AssetManager
 {
 public:
-	std::vector<MeshData> LoadModel(const std::string& path);
+	static std::vector<MeshData> LoadModel(const std::string& path);
 };

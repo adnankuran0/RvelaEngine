@@ -130,7 +130,8 @@ void ImGuiLayer::DrawSceneHierarchyPanel(entt::registry& registry, entt::entity&
             flags |= ImGuiTreeNodeFlags_Selected;
         }
 
-        std::string entityName = "Entity " + std::to_string((uint32_t)entity);
+        auto& tagComponent = m_Engine->GetScene()->GetComponent<TagComponent>(entity);
+        std::string entityName = tagComponent.tag;
         bool nodeOpen = ImGui::TreeNodeEx(entityName.c_str(), flags);
 
         // Sol veya sağ tıkla entity seçimi
@@ -195,8 +196,23 @@ void ImGuiLayer::DrawInspectorPanel(entt::registry& registry, entt::entity& sele
         ImGui::Text("Selected Entity: %u", (uint32_t)selectedEntity);
 
         // Component'leri alt alta ve açılıp kapanabilir şekilde göster
+
+        if (registry.any_of<TagComponent>(selectedEntity)) {
+            if (ImGui::CollapsingHeader("Name Tag",ImGuiTreeNodeFlags_DefaultOpen)) {
+                auto& tag = registry.get<TagComponent>(selectedEntity);
+
+                static char buffer[256]; // Geçici bir buffer
+                std::strncpy(buffer, tag.tag.c_str(), sizeof(buffer)); // Başlangıçta std::string içeriğini kopyala
+
+                if (ImGui::InputText("##hidden", buffer, sizeof(buffer))) {
+                    if (buffer != "")
+                        tag.tag = buffer; // Kullanıcı değişiklik yaptığında string'i güncelle
+                }
+            }
+        }
+
         if (registry.any_of<TransformComponent>(selectedEntity)) {
-            if (ImGui::CollapsingHeader("Transform")) {
+            if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
                 auto& transform = registry.get<TransformComponent>(selectedEntity);
                 ImGui::DragFloat3("Position", &transform.position[0], 0.1f);
                 ImGui::DragFloat3("Rotation", &transform.rotation[0], 0.1f, -360.0f, 360.0f);
@@ -210,7 +226,7 @@ void ImGuiLayer::DrawInspectorPanel(entt::registry& registry, entt::entity& sele
         }
 
         if (registry.any_of<SceneTreeComponent>(selectedEntity)) {
-            if (ImGui::CollapsingHeader("Parent/Child")) {
+            if (ImGui::CollapsingHeader("Parent/Child", ImGuiTreeNodeFlags_DefaultOpen)) {
                 auto& selectedNode = registry.get<SceneTreeComponent>(selectedEntity);
                 if (ImGui::BeginCombo("Parent", selectedNode.parent == entt::null ? "None" : std::to_string((uint32_t)selectedNode.parent).c_str())) {
                     if (ImGui::Selectable("None", selectedNode.parent == entt::null)) {

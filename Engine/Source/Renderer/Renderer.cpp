@@ -6,12 +6,13 @@
 #include "Core/Time.h"
 
 GLFWwindow* Renderer::activeWindow = nullptr;
-
+Shader Renderer::m_DefaultShader;
 
 
 
 Renderer::Renderer() 
 {
+    
 };
 
 Renderer::~Renderer()
@@ -22,6 +23,7 @@ Renderer::~Renderer()
 void Renderer::Init(GLFWwindow* window)
 {
     Renderer::activeWindow = window;
+    m_DefaultShader.Init("D:/GitHub/RvelaEngine/Resources/Engine/Shaders/vertex.glsl", "D:/GitHub/RvelaEngine/Resources/Engine/Shaders/fragment.glsl");
 }
 
 void Renderer::StartFrame()
@@ -41,31 +43,31 @@ void Renderer::EndFrame()
 
 }
 
-void Renderer::Render(WorldTransformComponent& transform, MeshComponent& data, MaterialComponent& metarial, Camera& camera) 
+void Renderer::Render(WorldTransformComponent& transform, MeshComponent& mesh, MaterialComponent& metarial, Camera& camera) 
 {
 
 
-    metarial.shader.use();
-
-    metarial.shader.setInt("albedoMap", 0);
-    metarial.shader.setInt("normalMap", 1);
-    metarial.shader.setInt("metallicMap", 2);
-    metarial.shader.setInt("roughnessMap", 3);
-    metarial.shader.setInt("aoMap", 4);
-    metarial.shader.setInt("heightMap", 5);
-    metarial.shader.setFloat("heightScale", 0.0f);
-    metarial.shader.setFloat("lightIntensity", 100.0f);
-    metarial.shader.setVec3("camPos", camera.Position);
-    metarial.shader.setVec3("lightPosition", glm::vec3(0.5f, 2.0f, 1.0f));
-    metarial.shader.setVec3("lightColor", glm::vec3(1.0f));
-    metarial.shader.setFloat("UVScale", 1.0f);
+    m_DefaultShader.use();
+    
+    m_DefaultShader.setInt("albedoMap", 0);
+    m_DefaultShader.setInt("normalMap", 1);
+    m_DefaultShader.setInt("metallicMap", 2);
+    m_DefaultShader.setInt("roughnessMap", 3);
+    m_DefaultShader.setInt("aoMap", 4);
+    m_DefaultShader.setInt("heightMap", 5);
+    m_DefaultShader.setFloat("heightScale", 0.0f);
+    m_DefaultShader.setFloat("lightIntensity", 100.0f);
+    m_DefaultShader.setVec3("camPos", camera.Position);
+    m_DefaultShader.setVec3("lightPosition", glm::vec3(0.5f, 2.0f, 1.0f));
+    m_DefaultShader.setVec3("lightColor", glm::vec3(1.0f));
+    m_DefaultShader.setFloat("UVScale", 1.0f);
     
     
 
-    metarial.shader.setMat4("model", transform.GetMatrix());
-    metarial.shader.setMat4("view", camera.GetViewMatrix());
-    metarial.shader.setMat4("projection", camera.projection);
-    data.VAO.Bind();
+    m_DefaultShader.setMat4("model", transform.GetMatrix());
+    m_DefaultShader.setMat4("view", camera.GetViewMatrix());
+    m_DefaultShader.setMat4("projection", camera.projection);
+    mesh.VAO.Bind();
     
     metarial.Albedo.Bind(0);
     metarial.Normal.Bind(1);
@@ -75,7 +77,7 @@ void Renderer::Render(WorldTransformComponent& transform, MeshComponent& data, M
     metarial.Height.Bind(5);
 
 
-    glDrawElements(GL_TRIANGLES, data.indexCount, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0);
 
     GLenum err;
     while ((err = glGetError()) != GL_NO_ERROR) {
@@ -89,4 +91,5 @@ void Renderer::Render(WorldTransformComponent& transform, MeshComponent& data, M
 
 void Renderer::Shutdown()
 {
+    m_DefaultShader.Destroy();
 }

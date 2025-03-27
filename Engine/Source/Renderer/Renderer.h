@@ -24,4 +24,5 @@ public:
 
 private:
     static GLFWwindow* activeWindow;
+    static Shader m_DefaultShader;
 };

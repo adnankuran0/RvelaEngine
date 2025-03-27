@@ -70,9 +70,9 @@ void Engine::Render()
 	Renderer::StartFrame();
 
 	
-	auto view = m_Scene->GetRegistry().view<MeshComponent, MaterialComponent>();
+	auto RenderableView = m_Scene->GetRegistry().view<MeshComponent, MaterialComponent>();
 
-	for (auto entity : view)
+	for (auto entity : RenderableView)
 	{
 		auto& mesh = m_Scene->GetComponent<MeshComponent>(entity);
 		auto& metarial = m_Scene->GetComponent<MaterialComponent>(entity);
