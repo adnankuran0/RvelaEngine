@@ -15,7 +15,7 @@ Entity Scene::CreateEntity(const std::string& name) {
     entity.AddComponent<SceneTreeComponent>();
     entity.AddComponent<TagComponent>(name);
 
-    entity.AddComponent<MaterialComponent>("D:/GitHub/RvelaEngine/Resources/Engine/Textures/bull");
+    entity.AddComponent<MaterialComponent>("D:/GitHub/RvelaEngine/Resources/Engine/Textures/wood");
 
     /*
     AssetManager assetManager;

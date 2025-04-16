@@ -12,29 +12,42 @@ uniform sampler2D roughnessMap;
 uniform sampler2D aoMap;
 uniform sampler2D heightMap;
 
-// parallax mapping parameters
-uniform float heightScale;
+uniform bool useAlbedoMap;
+uniform bool useNormalMap;
+uniform bool useMetallicMap;
+uniform bool useRoughnessMap;
+uniform bool useAOMap;
+uniform bool useHeightMap;
 
+uniform vec3 albedoColor;
+uniform float metallicValue;
+uniform float roughnessValue;
+uniform float aoValue;
+
+uniform float heightScale;
 uniform float lightIntensity;
 
-// lights
 uniform vec3 lightPosition;
 uniform vec3 lightColor;
-
 uniform vec3 camPos;
 
 const float PI = 3.14159265359;
 
-// ----------------------------------------------------------------------------
 vec2 parallaxMapping(vec2 texCoords, vec3 viewDir)
 {
+    if (!useHeightMap)
+        return texCoords;
+
     float height = texture(heightMap, texCoords).r; 
     vec2 p = viewDir.xy * (height * heightScale);
     return texCoords - p;
 }
-// ----------------------------------------------------------------------------
+
 vec3 getNormalFromMap()
 {
+    if (!useNormalMap)
+        return normalize(Normal);
+
     vec3 tangentNormal = texture(normalMap, TexCoords).xyz * 2.0 - 1.0;
 
     vec3 Q1  = dFdx(FragPos);
@@ -49,7 +62,7 @@ vec3 getNormalFromMap()
 
     return normalize(TBN * tangentNormal);
 }
-// ----------------------------------------------------------------------------
+
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
     float a = roughness*roughness;
@@ -63,7 +76,7 @@ float DistributionGGX(vec3 N, vec3 H, float roughness)
 
     return nom / denom;
 }
-// ----------------------------------------------------------------------------
+
 float GeometrySchlickGGX(float NdotV, float roughness)
 {
     float r = (roughness + 1.0);
@@ -74,7 +87,7 @@ float GeometrySchlickGGX(float NdotV, float roughness)
 
     return nom / denom;
 }
-// ----------------------------------------------------------------------------
+
 float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 {
     float NdotV = max(dot(N, V), 0.0);
@@ -84,43 +97,37 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 
     return ggx1 * ggx2;
 }
-// ----------------------------------------------------------------------------
+
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
     return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
-// ----------------------------------------------------------------------------
+
 void main()
 {		
     vec3 viewDir = normalize(camPos - FragPos);
 
-    // Apply parallax mapping
     vec2 adjustedTexCoords = parallaxMapping(TexCoords, viewDir);
 
-    // Sample material properties
-    vec3 albedo     = pow(texture(albedoMap, adjustedTexCoords).rgb, vec3(2.2));
-    float metallic  = texture(metallicMap, adjustedTexCoords).r;
-    float roughness = texture(roughnessMap, adjustedTexCoords).r;
-    float ao        = texture(aoMap, adjustedTexCoords).r;
+    vec3 albedo     = useAlbedoMap ? pow(texture(albedoMap, adjustedTexCoords).rgb, vec3(2.2)) : albedoColor;
+    float metallic  = useMetallicMap ? texture(metallicMap, adjustedTexCoords).r : metallicValue;
+    float roughness = useRoughnessMap ? texture(roughnessMap, adjustedTexCoords).r : roughnessValue;
+    float ao        = useAOMap ? texture(aoMap, adjustedTexCoords).r : aoValue;
 
     vec3 N = getNormalFromMap();
     vec3 V = viewDir;
 
-    // Reflectance at normal incidence
     vec3 F0 = vec3(0.04); 
     F0 = mix(F0, albedo, metallic);
 
-    // Reflectance equation
     vec3 Lo = vec3(0.0);
 
-    // Calculate per-light radiance
     vec3 L = normalize(lightPosition - FragPos);
     vec3 H = normalize(V + L);
     float distance = length(lightPosition - FragPos);
     float attenuation = 1.0 / (distance * distance);
     vec3 radiance = lightColor * attenuation * lightIntensity;
 
-    // Cook-Torrance BRDF
     float NDF = DistributionGGX(N, H, roughness);   
     float G   = GeometrySmith(N, V, L, roughness);      
     vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);

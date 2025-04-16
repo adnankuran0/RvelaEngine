@@ -62,7 +62,17 @@ void Renderer::Render(WorldTransformComponent& transform, MeshComponent& mesh, M
     m_DefaultShader.setVec3("lightColor", glm::vec3(1.0f));
     m_DefaultShader.setFloat("UVScale", 1.0f);
     
-    
+    m_DefaultShader.setBool("useAlbedoMap", false);
+    m_DefaultShader.setBool("useNormalMap", false);
+    m_DefaultShader.setBool("useMetallicMap", false);
+    m_DefaultShader.setBool("useRoughnessMap", false);
+    m_DefaultShader.setBool("useAOMap", false);
+    m_DefaultShader.setBool("useHeightMap", false);
+
+    m_DefaultShader.setVec3("albedoColor", glm::vec3(0, 1, 1));
+    m_DefaultShader.setFloat("metallicValue",0.0f);
+    m_DefaultShader.setFloat("roughnessValue",0.0f);
+    m_DefaultShader.setFloat("aoValue",1.0f);
 
     m_DefaultShader.setMat4("model", transform.GetMatrix());
     m_DefaultShader.setMat4("view", camera.GetViewMatrix());

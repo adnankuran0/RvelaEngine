@@ -124,18 +124,15 @@ struct MaterialComponent {
         Metallic.GenerateFromImage(texturesPath + "/metallic.png");
         Roughness.Init();
         Roughness.GenerateFromImage(texturesPath + "/roughness.png");
-        std::cout << "Roughness loaded\n";
         Ao.Init();
         Ao.GenerateFromImage(texturesPath + "/ao.png");
-        std::cout << "Ao loaded\n";
         Height.Init();
         Height.GenerateFromImage(texturesPath + "/height.png");
-        std::cout << "Height loaded\n";
         
     }
 
     void Destroy()
-    {   
+    {       
         
         Albedo.Destroy();
         Normal.Destroy();
@@ -153,9 +150,3 @@ struct SceneTreeComponent {
     std::vector<entt::entity> children;
 };
 
-struct PointLightComponent
-{
-    float intensity;
-    glm::vec3 color;
-    PointLightComponent(float intensinty, glm::vec3 color) { intensity = intensinty; color = color; }
-};
