@@ -1,7 +1,7 @@
 #include "rvelapch.h"
 #include "Material.h"
 #include "../nlohmann/json.hpp"
-#include "TextureManager.h"
+#include "Core/Utils/TextureManager.h"
 
 using json = nlohmann::json;
 

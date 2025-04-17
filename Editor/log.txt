@@ -447,3 +447,12 @@ Vertex info
 2025-04-17 04:30:17.164 INFO  [7448] [Window::Init@29] GLFW Initialized
 2025-04-17 04:30:17.364 INFO  [7448] [Window::Init@50] GLEW Initialized
 2025-04-17 04:30:17.364 INFO  [7448] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-04-17 04:48:31.089 INFO  [5300] [Window::Init@29] GLFW Initialized
+2025-04-17 04:48:31.258 INFO  [5300] [Window::Init@50] GLEW Initialized
+2025-04-17 04:48:31.258 INFO  [5300] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-04-17 05:06:09.332 INFO  [2512] [Window::Init@29] GLFW Initialized
+2025-04-17 05:06:09.493 INFO  [2512] [Window::Init@50] GLEW Initialized
+2025-04-17 05:06:09.493 INFO  [2512] [Window::Init@52] 3.3.0 NVIDIA 572.70
+2025-04-17 05:12:58.375 INFO  [7620] [Window::Init@29] GLFW Initialized
+2025-04-17 05:12:58.541 INFO  [7620] [Window::Init@50] GLEW Initialized
+2025-04-17 05:12:58.541 INFO  [7620] [Window::Init@52] 3.3.0 NVIDIA 572.70

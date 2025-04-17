@@ -3,9 +3,9 @@
 #include "Entity.h"
 #include "../Core/Time.h"
 #include "RvelaLog.h"
-#include "../Core/AssetManager.h"
-#include "Core/Serializer.h"
-#include "Renderer/MaterialManager.h"
+#include "../Core/Utils/AssetManager.h"
+#include "../Core/Utils/Serializer.h"
+#include "../Core/Utils/MaterialManager.h"
 
 Scene::Scene() : m_Registry() {}
 
@@ -45,7 +45,7 @@ void Scene::DestroyEntity(entt::entity entity) {
     if (HasComponent<MeshComponent>(entity))
         GetComponent<MeshComponent>(entity).Destroy();
     if (HasComponent<MaterialComponent>(entity))
-        MaterialManager::UnloadMaterial(GetComponent<MaterialComponent>(entity).materialPath);
+        MaterialManager::UnloadMaterial(GetComponent<MaterialComponent>(entity).materialPath); //FIX: this may cause performance issues, try to find a better solution
 
     m_Registry.destroy(entity);
 }

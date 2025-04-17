@@ -4,8 +4,8 @@
 #include "../RvelaLog.h"
 #include "Core/Input/Input.h"
 #include "Core/Time.h"
-#include "MaterialManager.h"
-#include "TextureManager.h"
+#include "Core/Utils/MaterialManager.h"
+#include "Core/Utils/TextureManager.h"
 
 GLFWwindow* Renderer::activeWindow = nullptr;
 Shader Renderer::m_DefaultShader;

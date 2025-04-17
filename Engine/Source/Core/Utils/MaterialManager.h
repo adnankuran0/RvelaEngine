@@ -1,6 +1,6 @@
 #pragma once
 #include "Scene/Components.h"
-#include "Material.h"
+#include "Renderer/Material.h"
 #include <fstream>
 
 class MaterialManager

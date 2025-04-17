@@ -13,7 +13,7 @@ public:
     Shader(const char* vertexPath, const char* fragmentPath);
     Shader() = default;
 
-    void Init(const char* vertexPath, const char* fragmentPath);
+    bool Init(const char* vertexPath, const char* fragmentPath);
 
     void Destroy();
 
@@ -36,6 +36,6 @@ public:
 
 
 private:
-    void checkCompileErrors(unsigned int shader, std::string type);
+    bool checkCompileErrors(unsigned int shader, std::string type);
   
 };
