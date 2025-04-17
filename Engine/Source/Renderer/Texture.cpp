@@ -9,7 +9,16 @@ Texture::Texture()
 	Init();
 }
 
+Texture::~Texture()
+{
+    Destroy();
+}
 
+Texture::Texture(const std::string& path)
+{
+    Init();
+    GenerateFromImage(path);
+}
 
 void Texture::Init()
 {
@@ -44,6 +53,8 @@ void Texture::Destroy() const
 
 void Texture::GenerateFromImage(const std::string& path)
 {
+    m_Path = path;
+
     m_Data = stbi_load(path.c_str(), &m_Width, &m_Height, &m_NrChannels, 0);
 
 
@@ -112,4 +123,9 @@ unsigned char* Texture::GetTexture() const
 int Texture::GetNrChannels() const
 {
     return m_NrChannels;
+}
+
+const std::string& Texture::GetPath() 
+{
+    return m_Path;
 }

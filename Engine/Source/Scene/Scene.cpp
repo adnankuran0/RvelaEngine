@@ -4,6 +4,8 @@
 #include "../Core/Time.h"
 #include "RvelaLog.h"
 #include "../Core/AssetManager.h"
+#include "Core/Serializer.h"
+#include "Renderer/MaterialManager.h"
 
 Scene::Scene() : m_Registry() {}
 
@@ -15,7 +17,7 @@ Entity Scene::CreateEntity(const std::string& name) {
     entity.AddComponent<SceneTreeComponent>();
     entity.AddComponent<TagComponent>(name);
 
-    entity.AddComponent<MaterialComponent>("D:/GitHub/RvelaEngine/Resources/Engine/Textures/wood");
+    entity.AddComponent<MaterialComponent>("D:/GitHub/RvelaEngine/Resources/Engine/Materials/second.rmaterial");
 
     /*
     AssetManager assetManager;
@@ -43,7 +45,8 @@ void Scene::DestroyEntity(entt::entity entity) {
     if (HasComponent<MeshComponent>(entity))
         GetComponent<MeshComponent>(entity).Destroy();
     if (HasComponent<MaterialComponent>(entity))
-        GetComponent<MaterialComponent>(entity).Destroy();
+        MaterialManager::UnloadMaterial(GetComponent<MaterialComponent>(entity).materialPath);
+
     m_Registry.destroy(entity);
 }
 

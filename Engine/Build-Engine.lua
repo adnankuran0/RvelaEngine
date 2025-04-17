@@ -20,7 +20,8 @@ project "Engine"
       "../Vendor/stb_image",
       "../Vendor/entt",
       "../Vendor/tiny_obj_loader",
-      "../Vendor/Assimp/include"
+      "../Vendor/Assimp/include",
+      "../Vendor/nlohmann"
       
    }
 

@@ -4,7 +4,6 @@
 #include "RvelaLog.h"
 #include "Scene/Entity.h"
 
-
 Engine* Engine::s_Instance = nullptr;
 
 
@@ -52,6 +51,13 @@ void Engine::Run()
 			MouseMovedEvent& mouseEvent = static_cast<MouseMovedEvent&>(event);
 			editorCamera.onMouseMoved(mouseEvent.GetX(), mouseEvent.GetY(),m_Window->GetGLFWWindow());
 		}
+
+		if (event.GetEventType() == EventType::MouseScrolled && Input::IsMouseButtonPressed(MouseCode::Button1))
+		{
+			MouseScrolledEvent& scrollEvent = static_cast<MouseScrolledEvent&>(event);
+			editorCamera.SprintSpeed += scrollEvent.GetYOffset() ;
+			editorCamera.SprintSpeed = std::clamp(editorCamera.SprintSpeed, 2.5f, 30.0f);
+		}
 	
 		});
 
@@ -60,7 +66,6 @@ void Engine::Run()
 	Render();
 
 	EventManager::clearEvents();
-
 	m_Scene->Update();
 	
 }

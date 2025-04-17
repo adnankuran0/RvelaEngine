@@ -12,6 +12,7 @@
 #include "../Renderer/Shader.h"
 #include "Core/RvelaMath.h"
 #include "entt/entt.h"
+#include "../Renderer/Material.h"
 
 struct WorldTransformComponent {
     glm::vec3 position;
@@ -31,7 +32,7 @@ struct WorldTransformComponent {
     glm::mat4 GetMatrix() const {
         return (glm::translate(glm::mat4(1.0f), position) *
             glm::mat4_cast(GetQuaternion()) *
-            glm::scale(glm::mat4(1.0f), scale))*fixRotation;
+            glm::scale(glm::mat4(1.0f), scale));
     }
 };
 
@@ -53,7 +54,7 @@ struct TransformComponent {
     glm::mat4 GetMatrix() const {
         return (glm::translate(glm::mat4(1.0f), position) *
             glm::mat4_cast(GetQuaternion()) *
-            glm::scale(glm::mat4(1.0f), scale))*fixRotation;
+            glm::scale(glm::mat4(1.0f), scale));
     }
 };
 
@@ -101,47 +102,12 @@ struct MeshComponent {
 
 struct MaterialComponent {
     
-    Texture Albedo;
-    Texture Normal;
-    Texture Metallic;
-    Texture Roughness;
-    Texture Ao;
-    Texture Height;
-    
-
-    MaterialComponent() = default;
-    MaterialComponent(const MaterialComponent&) = delete;
-    MaterialComponent& operator=(const MaterialComponent&) = delete;
-    MaterialComponent(MaterialComponent&&) = default;
-    MaterialComponent& operator=(MaterialComponent&&) = default;
-    MaterialComponent(const std::string& texturesPath)
+    MaterialComponent(const std::string& materialPath)
     {
-        Albedo.Init();
-        Albedo.GenerateFromImage(texturesPath+"/albedo.png");
-        Normal.Init();
-        Normal.GenerateFromImage(texturesPath + "/normal.png");
-        Metallic.Init();
-        Metallic.GenerateFromImage(texturesPath + "/metallic.png");
-        Roughness.Init();
-        Roughness.GenerateFromImage(texturesPath + "/roughness.png");
-        Ao.Init();
-        Ao.GenerateFromImage(texturesPath + "/ao.png");
-        Height.Init();
-        Height.GenerateFromImage(texturesPath + "/height.png");
-        
+        this->materialPath = materialPath;
     }
 
-    void Destroy()
-    {       
-        
-        Albedo.Destroy();
-        Normal.Destroy();
-        Metallic.Destroy();
-        Roughness.Destroy();
-        Height.Destroy();
-        Ao.Destroy();
-        
-    }
+    std::string materialPath;
 
 };
 

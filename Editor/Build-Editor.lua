@@ -5,7 +5,7 @@ project "Editor"
    targetdir "Binaries/%{cfg.buildcfg}"
    staticruntime "off"
 
-   files { "Source/**.h", "Source/**.cpp","Vendor/ImGui/*.cpp" }
+   files { "Source/**.h", "Source/**.cpp","Vendor/ImGui/*.cpp","Vendor/ImGui/*.c" }
 
    includedirs
    {

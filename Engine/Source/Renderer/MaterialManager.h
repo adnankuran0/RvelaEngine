@@ -1,16 +1,16 @@
 #pragma once
 #include "Scene/Components.h"
+#include "Material.h"
+#include <fstream>
 
 class MaterialManager
 {
 public:
-	using MaterialID = uint32_t;
-
-	MaterialID createMaterial(const std::string& name);
-	MaterialComponent* getMaterial(MaterialID id);
-	MaterialID getMaterialID(const std::string& name);
+	static std::shared_ptr<Material> CreateMaterial(const std::string& path);
+	static std::shared_ptr<Material> LoadOrGetMaterial(const std::string& path);
+	static void UnloadMaterial(const std::string& path);
+	static void ClearMaterials();
+	static size_t GetMaterialCount();
 private:
-	std::unordered_map<MaterialID, MaterialComponent*> materials;
-	std::unordered_map<std::string, MaterialID> nameToID;
-	MaterialID nextID = 1;
+	static std::unordered_map<std::string, std::shared_ptr<Material>> materialMap;
 };

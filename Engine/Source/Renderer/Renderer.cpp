@@ -4,6 +4,8 @@
 #include "../RvelaLog.h"
 #include "Core/Input/Input.h"
 #include "Core/Time.h"
+#include "MaterialManager.h"
+#include "TextureManager.h"
 
 GLFWwindow* Renderer::activeWindow = nullptr;
 Shader Renderer::m_DefaultShader;
@@ -43,58 +45,63 @@ void Renderer::EndFrame()
 
 }
 
-void Renderer::Render(WorldTransformComponent& transform, MeshComponent& mesh, MaterialComponent& metarial, Camera& camera) 
+void Renderer::Render(WorldTransformComponent& transform, MeshComponent& meshComponent, MaterialComponent& materialComponent, Camera& camera)
 {
-
+    auto material = MaterialManager::LoadOrGetMaterial(materialComponent.materialPath);
+    if (!material) return;
 
     m_DefaultShader.use();
-    
-    m_DefaultShader.setInt("albedoMap", 0);
-    m_DefaultShader.setInt("normalMap", 1);
-    m_DefaultShader.setInt("metallicMap", 2);
-    m_DefaultShader.setInt("roughnessMap", 3);
-    m_DefaultShader.setInt("aoMap", 4);
-    m_DefaultShader.setInt("heightMap", 5);
+
     m_DefaultShader.setFloat("heightScale", 0.0f);
     m_DefaultShader.setFloat("lightIntensity", 100.0f);
     m_DefaultShader.setVec3("camPos", camera.Position);
     m_DefaultShader.setVec3("lightPosition", glm::vec3(0.5f, 2.0f, 1.0f));
     m_DefaultShader.setVec3("lightColor", glm::vec3(1.0f));
     m_DefaultShader.setFloat("UVScale", 1.0f);
-    
-    m_DefaultShader.setBool("useAlbedoMap", false);
-    m_DefaultShader.setBool("useNormalMap", false);
-    m_DefaultShader.setBool("useMetallicMap", false);
-    m_DefaultShader.setBool("useRoughnessMap", false);
-    m_DefaultShader.setBool("useAOMap", false);
-    m_DefaultShader.setBool("useHeightMap", false);
+    m_DefaultShader.setVec3("albedoColor", material->albedoColor);
+    m_DefaultShader.setFloat("metallicValue", material->metallic);
+    m_DefaultShader.setFloat("roughnessValue", material->roughness);
+    m_DefaultShader.setFloat("aoValue", material->ao);
 
-    m_DefaultShader.setVec3("albedoColor", glm::vec3(0, 1, 1));
-    m_DefaultShader.setFloat("metallicValue",0.0f);
-    m_DefaultShader.setFloat("roughnessValue",0.0f);
-    m_DefaultShader.setFloat("aoValue",1.0f);
+    struct MapInfo {
+        std::string path;
+        std::string uniformName;
+        int slot;
+        std::string useUniform;
+    };
+
+    std::vector<MapInfo> maps = {
+        { material->albedoMapPath,    "albedoMap",    0, "useAlbedoMap" },
+        { material->normalMapPath,    "normalMap",    1, "useNormalMap" },
+        { material->metallicMapPath,  "metallicMap",  2, "useMetallicMap" },
+        { material->roughnessMapPath, "roughnessMap", 3, "useRoughnessMap" },
+        { material->aoMapPath,        "aoMap",        4, "useAOMap" },
+        { material->heightMapPath,    "heightMap",    5, "useHeightMap" },
+    };
+
+    for (const auto& map : maps) {
+        bool hasMap = !map.path.empty();
+        m_DefaultShader.setBool(map.useUniform, hasMap);
+        if (hasMap) {
+            auto tex = TextureManager::LoadOrGetTexture(map.path);
+            if (tex) {
+                m_DefaultShader.setInt(map.uniformName, map.slot);
+                tex->Bind(map.slot);
+            }
+        }
+    }
 
     m_DefaultShader.setMat4("model", transform.GetMatrix());
     m_DefaultShader.setMat4("view", camera.GetViewMatrix());
     m_DefaultShader.setMat4("projection", camera.projection);
-    mesh.VAO.Bind();
-    
-    metarial.Albedo.Bind(0);
-    metarial.Normal.Bind(1);
-    metarial.Metallic.Bind(2);
-    metarial.Roughness.Bind(3);
-    metarial.Ao.Bind(4);
-    metarial.Height.Bind(5);
 
-
-    glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0);
+    meshComponent.VAO.Bind();
+    glDrawElements(GL_TRIANGLES, meshComponent.indexCount, GL_UNSIGNED_INT, 0);
 
     GLenum err;
     while ((err = glGetError()) != GL_NO_ERROR) {
         LOG_ERROR << "OpenGL Error: " << err;
-
     }
-
 }
 
 

@@ -1,7 +1,8 @@
 ﻿#include "ImGuiLayer.h"
 #include "Scene/Components.h"
 #include "Scene/Entity.h"
-
+#define TINYFD_IMPLEMENTATION
+#include "ImGui/tinyfiledialogs.h"
 
 std::string OpenFileDialog()
 {

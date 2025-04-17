@@ -62,7 +62,7 @@ public:
     EventType GetEventType() const override { return EventType::MouseScrolled; }
     const char* GetName() const override { return "MouseScrolled"; }
     float GetXOffset() const { return m_XOffset; }
-    float GetOffset() const { return m_YOffset; }
+    float GetYOffset() const { return m_YOffset; }
 
     static EventType GetStaticType() { return EventType::MouseScrolled; }
 

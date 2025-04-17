@@ -6,6 +6,8 @@ class Texture
 {
 public:
     Texture();
+    ~Texture();
+    Texture(const std::string& path);
 
     void Init();
     void Destroy() const;
@@ -22,8 +24,10 @@ public:
     int GetWidth() const;
     int GetHeight() const;
     int GetNrChannels() const;
+    const std::string& GetPath() ;
 
 private:
+    std::string m_Path;
     unsigned int m_Texture{};
     unsigned char* m_Data{};
     int m_Width{}, m_Height{}, m_NrChannels{};
