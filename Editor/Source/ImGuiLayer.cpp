@@ -12,6 +12,13 @@ std::string OpenFileDialog()
     return filePath ? std::string(filePath) : "";
 }
 
+std::string OpenFolderDialog()
+{
+    const char* folderPath = tinyfd_selectFolderDialog("Select a Folder", "");
+
+    return folderPath ? std::string(folderPath) : "";
+}
+
 ImGuiLayer::ImGuiLayer(Engine* engine)
     : m_Engine(engine)
 {
@@ -180,7 +187,17 @@ void ImGuiLayer::DrawSceneHierarchyPanel(entt::registry& registry, entt::entity&
             m_Engine->GetScene()->DestroyEntity(selectedEntity);
             selectedEntity = entt::null;
         }
-
+        /*
+        if (ImGui::MenuItem("Create Project"))
+        {
+            std::string selectedFolder = OpenFolderDialog();
+            if (!selectedFolder.empty())
+            {
+                m_Engine->GetProjectManager()->CreateProject("TestProject", selectedFolder);
+            }
+            
+        }
+        */
       
 
         ImGui::EndPopup();

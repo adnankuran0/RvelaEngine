@@ -34,7 +34,7 @@ Engine::Engine()
 
 	m_Scene = std::make_unique<Scene>();
 
-
+	m_ProjectManager = std::make_unique<ProjectManager>();
 }
 
 Engine::~Engine()

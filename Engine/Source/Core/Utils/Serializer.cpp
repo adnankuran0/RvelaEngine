@@ -1,19 +1,29 @@
 ﻿#include "rvelapch.h"
 #include "Serializer.h"
-
+#include <filesystem>
 
 void Serializer::SaveToFile(const ISerializable& obj, const std::string& path)
 {
-	std::ofstream file(path);
-	if (!file.is_open())
+	try
 	{
-		std::cerr << "Dosya açılamadı: " << path << std::endl;
-		return;
-	}
-	std::string data = obj.Serialize();
-	file << data.c_str();
-}
+		std::filesystem::create_directories(std::filesystem::path(path).parent_path());
 
+		std::ofstream file(path);
+		if (!file.is_open())
+		{
+			std::cerr << "Dosya açılamadı: " << path << std::endl;
+			return;
+		}
+
+		std::string data = obj.Serialize();
+		file << data;
+		file.close();
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << "Serializer::SaveToFile hatası: " << e.what() << std::endl;
+	}
+}
 void Serializer::LoadFromFile(ISerializable& obj, const std::string& path)
 {
 	std::ifstream file(path);

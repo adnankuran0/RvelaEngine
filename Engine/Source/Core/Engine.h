@@ -9,8 +9,7 @@
 #include <iostream>
 #include "../Scene/Scene.h"
 #include "../Scene/Components.h"
-
-
+#include "Core/Utils/ProjectManager.h"
 
 class Engine
 {
@@ -26,13 +25,13 @@ public:
 	static Engine* Get() { return s_Instance; }
 	Window* GetWindow() const { return m_Window.get(); }
 	Scene* GetScene() const { return m_Scene.get(); }
-
-
+	ProjectManager* GetProjectManager() const { return m_ProjectManager.get(); }
 
 private:
 	static Engine* s_Instance;
 	std::unique_ptr<Window> m_Window;
 	std::unique_ptr<Renderer> m_Renderer;
 	std::unique_ptr<Scene> m_Scene;
+	std::unique_ptr<ProjectManager> m_ProjectManager;
 
 };
