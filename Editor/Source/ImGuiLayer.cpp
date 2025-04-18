@@ -6,7 +6,7 @@
 
 std::string OpenFileDialog()
 {
-    const char* filterPatterns[] = { "*.fbx", "*.obj", "*.glfw" };
+    const char* filterPatterns[] = { "*.fbx", "*.obj", "*.gltf"};
     const char* filePath = tinyfd_openFileDialog("Select a file", "", 3, filterPatterns, NULL, 0);
 
     return filePath ? std::string(filePath) : "";

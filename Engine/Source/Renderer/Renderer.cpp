@@ -47,7 +47,7 @@ void Renderer::EndFrame()
 
 void Renderer::Render(WorldTransformComponent& transform, MeshComponent& meshComponent, MaterialComponent& materialComponent, Camera& camera)
 {
-    auto material = MaterialManager::LoadOrGetMaterial(materialComponent.materialPath);
+    auto material = materialComponent.material;
     if (!material) return;
 
     m_DefaultShader.use();

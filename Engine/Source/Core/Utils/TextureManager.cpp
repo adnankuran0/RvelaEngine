@@ -11,6 +11,7 @@ std::shared_ptr<Texture> TextureManager::LoadOrGetTexture(const std::string& pat
 	if (it != textureMap.end())
 		return it->second;
 
+
 	auto texture = std::make_shared<Texture>();
 	texture->GenerateFromImage(path);
 	textureMap[path] = texture;
@@ -25,7 +26,7 @@ void TextureManager::UnloadTexture(const std::string& path) {
 		textureMap.erase(it); 
 	}
 	else {
-		std::cout << "Texture not found: " << path << std::endl;
+		std::cout << "Unload failed: Texture not found: " << path << std::endl;
 	}
 }
 

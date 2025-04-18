@@ -1,0 +1,16 @@
+{
+    "albedoColor": [
+        0.800000011920929,
+        0.800000011920929,
+        0.800000011920929
+    ],
+    "albedoMapPath": "C:/Users/adnan/Desktop/street_rat_2k/textures/street_rat_diff_2k.png",
+    "ao": 1.0,
+    "aoMapPath": "",
+    "heightMapPath": "",
+    "metallic": 0.0,
+    "metallicMapPath": "",
+    "normalMapPath": "C:/Users/adnan/Desktop/street_rat_2k/textures/street_rat_nor_gl_2k.png",
+    "roughness": 0.5,
+    "roughnessMapPath": "C:/Users/adnan/Desktop/street_rat_2k/textures/street_rat_rough_2k.png"
+}

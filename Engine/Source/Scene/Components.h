@@ -13,6 +13,7 @@
 #include "Core/RvelaMath.h"
 #include "entt/entt.h"
 #include "../Renderer/Material.h"
+#include <memory>
 
 struct WorldTransformComponent {
     glm::vec3 position;
@@ -101,14 +102,28 @@ struct MeshComponent {
 
 
 struct MaterialComponent {
-    
+
     MaterialComponent(const std::string& materialPath)
+        : materialPath(materialPath)
     {
-        this->materialPath = materialPath;
+    }
+
+    MaterialComponent(const MaterialComponent& other)
+        : materialPath(other.materialPath)
+    {
+    }
+
+    MaterialComponent(MaterialComponent&& other) noexcept
+        : materialPath(std::move(other.materialPath))
+    {
+    }
+
+    ~MaterialComponent()
+    {
     }
 
     std::string materialPath;
-
+    std::shared_ptr<Material> material;
 };
 
 struct SceneTreeComponent {

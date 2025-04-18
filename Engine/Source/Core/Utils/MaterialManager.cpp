@@ -1,45 +1,55 @@
-#include "rvelapch.h"
+﻿#include "rvelapch.h"
 #include "MaterialManager.h"
 #include "Core/Utils/Serializer.h"
-std::unordered_map<std::string, std::shared_ptr<Material>> MaterialManager::materialMap;
+#include <fstream>
+#include <iostream>
 
+std::unordered_map<std::string, std::weak_ptr<Material>> MaterialManager::materialMap;
 
-std::shared_ptr<Material> MaterialManager::CreateMaterial(const std::string& path)
+void MaterialManager::CreateMaterial(const std::string& path, MaterialData& materialData)
 {
     if (materialMap.contains(path))
-        return materialMap[path];
+    {
+        if (auto existing = materialMap[path].lock())
+        {
+            return;
+        }
+        //materialMap.erase(path);
+    }
 
-    auto mat = std::make_shared<Material>();
-    materialMap[path] = mat;
+    //auto mat = std::make_shared<Material>(std::move(materialData));
+    //materialMap[path] = mat;
 
-    Serializer::SaveToFile(*mat, path);
+    Serializer::SaveToFile(materialData, path);
 
-    return mat;
+    return;
 }
 
 std::shared_ptr<Material> MaterialManager::LoadOrGetMaterial(const std::string& path)
 {
-	//checking if texture already exists
     auto it = materialMap.find(path);
-    if (it != materialMap.end()) {
-        return it->second;
+    if (it != materialMap.end())
+    {
+        if (auto existing = it->second.lock())  
+        {
+            return existing;
+        }
+        materialMap.erase(it);
     }
 
     std::ifstream file(path);
-    if (!file.is_open()) {
+    if (!file.is_open())
+    {
         std::cerr << "Material file could not be opened: " << path << std::endl;
         return nullptr;
     }
 
     std::string jsonStr((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-
     auto material = std::make_shared<Material>();
     material->Deserialize(jsonStr);
     material->LoadTextures();
 
-    materialMap[path] = material;
-
-    
+    materialMap[path] = material;  
 
     return material;
 }
@@ -47,16 +57,33 @@ std::shared_ptr<Material> MaterialManager::LoadOrGetMaterial(const std::string& 
 void MaterialManager::UnloadMaterial(const std::string& path)
 {
     auto it = materialMap.find(path);
-    if (it != materialMap.end()) {
+    if (it != materialMap.end())
+    {
         materialMap.erase(it);
     }
 }
 
-void MaterialManager::ClearMaterials() {
+void MaterialManager::ClearMaterials()
+{
     materialMap.clear();
 }
 
-size_t MaterialManager::GetMaterialCount() 
+void MaterialManager::ClearExpiredMaterials()
+{
+    for (auto it = materialMap.begin(); it != materialMap.end();)
+    {
+        if (it->second.expired())
+        {
+            it = materialMap.erase(it); 
+        }
+        else
+        {
+            ++it;
+        }
+    }
+}
+
+size_t MaterialManager::GetMaterialCount()
 {
     return materialMap.size();
 }

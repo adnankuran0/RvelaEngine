@@ -1,0 +1,16 @@
+{
+    "albedoColor": [
+        0.800000011920929,
+        0.800000011920929,
+        0.800000011920929
+    ],
+    "albedoMapPath": "C:/Users/adnan/Desktop/Sofa_01_1k/textures/Sofa_01_diff_1k.png",
+    "ao": 1.0,
+    "aoMapPath": "",
+    "heightMapPath": "",
+    "metallic": 0.0,
+    "metallicMapPath": "C:/Users/adnan/Desktop/Sofa_01_1k/textures/Sofa_01_metallic_1k.png",
+    "normalMapPath": "C:/Users/adnan/Desktop/Sofa_01_1k/textures/Sofa_01_nor_gl_1k.png",
+    "roughness": 0.5,
+    "roughnessMapPath": "C:/Users/adnan/Desktop/Sofa_01_1k/textures/Sofa_01_roughness_1k.png"
+}

@@ -1,0 +1,16 @@
+{
+    "albedoColor": [
+        0.800000011920929,
+        0.800000011920929,
+        0.800000011920929
+    ],
+    "albedoMapPath": "C:/Users/adnan/Desktop/utility_box_02_1k/textures/utility_box_02_diff_1k.png",
+    "ao": 1.0,
+    "aoMapPath": "",
+    "heightMapPath": "",
+    "metallic": 0.0,
+    "metallicMapPath": "C:/Users/adnan/Desktop/utility_box_02_1k/textures/utility_box_02_metal_1k.png",
+    "normalMapPath": "C:/Users/adnan/Desktop/utility_box_02_1k/textures/utility_box_02_nor_gl_1k.png",
+    "roughness": 0.5,
+    "roughnessMapPath": "C:/Users/adnan/Desktop/utility_box_02_1k/textures/utility_box_02_rough_1k.png"
+}

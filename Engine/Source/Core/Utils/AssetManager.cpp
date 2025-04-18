@@ -3,6 +3,8 @@
 #include "assimp/Importer.hpp"
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
+#include "Core/Utils/MaterialManager.h"
+
 
 void FindNodeForMesh(aiNode* node, unsigned int meshIndex, std::string& meshName)
 {
@@ -20,6 +22,104 @@ void FindNodeForMesh(aiNode* node, unsigned int meshIndex, std::string& meshName
     }
 }
 
+fs::path AssetManager::FindTexturePath(const std::string& modelPath, const aiString& texPath)
+{
+    std::vector<std::string> possibleExtensions = { ".png", ".jpg", ".jpeg", ".tga", ".bmp" };
+
+    fs::path modelFsPath(modelPath);
+    fs::path modelDir = modelFsPath.parent_path();
+
+    fs::path textureFullPath = modelDir / texPath.C_Str();
+    textureFullPath = fs::weakly_canonical(textureFullPath);
+
+    if (fs::exists(textureFullPath))
+        return textureFullPath;
+
+    fs::path textureDir = textureFullPath.parent_path();
+    std::string textureNameStem = textureFullPath.stem().string();
+
+    for (const auto& ext : possibleExtensions)
+    {
+        fs::path altPath = textureDir / (textureNameStem + ext);
+        if (fs::exists(altPath))
+            return altPath;
+    }
+
+    std::cout << "Texture not found: " << textureFullPath << std::endl;
+    return "";
+}
+
+void AssetManager::LoadMaterials(const aiScene* scene, std::unordered_map<unsigned int, std::string>& materials, const std::string& modelPath)
+{
+    if (!scene->HasMaterials()) return;
+
+    for (unsigned int i = 0; i < scene->mNumMaterials; i++)
+    {
+        aiMaterial* aiMat = scene->mMaterials[i];
+        MaterialData materialData;
+
+
+
+        aiString name;
+        if (AI_FAILURE == aiMat->Get(AI_MATKEY_NAME, name))
+            std::cout << "Can't load material!" << std::endl;
+
+        aiColor4D color;
+        if (AI_SUCCESS == aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, color))
+            materialData.albedoColor = glm::vec4(color.r, color.g, color.b, color.a);
+        else
+            materialData.albedoColor = glm::vec4(1.0f);
+
+        struct TextureTarget {
+            aiTextureType type;
+            std::string& destination;
+        };
+
+        aiString texPath;
+
+        std::string albedoPath, normalPath, roughnessPath, metallicPath ,aoPath, heightPath;
+
+        std::vector<TextureTarget> targets = {
+            { aiTextureType_DIFFUSE, albedoPath },
+            { aiTextureType_NORMALS, normalPath },
+            { aiTextureType_SHININESS, roughnessPath },
+            { aiTextureType_METALNESS, metallicPath },
+            { aiTextureType_LIGHTMAP, aoPath },
+            { aiTextureType_HEIGHT, heightPath }
+        };
+
+        //FIX: Assimp cant find ao textures
+
+
+        for (auto& target : targets)
+        {
+            if (AI_SUCCESS == aiMat->GetTexture(target.type, 0, &texPath))
+            {
+                fs::path foundPath = FindTexturePath(modelPath, texPath);
+                if (!foundPath.empty())
+                {
+                    std::string nicePath = foundPath.string();
+                    std::replace(nicePath.begin(), nicePath.end(), '\\', '/');
+                    target.destination = nicePath;
+                }
+            }
+        }
+
+        materialData.albedoMapPath = albedoPath;
+        materialData.normalMapPath = normalPath;
+        materialData.roughnessMapPath = roughnessPath;
+        materialData.metallicMapPath = metallicPath;
+        materialData.aoMapPath = aoPath;
+        materialData.heightMapPath = heightPath;
+
+        std::string matSavePath = "D:/GitHub/RvelaEngine/Resources/Engine/Materials/" + std::string(name.C_Str()) + ".rmaterial";
+        materials[i] = matSavePath;
+        MaterialManager::CreateMaterial(matSavePath, materialData);
+        
+    }
+
+}
+
 std::vector<MeshData> AssetManager::LoadModel(const std::string& path)
 {
     Assimp::Importer importer;
@@ -35,16 +135,10 @@ std::vector<MeshData> AssetManager::LoadModel(const std::string& path)
         std::cout << "Model could not be loaded!\n";
     }
     
-    // MaterialID  MaterialIndex
-    std::unordered_map<unsigned int, unsigned int> materials;
+    // MaterialIndex  Path
+    std::unordered_map<unsigned int, std::string> materials;
 
-    if (scene->HasMaterials())
-    {
-        for (unsigned int i = 0; i < scene->mNumMaterials; i++)
-        {
-            auto& material = scene->mMaterials[i];
-        }
-    }
+    LoadMaterials(scene, materials, path);
 
     std::vector<MeshData> meshDatas;
     meshDatas.reserve(scene->mNumMeshes);
@@ -109,6 +203,7 @@ std::vector<MeshData> AssetManager::LoadModel(const std::string& path)
         data.indices = indices;
         data.indexCount = indices.size();
         data.name = meshName; 
+        data.materialPath = materials[mesh->mMaterialIndex];
 
 
         meshDatas.push_back(data);

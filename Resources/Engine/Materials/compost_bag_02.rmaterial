@@ -1,0 +1,16 @@
+{
+    "albedoColor": [
+        0.800000011920929,
+        0.800000011920929,
+        0.800000011920929
+    ],
+    "albedoMapPath": "C:/Users/adnan/Desktop/compost_bag_02_4k/textures/compost_bag_02_diff_4k.png",
+    "ao": 1.0,
+    "aoMapPath": "",
+    "heightMapPath": "",
+    "metallic": 0.0,
+    "metallicMapPath": "",
+    "normalMapPath": "C:/Users/adnan/Desktop/compost_bag_02_4k/textures/compost_bag_02_nor_gl_4k.png",
+    "roughness": 0.5,
+    "roughnessMapPath": "C:/Users/adnan/Desktop/compost_bag_02_4k/textures/compost_bag_02_rough_4k.png"
+}

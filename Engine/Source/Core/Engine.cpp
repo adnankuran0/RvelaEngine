@@ -4,6 +4,9 @@
 #include "RvelaLog.h"
 #include "Scene/Entity.h"
 
+#include "Core/Utils/MaterialManager.h"
+#include "Core/Utils/TextureManager.h"
+
 Engine* Engine::s_Instance = nullptr;
 
 
@@ -43,6 +46,8 @@ Engine::~Engine()
 void Engine::Run()
 {
 	glfwPollEvents();
+
+	//std::cout << "Texture count: " << TextureManager::GetTextureCount() << " Material count: " << MaterialManager::GetMaterialCount() << std::endl;
 	
 	EventManager::dispatchEvents([this](Event& event) {
 

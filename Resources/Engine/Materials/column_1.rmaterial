@@ -1,0 +1,16 @@
+{
+    "albedoColor": [
+        1.0,
+        1.0,
+        1.0
+    ],
+    "albedoMapPath": "C:/Users/adnan/Desktop/building_metallic_protective_fence_low_poly/column_1_baseColor.png",
+    "ao": 1.0,
+    "aoMapPath": "",
+    "heightMapPath": "",
+    "metallic": 0.0,
+    "metallicMapPath": "C:/Users/adnan/Desktop/building_metallic_protective_fence_low_poly/column_1_metallicRoughness.png",
+    "normalMapPath": "C:/Users/adnan/Desktop/building_metallic_protective_fence_low_poly/column_1_normal.png",
+    "roughness": 0.5,
+    "roughnessMapPath": ""
+}

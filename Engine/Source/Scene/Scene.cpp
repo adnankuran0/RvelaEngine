@@ -17,16 +17,10 @@ Entity Scene::CreateEntity(const std::string& name) {
     entity.AddComponent<SceneTreeComponent>();
     entity.AddComponent<TagComponent>(name);
 
-    entity.AddComponent<MaterialComponent>("D:/GitHub/RvelaEngine/Resources/Engine/Materials/second.rmaterial");
+    //auto& materialComponent = entity.AddComponent<MaterialComponent>("D:/GitHub/RvelaEngine/Resources/Engine/Materials/second.rmaterial");
+    //materialComponent.material = MaterialManager::LoadOrGetMaterial(materialComponent.materialPath);  
 
-    /*
-    AssetManager assetManager;
-    //entity.AddComponent<MeshComponent>(vertices, sizeof(vertices), indices, sizeof(indices));
-    entity.AddComponent<ModelComponent>();
-    auto& modelComponent = entity.GetComponent<ModelComponent>();
-    assetManager.LoadAsset("C:/Users/adnan/Desktop/newplane.fbx", modelComponent);
-    
-     */
+   
     return entity;
 }
 
@@ -44,10 +38,10 @@ void Scene::DestroyEntity(entt::entity entity) {
 
     if (HasComponent<MeshComponent>(entity))
         GetComponent<MeshComponent>(entity).Destroy();
-    if (HasComponent<MaterialComponent>(entity))
-        MaterialManager::UnloadMaterial(GetComponent<MaterialComponent>(entity).materialPath); //FIX: this may cause performance issues, try to find a better solution
 
     m_Registry.destroy(entity);
+
+    MaterialManager::ClearExpiredMaterials();
 }
 
 
@@ -56,11 +50,14 @@ Entity Scene::LoadAsset(const std::string& path)
     Entity rootEntity = CreateEntity("Model");
 
     std::vector<MeshData> meshDatas = AssetManager::LoadModel(path);
+
     if (meshDatas.size() == 1)
     {
         rootEntity.AddComponent<MeshComponent>(meshDatas.back().vertices.data(), meshDatas.back().vertices.size() * sizeof(float),
             meshDatas.back().indices.data(), meshDatas.back().indices.size() * sizeof(unsigned int), meshDatas.back().indices.size());
         rootEntity.GetComponent<TagComponent>().tag = meshDatas.back().name;
+        auto& materialComponent = rootEntity.AddComponent<MaterialComponent>(meshDatas.front().materialPath);
+        materialComponent.material = MaterialManager::LoadOrGetMaterial(materialComponent.materialPath);  
     }
     else
     {
@@ -71,6 +68,8 @@ Entity Scene::LoadAsset(const std::string& path)
             meshEntity.AddComponent<MeshComponent>(meshData.vertices.data(), meshData.vertices.size() * sizeof(float),
                 meshData.indices.data(), meshData.indices.size() * sizeof(unsigned int), meshData.indices.size());
             meshEntity.GetComponent<TagComponent>().tag = meshData.name;
+            auto& materialComponent = meshEntity.AddComponent<MaterialComponent>(meshData.materialPath);
+            materialComponent.material = MaterialManager::LoadOrGetMaterial(materialComponent.materialPath);
 
         }
     }
