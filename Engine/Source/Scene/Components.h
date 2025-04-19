@@ -14,8 +14,14 @@
 #include "entt/entt.h"
 #include "../Renderer/Material.h"
 #include <memory>
+#include "Component.h"
+#include "../nlohmann/json.hpp"
 
-struct WorldTransformComponent {
+using json = nlohmann::json;
+using UUID = uint64_t;
+
+class WorldTransformComponent : public Component {
+public:
     glm::vec3 position;
     glm::vec3 rotation;
     glm::vec3 scale;
@@ -35,9 +41,31 @@ struct WorldTransformComponent {
             glm::mat4_cast(GetQuaternion()) *
             glm::scale(glm::mat4(1.0f), scale));
     }
+
+    std::string Serialize() const override
+    {
+        json j;
+        j["position"] = { position.x,position.y,position.z };
+        j["rotation"] = { rotation.x,rotation.y,rotation.z };
+        j["scale"] = { scale.x,scale.y,scale.z };
+
+        return j.dump(4);
+    }
+    void Deserialize(const std::string& jsonStr) override
+    {
+        json j = json::parse(jsonStr);
+        auto positionData = j["position"];
+        position = glm::vec3(positionData[0], positionData[1], positionData[2]);
+        auto rotationData = j["rotation"];
+        rotation = glm::vec3(positionData[0], positionData[1], positionData[2]);
+        auto scaleData = j["scale"];
+        scale = glm::vec3(positionData[0], positionData[1], positionData[2]);
+        
+    }
 };
 
-struct TransformComponent {
+class TransformComponent : public Component {
+public:
     glm::vec3 position;
     glm::vec3 rotation;
     glm::vec3 scale;
@@ -57,14 +85,54 @@ struct TransformComponent {
             glm::mat4_cast(GetQuaternion()) *
             glm::scale(glm::mat4(1.0f), scale));
     }
+
+    std::string Serialize() const override
+    {
+        json j;
+        j["position"] = { position.x,position.y,position.z };
+        j["rotation"] = { rotation.x,rotation.y,rotation.z };
+        j["scale"] = { scale.x,scale.y,scale.z };
+
+        return j.dump(4);
+    }
+    void Deserialize(const std::string& jsonStr) override
+    {
+        json j = json::parse(jsonStr);
+        auto positionData = j["position"];
+        position = glm::vec3(positionData[0], positionData[1], positionData[2]);
+        auto rotationData = j["rotation"];
+        rotation = glm::vec3(positionData[0], positionData[1], positionData[2]);
+        auto scaleData = j["scale"];
+        scale = glm::vec3(positionData[0], positionData[1], positionData[2]);
+
+    }
 };
 
 
-struct TagComponent {
+class TagComponent : public Component {
+public:
     std::string tag;
+    TagComponent() = default;
+    TagComponent(const std::string& tag) : tag(tag) {}
+
+    std::string Serialize() const override
+    {
+        json j;
+        j["tag"] = tag;
+
+        return j.dump(4);
+    }
+    void Deserialize(const std::string& jsonStr) override
+    {
+        json j = json::parse(jsonStr);
+        auto tagData = j["tag"];
+        tag = tagData;
+    }
+    
 };
 
-struct MeshComponent {
+class MeshComponent{
+public:
     VertexArray VAO;
     VertexBuffer VBO;
     ElementBuffer EBO;
@@ -101,7 +169,8 @@ struct MeshComponent {
 
 
 
-struct MaterialComponent {
+class MaterialComponent : public Component {
+public:
 
     MaterialComponent(const std::string& materialPath)
         : materialPath(materialPath)
@@ -122,12 +191,56 @@ struct MaterialComponent {
     {
     }
 
+    std::string Serialize() const override
+    {
+        json j;
+        j["materialPath"] = materialPath;
+
+        return j.dump(4);
+    }
+    void Deserialize(const std::string& jsonStr) override
+    {
+        json j = json::parse(jsonStr);
+        auto materialPathData = j["materialPath"];
+        materialPath = materialPathData;
+
+    }
+
     std::string materialPath;
     std::shared_ptr<Material> material;
 };
 
-struct SceneTreeComponent {
+class SceneTreeComponent{
+public:
     entt::entity parent = entt::null;
     std::vector<entt::entity> children;
+
+    UUID parentUUID = 0;
+    std::vector<UUID> childrenUUIDs;
+
 };
 
+class UUIDComponent : public Component
+{
+public:
+    UUID uuid;
+
+    UUIDComponent() = default;
+    UUIDComponent(UUID uuid):uuid(uuid){}
+
+    std::string Serialize() const override
+    {
+        json j;
+        j["UUID"] = uuid;
+
+        return j.dump(4);
+    }
+    void Deserialize(const std::string& jsonStr) override
+    {
+        json j = json::parse(jsonStr);
+        auto UUIDData = j["UUID"];
+        uuid = UUIDData;
+
+    }
+
+};

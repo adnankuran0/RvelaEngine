@@ -4,10 +4,12 @@
 
 #include "Components.h"
 #include "Core/RvelaMath.h"
+#include "Core/Utils/ISerializable.h"
 
 class Entity;
 
-class Scene {
+class Scene 
+{
 public:
     Scene();
 
@@ -63,5 +65,6 @@ public:
 
 private:
     entt::registry m_Registry;
+    std::unordered_map<UUID, entt::entity> m_EntityMap;
     friend class Entity;
 };

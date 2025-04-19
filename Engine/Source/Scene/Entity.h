@@ -44,6 +44,11 @@ public:
 		m_Scene->GetRegistry().remove<T>(m_EntityHandle);
 	}
 
+	UUID GetUUID() 
+	{
+		return GetComponent<UUIDComponent>().uuid;
+	}
+
 	operator bool() const { return m_EntityHandle != entt::null; }
 	operator entt::entity() const { return m_EntityHandle; }
 	operator uint32_t() const { return (uint32_t)m_EntityHandle; }

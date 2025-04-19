@@ -6,6 +6,7 @@
 #include "../Core/Utils/AssetManager.h"
 #include "../Core/Utils/Serializer.h"
 #include "../Core/Utils/MaterialManager.h"
+#include "UUIDGenerator.h"
 
 Scene::Scene() : m_Registry() {}
 
@@ -16,6 +17,8 @@ Entity Scene::CreateEntity(const std::string& name) {
     entity.AddComponent<WorldTransformComponent>(glm::vec3(0.0f),glm::vec3(0.0f),glm::vec3(1.0f));
     entity.AddComponent<SceneTreeComponent>();
     entity.AddComponent<TagComponent>(name);
+    entity.AddComponent<UUIDComponent>(UUIDGenerator::Generate());
+    m_EntityMap[entity.GetUUID()] = (entt::entity)entity;
 
     //auto& materialComponent = entity.AddComponent<MaterialComponent>("D:/GitHub/RvelaEngine/Resources/Engine/Materials/second.rmaterial");
     //materialComponent.material = MaterialManager::LoadOrGetMaterial(materialComponent.materialPath);  
@@ -40,6 +43,11 @@ void Scene::DestroyEntity(entt::entity entity) {
         GetComponent<MeshComponent>(entity).Destroy();
 
     m_Registry.destroy(entity);
+    if (HasComponent<UUIDComponent>(entity))
+    {
+        auto& uuidComponent = GetComponent<UUIDComponent>(entity);
+        m_EntityMap.erase(uuidComponent.uuid);
+    }
 
     MaterialManager::ClearExpiredMaterials();
 }
