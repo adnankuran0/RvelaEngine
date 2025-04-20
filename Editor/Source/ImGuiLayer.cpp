@@ -3,6 +3,7 @@
 #include "Scene/Entity.h"
 #define TINYFD_IMPLEMENTATION
 #include "ImGui/tinyfiledialogs.h"
+#include "Core/Utils/Serializer.h"
 
 std::string OpenFileDialog()
 {
@@ -243,9 +244,47 @@ void ImGuiLayer::DrawInspectorPanel(entt::registry& registry, entt::entity& sele
             }
         }
 
+        if (registry.any_of<UUIDComponent>(selectedEntity)) {
+            if (ImGui::CollapsingHeader("UUID", ImGuiTreeNodeFlags_DefaultOpen)) {
+                auto& uuid = registry.get<UUIDComponent>(selectedEntity);
+                ImGui::Text("UUID: %s", std::to_string(uuid.uuid).c_str());
+            }
+        }
+
+        if (registry.any_of<MaterialComponent>(selectedEntity)) {
+            if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_DefaultOpen)) {
+                MaterialComponent& materialComponent = registry.get<MaterialComponent>(selectedEntity);
+                const ISerializable* materialSerializable = std::static_pointer_cast<const ISerializable>(materialComponent.material).get();
+
+                ImGui::Text("Material Path: %s", materialComponent.GetMaterialPath().c_str());
+            
+                glm::vec3 albedoColor = materialComponent.material->albedoColor;
+                float color[3] = { albedoColor.r, albedoColor.g, albedoColor.b };
+
+                if (ImGui::ColorPicker3("Albedo", color)) {
+                    materialComponent.material->albedoColor = glm::vec3(color[0], color[1], color[2]);
+                    
+                    Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath());
+                }
+
+                if (ImGui::SliderFloat("AO", &materialComponent.material->ao, 0.0f, 1.0f)) {
+                    Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath());
+                }
+
+                if (ImGui::SliderFloat("Metallic", &materialComponent.material->metallic, 0.0f, 1.0f)) {
+                    Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath());
+                }
+
+                if (ImGui::SliderFloat("Roughness", &materialComponent.material->roughness, 0.0f, 1.0f)) {
+                    Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath());
+                }
+
+            }
+        }
+
         if (registry.any_of<SceneTreeComponent>(selectedEntity)) {
+            auto& selectedNode = registry.get<SceneTreeComponent>(selectedEntity);
             if (ImGui::CollapsingHeader("Parent/Child", ImGuiTreeNodeFlags_DefaultOpen)) {
-                auto& selectedNode = registry.get<SceneTreeComponent>(selectedEntity);
                 if (ImGui::BeginCombo("Parent", selectedNode.parent == entt::null ? "None" : std::to_string((uint32_t)selectedNode.parent).c_str())) {
                     if (ImGui::Selectable("None", selectedNode.parent == entt::null)) {
                         m_Engine->GetScene()->RemoveParent(selectedEntity);
@@ -259,6 +298,8 @@ void ImGuiLayer::DrawInspectorPanel(entt::registry& registry, entt::entity& sele
                         });
                     ImGui::EndCombo();
                 }
+                auto& uuid = selectedNode.parentUUID;
+                ImGui::Text("Parent UUID: %s", std::to_string(uuid).c_str());
             }
         }
     }

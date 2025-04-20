@@ -4,7 +4,12 @@
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
 #include "Core/Utils/MaterialManager.h"
+#include <filesystem>
 
+//TODO: Move this function to its own place
+bool doesFileExist(const std::string& path) {
+    return fs::exists(path) && fs::is_regular_file(path);
+}
 
 void FindNodeForMesh(aiNode* node, unsigned int meshIndex, std::string& meshName)
 {
@@ -64,6 +69,9 @@ void AssetManager::LoadMaterials(const aiScene* scene, std::unordered_map<unsign
         if (AI_FAILURE == aiMat->Get(AI_MATKEY_NAME, name))
             std::cout << "Can't load material!" << std::endl;
 
+        
+        
+
         aiColor4D color;
         if (AI_SUCCESS == aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, color))
             materialData.albedoColor = glm::vec4(color.r, color.g, color.b, color.a);
@@ -114,6 +122,7 @@ void AssetManager::LoadMaterials(const aiScene* scene, std::unordered_map<unsign
 
         std::string matSavePath = "D:/GitHub/RvelaEngine/Resources/Engine/Materials/" + std::string(name.C_Str()) + ".rmaterial";
         materials[i] = matSavePath;
+        if (doesFileExist(matSavePath)) return;
         MaterialManager::CreateMaterial(matSavePath, materialData);
         
     }

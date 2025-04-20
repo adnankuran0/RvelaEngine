@@ -191,6 +191,18 @@ public:
     {
     }
 
+    std::string& GetMaterialPath()
+    {
+        return materialPath;
+    }
+
+    void SetMaterialPath(const std::string& materialPath)
+    {
+        this->materialPath = materialPath;
+    }
+
+    
+
     std::string Serialize() const override
     {
         json j;
@@ -206,8 +218,11 @@ public:
 
     }
 
-    std::string materialPath;
     std::shared_ptr<Material> material;
+    
+
+private:
+    std::string materialPath;
 };
 
 class SceneTreeComponent{

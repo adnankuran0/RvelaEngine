@@ -65,7 +65,7 @@ Entity Scene::LoadAsset(const std::string& path)
             meshDatas.back().indices.data(), meshDatas.back().indices.size() * sizeof(unsigned int), meshDatas.back().indices.size());
         rootEntity.GetComponent<TagComponent>().tag = meshDatas.back().name;
         auto& materialComponent = rootEntity.AddComponent<MaterialComponent>(meshDatas.front().materialPath);
-        materialComponent.material = MaterialManager::LoadOrGetMaterial(materialComponent.materialPath);  
+        materialComponent.material = MaterialManager::LoadOrGetMaterial(materialComponent.GetMaterialPath());  
     }
     else
     {
@@ -77,7 +77,7 @@ Entity Scene::LoadAsset(const std::string& path)
                 meshData.indices.data(), meshData.indices.size() * sizeof(unsigned int), meshData.indices.size());
             meshEntity.GetComponent<TagComponent>().tag = meshData.name;
             auto& materialComponent = meshEntity.AddComponent<MaterialComponent>(meshData.materialPath);
-            materialComponent.material = MaterialManager::LoadOrGetMaterial(materialComponent.materialPath);
+            materialComponent.material = MaterialManager::LoadOrGetMaterial(materialComponent.GetMaterialPath());
 
         }
     }
@@ -147,6 +147,7 @@ void Scene::SetParent(entt::entity child, entt::entity parent) {
         AddComponent<SceneTreeComponent>(parent);
 
     auto& childNode = GetComponent<SceneTreeComponent>(child);
+    UUID childUUID = GetComponent<UUIDComponent>(child).uuid;
 
     glm::mat4 childWorldMatrix;
     if (HasComponent<WorldTransformComponent>(child)) {
@@ -164,13 +165,19 @@ void Scene::SetParent(entt::entity child, entt::entity parent) {
             std::remove(oldParentNode.children.begin(), oldParentNode.children.end(), child),
             oldParentNode.children.end()
         );
+        oldParentNode.childrenUUIDs.erase(
+            std::remove(oldParentNode.childrenUUIDs.begin(), oldParentNode.childrenUUIDs.end(), childUUID),
+            oldParentNode.childrenUUIDs.end()
+        );
     }
 
     childNode.parent = parent;
+    childNode.parentUUID = parent != entt::null ? GetComponent<UUIDComponent>(parent).uuid : 0;
 
     if (parent != entt::null) {
         auto& parentNode = GetComponent<SceneTreeComponent>(parent);
         parentNode.children.push_back(child);
+        parentNode.childrenUUIDs.push_back(childUUID);
 
         auto& parentWorldTransform = GetComponent<WorldTransformComponent>(parent);
         glm::mat4 parentWorldMatrix = parentWorldTransform.GetMatrix();
@@ -202,6 +209,7 @@ void Scene::RemoveParent(entt::entity child) {
         return;
 
     auto& childNode = GetComponent<SceneTreeComponent>(child);
+    UUID childUUID = GetComponent<UUIDComponent>(child).uuid;
 
     glm::mat4 childWorldMatrix(1.0f);
     if (HasComponent<WorldTransformComponent>(child)) {
@@ -219,8 +227,14 @@ void Scene::RemoveParent(entt::entity child) {
             std::remove(parentNode.children.begin(), parentNode.children.end(), child),
             parentNode.children.end()
         );
+        parentNode.childrenUUIDs.erase(
+            std::remove(parentNode.childrenUUIDs.begin(), parentNode.childrenUUIDs.end(), childUUID),
+            parentNode.childrenUUIDs.end()
+        );
     }
+
     childNode.parent = entt::null;
+    childNode.parentUUID = 0;
 
     glm::vec3 newScale, newRotation, newPosition;
     DecomposeToEulerAngles(childWorldMatrix, newScale, newRotation, newPosition);
