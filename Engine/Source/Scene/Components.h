@@ -16,6 +16,7 @@
 #include <memory>
 #include "Component.h"
 #include "../nlohmann/json.hpp"
+#include "Core/Utils/MaterialManager.h"
 
 using json = nlohmann::json;
 using UUID = uint64_t;
@@ -57,9 +58,9 @@ public:
         auto positionData = j["position"];
         position = glm::vec3(positionData[0], positionData[1], positionData[2]);
         auto rotationData = j["rotation"];
-        rotation = glm::vec3(positionData[0], positionData[1], positionData[2]);
+        rotation = glm::vec3(rotationData[0], rotationData[1], rotationData[2]);
         auto scaleData = j["scale"];
-        scale = glm::vec3(positionData[0], positionData[1], positionData[2]);
+        scale = glm::vec3(scaleData[0], scaleData[1], scaleData[2]);
         
     }
 };
@@ -101,9 +102,9 @@ public:
         auto positionData = j["position"];
         position = glm::vec3(positionData[0], positionData[1], positionData[2]);
         auto rotationData = j["rotation"];
-        rotation = glm::vec3(positionData[0], positionData[1], positionData[2]);
+        rotation = glm::vec3(rotationData[0], rotationData[1], rotationData[2]);
         auto scaleData = j["scale"];
-        scale = glm::vec3(positionData[0], positionData[1], positionData[2]);
+        scale = glm::vec3(scaleData[0], scaleData[1], scaleData[2]);
 
     }
 };
@@ -172,9 +173,12 @@ public:
 class MaterialComponent : public Component {
 public:
 
+    MaterialComponent() = delete;
+
     MaterialComponent(const std::string& materialPath)
         : materialPath(materialPath)
     {
+        material = MaterialManager::LoadOrGetMaterial(materialPath);
     }
 
     MaterialComponent(const MaterialComponent& other)
@@ -198,7 +202,11 @@ public:
 
     void SetMaterialPath(const std::string& materialPath)
     {
+        if (this->materialPath == materialPath) return;
+        MaterialManager::UnloadMaterial(materialPath);
+        MaterialManager::ClearExpiredMaterials();
         this->materialPath = materialPath;
+        material = MaterialManager::LoadOrGetMaterial(materialPath);
     }
 
     
@@ -225,13 +233,33 @@ private:
     std::string materialPath;
 };
 
-class SceneTreeComponent{
+class SceneTreeComponent : public Component {
 public:
     entt::entity parent = entt::null;
     std::vector<entt::entity> children;
 
     UUID parentUUID = 0;
     std::vector<UUID> childrenUUIDs;
+
+    std::string Serialize() const override
+    {
+        json j;
+        j["parentUUID"] = parentUUID;
+        j["childrenUUIDs"] = childrenUUIDs;
+
+        return j.dump(4);
+    }
+
+    void Deserialize(const std::string& jsonStr) override
+    {
+        json j = json::parse(jsonStr);
+        parentUUID = j["parentUUID"];
+        childrenUUIDs.clear();
+        for (auto& id : j["childrenUUIDs"])
+        {
+            childrenUUIDs.push_back(id.get<UUID>());
+        }
+    }
 
 };
 

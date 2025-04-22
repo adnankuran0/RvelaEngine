@@ -54,6 +54,7 @@ public:
 	operator uint32_t() const { return (uint32_t)m_EntityHandle; }
 
 	const std::string& GetName() { return GetComponent<TagComponent>().tag; }
+	const entt::entity GetHandle() { return m_EntityHandle; }
 
 
 	bool operator==(const Entity& other) const

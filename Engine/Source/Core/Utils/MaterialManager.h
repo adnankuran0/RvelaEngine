@@ -1,5 +1,5 @@
 #pragma once
-#include "Scene/Components.h"
+
 #include "Renderer/Material.h"
 #include <fstream>
 #include <unordered_map>

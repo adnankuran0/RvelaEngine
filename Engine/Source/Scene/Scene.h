@@ -14,6 +14,7 @@ public:
     Scene();
 
     Entity CreateEntity(const std::string& name);
+    Entity CreateEntityWithUUID(const std::string& name, UUID uuid);
     void DestroyEntity(entt::entity entity);
 
     Entity LoadAsset(const std::string& path);
@@ -62,6 +63,7 @@ public:
     void Update();
 
     entt::registry& GetRegistry();
+    std::unordered_map<UUID, entt::entity> GetUUIDEntityMap() { return m_EntityMap; }
 
 private:
     entt::registry m_Registry;

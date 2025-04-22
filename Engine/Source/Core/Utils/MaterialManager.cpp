@@ -3,7 +3,7 @@
 #include "Core/Utils/Serializer.h"
 #include <fstream>
 #include <iostream>
-
+#include "Scene/Components.h"
 std::unordered_map<std::string, std::weak_ptr<Material>> MaterialManager::materialMap;
 
 void MaterialManager::CreateMaterial(const std::string& path, MaterialData& materialData)

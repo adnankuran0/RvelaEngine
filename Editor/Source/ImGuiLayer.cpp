@@ -188,6 +188,15 @@ void ImGuiLayer::DrawSceneHierarchyPanel(entt::registry& registry, entt::entity&
             m_Engine->GetScene()->DestroyEntity(selectedEntity);
             selectedEntity = entt::null;
         }
+        if (ImGui::MenuItem("Save Scene"))
+        {
+            m_Engine->GetSceneManager()->SaveScene(*m_Engine->GetScene(), "C:/Users/adnan/Desktop/amcik.rscene");
+        }
+        if (ImGui::MenuItem("Load Scene"))
+        {
+            m_Engine->GetSceneManager()->LoadScene(*m_Engine->GetScene(), "C:/Users/adnan/Desktop/amcik.rscene");
+        }
+
         /*
         if (ImGui::MenuItem("Create Project"))
         {

@@ -1,4 +1,4 @@
-#include "rvelapch.h"
+﻿#include "rvelapch.h"
 #include "Scene.h"
 #include "Entity.h"
 #include "../Core/Time.h"
@@ -19,22 +19,46 @@ Entity Scene::CreateEntity(const std::string& name) {
     entity.AddComponent<TagComponent>(name);
     entity.AddComponent<UUIDComponent>(UUIDGenerator::Generate());
     m_EntityMap[entity.GetUUID()] = (entt::entity)entity;
+    return entity;
+}
 
-    //auto& materialComponent = entity.AddComponent<MaterialComponent>("D:/GitHub/RvelaEngine/Resources/Engine/Materials/second.rmaterial");
-    //materialComponent.material = MaterialManager::LoadOrGetMaterial(materialComponent.materialPath);  
-
-   
+Entity Scene::CreateEntityWithUUID(const std::string& name, UUID uuid)
+{
+    Entity entity(m_Registry.create(), this);
+    entity.AddComponent<TransformComponent>(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f));
+    entity.AddComponent<WorldTransformComponent>(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f));
+    entity.AddComponent<SceneTreeComponent>();
+    entity.AddComponent<TagComponent>(name);
+    entity.AddComponent<UUIDComponent>(uuid);
+    m_EntityMap[uuid] = (entt::entity)entity;
     return entity;
 }
 
 void Scene::DestroyEntity(entt::entity entity) {
-    if (entity == entt::null) return;
+    if (entity == entt::null || !m_Registry.valid(entity)) return;
 
-    auto& nodeComponent = GetComponent<SceneTreeComponent>(entity);
-    if (!nodeComponent.children.empty())
-    {
-        for (auto& child : nodeComponent.children)
-        {
+    if (HasComponent<SceneTreeComponent>(entity)) {
+        auto& nodeComponent = GetComponent<SceneTreeComponent>(entity);
+        if (nodeComponent.parent != entt::null && m_Registry.valid(nodeComponent.parent)) {
+            auto& parentNode = GetComponent<SceneTreeComponent>(nodeComponent.parent);
+
+            auto childIt = std::find(parentNode.children.begin(), parentNode.children.end(), entity);
+            if (childIt != parentNode.children.end()) {
+                parentNode.children.erase(childIt);
+            }
+
+            UUID entityUUID = GetComponent<UUIDComponent>(entity).uuid;
+            auto uuidIt = std::find(parentNode.childrenUUIDs.begin(), parentNode.childrenUUIDs.end(), entityUUID);
+            if (uuidIt != parentNode.childrenUUIDs.end()) {
+                parentNode.childrenUUIDs.erase(uuidIt);
+            }
+        }
+    }
+
+    if (HasComponent<SceneTreeComponent>(entity)) {
+        auto& nodeComponent = GetComponent<SceneTreeComponent>(entity);
+        auto childrenCopy = nodeComponent.children; // Kopya oluştur
+        for (auto child : childrenCopy) {
             DestroyEntity(child);
         }
     }
@@ -42,12 +66,12 @@ void Scene::DestroyEntity(entt::entity entity) {
     if (HasComponent<MeshComponent>(entity))
         GetComponent<MeshComponent>(entity).Destroy();
 
-    m_Registry.destroy(entity);
-    if (HasComponent<UUIDComponent>(entity))
-    {
+    if (HasComponent<UUIDComponent>(entity)) {
         auto& uuidComponent = GetComponent<UUIDComponent>(entity);
         m_EntityMap.erase(uuidComponent.uuid);
     }
+
+    m_Registry.destroy(entity);
 
     MaterialManager::ClearExpiredMaterials();
 }
@@ -65,7 +89,7 @@ Entity Scene::LoadAsset(const std::string& path)
             meshDatas.back().indices.data(), meshDatas.back().indices.size() * sizeof(unsigned int), meshDatas.back().indices.size());
         rootEntity.GetComponent<TagComponent>().tag = meshDatas.back().name;
         auto& materialComponent = rootEntity.AddComponent<MaterialComponent>(meshDatas.front().materialPath);
-        materialComponent.material = MaterialManager::LoadOrGetMaterial(materialComponent.GetMaterialPath());  
+        
     }
     else
     {
@@ -77,7 +101,6 @@ Entity Scene::LoadAsset(const std::string& path)
                 meshData.indices.data(), meshData.indices.size() * sizeof(unsigned int), meshData.indices.size());
             meshEntity.GetComponent<TagComponent>().tag = meshData.name;
             auto& materialComponent = meshEntity.AddComponent<MaterialComponent>(meshData.materialPath);
-            materialComponent.material = MaterialManager::LoadOrGetMaterial(materialComponent.GetMaterialPath());
 
         }
     }
@@ -141,8 +164,7 @@ void Scene::UpdateNodeRecursive(entt::entity entity,
 }
 
 void Scene::SetParent(entt::entity child, entt::entity parent) {
-    if (!HasComponent<SceneTreeComponent>(child))
-        AddComponent<SceneTreeComponent>(child);
+
     if (parent != entt::null && !HasComponent<SceneTreeComponent>(parent))
         AddComponent<SceneTreeComponent>(parent);
 
