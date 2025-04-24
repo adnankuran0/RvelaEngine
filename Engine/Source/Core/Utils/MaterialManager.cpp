@@ -27,6 +27,7 @@ void MaterialManager::CreateMaterial(const std::string& path, MaterialData& mate
 
 std::shared_ptr<Material> MaterialManager::LoadOrGetMaterial(const std::string& path)
 {
+
     auto it = materialMap.find(path);
     if (it != materialMap.end())
     {

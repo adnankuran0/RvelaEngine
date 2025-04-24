@@ -5,8 +5,6 @@
 #include "Core/Utils/AssetManager.h"
 #include "UUIDGenerator.h"  
 
-//TODO: UUID olayı sıkıntı sahneyi yükledikten sonra silerken hata veriyor
-//TODO: MeshComponent sadece yol gibi bir şey tutmalı şuanki ise MeshRendererComponenet gibi bir şey olmalı
 
 using json = nlohmann::json;
 
@@ -35,6 +33,21 @@ void SceneManager::SaveScene(Scene& scene, const std::string& path)
             if (scene.HasComponent<SceneTreeComponent>(entity))
                 entityJson["SceneTreeComponent"] = scene.GetComponent<SceneTreeComponent>(entity).Serialize();
 
+            if (scene.HasComponent<MeshComponent>(entity))
+            {
+                entityJson["MeshComponent"] = scene.GetComponent<MeshComponent>(entity).Serialize();
+            }
+
+            if (scene.HasComponent<PointLightComponent>(entity))
+            {
+                entityJson["PointLightComponent"] = scene.GetComponent<PointLightComponent>(entity).Serialize();
+            }
+
+            if (scene.HasComponent<DirectionalLightComponent>(entity))
+            {
+                entityJson["DirectionalLightComponent"] = scene.GetComponent<DirectionalLightComponent>(entity).Serialize();
+            }
+
             sceneJson["Entities"].push_back(entityJson);
         });
 
@@ -48,10 +61,13 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
     std::ifstream file(path);
     if (!file.is_open())
         return;
-
+    auto start = std::chrono::high_resolution_clock::now();
     json sceneJson;
     file >> sceneJson;
     file.close();
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    std::cout << "Json loading took " << duration.count() << "ms\n";
 
     auto& registry = scene.GetRegistry();
     for (auto entity : registry.view<UUIDComponent>())
@@ -60,30 +76,25 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
 
     std::unordered_map<UUID, entt::entity> uuidToEntity;
 
+    start = std::chrono::high_resolution_clock::now();
+    auto meshLoadTotal = std::chrono::milliseconds(0);
+
     for (auto& entityJson : sceneJson["Entities"])
     {
         UUID uuid = entityJson["UUID"];
         UUIDGenerator::RegisterExternalUUID(uuid);
         Entity e = scene.CreateEntityWithUUID("am", uuid);
-       
         entt::entity entity = e.GetHandle();
-
         uuidToEntity[uuid] = entity;
 
         if (entityJson.contains("TagComponent"))
-        {
             scene.GetComponent<TagComponent>(entity).Deserialize(entityJson["TagComponent"]);
-        }
 
         if (entityJson.contains("TransformComponent"))
-        {
             scene.GetComponent<TransformComponent>(entity).Deserialize(entityJson["TransformComponent"]);
-        }
 
         if (entityJson.contains("WorldTransformComponent"))
-        {
             scene.GetComponent<WorldTransformComponent>(entity).Deserialize(entityJson["WorldTransformComponent"]);
-        }
 
         if (entityJson.contains("MaterialComponent"))
         {
@@ -93,19 +104,58 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
 
             scene.AddComponent<MaterialComponent>(entity, newMaterialPath);
             auto& mat = scene.GetComponent<MaterialComponent>(entity);
-            mat.Deserialize(serializedMat); 
+            mat.Deserialize(serializedMat);
         }
-        
-        std::vector<MeshData> meshDatas = AssetManager::LoadModel("D:/GitHub/RvelaEngine/Resources/Engine/Models/cube.fbx");
-        scene.AddComponent<MeshComponent>(entity,meshDatas.back().vertices.data(), meshDatas.back().vertices.size() * sizeof(float),
-                meshDatas.back().indices.data(), meshDatas.back().indices.size() * sizeof(unsigned int), meshDatas.back().indices.size());
+
+        if (entityJson.contains("MeshComponent"))
+        {
+            std::string serializedMesh = entityJson["MeshComponent"];
+            json j = json::parse(serializedMesh);
+            std::string newModelPath = j["modelPath"];
+            uint16_t meshIndex = j["meshIndex"];
+
+            auto meshStart = std::chrono::high_resolution_clock::now();
+            MeshData meshData = AssetManager::LoadMesh(newModelPath, meshIndex);
+            auto meshEnd = std::chrono::high_resolution_clock::now();
+            meshLoadTotal += std::chrono::duration_cast<std::chrono::milliseconds>(meshEnd - meshStart);
+
+            scene.AddComponent<MeshComponent>(entity, newModelPath, meshIndex);
+            scene.AddComponent<MeshRendererComponent>(entity, meshData.vertices.data(),
+                meshData.vertices.size() * sizeof(float),
+                meshData.indices.data(),
+                meshData.indices.size() * sizeof(unsigned int),
+                meshData.indices.size());
+        }
+
+        if (entityJson.contains("PointLightComponent"))
+        {
+            scene.AddComponent<PointLightComponent>(entity);
+            auto& pointLightComponent = scene.GetComponent<PointLightComponent>(entity);
+            pointLightComponent.Deserialize(entityJson["PointLightComponent"]);
+        }
+
+        if (entityJson.contains("DirectionalLightComponent"))
+        {
+            scene.AddComponent<DirectionalLightComponent>(entity);
+            auto& directionalLightComponent = scene.GetComponent<DirectionalLightComponent>(entity);
+            directionalLightComponent.Deserialize(entityJson["DirectionalLightComponent"]);
+        }
 
         if (entityJson.contains("SceneTreeComponent"))
         {
-            scene.GetComponent<SceneTreeComponent>(entity).Deserialize(entityJson["SceneTreeComponent"]);
+            auto& sceneTreeComp = scene.GetComponent<SceneTreeComponent>(entity);
+            std::unordered_set<UUID> uniqueChildren;
+            for (UUID childUUID : sceneTreeComp.childrenUUIDs)
+                uniqueChildren.insert(childUUID);
+            sceneTreeComp.childrenUUIDs.assign(uniqueChildren.begin(), uniqueChildren.end());
+            sceneTreeComp.Deserialize(entityJson["SceneTreeComponent"]);
         }
-        
     }
+
+    end = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    std::cout << "Scene loading took " << duration.count() << "ms\n";
+    std::cout << "Total mesh loading took " << meshLoadTotal.count() << "ms\n";
 
     for (auto& [uuid, entity] : uuidToEntity)
     {

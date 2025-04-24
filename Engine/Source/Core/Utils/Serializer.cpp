@@ -11,7 +11,7 @@ void Serializer::SaveToFile(const ISerializable& obj, const std::string& path)
 		std::ofstream file(path);
 		if (!file.is_open())
 		{
-			std::cerr << "Dosya açılamadı: " << path << std::endl;
+			std::cerr << "File can not be opened: " << path << std::endl;
 			return;
 		}
 
@@ -21,7 +21,7 @@ void Serializer::SaveToFile(const ISerializable& obj, const std::string& path)
 	}
 	catch (const std::exception& e)
 	{
-		std::cerr << "Serializer::SaveToFile hatası: " << e.what() << std::endl;
+		std::cerr << "Serializer::SaveToFile error: " << e.what() << std::endl;
 	}
 }
 void Serializer::LoadFromFile(ISerializable& obj, const std::string& path)
@@ -29,7 +29,7 @@ void Serializer::LoadFromFile(ISerializable& obj, const std::string& path)
 	std::ifstream file(path);
 	if (!file.is_open())
 	{
-		std::cerr << "Dosya açılamadı: " << path << std::endl;
+		std::cerr << "File can not be opened: " << path << std::endl;
 	}
 	std::string str((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 	obj.Deserialize(str.c_str());

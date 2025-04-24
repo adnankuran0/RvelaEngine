@@ -122,7 +122,7 @@ void AssetManager::LoadMaterials(const aiScene* scene, std::unordered_map<unsign
 
         std::string matSavePath = "D:/GitHub/RvelaEngine/Resources/Engine/Materials/" + std::string(name.C_Str()) + ".rmaterial";
         materials[i] = matSavePath;
-        if (doesFileExist(matSavePath)) return;
+        
         MaterialManager::CreateMaterial(matSavePath, materialData);
         
     }
@@ -213,10 +213,100 @@ std::vector<MeshData> AssetManager::LoadModel(const std::string& path)
         data.indexCount = indices.size();
         data.name = meshName; 
         data.materialPath = materials[mesh->mMaterialIndex];
-
+        data.meshIndex = i;
 
         meshDatas.push_back(data);
     }
 
     return meshDatas;
+}
+
+//TODO: This function needs optimization
+MeshData AssetManager::LoadMesh(const std::string& modelPath, uint32_t meshIndex)
+{
+    static std::unordered_map<std::string, std::unique_ptr<Assimp::Importer>> importerCache;
+    static std::unordered_map<std::string, const aiScene*> modelCache;
+
+    if (modelCache.find(modelPath) == modelCache.end())
+    {
+        auto importer = std::make_unique<Assimp::Importer>();
+        const aiScene* scene = importer->ReadFile(modelPath,
+            aiProcess_Triangulate
+            | aiProcess_FlipUVs
+            | aiProcess_GenSmoothNormals
+        );
+
+        if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+        {
+            std::cout << "Model could not be loaded!\n";
+        }
+
+        importerCache[modelPath] = std::move(importer);
+        modelCache[modelPath] = scene;
+    }
+
+    const aiScene* scene = modelCache[modelPath];
+    aiMesh* mesh = scene->mMeshes[meshIndex];
+
+    std::unordered_map<unsigned int, std::string> materials;
+    LoadMaterials(scene, materials, modelPath);
+
+    std::vector<float> vertices;
+    vertices.reserve(mesh->mNumVertices * 8);
+
+    for (unsigned int j = 0; j < mesh->mNumVertices; j++)
+    {
+        vertices.push_back(mesh->mVertices[j].x);
+        vertices.push_back(mesh->mVertices[j].y);
+        vertices.push_back(mesh->mVertices[j].z);
+
+        if (mesh->HasNormals())
+        {
+            vertices.push_back(mesh->mNormals[j].x);
+            vertices.push_back(mesh->mNormals[j].y);
+            vertices.push_back(mesh->mNormals[j].z);
+        }
+        else
+        {
+            vertices.push_back(0.0f);
+            vertices.push_back(0.0f);
+            vertices.push_back(0.0f);
+        }
+
+        if (mesh->mTextureCoords[0])
+        {
+            vertices.push_back(mesh->mTextureCoords[0][j].x);
+            vertices.push_back(mesh->mTextureCoords[0][j].y);
+        }
+        else
+        {
+            vertices.push_back(0.0f);
+            vertices.push_back(0.0f);
+        }
+    }
+
+    std::vector<unsigned int> indices;
+    indices.reserve(mesh->mNumFaces * 3);
+
+    for (unsigned int j = 0; j < mesh->mNumFaces; j++)
+    {
+        aiFace face = mesh->mFaces[j];
+        for (unsigned int k = 0; k < face.mNumIndices; k++)
+        {
+            indices.push_back(face.mIndices[k]);
+        }
+    }
+
+    std::string meshName = "Unnamed";
+    FindNodeForMesh(scene->mRootNode, meshIndex, meshName);
+
+    MeshData meshData;
+    meshData.vertices = vertices;
+    meshData.indices = indices;
+    meshData.indexCount = indices.size();
+    meshData.name = meshName;
+    meshData.materialPath = materials[mesh->mMaterialIndex];
+    meshData.meshIndex = meshIndex;
+
+    return meshData;
 }

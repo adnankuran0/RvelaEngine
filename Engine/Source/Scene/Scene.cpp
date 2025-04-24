@@ -10,6 +10,9 @@
 
 Scene::Scene() : m_Registry() {}
 
+
+
+
 Entity Scene::CreateEntity(const std::string& name) {
     Entity entity(m_Registry.create(),this);
     
@@ -63,8 +66,8 @@ void Scene::DestroyEntity(entt::entity entity) {
         }
     }
 
-    if (HasComponent<MeshComponent>(entity))
-        GetComponent<MeshComponent>(entity).Destroy();
+    if (HasComponent<MeshRendererComponent>(entity))
+        GetComponent<MeshRendererComponent>(entity).Destroy();
 
     if (HasComponent<UUIDComponent>(entity)) {
         auto& uuidComponent = GetComponent<UUIDComponent>(entity);
@@ -77,6 +80,20 @@ void Scene::DestroyEntity(entt::entity entity) {
 }
 
 
+Entity Scene::CreatePointLight()
+{
+    Entity entity = CreateEntity("PointLight");
+    AddComponent<PointLightComponent>(entity);
+    return entity;
+}
+
+Entity Scene::CreateDirectionalLight()
+{
+    Entity entity = CreateEntity("DirectionalLight");
+    AddComponent<DirectionalLightComponent>(entity);
+    return entity;
+}
+
 Entity Scene::LoadAsset(const std::string& path)
 {
     Entity rootEntity = CreateEntity("Model");
@@ -85,8 +102,9 @@ Entity Scene::LoadAsset(const std::string& path)
 
     if (meshDatas.size() == 1)
     {
-        rootEntity.AddComponent<MeshComponent>(meshDatas.back().vertices.data(), meshDatas.back().vertices.size() * sizeof(float),
+        rootEntity.AddComponent<MeshRendererComponent>(meshDatas.back().vertices.data(), meshDatas.back().vertices.size() * sizeof(float),
             meshDatas.back().indices.data(), meshDatas.back().indices.size() * sizeof(unsigned int), meshDatas.back().indices.size());
+        rootEntity.AddComponent<MeshComponent>(path, meshDatas.back().meshIndex);
         rootEntity.GetComponent<TagComponent>().tag = meshDatas.back().name;
         auto& materialComponent = rootEntity.AddComponent<MaterialComponent>(meshDatas.front().materialPath);
         
@@ -97,8 +115,9 @@ Entity Scene::LoadAsset(const std::string& path)
         {
             Entity meshEntity = CreateEntity("child");
             SetParent(meshEntity, rootEntity);
-            meshEntity.AddComponent<MeshComponent>(meshData.vertices.data(), meshData.vertices.size() * sizeof(float),
+            meshEntity.AddComponent<MeshRendererComponent>(meshData.vertices.data(), meshData.vertices.size() * sizeof(float),
                 meshData.indices.data(), meshData.indices.size() * sizeof(unsigned int), meshData.indices.size());
+            meshEntity.AddComponent<MeshComponent>(path, meshData.meshIndex);
             meshEntity.GetComponent<TagComponent>().tag = meshData.name;
             auto& materialComponent = meshEntity.AddComponent<MaterialComponent>(meshData.materialPath);
 
@@ -108,6 +127,51 @@ Entity Scene::LoadAsset(const std::string& path)
 
     return rootEntity;
 
+}
+
+struct PrimitiveConfig {
+    std::string name;
+    std::string meshPath;
+};
+
+Entity Scene::LoadPrimitive(const std::string& primitiveMeshName)
+{
+    // Define primitive configurations
+    static const std::unordered_map<std::string, PrimitiveConfig> primitiveMap = {
+        {"Cube", {"Cube", "D:/GitHub/RvelaEngine/Resources/Engine/Models/cube.fbx"}},
+        {"Sphere", {"Sphere", "D:/GitHub/RvelaEngine/Resources/Engine/Models/sphere.fbx"}},
+        {"Cylinder", {"Cylinder", "D:/GitHub/RvelaEngine/Resources/Engine/Models/cylinder.fbx"}},
+        {"Cone", {"Cone", "D:/GitHub/RvelaEngine/Resources/Engine/Models/cone.fbx"}},
+        {"Capsule", {"Capsule", "D:/GitHub/RvelaEngine/Resources/Engine/Models/capsule.fbx"}},
+        {"Torus", {"Torus", "D:/GitHub/RvelaEngine/Resources/Engine/Models/torus.fbx"}}
+    };
+
+    // Check if the primitive exists
+    auto it = primitiveMap.find(primitiveMeshName);
+    if (it == primitiveMap.end()) {
+        // Handle invalid primitive name (e.g., log error or return empty entity)
+        return Entity{};
+    }
+
+    const PrimitiveConfig& config = it->second;
+
+    // Create entity and load mesh
+    Entity rootEntity = CreateEntity(config.name);
+    MeshData meshData = AssetManager::LoadMesh(config.meshPath, 0);
+
+    // Add components
+    rootEntity.AddComponent<MeshRendererComponent>(
+        meshData.vertices.data(),
+        meshData.vertices.size() * sizeof(float),
+        meshData.indices.data(),
+        meshData.indices.size() * sizeof(unsigned int),
+        meshData.indices.size()
+    );
+    rootEntity.AddComponent<MeshComponent>(config.meshPath, meshData.meshIndex);
+    rootEntity.GetComponent<TagComponent>().tag = meshData.name;
+    rootEntity.AddComponent<MaterialComponent>(meshData.materialPath);
+
+    return rootEntity;
 }
 
 
@@ -199,7 +263,12 @@ void Scene::SetParent(entt::entity child, entt::entity parent) {
     if (parent != entt::null) {
         auto& parentNode = GetComponent<SceneTreeComponent>(parent);
         parentNode.children.push_back(child);
-        parentNode.childrenUUIDs.push_back(childUUID);
+        if (std::find(parentNode.childrenUUIDs.begin(),
+            parentNode.childrenUUIDs.end(), childUUID)
+            == parentNode.childrenUUIDs.end())
+        {
+            parentNode.childrenUUIDs.push_back(childUUID);
+        }
 
         auto& parentWorldTransform = GetComponent<WorldTransformComponent>(parent);
         glm::mat4 parentWorldMatrix = parentWorldTransform.GetMatrix();

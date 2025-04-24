@@ -176,6 +176,44 @@ void ImGuiLayer::DrawSceneHierarchyPanel(entt::registry& registry, entt::entity&
         if (ImGui::MenuItem("Create Entity")) {
             selectedEntity = m_Engine->GetScene()->CreateEntity("New Entity");
         }
+        if (ImGui::BeginMenu("Primitives")) {
+            if (ImGui::MenuItem("Cube"))
+                selectedEntity = m_Engine->GetScene()->LoadPrimitive("Cube");
+            if (ImGui::MenuItem("Sphere"))
+                selectedEntity = m_Engine->GetScene()->LoadPrimitive("Sphere");
+            if (ImGui::MenuItem("Cylinder"))
+                selectedEntity = m_Engine->GetScene()->LoadPrimitive("Cylinder");
+            if (ImGui::MenuItem("Cone"))
+                selectedEntity = m_Engine->GetScene()->LoadPrimitive("Cone");
+            if (ImGui::MenuItem("Capsule"))
+                selectedEntity = m_Engine->GetScene()->LoadPrimitive("Capsule");
+            if (ImGui::MenuItem("Torus"))
+                selectedEntity = m_Engine->GetScene()->LoadPrimitive("Torus");
+
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Lights")) {
+            if (ImGui::MenuItem("Directional Light"))
+            {
+                selectedEntity = m_Engine->GetScene()->CreateDirectionalLight();
+            }
+            if (ImGui::MenuItem("Point Light"))
+            {
+                selectedEntity = m_Engine->GetScene()->CreatePointLight();
+            }
+            if (ImGui::MenuItem("Spot Light"))
+            {
+
+            }
+            if (ImGui::MenuItem("Area Light"))
+            {
+
+            }
+
+            ImGui::EndMenu();
+        }
+
         if (ImGui::MenuItem("Load Asset")) {
             std::string file = OpenFileDialog();
             if (!file.empty())
@@ -239,12 +277,19 @@ void ImGuiLayer::DrawInspectorPanel(entt::registry& registry, entt::entity& sele
             }
         }
 
+        if (registry.any_of<UUIDComponent>(selectedEntity)) {
+            if (ImGui::CollapsingHeader("UUID")) {
+                auto& uuid = registry.get<UUIDComponent>(selectedEntity);
+                ImGui::Text("UUID: %s", std::to_string(uuid.uuid).c_str());
+            }
+        }
+
         if (registry.any_of<TransformComponent>(selectedEntity)) {
             if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
                 auto& transform = registry.get<TransformComponent>(selectedEntity);
                 ImGui::DragFloat3("Position", &transform.position[0], 0.1f);
                 ImGui::DragFloat3("Rotation", &transform.rotation[0], 0.1f, -360.0f, 360.0f);
-                ImGui::DragFloat3("Scale", &transform.scale[0], 0.1f, 0.1f, 10.0f);
+                ImGui::DragFloat3("Scale", &transform.scale[0], 0.1f, 0.01f, 10.0f);
                 if (ImGui::Button("Reset Transform")) {
                     transform.position = { 0.0f, 0.0f, 0.0f };
                     transform.rotation = { 0.0f, 0.0f, 0.0f };
@@ -253,10 +298,48 @@ void ImGuiLayer::DrawInspectorPanel(entt::registry& registry, entt::entity& sele
             }
         }
 
-        if (registry.any_of<UUIDComponent>(selectedEntity)) {
-            if (ImGui::CollapsingHeader("UUID", ImGuiTreeNodeFlags_DefaultOpen)) {
-                auto& uuid = registry.get<UUIDComponent>(selectedEntity);
-                ImGui::Text("UUID: %s", std::to_string(uuid.uuid).c_str());
+        if (registry.any_of<MeshComponent>(selectedEntity))
+        {
+            if (ImGui::CollapsingHeader("Mesh", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                auto& meshComponent = registry.get<MeshComponent>(selectedEntity);
+                ImGui::Text("Model Path: %s", meshComponent.modelPath.c_str());
+                ImGui::Text("Mesh Index: %s", std::to_string(meshComponent.meshIndex));
+            }
+        }
+
+        if (registry.any_of<PointLightComponent>(selectedEntity))
+        {
+            if (ImGui::CollapsingHeader("PointLight", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                auto& pointLightComponent = registry.get<PointLightComponent>(selectedEntity);
+                glm::vec3 lightColor = pointLightComponent.color;
+                float color[3] = { lightColor.r, lightColor.g, lightColor.b };
+                if (ImGui::ColorPicker3("Light Color", color)) {
+                    pointLightComponent.color = glm::vec3(color[0], color[1], color[2]);
+
+                }
+
+                if (ImGui::SliderFloat("Intensity", &pointLightComponent.intensity, 0.0f, 10.0f)) {}
+                if (ImGui::SliderFloat("Radius", &pointLightComponent.radius, 0.1f, 50.0f)) {}
+
+            }
+        }
+
+        if (registry.any_of<DirectionalLightComponent>(selectedEntity))
+        {
+            if (ImGui::CollapsingHeader("DirectionalLight", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                auto& directionalLightComponent = registry.get<DirectionalLightComponent>(selectedEntity);
+                glm::vec3 lightColor = directionalLightComponent.color;
+                float color[3] = { lightColor.r, lightColor.g, lightColor.b };
+                if (ImGui::ColorPicker3("Light Color", color)) {
+                    directionalLightComponent.color = glm::vec3(color[0], color[1], color[2]);
+
+                }
+
+                if (ImGui::SliderFloat("Intensity", &directionalLightComponent.intensity, 0.0f, 10.0f)) {}
+
             }
         }
 
@@ -309,8 +392,13 @@ void ImGuiLayer::DrawInspectorPanel(entt::registry& registry, entt::entity& sele
                 }
                 auto& uuid = selectedNode.parentUUID;
                 ImGui::Text("Parent UUID: %s", std::to_string(uuid).c_str());
+                ImGui::Text("Children UUIDs:");
+                for (const auto& childUUID : selectedNode.childrenUUIDs) {
+                    ImGui::Text("- %s", std::to_string(childUUID).c_str());
+                }
             }
         }
+
     }
     else {
         ImGui::Text("No entity selected.");

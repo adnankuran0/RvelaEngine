@@ -1,10 +1,10 @@
 {
     "albedoColor": [
-        0.6000000238418579,
-        0.6000000238418579,
-        0.6000000238418579
+        0.47040000557899475,
+        0.47040000557899475,
+        0.47040000557899475
     ],
-    "albedoMapPath": "",
+    "albedoMapPath": "C:/Users/adnan/Desktop/Sponza-master/Sponza-master/textures/background.tga",
     "ao": 1.0,
     "aoMapPath": "",
     "heightMapPath": "",

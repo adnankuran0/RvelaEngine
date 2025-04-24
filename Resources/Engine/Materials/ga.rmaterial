@@ -1,8 +1,8 @@
 {
     "albedoColor": [
-        0.6000000238418579,
-        0.6000000238418579,
-        0.6000000238418579
+        0.13748900592327118,
+        0.1488649994134903,
+        0.8000320196151733
     ],
     "albedoMapPath": "",
     "ao": 1.0,
@@ -11,6 +11,6 @@
     "metallic": 0.0,
     "metallicMapPath": "",
     "normalMapPath": "",
-    "roughness": 0.5,
+    "roughness": 0.15299999713897705,
     "roughnessMapPath": ""
 }

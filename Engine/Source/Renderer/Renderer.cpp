@@ -6,15 +6,18 @@
 #include "Core/Time.h"
 #include "Core/Utils/MaterialManager.h"
 #include "Core/Utils/TextureManager.h"
+#include <algorithm>
 
 GLFWwindow* Renderer::activeWindow = nullptr;
 Shader Renderer::m_DefaultShader;
+Shader Renderer::m_SkyboxShader;
+Skybox Renderer::m_Skybox;
 
 
 
-Renderer::Renderer() 
+Renderer::Renderer()
 {
-    
+
 };
 
 Renderer::~Renderer()
@@ -26,6 +29,17 @@ void Renderer::Init(GLFWwindow* window)
 {
     Renderer::activeWindow = window;
     m_DefaultShader.Init("D:/GitHub/RvelaEngine/Resources/Engine/Shaders/vertex.glsl", "D:/GitHub/RvelaEngine/Resources/Engine/Shaders/fragment.glsl");
+    m_SkyboxShader.Init("D:/GitHub/RvelaEngine/Resources/Engine/Shaders/skyboxVert.glsl", "D:/GitHub/RvelaEngine/Resources/Engine/Shaders/skyboxFrag.glsl");
+
+    std::vector<std::string> faces = {
+    "D:/GitHub/RvelaEngine/Resources/Engine/Textures/skybox/right.jpg",
+    "D:/GitHub/RvelaEngine/Resources/Engine/Textures/skybox/left.jpg",
+    "D:/GitHub/RvelaEngine/Resources/Engine/Textures/skybox/top.jpg",
+    "D:/GitHub/RvelaEngine/Resources/Engine/Textures/skybox/bottom.jpg",
+    "D:/GitHub/RvelaEngine/Resources/Engine/Textures/skybox/front.jpg",
+    "D:/GitHub/RvelaEngine/Resources/Engine/Textures/skybox/back.jpg"
+    };
+    m_Skybox.Init(faces);
 }
 
 void Renderer::StartFrame()
@@ -45,18 +59,46 @@ void Renderer::EndFrame()
 
 }
 
-void Renderer::Render(WorldTransformComponent& transform, MeshComponent& meshComponent, MaterialComponent& materialComponent, Camera& camera)
+void Renderer::RenderSkybox(Camera& camera)
+{
+    m_Skybox.Render(m_SkyboxShader, camera.projection, camera.GetViewMatrix());
+}
+
+void Renderer::Render(WorldTransformComponent& transform,
+    MeshRendererComponent& meshComponent,
+    MaterialComponent& materialComponent,
+    Camera& camera,
+    const std::vector<PointLightData>& pointLights,
+    const DirectionalLightData* directionalLight)
 {
     auto material = materialComponent.material;
     if (!material) return;
 
+
     m_DefaultShader.use();
 
+    m_DefaultShader.setBool("hasDirectionalLight", directionalLight != nullptr);
+    if (directionalLight) {
+        m_DefaultShader.setVec3("directionalLight.direction", directionalLight->direction);
+        m_DefaultShader.setVec3("directionalLight.color", directionalLight->color); // intensity çarpımı KALDIRILDI
+        m_DefaultShader.setFloat("directionalLight.intensity", directionalLight->intensity); // Yeni ekleme
+        m_DefaultShader.setBool("directionalLight.castShadows", false);
+    }
+
     m_DefaultShader.setFloat("heightScale", 0.0f);
-    m_DefaultShader.setFloat("lightIntensity", 100.0f);
+
+    const int MAX_POINT_LIGHTS = 10;
+    for (int i = 0; i < std::min(static_cast<int>(pointLights.size()), MAX_POINT_LIGHTS); ++i) {
+        std::string baseName = "pointLights[" + std::to_string(i) + "]";
+        m_DefaultShader.setVec3(baseName + ".position", pointLights[i].position);
+        m_DefaultShader.setVec3(baseName + ".color", pointLights[i].color);
+        m_DefaultShader.setFloat(baseName + ".intensity", pointLights[i].intensity);
+        m_DefaultShader.setFloat(baseName + ".radius", pointLights[i].radius);
+    }
+    m_DefaultShader.setInt("pointLightCount", std::min(static_cast<int>(pointLights.size()), MAX_POINT_LIGHTS));
+
     m_DefaultShader.setVec3("camPos", camera.Position);
-    m_DefaultShader.setVec3("lightPosition", glm::vec3(0.5f, 2.0f, 1.0f));
-    m_DefaultShader.setVec3("lightColor", glm::vec3(1.0f));
+
     m_DefaultShader.setFloat("UVScale", 1.0f);
     m_DefaultShader.setVec3("albedoColor", material->albedoColor);
     m_DefaultShader.setFloat("metallicValue", material->metallic);

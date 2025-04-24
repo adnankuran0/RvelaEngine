@@ -81,23 +81,57 @@ void Engine::Render()
 {
 	Renderer::StartFrame();
 
-	
-	auto RenderableView = m_Scene->GetRegistry().view<MeshComponent, MaterialComponent>();
+	std::vector<PointLightData> pointLights;
 
+	auto pointLightView = m_Scene->GetRegistry().view<PointLightComponent, WorldTransformComponent>();
+	for (auto entity : pointLightView) {
+		auto& light = m_Scene->GetComponent<PointLightComponent>(entity);
+		auto& transform = m_Scene->GetComponent<WorldTransformComponent>(entity);
+
+		PointLightData data;
+		data.position = glm::vec3(transform.GetMatrix()[3]); // mat4'ün son sütunu pozisyon
+		data.color = light.color;
+		data.intensity = light.intensity;
+		data.radius = light.radius;
+
+		pointLights.push_back(data);
+	}
+
+	DirectionalLightData mainDirLight;
+	bool hasDirLight = false;
+
+	auto dirLightView = m_Scene->GetRegistry().view<DirectionalLightComponent, WorldTransformComponent>();
+	for (auto entity : dirLightView) {
+		auto [light, transform] = dirLightView.get<DirectionalLightComponent, WorldTransformComponent>(entity);
+		mainDirLight.direction = transform.GetForward();
+		mainDirLight.color = light.color;
+		mainDirLight.intensity = light.intensity;
+		mainDirLight.castShadows = light.castShadows;
+		hasDirLight = true;
+		break;
+	}
+
+	auto RenderableView = m_Scene->GetRegistry().view<MeshRendererComponent, MaterialComponent>();
+
+	Renderer::RenderSkybox(editorCamera);
 	for (auto entity : RenderableView)
 	{
-		auto& mesh = m_Scene->GetComponent<MeshComponent>(entity);
+		auto& mesh = m_Scene->GetComponent<MeshRendererComponent>(entity);
 		auto& metarial = m_Scene->GetComponent<MaterialComponent>(entity);
 		auto& transform = m_Scene->GetComponent<WorldTransformComponent>(entity);
 
-		Renderer::Render(transform, mesh, metarial, editorCamera);
+		if (hasDirLight) {
+			Renderer::Render(transform, mesh, metarial, editorCamera, pointLights, &mainDirLight);
+		}
+		else {
+			Renderer::Render(transform, mesh, metarial, editorCamera, pointLights, nullptr);
+		}
 
 	}
-	
 
-	
 	Renderer::EndFrame();
 }
+
 
 void Engine::Shutdown()
 {

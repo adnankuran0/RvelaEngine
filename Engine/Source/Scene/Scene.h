@@ -17,7 +17,11 @@ public:
     Entity CreateEntityWithUUID(const std::string& name, UUID uuid);
     void DestroyEntity(entt::entity entity);
 
+    Entity CreatePointLight();
+    Entity CreateDirectionalLight();
+
     Entity LoadAsset(const std::string& path);
+    Entity LoadPrimitive(const std::string& primitiveMeshName);
 
     template<typename Component, typename... Args>
     void AddComponent(entt::entity entity, Args&&... args) {

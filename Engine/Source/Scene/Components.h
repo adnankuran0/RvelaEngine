@@ -43,6 +43,18 @@ public:
             glm::scale(glm::mat4(1.0f), scale));
     }
 
+    glm::vec3 GetForward() const {
+        return glm::normalize(glm::mat3_cast(GetQuaternion()) * glm::vec3(0.0f, 0.0f, -1.0f));
+    }
+
+    glm::vec3 GetUp() const {
+        return glm::normalize(glm::mat3_cast(GetQuaternion()) * glm::vec3(0.0f, 1.0f, 0.0f));
+    }
+
+    glm::vec3 GetRight() const {
+        return glm::normalize(glm::mat3_cast(GetQuaternion()) * glm::vec3(1.0f, 0.0f, 0.0f));
+    }
+
     std::string Serialize() const override
     {
         json j;
@@ -85,6 +97,18 @@ public:
         return (glm::translate(glm::mat4(1.0f), position) *
             glm::mat4_cast(GetQuaternion()) *
             glm::scale(glm::mat4(1.0f), scale));
+    }
+
+    glm::vec3 GetForward() const {
+        return glm::normalize(glm::mat3_cast(GetQuaternion()) * glm::vec3(0.0f, 0.0f, -1.0f));
+    }
+
+    glm::vec3 GetUp() const {
+        return glm::normalize(glm::mat3_cast(GetQuaternion()) * glm::vec3(0.0f, 1.0f, 0.0f));
+    }
+
+    glm::vec3 GetRight() const {
+        return glm::normalize(glm::mat3_cast(GetQuaternion()) * glm::vec3(1.0f, 0.0f, 0.0f));
     }
 
     std::string Serialize() const override
@@ -132,19 +156,19 @@ public:
     
 };
 
-class MeshComponent{
+class MeshRendererComponent{
 public:
     VertexArray VAO;
     VertexBuffer VBO;
     ElementBuffer EBO;
     BufferLayout Layout;
     unsigned int indexCount = 0;
-    MeshComponent() = default;
-    MeshComponent(const MeshComponent&) = delete;
-    MeshComponent& operator=(const MeshComponent&) = delete;
-    MeshComponent(MeshComponent&&) = default;
-    MeshComponent& operator=(MeshComponent&&) = default;
-    MeshComponent(void* vertices,size_t sizeOfVertices,void* indices,size_t sizeOfIndices,unsigned int indexCount) 
+    MeshRendererComponent() = default;
+    MeshRendererComponent(const MeshRendererComponent&) = delete;
+    MeshRendererComponent& operator=(const MeshRendererComponent&) = delete;
+    MeshRendererComponent(MeshRendererComponent&&) = default;
+    MeshRendererComponent& operator=(MeshRendererComponent&&) = default;
+    MeshRendererComponent(void* vertices,size_t sizeOfVertices,void* indices,size_t sizeOfIndices,unsigned int indexCount)
     { 
         this->indexCount = indexCount;
 
@@ -165,6 +189,27 @@ public:
         VAO.Destroy();
         VBO.Destroy();
         EBO.Destroy();
+    }
+};
+
+struct MeshComponent : public ISerializable {
+    std::string modelPath;
+    uint32_t meshIndex;
+
+    MeshComponent() = delete;
+    MeshComponent(const std::string& modelPath, uint16_t meshIndex) : modelPath(modelPath), meshIndex(meshIndex) {}
+
+    std::string Serialize() const override {
+        json j;
+        j["modelPath"] = modelPath;
+        j["meshIndex"] = meshIndex;
+        return j.dump(4);
+    }
+
+    void Deserialize(const std::string& str) override {
+        json j = json::parse(str);
+        modelPath = j["modelPath"];
+        meshIndex = j["meshIndex"];
     }
 };
 
@@ -284,6 +329,99 @@ public:
         auto UUIDData = j["UUID"];
         uuid = UUIDData;
 
+    }
+
+};
+
+class PointLightComponent : public Component
+{
+public:
+    glm::vec3 color = glm::vec3(1.0f);
+    float intensity = 10.0f;
+    float radius = 10.0f;
+    PointLightComponent() = default;
+    PointLightComponent(const glm::vec3& color, float intensity, float radius) : color(color), intensity(intensity), radius(radius) {}
+
+    std::string Serialize() const override
+    {
+        json j;
+        j["color"] = { color.r,color.g,color.b };
+        j["intensity"] = intensity;
+        j["radius"] = radius;
+        return j.dump(4);
+    }
+
+    void Deserialize(const std::string& jsonStr) override
+    {
+        json j = json::parse(jsonStr);
+        auto colorData = j["color"];
+        color = glm::vec3(colorData[0], colorData[1], colorData[2]);
+        intensity = j["intensity"];
+        radius = j["radius"];
+    }
+};
+
+class DirectionalLightComponent : public Component
+{
+public:
+    DirectionalLightComponent() = default;
+    DirectionalLightComponent(const glm::vec3& color, float intensity) : color(color), intensity(intensity) {}
+
+    glm::vec3 color = glm::vec3(1.0f);
+    float intensity = 10.0f;
+    bool castShadows = true;              
+    float shadowBias = 0.005f;
+
+    std::string Serialize() const override
+    {
+        json j; 
+        j["color"] = { color.r,color.g,color.b };
+        j["intensity"] = intensity;
+        return j.dump(4);
+    }
+
+    void Deserialize(const std::string& jsonStr) override
+    {
+        json j = json::parse(jsonStr);
+        auto colorData = j["color"];
+        color = glm::vec3(colorData[0], colorData[1], colorData[2]);
+        intensity = j["intensity"];
+    }
+};
+
+class SpotLightComponent : public Component
+{
+public:
+    SpotLightComponent() = default;
+    SpotLightComponent(const glm::vec3& color, float intensity,float radius, float innerCutoff,float outerCutoff)
+        : color(color), intensity(intensity), radius(radius), innerCutoff(glm::cos(glm::radians(innerCutoff))), outerCutoff(glm::cos(glm::radians(outerCutoff)))  { }
+
+    glm::vec3 color = glm::vec3(1.0f);
+    float intensity = 1.0f;
+    float radius = 5.0f;
+    float innerCutoff = glm::cos(glm::radians(15.0f)); 
+    float outerCutoff = glm::cos(glm::radians(30.0f)); 
+
+    std::string Serialize() const override
+    {
+        json j;
+        j["color"] = { color.r,color.g,color.b };
+        j["intensity"] = intensity;
+        j["radius"] = radius;
+        j["innerCutoff"] = innerCutoff;
+        j["outerCutoff"] = outerCutoff;
+        return j.dump(4);
+    }
+
+    void Deserialize(const std::string& jsonStr) override
+    {
+        json j = json::parse(jsonStr);
+        auto colorData = j["color"];
+        color = glm::vec3(colorData[0], colorData[1], colorData[2]);
+        intensity = j["intensity"];
+        radius = j["radius"];
+        innerCutoff = j["innerCutoff"];
+        outerCutoff = j["outerCutoff"];
     }
 
 };

@@ -10,6 +10,23 @@
 #include "GLFW/glfw3.h"
 #include "../Core/Time.h"
 #include "Scene/Components.h"
+#include "Skybox.h"
+
+struct PointLightData {
+    glm::vec3 position;
+    glm::vec3 color;
+    float intensity;
+    float radius;
+};
+
+struct DirectionalLightData {
+    glm::vec3 direction;
+    glm::vec3 color;
+    float intensity;
+    bool castShadows;
+};
+
+
 
 class Renderer
 {
@@ -19,10 +36,19 @@ public:
     static void Init(GLFWwindow* window);
     static void StartFrame();
     static void EndFrame();
-    static void Render(WorldTransformComponent& transform,MeshComponent& data, MaterialComponent& metarial, Camera& camera);
+    static void RenderSkybox(Camera& camera);
+    static void Render(WorldTransformComponent& transform,
+        MeshRendererComponent& data,
+        MaterialComponent& metarial,
+        Camera& camera,
+        const std::vector<PointLightData>& pointLights,
+        const DirectionalLightData* directionalLight
+        );
     static void Shutdown();
 
 private:
     static GLFWwindow* activeWindow;
     static Shader m_DefaultShader;
+    static Shader m_SkyboxShader;
+    static Skybox m_Skybox;
 };
