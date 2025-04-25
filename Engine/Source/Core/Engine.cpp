@@ -51,28 +51,35 @@ void Engine::Run()
 
 	//std::cout << "Texture count: " << TextureManager::GetTextureCount() << " Material count: " << MaterialManager::GetMaterialCount() << std::endl;
 	
-	EventManager::dispatchEvents([this](Event& event) {
-
-		if (event.GetEventType() == EventType::MouseMoved)
-		{
-			MouseMovedEvent& mouseEvent = static_cast<MouseMovedEvent&>(event);
-			editorCamera.onMouseMoved(mouseEvent.GetX(), mouseEvent.GetY(),m_Window->GetGLFWWindow());
+	EventManager::DispatchEvents([this](Event& event) {
+		// Handle mouse movement events
+		if (event.GetEventType() == EventType::MouseMoved) {
+			auto mouseEvent = dynamic_cast<MouseMovedEvent*>(&event);
+			if (mouseEvent) {
+				editorCamera.onMouseMoved(
+					mouseEvent->GetX(),
+					mouseEvent->GetY(),
+					m_Window->GetGLFWWindow()
+				);
+			}
 		}
 
-		if (event.GetEventType() == EventType::MouseScrolled && Input::IsMouseButtonPressed(MouseCode::Button1))
-		{
-			MouseScrolledEvent& scrollEvent = static_cast<MouseScrolledEvent&>(event);
-			editorCamera.SprintSpeed += scrollEvent.GetYOffset() ;
-			editorCamera.SprintSpeed = std::clamp(editorCamera.SprintSpeed, 2.5f, 30.0f);
+		// Handle mouse scroll events when the left mouse button is pressed
+		if (event.GetEventType() == EventType::MouseScrolled &&
+			Input::IsMouseButtonPressed(MouseCode::Button1)) {
+			auto* scrollEvent = dynamic_cast<MouseScrolledEvent*>(&event);
+			if (scrollEvent) {
+				editorCamera.SprintSpeed += scrollEvent->GetYOffset();
+				editorCamera.SprintSpeed = std::clamp(editorCamera.SprintSpeed, 2.5f, 30.0f);
+			}
 		}
-	
 		});
 
 	editorCamera.Update();
 
 	Render();
 
-	EventManager::clearEvents();
+	EventManager::ClearEvents();
 	m_Scene->Update();
 	
 }

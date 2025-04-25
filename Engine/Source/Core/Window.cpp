@@ -94,12 +94,12 @@ void Window::m_KeyCallback(GLFWwindow* window, int key, int scancode, int action
     if (action == GLFW_PRESS) {
         KeyCode keyCode = static_cast<KeyCode>(key);
         KeyPressedEvent* event = new KeyPressedEvent(keyCode);
-        EventManager::pushEvent(event); 
+        EventManager::PushEvent(event); 
     }
     else if (action == GLFW_RELEASE) {
         KeyCode keyCode = static_cast<KeyCode>(key);
         KeyReleasedEvent* event = new KeyReleasedEvent(keyCode);
-        EventManager::pushEvent(event);
+        EventManager::PushEvent(event);
     }
 }
 
@@ -107,30 +107,30 @@ void Window::m_MouseButtonCallback(GLFWwindow* window, int button, int action, i
     if (action == GLFW_PRESS) {
         MouseCode mouseCode = static_cast<MouseCode>(button);
         MouseButtonPressedEvent* event = new MouseButtonPressedEvent(mouseCode);
-        EventManager::pushEvent(event);
+        EventManager::PushEvent(event);
     }
     else if (action == GLFW_RELEASE) {
         MouseCode mouseCode = static_cast<MouseCode>(button);
         MouseButtonReleasedEvent* event = new MouseButtonReleasedEvent(mouseCode);
-        EventManager::pushEvent(event);
+        EventManager::PushEvent(event);
     }
 }
 
 void Window::m_MouseMovedCallback(GLFWwindow* window, double xpos, double ypos)
 {
     MouseMovedEvent* event = new MouseMovedEvent(xpos,ypos);
-    EventManager::pushEvent(event);
+    EventManager::PushEvent(event);
 }
 
 void Window::m_MouseScrolledCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
     MouseScrolledEvent* event = new MouseScrolledEvent(xoffset, yoffset);
-    EventManager::pushEvent(event);
+    EventManager::PushEvent(event);
 }
 
 void Window::m_FramebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
     WindowResizedEvent* event = new WindowResizedEvent(width, height);
-    EventManager::pushEvent(event);
+    EventManager::PushEvent(event);
 }
