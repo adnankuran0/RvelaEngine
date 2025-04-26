@@ -1,35 +1,67 @@
+#pragma once
+
 #include "GLFW/glfw3.h"
 #include <thread>
 #include <chrono>
-#pragma once
+
+/**
+ * @brief Manages time-related functionality for the game engine.
+ *
+ * The Time class provides a static interface to track and manage time-related metrics
+ * such as delta time, frames per second (FPS), and time scaling. It also supports
+ * FPS limiting and provides access to the current time since the application started.
+ */
 class Time {
 private:
-    static  double lastFrameTime;
-    static double deltaTime;
-    static double fpsUpdateTime;
-    static int frameCount;
-    static float fps;
-    static float timeScale;
-    static double maxFPS;
+    static double lastFrameTime;  ///< The time of the last frame (in seconds).
+    static double deltaTime;      ///< The time difference between the current and last frame (in seconds).
+    static double fpsUpdateTime;  ///< The last time FPS was updated (in seconds).
+    static int frameCount;        ///< The number of frames since the last FPS update.
+    static double fps;            ///< The current frames per second.
+    static double timeScale;      ///< The scaling factor for time (e.g., for slow motion).
+    static double maxFPS;         ///< The maximum allowed FPS (0 means unlimited).
 
 public:
 
-    static void update(); 
+    static void Update() noexcept;
 
-    static float getDeltaTime();
+    static float GetDeltaTime() noexcept
+    {
+        return static_cast<float>(deltaTime);
+    }
 
-    static float getFPS();
+    static float GetFPS() noexcept
+    {
+        return fps;
+    }
 
-    static void setTimeScale(float scale);
+    static void SetTimeScale(float scale) noexcept
+    {
+        timeScale = scale;
+    }
 
-    static float getTimeScale();
+    static float GetTimeScale() noexcept
+    {
+        return timeScale;
+    }
 
-    static float getTime();
+    static float GetTime() noexcept
+    {
+        return static_cast<float>(glfwGetTime());
+    }
 
-    static float getMaxFPS();
+    static float GetMaxFPS() noexcept
+    {
+        return maxFPS;
+    }
     
-    static void setMaxFPS(float maxFPS);
+    static void SetMaxFPS(float maxFPS) noexcept
+    {
+        Time::maxFPS = maxFPS;
+    }
 
-    static double getCurrentTime();
+    static double GetCurrentTime() noexcept {
+        return glfwGetTime();
+    }
 
 };

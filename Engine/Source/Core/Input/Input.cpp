@@ -2,30 +2,95 @@
 #include "../Engine.h"
 #include "Input.h"
 
-bool Input::IsKeyPressed(const KeyCode key)
-{
-    return glfwGetKey(Engine::Get()->GetWindow()->GetGLFWWindow(), key) == GLFW_PRESS;
+// Cache for the last known mouse position to avoid redundant GLFW calls
+static glm::vec2 s_LastMousePosition = { 0.0f, 0.0f };
+
+/**
+ * @brief Checks if a specific keyboard key is currently pressed.
+ *
+ * Queries the state of the specified key using GLFW and returns whether it is pressed.
+ *
+ * @param key The key code to check.
+ * @return bool True if the key is pressed, false otherwise. Returns false if the window is invalid.
+ */
+bool Input::IsKeyPressed(KeyCode key) noexcept {
+    auto* window = Engine::Get();
+    if (!window || !window->GetWindow()) {
+        return false;
+    }
+
+    GLFWwindow* glfwWindow = window->GetWindow()->GetGLFWWindow();
+    if (!glfwWindow) {
+        return false;
+    }
+
+    return glfwGetKey(glfwWindow, static_cast<int>(key)) == GLFW_PRESS;
 }
 
-bool Input::IsMouseButtonPressed(const MouseCode button)
-{
-    return glfwGetMouseButton(Engine::Get()->GetWindow()->GetGLFWWindow(), button) == GLFW_PRESS;
+/**
+ * @brief Checks if a specific mouse button is currently pressed.
+ *
+ * Queries the state of the specified mouse button using GLFW and returns whether it is pressed.
+ *
+ * @param button The mouse button code to check.
+ * @return bool True if the button is pressed, false otherwise. Returns false if the window is invalid.
+ */
+bool Input::IsMouseButtonPressed(MouseCode button) noexcept {
+    auto* window = Engine::Get();
+    if (!window || !window->GetWindow()) {
+        return false;
+    }
+
+    GLFWwindow* glfwWindow = window->GetWindow()->GetGLFWWindow();
+    if (!glfwWindow) {
+        return false;
+    }
+
+    return glfwGetMouseButton(glfwWindow, static_cast<int>(button)) == GLFW_PRESS;
 }
 
-glm::vec2 Input::GetMousePosition()
-{
+/**
+ * @brief Retrieves the current mouse cursor position as a 2D vector.
+ *
+ * Queries the mouse cursor position using GLFW and caches the result to avoid redundant calls.
+ *
+ * @return glm::vec2 The (x, y) coordinates of the mouse cursor. Returns (0, 0) if the window is invalid.
+ */
+glm::vec2 Input::GetMousePosition() noexcept {
+    auto* window = Engine::Get();
+    if (!window || !window->GetWindow()) {
+        return { 0.0f, 0.0f };
+    }
+
+    GLFWwindow* glfwWindow = window->GetWindow()->GetGLFWWindow();
+    if (!glfwWindow) {
+        return { 0.0f, 0.0f };
+    }
+
     double xPos, yPos;
-    glfwGetCursorPos(Engine::Get()->GetWindow()->GetGLFWWindow(), &xPos, &yPos);
-
-    return { static_cast<float>(xPos), static_cast<float>(yPos) };
+    glfwGetCursorPos(glfwWindow, &xPos, &yPos);
+    s_LastMousePosition = { static_cast<float>(xPos), static_cast<float>(yPos) };
+    return s_LastMousePosition;
 }
 
-float Input::GetMouseX()
-{
-    return GetMousePosition().x;
+/**
+ * @brief Retrieves the x-coordinate of the current mouse cursor position.
+ *
+ * Uses the cached mouse position to avoid redundant GLFW calls.
+ *
+ * @return float The x-coordinate of the mouse cursor.
+ */
+float Input::GetMouseX() noexcept {
+    return s_LastMousePosition.x;
 }
 
-float Input::GetMouseY()
-{
-    return GetMousePosition().y;
+/**
+ * @brief Retrieves the y-coordinate of the current mouse cursor position.
+ *
+ * Uses the cached mouse position to avoid redundant GLFW calls.
+ *
+ * @return float The y-coordinate of the mouse cursor.
+ */
+float Input::GetMouseY() noexcept {
+    return s_LastMousePosition.y;
 }

@@ -1,8 +1,8 @@
 {
     "albedoColor": [
-        0.800000011920929,
-        0.800000011920929,
-        0.800000011920929
+        0.0,
+        0.0,
+        0.0
     ],
     "albedoMapPath": "C:/Users/adnan/Desktop/utility_box_02_1k/textures/utility_box_02_diff_1k.png",
     "ao": 1.0,

@@ -1,52 +1,89 @@
 #pragma once
+
 #include <string>
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
-#include <iostream>
 
-
+/**
+ * @brief Represents the size of a window.
+ *
+ * Stores the width and height of a window, ensuring both values are non-negative.
+ */
 struct WindowSize
 {
 	int width, height;
 
-	WindowSize():width(0), height(0) {}
-	WindowSize(int width, int height) :width(width), height(height) {}
+	WindowSize() noexcept :width(0), height(0) {}
+	WindowSize(int width, int height) noexcept
+		: width(width < 0 ? 0 : width), height(height < 0 ? 0 : height) {
+	}
 };
 
+/**
+ * @brief Stores window configuration data.
+ *
+ * Contains the title and size of a window, with default values for convenience.
+ */
 struct WindowData
 {
 	std::string title;
 	WindowSize size;
 
-	WindowData(): title("Rvela Engine"), size(1280,720) {}
-	WindowData(const std::string& title, int width, int height): title(title), size(width,height) {}
+	WindowData() noexcept : title("Rvela Engine"), size(1280,720) {}
+	WindowData(const std::string& title, int width, int height) noexcept : title(title), size(width,height) {}
 };
 
+/**
+ * @brief Manages a GLFW window and its associated events.
+ *
+ * The Window class encapsulates the creation, initialization, and management of
+ * a GLFW window. It provides methods to access window properties and handle events
+ * such as keyboard input, mouse actions, and window resizing through callbacks.
+ */
 class Window
 {
 public:
-	Window();
-	Window(const std::string& title, int width,int height);
+	Window() noexcept;
+	Window(const std::string& title, int width,int height) noexcept;
 	~Window();
 
-	static Window Create();
-	static Window Create(const std::string& title, int width, int height);
-
+	static Window Create() noexcept;
+	static Window Create(const std::string& title, int width, int height) noexcept;
 	void Init();
 
-	GLFWwindow* GetGLFWWindow() const;
-	const std::string& GetTitle() const;
-	WindowSize GetSize();
+	GLFWwindow* GetGLFWWindow() const noexcept
+	{
+		return m_Window;
+	}
 
-	void Shutdown() const;
+	const std::string& GetTitle() const noexcept
+	{
+		return m_WindowData.title;
+	}
+
+	WindowSize GetSize() noexcept {
+		if (!m_Window) {
+			return WindowSize{ 0, 0 };
+		}
+		glfwGetWindowSize(m_Window, &m_WindowData.size.width, &m_WindowData.size.height);
+		return m_WindowData.size;
+	}
+
+	void Shutdown() const
+	{
+		glfwDestroyWindow(m_Window);
+	}
 
 private:
 	GLFWwindow* m_Window;
 	WindowData m_WindowData;
-	static void m_KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-	static void m_MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
-	static void m_MouseMovedCallback(GLFWwindow* window, double xpos, double ypos);
-	static void m_MouseScrolledCallback(GLFWwindow* window, double xoffset, double yoffset);
-	static void m_FramebufferSizeCallback(GLFWwindow* window, int width, int height);
+
+	void SetCallbacks() noexcept;
+
+	static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) noexcept;
+	static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods) noexcept;
+	static void MouseMovedCallback(GLFWwindow* window, double xpos, double ypos) noexcept;
+	static void MouseScrolledCallback(GLFWwindow* window, double xoffset, double yoffset) noexcept;
+	static void FramebufferSizeCallback(GLFWwindow* window, int width, int height) noexcept;
 
 };

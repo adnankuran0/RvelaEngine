@@ -4,7 +4,7 @@
 #include "../nlohmann/json.hpp"
 #include "Core/Utils/AssetManager.h"
 #include "UUIDGenerator.h"  
-
+#include <future>
 
 using json = nlohmann::json;
 
@@ -115,6 +115,7 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
             uint16_t meshIndex = j["meshIndex"];
 
             auto meshStart = std::chrono::high_resolution_clock::now();
+                
             MeshData meshData = AssetManager::LoadMesh(newModelPath, meshIndex);
             auto meshEnd = std::chrono::high_resolution_clock::now();
             meshLoadTotal += std::chrono::duration_cast<std::chrono::milliseconds>(meshEnd - meshStart);

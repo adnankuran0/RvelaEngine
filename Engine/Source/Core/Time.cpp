@@ -1,16 +1,29 @@
 #include "rvelapch.h"
 #include "Time.h"
+
+// Static member definitions (all in seconds)
 double Time::deltaTime = 0.0;
 double Time::lastFrameTime = 0.0;
 double Time::fpsUpdateTime = 0.0;
 int Time::frameCount = 0;
-float Time::fps = 0.0f;
-float Time::timeScale = 1.0f;
+double Time::fps = 0.0f;
+double Time::timeScale = 1.0f;
 double Time::maxFPS = 360.0;
 
-
-void Time::update()
+/**
+ * @brief Updates time-related metrics.
+ *
+ * Calculates the delta time, updates FPS, and applies FPS limiting if set.
+ * Time values are handled in seconds internally for consistency.
+ */
+void Time::Update() noexcept
 {
+    // Ensure GLFW is initialized
+    if (!glfwGetTime()) {
+        deltaTime = 0.0;
+        return;
+    }
+
     double currentFrameTime = glfwGetTime() * 1000.0;
 
     double frameTimeTarget = (maxFPS == 0.0) ? 0.0 : (1000.0 / maxFPS);
@@ -26,6 +39,7 @@ void Time::update()
     deltaTime = (currentFrameTime - lastFrameTime) / 1000.0;
     lastFrameTime = currentFrameTime;
 
+    // Update FPS
     frameCount++;
     if (currentFrameTime - fpsUpdateTime >= 10.0) 
     {
@@ -36,37 +50,7 @@ void Time::update()
 }
 
 
-float Time::getDeltaTime()
-{
-    return static_cast<float>(deltaTime);
-}
 
-float Time::getFPS()
-{
-    return fps;
-}
 
-void Time::setTimeScale(float scale)
-{
-    timeScale = scale;
-}
 
-float Time::getTimeScale()
-{
-    return timeScale;
-}
 
-float Time::getTime()
-{
-    return static_cast<float>(glfwGetTime());
-}
-
-float Time::getMaxFPS()
-{
-    return maxFPS;
-}
-
-void Time::setMaxFPS(float maxFPS)
-{
-    Time::maxFPS = maxFPS;
-}

@@ -1,7 +1,8 @@
 #include "rvelapch.h"
 
-#include "Engine.h"
 #include "RvelaLog.h"
+
+#include "Engine.h"
 #include "Scene/Entity.h"
 
 #include "Core/Utils/MaterialManager.h"
@@ -9,17 +10,12 @@
 
 Engine* Engine::s_Instance = nullptr;
 
-
-
-
-
 Camera editorCamera(glm::vec3(0.0f, 0.0f, 3.0f));
 
 Engine::Engine()
 {
 	RvelaLog::Init("log.txt");
 
-	//TODO: try to make initialization of the window with stack allocation
 	m_Window = std::make_unique<Window>();
 	if (s_Instance == nullptr)
 	{
@@ -54,7 +50,7 @@ void Engine::Run()
 	EventManager::DispatchEvents([this](Event& event) {
 		// Handle mouse movement events
 		if (event.GetEventType() == EventType::MouseMoved) {
-			auto mouseEvent = dynamic_cast<MouseMovedEvent*>(&event);
+			auto* mouseEvent = dynamic_cast<MouseMovedEvent*>(&event);
 			if (mouseEvent) {
 				editorCamera.onMouseMoved(
 					mouseEvent->GetX(),
@@ -87,6 +83,7 @@ void Engine::Run()
 void Engine::Render()
 {
 	Renderer::StartFrame();
+
 
 	std::vector<PointLightData> pointLights;
 

@@ -3,27 +3,60 @@
 #include "RvelaLog.h"
 #include "Event/EventManager.h"
 
-Window::Window()
+/**
+ * @brief Constructs a Window with default settings.
+ *
+ * Initializes the window using the default WindowData settings.
+ */
+Window::Window() noexcept
 {
 	Init();
 }
 
-Window::Window(const std::string& title, int width, int height)
+/**
+ * @brief Constructs a Window with the specified settings.
+ *
+ * @param title The title of the window.
+ * @param width The width of the window.
+ * @param height The height of the window.
+ */
+Window::Window(const std::string& title, int width, int height) noexcept
+    :m_WindowData(title, width, height)
 {
-	m_WindowData = WindowData{ title, width, height };
 	Init();
 }
 
+/**
+ * @brief Destroys the Window and releases its resources.
+ */
 Window::~Window()
 {
 	Shutdown();
 }
 
+/*
+*@brief Sets GLFW callback functions to use in event system.
+*/
+void Window::SetCallbacks() noexcept
+{
+    glfwSetKeyCallback(m_Window, KeyCallback);
+    glfwSetMouseButtonCallback(m_Window, MouseButtonCallback);
+    glfwSetCursorPosCallback(m_Window, MouseMovedCallback);
+    glfwSetScrollCallback(m_Window, MouseScrolledCallback);
+    glfwSetFramebufferSizeCallback(m_Window, FramebufferSizeCallback);
+}
+
+/**
+ * @brief Initializes the GLFW window and sets up event callbacks.
+ *
+ * Initializes GLFW and GLEW, creates the window, sets up the OpenGL context,
+ * and registers event callbacks for keyboard, mouse, and window events.
+ */
 void Window::Init()
 {
     if (!glfwInit()) {
         LOG_ERROR << "Failed to initialize GLFW";
-        return;
+        throw std::runtime_error("Failed to initialize GLFW");
     }
 
     LOG_INFO << "GLFW Initialized";
@@ -32,105 +65,129 @@ void Window::Init()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-
     m_Window = glfwCreateWindow(m_WindowData.size.width, m_WindowData.size.height, m_WindowData.title.c_str(), nullptr, nullptr);
     if (!m_Window) {
         LOG_ERROR << "Failed to create GLFW window";
         glfwTerminate();
-        return;
+        throw std::runtime_error("Failed to create GLFW window");
     }
 
     glfwMakeContextCurrent(m_Window);
-    if (glewInit() != GLEW_OK)
-    {
+    if (glewInit() != GLEW_OK) {
         LOG_ERROR << "Failed to initialize GLEW";
+        throw std::runtime_error("Failed to initialize GLEW");
     }
-    else
-    {
-        LOG_INFO << "GLEW Initialized";
-    }
-    LOG_INFO << glGetString(GL_VERSION);
 
-    glfwSetKeyCallback(m_Window, m_KeyCallback);
-    glfwSetMouseButtonCallback(m_Window, m_MouseButtonCallback);
-    glfwSetCursorPosCallback(m_Window, m_MouseMovedCallback);
-    glfwSetScrollCallback(m_Window, m_MouseScrolledCallback);
-    glfwSetFramebufferSizeCallback(m_Window, m_FramebufferSizeCallback);
+    LOG_INFO << "GLEW Initialized";
+    const GLubyte* glVersion = glGetString(GL_VERSION);
+    LOG_INFO << "OpenGL Version: " << (glVersion ? reinterpret_cast<const char*>(glVersion) : "Unknown");
+
+    SetCallbacks();
 }
 
-Window Window::Create()
+/**
+ * @brief Creates a Window with default settings.
+ *
+ * @return Window A new Window instance with default settings.
+ */
+Window Window::Create() noexcept
 {
     return Window{};
 }
 
-Window Window::Create(const std::string& title, int width, int height)
+/**
+ * @brief Creates a Window with the specified settings.
+ *
+ * @param title The title of the window.
+ * @param width The width of the window.
+ * @param height The height of the window.
+ * @return Window A new Window instance with the specified settings.
+ */
+Window Window::Create(const std::string& title, int width, int height) noexcept
 {
     return Window{ title, width, height };
 }
 
-GLFWwindow* Window::GetGLFWWindow() const
-{
-    return m_Window;
-}
-
-const std::string& Window::GetTitle() const
-{
-    return m_WindowData.title;
-}
-
-WindowSize Window::GetSize()
-{
-    glfwGetWindowSize(m_Window, &m_WindowData.size.width, &m_WindowData.size.height);
-    return m_WindowData.size;
-}
-
-void Window::Shutdown() const
-{
-    glfwDestroyWindow(m_Window);
-}
-
-void Window::m_KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+/**
+ * @brief Callback for keyboard events.
+ *
+ * Dispatches KeyPressedEvent or KeyReleasedEvent to the EventManager based on the action.
+ *
+ * @param window The GLFW window that received the event.
+ * @param key The keyboard key that was pressed or released.
+ * @param scancode The system-specific scancode of the key.
+ * @param action The key action (GLFW_PRESS, GLFW_RELEASE, GLFW_REPEAT).
+ * @param mods Bit field describing which modifier keys were held down.
+ */
+void Window::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) noexcept
 {
     if (action == GLFW_PRESS) {
         KeyCode keyCode = static_cast<KeyCode>(key);
-        KeyPressedEvent* event = new KeyPressedEvent(keyCode);
-        EventManager::PushEvent(event); 
+        EventManager::PushEvent(new KeyPressedEvent(keyCode));
     }
     else if (action == GLFW_RELEASE) {
         KeyCode keyCode = static_cast<KeyCode>(key);
-        KeyReleasedEvent* event = new KeyReleasedEvent(keyCode);
-        EventManager::PushEvent(event);
+        EventManager::PushEvent(new KeyReleasedEvent(keyCode));
     }
 }
 
-void Window::m_MouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+/**
+ * @brief Callback for mouse button events.
+ *
+ * Dispatches MouseButtonPressedEvent or MouseButtonReleasedEvent to the EventManager.
+ *
+ * @param window The GLFW window that received the event.
+ * @param button The mouse button that was pressed or released.
+ * @param action The button action (GLFW_PRESS, GLFW_RELEASE).
+ * @param mods Bit field describing which modifier keys were held down.
+ */
+void Window::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods) noexcept {
     if (action == GLFW_PRESS) {
         MouseCode mouseCode = static_cast<MouseCode>(button);
-        MouseButtonPressedEvent* event = new MouseButtonPressedEvent(mouseCode);
-        EventManager::PushEvent(event);
+        EventManager::PushEvent(new MouseButtonPressedEvent(mouseCode));
     }
     else if (action == GLFW_RELEASE) {
         MouseCode mouseCode = static_cast<MouseCode>(button);
-        MouseButtonReleasedEvent* event = new MouseButtonReleasedEvent(mouseCode);
-        EventManager::PushEvent(event);
+        EventManager::PushEvent(new MouseButtonReleasedEvent(mouseCode));
     }
 }
 
-void Window::m_MouseMovedCallback(GLFWwindow* window, double xpos, double ypos)
-{
-    MouseMovedEvent* event = new MouseMovedEvent(xpos,ypos);
-    EventManager::PushEvent(event);
+/**
+ * @brief Callback for mouse movement events.
+ *
+ * Dispatches a MouseMovedEvent to the EventManager with the new cursor position.
+ *
+ * @param window The GLFW window that received the event.
+ * @param xpos The new x-coordinate of the cursor.
+ * @param ypos The new y-coordinate of the cursor.
+ */
+void Window::MouseMovedCallback(GLFWwindow* window, double xpos, double ypos) noexcept {
+    EventManager::PushEvent(new MouseMovedEvent(static_cast<float>(xpos), static_cast<float>(ypos)));
 }
 
-void Window::m_MouseScrolledCallback(GLFWwindow* window, double xoffset, double yoffset)
-{
-    MouseScrolledEvent* event = new MouseScrolledEvent(xoffset, yoffset);
-    EventManager::PushEvent(event);
+/**
+ * @brief Callback for mouse scroll events.
+ *
+ * Dispatches a MouseScrolledEvent to the EventManager with the scroll offset.
+ *
+ * @param window The GLFW window that received the event.
+ * @param xoffset The scroll offset in the x direction.
+ * @param yoffset The scroll offset in the y direction.
+ */
+void Window::MouseScrolledCallback(GLFWwindow* window, double xoffset, double yoffset) noexcept {
+    EventManager::PushEvent(new MouseScrolledEvent(static_cast<float>(xoffset), static_cast<float>(yoffset)));
 }
 
-void Window::m_FramebufferSizeCallback(GLFWwindow* window, int width, int height)
-{
+/**
+ * @brief Callback for framebuffer size change events.
+ *
+ * Updates the OpenGL viewport and dispatches a WindowResizedEvent to the EventManager.
+ *
+ * @param window The GLFW window that received the event.
+ * @param width The new width of the framebuffer.
+ * @param height The new height of the framebuffer.
+ */
+void Window::FramebufferSizeCallback(GLFWwindow* window, int width, int height) noexcept {
     glViewport(0, 0, width, height);
-    WindowResizedEvent* event = new WindowResizedEvent(width, height);
-    EventManager::PushEvent(event);
+    EventManager::PushEvent(new WindowResizedEvent(width, height));
 }

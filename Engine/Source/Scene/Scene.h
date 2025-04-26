@@ -13,6 +13,8 @@ class Scene
 public:
     Scene();
 
+    bool isLoading = false;
+
     Entity CreateEntity(const std::string& name);
     Entity CreateEntityWithUUID(const std::string& name, UUID uuid);
     void DestroyEntity(entt::entity entity);
