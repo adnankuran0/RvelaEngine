@@ -6,11 +6,13 @@
 #include "Event/EventManager.h"
 #include "../Renderer/Renderer.h"
 #include "Time.h"
-#include <iostream>
 #include "../Scene/Scene.h"
 #include "../Scene/Components.h"
 #include "../Scene/SceneManager.h"
 #include "Core/Utils/ProjectManager.h"
+#include "Core/Utils/MaterialManager.h"
+#include "Core/Utils/TextureManager.h"
+#include "LayerStack.h"
 
 class Engine
 {
@@ -19,17 +21,32 @@ public:
 	~Engine();
 
 	void Run();
+	void FixedUpdate();
+	void Update();
+	void LateUpdate();
 	void Render();
 	void Shutdown();
-	
 
-	static Engine* Get() { return s_Instance; }
-	Window* GetWindow() const { return m_Window.get(); }
-	Scene* GetScene() const { return m_Scene.get(); }
-	ProjectManager* GetProjectManager() const { return m_ProjectManager.get(); }
-	SceneManager* GetSceneManager() const { return m_SceneManager.get(); }
+	void PushLayer(Layer* layer);
+	void PopLayer(Layer* layer);
+
+	inline static Engine* Get() noexcept { return s_Instance; } 
+	inline Window* GetWindow() const noexcept { return m_Window.get(); }
+	inline Scene* GetScene() const noexcept { return m_Scene.get(); }
+	inline ProjectManager* GetProjectManager() const noexcept { return m_ProjectManager.get(); }
+	inline SceneManager* GetSceneManager() const noexcept { return m_SceneManager.get(); }
+
+	inline void SetEditorCamera(EditorCamera* editorCam) { editorCamera = editorCam; }
 private:
+	LayerStack m_LayerStack;
+
+	void HandleEvents() noexcept;
+	std::vector<PointLightData> CollectPointLights() noexcept;
+	std::optional<DirectionalLightData>  CollectDirectionalLight() noexcept;
+
 	static Engine* s_Instance;
+
+	EditorCamera* editorCamera;
 	std::unique_ptr<Window> m_Window;
 	std::unique_ptr<Renderer> m_Renderer;
 	std::unique_ptr<Scene> m_Scene;

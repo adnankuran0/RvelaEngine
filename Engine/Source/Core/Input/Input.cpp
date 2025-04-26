@@ -3,7 +3,7 @@
 #include "Input.h"
 
 // Cache for the last known mouse position to avoid redundant GLFW calls
-static glm::vec2 s_LastMousePosition = { 0.0f, 0.0f };
+glm::vec2 Input::s_LastMousePosition = { 0.0f, 0.0f };
 
 /**
  * @brief Checks if a specific keyboard key is currently pressed.
@@ -71,26 +71,4 @@ glm::vec2 Input::GetMousePosition() noexcept {
     glfwGetCursorPos(glfwWindow, &xPos, &yPos);
     s_LastMousePosition = { static_cast<float>(xPos), static_cast<float>(yPos) };
     return s_LastMousePosition;
-}
-
-/**
- * @brief Retrieves the x-coordinate of the current mouse cursor position.
- *
- * Uses the cached mouse position to avoid redundant GLFW calls.
- *
- * @return float The x-coordinate of the mouse cursor.
- */
-float Input::GetMouseX() noexcept {
-    return s_LastMousePosition.x;
-}
-
-/**
- * @brief Retrieves the y-coordinate of the current mouse cursor position.
- *
- * Uses the cached mouse position to avoid redundant GLFW calls.
- *
- * @return float The y-coordinate of the mouse cursor.
- */
-float Input::GetMouseY() noexcept {
-    return s_LastMousePosition.y;
 }

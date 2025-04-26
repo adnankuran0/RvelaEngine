@@ -19,7 +19,7 @@ public:
      * @param width The new width of the window (must be positive).
      * @param height The new height of the window (must be positive).
      */
-    explicit WindowResizedEvent(unsigned int width, unsigned int height) noexcept
+    inline explicit WindowResizedEvent(unsigned int width, unsigned int height) noexcept
         : m_WindowWidth(width > 0 ? width : 1), m_WindowHeight(height > 0 ? height : 1) {
     }
 
@@ -28,35 +28,35 @@ public:
      *
      * @return EventType The event type (WindowResized).
      */
-    EventType GetEventType() const noexcept override { return EventType::WindowResized; }
+    inline EventType GetEventType() const noexcept override { return EventType::WindowResized; }
 
     /**
      * @brief Retrieves the name of the event for debugging or logging.
      *
      * @return const char* The name of the event ("WindowResized").
      */
-    const char* GetName() const noexcept override { return EVENT_NAME; }
+    inline const char* GetName() const noexcept override { return EVENT_NAME; }
 
     /**
      * @brief Retrieves the new width of the window.
      *
      * @return unsigned int The window width.
      */
-    unsigned int GetWidth() const noexcept { return m_WindowWidth; }
+    inline unsigned int GetWidth() const noexcept { return m_WindowWidth; }
 
     /**
      * @brief Retrieves the new height of the window.
      *
      * @return unsigned int The window height.
      */
-    unsigned int GetHeight() const noexcept { return m_WindowHeight; }
+    inline unsigned int GetHeight() const noexcept { return m_WindowHeight; }
 
     /**
      * @brief Retrieves the static event type.
      *
      * @return EventType The static event type (WindowResized).
      */
-    static EventType GetStaticType() noexcept { return EventType::WindowResized; }
+    inline static EventType GetStaticType() noexcept { return EventType::WindowResized; }
 
 private:
     unsigned int m_WindowWidth;  ///< The new width of the window.

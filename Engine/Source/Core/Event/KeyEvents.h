@@ -17,14 +17,14 @@ public:
      *
      * @param keyCode The key code representing the keyboard key.
      */
-    explicit KeyEvent(KeyCode keyCode) noexcept : m_KeyCode(keyCode) {}
+    inline explicit KeyEvent(KeyCode keyCode) noexcept : m_KeyCode(keyCode) {}
 
     /**
      * @brief Retrieves the key code associated with the event.
      *
      * @return KeyCode The key code of the keyboard key.
      */
-    KeyCode GetKeyCode() const noexcept { return m_KeyCode; }
+    inline KeyCode GetKeyCode() const noexcept { return m_KeyCode; }
 
 protected:
     KeyCode m_KeyCode; ///< The key code representing the keyboard key.
@@ -43,28 +43,28 @@ public:
      *
      * @param keyCode The key code representing the pressed key.
      */
-    explicit KeyPressedEvent(KeyCode keyCode) noexcept : KeyEvent(keyCode) {}
+    inline explicit KeyPressedEvent(KeyCode keyCode) noexcept : KeyEvent(keyCode) {}
 
     /**
      * @brief Retrieves the type of the event.
      *
      * @return EventType The event type (KeyPressed).
      */
-    EventType GetEventType() const noexcept override { return EventType::KeyPressed; }
+    inline EventType GetEventType() const noexcept override { return EventType::KeyPressed; }
 
     /**
      * @brief Retrieves the name of the event for debugging or logging.
      *
      * @return const char* The name of the event ("KeyPressed").
      */
-    const char* GetName() const noexcept override { return EVENT_NAME; }
+    inline const char* GetName() const noexcept override { return EVENT_NAME; }
 
     /**
      * @brief Retrieves the static event type.
      *
      * @return EventType The static event type (KeyPressed).
      */
-    static EventType GetStaticType() noexcept { return EventType::KeyPressed; }
+    inline static EventType GetStaticType() noexcept { return EventType::KeyPressed; }
 
 private:
     static constexpr const char* EVENT_NAME = "KeyPressed"; ///< Static event name for debugging.
@@ -83,28 +83,28 @@ public:
      *
      * @param keyCode The key code representing the released key.
      */
-    explicit KeyReleasedEvent(KeyCode keyCode) noexcept : KeyEvent(keyCode) {}
+    inline explicit KeyReleasedEvent(KeyCode keyCode) noexcept : KeyEvent(keyCode) {}
 
     /**
      * @brief Retrieves the type of the event.
      *
      * @return EventType The event type (KeyReleased).
      */
-    EventType GetEventType() const noexcept override { return EventType::KeyReleased; }
+    inline EventType GetEventType() const noexcept override { return EventType::KeyReleased; }
 
     /**
      * @brief Retrieves the name of the event for debugging or logging.
      *
      * @return const char* The name of the event ("KeyReleased").
      */
-    const char* GetName() const noexcept override { return EVENT_NAME; }
+    inline const char* GetName() const noexcept override { return EVENT_NAME; }
 
     /**
      * @brief Retrieves the static event type.
      *
      * @return EventType The static event type (KeyReleased).
      */
-    static EventType GetStaticType() noexcept { return EventType::KeyReleased; }
+    inline static EventType GetStaticType() noexcept { return EventType::KeyReleased; }
 
 private:
     static constexpr const char* EVENT_NAME = "KeyReleased"; ///< Static event name for debugging.

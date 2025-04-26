@@ -20,47 +20,69 @@ private:
     static double fps;            ///< The current frames per second.
     static double timeScale;      ///< The scaling factor for time (e.g., for slow motion).
     static double maxFPS;         ///< The maximum allowed FPS (0 means unlimited).
+    static double fixedDeltaTime; ///< Fixed time step used for physics updates.
+    static double fixedTimeAccumulator;  ///< Accumulates time for fixed updates to synchronize with frame rate.
 
 public:
 
     static void Update() noexcept;
 
-    static float GetDeltaTime() noexcept
+    inline static float GetDeltaTime() noexcept
     {
         return static_cast<float>(deltaTime);
     }
 
-    static float GetFPS() noexcept
+    inline static float GetFixedDeltaTime() noexcept
+    {
+        return fixedDeltaTime;
+    }
+
+    inline static bool ShouldRunFixedUpdate() noexcept
+    {
+        return fixedTimeAccumulator >= fixedDeltaTime;
+    }
+
+    inline static void ConsumeFixedDeltaTime() noexcept
+    {
+        fixedTimeAccumulator -= fixedDeltaTime;
+    }
+
+    inline static float GetFixedTimeAccumulator() noexcept
+    {
+        return fixedTimeAccumulator;
+    }
+
+    inline static float GetFPS() noexcept
     {
         return fps;
     }
 
-    static void SetTimeScale(float scale) noexcept
+    inline static void SetTimeScale(float scale) noexcept
     {
         timeScale = scale;
     }
 
-    static float GetTimeScale() noexcept
+    inline static float GetTimeScale() noexcept
     {
         return timeScale;
     }
 
-    static float GetTime() noexcept
+    inline static float GetTime() noexcept
     {
         return static_cast<float>(glfwGetTime());
     }
 
-    static float GetMaxFPS() noexcept
+    inline static float GetMaxFPS() noexcept
     {
         return maxFPS;
     }
     
-    static void SetMaxFPS(float maxFPS) noexcept
+    inline static void SetMaxFPS(float maxFPS) noexcept
     {
         Time::maxFPS = maxFPS;
     }
 
-    static double GetCurrentTime() noexcept {
+    inline static double GetCurrentTime() noexcept {
         return glfwGetTime();
     }
 

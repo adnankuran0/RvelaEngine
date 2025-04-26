@@ -18,14 +18,14 @@ public:
      *
      * @param mouseCode The mouse button code representing the button.
      */
-    explicit MouseButtonEvent(MouseCode mouseCode) noexcept : m_MouseCode(mouseCode) {}
+    inline explicit MouseButtonEvent(MouseCode mouseCode) noexcept : m_MouseCode(mouseCode) {}
 
     /**
      * @brief Retrieves the mouse button code associated with the event.
      *
      * @return MouseCode The mouse button code.
      */
-    MouseCode GetMouseCode() const noexcept { return m_MouseCode; }
+    inline MouseCode GetMouseCode() const noexcept { return m_MouseCode; }
 
 protected:
     MouseCode m_MouseCode; ///< The mouse button code.
@@ -44,28 +44,28 @@ public:
      *
      * @param mouseCode The mouse button code representing the pressed button.
      */
-    explicit MouseButtonPressedEvent(MouseCode mouseCode) noexcept : MouseButtonEvent(mouseCode) {}
+    inline explicit MouseButtonPressedEvent(MouseCode mouseCode) noexcept : MouseButtonEvent(mouseCode) {}
 
     /**
      * @brief Retrieves the type of the event.
      *
      * @return EventType The event type (MouseButtonPressed).
      */
-    EventType GetEventType() const noexcept override { return EventType::MouseButtonPressed; }
+    inline inline EventType GetEventType() const noexcept override { return EventType::MouseButtonPressed; }
 
     /**
      * @brief Retrieves the name of the event for debugging or logging.
      *
      * @return const char* The name of the event ("MouseButtonPressed").
      */
-    const char* GetName() const noexcept override { return EVENT_NAME; }
+    inline const char* GetName() const noexcept override { return EVENT_NAME; }
 
     /**
      * @brief Retrieves the static event type.
      *
      * @return EventType The static event type (MouseButtonPressed).
      */
-    static EventType GetStaticType() noexcept { return EventType::MouseButtonPressed; }
+    inline static EventType GetStaticType() noexcept { return EventType::MouseButtonPressed; }
 
 private:
     static constexpr const char* EVENT_NAME = "MouseButtonPressed"; ///< Static event name for debugging.
@@ -84,28 +84,28 @@ public:
      *
      * @param mouseCode The mouse button code representing the released button.
      */
-    explicit MouseButtonReleasedEvent(MouseCode mouseCode) noexcept : MouseButtonEvent(mouseCode) {}
+    inline explicit MouseButtonReleasedEvent(MouseCode mouseCode) noexcept : MouseButtonEvent(mouseCode) {}
 
     /**
      * @brief Retrieves the type of the event.
      *
      * @return EventType The event type (MouseButtonReleased).
      */
-    EventType GetEventType() const noexcept override { return EventType::MouseButtonReleased; }
+    inline EventType GetEventType() const noexcept override { return EventType::MouseButtonReleased; }
 
     /**
      * @brief Retrieves the name of the event for debugging or logging.
      *
      * @return const char* The name of the event ("MouseButtonReleased").
      */
-    const char* GetName() const noexcept override { return EVENT_NAME; }
+    inline const char* GetName() const noexcept override { return EVENT_NAME; }
 
     /**
      * @brief Retrieves the static event type.
      *
      * @return EventType The static event type (MouseButtonReleased).
      */
-    static EventType GetStaticType() noexcept { return EventType::MouseButtonReleased; }
+    inline static EventType GetStaticType() noexcept { return EventType::MouseButtonReleased; }
 
 private:
     static constexpr const char* EVENT_NAME = "MouseButtonReleased"; ///< Static event name for debugging.
@@ -125,49 +125,49 @@ public:
      * @param x The x-coordinate of the cursor position.
      * @param y The y-coordinate of the cursor position.
      */
-    MouseMovedEvent(float x, float y) noexcept : m_X(x), m_Y(y) {}
+    inline MouseMovedEvent(float x, float y) noexcept : m_X(x), m_Y(y) {}
 
     /**
      * @brief Retrieves the type of the event.
      *
      * @return EventType The event type (MouseMoved).
      */
-    EventType GetEventType() const noexcept override { return EventType::MouseMoved; }
+    inline EventType GetEventType() const noexcept override { return EventType::MouseMoved; }
 
     /**
      * @brief Retrieves the name of the event for debugging or logging.
      *
      * @return const char* The name of the event ("MouseMoved").
      */
-    const char* GetName() const noexcept override { return EVENT_NAME; }
+    inline const char* GetName() const noexcept override { return EVENT_NAME; }
 
     /**
      * @brief Retrieves the x-coordinate of the cursor position.
      *
      * @return float The x-coordinate.
      */
-    float GetX() const noexcept { return m_X; }
+    inline float GetX() const noexcept { return m_X; }
 
     /**
      * @brief Retrieves the y-coordinate of the cursor position.
      *
      * @return float The y-coordinate.
      */
-    float GetY() const noexcept { return m_Y; }
+    inline float GetY() const noexcept { return m_Y; }
 
     /**
      * @brief Retrieves the cursor position as a 2D vector.
      *
      * @return glm::vec2 The cursor position (x, y).
      */
-    glm::vec2 GetPos() const noexcept { return glm::vec2(m_X, m_Y); }
+    inline glm::vec2 GetPos() const noexcept { return glm::vec2(m_X, m_Y); }
 
     /**
      * @brief Retrieves the static event type.
      *
      * @return EventType The static event type (MouseMoved).
      */
-    static EventType GetStaticType() noexcept { return EventType::MouseMoved; }
+    inline static EventType GetStaticType() noexcept { return EventType::MouseMoved; }
 
 private:
     float m_X, m_Y; ///< The x and y coordinates of the cursor position.
@@ -188,42 +188,42 @@ public:
      * @param xOffset The scroll offset along the x-axis.
      * @param yOffset The scroll offset along the y-axis.
      */
-    MouseScrolledEvent(float xOffset, float yOffset) noexcept : m_XOffset(xOffset), m_YOffset(yOffset) {}
+    inline MouseScrolledEvent(float xOffset, float yOffset) noexcept : m_XOffset(xOffset), m_YOffset(yOffset) {}
 
     /**
      * @brief Retrieves the type of the event.
      *
      * @return EventType The event type (MouseScrolled).
      */
-    EventType GetEventType() const noexcept override { return EventType::MouseScrolled; }
+    inline EventType GetEventType() const noexcept override { return EventType::MouseScrolled; }
 
     /**
      * @brief Retrieves the name of the event for debugging or logging.
      *
      * @return const char* The name of the event ("MouseScrolled").
      */
-    const char* GetName() const noexcept override { return EVENT_NAME; }
+    inline const char* GetName() const noexcept override { return EVENT_NAME; }
 
     /**
      * @brief Retrieves the scroll offset along the x-axis.
      *
      * @return float The x-axis scroll offset.
      */
-    float GetXOffset() const noexcept { return m_XOffset; }
+    inline float GetXOffset() const noexcept { return m_XOffset; }
 
     /**
      * @brief Retrieves the scroll offset along the y-axis.
      *
      * @return float The y-axis scroll offset.
      */
-    float GetYOffset() const noexcept { return m_YOffset; }
+    inline float GetYOffset() const noexcept { return m_YOffset; }
 
     /**
      * @brief Retrieves the static event type.
      *
      * @return EventType The static event type (MouseScrolled).
      */
-    static EventType GetStaticType() noexcept { return EventType::MouseScrolled; }
+    inline static EventType GetStaticType() noexcept { return EventType::MouseScrolled; }
 
 private:
     float m_XOffset, m_YOffset; ///< The scroll offsets along the x and y axes.

@@ -9,6 +9,8 @@ int Time::frameCount = 0;
 double Time::fps = 0.0f;
 double Time::timeScale = 1.0f;
 double Time::maxFPS = 360.0;
+double Time::fixedDeltaTime = 0.02; // 20ms default fixed timestep
+double Time::fixedTimeAccumulator = 0.0;
 
 /**
  * @brief Updates time-related metrics.
@@ -47,6 +49,8 @@ void Time::Update() noexcept
         frameCount = 0;
         fpsUpdateTime = currentFrameTime;
     }
+
+    fixedTimeAccumulator += deltaTime;
 }
 
 

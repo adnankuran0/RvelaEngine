@@ -1,5 +1,5 @@
 #include "Core/Engine.h"
-#include "ImGuiLayer.h"
+
 
 class Editor
 {
@@ -10,6 +10,5 @@ public:
 	Engine* GetEngine();
 private:
 	Engine* m_Engine;
-	ImGuiLayer* m_ImGuiLayer;
 
 };

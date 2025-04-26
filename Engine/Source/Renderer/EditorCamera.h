@@ -6,8 +6,9 @@
 #include "../Core/Input/Input.h"
 #include "../Core/Time.h"
 
-class Camera
+class EditorCamera
 {
+
 public:
     glm::vec3 Position;
     glm::vec3 Front;
@@ -32,7 +33,7 @@ public:
     float positionSmoothness = 10.0f;
     glm::vec3 targetPosition;
 
-    Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), int width = 1280, int height = 720)
+    EditorCamera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), int width = 1280, int height = 720)
         : Front(glm::vec3(0.0f, 0.0f, -1.0f))
     {
         Position = targetPosition = position;
@@ -44,7 +45,7 @@ public:
         projection = glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.1f, 100.0f);
     }
 
-    Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch, int width, int height)
+    EditorCamera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch, int width, int height)
         : Front(glm::vec3(0.0f, 0.0f, -1.0f))
     {
         Position = targetPosition = glm::vec3(posX, posY, posZ);
@@ -58,7 +59,7 @@ public:
         projection = glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.1f, 100.0f);
     }
 
-    glm::mat4 GetViewMatrix()
+    inline glm::mat4 GetViewMatrix() noexcept
     {
         return glm::lookAt(Position, Position + Front, Up);
     }

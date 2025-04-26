@@ -59,15 +59,15 @@ void Renderer::EndFrame()
 
 }
 
-void Renderer::RenderSkybox(Camera& camera)
+void Renderer::RenderSkybox(EditorCamera* camera)
 {
-    m_Skybox.Render(m_SkyboxShader, camera.projection, camera.GetViewMatrix());
+    m_Skybox.Render(m_SkyboxShader, camera->projection, camera->GetViewMatrix());
 }
 
 void Renderer::Render(WorldTransformComponent& transform,
     MeshRendererComponent& meshComponent,
     MaterialComponent& materialComponent,
-    Camera& camera,
+    EditorCamera* camera,
     const std::vector<PointLightData>& pointLights,
     const DirectionalLightData* directionalLight)
 {
@@ -97,7 +97,7 @@ void Renderer::Render(WorldTransformComponent& transform,
     }
     m_DefaultShader.setInt("pointLightCount", std::min(static_cast<int>(pointLights.size()), MAX_POINT_LIGHTS));
 
-    m_DefaultShader.setVec3("camPos", camera.Position);
+    m_DefaultShader.setVec3("camPos", camera->Position);
 
     m_DefaultShader.setFloat("UVScale", 1.0f);
     m_DefaultShader.setVec3("albedoColor", material->albedoColor);
@@ -134,8 +134,8 @@ void Renderer::Render(WorldTransformComponent& transform,
     }
 
     m_DefaultShader.setMat4("model", transform.GetMatrix());
-    m_DefaultShader.setMat4("view", camera.GetViewMatrix());
-    m_DefaultShader.setMat4("projection", camera.projection);
+    m_DefaultShader.setMat4("view", camera->GetViewMatrix());
+    m_DefaultShader.setMat4("projection", camera->projection);
 
     meshComponent.VAO.Bind();
     glDrawElements(GL_TRIANGLES, meshComponent.indexCount, GL_UNSIGNED_INT, 0);

@@ -3,20 +3,19 @@
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_impl_glfw.h"
 #include "ImGui/imgui_impl_opengl3.h"
+#include "Core/Layer.h"
 
 
-
-class ImGuiLayer
+class ImGuiLayer : public Layer
 {
 public:
-    ImGuiLayer(Engine* engine);
+    ImGuiLayer(Engine* engine) : m_Engine(engine) {}
     ~ImGuiLayer();
 
-    void OnAttach();
-    void OnDetach();
-    void OnUpdate();
-    void OnRender();
-    void OnEvent();
+    void OnAttach() override;
+    void OnDetach() override;
+    void OnUpdate() override;
+    void OnRender() override;
 
 private:
     Engine* m_Engine;

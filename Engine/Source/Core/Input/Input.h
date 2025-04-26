@@ -21,7 +21,28 @@ public:
 
 	static glm::vec2 GetMousePosition() noexcept;
 
-	static float GetMouseX() noexcept;
+	/**
+	 * @brief Retrieves the x-coordinate of the current mouse cursor position.
+	 *
+	 * Uses the cached mouse position to avoid redundant GLFW calls.
+	 *
+	 * @return float The x-coordinate of the mouse cursor.
+	 */
+	inline float GetMouseX() noexcept {
+		return s_LastMousePosition.x;
+	}
 
-	static float GetMouseY() noexcept;
+	/**
+	 * @brief Retrieves the y-coordinate of the current mouse cursor position.
+	 *
+	 * Uses the cached mouse position to avoid redundant GLFW calls.
+	 *
+	 * @return float The y-coordinate of the mouse cursor.
+	 */
+	inline float GetMouseY() noexcept {
+		return s_LastMousePosition.y;
+	}
+
+private:
+	static glm::vec2 s_LastMousePosition;
 };

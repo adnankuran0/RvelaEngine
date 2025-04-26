@@ -6,7 +6,7 @@
 #include "BufferLayout.h"
 #include "Texture.h"
 #include "Shader.h"
-#include "Camera.h"
+#include "EditorCamera.h"
 #include "GLFW/glfw3.h"
 #include "../Core/Time.h"
 #include "Scene/Components.h"
@@ -36,11 +36,11 @@ public:
     static void Init(GLFWwindow* window);
     static void StartFrame();
     static void EndFrame();
-    static void RenderSkybox(Camera& camera);
+    static void RenderSkybox(EditorCamera* camera);
     static void Render(WorldTransformComponent& transform,
         MeshRendererComponent& data,
         MaterialComponent& metarial,
-        Camera& camera,
+        EditorCamera* camera,
         const std::vector<PointLightData>& pointLights,
         const DirectionalLightData* directionalLight
         );

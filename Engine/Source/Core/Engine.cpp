@@ -1,147 +1,264 @@
 #include "rvelapch.h"
 
 #include "RvelaLog.h"
-
 #include "Engine.h"
 #include "Scene/Entity.h"
 
-#include "Core/Utils/MaterialManager.h"
-#include "Core/Utils/TextureManager.h"
-
 Engine* Engine::s_Instance = nullptr;
 
-Camera editorCamera(glm::vec3(0.0f, 0.0f, 3.0f));
 
+/**
+ * @brief Constructs the Engine, initializing core systems and singleton instance.
+ * Initializes various subsystems like the window, renderer, scene, etc.
+ */
 Engine::Engine()
 {
 	RvelaLog::Init("log.txt");
 
 	m_Window = std::make_unique<Window>();
+	m_Renderer = std::make_unique<Renderer>();
+	m_Scene = std::make_unique<Scene>();
+	m_ProjectManager = std::make_unique<ProjectManager>();
+	m_SceneManager = std::make_unique<SceneManager>();
+	editorCamera = nullptr;
+
 	if (s_Instance == nullptr)
 	{
 		s_Instance = this;
 	}
 	else
 	{
-		LOG_WARNING << "Another instance is already created!";
+		LOG_WARNING << "Another instance of Engine already exists!";
 	}
-	m_Renderer = std::make_unique<Renderer>();
+
 	m_Renderer->Init(m_Window->GetGLFWWindow());
-
-	m_Scene = std::make_unique<Scene>();
-
-	m_ProjectManager = std::make_unique<ProjectManager>();
-
-	m_SceneManager = std::make_unique<SceneManager>();
 }
 
+/**
+ * @brief Destroys the Engine and shuts down all initialized systems.
+ * Cleans up all resources before application termination.
+ */
 Engine::~Engine()
-{		
+{
 	Shutdown();
 }
 
+/**
+ * @brief Adds a new layer to the engine's layer stack.
+ * Layers are used to manage various systems like rendering, UI, etc.
+ * @param layer A pointer to the layer to be added.
+ */
+void Engine::PushLayer(Layer* layer)
+{
+	m_LayerStack.PushLayer(layer);
+}
 
+/**
+ * @brief Removes a layer from the engine's layer stack.
+ * @param layer A pointer to the layer to be removed.
+ */
+void Engine::PopLayer(Layer* layer)
+{
+	m_LayerStack.PopLayer(layer);
+}
+
+/**
+ * @brief Updates all layers and core systems of the engine.
+ * This is where most of the game logic and system updates occur.
+ */
+void Engine::Update()
+{
+	for (Layer* layer : m_LayerStack)
+	{
+		layer->OnUpdate();
+	}
+
+	m_Scene->Update();
+}
+
+/**
+ * @brief Performs fixed time updates for physics or other time-dependent systems.
+ */
+void Engine::FixedUpdate()
+{
+	for (Layer* layer : m_LayerStack)
+		layer->OnFixedUpdate();
+}
+
+/**
+ * @brief Performs late updates for things that should occur after the main update.
+ */
+void Engine::LateUpdate()
+{
+	for (Layer* layer : m_LayerStack)
+		layer->OnLateUpdate();
+}
+
+/**
+ * @brief Main execution loop for the engine.
+ * Handles events, updates, rendering, and the main game loop.
+ */
 void Engine::Run()
 {
-	glfwPollEvents();
+	while (!glfwWindowShouldClose(GetWindow()->GetGLFWWindow()))
+	{
+		glfwPollEvents();
+		HandleEvents();
 
-	//std::cout << "Texture count: " << TextureManager::GetTextureCount() << " Material count: " << MaterialManager::GetMaterialCount() << std::endl;
-	
+		Time::Update();
+
+		while (Time::ShouldRunFixedUpdate())
+		{
+			FixedUpdate();
+			Time::ConsumeFixedDeltaTime();
+		}
+
+		Update();
+		LateUpdate();
+
+		Render();
+
+		EventManager::ClearEvents();
+
+		glfwSwapBuffers(GetWindow()->GetGLFWWindow());
+	}
+}
+
+/**
+ * @brief Handles all queued events such as mouse movement, scroll, etc.
+ * Dispatches events to the appropriate handlers.
+ */
+void Engine::HandleEvents() noexcept
+{
 	EventManager::DispatchEvents([this](Event& event) {
-		// Handle mouse movement events
-		if (event.GetEventType() == EventType::MouseMoved) {
-			auto* mouseEvent = dynamic_cast<MouseMovedEvent*>(&event);
-			if (mouseEvent) {
-				editorCamera.onMouseMoved(
+		switch (event.GetEventType())
+		{
+		case EventType::MouseMoved:
+		{
+			if (auto* mouseEvent = dynamic_cast<MouseMovedEvent*>(&event))
+			{
+				editorCamera->onMouseMoved(
 					mouseEvent->GetX(),
 					mouseEvent->GetY(),
 					m_Window->GetGLFWWindow()
 				);
 			}
+			break;
 		}
-
-		// Handle mouse scroll events when the left mouse button is pressed
-		if (event.GetEventType() == EventType::MouseScrolled &&
-			Input::IsMouseButtonPressed(MouseCode::Button1)) {
-			auto* scrollEvent = dynamic_cast<MouseScrolledEvent*>(&event);
-			if (scrollEvent) {
-				editorCamera.SprintSpeed += scrollEvent->GetYOffset();
-				editorCamera.SprintSpeed = std::clamp(editorCamera.SprintSpeed, 2.5f, 30.0f);
+		case EventType::MouseScrolled:
+		{
+			if (Input::IsMouseButtonPressed(MouseCode::Button1))
+			{
+				if (auto* scrollEvent = dynamic_cast<MouseScrolledEvent*>(&event))
+				{
+					// Adjust sprint speed based on scroll input
+					editorCamera->SprintSpeed += scrollEvent->GetYOffset();
+					editorCamera->SprintSpeed = std::clamp(editorCamera->SprintSpeed, 2.5f, 30.0f);
+				}
 			}
+			break;
+		}
+		default:
+			break;
 		}
 		});
-
-	editorCamera.Update();
-
-	Render();
-
-	EventManager::ClearEvents();
-	m_Scene->Update();
-	
 }
 
+/**
+ * @brief Executes the rendering pipeline for the current frame.
+ * Renders the scene, including skybox, mesh renderers, lights, etc.
+ */
 void Engine::Render()
 {
 	Renderer::StartFrame();
 
-
-	std::vector<PointLightData> pointLights;
-
-	auto pointLightView = m_Scene->GetRegistry().view<PointLightComponent, WorldTransformComponent>();
-	for (auto entity : pointLightView) {
-		auto& light = m_Scene->GetComponent<PointLightComponent>(entity);
-		auto& transform = m_Scene->GetComponent<WorldTransformComponent>(entity);
-
-		PointLightData data;
-		data.position = glm::vec3(transform.GetMatrix()[3]); // mat4'ün son sütunu pozisyon
-		data.color = light.color;
-		data.intensity = light.intensity;
-		data.radius = light.radius;
-
-		pointLights.push_back(data);
-	}
-
-	DirectionalLightData mainDirLight;
-	bool hasDirLight = false;
-
-	auto dirLightView = m_Scene->GetRegistry().view<DirectionalLightComponent, WorldTransformComponent>();
-	for (auto entity : dirLightView) {
-		auto [light, transform] = dirLightView.get<DirectionalLightComponent, WorldTransformComponent>(entity);
-		mainDirLight.direction = transform.GetForward();
-		mainDirLight.color = light.color;
-		mainDirLight.intensity = light.intensity;
-		mainDirLight.castShadows = light.castShadows;
-		hasDirLight = true;
-		break;
-	}
-
-	auto RenderableView = m_Scene->GetRegistry().view<MeshRendererComponent, MaterialComponent>();
+	std::vector<PointLightData> pointLights = CollectPointLights();
+	std::optional<DirectionalLightData> dirLight = CollectDirectionalLight();
 
 	Renderer::RenderSkybox(editorCamera);
-	for (auto entity : RenderableView)
+
+	auto renderableView = m_Scene->GetRegistry().view<MeshRendererComponent, MaterialComponent, WorldTransformComponent>();
+	for (auto entity : renderableView)
 	{
 		auto& mesh = m_Scene->GetComponent<MeshRendererComponent>(entity);
-		auto& metarial = m_Scene->GetComponent<MaterialComponent>(entity);
+		auto& material = m_Scene->GetComponent<MaterialComponent>(entity);
 		auto& transform = m_Scene->GetComponent<WorldTransformComponent>(entity);
 
-		if (hasDirLight) {
-			Renderer::Render(transform, mesh, metarial, editorCamera, pointLights, &mainDirLight);
-		}
-		else {
-			Renderer::Render(transform, mesh, metarial, editorCamera, pointLights, nullptr);
-		}
-
+		Renderer::Render(
+			transform,
+			mesh,
+			material,
+			editorCamera,
+			pointLights,
+			dirLight ? &(*dirLight) : nullptr
+		);
 	}
+
+	for (Layer* layer : m_LayerStack)
+		layer->OnRender();
 
 	Renderer::EndFrame();
 }
 
-
-void Engine::Shutdown()
+/**
+ * @brief Collects all point lights from the scene.
+ * @return A vector containing the data for all active point lights.
+ */
+std::vector<PointLightData> Engine::CollectPointLights() noexcept
 {
-	glfwTerminate();
-	m_Renderer->Shutdown();
+	std::vector<PointLightData> lights;
+	auto view = m_Scene->GetRegistry().view<PointLightComponent, WorldTransformComponent>();
+
+	for (auto entity : view)
+	{
+		auto& light = m_Scene->GetComponent<PointLightComponent>(entity);
+		auto& transform = m_Scene->GetComponent<WorldTransformComponent>(entity);
+
+		PointLightData data;
+		data.position = glm::vec3(transform.GetMatrix()[3]);
+		data.color = light.color;
+		data.intensity = light.intensity;
+		data.radius = light.radius;
+
+		lights.push_back(data);
+	}
+
+	return lights;
 }
 
+/**
+ * @brief Collects the main directional light from the scene if available.
+ * @return An optional containing the directional light data, or nullopt if no directional light is present.
+ */
+std::optional<DirectionalLightData> Engine::CollectDirectionalLight() noexcept
+{
+	auto view = m_Scene->GetRegistry().view<DirectionalLightComponent, WorldTransformComponent>();
 
+	for (auto entity : view)
+	{
+		auto& light = m_Scene->GetComponent<DirectionalLightComponent>(entity);
+		auto& transform = m_Scene->GetComponent<WorldTransformComponent>(entity);
 
+		DirectionalLightData data;
+		data.direction = transform.GetForward();
+		data.color = light.color;
+		data.intensity = light.intensity;
+		data.castShadows = light.castShadows;
+
+		return data;
+	}
+
+	return std::nullopt;
+}
+
+/**
+ * @brief Shuts down the Engine and deinitializes all resources.
+ * Cleans up the renderer and terminates GLFW.
+ */
+void Engine::Shutdown()
+{
+	if (m_Renderer)
+		m_Renderer->Shutdown();
+
+	glfwTerminate();
+}

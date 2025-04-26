@@ -51,12 +51,12 @@ public:
 	static Window Create(const std::string& title, int width, int height) noexcept;
 	void Init();
 
-	GLFWwindow* GetGLFWWindow() const noexcept
+	inline GLFWwindow* GetGLFWWindow() const noexcept
 	{
 		return m_Window;
 	}
 
-	const std::string& GetTitle() const noexcept
+	inline const std::string& GetTitle() const noexcept
 	{
 		return m_WindowData.title;
 	}
@@ -69,7 +69,7 @@ public:
 		return m_WindowData.size;
 	}
 
-	void Shutdown() const
+	inline void Shutdown() const
 	{
 		glfwDestroyWindow(m_Window);
 	}

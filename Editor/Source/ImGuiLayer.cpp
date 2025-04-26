@@ -20,11 +20,6 @@ std::string OpenFolderDialog()
     return folderPath ? std::string(folderPath) : "";
 }
 
-ImGuiLayer::ImGuiLayer(Engine* engine)
-    : m_Engine(engine)
-{
-}
-
 ImGuiLayer::~ImGuiLayer()
 {
 }
@@ -96,10 +91,6 @@ void ImGuiLayer::OnRender()
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void ImGuiLayer::OnEvent()
-{
-    // Olayları işleyin (gerekirse)
-}
 
 void ImGuiLayer::DrawSceneHierarchyPanel(entt::registry& registry, entt::entity& selectedEntity)
 {
