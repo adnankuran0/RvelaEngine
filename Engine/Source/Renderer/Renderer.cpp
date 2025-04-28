@@ -99,7 +99,8 @@ void Renderer::Render(WorldTransformComponent& transform,
 
     m_DefaultShader.setVec3("camPos", camera->Position);
 
-    m_DefaultShader.setFloat("UVScale", 1.0f);
+    m_DefaultShader.setVec3("UVScale", material->UVScale);
+    m_DefaultShader.setVec3("UVOffset", material->UVOffset);
     m_DefaultShader.setVec3("albedoColor", material->albedoColor);
     m_DefaultShader.setFloat("metallicValue", material->metallic);
     m_DefaultShader.setFloat("roughnessValue", material->roughness);

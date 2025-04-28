@@ -7,6 +7,7 @@
 #include "../Core/Utils/Serializer.h"
 #include "../Core/Utils/MaterialManager.h"
 #include "UUIDGenerator.h"
+#include <glm/gtx/matrix_decompose.hpp>
 
 Scene::Scene() : m_Registry() {}
 
@@ -14,10 +15,10 @@ Scene::Scene() : m_Registry() {}
 
 
 Entity Scene::CreateEntity(const std::string& name) {
-    Entity entity(m_Registry.create(),this);
-    
-    entity.AddComponent<TransformComponent>(glm::vec3(0.0f),glm::vec3(0.0f),glm::vec3(1.0f));
-    entity.AddComponent<WorldTransformComponent>(glm::vec3(0.0f),glm::vec3(0.0f),glm::vec3(1.0f));
+    Entity entity(m_Registry.create(), this);
+
+    entity.AddComponent<TransformComponent>(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f));
+    entity.AddComponent<WorldTransformComponent>(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f));
     entity.AddComponent<SceneTreeComponent>();
     entity.AddComponent<TagComponent>(name);
     entity.AddComponent<UUIDComponent>(UUIDGenerator::Generate());
@@ -75,7 +76,6 @@ void Scene::DestroyEntity(entt::entity entity) {
     }
 
     m_Registry.destroy(entity);
-
     MaterialManager::ClearExpiredMaterials();
 }
 
@@ -90,6 +90,7 @@ Entity Scene::CreatePointLight()
 Entity Scene::CreateDirectionalLight()
 {
     Entity entity = CreateEntity("DirectionalLight");
+    GetComponent<TransformComponent>(entity).SetEulerRotation(glm::vec3(-45.0, 0.0, 0.0));
     AddComponent<DirectionalLightComponent>(entity);
     return entity;
 }
@@ -107,7 +108,7 @@ Entity Scene::LoadAsset(const std::string& path)
         rootEntity.AddComponent<MeshComponent>(path, meshDatas.back().meshIndex);
         rootEntity.GetComponent<TagComponent>().tag = meshDatas.back().name;
         auto& materialComponent = rootEntity.AddComponent<MaterialComponent>(meshDatas.front().materialPath);
-        
+
     }
     else
     {
@@ -123,7 +124,7 @@ Entity Scene::LoadAsset(const std::string& path)
 
         }
     }
-    
+
 
     return rootEntity;
 
@@ -203,24 +204,21 @@ void Scene::UpdateHierarchy() {
 void Scene::UpdateNodeRecursive(entt::entity entity,
     const glm::vec3& parentPos,
     const glm::quat& parentRot,
-    const glm::vec3& parentScale) {
-    if (!m_Registry.valid(entity)) return;
-
+    const glm::vec3& parentScale)
+{
     auto& transform = m_Registry.get<TransformComponent>(entity);
     auto& worldTransform = m_Registry.get<WorldTransformComponent>(entity);
 
-    glm::quat localRot = transform.GetQuaternion();
-    glm::quat worldRot = parentRot * localRot;
-
-    glm::vec3 scaledPos = transform.position * parentScale;
-    glm::vec3 worldPos = parentPos + parentRot * scaledPos;
-
+    // World transform hesaplama
+    glm::vec3 worldPos = parentPos + parentRot * (transform.position * parentScale);
+    glm::quat worldRot = parentRot * transform.rotation;
     glm::vec3 worldScale = parentScale * transform.scale;
 
     worldTransform.position = worldPos;
-    worldTransform.rotation = glm::degrees(glm::eulerAngles(worldRot));
+    worldTransform.rotation = worldRot;
     worldTransform.scale = worldScale;
 
+    // Çocukları güncelle
     auto& node = m_Registry.get<SceneTreeComponent>(entity);
     for (auto child : node.children) {
         UpdateNodeRecursive(child, worldPos, worldRot, worldScale);
@@ -276,13 +274,15 @@ void Scene::SetParent(entt::entity child, entt::entity parent) {
 
         glm::mat4 newLocalMatrix = parentInverseMatrix * childWorldMatrix;
 
-        glm::vec3 newScale, newRotation, newPosition;
-        DecomposeToEulerAngles(newLocalMatrix, newScale, newRotation, newPosition);
+        glm::vec3 scale, translation, skew;
+        glm::quat rotation;
+        glm::vec4 perspective;
+        glm::decompose(newLocalMatrix, scale, rotation, translation, skew, perspective);
 
         auto& childTransform = GetComponent<TransformComponent>(child);
-        childTransform.scale = newScale;
-        childTransform.rotation = newRotation;
-        childTransform.position = newPosition;
+        childTransform.position = translation;
+        childTransform.rotation = rotation; // Direkt quaternion ata
+        childTransform.scale = scale;
     }
     else {
         glm::vec3 scale, rotation, position;
@@ -302,16 +302,16 @@ void Scene::RemoveParent(entt::entity child) {
     auto& childNode = GetComponent<SceneTreeComponent>(child);
     UUID childUUID = GetComponent<UUIDComponent>(child).uuid;
 
+    // 1) World matrisi al
     glm::mat4 childWorldMatrix(1.0f);
     if (HasComponent<WorldTransformComponent>(child)) {
-        auto& childWorldTransform = GetComponent<WorldTransformComponent>(child);
-        childWorldMatrix = childWorldTransform.GetMatrix();
+        childWorldMatrix = GetComponent<WorldTransformComponent>(child).GetMatrix();
     }
     else {
-        auto& childTransform = GetComponent<TransformComponent>(child);
-        childWorldMatrix = childTransform.GetMatrix();
+        childWorldMatrix = GetComponent<TransformComponent>(child).GetMatrix();
     }
 
+    // 2) Parent ilişkisini kaldır
     if (childNode.parent != entt::null) {
         auto& parentNode = GetComponent<SceneTreeComponent>(childNode.parent);
         parentNode.children.erase(
@@ -323,15 +323,19 @@ void Scene::RemoveParent(entt::entity child) {
             parentNode.childrenUUIDs.end()
         );
     }
-
     childNode.parent = entt::null;
     childNode.parentUUID = 0;
 
-    glm::vec3 newScale, newRotation, newPosition;
-    DecomposeToEulerAngles(childWorldMatrix, newScale, newRotation, newPosition);
+    // 3) World pozisyon/ölçek/Euler elde et (istersen sadece pozisyon + ölçek dekompoze edebilirsin)
+    glm::vec3 newScale, newEuler, newPosition;
+    DecomposeToEulerAngles(childWorldMatrix, newScale, newEuler, newPosition);
 
-    auto& childTransform = GetComponent<TransformComponent>(child);
-    childTransform.position = newPosition;
-    childTransform.rotation = newRotation;
-    childTransform.scale = newScale;
+    // 4) World quaternion’ı al
+    glm::quat worldQuat = glm::quat_cast(childWorldMatrix);
+
+    // 5) TransformComponent’e ata
+    auto& tc = GetComponent<TransformComponent>(child);
+    tc.position = newPosition;
+    tc.scale = newScale;
+    tc.SetRotation(worldQuat);  // hem rotationı hem de rotation_degrees’ı günceller
 }

@@ -30,7 +30,7 @@ public:
 
     glm::mat4 projection;
 
-    float positionSmoothness = 10.0f;
+    float positionSmoothness = 20.0f;
     glm::vec3 targetPosition;
 
     EditorCamera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), int width = 1280, int height = 720)

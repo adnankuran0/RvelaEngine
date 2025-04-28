@@ -5,6 +5,7 @@
 #include "assimp/postprocess.h"
 #include "Core/Utils/MaterialManager.h"
 #include <filesystem>
+#include <mutex>
 
 //TODO: Move this function to its own place
 bool doesFileExist(const std::string& path) {
@@ -221,14 +222,22 @@ std::vector<MeshData> AssetManager::LoadModel(const std::string& path)
     return meshDatas;
 }
 
-//TODO: This function needs optimization
 MeshData AssetManager::LoadMesh(const std::string& modelPath, uint32_t meshIndex)
 {
-    static std::unordered_map<std::string, std::unique_ptr<Assimp::Importer>> importerCache;
-    static std::unordered_map<std::string, const aiScene*> modelCache;
+    struct ModelCacheEntry {
+        std::unique_ptr<Assimp::Importer> importer;
+        const aiScene* scene = nullptr;
+        std::unordered_map<unsigned int, std::string> materials;
+        std::vector<std::string> meshNames;
+    };
 
-    if (modelCache.find(modelPath) == modelCache.end())
-    {
+    static std::unordered_map<std::string, ModelCacheEntry> modelCache;
+    static std::mutex cacheMutex;
+
+    std::unique_lock<std::mutex> lock(cacheMutex);
+    auto& cacheEntry = modelCache[modelPath];
+
+    if (!cacheEntry.scene) {
         auto importer = std::make_unique<Assimp::Importer>();
         const aiScene* scene = importer->ReadFile(modelPath,
             aiProcess_Triangulate
@@ -236,76 +245,73 @@ MeshData AssetManager::LoadMesh(const std::string& modelPath, uint32_t meshIndex
             | aiProcess_GenSmoothNormals
         );
 
-        if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-        {
-            std::cout << "Model could not be loaded!\n";
+        if (!scene || (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) || !scene->mRootNode) {
+            modelCache.erase(modelPath);
+            std::cerr << "Failed to load model: " << modelPath << "\n";
+            return {};
         }
 
-        importerCache[modelPath] = std::move(importer);
-        modelCache[modelPath] = scene;
+        cacheEntry.importer = std::move(importer);
+        cacheEntry.scene = scene;
+
+        LoadMaterials(scene, cacheEntry.materials, modelPath);
+
+        cacheEntry.meshNames.resize(scene->mNumMeshes);
+        for (unsigned int i = 0; i < scene->mNumMeshes; ++i) {
+            FindNodeForMesh(scene->mRootNode, i, cacheEntry.meshNames[i]);
+        }
     }
 
-    const aiScene* scene = modelCache[modelPath];
+    const aiScene* scene = cacheEntry.scene;
+    if (meshIndex >= scene->mNumMeshes) {
+        std::cerr << "Invalid mesh index: " << meshIndex << " for model: " << modelPath << "\n";
+        return {};
+    }
+
     aiMesh* mesh = scene->mMeshes[meshIndex];
 
-    std::unordered_map<unsigned int, std::string> materials;
-    LoadMaterials(scene, materials, modelPath);
+    const bool hasNormals = mesh->HasNormals();
+    const bool hasTexCoords = mesh->mTextureCoords[0] != nullptr;
+    const size_t vertexSize = 3 + (hasNormals ? 3 : 3) + (hasTexCoords ? 2 : 2);
 
     std::vector<float> vertices;
-    vertices.reserve(mesh->mNumVertices * 8);
+    vertices.reserve(mesh->mNumVertices * vertexSize);
 
-    for (unsigned int j = 0; j < mesh->mNumVertices; j++)
-    {
-        vertices.push_back(mesh->mVertices[j].x);
-        vertices.push_back(mesh->mVertices[j].y);
-        vertices.push_back(mesh->mVertices[j].z);
+    for (unsigned int j = 0; j < mesh->mNumVertices; ++j) {
+        const aiVector3D& pos = mesh->mVertices[j];
+        vertices.insert(vertices.end(), { pos.x, pos.y, pos.z });
 
-        if (mesh->HasNormals())
-        {
-            vertices.push_back(mesh->mNormals[j].x);
-            vertices.push_back(mesh->mNormals[j].y);
-            vertices.push_back(mesh->mNormals[j].z);
+        if (hasNormals) {
+            const aiVector3D& normal = mesh->mNormals[j];
+            vertices.insert(vertices.end(), { normal.x, normal.y, normal.z });
         }
-        else
-        {
-            vertices.push_back(0.0f);
-            vertices.push_back(0.0f);
-            vertices.push_back(0.0f);
+        else {
+            vertices.insert(vertices.end(), { 0.0f, 0.0f, 0.0f });
         }
 
-        if (mesh->mTextureCoords[0])
-        {
-            vertices.push_back(mesh->mTextureCoords[0][j].x);
-            vertices.push_back(mesh->mTextureCoords[0][j].y);
+        if (hasTexCoords) {
+            const aiVector3D& texCoord = mesh->mTextureCoords[0][j];
+            vertices.insert(vertices.end(), { texCoord.x, texCoord.y });
         }
-        else
-        {
-            vertices.push_back(0.0f);
-            vertices.push_back(0.0f);
+        else {
+            vertices.insert(vertices.end(), { 0.0f, 0.0f });
         }
     }
 
     std::vector<unsigned int> indices;
     indices.reserve(mesh->mNumFaces * 3);
 
-    for (unsigned int j = 0; j < mesh->mNumFaces; j++)
-    {
-        aiFace face = mesh->mFaces[j];
-        for (unsigned int k = 0; k < face.mNumIndices; k++)
-        {
-            indices.push_back(face.mIndices[k]);
-        }
+    for (unsigned int j = 0; j < mesh->mNumFaces; ++j) {
+        const aiFace& face = mesh->mFaces[j];
+        indices.insert(indices.end(), face.mIndices, face.mIndices + face.mNumIndices);
     }
 
-    std::string meshName = "Unnamed";
-    FindNodeForMesh(scene->mRootNode, meshIndex, meshName);
-
     MeshData meshData;
-    meshData.vertices = vertices;
-    meshData.indices = indices;
-    meshData.indexCount = indices.size();
-    meshData.name = meshName;
-    meshData.materialPath = materials[mesh->mMaterialIndex];
+    meshData.vertices = std::move(vertices);
+    meshData.indices = std::move(indices);
+    meshData.indexCount = meshData.indices.size();
+    meshData.name = cacheEntry.meshNames[meshIndex];
+    meshData.materialPath = cacheEntry.materials[mesh->mMaterialIndex];
     meshData.meshIndex = meshIndex;
 
     return meshData;

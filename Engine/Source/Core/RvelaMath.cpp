@@ -1,4 +1,4 @@
-#include "rvelapch.h"
+﻿#include "rvelapch.h"
 #include "RvelaMath.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
@@ -46,11 +46,40 @@ void DecomposeToEulerAngles(const glm::mat4& worldMatrix, glm::vec3& scale, glm:
     rotation = degrees(rotation);
 }
 
-glm::quat EulerToQuat(const glm::vec3& eulerAngles)
-{
-    glm::quat qz = glm::angleAxis(glm::radians(eulerAngles.z), glm::vec3(0, 0, 1));
-    glm::quat qy = glm::angleAxis(glm::radians(eulerAngles.y), glm::vec3(0, 1, 0));
-    glm::quat qx = glm::angleAxis(glm::radians(eulerAngles.x), glm::vec3(1, 0, 0));
-    return qz * qy * qx;
+glm::quat EulerToQuat(const glm::vec3& eulerDegrees) {
+    glm::vec3 radians = glm::radians(eulerDegrees);
+    return
+        glm::angleAxis(radians.y, glm::vec3(0, 1, 0)) * // Y
+        glm::angleAxis(radians.x, glm::vec3(1, 0, 0)) * // X 
+        glm::angleAxis(radians.z, glm::vec3(0, 0, 1));  // Z
 }
 
+glm::vec3 QuatToEuler(const glm::quat& q) {
+    glm::mat3 m = glm::mat3_cast(q);
+
+    // YXZ sıralaması (Godot gibi)
+    float x, y, z;
+
+    // Pitch (X)
+    x = asin(-m[2][1]);
+
+    // Yaw (Y) ve Roll (Z) hesaplama
+    if (abs(cos(x)) > 1e-5f) { // Gimbal lock değilse
+        y = atan2(m[2][0], m[2][2]);
+        z = atan2(m[0][1], m[1][1]);
+    }
+    else { // Gimbal lock durumu
+        y = atan2(-m[0][2], m[0][0]);
+        z = 0.0f;
+    }
+
+    // Radyandan dereceye çevir
+    glm::vec3 result = glm::degrees(glm::vec3(x, y, z));
+
+    // Açıları -180° ile +180° aralığına getir
+    result.x = fmod(result.x + 180.0f, 360.0f) - 180.0f;
+    result.y = fmod(result.y + 180.0f, 360.0f) - 180.0f;
+    result.z = fmod(result.z + 180.0f, 360.0f) - 180.0f;
+
+    return result;
+}

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "glm/glm.hpp"
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtc/matrix_transform.hpp"
@@ -24,42 +24,46 @@ using UUID = uint64_t;
 class WorldTransformComponent : public Component {
 public:
     glm::vec3 position;
-    glm::vec3 rotation;
+    glm::quat rotation;
     glm::vec3 scale;
-    glm::mat4 fixRotation = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1, 0, 0));
+    glm::vec3 rotation_degrees = glm::vec3(0.0f);
 
     WorldTransformComponent() = default;
     WorldTransformComponent(glm::vec3 pos, glm::vec3 rot, glm::vec3 scl)
         : position(pos), rotation(rot), scale(scl) {
     }
 
-    glm::quat GetQuaternion() const {
-        return EulerToQuat(rotation);
+    glm::mat4 GetMatrix() const {
+        return glm::translate(glm::mat4(1.0f), position) *
+            glm::mat4_cast(rotation) *
+            glm::scale(glm::mat4(1.0f), scale);
     }
 
-    glm::mat4 GetMatrix() const {
-        return (glm::translate(glm::mat4(1.0f), position) *
-            glm::mat4_cast(GetQuaternion()) *
-            glm::scale(glm::mat4(1.0f), scale));
+    void SetEulerRotation(const glm::vec3& euler) {
+        rotation_degrees = euler;
+        rotation = EulerToQuat(rotation_degrees);
+    }
+    glm::vec3 GetEulerRotation() const {
+        return rotation_degrees;
     }
 
     glm::vec3 GetForward() const {
-        return glm::normalize(glm::mat3_cast(GetQuaternion()) * glm::vec3(0.0f, 0.0f, -1.0f));
+        return glm::normalize(glm::mat3_cast(rotation) * glm::vec3(0.0f, 0.0f, -1.0f));
     }
 
     glm::vec3 GetUp() const {
-        return glm::normalize(glm::mat3_cast(GetQuaternion()) * glm::vec3(0.0f, 1.0f, 0.0f));
+        return glm::normalize(glm::mat3_cast(rotation) * glm::vec3(0.0f, 1.0f, 0.0f));
     }
 
     glm::vec3 GetRight() const {
-        return glm::normalize(glm::mat3_cast(GetQuaternion()) * glm::vec3(1.0f, 0.0f, 0.0f));
+        return glm::normalize(glm::mat3_cast(rotation) * glm::vec3(1.0f, 0.0f, 0.0f));
     }
 
     std::string Serialize() const override
     {
         json j;
         j["position"] = { position.x,position.y,position.z };
-        j["rotation"] = { rotation.x,rotation.y,rotation.z };
+        j["rotation"] = { rotation_degrees.x, rotation_degrees.y, rotation_degrees.z };
         j["scale"] = { scale.x,scale.y,scale.z };
 
         return j.dump(4);
@@ -70,52 +74,64 @@ public:
         auto positionData = j["position"];
         position = glm::vec3(positionData[0], positionData[1], positionData[2]);
         auto rotationData = j["rotation"];
-        rotation = glm::vec3(rotationData[0], rotationData[1], rotationData[2]);
+        glm::vec3 euler(rotationData[0], rotationData[1], rotationData[2]);
+        SetEulerRotation(euler);
         auto scaleData = j["scale"];
         scale = glm::vec3(scaleData[0], scaleData[1], scaleData[2]);
-        
+
     }
 };
 
 class TransformComponent : public Component {
 public:
     glm::vec3 position;
-    glm::vec3 rotation;
+    glm::quat rotation;
     glm::vec3 scale;
-    glm::mat4 fixRotation = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1, 0, 0));
+    glm::vec3 rotation_degrees = glm::vec3(0.0f);
+
 
     TransformComponent() = default;
     TransformComponent(glm::vec3 pos, glm::vec3 rot, glm::vec3 scl)
         : position(pos), rotation(rot), scale(scl) {
     }
 
-    glm::quat GetQuaternion() const {
-        return EulerToQuat(rotation);
+    void SetEulerRotation(const glm::vec3& euler) {
+        rotation_degrees = euler;
+        rotation = EulerToQuat(rotation_degrees);
+    }
+    glm::vec3 GetEulerRotation() const {
+        return rotation_degrees;
+    }
+
+    void SetRotation(const glm::quat& quat)
+    {
+        rotation = quat;
+        rotation_degrees = QuatToEuler(quat);
     }
 
     glm::mat4 GetMatrix() const {
-        return (glm::translate(glm::mat4(1.0f), position) *
-            glm::mat4_cast(GetQuaternion()) *
-            glm::scale(glm::mat4(1.0f), scale));
+        return glm::translate(glm::mat4(1.0f), position) *
+            glm::mat4_cast(rotation) *
+            glm::scale(glm::mat4(1.0f), scale);
     }
 
     glm::vec3 GetForward() const {
-        return glm::normalize(glm::mat3_cast(GetQuaternion()) * glm::vec3(0.0f, 0.0f, -1.0f));
+        return glm::normalize(glm::mat3_cast(rotation) * glm::vec3(0.0f, 0.0f, -1.0f));
     }
 
     glm::vec3 GetUp() const {
-        return glm::normalize(glm::mat3_cast(GetQuaternion()) * glm::vec3(0.0f, 1.0f, 0.0f));
+        return glm::normalize(glm::mat3_cast(rotation) * glm::vec3(0.0f, 1.0f, 0.0f));
     }
 
     glm::vec3 GetRight() const {
-        return glm::normalize(glm::mat3_cast(GetQuaternion()) * glm::vec3(1.0f, 0.0f, 0.0f));
+        return glm::normalize(glm::mat3_cast(rotation) * glm::vec3(1.0f, 0.0f, 0.0f));
     }
 
     std::string Serialize() const override
     {
         json j;
         j["position"] = { position.x,position.y,position.z };
-        j["rotation"] = { rotation.x,rotation.y,rotation.z };
+        j["rotation"] = { rotation_degrees.x, rotation_degrees.y, rotation_degrees.z };
         j["scale"] = { scale.x,scale.y,scale.z };
 
         return j.dump(4);
@@ -126,7 +142,8 @@ public:
         auto positionData = j["position"];
         position = glm::vec3(positionData[0], positionData[1], positionData[2]);
         auto rotationData = j["rotation"];
-        rotation = glm::vec3(rotationData[0], rotationData[1], rotationData[2]);
+        glm::vec3 euler(rotationData[0], rotationData[1], rotationData[2]);
+        SetEulerRotation(euler);
         auto scaleData = j["scale"];
         scale = glm::vec3(scaleData[0], scaleData[1], scaleData[2]);
 
@@ -153,10 +170,10 @@ public:
         auto tagData = j["tag"];
         tag = tagData;
     }
-    
+
 };
 
-class MeshRendererComponent{
+class MeshRendererComponent {
 public:
     VertexArray VAO;
     VertexBuffer VBO;
@@ -168,8 +185,8 @@ public:
     MeshRendererComponent& operator=(const MeshRendererComponent&) = delete;
     MeshRendererComponent(MeshRendererComponent&&) = default;
     MeshRendererComponent& operator=(MeshRendererComponent&&) = default;
-    MeshRendererComponent(void* vertices,size_t sizeOfVertices,void* indices,size_t sizeOfIndices,unsigned int indexCount)
-    { 
+    MeshRendererComponent(void* vertices, size_t sizeOfVertices, void* indices, size_t sizeOfIndices, unsigned int indexCount)
+    {
         this->indexCount = indexCount;
 
         VAO.Bind();
@@ -254,7 +271,7 @@ public:
         material = MaterialManager::LoadOrGetMaterial(materialPath);
     }
 
-    
+
 
     std::string Serialize() const override
     {
@@ -272,7 +289,7 @@ public:
     }
 
     std::shared_ptr<Material> material;
-    
+
 
 private:
     std::string materialPath;
@@ -314,7 +331,7 @@ public:
     UUID uuid;
 
     UUIDComponent() = default;
-    UUIDComponent(UUID uuid):uuid(uuid){}
+    UUIDComponent(UUID uuid) :uuid(uuid) {}
 
     std::string Serialize() const override
     {
@@ -369,12 +386,12 @@ public:
 
     glm::vec3 color = glm::vec3(1.0f);
     float intensity = 10.0f;
-    bool castShadows = true;              
+    bool castShadows = true;
     float shadowBias = 0.005f;
 
     std::string Serialize() const override
     {
-        json j; 
+        json j;
         j["color"] = { color.r,color.g,color.b };
         j["intensity"] = intensity;
         return j.dump(4);
@@ -393,14 +410,15 @@ class SpotLightComponent : public Component
 {
 public:
     SpotLightComponent() = default;
-    SpotLightComponent(const glm::vec3& color, float intensity,float radius, float innerCutoff,float outerCutoff)
-        : color(color), intensity(intensity), radius(radius), innerCutoff(glm::cos(glm::radians(innerCutoff))), outerCutoff(glm::cos(glm::radians(outerCutoff)))  { }
+    SpotLightComponent(const glm::vec3& color, float intensity, float radius, float innerCutoff, float outerCutoff)
+        : color(color), intensity(intensity), radius(radius), innerCutoff(glm::cos(glm::radians(innerCutoff))), outerCutoff(glm::cos(glm::radians(outerCutoff))) {
+    }
 
     glm::vec3 color = glm::vec3(1.0f);
     float intensity = 1.0f;
     float radius = 5.0f;
-    float innerCutoff = glm::cos(glm::radians(15.0f)); 
-    float outerCutoff = glm::cos(glm::radians(30.0f)); 
+    float innerCutoff = glm::cos(glm::radians(15.0f));
+    float outerCutoff = glm::cos(glm::radians(30.0f));
 
     std::string Serialize() const override
     {

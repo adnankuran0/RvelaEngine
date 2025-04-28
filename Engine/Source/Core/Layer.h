@@ -15,7 +15,7 @@ public:
 	virtual void OnLateUpdate() {}
 	virtual void OnRender() {}
 
-	const std::string& GetName() const { return m_DebugName; }
+	inline const std::string& GetName() const noexcept { return m_DebugName; }
 
 protected:
 	std::string m_DebugName;
