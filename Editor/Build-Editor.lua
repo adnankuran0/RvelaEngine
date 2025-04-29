@@ -45,7 +45,7 @@ project "Editor"
        runtime "Debug"
        symbols "On"
        postbuildcommands {
-        "{COPY} ../Vendor/Assimp/lib/assimp-vc143-mtd.dll ../Binaries/" .. OutputDir .. "/Editor/" }
+        "{COPY} ../Vendor/Assimp/lib/assimp-vc143-mt.dll ../Binaries/" .. OutputDir .. "/Editor/" }
 
    filter "configurations:Release"
        defines { "RELEASE" }
