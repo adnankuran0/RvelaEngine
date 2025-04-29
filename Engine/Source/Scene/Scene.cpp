@@ -90,7 +90,7 @@ Entity Scene::CreatePointLight()
 Entity Scene::CreateDirectionalLight()
 {
     Entity entity = CreateEntity("DirectionalLight");
-    GetComponent<TransformComponent>(entity).SetEulerRotation(glm::vec3(-45.0, 0.0, 0.0));
+    GetComponent<TransformComponent>(entity).SetEulerRotation(glm::vec3(-60.0, -90.0, 0.0));
     AddComponent<DirectionalLightComponent>(entity);
     return entity;
 }

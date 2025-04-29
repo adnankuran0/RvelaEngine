@@ -13,7 +13,6 @@
 #include "Core/RvelaMath.h"
 #include "entt/entt.h"
 #include "../Renderer/Material.h"
-#include <memory>
 #include "Component.h"
 #include "../nlohmann/json.hpp"
 #include "Core/Utils/MaterialManager.h"

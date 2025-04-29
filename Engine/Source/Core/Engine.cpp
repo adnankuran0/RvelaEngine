@@ -32,6 +32,8 @@ Engine::Engine()
 	}
 
 	m_Renderer->Init(m_Window->GetGLFWWindow());
+
+	Time::SetMaxFPS(0);
 }
 
 /**

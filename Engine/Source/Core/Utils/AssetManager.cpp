@@ -4,7 +4,6 @@
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
 #include "Core/Utils/MaterialManager.h"
-#include <filesystem>
 #include <mutex>
 
 //TODO: Move this function to its own place

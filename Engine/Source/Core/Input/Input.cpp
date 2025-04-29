@@ -2,6 +2,7 @@
 #include "../Engine.h"
 #include "Input.h"
 
+
 // Cache for the last known mouse position to avoid redundant GLFW calls
 glm::vec2 Input::s_LastMousePosition = { 0.0f, 0.0f };
 

@@ -17,8 +17,6 @@ void MaterialManager::CreateMaterial(const std::string& path, MaterialData& mate
         //materialMap.erase(path);
     }
 
-    //auto mat = std::make_shared<Material>(std::move(materialData));
-    //materialMap[path] = mat;
 
     Serializer::SaveToFile(materialData, path);
 

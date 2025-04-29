@@ -1,9 +1,7 @@
 #pragma once
 
 #include "Renderer/Material.h"
-#include <fstream>
 #include <unordered_map>
-#include <memory>
 
 class MaterialManager
 {
