@@ -277,46 +277,47 @@ void ImGuiLayer::DrawInspectorPanel(entt::registry& registry, entt::entity& sele
             }
         }
 
+        if (registry.any_of<TransformComponent>(selectedEntity)) {
+            if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
+                auto& transform = registry.get<TransformComponent>(selectedEntity);
 
-        if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
-            auto& transform = registry.get<TransformComponent>(selectedEntity);
+                static bool lockScaleRatio = true;
+                static glm::vec3 lastScale = transform.scale;
 
-            static bool lockScaleRatio = true;
-            static glm::vec3 lastScale = transform.scale;
+                glm::vec3 euler = transform.GetEulerRotation();
 
-            glm::vec3 euler = transform.GetEulerRotation();
+                ImGui::DragFloat3("Position", &transform.position[0], 0.1f);
 
-            ImGui::DragFloat3("Position", &transform.position[0], 0.1f);
+                if (ImGui::DragFloat3("Rotation", &euler[0], 0.1f, -360, 360)) {
+                    transform.SetEulerRotation(euler);
+                }
 
-            if (ImGui::DragFloat3("Rotation", &euler[0], 0.1f, -360, 360)) {
-                transform.SetEulerRotation(euler);
-            }
+                ImGui::PushID("ScaleControls");
+                ImGui::DragFloat3("Scale", &transform.scale[0], 0.1f, 0.01f, 10.0f);
+                ImGui::Checkbox("Lock Ratio", &lockScaleRatio);
+                ImGui::PopID();
 
-            ImGui::PushID("ScaleControls");
-            ImGui::DragFloat3("Scale", &transform.scale[0], 0.1f, 0.01f, 10.0f);
-            ImGui::Checkbox("Lock Ratio", &lockScaleRatio);
-            ImGui::PopID();
-
-            if (lockScaleRatio) {
-                for (int i = 0; i < 3; i++) {
-                    if (transform.scale[i] != lastScale[i]) {
-                        float ratio = transform.scale[i] / lastScale[i];
-                        for (int j = 0; j < 3; j++) {
-                            if (i != j) {
-                                transform.scale[j] *= ratio;
+                if (lockScaleRatio) {
+                    for (int i = 0; i < 3; i++) {
+                        if (transform.scale[i] != lastScale[i]) {
+                            float ratio = transform.scale[i] / lastScale[i];
+                            for (int j = 0; j < 3; j++) {
+                                if (i != j) {
+                                    transform.scale[j] *= ratio;
+                                }
                             }
+                            break;
                         }
-                        break;
                     }
                 }
-            }
 
-            lastScale = transform.scale;
+                lastScale = transform.scale;
 
-            if (ImGui::Button("Reset Transform")) {
-                transform.position = { 0.0f, 0.0f, 0.0f };
-                transform.SetEulerRotation({ 0.0f, 0.0f, 0.0f });
-                transform.scale = { 1.0f, 1.0f, 1.0f };
+                if (ImGui::Button("Reset Transform")) {
+                    transform.position = { 0.0f, 0.0f, 0.0f };
+                    transform.SetEulerRotation({ 0.0f, 0.0f, 0.0f });
+                    transform.scale = { 1.0f, 1.0f, 1.0f };
+                }
             }
         }
 

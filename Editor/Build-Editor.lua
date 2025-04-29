@@ -44,15 +44,21 @@ project "Editor"
        defines { "DEBUG" }
        runtime "Debug"
        symbols "On"
+       postbuildcommands {
+        "{COPY} ../Vendor/Assimp/lib/assimp-vc143-mtd.dll ../Binaries/" .. OutputDir .. "/Editor/" }
 
    filter "configurations:Release"
        defines { "RELEASE" }
        runtime "Release"
        optimize "On"
        symbols "On"
+       postbuildcommands {
+        "{COPY} ../Vendor/Assimp/lib/assimp-vc143-mt.dll ../Binaries/" .. OutputDir .. "/Editor/"}
 
    filter "configurations:Dist"
        defines { "DIST" }
        runtime "Release"
        optimize "On"
        symbols "Off"
+
+   

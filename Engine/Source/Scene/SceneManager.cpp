@@ -71,8 +71,9 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
 
     auto& registry = scene.GetRegistry();
     for (auto entity : registry.view<UUIDComponent>())
+    {
         scene.DestroyEntity(entity);
-    
+    }
 
     std::unordered_map<UUID, entt::entity> uuidToEntity;
 
@@ -176,5 +177,8 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
     }
 
     scene.UpdateHierarchy();
+
+    std::cout << "Scene loading complete\n";
+    
     
 }
