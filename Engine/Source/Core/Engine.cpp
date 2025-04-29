@@ -1,4 +1,4 @@
-#include "rvelapch.h"
+﻿#include "rvelapch.h"
 
 #include "RvelaLog.h"
 #include "Engine.h"
@@ -33,7 +33,6 @@ Engine::Engine()
 
 	m_Renderer->Init(m_Window->GetGLFWWindow());
 
-	Time::SetMaxFPS(0);
 }
 
 /**
@@ -83,6 +82,9 @@ void Engine::Update()
  */
 void Engine::FixedUpdate()
 {
+	static double lastTime = glfwGetTime();
+	double currentTime = glfwGetTime();
+	lastTime = currentTime;
 	for (Layer* layer : m_LayerStack)
 		layer->OnFixedUpdate();
 }

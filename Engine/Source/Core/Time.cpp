@@ -9,7 +9,7 @@ int Time::frameCount = 0;
 double Time::fps = 0.0f;
 double Time::timeScale = 1.0f;
 double Time::maxFPS = 360.0;
-double Time::fixedDeltaTime = 0.02; // 20ms default fixed timestep
+double Time::fixedDeltaTime = 1.0 / 60.0; // 20ms default fixed timestep
 double Time::fixedTimeAccumulator = 0.0;
 
 /**
