@@ -28,16 +28,16 @@ Renderer::~Renderer()
 void Renderer::Init(GLFWwindow* window)
 {
     Renderer::activeWindow = window;
-    m_DefaultShader.Init("D:/GitHub/RvelaEngine/Resources/Engine/Shaders/vertex.glsl", "D:/GitHub/RvelaEngine/Resources/Engine/Shaders/fragment.glsl");
-    m_SkyboxShader.Init("D:/GitHub/RvelaEngine/Resources/Engine/Shaders/skyboxVert.glsl", "D:/GitHub/RvelaEngine/Resources/Engine/Shaders/skyboxFrag.glsl");
+    m_DefaultShader.Init("C:/RvelaEngine/Resources/Engine/Shaders/vertex.glsl", "C:/RvelaEngine/Resources/Engine/Shaders/fragment.glsl");
+    m_SkyboxShader.Init("C:/RvelaEngine/Resources/Engine/Shaders/skyboxVert.glsl", "C:/RvelaEngine/Resources/Engine/Shaders/skyboxFrag.glsl");
 
     std::vector<std::string> faces = {
-    "D:/GitHub/RvelaEngine/Resources/Engine/Textures/skybox/right.jpg",
-    "D:/GitHub/RvelaEngine/Resources/Engine/Textures/skybox/left.jpg",
-    "D:/GitHub/RvelaEngine/Resources/Engine/Textures/skybox/top.jpg",
-    "D:/GitHub/RvelaEngine/Resources/Engine/Textures/skybox/bottom.jpg",
-    "D:/GitHub/RvelaEngine/Resources/Engine/Textures/skybox/front.jpg",
-    "D:/GitHub/RvelaEngine/Resources/Engine/Textures/skybox/back.jpg"
+    "C:/RvelaEngine/Resources/Engine/Textures/skybox/right.jpg",
+    "C:/RvelaEngine/Resources/Engine/Textures/skybox/left.jpg",
+    "C:/RvelaEngine/Resources/Engine/Textures/skybox/top.jpg",
+    "C:/RvelaEngine/Resources/Engine/Textures/skybox/bottom.jpg",
+    "C:/RvelaEngine/Resources/Engine/Textures/skybox/front.jpg",
+    "C:/RvelaEngine/Resources/Engine/Textures/skybox/back.jpg"
     };
     m_Skybox.Init(faces);
 }
