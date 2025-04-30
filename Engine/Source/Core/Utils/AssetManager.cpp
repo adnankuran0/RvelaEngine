@@ -210,7 +210,7 @@ std::vector<MeshData> AssetManager::LoadModel(const std::string& path)
         MeshData data;
         data.vertices = vertices;
         data.indices = indices;
-        data.indexCount = indices.size();
+        data.indexCount = (unsigned int) indices.size();
         data.name = meshName; 
         data.materialPath = materials[mesh->mMaterialIndex];
         data.meshIndex = i;
@@ -308,7 +308,7 @@ MeshData AssetManager::LoadMesh(const std::string& modelPath, uint32_t meshIndex
     MeshData meshData;
     meshData.vertices = std::move(vertices);
     meshData.indices = std::move(indices);
-    meshData.indexCount = meshData.indices.size();
+    meshData.indexCount = (unsigned int) meshData.indices.size();
     meshData.name = cacheEntry.meshNames[meshIndex];
     meshData.materialPath = cacheEntry.materials[mesh->mMaterialIndex];
     meshData.meshIndex = meshIndex;

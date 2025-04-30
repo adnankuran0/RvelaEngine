@@ -18,7 +18,7 @@ public:
      *
      * @param mouseCode The mouse button code representing the button.
      */
-    inline explicit MouseButtonEvent(MouseCode mouseCode) noexcept : m_MouseCode(mouseCode) {}
+    MouseButtonEvent(MouseCode mouseCode) noexcept : m_MouseCode(mouseCode) {}
 
     /**
      * @brief Retrieves the mouse button code associated with the event.
@@ -51,7 +51,7 @@ public:
      *
      * @return EventType The event type (MouseButtonPressed).
      */
-    inline inline EventType GetEventType() const noexcept override { return EventType::MouseButtonPressed; }
+    inline EventType GetEventType() const noexcept override { return EventType::MouseButtonPressed; }
 
     /**
      * @brief Retrieves the name of the event for debugging or logging.

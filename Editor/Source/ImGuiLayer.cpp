@@ -5,6 +5,11 @@
 #include "ImGui/tinyfiledialogs.h"
 #include "Core/Utils/Serializer.h"
 
+static bool createProjectRequested = false;
+static char projectNameBuffer[128] = "";
+
+
+
 void SetModernDarkImGuiStyle()
 {
     ImGuiStyle& style = ImGui::GetStyle();
@@ -141,6 +146,8 @@ void ImGuiLayer::OnRender()
     ImGui::SetNextWindowSize(ImVec2(ImGui::GetIO().DisplaySize.x * 0.2f, ImGui::GetIO().DisplaySize.y));
 #endif
     DrawInspectorPanel(m_Engine->GetScene()->GetRegistry(), selectedEntity);
+    DrawCreateProjectPopup(m_Engine);
+
 
     ImGui::Begin("Engine Debug");
     ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
@@ -153,6 +160,32 @@ void ImGuiLayer::OnRender()
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
+void ImGuiLayer::DrawCreateProjectPopup(Engine* engine)
+{
+    if (createProjectRequested)
+    {
+        ImGui::Begin("New Project", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+
+        ImGui::Text("Project Name:");
+        ImGui::InputText("##projectname", projectNameBuffer, IM_ARRAYSIZE(projectNameBuffer));
+
+        if (ImGui::Button("Create")) {
+            std::string folder = OpenFolderDialog();
+            if (!folder.empty()) {
+                engine->GetProjectManager()->CreateProject(projectNameBuffer, folder);
+                createProjectRequested = false;
+            }
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Cancel")) {
+            createProjectRequested = false;
+        }
+
+        ImGui::End();
+    }
+}
 
 void ImGuiLayer::DrawSceneHierarchyPanel(entt::registry& registry, entt::entity& selectedEntity)
 {
@@ -287,18 +320,11 @@ void ImGuiLayer::DrawSceneHierarchyPanel(entt::registry& registry, entt::entity&
         {
             m_Engine->GetSceneManager()->LoadScene(*m_Engine->GetScene(), "C:/Users/adnan/Desktop/amcik.rscene");
         }
-
-        /*
         if (ImGui::MenuItem("Create Project"))
         {
-            std::string selectedFolder = OpenFolderDialog();
-            if (!selectedFolder.empty())
-            {
-                m_Engine->GetProjectManager()->CreateProject("TestProject", selectedFolder);
-            }
-            
+            createProjectRequested = true;
+            strcpy(projectNameBuffer, "");
         }
-        */
       
 
         ImGui::EndPopup();

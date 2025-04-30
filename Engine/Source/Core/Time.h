@@ -27,12 +27,12 @@ public:
 
     static void Update() noexcept;
 
-    inline static float GetDeltaTime() noexcept
+    inline static double GetDeltaTime() noexcept
     {
         return static_cast<float>(deltaTime);
     }
 
-    inline static float GetFixedDeltaTime() noexcept
+    inline static double GetFixedDeltaTime() noexcept
     {
         return fixedDeltaTime;
     }
@@ -47,12 +47,12 @@ public:
         fixedTimeAccumulator -= fixedDeltaTime;
     }
 
-    inline static float GetFixedTimeAccumulator() noexcept
+    inline static double GetFixedTimeAccumulator() noexcept
     {
         return fixedTimeAccumulator;
     }
 
-    inline static float GetFPS() noexcept
+    inline static double GetFPS() noexcept
     {
         return fps;
     }
@@ -62,17 +62,17 @@ public:
         timeScale = scale;
     }
 
-    inline static float GetTimeScale() noexcept
+    inline static double GetTimeScale() noexcept
     {
         return timeScale;
     }
 
-    inline static float GetTime() noexcept
+    inline static double GetTime() noexcept
     {
         return static_cast<float>(glfwGetTime());
     }
 
-    inline static float GetMaxFPS() noexcept
+    inline static double GetMaxFPS() noexcept
     {
         return maxFPS;
     }

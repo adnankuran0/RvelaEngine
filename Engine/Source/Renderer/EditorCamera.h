@@ -105,8 +105,8 @@ public:
 
     void ProcessKeyboard()
     {
-        float speed = Input::IsKeyPressed(KeyCode::LeftShift) ? SprintSpeed : MovementSpeed;
-        float velocity = speed * Time::GetDeltaTime();
+        double speed = Input::IsKeyPressed(KeyCode::LeftShift) ? SprintSpeed : MovementSpeed;
+        float velocity = (float)(speed * Time::GetDeltaTime());
         glm::vec3 movement(0.0f);
 
         if (Input::IsKeyPressed(KeyCode::W))

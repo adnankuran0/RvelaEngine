@@ -24,5 +24,6 @@ private:
     void DrawTransformEditor(entt::registry& registry, entt::entity selectedEntity);
     void DrawParentChildEditor(entt::registry& registry, entt::entity selectedEntity);
     void DrawInspectorPanel(entt::registry& registry, entt::entity& selectedEntity);
+    void DrawCreateProjectPopup(Engine* engine);
     void DrawMenuBar();
 };

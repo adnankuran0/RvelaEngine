@@ -22,9 +22,9 @@ using UUID = uint64_t;
 
 class WorldTransformComponent : public Component {
 public:
-    glm::vec3 position;
+    glm::vec3 position = glm::vec3(0.0f);
     glm::quat rotation;
-    glm::vec3 scale;
+    glm::vec3 scale = glm::vec3(1.0f);
     glm::vec3 rotation_degrees = glm::vec3(0.0f);
 
     WorldTransformComponent() = default;
@@ -83,9 +83,9 @@ public:
 
 class TransformComponent : public Component {
 public:
-    glm::vec3 position;
+    glm::vec3 position = glm::vec3(0.0f);
     glm::quat rotation;
-    glm::vec3 scale;
+    glm::vec3 scale = glm::vec3(1.0f);
     glm::vec3 rotation_degrees = glm::vec3(0.0f);
 
 

@@ -17,7 +17,7 @@ public:
      *
      * @param keyCode The key code representing the keyboard key.
      */
-    inline explicit KeyEvent(KeyCode keyCode) noexcept : m_KeyCode(keyCode) {}
+    KeyEvent(KeyCode keyCode) noexcept : m_KeyCode(keyCode) {}
 
     /**
      * @brief Retrieves the key code associated with the event.

@@ -1,6 +1,6 @@
 #pragma once
 
-enum MouseCode {
+enum class MouseCode {
     Button0 = 0,
     Button1 = 1,
     Button2 = 2,
