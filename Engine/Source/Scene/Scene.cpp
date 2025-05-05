@@ -139,12 +139,12 @@ Entity Scene::LoadPrimitive(const std::string& primitiveMeshName)
 {
     // Define primitive configurations
     static const std::unordered_map<std::string, PrimitiveConfig> primitiveMap = {
-        {"Cube", {"Cube", "C:/RvelaEngine/Resources/Engine/Models/cube.fbx"}},
-        {"Sphere", {"Sphere", "C:/RvelaEngine/Resources/Engine/Models/sphere.fbx"}},
-        {"Cylinder", {"Cylinder", "C:/RvelaEngine/Resources/Engine/Models/cylinder.fbx"}},
-        {"Cone", {"Cone", "C:/RvelaEngine/Resources/Engine/Models/cone.fbx"}},
-        {"Capsule", {"Capsule", "C:/RvelaEngine/Resources/Engine/Models/capsule.fbx"}},
-        {"Torus", {"Torus", "C:/RvelaEngine/Resources/Engine/Models/torus.fbx"}}
+        {"Cube", {"Cube", "D:/GitHub/RvelaEngine/Resources/Engine/Models/cube.fbx"}},
+        {"Sphere", {"Sphere", "D:/GitHub/RvelaEngine/Resources/Engine/Models/sphere.fbx"}},
+        {"Cylinder", {"Cylinder", "D:/GitHub/RvelaEngine/Resources/Engine/Models/cylinder.fbx"}},
+        {"Cone", {"Cone", "D:/GitHub/RvelaEngine/Resources/Engine/Models/cone.fbx"}},
+        {"Capsule", {"Capsule", "D:/GitHub/RvelaEngine/Resources/Engine/Models/capsule.fbx"}},
+        {"Torus", {"Torus", "D:/GitHub/RvelaEngine/Resources/Engine/Models/torus.fbx"}}
     };
 
     // Check if the primitive exists

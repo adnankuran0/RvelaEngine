@@ -75,3 +75,20 @@
 2025-04-30 23:02:21.716 INFO  [22464] [Window::Init@62] GLFW Initialized
 2025-04-30 23:02:22.730 INFO  [22464] [Window::Init@81] GLEW Initialized
 2025-04-30 23:02:22.730 INFO  [22464] [Window::Init@83] OpenGL Version: 3.3.0 NVIDIA 546.65
+2025-05-05 17:32:49.800 INFO  [12528] [Window::Init@62] GLFW Initialized
+2025-05-05 17:32:50.037 INFO  [12528] [Window::Init@81] GLEW Initialized
+2025-05-05 17:32:50.037 INFO  [12528] [Window::Init@83] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-05 17:32:50.038 ERROR [12528] [Shader::Init@34] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+2025-05-05 17:32:50.039 ERROR [12528] [Shader::Init@34] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+2025-05-05 17:35:19.484 INFO  [4948] [Window::Init@62] GLFW Initialized
+2025-05-05 17:35:19.695 INFO  [4948] [Window::Init@81] GLEW Initialized
+2025-05-05 17:35:19.696 INFO  [4948] [Window::Init@83] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-05 17:35:52.320 INFO  [19308] [Window::Init@62] GLFW Initialized
+2025-05-05 17:35:52.573 INFO  [19308] [Window::Init@81] GLEW Initialized
+2025-05-05 17:35:52.573 INFO  [19308] [Window::Init@83] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-05 17:36:19.656 INFO  [26516] [Window::Init@62] GLFW Initialized
+2025-05-05 17:36:19.884 INFO  [26516] [Window::Init@81] GLEW Initialized
+2025-05-05 17:36:19.884 INFO  [26516] [Window::Init@83] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-05 17:38:25.781 INFO  [7744] [Window::Init@62] GLFW Initialized
+2025-05-05 17:38:26.032 INFO  [7744] [Window::Init@81] GLEW Initialized
+2025-05-05 17:38:26.032 INFO  [7744] [Window::Init@83] OpenGL Version: 3.3.0 NVIDIA 572.70
