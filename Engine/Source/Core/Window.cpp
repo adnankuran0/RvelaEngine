@@ -3,40 +3,22 @@
 #include "RvelaLog.h"
 #include "Event/EventManager.h"
 
-/**
- * @brief Constructs a Window with default settings.
- *
- * Initializes the window using the default WindowData settings.
- */
 Window::Window() noexcept
 {
 	Init();
 }
 
-/**
- * @brief Constructs a Window with the specified settings.
- *
- * @param title The title of the window.
- * @param width The width of the window.
- * @param height The height of the window.
- */
 Window::Window(const std::string& title, int width, int height) noexcept
     :m_WindowData(title, width, height)
 {
 	Init();
 }
 
-/**
- * @brief Destroys the Window and releases its resources.
- */
 Window::~Window()
 {
 	Shutdown();
 }
 
-/*
-*@brief Sets GLFW callback functions to use in event system.
-*/
 void Window::SetCallbacks() noexcept
 {
     glfwSetKeyCallback(m_Window, KeyCallback);
@@ -46,12 +28,6 @@ void Window::SetCallbacks() noexcept
     glfwSetFramebufferSizeCallback(m_Window, FramebufferSizeCallback);
 }
 
-/**
- * @brief Initializes the GLFW window and sets up event callbacks.
- *
- * Initializes GLFW and GLEW, creates the window, sets up the OpenGL context,
- * and registers event callbacks for keyboard, mouse, and window events.
- */
 void Window::Init()
 {
     if (!glfwInit()) {
@@ -85,40 +61,16 @@ void Window::Init()
     SetCallbacks();
 }
 
-/**
- * @brief Creates a Window with default settings.
- *
- * @return Window A new Window instance with default settings.
- */
 Window Window::Create() noexcept
 {
     return Window{};
 }
 
-/**
- * @brief Creates a Window with the specified settings.
- *
- * @param title The title of the window.
- * @param width The width of the window.
- * @param height The height of the window.
- * @return Window A new Window instance with the specified settings.
- */
 Window Window::Create(const std::string& title, int width, int height) noexcept
 {
     return Window{ title, width, height };
 }
 
-/**
- * @brief Callback for keyboard events.
- *
- * Dispatches KeyPressedEvent or KeyReleasedEvent to the EventManager based on the action.
- *
- * @param window The GLFW window that received the event.
- * @param key The keyboard key that was pressed or released.
- * @param scancode The system-specific scancode of the key.
- * @param action The key action (GLFW_PRESS, GLFW_RELEASE, GLFW_REPEAT).
- * @param mods Bit field describing which modifier keys were held down.
- */
 void Window::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) noexcept
 {
     if (action == GLFW_PRESS) {
@@ -131,16 +83,6 @@ void Window::KeyCallback(GLFWwindow* window, int key, int scancode, int action, 
     }
 }
 
-/**
- * @brief Callback for mouse button events.
- *
- * Dispatches MouseButtonPressedEvent or MouseButtonReleasedEvent to the EventManager.
- *
- * @param window The GLFW window that received the event.
- * @param button The mouse button that was pressed or released.
- * @param action The button action (GLFW_PRESS, GLFW_RELEASE).
- * @param mods Bit field describing which modifier keys were held down.
- */
 void Window::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods) noexcept {
     if (action == GLFW_PRESS) {
         MouseCode mouseCode = static_cast<MouseCode>(button);
@@ -152,41 +94,14 @@ void Window::MouseButtonCallback(GLFWwindow* window, int button, int action, int
     }
 }
 
-/**
- * @brief Callback for mouse movement events.
- *
- * Dispatches a MouseMovedEvent to the EventManager with the new cursor position.
- *
- * @param window The GLFW window that received the event.
- * @param xpos The new x-coordinate of the cursor.
- * @param ypos The new y-coordinate of the cursor.
- */
 void Window::MouseMovedCallback(GLFWwindow* window, double xpos, double ypos) noexcept {
     EventManager::PushEvent(new MouseMovedEvent(static_cast<float>(xpos), static_cast<float>(ypos)));
 }
 
-/**
- * @brief Callback for mouse scroll events.
- *
- * Dispatches a MouseScrolledEvent to the EventManager with the scroll offset.
- *
- * @param window The GLFW window that received the event.
- * @param xoffset The scroll offset in the x direction.
- * @param yoffset The scroll offset in the y direction.
- */
 void Window::MouseScrolledCallback(GLFWwindow* window, double xoffset, double yoffset) noexcept {
     EventManager::PushEvent(new MouseScrolledEvent(static_cast<float>(xoffset), static_cast<float>(yoffset)));
 }
 
-/**
- * @brief Callback for framebuffer size change events.
- *
- * Updates the OpenGL viewport and dispatches a WindowResizedEvent to the EventManager.
- *
- * @param window The GLFW window that received the event.
- * @param width The new width of the framebuffer.
- * @param height The new height of the framebuffer.
- */
 void Window::FramebufferSizeCallback(GLFWwindow* window, int width, int height) noexcept {
     glViewport(0, 0, width, height);
     EventManager::PushEvent(new WindowResizedEvent(width, height));

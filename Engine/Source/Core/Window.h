@@ -4,11 +4,6 @@
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
 
-/**
- * @brief Represents the size of a window.
- *
- * Stores the width and height of a window, ensuring both values are non-negative.
- */
 struct WindowSize
 {
 	int width, height;
@@ -19,11 +14,6 @@ struct WindowSize
 	}
 };
 
-/**
- * @brief Stores window configuration data.
- *
- * Contains the title and size of a window, with default values for convenience.
- */
 struct WindowData
 {
 	std::string title;
@@ -33,13 +23,6 @@ struct WindowData
 	WindowData(const std::string& title, int width, int height) noexcept : title(title), size(width,height) {}
 };
 
-/**
- * @brief Manages a GLFW window and its associated events.
- *
- * The Window class encapsulates the creation, initialization, and management of
- * a GLFW window. It provides methods to access window properties and handle events
- * such as keyboard input, mouse actions, and window resizing through callbacks.
- */
 class Window
 {
 public:

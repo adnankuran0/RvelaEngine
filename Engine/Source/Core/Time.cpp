@@ -12,12 +12,6 @@ double Time::maxFPS = 360.0;
 double Time::fixedDeltaTime = 1.0 / 60.0; // 20ms default fixed timestep
 double Time::fixedTimeAccumulator = 0.0;
 
-/**
- * @brief Updates time-related metrics.
- *
- * Calculates the delta time, updates FPS, and applies FPS limiting if set.
- * Time values are handled in seconds internally for consistency.
- */
 void Time::Update() noexcept
 {
     // Ensure GLFW is initialized

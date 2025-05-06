@@ -367,7 +367,7 @@ void ImGuiLayer::DrawInspectorPanel(entt::registry& registry, entt::entity& sele
             if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
                 auto& transform = registry.get<TransformComponent>(selectedEntity);
 
-                static bool lockScaleRatio = true;
+                static bool lockScaleRatio = false;
                 static glm::vec3 lastScale = transform.scale;
 
                 glm::vec3 euler = transform.GetEulerRotation();

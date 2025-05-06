@@ -4,13 +4,6 @@
 #include <thread>
 #include <chrono>
 
-/**
- * @brief Manages time-related functionality for the game engine.
- *
- * The Time class provides a static interface to track and manage time-related metrics
- * such as delta time, frames per second (FPS), and time scaling. It also supports
- * FPS limiting and provides access to the current time since the application started.
- */
 class Time {
 private:
     static double lastFrameTime;  ///< The time of the last frame (in seconds).

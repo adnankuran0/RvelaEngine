@@ -6,11 +6,6 @@
 
 Engine* Engine::s_Instance = nullptr;
 
-
-/**
- * @brief Constructs the Engine, initializing core systems and singleton instance.
- * Initializes various subsystems like the window, renderer, scene, etc.
- */
 Engine::Engine()
 {
 	RvelaLog::Init("log.txt");
@@ -33,41 +28,23 @@ Engine::Engine()
 
 	m_Renderer->Init(m_Window->GetGLFWWindow());
 
-	Time::SetMaxFPS(0);
 }
 
-/**
- * @brief Destroys the Engine and shuts down all initialized systems.
- * Cleans up all resources before application termination.
- */
 Engine::~Engine()
 {
 	Shutdown();
 }
 
-/**
- * @brief Adds a new layer to the engine's layer stack.
- * Layers are used to manage various systems like rendering, UI, etc.
- * @param layer A pointer to the layer to be added.
- */
 void Engine::PushLayer(Layer* layer)
 {
 	m_LayerStack.PushLayer(layer);
 }
 
-/**
- * @brief Removes a layer from the engine's layer stack.
- * @param layer A pointer to the layer to be removed.
- */
 void Engine::PopLayer(Layer* layer)
 {
 	m_LayerStack.PopLayer(layer);
 }
 
-/**
- * @brief Updates all layers and core systems of the engine.
- * This is where most of the game logic and system updates occur.
- */
 void Engine::Update()
 {
 	for (Layer* layer : m_LayerStack)
@@ -78,9 +55,6 @@ void Engine::Update()
 	m_Scene->Update();
 }
 
-/**
- * @brief Performs fixed time updates for physics or other time-dependent systems.
- */
 void Engine::FixedUpdate()
 {
 	static double lastTime = glfwGetTime();
@@ -90,19 +64,12 @@ void Engine::FixedUpdate()
 		layer->OnFixedUpdate();
 }
 
-/**
- * @brief Performs late updates for things that should occur after the main update.
- */
 void Engine::LateUpdate()
 {
 	for (Layer* layer : m_LayerStack)
 		layer->OnLateUpdate();
 }
 
-/**
- * @brief Main execution loop for the engine.
- * Handles events, updates, rendering, and the main game loop.
- */
 void Engine::Run()
 {
 	while (!glfwWindowShouldClose(GetWindow()->GetGLFWWindow()))
@@ -129,10 +96,6 @@ void Engine::Run()
 	}
 }
 
-/**
- * @brief Handles all queued events such as mouse movement, scroll, etc.
- * Dispatches events to the appropriate handlers.
- */
 void Engine::HandleEvents() noexcept
 {
 	EventManager::DispatchEvents([this](Event& event) {
@@ -169,10 +132,6 @@ void Engine::HandleEvents() noexcept
 		});
 }
 
-/**
- * @brief Executes the rendering pipeline for the current frame.
- * Renders the scene, including skybox, mesh renderers, lights, etc.
- */
 void Engine::Render()
 {
 	Renderer::StartFrame();
@@ -205,10 +164,6 @@ void Engine::Render()
 	Renderer::EndFrame();
 }
 
-/**
- * @brief Collects all point lights from the scene.
- * @return A vector containing the data for all active point lights.
- */
 std::vector<PointLightData> Engine::CollectPointLights() noexcept
 {
 	std::vector<PointLightData> lights;
@@ -231,10 +186,6 @@ std::vector<PointLightData> Engine::CollectPointLights() noexcept
 	return lights;
 }
 
-/**
- * @brief Collects the main directional light from the scene if available.
- * @return An optional containing the directional light data, or nullopt if no directional light is present.
- */
 std::optional<DirectionalLightData> Engine::CollectDirectionalLight() noexcept
 {
 	auto view = m_Scene->GetRegistry().view<DirectionalLightComponent, WorldTransformComponent>();
@@ -256,10 +207,6 @@ std::optional<DirectionalLightData> Engine::CollectDirectionalLight() noexcept
 	return std::nullopt;
 }
 
-/**
- * @brief Shuts down the Engine and deinitializes all resources.
- * Cleans up the renderer and terminates GLFW.
- */
 void Engine::Shutdown()
 {
 	if (m_Renderer)

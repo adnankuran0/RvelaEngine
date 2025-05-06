@@ -9,14 +9,6 @@
 #include "WindowEvents.h"
 #include "KeyEvents.h"
 
-/**
- * @brief Manages the event queue and dispatches events to registered handlers.
- *
- * The EventManager class provides a centralized mechanism for collecting, storing,
- * and dispatching events in the game engine. It maintains a queue of events and
- * allows systems to push new events, clear the queue, and dispatch events to
- * handlers. All operations are static, making this a singleton-like utility class.
- */
 class EventManager {
 public:
 
