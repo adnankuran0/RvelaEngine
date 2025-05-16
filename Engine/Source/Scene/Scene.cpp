@@ -6,6 +6,7 @@
 #include "../Core/Utils/AssetManager.h"
 #include "../Core/Utils/Serializer.h"
 #include "../Core/Utils/MaterialManager.h"
+#include "../Core/Utils/ProjectManager.h"
 #include "UUIDGenerator.h"
 #include <glm/gtx/matrix_decompose.hpp>
 
