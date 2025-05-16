@@ -245,3 +245,6 @@
 2025-05-16 14:43:10.792 INFO  [22024] [Window::Init@38] GLFW Initialized
 2025-05-16 14:43:11.000 INFO  [22024] [Window::Init@57] GLEW Initialized
 2025-05-16 14:43:11.001 INFO  [22024] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-16 15:44:51.758 INFO  [18184] [Window::Init@38] GLFW Initialized
+2025-05-16 15:44:52.032 INFO  [18184] [Window::Init@57] GLEW Initialized
+2025-05-16 15:44:52.032 INFO  [18184] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
