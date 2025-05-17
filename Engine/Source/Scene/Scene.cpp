@@ -133,19 +133,19 @@ Entity Scene::LoadAsset(const std::string& path)
 
 struct PrimitiveConfig {
     std::string name;
-    std::string meshPath;
+    Path meshPath;
 };
 
 Entity Scene::LoadPrimitive(const std::string& primitiveMeshName)
 {
     // Define primitive configurations
     static const std::unordered_map<std::string, PrimitiveConfig> primitiveMap = {
-        {"Cube", {"Cube", "D:/GitHub/RvelaEngine/Resources/Engine/Models/cube.fbx"}},
-        {"Sphere", {"Sphere", "D:/GitHub/RvelaEngine/Resources/Engine/Models/sphere.fbx"}},
-        {"Cylinder", {"Cylinder", "D:/GitHub/RvelaEngine/Resources/Engine/Models/cylinder.fbx"}},
-        {"Cone", {"Cone", "D:/GitHub/RvelaEngine/Resources/Engine/Models/cone.fbx"}},
-        {"Capsule", {"Capsule", "D:/GitHub/RvelaEngine/Resources/Engine/Models/capsule.fbx"}},
-        {"Torus", {"Torus", "D:/GitHub/RvelaEngine/Resources/Engine/Models/torus.fbx"}}
+        {"Cube", {"Cube", TO_ABSOLUTE_PATH("Assets\\Models\\Primitives\\Cube.fbx")}},
+        {"Sphere", {"Sphere", TO_ABSOLUTE_PATH("Assets\\Models\\Primitives\\Sphere.fbx")}},
+        {"Cylinder", {"Cylinder", TO_ABSOLUTE_PATH("Assets\\Models\\Primitives\\Cylinder.fbx")}},
+        {"Cone", {"Cone", TO_ABSOLUTE_PATH("Assets\\Models\\Primitives\\Cone.fbx")}},
+        {"Capsule", {"Capsule", TO_ABSOLUTE_PATH("Assets\\Models\\Primitives\\Capsule.fbx")}},
+        {"Torus", {"Torus", TO_ABSOLUTE_PATH("Assets\\Models\\Primitives\\Torus.fbx")}}
     };
 
     // Check if the primitive exists
@@ -159,7 +159,7 @@ Entity Scene::LoadPrimitive(const std::string& primitiveMeshName)
 
     // Create entity and load mesh
     Entity rootEntity = CreateEntity(config.name);
-    MeshData meshData = AssetManager::LoadMesh(config.meshPath, 0);
+    MeshData meshData = AssetManager::LoadMesh(config.meshPath.GetAbsoluteStr(), 0);
 
     // Add components
     rootEntity.AddComponent<MeshRendererComponent>(
@@ -169,7 +169,7 @@ Entity Scene::LoadPrimitive(const std::string& primitiveMeshName)
         meshData.indices.size() * sizeof(unsigned int),
         meshData.indices.size()
     );
-    rootEntity.AddComponent<MeshComponent>(config.meshPath, meshData.meshIndex);
+    rootEntity.AddComponent<MeshComponent>(config.meshPath.GetAbsoluteStr(), meshData.meshIndex);
     rootEntity.GetComponent<TagComponent>().tag = meshData.name;
     rootEntity.AddComponent<MaterialComponent>(meshData.materialPath);
 

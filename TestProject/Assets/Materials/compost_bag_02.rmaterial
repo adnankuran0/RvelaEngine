@@ -1,0 +1,26 @@
+{
+    "UVOffset": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "UVScale": [
+        1.0,
+        1.0,
+        1.0
+    ],
+    "albedoColor": [
+        0.800000011920929,
+        0.800000011920929,
+        0.800000011920929
+    ],
+    "albedoMapPath": "C:/Users/adnan/Desktop/zubbik/Assets/Models/textures/compost_bag_02_diff_4k.png",
+    "ao": 1.0,
+    "aoMapPath": "",
+    "heightMapPath": "",
+    "metallic": 0.0,
+    "metallicMapPath": "",
+    "normalMapPath": "C:/Users/adnan/Desktop/zubbik/Assets/Models/textures/compost_bag_02_nor_gl_4k.png",
+    "roughness": 0.5,
+    "roughnessMapPath": "C:/Users/adnan/Desktop/zubbik/Assets/Models/textures/compost_bag_02_rough_4k.png"
+}

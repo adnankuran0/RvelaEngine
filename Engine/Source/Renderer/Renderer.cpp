@@ -1,11 +1,11 @@
 ﻿#include "rvelapch.h"
 #include "Renderer.h"
-
 #include "../RvelaLog.h"
 #include "Core/Input/Input.h"
 #include "Core/Time.h"
 #include "Core/Utils/MaterialManager.h"
 #include "Core/Utils/TextureManager.h"
+#include "Core/Utils/FileUtils.h"
 #include <algorithm>
 
 GLFWwindow* Renderer::activeWindow = nullptr;
@@ -28,16 +28,16 @@ Renderer::~Renderer()
 void Renderer::Init(GLFWwindow* window)
 {
     Renderer::activeWindow = window;
-    m_DefaultShader.Init("D:/GitHub/RvelaEngine/Resources/Engine/Shaders/vertex.glsl", "D:/GitHub/RvelaEngine/Resources/Engine/Shaders/fragment.glsl");
-    m_SkyboxShader.Init("D:/GitHub/RvelaEngine/Resources/Engine/Shaders/skyboxVert.glsl", "D:/GitHub/RvelaEngine/Resources/Engine/Shaders/skyboxFrag.glsl");
+    m_DefaultShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\vertex.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\fragment.glsl"));
+    m_SkyboxShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\skyboxVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\skyboxFrag.glsl"));
 
-    std::vector<std::string> faces = {
-    "D:/GitHub/RvelaEngine/Resources/Engine/Textures/skybox/right.jpg",
-    "D:/GitHub/RvelaEngine/Resources/Engine/Textures/skybox/left.jpg",
-    "D:/GitHub/RvelaEngine/Resources/Engine/Textures/skybox/top.jpg",
-    "D:/GitHub/RvelaEngine/Resources/Engine/Textures/skybox/bottom.jpg",
-    "D:/GitHub/RvelaEngine/Resources/Engine/Textures/skybox/front.jpg",
-    "D:/GitHub/RvelaEngine/Resources/Engine/Textures/skybox/back.jpg"
+    std::vector<Path> faces = {
+    TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\right.jpg"),
+    TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\left.jpg"),
+    TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\top.jpg"),
+    TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\bottom.jpg"),
+    TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\front.jpg"),
+    TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\back.jpg")
     };
     m_Skybox.Init(faces);
 }
@@ -80,8 +80,8 @@ void Renderer::Render(WorldTransformComponent& transform,
     m_DefaultShader.setBool("hasDirectionalLight", directionalLight != nullptr);
     if (directionalLight) {
         m_DefaultShader.setVec3("directionalLight.direction", directionalLight->direction);
-        m_DefaultShader.setVec3("directionalLight.color", directionalLight->color); // intensity çarpımı KALDIRILDI
-        m_DefaultShader.setFloat("directionalLight.intensity", directionalLight->intensity); // Yeni ekleme
+        m_DefaultShader.setVec3("directionalLight.color", directionalLight->color); 
+        m_DefaultShader.setFloat("directionalLight.intensity", directionalLight->intensity); 
         m_DefaultShader.setBool("directionalLight.castShadows", false);
     }
 

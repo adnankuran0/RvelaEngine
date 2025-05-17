@@ -120,10 +120,11 @@ void AssetManager::LoadMaterials(const aiScene* scene, std::unordered_map<unsign
         materialData.aoMapPath = aoPath;
         materialData.heightMapPath = heightPath;
 
-        std::string matSavePath = "C:/RvelaEngine/Resources/Engine/Materials/" + std::string(name.C_Str()) + ".rmaterial";
-        materials[i] = matSavePath;
+        Path matSavePath = TO_ABSOLUTE_PATH("Assets/Materials/" + 
+            std::string(name.C_Str()) + ".rmaterial").GetAbsolute();
+        materials[i] = matSavePath.GetAbsoluteStr();
         
-        MaterialManager::CreateMaterial(matSavePath, materialData);
+        MaterialManager::CreateMaterial(matSavePath.GetAbsoluteStr(), materialData);
         
     }
 

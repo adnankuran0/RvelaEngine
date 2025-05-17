@@ -13,7 +13,7 @@ public:
 		: name(name)
 	{
 
-		this->projectFolderPath = std::filesystem::path(projectFolderPath) / name;
+		this->projectFolderPath = std::filesystem::path(projectFolderPath);
 		
 	}
 

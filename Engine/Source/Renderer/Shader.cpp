@@ -3,12 +3,12 @@
 #include "Shader.h"
 #include "RvelaLog.h"
 
-Shader::Shader(const char* vertexPath, const char* fragmentPath)
+Shader::Shader(const Path& vertexPath, const Path& fragmentPath)
 {
     Init(vertexPath, fragmentPath);
 }
 
-bool Shader::Init(const char* vertexPath, const char* fragmentPath)
+bool Shader::Init(const Path& vertexPath, const Path& fragmentPath)
 {
     std::string vertexCode;
     std::string fragmentCode;
@@ -19,8 +19,8 @@ bool Shader::Init(const char* vertexPath, const char* fragmentPath)
 
     try
     {
-        vShaderFile.open(vertexPath);
-        fShaderFile.open(fragmentPath);
+        vShaderFile.open(vertexPath.GetAbsolute());
+        fShaderFile.open(fragmentPath.GetAbsolute());
         std::stringstream vShaderStream, fShaderStream;
         vShaderStream << vShaderFile.rdbuf();
         fShaderStream << fShaderFile.rdbuf();

@@ -248,3 +248,90 @@
 2025-05-16 15:44:51.758 INFO  [18184] [Window::Init@38] GLFW Initialized
 2025-05-16 15:44:52.032 INFO  [18184] [Window::Init@57] GLEW Initialized
 2025-05-16 15:44:52.032 INFO  [18184] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-17 03:21:24.560 INFO  [21956] [Window::Init@38] GLFW Initialized
+2025-05-17 03:21:24.970 INFO  [21956] [Window::Init@57] GLEW Initialized
+2025-05-17 03:21:24.970 INFO  [21956] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-17 03:31:34.978 INFO  [6204] [Window::Init@38] GLFW Initialized
+2025-05-17 03:31:35.289 INFO  [6204] [Window::Init@57] GLEW Initialized
+2025-05-17 03:31:35.289 INFO  [6204] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-17 03:35:08.668 INFO  [25284] [Window::Init@38] GLFW Initialized
+2025-05-17 03:35:08.976 INFO  [25284] [Window::Init@57] GLEW Initialized
+2025-05-17 03:35:08.976 INFO  [25284] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-17 03:36:30.807 INFO  [13944] [Window::Init@38] GLFW Initialized
+2025-05-17 03:36:31.137 INFO  [13944] [Window::Init@57] GLEW Initialized
+2025-05-17 03:36:31.137 INFO  [13944] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-17 03:38:23.198 INFO  [12600] [Window::Init@38] GLFW Initialized
+2025-05-17 03:38:23.501 INFO  [12600] [Window::Init@57] GLEW Initialized
+2025-05-17 03:38:23.501 INFO  [12600] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-17 03:39:37.571 INFO  [18680] [Window::Init@38] GLFW Initialized
+2025-05-17 03:39:37.850 INFO  [18680] [Window::Init@57] GLEW Initialized
+2025-05-17 03:39:37.850 INFO  [18680] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-17 03:44:05.384 INFO  [22868] [Window::Init@38] GLFW Initialized
+2025-05-17 03:44:05.693 INFO  [22868] [Window::Init@57] GLEW Initialized
+2025-05-17 03:44:05.693 INFO  [22868] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-17 03:44:05.697 ERROR [22868] [Shader::Init@34] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+2025-05-17 03:44:30.622 INFO  [5772] [Window::Init@38] GLFW Initialized
+2025-05-17 03:44:30.980 INFO  [5772] [Window::Init@57] GLEW Initialized
+2025-05-17 03:44:30.980 INFO  [5772] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-17 03:44:30.983 ERROR [5772] [Shader::Init@34] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+2025-05-17 03:45:03.852 INFO  [3824] [Window::Init@38] GLFW Initialized
+2025-05-17 03:45:04.265 INFO  [3824] [Window::Init@57] GLEW Initialized
+2025-05-17 03:45:04.265 INFO  [3824] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-17 03:45:04.268 ERROR [3824] [Shader::Init@34] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+2025-05-17 03:45:45.632 INFO  [22876] [Window::Init@38] GLFW Initialized
+2025-05-17 03:45:45.943 INFO  [22876] [Window::Init@57] GLEW Initialized
+2025-05-17 03:45:45.943 INFO  [22876] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-17 03:45:45.945 ERROR [22876] [Shader::Init@34] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+2025-05-17 03:46:08.413 INFO  [2260] [Window::Init@38] GLFW Initialized
+2025-05-17 03:46:08.746 INFO  [2260] [Window::Init@57] GLEW Initialized
+2025-05-17 03:46:08.746 INFO  [2260] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-17 03:46:08.749 ERROR [2260] [Shader::Init@34] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+2025-05-17 03:52:01.450 INFO  [3036] [Window::Init@38] GLFW Initialized
+2025-05-17 03:52:01.767 INFO  [3036] [Window::Init@57] GLEW Initialized
+2025-05-17 03:52:01.767 INFO  [3036] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-17 03:52:01.768 ERROR [3036] [Shader::Init@34] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+2025-05-17 03:58:19.331 INFO  [14388] [Window::Init@38] GLFW Initialized
+2025-05-17 03:58:19.657 INFO  [14388] [Window::Init@57] GLEW Initialized
+2025-05-17 03:58:19.657 INFO  [14388] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-17 03:58:45.989 INFO  [3836] [Window::Init@38] GLFW Initialized
+2025-05-17 03:58:46.296 INFO  [3836] [Window::Init@57] GLEW Initialized
+2025-05-17 03:58:46.296 INFO  [3836] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-17 16:59:29.493 INFO  [20832] [Window::Init@38] GLFW Initialized
+2025-05-17 16:59:29.731 INFO  [20832] [Window::Init@57] GLEW Initialized
+2025-05-17 16:59:29.731 INFO  [20832] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-17 17:13:17.927 INFO  [19948] [Window::Init@38] GLFW Initialized
+2025-05-17 17:13:18.156 INFO  [19948] [Window::Init@57] GLEW Initialized
+2025-05-17 17:13:18.156 INFO  [19948] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-17 17:27:11.217 INFO  [5096] [Window::Init@38] GLFW Initialized
+2025-05-17 17:27:11.448 INFO  [5096] [Window::Init@57] GLEW Initialized
+2025-05-17 17:27:11.448 INFO  [5096] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-17 17:32:39.719 INFO  [13988] [Window::Init@38] GLFW Initialized
+2025-05-17 17:32:40.011 INFO  [13988] [Window::Init@57] GLEW Initialized
+2025-05-17 17:32:40.011 INFO  [13988] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-17 17:36:12.488 INFO  [3032] [Window::Init@38] GLFW Initialized
+2025-05-17 17:36:12.781 INFO  [3032] [Window::Init@57] GLEW Initialized
+2025-05-17 17:36:12.781 INFO  [3032] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-17 17:54:20.116 INFO  [13100] [Window::Init@38] GLFW Initialized
+2025-05-17 17:54:20.370 INFO  [13100] [Window::Init@57] GLEW Initialized
+2025-05-17 17:54:20.370 INFO  [13100] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-17 17:56:29.890 INFO  [22756] [Window::Init@38] GLFW Initialized
+2025-05-17 17:56:30.159 INFO  [22756] [Window::Init@57] GLEW Initialized
+2025-05-17 17:56:30.160 INFO  [22756] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-17 17:57:23.453 INFO  [22444] [Window::Init@38] GLFW Initialized
+2025-05-17 17:57:23.686 INFO  [22444] [Window::Init@57] GLEW Initialized
+2025-05-17 17:57:23.686 INFO  [22444] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-17 18:15:54.464 INFO  [10648] [Window::Init@38] GLFW Initialized
+2025-05-17 18:15:54.775 INFO  [10648] [Window::Init@57] GLEW Initialized
+2025-05-17 18:15:54.775 INFO  [10648] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-17 18:16:12.699 INFO  [7756] [Window::Init@38] GLFW Initialized
+2025-05-17 18:16:13.001 INFO  [7756] [Window::Init@57] GLEW Initialized
+2025-05-17 18:16:13.002 INFO  [7756] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-17 18:19:10.289 INFO  [11708] [Window::Init@38] GLFW Initialized
+2025-05-17 18:19:10.510 INFO  [11708] [Window::Init@57] GLEW Initialized
+2025-05-17 18:19:10.510 INFO  [11708] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-17 18:19:52.249 INFO  [3600] [Window::Init@38] GLFW Initialized
+2025-05-17 18:19:52.495 INFO  [3600] [Window::Init@57] GLEW Initialized
+2025-05-17 18:19:52.495 INFO  [3600] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-17 18:20:45.943 INFO  [24052] [Window::Init@38] GLFW Initialized
+2025-05-17 18:20:46.200 INFO  [24052] [Window::Init@57] GLEW Initialized
+2025-05-17 18:20:46.200 INFO  [24052] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70

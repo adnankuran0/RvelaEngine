@@ -1,8 +1,7 @@
 #include "rvelapch.h"
 #include "FileUtils.h"
 
-#define VIRTUAL_PATH(x) Path::FromVirtual(x)
-#define ABSOLUTE_PATH(x) Path::FromAbsolute(x)
+
 
 Path::Path(const std::filesystem::path& path, bool isVirual)
 {
@@ -39,6 +38,11 @@ std::filesystem::path Path::GetAbsolute() const
 std::string Path::String() const
 {
 	return m_VirtualPath.string();
+}
+
+const char* Path::C_str() const
+{
+	return String().c_str();
 }
 
 bool Path::IsValid() const
