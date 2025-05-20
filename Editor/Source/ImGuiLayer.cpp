@@ -314,11 +314,11 @@ void ImGuiLayer::DrawSceneHierarchyPanel(entt::registry& registry, entt::entity&
         }
         if (ImGui::MenuItem("Save Scene"))
         {
-            m_Engine->GetSceneManager()->SaveScene(*m_Engine->GetScene(), "C:/Users/adnan/Desktop/amcik.rscene");
+            m_Engine->GetSceneManager()->SaveScene(*m_Engine->GetScene(), "D:\\GitHub\\RvelaEngine\\TestProject\\Scenes\\Test.rscene");
         }
         if (ImGui::MenuItem("Load Scene"))
         {
-            m_Engine->GetSceneManager()->LoadScene(*m_Engine->GetScene(), "C:/Users/adnan/Desktop/amcik.rscene");
+            m_Engine->GetSceneManager()->LoadScene(*m_Engine->GetScene(), "D:\\GitHub\\RvelaEngine\\TestProject\\Scenes\\Test.rscene");
         }
         if (ImGui::MenuItem("Create Project"))
         {
@@ -412,7 +412,7 @@ void ImGuiLayer::DrawInspectorPanel(entt::registry& registry, entt::entity& sele
             if (ImGui::CollapsingHeader("Mesh", ImGuiTreeNodeFlags_DefaultOpen))
             {
                 auto& meshComponent = registry.get<MeshComponent>(selectedEntity);
-                ImGui::Text("Model Path: %s", meshComponent.modelPath.c_str());
+                ImGui::Text("Model Path: %s", meshComponent.modelPath.GetAbsoluteStr().c_str());
                 ImGui::Text("Mesh Index: %s", std::to_string(meshComponent.meshIndex));
             }
         }
@@ -457,7 +457,7 @@ void ImGuiLayer::DrawInspectorPanel(entt::registry& registry, entt::entity& sele
                 MaterialComponent& materialComponent = registry.get<MaterialComponent>(selectedEntity);
                 const ISerializable* materialSerializable = std::static_pointer_cast<const ISerializable>(materialComponent.material).get();
 
-                ImGui::Text("Material Path: %s", materialComponent.GetMaterialPath().c_str());
+                ImGui::Text("Material Path: %s", materialComponent.GetMaterialPath().GetAbsoluteStr().c_str());
             
                 glm::vec3 albedoColor = materialComponent.material->albedoColor;
                 float color[3] = { albedoColor.r, albedoColor.g, albedoColor.b };
@@ -465,19 +465,19 @@ void ImGuiLayer::DrawInspectorPanel(entt::registry& registry, entt::entity& sele
                 if (ImGui::ColorPicker3("Albedo", color)) {
                     materialComponent.material->albedoColor = glm::vec3(color[0], color[1], color[2]);
                     
-                    Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath());
+                    Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath().GetAbsoluteStr());
                 }
 
                 if (ImGui::SliderFloat("AO", &materialComponent.material->ao, 0.0f, 1.0f)) {
-                    Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath());
+                    Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath().GetAbsoluteStr());
                 }
 
                 if (ImGui::SliderFloat("Metallic", &materialComponent.material->metallic, 0.0f, 1.0f)) {
-                    Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath());
+                    Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath().GetAbsoluteStr());
                 }
 
                 if (ImGui::SliderFloat("Roughness", &materialComponent.material->roughness, 0.0f, 1.0f)) {
-                    Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath());
+                    Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath().GetAbsoluteStr());
                 }
 
             }

@@ -2,6 +2,7 @@
 #include "Material.h"
 #include "../nlohmann/json.hpp"
 #include "Core/Utils/TextureManager.h"
+#include "RvelaLog.h"
 
 using json = nlohmann::json;
 
@@ -22,12 +23,12 @@ std::string Material::Serialize() const
     j["UVScale"] = { UVScale.x , UVScale.y, UVScale.z };
     j["UVOffset"] = { UVOffset.x , UVOffset.y, UVOffset.z };
 
-	j["albedoMapPath"] = albedoMapPath;
-	j["normalMapPath"] = normalMapPath;
-	j["metallicMapPath"] = metallicMapPath;
-	j["roughnessMapPath"] = roughnessMapPath;
-	j["aoMapPath"] = aoMapPath;
-	j["heightMapPath"] = heightMapPath;
+	j["albedoMapPath"] = albedoMapPath.GetVirtualStr();
+	j["normalMapPath"] = normalMapPath.GetVirtualStr();
+	j["metallicMapPath"] = metallicMapPath.GetVirtualStr();
+	j["roughnessMapPath"] = roughnessMapPath.GetVirtualStr();
+	j["aoMapPath"] = aoMapPath.GetVirtualStr();
+    j["heightMapPath"] = heightMapPath.GetVirtualStr();
 
 	return j.dump(4);
 }
@@ -48,12 +49,12 @@ void Material::Deserialize(const std::string& jsonStr)
     auto uvOffset = j["UVOffset"];
     UVOffset = glm::vec3(uvOffset[0], uvOffset[1], uvOffset[2]);
 
-    albedoMapPath = j["albedoMapPath"];
-    normalMapPath = j["normalMapPath"];
-    metallicMapPath = j["metallicMapPath"];
-    roughnessMapPath = j["roughnessMapPath"];
-    aoMapPath = j["aoMapPath"];
-    heightMapPath = j["heightMapPath"];
+    albedoMapPath = TO_ABSOLUTE_PATH(j["albedoMapPath"]);
+    normalMapPath = TO_ABSOLUTE_PATH(j["normalMapPath"]);
+    metallicMapPath = TO_ABSOLUTE_PATH(j["metallicMapPath"]);
+    roughnessMapPath = TO_ABSOLUTE_PATH(j["roughnessMapPath"]);
+    aoMapPath = TO_ABSOLUTE_PATH(j["aoMapPath"]);
+    heightMapPath = TO_ABSOLUTE_PATH(j["heightMapPath"]);
 }
 
 std::string MaterialData::Serialize() const
@@ -67,12 +68,12 @@ std::string MaterialData::Serialize() const
     j["UVScale"] = { UVScale.x , UVScale.y, UVScale.z };
     j["UVOffset"] = { UVOffset.x , UVOffset.y, UVOffset.z };
 
-    j["albedoMapPath"] = albedoMapPath;
-    j["normalMapPath"] = normalMapPath;
-    j["metallicMapPath"] = metallicMapPath;
-    j["roughnessMapPath"] = roughnessMapPath;
-    j["aoMapPath"] = aoMapPath;
-    j["heightMapPath"] = heightMapPath;
+    j["albedoMapPath"] = albedoMapPath.GetVirtualStr();
+    j["normalMapPath"] = normalMapPath.GetVirtualStr();
+    j["metallicMapPath"] = metallicMapPath.GetVirtualStr();
+    j["roughnessMapPath"] = roughnessMapPath.GetVirtualStr();
+    j["aoMapPath"] = aoMapPath.GetVirtualStr();
+    j["heightMapPath"] = heightMapPath.GetVirtualStr();
 
     return j.dump(4);
 }
@@ -93,12 +94,12 @@ void MaterialData::Deserialize(const std::string& jsonStr)
     auto uvOffset = j["UVOffset"];
     UVOffset = glm::vec3(uvOffset[0], uvOffset[1], uvOffset[2]);
 
-    albedoMapPath = j["albedoMapPath"];
-    normalMapPath = j["normalMapPath"];
-    metallicMapPath = j["metallicMapPath"];
-    roughnessMapPath = j["roughnessMapPath"];
-    aoMapPath = j["aoMapPath"];
-    heightMapPath = j["heightMapPath"];
+    albedoMapPath = TO_ABSOLUTE_PATH(j["albedoMapPath"]);
+    normalMapPath = TO_ABSOLUTE_PATH(j["normalMapPath"]);
+    metallicMapPath = TO_ABSOLUTE_PATH(j["metallicMapPath"]);
+    roughnessMapPath = TO_ABSOLUTE_PATH(j["roughnessMapPath"]);
+    aoMapPath = TO_ABSOLUTE_PATH(j["aoMapPath"]);
+    heightMapPath = TO_ABSOLUTE_PATH(j["heightMapPath"]);
 }
 
 void Material::LoadTextures()

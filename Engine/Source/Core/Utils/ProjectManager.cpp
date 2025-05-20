@@ -58,16 +58,4 @@ std::shared_ptr<Project> ProjectManager::GetActiveProject()
 	return m_ActiveProject;
 }
 
-std::filesystem::path ProjectManager::GetAbsolutePath(const std::string& relativePath)
-{
-	std::filesystem::path _relativePath = std::filesystem::path(relativePath);
-	return m_ProjectFolderPath / relativePath;
-}
 
-std::filesystem::path ProjectManager::GetVirtualPath(const std::string& absolutePath)
-{
-	std::filesystem::path absPath = std::filesystem::absolute(absolutePath);
-	if (absPath.string().find(m_ProjectFolderPath.string()) == 0)
-		return std::filesystem::relative(absPath, m_ProjectFolderPath);
-	return {};
-}

@@ -101,7 +101,8 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
         {
             std::string serializedMat = entityJson["MaterialComponent"];
             json j = json::parse(serializedMat);
-            std::string newMaterialPath = j["materialPath"];
+            std::string newMaterialPathData = j["materialPath"];
+            Path newMaterialPath = TO_ABSOLUTE_PATH(newMaterialPathData);
 
             scene.AddComponent<MaterialComponent>(entity, newMaterialPath);
             auto& mat = scene.GetComponent<MaterialComponent>(entity);
@@ -117,11 +118,11 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
 
             auto meshStart = std::chrono::high_resolution_clock::now();
                 
-            MeshData meshData = AssetManager::LoadMesh(newModelPath, meshIndex);
+            MeshData meshData = AssetManager::LoadMesh(TO_ABSOLUTE_PATH(newModelPath), meshIndex);
             auto meshEnd = std::chrono::high_resolution_clock::now();
             meshLoadTotal += std::chrono::duration_cast<std::chrono::milliseconds>(meshEnd - meshStart);
 
-            scene.AddComponent<MeshComponent>(entity, newModelPath, meshIndex);
+            scene.AddComponent<MeshComponent>(entity, TO_ABSOLUTE_PATH(newModelPath), meshIndex);
             scene.AddComponent<MeshRendererComponent>(entity, meshData.vertices.data(),
                 meshData.vertices.size() * sizeof(float),
                 meshData.indices.data(),

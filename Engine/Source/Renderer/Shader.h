@@ -4,16 +4,17 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "Core/Utils/FileUtils.h"
 
 
 class Shader
 {
 public:
     unsigned int ID;
-    Shader(const char* vertexPath, const char* fragmentPath);
+    Shader(const Path& vertexPath, const Path& fragmentPath);
     Shader() = default;
 
-    bool Init(const char* vertexPath, const char* fragmentPath);
+    bool Init(const Path& vertexPath, const Path& fragmentPath);
 
     void Destroy();
 

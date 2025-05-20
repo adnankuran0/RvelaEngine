@@ -1,0 +1,26 @@
+{
+    "UVOffset": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "UVScale": [
+        1.0,
+        1.0,
+        1.0
+    ],
+    "albedoColor": [
+        0.800000011920929,
+        0.800000011920929,
+        0.800000011920929
+    ],
+    "albedoMapPath": "C:/Users/adnan/Desktop/TestAssets/gallinera_chair_1k/textures/gallinera_chair_diff_1k.png",
+    "ao": 1.0,
+    "aoMapPath": "",
+    "heightMapPath": "",
+    "metallic": 0.0,
+    "metallicMapPath": "",
+    "normalMapPath": "C:/Users/adnan/Desktop/TestAssets/gallinera_chair_1k/textures/gallinera_chair_nor_gl_1k.png",
+    "roughness": 0.5,
+    "roughnessMapPath": "C:/Users/adnan/Desktop/TestAssets/gallinera_chair_1k/textures/gallinera_chair_rough_1k.png"
+}

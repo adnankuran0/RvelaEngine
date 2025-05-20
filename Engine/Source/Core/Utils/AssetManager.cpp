@@ -5,6 +5,8 @@
 #include "assimp/postprocess.h"
 #include "Core/Utils/MaterialManager.h"
 #include <mutex>
+#include "FileUtils.h"
+#include "RvelaLog.h"
 
 //TODO: Move this function to its own place
 bool doesFileExist(const std::string& path) {
@@ -27,11 +29,11 @@ void FindNodeForMesh(aiNode* node, unsigned int meshIndex, std::string& meshName
     }
 }
 
-fs::path AssetManager::FindTexturePath(const std::string& modelPath, const aiString& texPath)
+fs::path AssetManager::FindTexturePath(const Path modelPath, const aiString& texPath)
 {
     std::vector<std::string> possibleExtensions = { ".png", ".jpg", ".jpeg", ".tga", ".bmp" };
 
-    fs::path modelFsPath(modelPath);
+    fs::path modelFsPath(modelPath.GetAbsoluteStr());
     fs::path modelDir = modelFsPath.parent_path();
 
     fs::path textureFullPath = modelDir / texPath.C_Str();
@@ -54,7 +56,7 @@ fs::path AssetManager::FindTexturePath(const std::string& modelPath, const aiStr
     return "";
 }
 
-void AssetManager::LoadMaterials(const aiScene* scene, std::unordered_map<unsigned int, std::string>& materials, const std::string& modelPath)
+void AssetManager::LoadMaterials(const aiScene* scene, std::unordered_map<unsigned int, std::string>& materials, const Path modelPath)
 {
     if (!scene->HasMaterials()) return;
 
@@ -113,15 +115,16 @@ void AssetManager::LoadMaterials(const aiScene* scene, std::unordered_map<unsign
             }
         }
 
-        materialData.albedoMapPath = albedoPath;
-        materialData.normalMapPath = normalPath;
-        materialData.roughnessMapPath = roughnessPath;
-        materialData.metallicMapPath = metallicPath;
-        materialData.aoMapPath = aoPath;
-        materialData.heightMapPath = heightPath;
+        materialData.albedoMapPath = TO_ABSOLUTE_PATH(albedoPath);
+        materialData.normalMapPath = TO_ABSOLUTE_PATH(normalPath);
+        materialData.roughnessMapPath = TO_ABSOLUTE_PATH(roughnessPath);
+        materialData.metallicMapPath = TO_ABSOLUTE_PATH(metallicPath);
+        materialData.aoMapPath = TO_ABSOLUTE_PATH(aoPath);
+        materialData.heightMapPath = TO_ABSOLUTE_PATH(heightPath);
 
-        std::string matSavePath = "C:/RvelaEngine/Resources/Engine/Materials/" + std::string(name.C_Str()) + ".rmaterial";
-        materials[i] = matSavePath;
+        Path matSavePath = TO_ABSOLUTE_PATH("Assets/Materials/" + 
+            std::string(name.C_Str()) + ".rmaterial").GetAbsolute();
+        materials[i] = matSavePath.GetAbsoluteStr();
         
         MaterialManager::CreateMaterial(matSavePath, materialData);
         
@@ -129,10 +132,10 @@ void AssetManager::LoadMaterials(const aiScene* scene, std::unordered_map<unsign
 
 }
 
-std::vector<MeshData> AssetManager::LoadModel(const std::string& path)
+std::vector<MeshData> AssetManager::LoadModel(const Path path)
 {
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(path,
+    const aiScene* scene = importer.ReadFile(path.GetAbsoluteStr(),
         aiProcess_Triangulate
         | aiProcess_FlipUVs
         | aiProcess_GenSmoothNormals
@@ -212,7 +215,7 @@ std::vector<MeshData> AssetManager::LoadModel(const std::string& path)
         data.indices = indices;
         data.indexCount = (unsigned int) indices.size();
         data.name = meshName; 
-        data.materialPath = materials[mesh->mMaterialIndex];
+        data.materialPath = TO_ABSOLUTE_PATH(materials[mesh->mMaterialIndex]);
         data.meshIndex = i;
 
         meshDatas.push_back(data);
@@ -221,7 +224,7 @@ std::vector<MeshData> AssetManager::LoadModel(const std::string& path)
     return meshDatas;
 }
 
-MeshData AssetManager::LoadMesh(const std::string& modelPath, uint32_t meshIndex)
+MeshData AssetManager::LoadMesh(const Path modelPath, uint32_t meshIndex)
 {
     struct ModelCacheEntry {
         std::unique_ptr<Assimp::Importer> importer;
@@ -234,19 +237,19 @@ MeshData AssetManager::LoadMesh(const std::string& modelPath, uint32_t meshIndex
     static std::mutex cacheMutex;
 
     std::unique_lock<std::mutex> lock(cacheMutex);
-    auto& cacheEntry = modelCache[modelPath];
+    auto& cacheEntry = modelCache[modelPath.GetAbsoluteStr()];
 
     if (!cacheEntry.scene) {
         auto importer = std::make_unique<Assimp::Importer>();
-        const aiScene* scene = importer->ReadFile(modelPath,
+        const aiScene* scene = importer->ReadFile(modelPath.GetAbsoluteStr(),
             aiProcess_Triangulate
             | aiProcess_FlipUVs
             | aiProcess_GenSmoothNormals
         );
 
         if (!scene || (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) || !scene->mRootNode) {
-            modelCache.erase(modelPath);
-            std::cerr << "Failed to load model: " << modelPath << "\n";
+            modelCache.erase(modelPath.GetAbsoluteStr());
+            std::cerr << "Failed to load model: " << modelPath.GetAbsoluteStr() << "\n";
             return {};
         }
 
@@ -263,7 +266,7 @@ MeshData AssetManager::LoadMesh(const std::string& modelPath, uint32_t meshIndex
 
     const aiScene* scene = cacheEntry.scene;
     if (meshIndex >= scene->mNumMeshes) {
-        std::cerr << "Invalid mesh index: " << meshIndex << " for model: " << modelPath << "\n";
+        std::cerr << "Invalid mesh index: " << meshIndex << " for model: " << modelPath.GetAbsoluteStr() << "\n";
         return {};
     }
 
@@ -310,7 +313,7 @@ MeshData AssetManager::LoadMesh(const std::string& modelPath, uint32_t meshIndex
     meshData.indices = std::move(indices);
     meshData.indexCount = (unsigned int) meshData.indices.size();
     meshData.name = cacheEntry.meshNames[meshIndex];
-    meshData.materialPath = cacheEntry.materials[mesh->mMaterialIndex];
+    meshData.materialPath = TO_ABSOLUTE_PATH(cacheEntry.materials[mesh->mMaterialIndex]);
     meshData.meshIndex = meshIndex;
 
     return meshData;

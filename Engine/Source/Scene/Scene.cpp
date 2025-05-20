@@ -100,13 +100,13 @@ Entity Scene::LoadAsset(const std::string& path)
 {
     Entity rootEntity = CreateEntity("Model");
 
-    std::vector<MeshData> meshDatas = AssetManager::LoadModel(path);
+    std::vector<MeshData> meshDatas = AssetManager::LoadModel(TO_ABSOLUTE_PATH(path));
 
     if (meshDatas.size() == 1)
     {
         rootEntity.AddComponent<MeshRendererComponent>(meshDatas.back().vertices.data(), meshDatas.back().vertices.size() * sizeof(float),
             meshDatas.back().indices.data(), meshDatas.back().indices.size() * sizeof(unsigned int), meshDatas.back().indices.size());
-        rootEntity.AddComponent<MeshComponent>(path, meshDatas.back().meshIndex);
+        rootEntity.AddComponent<MeshComponent>(TO_ABSOLUTE_PATH(path), meshDatas.back().meshIndex);
         rootEntity.GetComponent<TagComponent>().tag = meshDatas.back().name;
         auto& materialComponent = rootEntity.AddComponent<MaterialComponent>(meshDatas.front().materialPath);
 
@@ -119,7 +119,7 @@ Entity Scene::LoadAsset(const std::string& path)
             SetParent(meshEntity, rootEntity);
             meshEntity.AddComponent<MeshRendererComponent>(meshData.vertices.data(), meshData.vertices.size() * sizeof(float),
                 meshData.indices.data(), meshData.indices.size() * sizeof(unsigned int), meshData.indices.size());
-            meshEntity.AddComponent<MeshComponent>(path, meshData.meshIndex);
+            meshEntity.AddComponent<MeshComponent>(TO_ABSOLUTE_PATH(path), meshData.meshIndex);
             meshEntity.GetComponent<TagComponent>().tag = meshData.name;
             auto& materialComponent = meshEntity.AddComponent<MaterialComponent>(meshData.materialPath);
 
@@ -133,19 +133,19 @@ Entity Scene::LoadAsset(const std::string& path)
 
 struct PrimitiveConfig {
     std::string name;
-    std::string meshPath;
+    Path meshPath;
 };
 
 Entity Scene::LoadPrimitive(const std::string& primitiveMeshName)
 {
     // Define primitive configurations
     static const std::unordered_map<std::string, PrimitiveConfig> primitiveMap = {
-        {"Cube", {"Cube", "D:/GitHub/RvelaEngine/Resources/Engine/Models/cube.fbx"}},
-        {"Sphere", {"Sphere", "D:/GitHub/RvelaEngine/Resources/Engine/Models/sphere.fbx"}},
-        {"Cylinder", {"Cylinder", "D:/GitHub/RvelaEngine/Resources/Engine/Models/cylinder.fbx"}},
-        {"Cone", {"Cone", "D:/GitHub/RvelaEngine/Resources/Engine/Models/cone.fbx"}},
-        {"Capsule", {"Capsule", "D:/GitHub/RvelaEngine/Resources/Engine/Models/capsule.fbx"}},
-        {"Torus", {"Torus", "D:/GitHub/RvelaEngine/Resources/Engine/Models/torus.fbx"}}
+        {"Cube", {"Cube", TO_ABSOLUTE_PATH("Assets\\Models\\Primitives\\Cube.fbx")}},
+        {"Sphere", {"Sphere", TO_ABSOLUTE_PATH("Assets\\Models\\Primitives\\Sphere.fbx")}},
+        {"Cylinder", {"Cylinder", TO_ABSOLUTE_PATH("Assets\\Models\\Primitives\\Cylinder.fbx")}},
+        {"Cone", {"Cone", TO_ABSOLUTE_PATH("Assets\\Models\\Primitives\\Cone.fbx")}},
+        {"Capsule", {"Capsule", TO_ABSOLUTE_PATH("Assets\\Models\\Primitives\\Capsule.fbx")}},
+        {"Torus", {"Torus", TO_ABSOLUTE_PATH("Assets\\Models\\Primitives\\Torus.fbx")}}
     };
 
     // Check if the primitive exists

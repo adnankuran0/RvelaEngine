@@ -7,7 +7,7 @@
 class ShaderManager
 {
 public:
-    static std::shared_ptr<Shader> LoadOrGetShader(const std::string& name, const std::string& vertexPath, const std::string& fragmentPath);
+    static std::shared_ptr<Shader> LoadOrGetShader(const std::string& name, const Path& vertexPath, const Path& fragmentPath);
     static std::shared_ptr<Shader> GetShader(const std::string& name);
     static void Clear();
 

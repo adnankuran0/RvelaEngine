@@ -23,12 +23,12 @@ public:
 	glm::vec3 UVScale = glm::vec3(1.0f);
 	glm::vec3 UVOffset = glm::vec3(0.0f);
 
-	std::string albedoMapPath = "";
-	std::string normalMapPath = "";
-	std::string metallicMapPath = "";
-	std::string roughnessMapPath = "";
-	std::string aoMapPath = "";
-	std::string heightMapPath = "";
+	Path albedoMapPath;
+	Path normalMapPath;
+	Path metallicMapPath;
+	Path roughnessMapPath;
+	Path aoMapPath;
+	Path heightMapPath;
 
 	void LoadTextures();
 	std::string Serialize() const override;
@@ -48,12 +48,12 @@ public:
 	glm::vec3 UVScale = glm::vec3(1.0f);
 	glm::vec3 UVOffset = glm::vec3(0.0f);
 
-	std::string albedoMapPath = "";
-	std::string normalMapPath = "";
-	std::string metallicMapPath = "";
-	std::string roughnessMapPath = "";
-	std::string aoMapPath = "";
-	std::string heightMapPath = "";
+	Path albedoMapPath;
+	Path normalMapPath;
+	Path metallicMapPath;
+	Path roughnessMapPath;
+	Path aoMapPath;
+	Path heightMapPath;
 
 	std::string Serialize() const override;
 	void Deserialize(const std::string& jsonStr) override;

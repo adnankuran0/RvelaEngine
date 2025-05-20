@@ -1,8 +1,8 @@
 #pragma once
 
-#include <string>
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
+#include <string>
 
 struct WindowSize
 {
@@ -19,7 +19,7 @@ struct WindowData
 	std::string title;
 	WindowSize size;
 
-	WindowData() noexcept : title("Rvela Engine"), size(1920,1080) {}
+	WindowData() noexcept : title("Rvela Engine"), size(1280,720) {}
 	WindowData(const std::string& title, int width, int height) noexcept : title(title), size(width,height) {}
 };
 
@@ -34,12 +34,12 @@ public:
 	static Window Create(const std::string& title, int width, int height) noexcept;
 	void Init();
 
-	inline GLFWwindow* GetGLFWWindow() const noexcept
+	GLFWwindow* GetGLFWWindow() const noexcept
 	{
 		return m_Window;
 	}
 
-	inline const std::string& GetTitle() const noexcept
+	const std::string& GetTitle() const noexcept
 	{
 		return m_WindowData.title;
 	}

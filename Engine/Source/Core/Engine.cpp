@@ -14,7 +14,7 @@ Engine::Engine()
 	m_Renderer = std::make_unique<Renderer>();
 	m_Scene = std::make_unique<Scene>();
 	m_ProjectManager = std::make_unique<ProjectManager>();
-	m_ProjectManager->LoadProject("C:/Users/adnan/Desktop/zubbik/zubbik.rproj");
+	m_ProjectManager->LoadProject("D:\\Github\\RvelaEngine\\TestProject\\TestProject.rproj");
 	m_SceneManager = std::make_unique<SceneManager>();
 	editorCamera = nullptr;
 

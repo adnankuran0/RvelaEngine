@@ -6,9 +6,9 @@
 class MaterialManager
 {
 public:
-    static void CreateMaterial(const std::string& path,MaterialData& materialData);
-    static std::shared_ptr<Material> LoadOrGetMaterial(const std::string& path);
-    static void UnloadMaterial(const std::string& path);
+    static void CreateMaterial(const Path path,MaterialData& materialData);
+    static std::shared_ptr<Material> LoadOrGetMaterial(const Path path);
+    static void UnloadMaterial(const Path path);
     static void ClearMaterials();
     static size_t GetMaterialCount();
 
