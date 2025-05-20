@@ -209,22 +209,24 @@ public:
 };
 
 struct MeshComponent : public ISerializable {
-    std::string modelPath;
+    Path modelPath;
     uint32_t meshIndex;
 
     MeshComponent() = delete;
-    MeshComponent(const std::string& modelPath, uint16_t meshIndex) : modelPath(modelPath), meshIndex(meshIndex) {}
+    MeshComponent(const Path modelPath, uint16_t meshIndex) : modelPath(modelPath), meshIndex(meshIndex) {}
 
     std::string Serialize() const override {
         json j;
-        j["modelPath"] = modelPath;
+        j["modelPath"] = modelPath.GetVirtualStr();
+        std::cout << "Virtual model path: " << modelPath.GetVirtualStr() << std::endl;
         j["meshIndex"] = meshIndex;
         return j.dump(4);
     }
 
     void Deserialize(const std::string& str) override {
         json j = json::parse(str);
-        modelPath = j["modelPath"];
+        std::string modelPathData = j["modelPath"];
+        modelPath = TO_ABSOLUTE_PATH(modelPathData);
         meshIndex = j["meshIndex"];
     }
 };
@@ -236,7 +238,7 @@ public:
 
     MaterialComponent() = delete;
 
-    MaterialComponent(const std::string& materialPath)
+    MaterialComponent(const Path materialPath)
         : materialPath(materialPath)
     {
         material = MaterialManager::LoadOrGetMaterial(materialPath);
@@ -256,12 +258,12 @@ public:
     {
     }
 
-    std::string& GetMaterialPath()
+    Path& GetMaterialPath()
     {
         return materialPath;
     }
 
-    void SetMaterialPath(const std::string& materialPath)
+    void SetMaterialPath(const Path materialPath)
     {
         if (this->materialPath == materialPath) return;
         MaterialManager::UnloadMaterial(materialPath);
@@ -275,15 +277,15 @@ public:
     std::string Serialize() const override
     {
         json j;
-        j["materialPath"] = materialPath;
+        j["materialPath"] = materialPath.GetVirtualStr();
 
         return j.dump(4);
     }
     void Deserialize(const std::string& jsonStr) override
     {
         json j = json::parse(jsonStr);
-        auto materialPathData = j["materialPath"];
-        materialPath = materialPathData;
+        std::string materialPathData = j["materialPath"];
+        materialPath = TO_ABSOLUTE_PATH(materialPathData);
 
     }
 
@@ -291,7 +293,7 @@ public:
 
 
 private:
-    std::string materialPath;
+    Path materialPath;
 };
 
 class SceneTreeComponent : public Component {

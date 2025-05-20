@@ -6,11 +6,11 @@
 #include "Scene/Components.h"
 std::unordered_map<std::string, std::weak_ptr<Material>> MaterialManager::materialMap;
 
-void MaterialManager::CreateMaterial(const std::string& path, MaterialData& materialData)
+void MaterialManager::CreateMaterial(const Path path, MaterialData& materialData)
 {
-    if (materialMap.contains(path))
+    if (materialMap.contains(path.GetAbsoluteStr()))
     {
-        if (auto existing = materialMap[path].lock())
+        if (auto existing = materialMap[path.GetAbsoluteStr()].lock())
         {
             return;
         }
@@ -18,15 +18,15 @@ void MaterialManager::CreateMaterial(const std::string& path, MaterialData& mate
     }
 
 
-    Serializer::SaveToFile(materialData, path);
+    Serializer::SaveToFile(materialData, path.GetAbsoluteStr());
 
     return;
 }
 
-std::shared_ptr<Material> MaterialManager::LoadOrGetMaterial(const std::string& path)
+std::shared_ptr<Material> MaterialManager::LoadOrGetMaterial(const Path path)
 {
 
-    auto it = materialMap.find(path);
+    auto it = materialMap.find(path.GetAbsoluteStr());
     if (it != materialMap.end())
     {
         if (auto existing = it->second.lock())  
@@ -36,10 +36,10 @@ std::shared_ptr<Material> MaterialManager::LoadOrGetMaterial(const std::string& 
         materialMap.erase(it);
     }
 
-    std::ifstream file(path);
+    std::ifstream file(path.GetAbsoluteStr());
     if (!file.is_open())
     {
-        std::cerr << "Material file could not be opened: " << path << std::endl;
+        std::cerr << "Material file could not be opened: " << path.GetAbsoluteStr() << std::endl;
         return nullptr;
     }
 
@@ -48,14 +48,14 @@ std::shared_ptr<Material> MaterialManager::LoadOrGetMaterial(const std::string& 
     material->Deserialize(jsonStr);
     material->LoadTextures();
 
-    materialMap[path] = material;  
+    materialMap[path.GetAbsoluteStr()] = material;
 
     return material;
 }
 
-void MaterialManager::UnloadMaterial(const std::string& path)
+void MaterialManager::UnloadMaterial(const Path path)
 {
-    auto it = materialMap.find(path);
+    auto it = materialMap.find(path.GetAbsoluteStr());
     if (it != materialMap.end())
     {
         materialMap.erase(it);

@@ -1,11 +1,13 @@
 #include "Renderer/Texture.h"
 #include <string>
 #include <unordered_map>
+#include "FileUtils.h"
+
 class TextureManager
 {
 public:
-	static std::shared_ptr<Texture> LoadOrGetTexture(const std::string& path);
-	static void UnloadTexture(const std::string& path);
+	static std::shared_ptr<Texture> LoadOrGetTexture(const Path path);
+	static void UnloadTexture(const Path path);
 	static void ClearTextures();
 	static size_t GetTextureCount();
 private:

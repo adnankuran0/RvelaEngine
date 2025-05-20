@@ -107,7 +107,7 @@ void Renderer::Render(WorldTransformComponent& transform,
     m_DefaultShader.setFloat("aoValue", material->ao);
 
     struct MapInfo {
-        std::string path;
+        Path path;
         std::string uniformName;
         int slot;
         std::string useUniform;
@@ -122,8 +122,10 @@ void Renderer::Render(WorldTransformComponent& transform,
         { material->heightMapPath,    "heightMap",    5, "useHeightMap" },
     };
 
+
+
     for (const auto& map : maps) {
-        bool hasMap = !map.path.empty();
+        bool hasMap = map.path.IsValid();
         m_DefaultShader.setBool(map.useUniform, hasMap);
         if (hasMap) {
             auto tex = TextureManager::LoadOrGetTexture(map.path);
@@ -133,6 +135,7 @@ void Renderer::Render(WorldTransformComponent& transform,
             }
         }
     }
+
 
     m_DefaultShader.setMat4("model", transform.GetMatrix());
     m_DefaultShader.setMat4("view", camera->GetViewMatrix());

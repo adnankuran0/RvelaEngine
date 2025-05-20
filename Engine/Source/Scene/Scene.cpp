@@ -100,13 +100,13 @@ Entity Scene::LoadAsset(const std::string& path)
 {
     Entity rootEntity = CreateEntity("Model");
 
-    std::vector<MeshData> meshDatas = AssetManager::LoadModel(path);
+    std::vector<MeshData> meshDatas = AssetManager::LoadModel(TO_ABSOLUTE_PATH(path));
 
     if (meshDatas.size() == 1)
     {
         rootEntity.AddComponent<MeshRendererComponent>(meshDatas.back().vertices.data(), meshDatas.back().vertices.size() * sizeof(float),
             meshDatas.back().indices.data(), meshDatas.back().indices.size() * sizeof(unsigned int), meshDatas.back().indices.size());
-        rootEntity.AddComponent<MeshComponent>(path, meshDatas.back().meshIndex);
+        rootEntity.AddComponent<MeshComponent>(TO_ABSOLUTE_PATH(path), meshDatas.back().meshIndex);
         rootEntity.GetComponent<TagComponent>().tag = meshDatas.back().name;
         auto& materialComponent = rootEntity.AddComponent<MaterialComponent>(meshDatas.front().materialPath);
 
@@ -119,7 +119,7 @@ Entity Scene::LoadAsset(const std::string& path)
             SetParent(meshEntity, rootEntity);
             meshEntity.AddComponent<MeshRendererComponent>(meshData.vertices.data(), meshData.vertices.size() * sizeof(float),
                 meshData.indices.data(), meshData.indices.size() * sizeof(unsigned int), meshData.indices.size());
-            meshEntity.AddComponent<MeshComponent>(path, meshData.meshIndex);
+            meshEntity.AddComponent<MeshComponent>(TO_ABSOLUTE_PATH(path), meshData.meshIndex);
             meshEntity.GetComponent<TagComponent>().tag = meshData.name;
             auto& materialComponent = meshEntity.AddComponent<MaterialComponent>(meshData.materialPath);
 
@@ -159,7 +159,7 @@ Entity Scene::LoadPrimitive(const std::string& primitiveMeshName)
 
     // Create entity and load mesh
     Entity rootEntity = CreateEntity(config.name);
-    MeshData meshData = AssetManager::LoadMesh(config.meshPath.GetAbsoluteStr(), 0);
+    MeshData meshData = AssetManager::LoadMesh(config.meshPath, 0);
 
     // Add components
     rootEntity.AddComponent<MeshRendererComponent>(
@@ -169,7 +169,7 @@ Entity Scene::LoadPrimitive(const std::string& primitiveMeshName)
         meshData.indices.size() * sizeof(unsigned int),
         meshData.indices.size()
     );
-    rootEntity.AddComponent<MeshComponent>(config.meshPath.GetAbsoluteStr(), meshData.meshIndex);
+    rootEntity.AddComponent<MeshComponent>(config.meshPath, meshData.meshIndex);
     rootEntity.GetComponent<TagComponent>().tag = meshData.name;
     rootEntity.AddComponent<MaterialComponent>(meshData.materialPath);
 

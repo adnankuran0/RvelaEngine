@@ -2,6 +2,7 @@
 
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
+#include <string>
 
 struct WindowSize
 {
@@ -33,12 +34,12 @@ public:
 	static Window Create(const std::string& title, int width, int height) noexcept;
 	void Init();
 
-	inline GLFWwindow* GetGLFWWindow() const noexcept
+	GLFWwindow* GetGLFWWindow() const noexcept
 	{
 		return m_Window;
 	}
 
-	inline const std::string& GetTitle() const noexcept
+	const std::string& GetTitle() const noexcept
 	{
 		return m_WindowData.title;
 	}

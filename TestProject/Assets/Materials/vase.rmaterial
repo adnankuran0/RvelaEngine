@@ -1,0 +1,26 @@
+{
+    "UVOffset": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "UVScale": [
+        1.0,
+        1.0,
+        1.0
+    ],
+    "albedoColor": [
+        0.47040000557899475,
+        0.47040000557899475,
+        0.47040000557899475
+    ],
+    "albedoMapPath": "D:/GitHub/RvelaEngine/TestProject/Assets/Models/Sponza-master/Sponza-master/textures/vase_dif.tga",
+    "ao": 1.0,
+    "aoMapPath": "",
+    "heightMapPath": "",
+    "metallic": 0.0,
+    "metallicMapPath": "",
+    "normalMapPath": "",
+    "roughness": 0.5,
+    "roughnessMapPath": ""
+}
