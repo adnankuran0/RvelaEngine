@@ -39,8 +39,7 @@ private:
 	LayerStack m_LayerStack;
 
 	void HandleEvents() noexcept;
-	std::vector<PointLightData> CollectPointLights() noexcept;
-	std::optional<DirectionalLightData>  CollectDirectionalLight() noexcept;
+	
 
 	static Engine* s_Instance;
 

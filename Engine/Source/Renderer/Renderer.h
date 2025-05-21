@@ -46,6 +46,8 @@ public:
         );
     static void Shutdown();
 
+    static Shader& GetDefaultShader() { return m_DefaultShader; }
+
 private:
     static GLFWwindow* activeWindow;
     static Shader m_DefaultShader;

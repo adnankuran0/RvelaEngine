@@ -3,6 +3,7 @@
 #include "RvelaLog.h"
 #include "Engine.h"
 #include "Scene/Entity.h"
+#include <Renderer/MeshPass.h>
 
 Engine* Engine::s_Instance = nullptr;
 
@@ -137,10 +138,14 @@ void Engine::Render()
 {
 	Renderer::StartFrame();
 
-	std::vector<PointLightData> pointLights = CollectPointLights();
-	std::optional<DirectionalLightData> dirLight = CollectDirectionalLight();
+	std::vector<PointLightData> pointLights = m_Scene->CollectPointLights();
+	std::optional<DirectionalLightData> dirLight = m_Scene->CollectDirectionalLight();
 
 	Renderer::RenderSkybox(editorCamera);
+
+	MeshPass meshPass;
+	meshPass.SetCamera(editorCamera);
+	meshPass.SetLights(pointLights, dirLight ? &(*dirLight) : nullptr);
 
 	auto renderableView = m_Scene->GetRegistry().view<MeshRendererComponent, MaterialComponent, WorldTransformComponent>();
 	for (auto entity : renderableView)
@@ -149,15 +154,10 @@ void Engine::Render()
 		auto& material = m_Scene->GetComponent<MaterialComponent>(entity);
 		auto& transform = m_Scene->GetComponent<WorldTransformComponent>(entity);
 
-		Renderer::Render(
-			transform,
-			mesh,
-			material,
-			editorCamera,
-			pointLights,
-			dirLight ? &(*dirLight) : nullptr
-		);
+		meshPass.AddRenderable(&transform, &mesh, &material);
 	}
+
+	meshPass.Execute();
 
 	for (Layer* layer : m_LayerStack)
 		layer->OnRender();
@@ -165,48 +165,6 @@ void Engine::Render()
 	Renderer::EndFrame();
 }
 
-std::vector<PointLightData> Engine::CollectPointLights() noexcept
-{
-	std::vector<PointLightData> lights;
-	auto view = m_Scene->GetRegistry().view<PointLightComponent, WorldTransformComponent>();
-
-	for (auto entity : view)
-	{
-		auto& light = m_Scene->GetComponent<PointLightComponent>(entity);
-		auto& transform = m_Scene->GetComponent<WorldTransformComponent>(entity);
-
-		PointLightData data;
-		data.position = glm::vec3(transform.GetMatrix()[3]);
-		data.color = light.color;
-		data.intensity = light.intensity;
-		data.radius = light.radius;
-
-		lights.push_back(data);
-	}
-
-	return lights;
-}
-
-std::optional<DirectionalLightData> Engine::CollectDirectionalLight() noexcept
-{
-	auto view = m_Scene->GetRegistry().view<DirectionalLightComponent, WorldTransformComponent>();
-
-	for (auto entity : view)
-	{
-		auto& light = m_Scene->GetComponent<DirectionalLightComponent>(entity);
-		auto& transform = m_Scene->GetComponent<WorldTransformComponent>(entity);
-
-		DirectionalLightData data;
-		data.direction = transform.GetForward();
-		data.color = light.color;
-		data.intensity = light.intensity;
-		data.castShadows = light.castShadows;
-
-		return data;
-	}
-
-	return std::nullopt;
-}
 
 void Engine::Shutdown()
 {

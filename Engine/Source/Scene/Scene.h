@@ -5,6 +5,7 @@
 #include "Components.h"
 #include "Core/RvelaMath.h"
 #include "Core/Utils/ISerializable.h"
+#include "Renderer/Renderer.h"
 
 class Entity;
 
@@ -70,6 +71,9 @@ public:
 
     entt::registry& GetRegistry();
     std::unordered_map<UUID, entt::entity> GetUUIDEntityMap() { return m_EntityMap; }
+
+    std::vector<PointLightData> CollectPointLights() noexcept;
+    std::optional<DirectionalLightData>  CollectDirectionalLight() noexcept;
 
 private:
     entt::registry m_Registry;

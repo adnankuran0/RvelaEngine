@@ -5373,3 +5373,12 @@
 2025-05-21 18:19:43.098 INFO  [17644] [Window::Init@38] GLFW Initialized
 2025-05-21 18:19:43.301 INFO  [17644] [Window::Init@57] GLEW Initialized
 2025-05-21 18:19:43.301 INFO  [17644] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-21 21:46:44.702 INFO  [20760] [Window::Init@38] GLFW Initialized
+2025-05-21 21:46:44.913 INFO  [20760] [Window::Init@57] GLEW Initialized
+2025-05-21 21:46:44.913 INFO  [20760] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-22 00:12:16.842 INFO  [4296] [Window::Init@38] GLFW Initialized
+2025-05-22 00:12:17.005 INFO  [4296] [Window::Init@57] GLEW Initialized
+2025-05-22 00:12:17.005 INFO  [4296] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70
+2025-05-22 00:17:54.711 INFO  [23208] [Window::Init@38] GLFW Initialized
+2025-05-22 00:17:54.905 INFO  [23208] [Window::Init@57] GLEW Initialized
+2025-05-22 00:17:54.905 INFO  [23208] [Window::Init@59] OpenGL Version: 3.3.0 NVIDIA 572.70

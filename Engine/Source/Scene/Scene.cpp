@@ -340,3 +340,46 @@ void Scene::RemoveParent(entt::entity child) {
     tc.scale = newScale;
     tc.SetRotation(worldQuat);  // hem rotationı hem de rotation_degrees’ı günceller
 }
+
+std::vector<PointLightData> Scene::CollectPointLights() noexcept
+{
+    std::vector<PointLightData> lights;
+    auto view = GetRegistry().view<PointLightComponent, WorldTransformComponent>();
+
+    for (auto entity : view)
+    {
+        auto& light = GetComponent<PointLightComponent>(entity);
+        auto& transform = GetComponent<WorldTransformComponent>(entity);
+
+        PointLightData data;
+        data.position = glm::vec3(transform.GetMatrix()[3]);
+        data.color = light.color;
+        data.intensity = light.intensity;
+        data.radius = light.radius;
+
+        lights.push_back(data);
+    }
+
+    return lights;
+}
+
+std::optional<DirectionalLightData> Scene::CollectDirectionalLight() noexcept
+{
+    auto view = GetRegistry().view<DirectionalLightComponent, WorldTransformComponent>();
+
+    for (auto entity : view)
+    {
+        auto& light = GetComponent<DirectionalLightComponent>(entity);
+        auto& transform = GetComponent<WorldTransformComponent>(entity);
+
+        DirectionalLightData data;
+        data.direction = transform.GetForward();
+        data.color = light.color;
+        data.intensity = light.intensity;
+        data.castShadows = light.castShadows;
+
+        return data;
+    }
+
+    return std::nullopt;
+}
