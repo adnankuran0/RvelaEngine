@@ -5,6 +5,7 @@
 #include "ImGui/tinyfiledialogs.h"
 #include "Core/Utils/Serializer.h"
 
+
 static bool createProjectRequested = false;
 static char projectNameBuffer[128] = "";
 
@@ -186,6 +187,8 @@ void ImGuiLayer::DrawCreateProjectPopup(Engine* engine)
         ImGui::End();
     }
 }
+
+
 
 void ImGuiLayer::DrawSceneHierarchyPanel(entt::registry& registry, entt::entity& selectedEntity)
 {

@@ -1,0 +1,26 @@
+{
+    "UVOffset": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "UVScale": [
+        1.0,
+        1.0,
+        1.0
+    ],
+    "albedoColor": [
+        1.0,
+        1.0,
+        1.0
+    ],
+    "albedoMapPath": "C:/Users/adnan/Desktop/San_Miguel/textures/Finishes.Flooring.Carpet.Loop.5.png",
+    "ao": 1.0,
+    "aoMapPath": "",
+    "heightMapPath": "C:/Users/adnan/Desktop/San_Miguel/textures/N_Finishes.Flooring.Carpet.Loop.5.png",
+    "metallic": 0.0,
+    "metallicMapPath": "",
+    "normalMapPath": "",
+    "roughness": 0.5,
+    "roughnessMapPath": ""
+}

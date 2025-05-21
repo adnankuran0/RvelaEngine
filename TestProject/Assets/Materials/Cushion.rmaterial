@@ -1,0 +1,26 @@
+{
+    "UVOffset": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "UVScale": [
+        1.0,
+        1.0,
+        1.0
+    ],
+    "albedoColor": [
+        0.800000011920929,
+        0.7913600206375122,
+        0.800000011920929
+    ],
+    "albedoMapPath": "C:/Users/adnan/Desktop/living_room/textures/cushion-green-circles.jpg",
+    "ao": 1.0,
+    "aoMapPath": "",
+    "heightMapPath": "",
+    "metallic": 0.0,
+    "metallicMapPath": "",
+    "normalMapPath": "",
+    "roughness": 0.5,
+    "roughnessMapPath": ""
+}

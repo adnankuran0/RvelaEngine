@@ -1,0 +1,26 @@
+{
+    "UVOffset": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "UVScale": [
+        1.0,
+        1.0,
+        1.0
+    ],
+    "albedoColor": [
+        0.5647000074386597,
+        0.3059000074863434,
+        0.0940999984741211
+    ],
+    "albedoMapPath": "",
+    "ao": 1.0,
+    "aoMapPath": "",
+    "heightMapPath": "",
+    "metallic": 0.0,
+    "metallicMapPath": "",
+    "normalMapPath": "",
+    "roughness": 0.5,
+    "roughnessMapPath": ""
+}

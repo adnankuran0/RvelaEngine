@@ -49,3 +49,13 @@ bool Path::IsValid() const
 {
 	return !m_VirtualPath.empty();
 }
+
+bool Path::operator==(const Path& other) const
+{
+	return m_VirtualPath == other.GetVirtual();
+}
+
+bool Path::operator!=(const Path& other) const
+{
+	return m_VirtualPath != other.GetVirtual();
+}

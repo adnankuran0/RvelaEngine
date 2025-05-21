@@ -1,0 +1,26 @@
+{
+    "UVOffset": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "UVScale": [
+        1.0,
+        1.0,
+        1.0
+    ],
+    "albedoColor": [
+        0.2509799897670746,
+        0.1333329975605011,
+        0.04313730075955391
+    ],
+    "albedoMapPath": "C:/Users/adnan/Desktop/rungholt (1)/rungholt-RGB.png",
+    "ao": 1.0,
+    "aoMapPath": "",
+    "heightMapPath": "",
+    "metallic": 0.0,
+    "metallicMapPath": "",
+    "normalMapPath": "",
+    "roughness": 0.5,
+    "roughnessMapPath": ""
+}

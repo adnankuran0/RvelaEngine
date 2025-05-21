@@ -5,7 +5,6 @@
 #include "ImGui/imgui_impl_opengl3.h"
 #include "Core/Layer.h"
 
-
 class ImGuiLayer : public Layer
 {
 public:

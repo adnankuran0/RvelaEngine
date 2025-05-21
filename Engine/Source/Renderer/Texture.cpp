@@ -1,4 +1,4 @@
-#include "rvelapch.h"
+﻿#include "rvelapch.h"
 
 #include "Texture.h"
 #define STB_IMAGE_IMPLEMENTATION
@@ -75,7 +75,16 @@ void Texture::GenerateFromImage(const std::string& path)
 
 void Texture::ToImage(int width, int height, const unsigned char* data, int nrChannels)
 {
-    GLenum format = (nrChannels == 1) ? GL_RED : (nrChannels == 3 ? GL_RGB : GL_RGBA);
+    GLenum format;
+    switch (nrChannels) {
+        case 1: format = GL_RED; break;
+        case 2: format = GL_RG; break;
+        case 3: format = GL_RGB; break;
+        case 4: format = GL_RGBA; break;
+        default:
+            std::cerr << "Unsupported number of channels: " << nrChannels << std::endl;
+            return;
+    }
     glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 }
 
