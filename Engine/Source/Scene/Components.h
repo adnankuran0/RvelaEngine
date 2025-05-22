@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "Scene/Components/TransformComponent.h"
-#include "Scene/Components/WorldTransformComponent.h"
 #include "Scene/Components/TagComponent.h"
 #include "Scene/Components/MeshRendererComponent.h"
 #include "Scene/Components/MeshComponent.h"

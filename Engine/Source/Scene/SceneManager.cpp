@@ -24,9 +24,6 @@ void SceneManager::SaveScene(Scene& scene, const std::string& path)
             if (scene.HasComponent<TransformComponent>(entity))
                 entityJson["TransformComponent"] = scene.GetComponent<TransformComponent>(entity).Serialize();
 
-            if (scene.HasComponent<WorldTransformComponent>(entity))
-                entityJson["WorldTransformComponent"] = scene.GetComponent<WorldTransformComponent>(entity).Serialize();
-
             if (scene.HasComponent<MaterialComponent>(entity))
                 entityJson["MaterialComponent"] = scene.GetComponent<MaterialComponent>(entity).Serialize();
 
@@ -93,9 +90,6 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
 
         if (entityJson.contains("TransformComponent"))
             scene.GetComponent<TransformComponent>(entity).Deserialize(entityJson["TransformComponent"]);
-
-        if (entityJson.contains("WorldTransformComponent"))
-            scene.GetComponent<WorldTransformComponent>(entity).Deserialize(entityJson["WorldTransformComponent"]);
 
         if (entityJson.contains("MaterialComponent"))
         {

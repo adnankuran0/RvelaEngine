@@ -70,7 +70,7 @@ void MeshPass::Execute() {
             }
         }
 
-        shader.setMat4("model", transform->GetMatrix());
+        shader.setMat4("model", transform->GetWorldMatrix());
         shader.setMat4("view", camera->GetViewMatrix());
         shader.setMat4("projection", camera->projection);
 

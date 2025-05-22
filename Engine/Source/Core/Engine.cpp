@@ -147,12 +147,12 @@ void Engine::Render()
 	meshPass.SetCamera(editorCamera);
 	meshPass.SetLights(pointLights, dirLight ? &(*dirLight) : nullptr);
 
-	auto renderableView = m_Scene->GetRegistry().view<MeshRendererComponent, MaterialComponent, WorldTransformComponent>();
+	auto renderableView = m_Scene->GetRegistry().view<MeshRendererComponent, MaterialComponent, TransformComponent>();
 	for (auto entity : renderableView)
 	{
 		auto& mesh = m_Scene->GetComponent<MeshRendererComponent>(entity);
 		auto& material = m_Scene->GetComponent<MaterialComponent>(entity);
-		auto& transform = m_Scene->GetComponent<WorldTransformComponent>(entity);
+		auto& transform = m_Scene->GetComponent<TransformComponent>(entity);
 
 		meshPass.AddRenderable(&transform, &mesh, &material);
 	}

@@ -18,7 +18,7 @@ public:
 		directionalLight = dLight;
 	}
 
-	void AddRenderable(WorldTransformComponent* transform, MeshRendererComponent* mesh, MaterialComponent* material) {
+	void AddRenderable(TransformComponent* transform, MeshRendererComponent* mesh, MaterialComponent* material) {
 		renderables.emplace_back(transform, mesh, material);
 	}
 
@@ -29,6 +29,6 @@ private:
 	std::vector<PointLightData> pointLights;
 	const DirectionalLightData* directionalLight = nullptr;
 
-	std::vector<std::tuple<WorldTransformComponent*, MeshRendererComponent*, MaterialComponent*>> renderables;
+	std::vector<std::tuple<TransformComponent*, MeshRendererComponent*, MaterialComponent*>> renderables;
 };
 

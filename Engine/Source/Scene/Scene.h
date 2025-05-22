@@ -63,9 +63,7 @@ public:
     void UpdateHierarchy();
 
     void UpdateNodeRecursive(entt::entity entity,
-        const glm::vec3& parentPos,
-        const glm::quat& parentRot,
-        const glm::vec3& parentScale);
+        const glm::mat4& parentWorld);
 
     void Update();
 

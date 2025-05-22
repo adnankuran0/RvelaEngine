@@ -370,42 +370,38 @@ void ImGuiLayer::DrawInspectorPanel(entt::registry& registry, entt::entity& sele
             if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
                 auto& transform = registry.get<TransformComponent>(selectedEntity);
 
-                static bool lockScaleRatio = false;
-                static glm::vec3 lastScale = transform.scale;
 
                 glm::vec3 euler = transform.GetEulerRotation();
+                bool isScaleRatioLocked = transform.IsScaleRatioLocked();
 
-                ImGui::DragFloat3("Position", &transform.position[0], 0.1f);
+                glm::vec3 pos = transform.GetPosition();
+                if (ImGui::DragFloat3("Position", &pos[0], 0.1f)) {
+                    transform.SetPosition(pos);
+                }
 
                 if (ImGui::DragFloat3("Rotation", &euler[0], 0.1f, -360, 360)) {
                     transform.SetEulerRotation(euler);
                 }
 
                 ImGui::PushID("ScaleControls");
-                ImGui::DragFloat3("Scale", &transform.scale[0], 0.1f, 0.01f, 10.0f);
-                ImGui::Checkbox("Lock Ratio", &lockScaleRatio);
+                glm::vec3 scale = transform.GetScale();
+                if(ImGui::DragFloat3("Scale", &scale[0], 0.1f, 0.01f, 10.0f))
+                {
+                    transform.SetScale(scale);
+                }
+                if(ImGui::Checkbox("Lock Ratio", &isScaleRatioLocked))
+                {
+                    transform.SetLockScaleRatio(isScaleRatioLocked);
+                }
                 ImGui::PopID();
 
-                if (lockScaleRatio) {
-                    for (int i = 0; i < 3; i++) {
-                        if (transform.scale[i] != lastScale[i]) {
-                            float ratio = transform.scale[i] / lastScale[i];
-                            for (int j = 0; j < 3; j++) {
-                                if (i != j) {
-                                    transform.scale[j] *= ratio;
-                                }
-                            }
-                            break;
-                        }
-                    }
-                }
+                
 
-                lastScale = transform.scale;
 
                 if (ImGui::Button("Reset Transform")) {
-                    transform.position = { 0.0f, 0.0f, 0.0f };
+                    transform.SetPosition({ 0.0f, 0.0f, 0.0f });
                     transform.SetEulerRotation({ 0.0f, 0.0f, 0.0f });
-                    transform.scale = { 1.0f, 1.0f, 1.0f };
+                    transform.SetScale({1.0f, 1.0f, 1.0f});
                 }
             }
         }

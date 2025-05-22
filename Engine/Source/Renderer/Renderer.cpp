@@ -64,7 +64,7 @@ void Renderer::RenderSkybox(EditorCamera* camera)
     m_Skybox.Render(m_SkyboxShader, camera->projection, camera->GetViewMatrix());
 }
 
-void Renderer::Render(WorldTransformComponent& transform,
+void Renderer::Render(TransformComponent& transform,
     MeshRendererComponent& meshComponent,
     MaterialComponent& materialComponent,
     EditorCamera* camera,
@@ -137,7 +137,7 @@ void Renderer::Render(WorldTransformComponent& transform,
     }
 
 
-    m_DefaultShader.setMat4("model", transform.GetMatrix());
+    m_DefaultShader.setMat4("model", transform.GetWorldMatrix());
     m_DefaultShader.setMat4("view", camera->GetViewMatrix());
     m_DefaultShader.setMat4("projection", camera->projection);
 
