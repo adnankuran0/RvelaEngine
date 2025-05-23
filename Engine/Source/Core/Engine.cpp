@@ -141,9 +141,6 @@ void Engine::Render()
 {
 	Renderer::StartFrame();
 
-
-	Renderer::RenderSkybox(editorCamera);
-
 	for (Layer* layer : m_LayerStack)
 		layer->OnRender();
 

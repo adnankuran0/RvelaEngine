@@ -15,7 +15,11 @@ void MeshPass::Execute() {
         shader.setVec3("directionalLight.direction", ctx.directionalLight->direction);
         shader.setVec3("directionalLight.color", ctx.directionalLight->color);
         shader.setFloat("directionalLight.intensity", ctx.directionalLight->intensity);
-        shader.setBool("directionalLight.castShadows", false);
+        shader.setBool("directionalLight.castShadows", true);
+        shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+        shader.setInt("shadowMap", 6);
+        glActiveTexture(GL_TEXTURE0 + 6);
+        glBindTexture(GL_TEXTURE_2D, shadowMap);
     }
 
     shader.setFloat("heightScale", 0.0f);

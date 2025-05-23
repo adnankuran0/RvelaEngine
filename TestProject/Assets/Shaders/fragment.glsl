@@ -3,6 +3,7 @@ out vec4 FragColor;
 in vec2 TexCoords;
 in vec3 FragPos;
 in vec3 Normal;
+in vec4 FragPosLightSpace;
 
 #define MAX_POINT_LIGHTS 10
 #define MAX_DIRECTIONAL_LIGHTS 1
@@ -27,6 +28,9 @@ uniform float metallicValue;
 uniform float roughnessValue;
 uniform float aoValue;
 uniform float heightScale;
+
+uniform sampler2D shadowMap;
+uniform mat4 lightSpaceMatrix;
 
 // Lights
 struct PointLight {
@@ -105,6 +109,32 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0) {
     return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
+float calculateShadow(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir) {
+    // Perspective divide and transform to [0,1] range
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    projCoords = projCoords * 0.5 + 0.5;
+
+    // Early exit if outside shadow frustum
+    if (projCoords.z > 1.0 || projCoords.x < 0.0 || projCoords.x > 1.0 || projCoords.y < 0.0 || projCoords.y > 1.0)
+        return 0.0;
+
+    // Dynamic depth bias (reduces Peter Panning)
+    float bias = max(0.02 * (1.0 - dot(normal, lightDir)), 0.005);
+
+    // PCF filtering (5x5 kernel for smoother shadows)
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
+    for (int x = -2; x <= 2; ++x) {
+        for (int y = -2; y <= 2; ++y) {
+            float closestDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
+            shadow += (projCoords.z - bias) > closestDepth ? 1.0 : 0.0;
+        }
+    }
+    shadow /= 25.0;
+
+    return shadow;
+}
+
 vec3 calculateDirectionalLight(DirectionalLight light, vec3 N, vec3 V, vec3 albedo, float metallic, float roughness, vec3 F0) {
     vec3 L = normalize(-light.direction);
     vec3 H = normalize(V + L);
@@ -149,8 +179,31 @@ void main() {
     vec3 Lo = vec3(0.0);
     
     // Directional light
-    if (hasDirectionalLight) {
-        Lo += calculateDirectionalLight(directionalLight, N, V, albedo, metallic, roughness, F0);
+    if (hasDirectionalLight) 
+    {
+        vec3 L = normalize(-directionalLight.direction);
+        vec3 H = normalize(V + L);
+        
+        float NDF = DistributionGGX(N, H, roughness);
+        float G = GeometrySmith(N, V, L, roughness);
+        vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+
+        vec3 kS = F;
+        vec3 kD = vec3(1.0) - kS;
+        kD *= 1.0 - metallic;
+
+        vec3 numerator = NDF * G * F;
+        float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
+        vec3 specular = numerator / denominator;
+
+        float NdotL = max(dot(N, L), 0.0);
+
+        vec4 fragPosLightSpace = lightSpaceMatrix * vec4(FragPos, 1.0);
+        float shadow = directionalLight.castShadows ? calculateShadow(fragPosLightSpace, N, L) : 0.0;
+
+        vec3 lightColor = directionalLight.color * directionalLight.intensity;
+        vec3 lighting = (kD * albedo / PI + specular) * lightColor * NdotL;
+        Lo += (1.0 - shadow) * lighting;
     }
     
     // Point lights

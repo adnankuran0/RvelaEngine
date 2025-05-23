@@ -36,14 +36,17 @@ public:
     static void Init(GLFWwindow* window);
     static void StartFrame();
     static void EndFrame();
-    static void RenderSkybox(EditorCamera* camera);
     static void Shutdown();
 
     static Shader& GetDefaultShader() { return m_DefaultShader; }
+    static Shader& GetSkyboxShader() { return m_SkyboxShader;}
+    static Shader& GetShadowShader() { return m_ShadowShader; }
+    static Skybox& GetSkybox() { return m_Skybox; }
 
 private:
     static GLFWwindow* activeWindow;
     static Shader m_DefaultShader;
     static Shader m_SkyboxShader;
+    static Shader m_ShadowShader;
     static Skybox m_Skybox;
 };

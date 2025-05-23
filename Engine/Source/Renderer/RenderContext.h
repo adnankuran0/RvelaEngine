@@ -9,6 +9,8 @@ public:
 	EditorCamera* camera;
 	std::vector<PointLightData> pointLights;
 	std::optional<DirectionalLightData> directionalLight;
+	unsigned int viewportWidth;
+	unsigned int viewportHeight;
 
 	bool IsValid()
 	{

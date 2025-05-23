@@ -11,6 +11,7 @@
 GLFWwindow* Renderer::activeWindow = nullptr;
 Shader Renderer::m_DefaultShader;
 Shader Renderer::m_SkyboxShader;
+Shader Renderer::m_ShadowShader;
 Skybox Renderer::m_Skybox;
 
 
@@ -30,6 +31,7 @@ void Renderer::Init(GLFWwindow* window)
     Renderer::activeWindow = window;
     m_DefaultShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\vertex.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\fragment.glsl"));
     m_SkyboxShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\skyboxVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\skyboxFrag.glsl"));
+    m_ShadowShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\shadowVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\shadowFrag.glsl"));
 
     std::vector<Path> faces = {
     TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\right.jpg"),
@@ -58,12 +60,6 @@ void Renderer::EndFrame()
 {
 
 }
-
-void Renderer::RenderSkybox(EditorCamera* camera)
-{
-    m_Skybox.Render(m_SkyboxShader, camera->projection, camera->GetViewMatrix());
-}
-
 
 
 void Renderer::Shutdown()

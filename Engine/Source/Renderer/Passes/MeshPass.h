@@ -8,6 +8,10 @@
 class MeshPass : public RenderPass
 {
 public:
+	MeshPass(const RenderContext& context) : RenderPass(context) {}
 	void Execute() override;
+
+	GLuint shadowMap = 0;
+	glm::mat4 lightSpaceMatrix;
 };
 

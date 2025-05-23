@@ -12,9 +12,14 @@ void RenderLayer::OnRender()
 	context.camera = camera;
 	context.pointLights = scene->CollectPointLights();
 	context.directionalLight = scene->CollectDirectionalLight();
+	context.viewportWidth = m_Engine->GetWindow()->GetSize().width;
+	context.viewportHeight = m_Engine->GetWindow()->GetSize().height;
 
-	MeshPass meshPass;
-	meshPass.SetContext(context);
+	SkyboxPass skyboxPass(context);
+	ShadowPass shadowPass(context);
+	MeshPass meshPass(context);
+
+
 
 	auto view = scene->GetRegistry().view<MeshRendererComponent, MaterialComponent, TransformComponent>();
 	for (auto& entity : view)
@@ -22,10 +27,14 @@ void RenderLayer::OnRender()
 		RenderCommand command(scene->GetComponent<TransformComponent>(entity),
 			scene->GetComponent<MeshRendererComponent>(entity),
 			scene->GetComponent<MaterialComponent>(entity));
+
+		shadowPass.AddCommand(command);
 		meshPass.AddCommand(command);
 	}
 
-	m_RenderPipeline->AddPass(&meshPass);
+	m_RenderPipeline->skyboxPass = &skyboxPass;
+	m_RenderPipeline->shadowPass = &shadowPass;
+	m_RenderPipeline->meshPass = &meshPass;
 
 	m_RenderPipeline->Execute();
 }
