@@ -37,13 +37,6 @@ public:
     static void StartFrame();
     static void EndFrame();
     static void RenderSkybox(EditorCamera* camera);
-    static void Render(TransformComponent& transform,
-        MeshRendererComponent& data,
-        MaterialComponent& metarial,
-        EditorCamera* camera,
-        const std::vector<PointLightData>& pointLights,
-        const DirectionalLightData* directionalLight
-        );
     static void Shutdown();
 
     static Shader& GetDefaultShader() { return m_DefaultShader; }

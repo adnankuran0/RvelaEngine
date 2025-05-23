@@ -5,8 +5,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "../Core/Input/Input.h"
 #include "../Core/Time.h"
+#include "Camera.h"
 
-class EditorCamera
+class EditorCamera 
 {
 
 public:

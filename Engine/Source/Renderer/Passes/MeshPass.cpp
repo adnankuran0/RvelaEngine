@@ -2,37 +2,37 @@
 #include "MeshPass.h"
 #include "Core/Utils/TextureManager.h"
 #include "Core/Utils/MaterialManager.h"
-#include "../RvelaLog.h"
+#include "../../RvelaLog.h"
 
 void MeshPass::Execute() {
-    if (!camera) return;
+    if (commands.empty() || !ctx.IsValid()) return;
 
     Shader& shader = Renderer::GetDefaultShader();
     shader.use();
 
-    shader.setBool("hasDirectionalLight", directionalLight != nullptr);
-    if (directionalLight) {
-        shader.setVec3("directionalLight.direction", directionalLight->direction);
-        shader.setVec3("directionalLight.color", directionalLight->color);
-        shader.setFloat("directionalLight.intensity", directionalLight->intensity);
+    shader.setBool("hasDirectionalLight", ctx.directionalLight.has_value());
+    if (ctx.directionalLight) {
+        shader.setVec3("directionalLight.direction", ctx.directionalLight->direction);
+        shader.setVec3("directionalLight.color", ctx.directionalLight->color);
+        shader.setFloat("directionalLight.intensity", ctx.directionalLight->intensity);
         shader.setBool("directionalLight.castShadows", false);
     }
 
     shader.setFloat("heightScale", 0.0f);
     const int MAX_POINT_LIGHTS = 10;
-    for (int i = 0; i < std::min(static_cast<int>(pointLights.size()), MAX_POINT_LIGHTS); ++i) {
+    for (int i = 0; i < std::min(static_cast<int>(ctx.pointLights.size()), MAX_POINT_LIGHTS); ++i) {
         std::string baseName = "pointLights[" + std::to_string(i) + "]";
-        shader.setVec3(baseName + ".position", pointLights[i].position);
-        shader.setVec3(baseName + ".color", pointLights[i].color);
-        shader.setFloat(baseName + ".intensity", pointLights[i].intensity);
-        shader.setFloat(baseName + ".radius", pointLights[i].radius);
+        shader.setVec3(baseName + ".position", ctx.pointLights[i].position);
+        shader.setVec3(baseName + ".color", ctx.pointLights[i].color);
+        shader.setFloat(baseName + ".intensity", ctx.pointLights[i].intensity);
+        shader.setFloat(baseName + ".radius", ctx.pointLights[i].radius);
     }
-    shader.setInt("pointLightCount", std::min(static_cast<int>(pointLights.size()), MAX_POINT_LIGHTS));
+    shader.setInt("pointLightCount", std::min(static_cast<int>(ctx.pointLights.size()), MAX_POINT_LIGHTS));
 
-    shader.setVec3("camPos", camera->Position);
+    shader.setVec3("camPos", ctx.camera->Position);
 
-    for (auto& [transform, meshComponent, materialComponent] : renderables) {
-        auto material = materialComponent->material;
+    for (auto& command : commands) {
+        auto& material = command.material.material;
         if (!material) continue;
 
         shader.setVec3("UVScale", material->UVScale);
@@ -70,12 +70,12 @@ void MeshPass::Execute() {
             }
         }
 
-        shader.setMat4("model", transform->GetWorldMatrix());
-        shader.setMat4("view", camera->GetViewMatrix());
-        shader.setMat4("projection", camera->projection);
+        shader.setMat4("model", command.transform.GetWorldMatrix());
+        shader.setMat4("view", ctx.camera->GetViewMatrix());
+        shader.setMat4("projection", ctx.camera->projection);
 
-        meshComponent->VAO.Bind();
-        glDrawElements(GL_TRIANGLES, meshComponent->indexCount, GL_UNSIGNED_INT, 0);
+        command.mesh.VAO.Bind();
+        glDrawElements(GL_TRIANGLES, command.mesh.indexCount, GL_UNSIGNED_INT, 0);
 
         GLenum err;
         while ((err = glGetError()) != GL_NO_ERROR) {
@@ -83,5 +83,5 @@ void MeshPass::Execute() {
         }
     }
 
-    renderables.clear();
+    commands.clear();
 }

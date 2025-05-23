@@ -6,7 +6,12 @@
 class RenderPipeline
 {
 public:
-	void AddPass(std::shared_ptr<RenderPass> pass)
+	void Clear()
+	{
+		passes.clear();
+	}
+
+	void AddPass(RenderPass* pass)
 	{
 		passes.push_back(pass);
 	}
@@ -19,6 +24,6 @@ public:
 		}
 	}
 private:
-	std::vector <std::shared_ptr<RenderPass>> passes;
+	std::vector <RenderPass*> passes;
 };
 

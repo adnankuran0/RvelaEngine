@@ -3,7 +3,8 @@
 #include "RvelaLog.h"
 #include "Engine.h"
 #include "Scene/Entity.h"
-#include <Renderer/MeshPass.h>
+#include "Renderer/RenderLayer.h"
+#include "Renderer/Passes/MeshPass.h"
 
 Engine* Engine::s_Instance = nullptr;
 
@@ -18,6 +19,8 @@ Engine::Engine()
 	m_ProjectManager->LoadProject("D:\\Github\\RvelaEngine\\TestProject\\TestProject.rproj");
 	m_SceneManager = std::make_unique<SceneManager>();
 	editorCamera = nullptr;
+
+	PushLayer(new RenderLayer(this));
 
 	if (s_Instance == nullptr)
 	{
@@ -138,26 +141,8 @@ void Engine::Render()
 {
 	Renderer::StartFrame();
 
-	std::vector<PointLightData> pointLights = m_Scene->CollectPointLights();
-	std::optional<DirectionalLightData> dirLight = m_Scene->CollectDirectionalLight();
 
 	Renderer::RenderSkybox(editorCamera);
-
-	MeshPass meshPass;
-	meshPass.SetCamera(editorCamera);
-	meshPass.SetLights(pointLights, dirLight ? &(*dirLight) : nullptr);
-
-	auto renderableView = m_Scene->GetRegistry().view<MeshRendererComponent, MaterialComponent, TransformComponent>();
-	for (auto entity : renderableView)
-	{
-		auto& mesh = m_Scene->GetComponent<MeshRendererComponent>(entity);
-		auto& material = m_Scene->GetComponent<MaterialComponent>(entity);
-		auto& transform = m_Scene->GetComponent<TransformComponent>(entity);
-
-		meshPass.AddRenderable(&transform, &mesh, &material);
-	}
-
-	meshPass.Execute();
 
 	for (Layer* layer : m_LayerStack)
 		layer->OnRender();
