@@ -3173,10 +3173,10 @@
                                                 "UUID": 2
                                 },
                                 {
-                                                "DirectionalLightComponent": "{\n    \"color\": [\n        1.0,\n        1.0,\n        1.0\n    ],\n    \"intensity\": 10.0\n}",
+                                                "DirectionalLightComponent": "{\n    \"castShadows\": true,\n    \"color\": [\n        1.0,\n        1.0,\n        1.0\n    ],\n    \"intensity\": 10.0\n}",
                                                 "SceneTreeComponent": "{\n    \"childrenUUIDs\": [],\n    \"parentUUID\": 0\n}",
                                                 "TagComponent": "{\n    \"tag\": \"DirectionalLight\"\n}",
-                                                "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        0.0,\n        0.0,\n        0.0\n    ],\n    \"rotation\": [\n        -72.30000305175781,\n        -120.5999984741211,\n        0.0\n    ],\n    \"scale\": [\n        1.0,\n        1.0,\n        1.0\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
+                                                "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        0.0,\n        1.0,\n        0.0\n    ],\n    \"rotation\": [\n        -56.5,\n        -98.5999984741211,\n        -11.399999618530273\n    ],\n    \"scale\": [\n        1.0,\n        1.0,\n        1.0\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
                                                 "UUID": 399
                                 },
                                 {
@@ -3184,7 +3184,7 @@
                                                 "MeshComponent": "{\n    \"meshIndex\": 0,\n    \"modelPath\": \"Assets\\\\Models\\\\Primitives\\\\Cube.fbx\"\n}",
                                                 "SceneTreeComponent": "{\n    \"childrenUUIDs\": [],\n    \"parentUUID\": 0\n}",
                                                 "TagComponent": "{\n    \"tag\": \"Cube\"\n}",
-                                                "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        0.0,\n        1.399999976158142,\n        0.0\n    ],\n    \"rotation\": [\n        0.0,\n        0.0,\n        0.0\n    ],\n    \"scale\": [\n        0.30000001192092896,\n        0.30000001192092896,\n        0.30000001192092896\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
+                                                "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        0.5,\n        -0.20000000298023224,\n        0.0\n    ],\n    \"rotation\": [\n        0.0,\n        0.0,\n        0.0\n    ],\n    \"scale\": [\n        0.30000001192092896,\n        0.30000001192092896,\n        0.30000001192092896\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
                                                 "UUID": 400
                                 }
                 ]

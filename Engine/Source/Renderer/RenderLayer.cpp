@@ -19,8 +19,6 @@ void RenderLayer::OnRender()
 	ShadowPass shadowPass(context);
 	MeshPass meshPass(context);
 
-
-
 	auto view = scene->GetRegistry().view<MeshRendererComponent, MaterialComponent, TransformComponent>();
 	for (auto& entity : view)
 	{
@@ -32,9 +30,9 @@ void RenderLayer::OnRender()
 		meshPass.AddCommand(command);
 	}
 
-	m_RenderPipeline->skyboxPass = &skyboxPass;
-	m_RenderPipeline->shadowPass = &shadowPass;
-	m_RenderPipeline->meshPass = &meshPass;
+	m_RenderPipeline->SetSkyboxPass(&skyboxPass);
+	m_RenderPipeline->SetShadowPass(&shadowPass);
+	m_RenderPipeline->SetMeshPass(&meshPass);
 
 	m_RenderPipeline->Execute();
 }

@@ -19,9 +19,9 @@ public:
 		passes.push_back(pass);
 	}
 
-	SkyboxPass* skyboxPass;
-	ShadowPass* shadowPass;
-	MeshPass* meshPass;
+	void SetSkyboxPass(SkyboxPass* skyboxPass) { this->skyboxPass = skyboxPass; }
+	void SetShadowPass(ShadowPass* shadowPass) { this->shadowPass = shadowPass; }
+	void SetMeshPass(MeshPass* meshPass) { this->meshPass = meshPass; }
 
 
 	void Execute() noexcept
@@ -34,5 +34,8 @@ public:
 	}
 private:
 	std::vector <RenderPass*> passes;
+	SkyboxPass* skyboxPass;
+	ShadowPass* shadowPass;
+	MeshPass* meshPass;
 };
 

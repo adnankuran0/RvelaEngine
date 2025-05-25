@@ -216,6 +216,9 @@ std::vector<PointLightData> Scene::CollectPointLights() noexcept {
         data.color = light.color;
         data.intensity = light.intensity;
         data.radius = light.radius;
+        data.castShadows = light.castShadows;
+        data.shadowMap = light.GetShadowMap();
+
         lights.push_back(data);
     }
     return lights;

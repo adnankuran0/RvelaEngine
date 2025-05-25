@@ -21,6 +21,7 @@ public:
         json j;
         j["color"] = { color.r,color.g,color.b };
         j["intensity"] = intensity;
+        j["castShadows"] = castShadows;
         return j.dump(4);
     }
 
@@ -30,5 +31,6 @@ public:
         auto colorData = j["color"];
         color = glm::vec3(colorData[0], colorData[1], colorData[2]);
         intensity = j["intensity"];
+        castShadows = j["castShadows"];
     }
 };

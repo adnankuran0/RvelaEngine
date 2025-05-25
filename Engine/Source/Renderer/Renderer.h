@@ -17,6 +17,9 @@ struct PointLightData {
     glm::vec3 color;
     float intensity;
     float radius;
+    bool castShadows;
+    GLuint shadowMap;
+    GLuint fbo;
 };
 
 struct DirectionalLightData {

@@ -5,7 +5,7 @@ in vec3 FragPos;
 in vec3 Normal;
 in vec4 FragPosLightSpace;
 
-#define MAX_POINT_LIGHTS 10
+#define MAX_POINT_LIGHTS 20
 #define MAX_DIRECTIONAL_LIGHTS 1
 
 // Material parameters
@@ -119,7 +119,8 @@ float calculateShadow(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir) {
         return 0.0;
 
     // Dynamic depth bias (reduces Peter Panning)
-    float bias = max(0.02 * (1.0 - dot(normal, lightDir)), 0.005);
+    float bias = min(0.005 * (1.0 - dot(normal, lightDir)), 0.005f);
+
 
     // PCF filtering (5x5 kernel for smoother shadows)
     float shadow = 0.0;
@@ -240,3 +241,5 @@ void main() {
 
     FragColor = vec4(color, alpha);
 }
+
+

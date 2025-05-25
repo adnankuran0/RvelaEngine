@@ -447,6 +447,7 @@ void ImGuiLayer::DrawInspectorPanel(entt::registry& registry, entt::entity& sele
                 }
 
                 if (ImGui::SliderFloat("Intensity", &directionalLightComponent.intensity, 0.0f, 10.0f)) {}
+                if (ImGui::Checkbox("Cast Shadow", &directionalLightComponent.castShadows));
 
             }
         }

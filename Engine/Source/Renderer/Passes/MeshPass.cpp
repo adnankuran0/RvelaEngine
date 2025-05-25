@@ -1,4 +1,4 @@
-#include "rvelapch.h"
+﻿#include "rvelapch.h"
 #include "MeshPass.h"
 #include "Core/Utils/TextureManager.h"
 #include "Core/Utils/MaterialManager.h"
@@ -15,23 +15,30 @@ void MeshPass::Execute() {
         shader.setVec3("directionalLight.direction", ctx.directionalLight->direction);
         shader.setVec3("directionalLight.color", ctx.directionalLight->color);
         shader.setFloat("directionalLight.intensity", ctx.directionalLight->intensity);
-        shader.setBool("directionalLight.castShadows", true);
+        shader.setBool("directionalLight.castShadows", ctx.directionalLight->castShadows);
         shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
         shader.setInt("shadowMap", 6);
         glActiveTexture(GL_TEXTURE0 + 6);
         glBindTexture(GL_TEXTURE_2D, shadowMap);
+        GLenum err = glGetError();
+        //if (err != GL_NO_ERROR) LOG_ERROR << "OpenGL Error after directional light setup: " << err;
     }
 
-    shader.setFloat("heightScale", 0.0f);
-    const int MAX_POINT_LIGHTS = 10;
-    for (int i = 0; i < std::min(static_cast<int>(ctx.pointLights.size()), MAX_POINT_LIGHTS); ++i) {
+    // Point light ayarları
+    
+    const int MAX_POINT_LIGHTS = 20;
+    int pointLightCount = std::min(static_cast<int>(ctx.pointLights.size()), MAX_POINT_LIGHTS);
+   
+    for (int i = 0; i < pointLightCount; ++i) {
         std::string baseName = "pointLights[" + std::to_string(i) + "]";
         shader.setVec3(baseName + ".position", ctx.pointLights[i].position);
         shader.setVec3(baseName + ".color", ctx.pointLights[i].color);
         shader.setFloat(baseName + ".intensity", ctx.pointLights[i].intensity);
         shader.setFloat(baseName + ".radius", ctx.pointLights[i].radius);
+        shader.setBool(baseName + ".castShadows", ctx.pointLights[i].castShadows);
     }
-    shader.setInt("pointLightCount", std::min(static_cast<int>(ctx.pointLights.size()), MAX_POINT_LIGHTS));
+
+    shader.setInt("pointLightCount", pointLightCount);
 
     shader.setVec3("camPos", ctx.camera->Position);
 
