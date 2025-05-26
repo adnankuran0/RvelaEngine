@@ -242,4 +242,3 @@ void main() {
     FragColor = vec4(color, alpha);
 }
 
-

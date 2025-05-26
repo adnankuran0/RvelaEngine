@@ -53,16 +53,15 @@ public:
         }
     }
 
-	void Execute() override;
+    void Execute() override;
 
-	GLuint GetDepthMap() const { return depthMap; }
-	glm::mat4 GetLightSpaceMatrix() const { return lightSpaceMatrix; }
+    GLuint GetDepthMap() const { return depthMap; }
+    glm::mat4 GetLightSpaceMatrix() const { return lightSpaceMatrix; }
 private:
-	static GLuint fbo;
-	static GLuint depthMap;
-	static glm::mat4 lightSpaceMatrix;
+    static GLuint fbo;
+    static GLuint depthMap;
+    static glm::mat4 lightSpaceMatrix;
     static bool isInitialized;
-	const unsigned int SHADOW_WIDTH = 8192, SHADOW_HEIGHT = 8192;
+    const unsigned int SHADOW_WIDTH = 8192, SHADOW_HEIGHT = 8192;
 };
-
 

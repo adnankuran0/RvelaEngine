@@ -17,9 +17,6 @@ struct PointLightData {
     glm::vec3 color;
     float intensity;
     float radius;
-    bool castShadows;
-    GLuint shadowMap;
-    GLuint fbo;
 };
 
 struct DirectionalLightData {
@@ -42,7 +39,7 @@ public:
     static void Shutdown();
 
     static Shader& GetDefaultShader() { return m_DefaultShader; }
-    static Shader& GetSkyboxShader() { return m_SkyboxShader;}
+    static Shader& GetSkyboxShader() { return m_SkyboxShader; }
     static Shader& GetShadowShader() { return m_ShadowShader; }
     static Skybox& GetSkybox() { return m_Skybox; }
 

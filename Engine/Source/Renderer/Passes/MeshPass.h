@@ -14,4 +14,3 @@ public:
 	GLuint shadowMap = 0;
 	glm::mat4 lightSpaceMatrix;
 };
-

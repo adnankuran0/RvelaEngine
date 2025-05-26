@@ -31,6 +31,5 @@ public:
         auto colorData = j["color"];
         color = glm::vec3(colorData[0], colorData[1], colorData[2]);
         intensity = j["intensity"];
-        castShadows = j["castShadows"];
     }
 };
