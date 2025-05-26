@@ -427,6 +427,8 @@ void ImGuiLayer::DrawInspectorPanel(entt::registry& registry, entt::entity& sele
                     pointLightComponent.color = glm::vec3(color[0], color[1], color[2]);
 
                 }
+                
+                if (ImGui::Checkbox("CastShadows",&pointLightComponent.castShadows)) {}
 
                 if (ImGui::SliderFloat("Intensity", &pointLightComponent.intensity, 0.0f, 10.0f)) {}
                 if (ImGui::SliderFloat("Radius", &pointLightComponent.radius, 0.1f, 50.0f)) {}

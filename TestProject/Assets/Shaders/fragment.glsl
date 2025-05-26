@@ -32,12 +32,17 @@ uniform float heightScale;
 uniform sampler2D shadowMap;
 uniform mat4 lightSpaceMatrix;
 
+uniform samplerCube pointShadowMap;
+uniform float pointLightFarPlane;
+
+
 // Lights
 struct PointLight {
     vec3 position;
     vec3 color;
     float intensity;
     float radius;
+    bool castShadows;
 };
 uniform PointLight pointLights[MAX_POINT_LIGHTS];
 uniform int pointLightCount;
@@ -136,6 +141,36 @@ float calculateShadow(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir) {
     return shadow;
 }
 
+float calculatePointLightShadow(int index, vec3 fragPos, vec3 lightPos, float farPlane) {
+    vec3 fragToLight = fragPos - lightPos;
+    float currentDepth = length(fragToLight);
+    float shadow = 0.0;
+
+    float bias = 0.1;
+    float samples = 20.0;
+    float diskRadius = (1.0 + (currentDepth / farPlane)) / 25.0;
+
+    for (float i = 0.0; i < samples; ++i) {
+        // Örnekleme için rasgele yönler, basit olarak küresel örnekleme (örnekleme yöntemi geliştirilebilir)
+        vec3 sampleOffset = normalize(vec3(
+            cos(i * 3.14159 * 2.0 / samples),
+            sin(i * 3.14159 * 2.0 / samples),
+            cos(i * 3.14159 / samples)
+        )) * diskRadius;
+
+        float closestDepth = texture(pointShadowMap, fragToLight + sampleOffset).r;
+        closestDepth *= farPlane; // depth cubemap'lar normalize derinlik içerir, onu gerçek derinliğe çevirdik
+        if (currentDepth - bias > closestDepth)
+            shadow += 1.0;
+    }
+
+    shadow /= samples;
+    if (currentDepth > farPlane) // ışık menzili dışında shadow yok
+        shadow = 0.0;
+
+    return shadow;
+}
+
 vec3 calculateDirectionalLight(DirectionalLight light, vec3 N, vec3 V, vec3 albedo, float metallic, float roughness, vec3 F0) {
     vec3 L = normalize(-light.direction);
     vec3 H = normalize(V + L);
@@ -208,29 +243,38 @@ void main() {
     }
     
     // Point lights
-    for (int i = 0; i < pointLightCount; ++i) {
-        vec3 L = normalize(pointLights[i].position - FragPos);
+    for (int i = 0; i < pointLightCount; ++i) 
+    {
+        PointLight light = pointLights[i];
+        vec3 L = light.position - FragPos;
+        float distance = length(L);
+        if (distance > light.radius)
+            continue;
+
+        L = normalize(L);
         vec3 H = normalize(V + L);
-        float distance = length(pointLights[i].position - FragPos);
-        
-        // Radius desteği eklenmiş attenuation formülü
-        float attenuation = 1.0 / (1.0 + (distance / pointLights[i].radius) * (distance / pointLights[i].radius));
-        vec3 radiance = pointLights[i].color * attenuation * pointLights[i].intensity;
+
+        float attenuation = 1.0 - (distance / light.radius);
+        attenuation = clamp(attenuation, 0.0, 1.0);
 
         float NDF = DistributionGGX(N, H, roughness);
         float G = GeometrySmith(N, V, L, roughness);
         vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
-        
-        vec3 numerator = NDF * G * F;
-        float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
-        vec3 specular = numerator / denominator;
-        
+
         vec3 kS = F;
         vec3 kD = vec3(1.0) - kS;
         kD *= 1.0 - metallic;
-        
+
+        vec3 numerator = NDF * G * F;
+        float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001;
+        vec3 specular = numerator / denominator;
+
         float NdotL = max(dot(N, L), 0.0);
-        Lo += (kD * albedo / PI + specular) * radiance * NdotL;
+
+        float shadow = light.castShadows ? calculatePointLightShadow(i, FragPos, light.position, pointLightFarPlane) : 0.0;
+
+        vec3 radiance = light.color * light.intensity * attenuation;
+        Lo += (kD * albedo / PI + specular) * radiance * NdotL * (1.0 - shadow);
     }
     
     // Ambient ve tonemapping
@@ -241,4 +285,3 @@ void main() {
 
     FragColor = vec4(color, alpha);
 }
-

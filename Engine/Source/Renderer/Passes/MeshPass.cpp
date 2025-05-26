@@ -15,24 +15,62 @@ void MeshPass::Execute() {
         shader.setVec3("directionalLight.direction", ctx.directionalLight->direction);
         shader.setVec3("directionalLight.color", ctx.directionalLight->color);
         shader.setFloat("directionalLight.intensity", ctx.directionalLight->intensity);
-        shader.setBool("directionalLight.castShadows", true);
+        shader.setBool("directionalLight.castShadows", ctx.directionalLight->castShadows);
         shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
         shader.setInt("shadowMap", 6);
         glActiveTexture(GL_TEXTURE0 + 6);
         glBindTexture(GL_TEXTURE_2D, shadowMap);
+        GLenum err = glGetError();
+        if (err != GL_NO_ERROR) LOG_ERROR << "OpenGL Error after directional light setup: " << err;
     }
 
     shader.setFloat("heightScale", 0.0f);
-    const int MAX_POINT_LIGHTS = 10;
-    for (int i = 0; i < std::min(static_cast<int>(ctx.pointLights.size()), MAX_POINT_LIGHTS); ++i) {
+
+    // Point light ayarları - GPU limitlerini kontrol et
+    GLint maxTextureUnits;
+    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextureUnits);
+
+    const int RESERVED_SLOTS = 7; // İlk 7 slot materyal ve directional light için ayrılmış
+    const int MAX_POINT_LIGHTS = std::min(20, maxTextureUnits - RESERVED_SLOTS);
+
+    int pointLightCount = std::min(static_cast<int>(ctx.pointLights.size()), MAX_POINT_LIGHTS);
+
+    // Point light shadow map'lerini bind et
+    for (int i = 0; i < pointLightCount; ++i) {
+        int textureSlot = RESERVED_SLOTS + i;
+        if (textureSlot >= maxTextureUnits) {
+            LOG_ERROR << "Texture slot limit exceeded for point light " << i;
+            break;
+        }
+
         std::string baseName = "pointLights[" + std::to_string(i) + "]";
         shader.setVec3(baseName + ".position", ctx.pointLights[i].position);
         shader.setVec3(baseName + ".color", ctx.pointLights[i].color);
         shader.setFloat(baseName + ".intensity", ctx.pointLights[i].intensity);
         shader.setFloat(baseName + ".radius", ctx.pointLights[i].radius);
-    }
-    shader.setInt("pointLightCount", std::min(static_cast<int>(ctx.pointLights.size()), MAX_POINT_LIGHTS));
+        shader.setBool(baseName + ".castShadows", ctx.pointLights[i].castShadows);
 
+        shader.setFloat("pointLightFarPlane", ctx.pointLights[0].radius);
+
+        
+        shader.setInt("pointShadowMap", 10);
+        glActiveTexture(GL_TEXTURE0 + 10);
+        GLenum err = glGetError();
+        if (err != GL_NO_ERROR) {
+            LOG_ERROR << "OpenGL Error after glActiveTexture for point light " << i << ": " << err;
+            continue;
+        }
+        glActiveTexture(GL_TEXTURE0 + 10);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, ctx.pointLights[0].depthCubemap);
+
+        err = glGetError();
+        if (err != GL_NO_ERROR) {
+            LOG_ERROR << "OpenGL Error after glBindTexture for point light " << i << ": " << err;
+            continue;
+        }
+    }
+
+    shader.setInt("pointLightCount", pointLightCount);
     shader.setVec3("camPos", ctx.camera->Position);
 
     for (auto& command : commands) {
