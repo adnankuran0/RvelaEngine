@@ -26,16 +26,14 @@ void MeshPass::Execute() {
 
     shader.setFloat("heightScale", 0.0f);
 
-    // Point light ayarları - GPU limitlerini kontrol et
     GLint maxTextureUnits;
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextureUnits);
 
-    const int RESERVED_SLOTS = 7; // İlk 7 slot materyal ve directional light için ayrılmış
+    const int RESERVED_SLOTS = 7;
     const int MAX_POINT_LIGHTS = std::min(20, maxTextureUnits - RESERVED_SLOTS);
 
     int pointLightCount = std::min(static_cast<int>(ctx.pointLights.size()), MAX_POINT_LIGHTS);
 
-    // Point light shadow map'lerini bind et
     for (int i = 0; i < pointLightCount; ++i) {
         int textureSlot = RESERVED_SLOTS + i;
         if (textureSlot >= maxTextureUnits) {
