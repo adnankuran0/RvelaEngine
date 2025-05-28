@@ -432,6 +432,7 @@ void ImGuiLayer::DrawInspectorPanel(entt::registry& registry, entt::entity& sele
 
                 if (ImGui::SliderFloat("Intensity", &pointLightComponent.intensity, 0.0f, 10.0f)) {}
                 if (ImGui::SliderFloat("Radius", &pointLightComponent.radius, 0.1f, 50.0f)) {}
+                if (ImGui::SliderFloat("Falloff", &pointLightComponent.falloff, 0.0f, 10.0f)) {}
 
             }
         }

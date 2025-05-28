@@ -40,6 +40,7 @@ struct PointLight {
     vec3 color;
     float intensity;
     float radius;
+    float falloff;
     bool castShadows;
     int shadowIndex;
 };
@@ -130,7 +131,7 @@ float calculateDirectionalShadow(vec4 fragPosLightSpace, vec3 normal, vec3 light
         return 0.0;
 
     // Dynamic depth bias (reduces Peter Panning)
-    float bias = min(0.005 * (1.0 - dot(normal, lightDir)), 0.005f);
+    float bias = min(0.001 * (1.0 - dot(normal, lightDir)), 0.001f);
 
 
     // PCF filtering (5x5 kernel for smoother shadows)
@@ -215,7 +216,8 @@ void main()
     }
 
     // Point lights
-    for(int i = 0; i < pointLightCount; ++i) {
+    for(int i = 0; i < pointLightCount; ++i) 
+    {
         PointLight light = pointLights[i];
         vec3 L = light.position - FragPos;
         float distance = length(L);
@@ -225,8 +227,9 @@ void main()
         L = normalize(L);
         vec3 H = normalize(V + L);
         
-        // Attenuation
-        float attenuation = 1.0 - smoothstep(light.radius * 0.75, light.radius, distance);
+        // Attenuation 
+        float attenuation = 1.0 / (1.0 + light.falloff * distance * distance);
+        attenuation *= 1.0 - smoothstep(light.radius * 0.75, light.radius, distance);
         
         // Cook-Torrance BRDF
         float NDF = DistributionGGX(N, H, roughness);

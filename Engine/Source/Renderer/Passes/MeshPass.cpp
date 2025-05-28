@@ -44,6 +44,7 @@ void MeshPass::Execute() {
         shader.setVec3(base + ".color", light.color);
         shader.setFloat(base + ".intensity", light.intensity);
         shader.setFloat(base + ".radius", light.radius);
+        shader.setFloat(base + ".falloff", light.falloff);
         shader.setInt(base + ".shadowIndex", light.shadowIndex);
         shader.setBool(base + ".castShadows", light.castShadows);
     }
