@@ -18,10 +18,7 @@ struct PointLightData {
     float intensity;
     float radius;
     bool castShadows;
-    unsigned int shadowWidth;
-    unsigned int shadowHeight;
-    GLuint depthCubemap;
-    GLuint depthMapFBO;
+    int shadowIndex;
 };
 
 struct DirectionalLightData {

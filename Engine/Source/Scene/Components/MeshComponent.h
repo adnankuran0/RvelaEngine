@@ -15,7 +15,6 @@ struct MeshComponent : public Component {
     std::string Serialize() const override {
         json j;
         j["modelPath"] = modelPath.GetVirtualStr();
-        std::cout << "Virtual model path: " << modelPath.GetVirtualStr() << std::endl;
         j["meshIndex"] = meshIndex;
         return j.dump(4);
     }

@@ -29,6 +29,7 @@ public:
 		skyboxPass->Execute();
 		shadowPass->Execute();
 		meshPass->shadowMap = shadowPass->GetDepthMap();
+		meshPass->pointShadowMap = shadowPass->GetPointDepthMap();
 		meshPass->lightSpaceMatrix = shadowPass->GetLightSpaceMatrix();
 		meshPass->Execute();
 	}

@@ -12,5 +12,7 @@ public:
 	void Execute() override;
 
 	GLuint shadowMap = 0;
+	GLuint pointShadowMap = 0;
+
 	glm::mat4 lightSpaceMatrix;
 };
