@@ -95,5 +95,5 @@ private:
     static std::vector<GLuint> upsampleTextures;
 
     static GLuint blurredTexture;
-    static constexpr int mipLevels = 5;
+    static constexpr int mipLevels = 6;
 };

@@ -8,6 +8,8 @@ bool MeshPass::isInitialized = false;
 GLuint MeshPass::screenFBO = 0; 
 GLuint MeshPass::screenColorTex = 0;
 GLuint MeshPass::screenRBO = 0;
+GLuint MeshPass::intermediateFBO = 0;
+GLuint MeshPass::intermediateColorTex = 0;
 
 void MeshPass::Execute() {
     if (commands.empty() || !ctx.IsValid()) return;
@@ -120,6 +122,13 @@ void MeshPass::Execute() {
         }
 
     }
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, screenFBO);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, intermediateFBO);
+    glBlitFramebuffer(
+        0, 0, ctx.viewportWidth, ctx.viewportHeight,
+        0, 0, ctx.viewportWidth, ctx.viewportHeight,
+        GL_COLOR_BUFFER_BIT, GL_NEAREST
+    );
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     commands.clear();
