@@ -16,7 +16,7 @@ void MeshPass::Execute() {
 
     glBindFramebuffer(GL_FRAMEBUFFER, screenFBO);
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     Shader& shader = Renderer::GetDefaultShader();
     shader.use();

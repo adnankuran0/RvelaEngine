@@ -32,6 +32,7 @@ public:
 
 	void Execute() noexcept
 	{
+		skyboxPass->screenFBO = meshPass->GetScreenFBO();
 		skyboxPass->Execute();
 		shadowPass->Execute();
 		meshPass->shadowMap = shadowPass->GetDepthMap();

@@ -48,13 +48,7 @@ public:
 
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, brightColorTex, 0);
 
-            //optional
-            GLuint brightRBO;
-            glGenRenderbuffers(1, &brightRBO);
-            glBindRenderbuffer(GL_RENDERBUFFER, brightRBO);
-            glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, context.viewportWidth, context.viewportHeight);
-            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, brightRBO);
-
+            
             if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
                 std::cerr << "Bright FBO not complete!" << std::endl;
 

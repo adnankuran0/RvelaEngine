@@ -52,6 +52,7 @@ public:
 	void Execute() override;
 
 	GLuint GetScreenTexture() { return intermediateColorTex; }
+    GLuint GetScreenFBO() { return screenFBO; }
 
 	GLuint shadowMap = 0;
 	GLuint pointShadowMap = 0;

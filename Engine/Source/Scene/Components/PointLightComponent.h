@@ -15,7 +15,7 @@ public:
     float intensity = 10.0f;
     float radius = 5.0f;
     float falloff = 0.0f;
-    bool castShadows = true;
+    bool castShadows = false;
     int shadowIndex = -1;
     PointLightComponent()
     {
