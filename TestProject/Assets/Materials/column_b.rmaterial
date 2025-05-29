@@ -21,6 +21,6 @@
     "metallic": 0.0,
     "metallicMapPath": "",
     "normalMapPath": "",
-    "roughness": 0.5,
+    "roughness": 1.0,
     "roughnessMapPath": ""
 }

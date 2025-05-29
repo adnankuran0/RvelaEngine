@@ -45,6 +45,10 @@ public:
     static Shader& GetSkyboxShader() { return m_SkyboxShader; }
     static Shader& GetShadowShader() { return m_ShadowShader; }
     static Shader& GetPointShadowShader() { return m_PointShadowShader; }
+    static Shader& GetScreenQuadShader() { return m_ScreenQuadShader; }
+    static Shader& GetBrightShader() { return m_BrightShader; }
+    static Shader& GetDownsampleShader() { return m_DownsampleShader; }
+    static Shader& GetUpsampleShader() { return m_UpsampleShader; }
     static Skybox& GetSkybox() { return m_Skybox; }
 
 private:
@@ -53,5 +57,9 @@ private:
     static Shader m_SkyboxShader;
     static Shader m_ShadowShader;
     static Shader m_PointShadowShader;
+    static Shader m_ScreenQuadShader;
+    static Shader m_BrightShader;
+    static Shader m_DownsampleShader;
+    static Shader m_UpsampleShader;
     static Skybox m_Skybox;
 };

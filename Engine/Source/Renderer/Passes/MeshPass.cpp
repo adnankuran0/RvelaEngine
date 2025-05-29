@@ -4,8 +4,17 @@
 #include "Core/Utils/MaterialManager.h"
 #include "../../RvelaLog.h"
 
+bool MeshPass::isInitialized = false;
+GLuint MeshPass::screenFBO = 0; 
+GLuint MeshPass::screenColorTex = 0;
+GLuint MeshPass::screenRBO = 0;
+
 void MeshPass::Execute() {
     if (commands.empty() || !ctx.IsValid()) return;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, screenFBO);
+    glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     Shader& shader = Renderer::GetDefaultShader();
     shader.use();
@@ -57,6 +66,8 @@ void MeshPass::Execute() {
     shader.setInt("pointLightCount", pointLightCount);
     shader.setVec3("camPos", ctx.camera->Position);
 
+    
+
     for (auto& command : commands) {
         auto& material = command.material.material;
         if (!material) continue;
@@ -107,7 +118,9 @@ void MeshPass::Execute() {
         while ((err = glGetError()) != GL_NO_ERROR) {
             LOG_ERROR << "OpenGL Error: " << err;
         }
+
     }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     commands.clear();
 }

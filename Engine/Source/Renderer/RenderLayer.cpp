@@ -18,6 +18,10 @@ void RenderLayer::OnRender()
 	SkyboxPass skyboxPass(context);
 	ShadowPass shadowPass(context);
 	MeshPass meshPass(context);
+	PostProcessPass postProcessPass(context);
+	BrightPass brightPass(context);
+	BloomPass bloomPass(context);
+
 
 
 
@@ -35,6 +39,9 @@ void RenderLayer::OnRender()
 	m_RenderPipeline->SetSkyboxPass(&skyboxPass);
 	m_RenderPipeline->SetShadowPass(&shadowPass) ;
 	m_RenderPipeline->SetMeshPass(&meshPass);
+	m_RenderPipeline->SetPostProcessPass(&postProcessPass);
+	m_RenderPipeline->SetBrightPass(&brightPass);
+	m_RenderPipeline->SetBloomPass(&bloomPass);
 
 	m_RenderPipeline->Execute();
 }

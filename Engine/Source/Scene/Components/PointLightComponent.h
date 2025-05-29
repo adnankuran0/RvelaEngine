@@ -13,7 +13,7 @@ public:
 
     glm::vec3 color = glm::vec3(1.0f);
     float intensity = 10.0f;
-    float radius = 10.0f;
+    float radius = 5.0f;
     float falloff = 0.0f;
     bool castShadows = true;
     int shadowIndex = -1;
@@ -34,6 +34,8 @@ public:
         j["color"] = { color.r,color.g,color.b };
         j["intensity"] = intensity;
         j["radius"] = radius;
+        j["falloff"] = falloff;
+        j["castShadows"] = castShadows;
         return j.dump(4);
     }
 
@@ -44,6 +46,8 @@ public:
         color = glm::vec3(colorData[0], colorData[1], colorData[2]);
         intensity = j["intensity"];
         radius = j["radius"];
+        falloff = j["falloff"];
+        castShadows = j["castShadows"];
     }
 
 private:

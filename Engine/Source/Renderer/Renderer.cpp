@@ -13,6 +13,10 @@ Shader Renderer::m_DefaultShader;
 Shader Renderer::m_SkyboxShader;
 Shader Renderer::m_ShadowShader;
 Shader Renderer::m_PointShadowShader;
+Shader Renderer::m_ScreenQuadShader;
+Shader Renderer::m_BrightShader;
+Shader Renderer::m_DownsampleShader;
+Shader Renderer::m_UpsampleShader;
 Skybox Renderer::m_Skybox;
 
 
@@ -34,6 +38,10 @@ void Renderer::Init(GLFWwindow* window)
     m_SkyboxShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\skyboxVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\skyboxFrag.glsl"));
     m_ShadowShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\shadowVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\shadowFrag.glsl"));
     m_PointShadowShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\pointShadowVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\pointShadowFrag.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\pointShadowGeom.glsl"));
+    m_ScreenQuadShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\screenQuadVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\screenQuadFrag.glsl"));
+    m_BrightShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\brightPassVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\brightPassFrag.glsl"));
+    m_DownsampleShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\downsampleVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\downsampleFrag.glsl"));
+    m_UpsampleShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\upsampleVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\upsampleFrag.glsl"));
 
     std::vector<Path> faces = {
     TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\right.jpg"),
