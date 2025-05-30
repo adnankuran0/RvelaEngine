@@ -43,6 +43,7 @@ public:
 
     GLuint screenTexture;
     GLuint bloomBlurTexture;
+    GLuint aoTexture;
 
 private:
     static bool isInitialized;

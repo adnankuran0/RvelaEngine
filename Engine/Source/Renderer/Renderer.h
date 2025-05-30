@@ -49,6 +49,8 @@ public:
     static Shader& GetBrightShader() { return m_BrightShader; }
     static Shader& GetDownsampleShader() { return m_DownsampleShader; }
     static Shader& GetUpsampleShader() { return m_UpsampleShader; }
+    static Shader& GetGeometryShader() { return m_GeometryShader; }
+    static Shader& GetSSAOShader() { return m_SSAOShader; }
     static Skybox& GetSkybox() { return m_Skybox; }
 
 private:
@@ -61,5 +63,7 @@ private:
     static Shader m_BrightShader;
     static Shader m_DownsampleShader;
     static Shader m_UpsampleShader;
+    static Shader m_GeometryShader;
+    static Shader m_SSAOShader;
     static Skybox m_Skybox;
 };

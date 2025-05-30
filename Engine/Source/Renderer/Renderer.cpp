@@ -17,6 +17,8 @@ Shader Renderer::m_ScreenQuadShader;
 Shader Renderer::m_BrightShader;
 Shader Renderer::m_DownsampleShader;
 Shader Renderer::m_UpsampleShader;
+Shader Renderer::m_GeometryShader;
+Shader Renderer::m_SSAOShader;
 Skybox Renderer::m_Skybox;
 
 
@@ -42,6 +44,8 @@ void Renderer::Init(GLFWwindow* window)
     m_BrightShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\brightPassVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\brightPassFrag.glsl"));
     m_DownsampleShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\downsampleVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\downsampleFrag.glsl"));
     m_UpsampleShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\upsampleVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\upsampleFrag.glsl"));
+    m_GeometryShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\geometryVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\geometryFrag.glsl"));
+    m_SSAOShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\ssaoVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\ssaoFrag.glsl"));
 
     std::vector<Path> faces = {
     TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\right.jpg"),

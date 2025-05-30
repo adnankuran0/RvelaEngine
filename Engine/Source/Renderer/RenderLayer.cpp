@@ -17,10 +17,12 @@ void RenderLayer::OnRender()
 
 	SkyboxPass skyboxPass(context);
 	ShadowPass shadowPass(context);
+	GeometryPass geometryPass(context);
 	MeshPass meshPass(context);
 	PostProcessPass postProcessPass(context);
 	BrightPass brightPass(context);
 	BloomPass bloomPass(context);
+	SSAOPass ssaoPass(context);
 
 
 
@@ -33,15 +35,18 @@ void RenderLayer::OnRender()
 			scene->GetComponent<MaterialComponent>(entity));
 
 		shadowPass.AddCommand(command);
+		geometryPass.AddCommand(command);
 		meshPass.AddCommand(command);
 	}
 
 	m_RenderPipeline->SetSkyboxPass(&skyboxPass);
 	m_RenderPipeline->SetShadowPass(&shadowPass) ;
+	m_RenderPipeline->SetGeometryPass(&geometryPass);
 	m_RenderPipeline->SetMeshPass(&meshPass);
 	m_RenderPipeline->SetPostProcessPass(&postProcessPass);
 	m_RenderPipeline->SetBrightPass(&brightPass);
 	m_RenderPipeline->SetBloomPass(&bloomPass);
+	m_RenderPipeline->SetSSAOPass(&ssaoPass);
 
 	m_RenderPipeline->Execute();
 }
