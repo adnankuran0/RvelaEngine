@@ -32,7 +32,16 @@ void ShadowPass::Execute()
 
         glEnable(GL_POLYGON_OFFSET_FILL);
         glPolygonOffset(1.0f, 2.0f);
-        glCullFace(GL_FRONT);
+
+        if (ctx.directionalLight->reverseCullFace)
+        {
+            glCullFace(GL_BACK);
+        }
+        else
+        {
+            glCullFace(GL_FRONT);
+        }
+        
         glEnable(GL_CULL_FACE);
 
         for (auto& command : commands) {
@@ -57,9 +66,11 @@ void ShadowPass::Execute()
     for (auto& light : ctx.pointLights)
     {
         if (!light.castShadows) continue;
+
+
         glm::vec3 lightPos = light.position;
 
-        float near_plane = 1.0f;
+        float near_plane = 0.1f;
         float far_plane = light.radius;
         glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)POINT_SHADOW_WIDTH/ (float)POINT_SHADOW_HEIGHT, near_plane, far_plane);
         std::vector<glm::mat4> shadowTransforms;

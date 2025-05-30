@@ -40,7 +40,8 @@ void Material::Deserialize(const std::string& jsonStr)
     auto color = j["albedoColor"];
     albedoColor = glm::vec3(color[0], color[1], color[2]);
     metallic = j["metallic"];
-    roughness = j["roughness"];
+    //roughness = j["roughness"];
+    roughness = 1.0f;
     ao = j["ao"];
 
     auto uvScale = j["UVScale"];

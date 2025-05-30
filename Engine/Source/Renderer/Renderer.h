@@ -20,6 +20,9 @@ struct PointLightData {
     float falloff;
     bool castShadows;
     int shadowIndex;
+    bool reverseCullFace;
+    float blurRadius;
+    float shadowBias;
 };
 
 struct DirectionalLightData {
@@ -27,6 +30,9 @@ struct DirectionalLightData {
     glm::vec3 color;
     float intensity;
     bool castShadows;
+    bool reverseCullFace;
+    float blurRadius;
+    float shadowBias;
 };
 
 
@@ -41,7 +47,7 @@ public:
     static void EndFrame();
     static void Shutdown();
 
-    static Shader& GetDefaultShader() { return m_DefaultShader; }
+    static Shader& GetPBRShader() { return m_PBRShader; }
     static Shader& GetSkyboxShader() { return m_SkyboxShader; }
     static Shader& GetShadowShader() { return m_ShadowShader; }
     static Shader& GetPointShadowShader() { return m_PointShadowShader; }
@@ -51,11 +57,12 @@ public:
     static Shader& GetUpsampleShader() { return m_UpsampleShader; }
     static Shader& GetGeometryShader() { return m_GeometryShader; }
     static Shader& GetSSAOShader() { return m_SSAOShader; }
+    static Shader& GetSSRShader() { return m_SSRShader; }
     static Skybox& GetSkybox() { return m_Skybox; }
 
 private:
     static GLFWwindow* activeWindow;
-    static Shader m_DefaultShader;
+    static Shader m_PBRShader;
     static Shader m_SkyboxShader;
     static Shader m_ShadowShader;
     static Shader m_PointShadowShader;
@@ -65,5 +72,6 @@ private:
     static Shader m_UpsampleShader;
     static Shader m_GeometryShader;
     static Shader m_SSAOShader;
+    static Shader m_SSRShader;
     static Skybox m_Skybox;
 };

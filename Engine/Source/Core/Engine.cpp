@@ -4,7 +4,7 @@
 #include "Engine.h"
 #include "Scene/Entity.h"
 #include "Renderer/RenderLayer.h"
-#include "Renderer/Passes/MeshPass.h"
+#include "Renderer/Passes/LightingPass.h"
 
 Engine* Engine::s_Instance = nullptr;
 

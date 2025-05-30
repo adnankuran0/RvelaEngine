@@ -42,6 +42,8 @@ struct PointLight {
     float radius;
     float falloff;
     bool castShadows;
+    float shadowBias;
+    float blurRadius;
     int shadowIndex;
 };
 uniform PointLight pointLights[MAX_POINT_LIGHTS];
@@ -52,6 +54,8 @@ struct DirectionalLight {
     vec3 color;
     float intensity;
     bool castShadows;
+    float shadowBias;
+    float blurRadius;
 };
 uniform DirectionalLight directionalLight;
 uniform bool hasDirectionalLight;
@@ -121,51 +125,55 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0) {
 }
 
 // Shadow calculations
-float calculateDirectionalShadow(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir) {
-    // Perspective divide and transform to [0,1] range
+float calculateDirectionalShadow(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir, float shadowBias, float blurRadius) {
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
     projCoords = projCoords * 0.5 + 0.5;
 
-    // Early exit if outside shadow frustum
     if (projCoords.z > 1.0 || projCoords.x < 0.0 || projCoords.x > 1.0 || projCoords.y < 0.0 || projCoords.y > 1.0)
         return 0.0;
 
-    // Dynamic depth bias (reduces Peter Panning)
-    float bias = min(0.001 * (1.0 - dot(normal, lightDir)), 0.001f);
+    float bias = min(shadowBias * (1.0 - dot(normal, lightDir)), shadowBias);
 
-
-    // PCF filtering (5x5 kernel for smoother shadows)
     float shadow = 0.0;
-    vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
+    float totalWeight = 0.0;
+
+    vec2 texelSize = blurRadius / textureSize(shadowMap, 0);
+
+    float weights[5] = float[](0.06136, 0.24477, 0.38774, 0.24477, 0.06136);
+
     for (int x = -2; x <= 2; ++x) {
         for (int y = -2; y <= 2; ++y) {
+            float weight = weights[x + 2] * weights[y + 2];
             float closestDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
-            shadow += (projCoords.z - bias) > closestDepth ? 1.0 : 0.0;
+            shadow += ((projCoords.z - bias) > closestDepth ? 1.0 : 0.0) * weight;
+            totalWeight += weight;
         }
     }
-    shadow /= 25.0;
+
+    shadow /= totalWeight;
 
     return shadow;
 }
 
-float calculatePointLightShadow(int index, vec3 fragPos, vec3 lightPos, float farPlane, vec3 normal) {
+float calculatePointLightShadow(int index, vec3 fragPos, vec3 lightPos, float farPlane, vec3 normal, float shadowBias, float blurRadius) {
     vec3 fragToLight = fragPos - lightPos;
     float currentDepth = length(fragToLight);
-    
-    if(currentDepth > farPlane) return 0.0;
-    
+
+    if (currentDepth > farPlane) return 0.0;
+
     float shadow = 0.0;
-    float bias = max(0.05 * (1.0 - dot(normal, normalize(fragToLight))), 0.005);
-    float diskRadius = 0.05;
-    
-    for(int i = 0; i < 16; ++i) {
+    float bias = max(shadowBias * (1.0 - dot(normal, normalize(fragToLight))), shadowBias);
+
+    float diskRadius = blurRadius * (1.0 + (currentDepth / farPlane));
+
+    for (int i = 0; i < 16; ++i) {
         vec3 sampleDir = fragToLight;
         sampleDir.xy += poissonDisk[i] * diskRadius;
-        
+
         float closestDepth = texture(pointShadowMap, vec4(sampleDir, index)).r * farPlane;
         shadow += (currentDepth - bias) > closestDepth ? 1.0 : 0.0;
     }
-    
+
     return shadow / 16.0;
 }
 
@@ -209,7 +217,7 @@ void main()
         
         float NdotL = max(dot(N, L), 0.0);
         float shadow = directionalLight.castShadows ? 
-            calculateDirectionalShadow(FragPosLightSpace, N, L) : 0.0;
+            calculateDirectionalShadow(FragPosLightSpace, N, L,directionalLight.shadowBias,directionalLight.blurRadius) : 0.0;
 
         Lo += (1.0 - shadow) * (kD * albedo / PI + specular) * 
               directionalLight.color * directionalLight.intensity * NdotL;
@@ -246,7 +254,7 @@ void main()
         
         float NdotL = max(dot(N, L), 0.0);
         float shadow = light.castShadows ? 
-            calculatePointLightShadow(light.shadowIndex, FragPos, light.position, light.radius, N) : 0.0;
+            calculatePointLightShadow(light.shadowIndex, FragPos, light.position, light.radius, N, light.shadowBias, light.blurRadius) : 0.0;
 
         vec3 radiance = light.color * light.intensity * attenuation;
         Lo += (1.0 - shadow) * (kD * albedo / PI + specular) * radiance * NdotL;

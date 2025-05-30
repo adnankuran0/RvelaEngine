@@ -101,7 +101,7 @@ private:
     static GLuint pointDepthMap;
     static glm::mat4 lightSpaceMatrix;
     static bool isInitialized;
-    const unsigned int SHADOW_WIDTH = 8192, SHADOW_HEIGHT = 8192;
+    const unsigned int SHADOW_WIDTH = 4096, SHADOW_HEIGHT = 4096;
     const unsigned int POINT_SHADOW_WIDTH = 1024, POINT_SHADOW_HEIGHT = 1024;
 };
 

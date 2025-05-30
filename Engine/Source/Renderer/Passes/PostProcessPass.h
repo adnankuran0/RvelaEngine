@@ -44,8 +44,11 @@ public:
     GLuint screenTexture;
     GLuint bloomBlurTexture;
     GLuint aoTexture;
+    GLuint ssrTexture;
 
 private:
     static bool isInitialized;
     static GLuint quadVAO, quadVBO;
+    static float exposure;
+    void UpdateExposure(float deltaTime);
 };

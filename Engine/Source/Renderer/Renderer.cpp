@@ -9,7 +9,7 @@
 #include <algorithm>
 
 GLFWwindow* Renderer::activeWindow = nullptr;
-Shader Renderer::m_DefaultShader;
+Shader Renderer::m_PBRShader;
 Shader Renderer::m_SkyboxShader;
 Shader Renderer::m_ShadowShader;
 Shader Renderer::m_PointShadowShader;
@@ -19,6 +19,7 @@ Shader Renderer::m_DownsampleShader;
 Shader Renderer::m_UpsampleShader;
 Shader Renderer::m_GeometryShader;
 Shader Renderer::m_SSAOShader;
+Shader Renderer::m_SSRShader;
 Skybox Renderer::m_Skybox;
 
 
@@ -36,7 +37,7 @@ Renderer::~Renderer()
 void Renderer::Init(GLFWwindow* window)
 {
     Renderer::activeWindow = window;
-    m_DefaultShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\pbrVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\pbrFrag.glsl"));
+    m_PBRShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\pbrVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\pbrFrag.glsl"));
     m_SkyboxShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\skyboxVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\skyboxFrag.glsl"));
     m_ShadowShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\shadowVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\shadowFrag.glsl"));
     m_PointShadowShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\pointShadowVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\pointShadowFrag.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\pointShadowGeom.glsl"));
@@ -46,6 +47,7 @@ void Renderer::Init(GLFWwindow* window)
     m_UpsampleShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\upsampleVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\upsampleFrag.glsl"));
     m_GeometryShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\geometryVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\geometryFrag.glsl"));
     m_SSAOShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\ssaoVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\ssaoFrag.glsl"));
+    m_SSRShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\ssrVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\ssrFrag.glsl"));
 
     std::vector<Path> faces = {
     TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\right.jpg"),
@@ -78,5 +80,15 @@ void Renderer::EndFrame()
 
 void Renderer::Shutdown()
 {
-    m_DefaultShader.Destroy();
+    m_PBRShader.Destroy();
+    m_SkyboxShader.Destroy();
+    m_ShadowShader.Destroy();
+    m_PointShadowShader.Destroy();
+    m_ScreenQuadShader.Destroy();
+    m_BrightShader.Destroy();
+    m_DownsampleShader.Destroy();
+    m_UpsampleShader.Destroy();
+    m_GeometryShader.Destroy();
+    m_SSAOShader.Destroy();
+    m_SSRShader.Destroy();
 }

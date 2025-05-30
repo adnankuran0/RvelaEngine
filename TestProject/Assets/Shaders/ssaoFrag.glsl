@@ -7,12 +7,14 @@ uniform sampler2D gDepth;
 uniform sampler2D texNoise;
 uniform mat4 projection;
 uniform mat4 invProjection; 
+uniform int windowWidth;
+uniform int windowHeight;
 uniform vec3 samples[64];
 
-const float radius = 1.0;      
-const float bias = 0.1;        
+const float radius = 0.5;      
+const float bias = 0.025;
 const float intensity = 1.0;
-const vec2 noiseScale = vec2(1280.0/4.0, 720.0/4.0);
+
 uniform float near;
 uniform float far;
 
@@ -40,6 +42,7 @@ void main()
 {
     vec3 fragPos = getViewPos(TexCoords); // Görüş uzayında (z negatif)
     vec3 normal = normalize(texture(gNormal, TexCoords).rgb);
+    vec2 noiseScale = vec2(windowWidth/4.0, windowHeight/4.0);
     vec3 randomVec = normalize(texture(texNoise, TexCoords * noiseScale).xyz);
     
     // TBN matrisi oluştur (aynı)
@@ -55,21 +58,18 @@ void main()
         
         // Örnek noktayı ekran koordinatına dönüştür
         vec4 clipPos = projection * vec4(samplePos, 1.0);
-        clipPos.xyz /= clipPos.w; // Perspektif bölme
+        clipPos.xyz /= clipPos.w;
         vec2 sampleUV = clipPos.xy * 0.5 + 0.5;
-        
-        // Örneklenen geometrinin gerçek derinliğini al
-        float sampledDepth = texture(gDepth, sampleUV).r;
-        float linearSampledDepth = LinearizeDepth(sampledDepth);
-        float sampleViewZ = -linearSampledDepth; // Görüş uzayı Z'si (negatif)
-        
-        // Mesim kontrolü (artifacts önlemek için)
+
+        vec3 sampleViewPos = getViewPos(sampleUV);
+        float sampleViewZ = sampleViewPos.z;
+
         float rangeCheck = smoothstep(0.0, 1.0, radius / abs(fragPos.z - sampleViewZ));
-        
-        // DÜZELTME: Negatif Z değerleriyle karşılaştır
+
         if (sampleViewZ >= samplePos.z + bias) {
             occlusion += 1.0 * rangeCheck;
         }
+
     }
     
     occlusion = 1.0 - (occlusion / 64.0);

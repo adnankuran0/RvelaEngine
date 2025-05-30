@@ -430,9 +430,13 @@ void ImGuiLayer::DrawInspectorPanel(entt::registry& registry, entt::entity& sele
                 
                 if (ImGui::Checkbox("CastShadows",&pointLightComponent.castShadows)) {}
 
-                if (ImGui::SliderFloat("Intensity", &pointLightComponent.intensity, 0.0f, 10.0f)) {}
+                if (ImGui::SliderFloat("Intensity", &pointLightComponent.intensity, 0.0f, 20.0f)) {}
                 if (ImGui::SliderFloat("Radius", &pointLightComponent.radius, 0.1f, 50.0f)) {}
                 if (ImGui::SliderFloat("Falloff", &pointLightComponent.falloff, 0.0f, 10.0f)) {}
+                if (ImGui::SliderFloat("Shadow bias", &pointLightComponent.shadowBias, 0.0f, 0.1f)) {}
+                if (ImGui::SliderFloat("Blur radius", &pointLightComponent.blurRadius, 0.0f, 0.1f)) {}
+                if (ImGui::Checkbox("Reverse cull face", &pointLightComponent.reverseCullFace));
+
 
             }
         }
@@ -451,6 +455,9 @@ void ImGuiLayer::DrawInspectorPanel(entt::registry& registry, entt::entity& sele
 
                 if (ImGui::SliderFloat("Intensity", &directionalLightComponent.intensity, 0.0f, 10.0f)) {}
                 if (ImGui::Checkbox("Cast Shadow", &directionalLightComponent.castShadows));
+                if (ImGui::SliderFloat("Shadow bias", &directionalLightComponent.shadowBias, 0.0f, 0.1f)) {}
+                if (ImGui::SliderFloat("Blur radius", &directionalLightComponent.blurRadius, 0.0f, 2.0f)) {}
+                if (ImGui::Checkbox("Reverse cull face", &directionalLightComponent.reverseCullFace));
 
             }
         }

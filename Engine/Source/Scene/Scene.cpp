@@ -219,6 +219,9 @@ std::vector<PointLightData> Scene::CollectPointLights() noexcept {
         data.falloff = light.falloff;
         data.castShadows = light.castShadows;
         data.shadowIndex = light.shadowIndex;
+        data.shadowBias = light.shadowBias;
+        data.reverseCullFace = light.reverseCullFace;
+        data.blurRadius = light.blurRadius;
         lights.push_back(data);
     }
     return lights;
@@ -233,7 +236,11 @@ std::optional<DirectionalLightData> Scene::CollectDirectionalLight() noexcept {
         data.direction = t.GetForward();
         data.color = light.color;
         data.intensity = light.intensity;
+        data.shadowBias = light.shadowBias;
         data.castShadows = light.castShadows;
+        data.reverseCullFace = light.reverseCullFace;
+        data.blurRadius = light.blurRadius;
+
         return data;
     }
     return std::nullopt;

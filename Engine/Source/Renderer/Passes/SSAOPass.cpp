@@ -21,6 +21,8 @@ void SSAOPass::Execute()
     ssaoShader.setMat4("projection", ctx.camera->projection);
     glm::mat4 invProjection = glm::inverse(ctx.camera->projection);
     ssaoShader.setMat4("invProjection", invProjection); 
+    ssaoShader.setInt("windowWidth", ctx.viewportWidth); 
+    ssaoShader.setInt("windowHeight", ctx.viewportHeight);
     ssaoShader.setFloat("near", 0.1f);
     ssaoShader.setFloat("far", 100.0f);
 

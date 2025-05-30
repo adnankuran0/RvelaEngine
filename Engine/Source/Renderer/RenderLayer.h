@@ -1,6 +1,6 @@
 #include "../Core/Engine.h"
 #include "../Core/Layer.h"
-#include "Renderer/Passes/MeshPass.h"
+#include "Renderer/Passes/LightingPass.h"
 #include "Renderer/Passes/SkyboxPass.h"
 #include "Renderer/Passes/ShadowPass.h"
 #include "RenderContext.h"

@@ -14,7 +14,9 @@ public:
     glm::vec3 color = glm::vec3(1.0f);
     float intensity = 10.0f;
     bool castShadows = true;
-    float shadowBias = 0.005f;
+    bool reverseCullFace = true;
+    float shadowBias = 0.001f;
+    float blurRadius = 0.5f;
 
     std::string Serialize() const override
     {

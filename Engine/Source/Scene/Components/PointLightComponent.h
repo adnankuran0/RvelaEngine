@@ -16,6 +16,9 @@ public:
     float radius = 5.0f;
     float falloff = 0.0f;
     bool castShadows = false;
+    bool reverseCullFace = true;
+    float shadowBias = 0.1f;
+    float blurRadius = 0.03f;
     int shadowIndex = -1;
     PointLightComponent()
     {

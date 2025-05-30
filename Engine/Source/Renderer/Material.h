@@ -17,7 +17,7 @@ public:
 
 	glm::vec3 albedoColor = glm::vec3(1.0f);
 	float metallic = 0.0f;
-	float roughness = 0.5f;
+	float roughness = 1.0f;
 	float ao = 1.0f;
 
 	glm::vec3 UVScale = glm::vec3(1.0f);
