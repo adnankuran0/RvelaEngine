@@ -13722,3 +13722,79 @@
 [INFO ] Total mesh loading took 1200ms
 [INFO ] Scene loading complete
 [INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.1.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 4ms
+[INFO ] Scene loading took 1442ms
+[INFO ] Total mesh loading took 596ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.1.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 76ms
+[INFO ] Scene loading took 4213ms
+[INFO ] Total mesh loading took 1160ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.1.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 1164ms
+[INFO ] Total mesh loading took 539ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.1.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 4ms
+[INFO ] Scene loading took 1100ms
+[INFO ] Total mesh loading took 495ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.1.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 1103ms
+[INFO ] Total mesh loading took 498ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.1.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 6ms
+[INFO ] Scene loading took 1079ms
+[INFO ] Total mesh loading took 476ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.1.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.1.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 112ms
+[INFO ] Scene loading took 4360ms
+[INFO ] Total mesh loading took 1260ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.1.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 1073ms
+[INFO ] Total mesh loading took 465ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!

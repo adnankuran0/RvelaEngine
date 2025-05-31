@@ -5,11 +5,12 @@
 class RenderPass
 {
 public:
-	RenderPass(const RenderContext& context) : ctx(context) {}
+	void SetRenderContext(const RenderContext& context) { ctx = context; }
 	virtual ~RenderPass() = default;
 	virtual void Execute() = 0;
+	virtual void Init() = 0;
 
-	void AddCommand(const RenderCommand& cmd) { commands.push_back(cmd); }
+	void AddRenderCommand(const RenderCommand& cmd) { commands.push_back(cmd); }
 
 protected:
 	RenderContext ctx;

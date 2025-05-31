@@ -6,7 +6,6 @@ void RenderLayer::OnRender()
 	auto scene = m_Engine->GetScene();
 	auto camera = m_Engine->GetCamera();
 
-	m_RenderPipeline->Clear();
 
 	RenderContext context;
 	context.camera = camera;
@@ -15,40 +14,27 @@ void RenderLayer::OnRender()
 	context.viewportWidth = m_Engine->GetWindow()->GetSize().width;
 	context.viewportHeight = m_Engine->GetWindow()->GetSize().height;
 
-	GeometryPass geometryPass(context);
-	ShadowPass shadowPass(context);
-	SkyboxPass skyboxPass(context);
-	LightingPass lightingPass(context);
-	BrightPass brightPass(context);
-	BloomPass bloomPass(context);
-	SSAOPass ssaoPass(context);
-	SSRPass ssrPass(context);
-	CompositePass compositePass(context);
 
+	m_RenderPipeline->SetRenderContext(context);
+	m_RenderPipeline->EnsureInitialized();
 
+	// Collect commands and submit them to render passes via render pipeline
+	CollectRenderCommands(scene, [&](const RenderCommand& cmd) {
+		m_RenderPipeline->SubmitRenderCommand(cmd);
+		});
 
+	m_RenderPipeline->Execute();
+}
 
-	auto view = scene->GetRegistry().view<MeshRendererComponent, MaterialComponent, TransformComponent>();
-	for (auto& entity : view)
+void RenderLayer::CollectRenderCommands(Scene* scene, const std::function<void(const RenderCommand&)>& submitCallback)
+{
+	auto view = scene->GetRegistry().view<TransformComponent, MeshRendererComponent, MaterialComponent>();
+	for (auto entity : view)
 	{
-		RenderCommand command(scene->GetComponent<TransformComponent>(entity),
+		RenderCommand cmd(scene->GetComponent<TransformComponent>(entity),
 			scene->GetComponent<MeshRendererComponent>(entity),
 			scene->GetComponent<MaterialComponent>(entity));
 
-		shadowPass.AddCommand(command);
-		geometryPass.AddCommand(command);
-		lightingPass.AddCommand(command);
+		submitCallback(cmd);
 	}
-
-	m_RenderPipeline->SetGeometryPass(&geometryPass);
-	m_RenderPipeline->SetShadowPass(&shadowPass) ;
-	m_RenderPipeline->SetSkyboxPass(&skyboxPass);
-	m_RenderPipeline->SetLightingPass(&lightingPass);
-	m_RenderPipeline->SetBrightPass(&brightPass);
-	m_RenderPipeline->SetBloomPass(&bloomPass);
-	m_RenderPipeline->SetSSAOPass(&ssaoPass);
-	m_RenderPipeline->SetSSRPass(&ssrPass);
-	m_RenderPipeline->SetCompositePass(&compositePass);
-
-	m_RenderPipeline->Execute();
 }

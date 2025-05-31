@@ -1,12 +1,59 @@
 #include "rvelapch.h"
 #include "GeometryPass.h"
 
-GLuint GeometryPass::gBuffer = 0;
-GLuint GeometryPass::gNormal = 0;
-GLuint GeometryPass::gDepth = 0;
-GLuint GeometryPass::gMetallic = 0;
-GLuint GeometryPass::gRoughness = 0;
-bool GeometryPass::isInitialized = false;
+void GeometryPass::Init()
+{
+    glGenFramebuffers(1, &gBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
+
+    glGenTextures(1, &o_Normal);
+    glBindTexture(GL_TEXTURE_2D, o_Normal);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, ctx.viewportWidth, ctx.viewportHeight, 0, GL_RGB, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, o_Normal, 0);
+
+    glGenTextures(1, &o_Depth);
+    glBindTexture(GL_TEXTURE_2D, o_Depth);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, ctx.viewportWidth, ctx.viewportHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, o_Depth, 0);
+
+    glGenTextures(1, &o_Roughness);
+    glBindTexture(GL_TEXTURE_2D, o_Roughness);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, ctx.viewportWidth, ctx.viewportHeight, 0, GL_RED, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, o_Roughness, 0);
+
+    glGenTextures(1, &o_Metallic);
+    glBindTexture(GL_TEXTURE_2D, o_Metallic);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, ctx.viewportWidth, ctx.viewportHeight, 0, GL_RED, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, o_Metallic, 0);
+
+    GLuint attachments[3] = {
+        GL_COLOR_ATTACHMENT0, // normal
+        GL_COLOR_ATTACHMENT1, // roughness
+        GL_COLOR_ATTACHMENT2  // metallic
+    };
+    glDrawBuffers(3, attachments);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "Geometry framebuffer not complete!" << std::endl;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+}
+
+GeometryPass::~GeometryPass()
+{
+    //TODO: fill this function
+}
 
 void GeometryPass::Execute()
 {
@@ -62,3 +109,4 @@ void GeometryPass::Execute()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     commands.clear();
 }
+

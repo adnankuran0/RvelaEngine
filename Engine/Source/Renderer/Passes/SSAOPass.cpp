@@ -2,11 +2,31 @@
 #include "SSAOPass.h"
 #include <random>
 
-bool SSAOPass::isInitialized = false;
-GLuint SSAOPass::ssaoFBO = 0;
-GLuint SSAOPass::ssaoTexture = 0;
-GLuint SSAOPass::noiseTexture = 0;
-glm::vec3 SSAOPass::kernel[64] = {};
+void SSAOPass::Init()
+{
+    glGenFramebuffers(1, &ssaoFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
+
+    glGenTextures(1, &o_SsaoTexture);
+    glBindTexture(GL_TEXTURE_2D, o_SsaoTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, ctx.viewportWidth, ctx.viewportHeight, 0, GL_RED, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, o_SsaoTexture, 0);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "SSAO framebuffer not complete!" << std::endl;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    GenerateSampleKernel();
+    GenerateNoiseTexture();
+}
+
+SSAOPass::~SSAOPass()
+{
+    //TODO: Fill this function
+}
 
 void SSAOPass::Execute()
 {
@@ -25,11 +45,11 @@ void SSAOPass::Execute()
     ssaoShader.setFloat("far", 100.0f);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, gNormal);
+    glBindTexture(GL_TEXTURE_2D, i_Normal);
     ssaoShader.setInt("gNormal", 0);
 
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, gDepth);
+    glBindTexture(GL_TEXTURE_2D, i_Depth);
     ssaoShader.setInt("gDepth", 1);
 
     glActiveTexture(GL_TEXTURE2);

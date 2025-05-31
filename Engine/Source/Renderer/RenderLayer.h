@@ -20,4 +20,6 @@ private:
 	Engine* m_Engine;
 	std::unique_ptr<RenderPipeline> m_RenderPipeline;
 
+	void CollectRenderCommands(Scene* scene, const std::function<void(const RenderCommand&)>& submitCallback);
+
 };

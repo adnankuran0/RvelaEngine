@@ -1,9 +1,28 @@
 #include "rvelapch.h"
 #include "SSRPass.h"
 
-bool SSRPass::isInitialized = false;
-GLuint SSRPass::ssrFBO = 0;
-GLuint SSRPass::ssrTexture = 0;
+void SSRPass::Init()
+{
+    glGenFramebuffers(1, &ssrFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, ssrFBO);
+
+    glGenTextures(1, &o_SsrTexture);
+    glBindTexture(GL_TEXTURE_2D, o_SsrTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, ctx.viewportWidth, ctx.viewportHeight, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, o_SsrTexture, 0);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "SSR framebuffer not complete!" << std::endl;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+SSRPass::~SSRPass()
+{
+    //TODO: Fill this function
+}
 
 void SSRPass::Execute()
 {
@@ -30,23 +49,23 @@ void SSRPass::Execute()
 
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, gDepth);
+    glBindTexture(GL_TEXTURE_2D, i_Depth);
     ssrShader.setInt("uDepthTexture", 0);
 
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, gNormal);
+    glBindTexture(GL_TEXTURE_2D, i_Normal);
     ssrShader.setInt("uNormalTexture", 1);
 
     glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, gRoughness);
+    glBindTexture(GL_TEXTURE_2D, i_Roughness);
     ssrShader.setInt("uRoughnessTexture", 2);
 
     glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, gMetallic);
+    glBindTexture(GL_TEXTURE_2D, i_Metallic);
     ssrShader.setInt("uMetallicTexture", 3);
 
     glActiveTexture(GL_TEXTURE4);
-    glBindTexture(GL_TEXTURE_2D, gScreen);
+    glBindTexture(GL_TEXTURE_2D, i_Screen);
     ssrShader.setInt("uScreenTexture", 4);
 
     Renderer::DrawFullScreenQuad();

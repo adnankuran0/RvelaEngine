@@ -2,9 +2,6 @@
 #include "CompositePass.h"
 #include "../Renderer.h"
 
-bool CompositePass::isInitialized = false;
-float CompositePass::exposure = 1.0f;
-
 void CompositePass::Execute()
 {
 	glDisable(GL_DEPTH_TEST);
@@ -23,13 +20,13 @@ void CompositePass::Execute()
 	compositeShader.setInt("ssrTexture", 3);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, screenTexture);
+	glBindTexture(GL_TEXTURE_2D, i_ScreenTexture);
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, bloomBlurTexture);
+	glBindTexture(GL_TEXTURE_2D, i_BloomBlurTexture);
 	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, aoTexture);
+	glBindTexture(GL_TEXTURE_2D, i_AoTexture);
 	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, ssrTexture);
+	glBindTexture(GL_TEXTURE_2D, i_SsrTexture);
 
 	Renderer::DrawFullScreenQuad();
 	glEnable(GL_DEPTH_TEST);
@@ -38,7 +35,7 @@ void CompositePass::Execute()
 
 void CompositePass::UpdateExposure(float deltaTime)
 {
-	glBindTexture(GL_TEXTURE_2D, screenTexture); // screenTexture
+	glBindTexture(GL_TEXTURE_2D, i_ScreenTexture); // screenTexture
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	int mipLevel = (int)std::log2(std::max(ctx.viewportWidth, ctx.viewportHeight));

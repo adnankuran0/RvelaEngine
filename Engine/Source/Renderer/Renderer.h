@@ -60,7 +60,6 @@ public:
     static Shader& GetGeometryShader() { return m_GeometryShader; }
     static Shader& GetSSAOShader() { return m_SSAOShader; }
     static Shader& GetSSRShader() { return m_SSRShader; }
-    static Skybox& GetSkybox() { return m_Skybox; }
     static Shader& GetCompositeShader() { return m_CompositeShader; }
 
 private:
@@ -76,7 +75,6 @@ private:
     static Shader m_SSAOShader;
     static Shader m_SSRShader;
     static Shader m_CompositeShader;
-    static Skybox m_Skybox;
 
     static ScreenQuad m_ScreenQuad;
 };

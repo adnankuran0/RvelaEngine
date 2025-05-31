@@ -1,12 +1,87 @@
 ﻿#include "rvelapch.h"
 #include "ShadowPass.h"
 
-GLuint ShadowPass::fbo = 0;
-GLuint ShadowPass::depthMap = 0;
-GLuint ShadowPass::pointFBO = 0;
-GLuint ShadowPass::pointDepthMap = 0;
-glm::mat4 ShadowPass::lightSpaceMatrix;
-bool ShadowPass::isInitialized = false;
+void ShadowPass::Init()
+{
+    // DIRECTIONAL LIGHT SHADOWMAP SETUP
+    glGenFramebuffers(1, &fbo);
+
+    glGenTextures(1, &o_DirectionalShadowMap);
+    glBindTexture(GL_TEXTURE_2D, o_DirectionalShadowMap);
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0,
+        GL_DEPTH_COMPONENT32F,
+        SHADOW_WIDTH,
+        SHADOW_HEIGHT,
+        0,
+        GL_DEPTH_COMPONENT,
+        GL_FLOAT,
+        nullptr
+    );
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+
+    float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, o_DirectionalShadowMap, 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cerr << "ERROR: Shadow framebuffer not complete!" << std::endl;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // POINT LIGHT SHADOWMAP SETUP
+    glGenFramebuffers(1, &pointFBO);
+
+    glGenTextures(1, &o_PointShadowMap);
+    glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, o_PointShadowMap);
+    glTexImage3D(
+        GL_TEXTURE_CUBE_MAP_ARRAY,
+        0,
+        GL_DEPTH_COMPONENT32F,
+        POINT_SHADOW_WIDTH,
+        POINT_SHADOW_HEIGHT,
+        6 * 20,
+        0,
+        GL_DEPTH_COMPONENT,
+        GL_FLOAT,
+        nullptr
+    );
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, pointFBO);
+    for (int layer = 0; layer < 6 * 20; ++layer) {
+        glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, o_PointShadowMap, 0, layer);
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+            std::cerr << "ERROR: Point shadow framebuffer layer " << layer << " not complete!" << std::endl;
+        }
+    }
+
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+ShadowPass::~ShadowPass()
+{
+    //TODO: Fill this function
+}
 
 void ShadowPass::Execute()
 {
@@ -22,9 +97,9 @@ void ShadowPass::Execute()
         glm::vec3 sceneCenter = ctx.camera->Position;
         glm::mat4 lightView = glm::lookAt(sceneCenter - lightDir * 50.0f, sceneCenter, glm::vec3(0, 1, 0));
         glm::mat4 lightProjection = glm::ortho(-35.0f, 35.0f, -35.0f, 35.0f, 0.01f, 120.0f);
-        lightSpaceMatrix = lightProjection * lightView;
+        o_LightSpaceMatrix = lightProjection * lightView;
 
-        shadowShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+        shadowShader.setMat4("lightSpaceMatrix", o_LightSpaceMatrix);
 
         glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
         glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -59,7 +134,7 @@ void ShadowPass::Execute()
     Shader& pointShadowShader = Renderer::GetPointShadowShader();
     pointShadowShader.use();
     glBindFramebuffer(GL_FRAMEBUFFER, pointFBO);
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, pointDepthMap, 0);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, o_PointShadowMap, 0);
     glClear(GL_DEPTH_BUFFER_BIT);   
     glViewport(0, 0, POINT_SHADOW_WIDTH, POINT_SHADOW_HEIGHT);
     glDisable(GL_CULL_FACE);
@@ -80,8 +155,6 @@ void ShadowPass::Execute()
         shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
         shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
         shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-
-        
 
         
         for (unsigned int i = 0; i < 6; ++i)

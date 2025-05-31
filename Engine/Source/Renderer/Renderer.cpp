@@ -20,7 +20,6 @@ Shader Renderer::m_UpsampleShader;
 Shader Renderer::m_SSAOShader;
 Shader Renderer::m_SSRShader;
 Shader Renderer::m_CompositeShader;
-Skybox Renderer::m_Skybox;
 
 ScreenQuad Renderer::m_ScreenQuad;
 
@@ -49,15 +48,7 @@ void Renderer::Init(GLFWwindow* window)
     m_SSRShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\ssr.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\ssr.frag"));
     m_CompositeShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\composite.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\composite.frag"));
 
-    std::vector<Path> faces = {
-    TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\right.jpg"),
-    TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\left.jpg"),
-    TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\top.jpg"),
-    TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\bottom.jpg"),
-    TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\front.jpg"),
-    TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\back.jpg")
-    };
-    m_Skybox.Init(faces);
+    
 
     m_ScreenQuad.Init();
 

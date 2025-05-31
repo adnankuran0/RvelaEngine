@@ -4,18 +4,52 @@
 #include "Core/Utils/MaterialManager.h"
 #include "../../RvelaLog.h"
 
-bool LightingPass::isInitialized = false;
-GLuint LightingPass::screenFBO = 0;
-GLuint LightingPass::screenColorTex = 0;
-GLuint LightingPass::screenRBO = 0;
-GLuint LightingPass::intermediateFBO = 0;
-GLuint LightingPass::intermediateColorTex = 0;
+void LightingPass::Init()
+{
+    // MSAA framebuffer
+    glGenFramebuffers(1, &o_ScreenFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, o_ScreenFBO);
 
-void LightingPass::Execute() 
+    glGenTextures(1, &screenColorTex);
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, screenColorTex);
+    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGBA16F, ctx.viewportWidth, ctx.viewportHeight, GL_TRUE);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, screenColorTex, 0);
+
+    glGenRenderbuffers(1, &screenRBO);
+    glBindRenderbuffer(GL_RENDERBUFFER, screenRBO);
+    glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, ctx.viewportWidth, ctx.viewportHeight);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, screenRBO);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cerr << "MSAA Framebuffer not complete" << std::endl;
+
+    // Intermediate framebuffer (non-MSAA)
+    glGenFramebuffers(1, &intermediateFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
+
+    glGenTextures(1, &o_IntermediateColorTex);
+    glBindTexture(GL_TEXTURE_2D, o_IntermediateColorTex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, ctx.viewportWidth, ctx.viewportHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, o_IntermediateColorTex, 0);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cerr << "Intermediate Framebuffer not complete" << std::endl;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+LightingPass::~LightingPass()
+{
+    //TODO: Fill this function
+}
+
+void LightingPass::Execute()
 {
     if (commands.empty() || !ctx.IsValid()) return;
 
-    glBindFramebuffer(GL_FRAMEBUFFER, screenFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, o_ScreenFBO);
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
 
     Shader& shader = Renderer::GetPBRShader();
@@ -32,11 +66,11 @@ void LightingPass::Execute()
         shader.setFloat("directionalLight.shadowBias", dirLight.shadowBias);
         shader.setFloat("directionalLight.blurRadius", dirLight.blurRadius);
 
-        shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+        shader.setMat4("lightSpaceMatrix", i_LightSpaceMatrix);
         shader.setInt("shadowMap", 6);
 
         glActiveTexture(GL_TEXTURE0 + 6);
-        glBindTexture(GL_TEXTURE_2D, shadowMap);
+        glBindTexture(GL_TEXTURE_2D, i_DirectionalShadowMap);
 
         GLenum err = glGetError();
         if (err != GL_NO_ERROR) LOG_ERROR << "OpenGL Error after directional light setup: " << err;
@@ -68,7 +102,7 @@ void LightingPass::Execute()
     constexpr int POINT_SHADOW_MAP_SLOT = 10;
     shader.setInt("pointShadowMap", POINT_SHADOW_MAP_SLOT);
     glActiveTexture(GL_TEXTURE0 + POINT_SHADOW_MAP_SLOT);
-    glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, pointShadowMap);
+    glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, i_PointShadowMap);
 
     shader.setInt("pointLightCount", pointLightCount);
     shader.setVec3("camPos", ctx.camera->Position);
@@ -129,7 +163,7 @@ void LightingPass::Execute()
         }
 
     }
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, screenFBO);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, o_ScreenFBO);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, intermediateFBO);
     glBlitFramebuffer(
         0, 0, ctx.viewportWidth, ctx.viewportHeight,

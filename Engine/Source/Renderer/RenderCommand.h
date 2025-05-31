@@ -6,10 +6,10 @@
 struct RenderCommand
 {
 public:
-	RenderCommand(TransformComponent& t, MeshRendererComponent& m, MaterialComponent& mat)
+	RenderCommand(const TransformComponent& t, const MeshRendererComponent& m, const MaterialComponent& mat)
 		: transform(t), mesh(m), material(mat) {
 	}
-	TransformComponent& transform;
-	MeshRendererComponent& mesh;
-	MaterialComponent& material;
+	const TransformComponent& transform;
+	const MeshRendererComponent& mesh;
+	const MaterialComponent& material;
 };

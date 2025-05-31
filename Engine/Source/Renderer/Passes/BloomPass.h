@@ -9,74 +9,22 @@
 class BloomPass : public RenderPass
 {
 public:
-    BloomPass(const RenderContext& context) : RenderPass(context), brightTexture(-1)
-    {
-        if (!isInitialized)
-        {
-            downsampleFBOs.resize(mipLevels);
-            downsampleTextures.resize(mipLevels);
-            upsampleFBOs.resize(mipLevels);
-            upsampleTextures.resize(mipLevels);
-
-            for (int i = 0; i < mipLevels; ++i)
-            {
-                int w = std::max((unsigned int)1, context.viewportWidth >> i);
-                int h = std::max((unsigned int)1, context.viewportHeight >> i);
-
-                GLuint texDown, fboDown, texUp, fboUp;
-
-                glGenTextures(1, &texDown);
-                glBindTexture(GL_TEXTURE_2D, texDown);
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, w, h, 0, GL_RGBA, GL_FLOAT, nullptr);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-                glGenFramebuffers(1, &fboDown);
-                glBindFramebuffer(GL_FRAMEBUFFER, fboDown);
-                glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texDown, 0);
-                glBindFramebuffer(GL_FRAMEBUFFER, fboDown);
-                if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-                {
-                    std::cerr << "Downsample framebuffer incomplete at mip level " << i << std::endl;
-                }
-
-                glGenTextures(1, &texUp);
-                glBindTexture(GL_TEXTURE_2D, texUp);
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, w, h, 0, GL_RGBA, GL_FLOAT, nullptr);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-                glGenFramebuffers(1, &fboUp);
-                glBindFramebuffer(GL_FRAMEBUFFER, fboUp);
-                glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texUp, 0);
-
-                downsampleTextures[i] = texDown;
-                downsampleFBOs[i] = fboDown;
-                upsampleTextures[i] = texUp;
-                upsampleFBOs[i] = fboUp;
-            }
-
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            isInitialized = true;
-        }
-    }
+    ~BloomPass();
     void Execute() override;
-    GLuint GetBlurTexture() { return blurredTexture; }
+    void Init() override;
+    GLuint GetBloomBlurTexture() { return o_BlurredTexture; }
 
-    GLuint brightTexture;
+    void SetBrightTexture(GLuint brightTexture) { i_BrightTexture = brightTexture; }
+    
 
 private:
-    static bool isInitialized;
-    static std::vector<GLuint> downsampleFBOs;
-    static std::vector<GLuint> downsampleTextures;
 
-    static std::vector<GLuint> upsampleFBOs;
-    static std::vector<GLuint> upsampleTextures;
+    GLuint i_BrightTexture = 0;
+    GLuint o_BlurredTexture = 0;
+    std::vector<GLuint> downsampleFBOs;
+    std::vector<GLuint> downsampleTextures;
 
-    static GLuint blurredTexture;
-    static constexpr int mipLevels = 6;
+    std::vector<GLuint> upsampleFBOs;
+    std::vector<GLuint> upsampleTextures;
+    const int mipLevels = 6;
 };
