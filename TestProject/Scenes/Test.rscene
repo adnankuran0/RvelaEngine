@@ -3178,6 +3178,59 @@
                                                 "TagComponent": "{\n    \"tag\": \"BlueLight\"\n}",
                                                 "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        -12.399999618530273,\n        2.9000000953674316,\n        -2.5\n    ],\n    \"rotation\": [\n        0.0,\n        0.0,\n        0.0\n    ],\n    \"scale\": [\n        1.0,\n        1.0,\n        1.0\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
                                                 "UUID": 401
+                                },
+                                {
+                                                "PointLightComponent": "{\n    \"castShadows\": false,\n    \"color\": [\n        1.0,\n        1.0,\n        1.0\n    ],\n    \"falloff\": 8.866999626159668,\n    \"intensity\": 19.466999053955078,\n    \"radius\": 2.00600004196167\n}",
+                                                "SceneTreeComponent": "{\n    \"childrenUUIDs\": [],\n    \"parentUUID\": 0\n}",
+                                                "TagComponent": "{\n    \"tag\": \"PointLight\"\n}",
+                                                "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        -0.699999988079071,\n        0.8999999761581421,\n        -4.699999809265137\n    ],\n    \"rotation\": [\n        0.0,\n        0.0,\n        0.0\n    ],\n    \"scale\": [\n        1.0,\n        1.0,\n        1.0\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
+                                                "UUID": 402
+                                },
+                                {
+                                                "SceneTreeComponent": "{\n    \"childrenUUIDs\": [\n        404,\n        405,\n        406,\n        407,\n        408\n    ],\n    \"parentUUID\": 0\n}",
+                                                "TagComponent": "{\n    \"tag\": \"Model\"\n}",
+                                                "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        -0.10000000149011612,\n        -0.026000000536441803,\n        -4.5\n    ],\n    \"rotation\": [\n        -90.0,\n        44.0,\n        0.0\n    ],\n    \"scale\": [\n        1.0,\n        1.0,\n        1.0\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
+                                                "UUID": 403
+                                },
+                                {
+                                                "MaterialComponent": "{\n    \"materialPath\": \"D:\\\\GitHub\\\\RvelaEngine\\\\TestProject\\\\Assets/Materials/treasure_chest.rmaterial\"\n}",
+                                                "MeshComponent": "{\n    \"meshIndex\": 0,\n    \"modelPath\": \"D:\\\\GitHub\\\\RvelaEngine\\\\TestProject\\\\Assets\\\\Models\\\\treasure_chest_1k\\\\treasure_chest_1k.fbx\"\n}",
+                                                "SceneTreeComponent": "{\n    \"childrenUUIDs\": [],\n    \"parentUUID\": 403\n}",
+                                                "TagComponent": "{\n    \"tag\": \"treasure_chest_bottom\"\n}",
+                                                "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        0.0,\n        0.0,\n        0.0\n    ],\n    \"rotation\": [\n        0.0,\n        0.0,\n        0.0\n    ],\n    \"scale\": [\n        1.0,\n        1.0,\n        1.0\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
+                                                "UUID": 404
+                                },
+                                {
+                                                "MaterialComponent": "{\n    \"materialPath\": \"D:\\\\GitHub\\\\RvelaEngine\\\\TestProject\\\\Assets/Materials/treasure_chest.rmaterial\"\n}",
+                                                "MeshComponent": "{\n    \"meshIndex\": 1,\n    \"modelPath\": \"D:\\\\GitHub\\\\RvelaEngine\\\\TestProject\\\\Assets\\\\Models\\\\treasure_chest_1k\\\\treasure_chest_1k.fbx\"\n}",
+                                                "SceneTreeComponent": "{\n    \"childrenUUIDs\": [],\n    \"parentUUID\": 403\n}",
+                                                "TagComponent": "{\n    \"tag\": \"treasure_chest_handle_left\"\n}",
+                                                "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        0.0,\n        0.0,\n        0.0\n    ],\n    \"rotation\": [\n        0.0,\n        0.0,\n        0.0\n    ],\n    \"scale\": [\n        1.0,\n        1.0,\n        1.0\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
+                                                "UUID": 405
+                                },
+                                {
+                                                "MaterialComponent": "{\n    \"materialPath\": \"D:\\\\GitHub\\\\RvelaEngine\\\\TestProject\\\\Assets/Materials/treasure_chest.rmaterial\"\n}",
+                                                "MeshComponent": "{\n    \"meshIndex\": 2,\n    \"modelPath\": \"D:\\\\GitHub\\\\RvelaEngine\\\\TestProject\\\\Assets\\\\Models\\\\treasure_chest_1k\\\\treasure_chest_1k.fbx\"\n}",
+                                                "SceneTreeComponent": "{\n    \"childrenUUIDs\": [],\n    \"parentUUID\": 403\n}",
+                                                "TagComponent": "{\n    \"tag\": \"treasure_chest_handle_right\"\n}",
+                                                "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        0.0,\n        0.0,\n        0.0\n    ],\n    \"rotation\": [\n        0.0,\n        0.0,\n        0.0\n    ],\n    \"scale\": [\n        1.0,\n        1.0,\n        1.0\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
+                                                "UUID": 406
+                                },
+                                {
+                                                "MaterialComponent": "{\n    \"materialPath\": \"D:\\\\GitHub\\\\RvelaEngine\\\\TestProject\\\\Assets/Materials/treasure_chest.rmaterial\"\n}",
+                                                "MeshComponent": "{\n    \"meshIndex\": 3,\n    \"modelPath\": \"D:\\\\GitHub\\\\RvelaEngine\\\\TestProject\\\\Assets\\\\Models\\\\treasure_chest_1k\\\\treasure_chest_1k.fbx\"\n}",
+                                                "SceneTreeComponent": "{\n    \"childrenUUIDs\": [],\n    \"parentUUID\": 403\n}",
+                                                "TagComponent": "{\n    \"tag\": \"treasure_chest_lid\"\n}",
+                                                "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        0.0,\n        0.0,\n        0.0\n    ],\n    \"rotation\": [\n        0.0,\n        0.0,\n        0.0\n    ],\n    \"scale\": [\n        1.0,\n        1.0,\n        1.0\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
+                                                "UUID": 407
+                                },
+                                {
+                                                "MaterialComponent": "{\n    \"materialPath\": \"D:\\\\GitHub\\\\RvelaEngine\\\\TestProject\\\\Assets/Materials/treasure_chest.rmaterial\"\n}",
+                                                "MeshComponent": "{\n    \"meshIndex\": 4,\n    \"modelPath\": \"D:\\\\GitHub\\\\RvelaEngine\\\\TestProject\\\\Assets\\\\Models\\\\treasure_chest_1k\\\\treasure_chest_1k.fbx\"\n}",
+                                                "SceneTreeComponent": "{\n    \"childrenUUIDs\": [],\n    \"parentUUID\": 403\n}",
+                                                "TagComponent": "{\n    \"tag\": \"treasure_chest_lock\"\n}",
+                                                "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        0.0,\n        0.0,\n        0.0\n    ],\n    \"rotation\": [\n        0.0,\n        0.0,\n        0.0\n    ],\n    \"scale\": [\n        1.0,\n        1.0,\n        1.0\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
+                                                "UUID": 408
                                 }
                 ]
 }

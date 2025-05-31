@@ -15,7 +15,7 @@ void ShadowPass::Execute()
     //DIRECTIONAL LIGHT SHADOW MAPPING
     if (ctx.directionalLight && ctx.directionalLight->castShadows)
     {
-        Shader& shadowShader = Renderer::GetShadowShader();
+        Shader& shadowShader = Renderer::GetDirectionalShadowShader();
         shadowShader.use();
 
         glm::vec3 lightDir = ctx.directionalLight->direction;

@@ -52,12 +52,15 @@ void Engine::PopLayer(Layer* layer)
 
 void Engine::Update()
 {
+
 	for (Layer* layer : m_LayerStack)
 	{
 		layer->OnUpdate();
 	}
 
 	m_Scene->Update();
+
+
 }
 
 void Engine::FixedUpdate()
@@ -77,6 +80,7 @@ void Engine::LateUpdate()
 
 void Engine::Run()
 {
+	LOG_INFO << "Engine has started!";
 	while (!glfwWindowShouldClose(GetWindow()->GetGLFWWindow()))
 	{
 		glfwPollEvents();
@@ -99,6 +103,7 @@ void Engine::Run()
 
 		glfwSwapBuffers(GetWindow()->GetGLFWWindow());
 	}
+	LOG_INFO << "Engine has stopped!";
 }
 
 void Engine::HandleEvents() noexcept

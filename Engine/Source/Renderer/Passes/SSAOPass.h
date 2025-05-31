@@ -4,30 +4,11 @@
 class SSAOPass : public RenderPass
 {
 public:
-    SSAOPass(const RenderContext& context)
-        : RenderPass(context)
+    SSAOPass(const RenderContext& context) : RenderPass(context), gNormal(-1), gDepth(-1)
     {
         if (!isInitialized)
         {
-            float quadVertices[] = {
-                -1.0f,  1.0f,   0.0f, 1.0f,
-                -1.0f, -1.0f,   0.0f, 0.0f,
-                 1.0f, -1.0f,   1.0f, 0.0f,
-
-                -1.0f,  1.0f,   0.0f, 1.0f,
-                 1.0f, -1.0f,   1.0f, 0.0f,
-                 1.0f,  1.0f,   1.0f, 1.0f
-            };
-
-            glGenVertexArrays(1, &quadVAO);
-            glGenBuffers(1, &quadVBO);
-            glBindVertexArray(quadVAO);
-            glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
-            glEnableVertexAttribArray(0);
-            glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-            glEnableVertexAttribArray(1);
-            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+            
 
             glGenFramebuffers(1, &ssaoFBO);
             glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
@@ -58,8 +39,6 @@ public:
     GLuint GetSSAOTexture() const { return ssaoTexture; }
 
 private:
-    static GLuint quadVAO;
-    static GLuint quadVBO;
     static GLuint ssaoFBO;
     static GLuint ssaoTexture;
     static GLuint noiseTexture;

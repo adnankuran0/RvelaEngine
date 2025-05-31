@@ -5,7 +5,7 @@
 class SkyboxPass : public RenderPass
 {
 public:
-	SkyboxPass(const RenderContext& context) : RenderPass(context) {}
+	SkyboxPass(const RenderContext& context) : RenderPass(context), screenFBO(-1) {}
 	void Execute() override;
 
 	GLuint screenFBO;

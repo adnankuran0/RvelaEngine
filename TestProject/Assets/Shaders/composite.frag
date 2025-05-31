@@ -4,6 +4,9 @@ in vec2 TexCoords;
 
 uniform sampler2D screenTexture;
 uniform sampler2D bloomTexture;
+uniform sampler2D aoTexture;
+uniform sampler2D ssrTexture;
+uniform float exposure;
 
 vec3 ACESFilm(vec3 x)
 {
@@ -19,14 +22,30 @@ void main()
 {
     vec3 hdrColor = texture(screenTexture, TexCoords).rgb;
     vec3 bloomColor = texture(bloomTexture, TexCoords).rgb;
+    
+    vec4 ssrSample = texture(ssrTexture, TexCoords);
+    vec3 ssrColor = ssrSample.rgb;
+    float ssrStrength = ssrSample.a;
+    
+    float blurredAO = 0.0;
+    for (int x = -1; x <= 1; ++x) {
+        for (int y = -1; y <= 1; ++y) {
+            blurredAO += texture(aoTexture, TexCoords + vec2(x, y) / textureSize(aoTexture, 0)).r;
+        }
+    }
+    float ao = blurredAO / 9.0;
+    
+    vec3 ambient = hdrColor * 0.03;
+    hdrColor -= ambient * (1.0 - ao) * 50.0;
+    
+    hdrColor = mix(hdrColor, hdrColor + ssrColor, ssrStrength);
+    
     vec3 combined = hdrColor + bloomColor;
 
-    float exposure = 1.0;
     combined = vec3(1.0) - exp(-combined * exposure);
-
     vec3 mapped = ACESFilm(combined);
 
-    // Gamma correction (sRGB -> ekran)
+    // Gamma correction
     mapped = pow(mapped, vec3(1.0 / 2.2));
 
     FragColor = vec4(mapped, 1.0);

@@ -9,20 +9,20 @@
 #include <algorithm>
 
 GLFWwindow* Renderer::activeWindow = nullptr;
-Shader Renderer::m_PBRShader;
-Shader Renderer::m_SkyboxShader;
-Shader Renderer::m_ShadowShader;
+Shader Renderer::m_DirectionalShadowShader;
 Shader Renderer::m_PointShadowShader;
-Shader Renderer::m_ScreenQuadShader;
+Shader Renderer::m_GeometryShader;
+Shader Renderer::m_SkyboxShader;
+Shader Renderer::m_PBRShader;
 Shader Renderer::m_BrightShader;
 Shader Renderer::m_DownsampleShader;
 Shader Renderer::m_UpsampleShader;
-Shader Renderer::m_GeometryShader;
 Shader Renderer::m_SSAOShader;
 Shader Renderer::m_SSRShader;
+Shader Renderer::m_CompositeShader;
 Skybox Renderer::m_Skybox;
 
-
+ScreenQuad Renderer::m_ScreenQuad;
 
 Renderer::Renderer()
 {
@@ -37,17 +37,17 @@ Renderer::~Renderer()
 void Renderer::Init(GLFWwindow* window)
 {
     Renderer::activeWindow = window;
-    m_PBRShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\pbrVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\pbrFrag.glsl"));
-    m_SkyboxShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\skyboxVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\skyboxFrag.glsl"));
-    m_ShadowShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\shadowVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\shadowFrag.glsl"));
-    m_PointShadowShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\pointShadowVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\pointShadowFrag.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\pointShadowGeom.glsl"));
-    m_ScreenQuadShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\screenQuadVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\screenQuadFrag.glsl"));
-    m_BrightShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\brightPassVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\brightPassFrag.glsl"));
-    m_DownsampleShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\downsampleVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\downsampleFrag.glsl"));
-    m_UpsampleShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\upsampleVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\upsampleFrag.glsl"));
-    m_GeometryShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\geometryVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\geometryFrag.glsl"));
-    m_SSAOShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\ssaoVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\ssaoFrag.glsl"));
-    m_SSRShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\ssrVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\ssrFrag.glsl"));
+    m_GeometryShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\geometry.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\geometry.frag"));
+    m_PointShadowShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\pointShadow.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\pointShadow.frag"), TO_ABSOLUTE_PATH("Assets\\Shaders\\pointShadow.geom"));
+    m_DirectionalShadowShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\directionalShadow.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\directionalShadow.frag"));
+    m_SkyboxShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\skybox.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\skybox.frag"));
+    m_PBRShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\pbr.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\pbr.frag"));
+    m_BrightShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\brightPass.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\brightPass.frag"));
+    m_DownsampleShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\downsample.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\downsample.frag"));
+    m_UpsampleShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\upsample.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\upsample.frag"));
+    m_SSAOShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\ssao.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\ssao.frag"));
+    m_SSRShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\ssr.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\ssr.frag"));
+    m_CompositeShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\composite.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\composite.frag"));
 
     std::vector<Path> faces = {
     TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\right.jpg"),
@@ -58,6 +58,11 @@ void Renderer::Init(GLFWwindow* window)
     TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\back.jpg")
     };
     m_Skybox.Init(faces);
+
+    m_ScreenQuad.Init();
+
+    
+
 }
 
 void Renderer::StartFrame()
@@ -80,15 +85,20 @@ void Renderer::EndFrame()
 
 void Renderer::Shutdown()
 {
-    m_PBRShader.Destroy();
-    m_SkyboxShader.Destroy();
-    m_ShadowShader.Destroy();
+    m_GeometryShader.Destroy();
+    m_DirectionalShadowShader.Destroy();
     m_PointShadowShader.Destroy();
-    m_ScreenQuadShader.Destroy();
+    m_SkyboxShader.Destroy();
+    m_PBRShader.Destroy();
     m_BrightShader.Destroy();
     m_DownsampleShader.Destroy();
     m_UpsampleShader.Destroy();
-    m_GeometryShader.Destroy();
     m_SSAOShader.Destroy();
     m_SSRShader.Destroy();
+    m_CompositeShader.Destroy();
+}
+
+void Renderer::DrawFullScreenQuad()
+{
+    m_ScreenQuad.Draw();
 }

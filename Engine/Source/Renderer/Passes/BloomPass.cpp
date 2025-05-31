@@ -3,8 +3,6 @@
 #include <algorithm>
 
 bool BloomPass::isInitialized = false;
-GLuint BloomPass::quadVAO = 0;
-GLuint BloomPass::quadVBO = 0;
 std::vector<GLuint> BloomPass::downsampleFBOs;
 std::vector<GLuint> BloomPass::downsampleTextures;
 std::vector<GLuint> BloomPass::upsampleFBOs;
@@ -14,7 +12,6 @@ GLuint BloomPass::blurredTexture = 0;
 void BloomPass::Execute()
 {
     glDisable(GL_DEPTH_TEST);
-    glBindVertexArray(quadVAO);
 
     Shader& downsampleShader = Renderer::GetDownsampleShader();
     Shader& upsampleShader = Renderer::GetUpsampleShader();
@@ -39,7 +36,7 @@ void BloomPass::Execute()
         else
             glBindTexture(GL_TEXTURE_2D, downsampleTextures[i - 1]);
 
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        Renderer::DrawFullScreenQuad();
     }
 
     for (int i = mipLevels - 2; i >= 0; --i)
@@ -61,7 +58,7 @@ void BloomPass::Execute()
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, downsampleTextures[i]);
 
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        Renderer::DrawFullScreenQuad();
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

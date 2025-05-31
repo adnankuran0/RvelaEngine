@@ -1,30 +1,27 @@
 #include "rvelapch.h"
-#include "PostProcessPass.h"
+#include "CompositePass.h"
 #include "../Renderer.h"
 
-bool PostProcessPass::isInitialized = false;
-GLuint PostProcessPass::quadVAO = 0;
-GLuint PostProcessPass::quadVBO = 0;
-float PostProcessPass::exposure = 1.0f;
+bool CompositePass::isInitialized = false;
+float CompositePass::exposure = 1.0f;
 
-void PostProcessPass::Execute()
+void CompositePass::Execute()
 {
 	glDisable(GL_DEPTH_TEST);
-	Shader& postProcessShader = Renderer::GetScreenQuadShader();
+	Shader& compositeShader = Renderer::GetCompositeShader();
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	UpdateExposure(Time::GetDeltaTime());
 
-	postProcessShader.use();
+	compositeShader.use();
+	//UpdateExposure(Time::GetDeltaTime());
 	//postProcessShader.setFloat("exposure", glm::clamp(exposure, 0.1f, 5.0f)); TODO: take a look at this
-	postProcessShader.setFloat("exposure", 1.0f);
-	postProcessShader.setInt("screenTexture", 0);
-	postProcessShader.setInt("bloomTexture", 1);
-	postProcessShader.setInt("aoTexture", 2);
-	postProcessShader.setInt("ssrTexture", 3);
+	compositeShader.setFloat("exposure", 1.0f);
+	compositeShader.setInt("screenTexture", 0);
+	compositeShader.setInt("bloomTexture", 1);
+	compositeShader.setInt("aoTexture", 2);
+	compositeShader.setInt("ssrTexture", 3);
 
-	glBindVertexArray(quadVAO);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, screenTexture);
 	glActiveTexture(GL_TEXTURE1);
@@ -34,17 +31,17 @@ void PostProcessPass::Execute()
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, ssrTexture);
 
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	Renderer::DrawFullScreenQuad();
 	glEnable(GL_DEPTH_TEST);
 
 }
 
-void PostProcessPass::UpdateExposure(float deltaTime)
+void CompositePass::UpdateExposure(float deltaTime)
 {
 	glBindTexture(GL_TEXTURE_2D, screenTexture); // screenTexture
 	glGenerateMipmap(GL_TEXTURE_2D);
 
-	int mipLevel = std::log2(std::max(ctx.viewportWidth, ctx.viewportHeight));
+	int mipLevel = (int)std::log2(std::max(ctx.viewportWidth, ctx.viewportHeight));
 	float avgColor[3];
 	glGetTexImage(GL_TEXTURE_2D, mipLevel, GL_RGB, GL_FLOAT, avgColor);
 

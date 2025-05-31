@@ -5,6 +5,7 @@
 #include "Core/Utils/AssetManager.h"
 #include "UUIDGenerator.h"  
 #include <future>
+#include "../RvelaLog.h"
 
 using json = nlohmann::json;
 
@@ -64,7 +65,7 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
     file.close();
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    std::cout << "Json loading took " << duration.count() << "ms\n";
+    LOG_INFO << "Json loading took " << duration.count() << "ms";
 
     auto& registry = scene.GetRegistry();
     for (auto entity : registry.view<UUIDComponent>())
@@ -151,8 +152,8 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
 
     end = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    std::cout << "Scene loading took " << duration.count() << "ms\n";
-    std::cout << "Total mesh loading took " << meshLoadTotal.count() << "ms\n";
+    LOG_INFO << "Scene loading took " << duration.count() << "ms";
+    LOG_INFO << "Total mesh loading took " << meshLoadTotal.count() << "ms";
 
     for (auto& [uuid, entity] : uuidToEntity)
     {
@@ -173,7 +174,5 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
 
     scene.UpdateHierarchy();
 
-    std::cout << "Scene loading complete\n";
-    
-    
+    LOG_INFO << "Scene loading complete";
 }

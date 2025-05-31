@@ -2,8 +2,6 @@
 #include "SSRPass.h"
 
 bool SSRPass::isInitialized = false;
-GLuint SSRPass::quadVAO = 0;
-GLuint SSRPass::quadVBO = 0;
 GLuint SSRPass::ssrFBO = 0;
 GLuint SSRPass::ssrTexture = 0;
 
@@ -51,8 +49,7 @@ void SSRPass::Execute()
     glBindTexture(GL_TEXTURE_2D, gScreen);
     ssrShader.setInt("uScreenTexture", 4);
 
-    glBindVertexArray(quadVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    Renderer::DrawFullScreenQuad();
 
     glEnable(GL_DEPTH_TEST);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

@@ -11,6 +11,7 @@
 #include "../Core/Time.h"
 #include "Scene/Components.h"
 #include "Skybox.h"
+#include "ScreenQuad.h"
 
 struct PointLightData {
     glm::vec3 position;
@@ -47,11 +48,12 @@ public:
     static void EndFrame();
     static void Shutdown();
 
+    static void DrawFullScreenQuad();
+
     static Shader& GetPBRShader() { return m_PBRShader; }
     static Shader& GetSkyboxShader() { return m_SkyboxShader; }
-    static Shader& GetShadowShader() { return m_ShadowShader; }
+    static Shader& GetDirectionalShadowShader() { return m_DirectionalShadowShader; }
     static Shader& GetPointShadowShader() { return m_PointShadowShader; }
-    static Shader& GetScreenQuadShader() { return m_ScreenQuadShader; }
     static Shader& GetBrightShader() { return m_BrightShader; }
     static Shader& GetDownsampleShader() { return m_DownsampleShader; }
     static Shader& GetUpsampleShader() { return m_UpsampleShader; }
@@ -59,19 +61,22 @@ public:
     static Shader& GetSSAOShader() { return m_SSAOShader; }
     static Shader& GetSSRShader() { return m_SSRShader; }
     static Skybox& GetSkybox() { return m_Skybox; }
+    static Shader& GetCompositeShader() { return m_CompositeShader; }
 
 private:
     static GLFWwindow* activeWindow;
     static Shader m_PBRShader;
     static Shader m_SkyboxShader;
-    static Shader m_ShadowShader;
+    static Shader m_DirectionalShadowShader;
     static Shader m_PointShadowShader;
-    static Shader m_ScreenQuadShader;
     static Shader m_BrightShader;
     static Shader m_DownsampleShader;
     static Shader m_UpsampleShader;
     static Shader m_GeometryShader;
     static Shader m_SSAOShader;
     static Shader m_SSRShader;
+    static Shader m_CompositeShader;
     static Skybox m_Skybox;
+
+    static ScreenQuad m_ScreenQuad;
 };

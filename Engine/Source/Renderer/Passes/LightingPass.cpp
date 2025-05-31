@@ -11,7 +11,8 @@ GLuint LightingPass::screenRBO = 0;
 GLuint LightingPass::intermediateFBO = 0;
 GLuint LightingPass::intermediateColorTex = 0;
 
-void LightingPass::Execute() {
+void LightingPass::Execute() 
+{
     if (commands.empty() || !ctx.IsValid()) return;
 
     glBindFramebuffer(GL_FRAMEBUFFER, screenFBO);
@@ -71,6 +72,7 @@ void LightingPass::Execute() {
 
     shader.setInt("pointLightCount", pointLightCount);
     shader.setVec3("camPos", ctx.camera->Position);
+    
 
     
 
@@ -84,6 +86,7 @@ void LightingPass::Execute() {
         shader.setFloat("metallicValue", material->metallic);
         shader.setFloat("roughnessValue", material->roughness);
         shader.setFloat("aoValue", material->ao);
+        shader.setFloat("normalScale", material->normalScale);
 
         struct MapInfo {
             Path path;

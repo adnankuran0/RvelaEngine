@@ -15,15 +15,15 @@ void RenderLayer::OnRender()
 	context.viewportWidth = m_Engine->GetWindow()->GetSize().width;
 	context.viewportHeight = m_Engine->GetWindow()->GetSize().height;
 
-	SkyboxPass skyboxPass(context);
-	ShadowPass shadowPass(context);
 	GeometryPass geometryPass(context);
+	ShadowPass shadowPass(context);
+	SkyboxPass skyboxPass(context);
 	LightingPass lightingPass(context);
-	PostProcessPass postProcessPass(context);
 	BrightPass brightPass(context);
 	BloomPass bloomPass(context);
 	SSAOPass ssaoPass(context);
 	SSRPass ssrPass(context);
+	CompositePass compositePass(context);
 
 
 
@@ -40,15 +40,15 @@ void RenderLayer::OnRender()
 		lightingPass.AddCommand(command);
 	}
 
-	m_RenderPipeline->SetSkyboxPass(&skyboxPass);
-	m_RenderPipeline->SetShadowPass(&shadowPass) ;
 	m_RenderPipeline->SetGeometryPass(&geometryPass);
+	m_RenderPipeline->SetShadowPass(&shadowPass) ;
+	m_RenderPipeline->SetSkyboxPass(&skyboxPass);
 	m_RenderPipeline->SetLightingPass(&lightingPass);
-	m_RenderPipeline->SetPostProcessPass(&postProcessPass);
 	m_RenderPipeline->SetBrightPass(&brightPass);
 	m_RenderPipeline->SetBloomPass(&bloomPass);
 	m_RenderPipeline->SetSSAOPass(&ssaoPass);
 	m_RenderPipeline->SetSSRPass(&ssrPass);
+	m_RenderPipeline->SetCompositePass(&compositePass);
 
 	m_RenderPipeline->Execute();
 }

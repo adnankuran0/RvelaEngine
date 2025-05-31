@@ -490,6 +490,10 @@ void ImGuiLayer::DrawInspectorPanel(entt::registry& registry, entt::entity& sele
                     Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath().GetAbsoluteStr());
                 }
 
+                if (ImGui::SliderFloat("Normal Scale", &materialComponent.material->normalScale, 0.0f, 10.0f)) {
+                    Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath().GetAbsoluteStr());
+                }
+
             }
         }
 

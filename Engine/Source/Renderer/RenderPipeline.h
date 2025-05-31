@@ -5,7 +5,7 @@
 #include "Renderer/Passes/LightingPass.h"
 #include "Renderer/Passes/SkyboxPass.h"
 #include "Renderer/Passes/ShadowPass.h"
-#include "Renderer/Passes/PostProcessPass.h"
+#include "Renderer/Passes/CompositePass.h"
 #include "Renderer/Passes/BrightPass.h"
 #include "Renderer/Passes/BloomPass.h"
 #include "Renderer/Passes/GeometryPass.h"
@@ -29,29 +29,31 @@ public:
 	void SetShadowPass(ShadowPass* shadowPass) { this->shadowPass = shadowPass; }
 	void SetGeometryPass(GeometryPass* geometryPass) { this->geometryPass = geometryPass; }
 	void SetLightingPass(LightingPass* lightingPass) { this->lightingPass = lightingPass; }
-	void SetPostProcessPass(PostProcessPass* postProcessPass) { this->postProcessPass = postProcessPass; }
 	void SetBrightPass(BrightPass* brightPass) { this->brightPass = brightPass; }
 	void SetBloomPass(BloomPass* bloomPass) { this->bloomPass = bloomPass; }
 	void SetSSAOPass(SSAOPass* ssaoPass) { this->ssaoPass = ssaoPass; }
 	void SetSSRPass(SSRPass* ssrPass) { this->ssrPass = ssrPass; }
+	void SetCompositePass(CompositePass* compositePass) { this->compositePass = compositePass; }
 
 
 	void Execute() noexcept
 	{
-		skyboxPass->screenFBO = lightingPass->GetScreenFBO();
-		skyboxPass->Execute();
-		shadowPass->Execute();
 
 		geometryPass->Execute();
 
-		ssaoPass->gDepth = geometryPass->GetDepthTexure();
-		ssaoPass->gNormal = geometryPass->GetNormalTexure();
-		ssaoPass->Execute();
+		shadowPass->Execute();
+
+		skyboxPass->screenFBO = lightingPass->GetScreenFBO();
+		skyboxPass->Execute();
 
 		lightingPass->shadowMap = shadowPass->GetDepthMap();
 		lightingPass->pointShadowMap = shadowPass->GetPointDepthMap();
 		lightingPass->lightSpaceMatrix = shadowPass->GetLightSpaceMatrix();
 		lightingPass->Execute();
+
+		ssaoPass->gDepth = geometryPass->GetDepthTexure();
+		ssaoPass->gNormal = geometryPass->GetNormalTexure();
+		ssaoPass->Execute();
 
 		brightPass->screenTexture = lightingPass->GetScreenTexture();
 		brightPass->Execute();
@@ -66,22 +68,22 @@ public:
 		ssrPass->gScreen = lightingPass->GetScreenTexture();
 		ssrPass->Execute();
 
-		postProcessPass->screenTexture = lightingPass->GetScreenTexture();
-		postProcessPass->bloomBlurTexture = bloomPass->GetBlurTexture();
-		postProcessPass->aoTexture = ssaoPass->GetSSAOTexture();
-		postProcessPass->ssrTexture = ssrPass->GetSSRTexture();
-		postProcessPass->Execute();
+		compositePass->screenTexture = lightingPass->GetScreenTexture();
+		compositePass->bloomBlurTexture = bloomPass->GetBlurTexture();
+		compositePass->aoTexture = ssaoPass->GetSSAOTexture();
+		compositePass->ssrTexture = ssrPass->GetSSRTexture();
+		compositePass->Execute();
 	}
 private:
 	std::vector <RenderPass*> passes;
-	SkyboxPass* skyboxPass;
+	GeometryPass* geometryPass;
 	ShadowPass* shadowPass;
+	SkyboxPass* skyboxPass;
 	LightingPass* lightingPass;
-	PostProcessPass* postProcessPass;
 	BrightPass* brightPass;
 	BloomPass* bloomPass;
-	GeometryPass* geometryPass;
 	SSAOPass* ssaoPass;
 	SSRPass* ssrPass;
+	CompositePass* compositePass;
 };
 

@@ -3,8 +3,6 @@
 #include <random>
 
 bool SSAOPass::isInitialized = false;
-GLuint SSAOPass::quadVAO = 0;
-GLuint SSAOPass::quadVBO = 0;
 GLuint SSAOPass::ssaoFBO = 0;
 GLuint SSAOPass::ssaoTexture = 0;
 GLuint SSAOPass::noiseTexture = 0;
@@ -40,8 +38,7 @@ void SSAOPass::Execute()
 
     for (unsigned int i = 0; i < 64; ++i)
         ssaoShader.setVec3("samples[" + std::to_string(i) + "]", kernel[i]);
-    glBindVertexArray(quadVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    Renderer::DrawFullScreenQuad();
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -60,7 +57,7 @@ void SSAOPass::GenerateSampleKernel()
         );
         sample = glm::normalize(sample);
         sample *= randomFloats(generator);
-        float scale = float(i) / 64.0;
+        float scale = float(i) / 64.0f;
         scale = glm::mix(0.1f, 1.0f, scale * scale);
         sample *= scale;
         kernel[i] = sample;

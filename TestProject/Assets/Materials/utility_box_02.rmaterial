@@ -21,6 +21,6 @@
     "metallic": 0.0,
     "metallicMapPath": "D:/GitHub/RvelaEngine/TestProject/Assets/Models/utility_box_02_1k/textures/utility_box_02_metal_1k.png",
     "normalMapPath": "D:/GitHub/RvelaEngine/TestProject/Assets/Models/utility_box_02_1k/textures/utility_box_02_nor_gl_1k.png",
-    "roughness": 0.5,
+    "roughness": 1.0,
     "roughnessMapPath": "D:/GitHub/RvelaEngine/TestProject/Assets/Models/utility_box_02_1k/textures/utility_box_02_rough_1k.png"
 }
