@@ -162,11 +162,22 @@ std::vector<MeshData> AssetManager::LoadModel(const Path path)
         std::vector<float> vertices;
         vertices.reserve(mesh->mNumVertices * 8);
 
+        glm::vec3 minBounds(FLT_MAX);
+        glm::vec3 maxBounds(-FLT_MAX);
+
         for (unsigned int j = 0; j < mesh->mNumVertices; j++)
         {
-            vertices.push_back(mesh->mVertices[j].x);
-            vertices.push_back(mesh->mVertices[j].y);
-            vertices.push_back(mesh->mVertices[j].z);
+            const aiVector3D& pos = mesh->mVertices[j];
+            vertices.insert(vertices.end(), { pos.x, pos.y, pos.z });
+
+            //Calculate bounds for AABB
+            minBounds.x = std::min(minBounds.x, pos.x);
+            minBounds.y = std::min(minBounds.y, pos.y);
+            minBounds.z = std::min(minBounds.z, pos.z);
+
+            maxBounds.x = std::max(maxBounds.x, pos.x);
+            maxBounds.y = std::max(maxBounds.y, pos.y);
+            maxBounds.z = std::max(maxBounds.z, pos.z);
 
             if (mesh->HasNormals())
             {
@@ -193,6 +204,8 @@ std::vector<MeshData> AssetManager::LoadModel(const Path path)
             }
         }
 
+        BoundingBox localAABB(minBounds, maxBounds);
+
         std::vector<unsigned int> indices;
         indices.reserve(mesh->mNumFaces * 3);
 
@@ -217,6 +230,7 @@ std::vector<MeshData> AssetManager::LoadModel(const Path path)
         data.name = meshName; 
         data.materialPath = TO_ABSOLUTE_PATH(materials[mesh->mMaterialIndex]);
         data.meshIndex = i;
+        data.localAABB = localAABB;
 
         meshDatas.push_back(data);
     }
@@ -279,9 +293,21 @@ MeshData AssetManager::LoadMesh(const Path modelPath, uint32_t meshIndex)
     std::vector<float> vertices;
     vertices.reserve(mesh->mNumVertices * vertexSize);
 
+    glm::vec3 minBounds(FLT_MAX);
+    glm::vec3 maxBounds(-FLT_MAX);
+
     for (unsigned int j = 0; j < mesh->mNumVertices; ++j) {
         const aiVector3D& pos = mesh->mVertices[j];
         vertices.insert(vertices.end(), { pos.x, pos.y, pos.z });
+
+        //Calculate bounds for AABB
+        minBounds.x = std::min(minBounds.x, pos.x);
+        minBounds.y = std::min(minBounds.y, pos.y);
+        minBounds.z = std::min(minBounds.z, pos.z);
+
+        maxBounds.x = std::max(maxBounds.x, pos.x);
+        maxBounds.y = std::max(maxBounds.y, pos.y);
+        maxBounds.z = std::max(maxBounds.z, pos.z);
 
         if (hasNormals) {
             const aiVector3D& normal = mesh->mNormals[j];
@@ -300,6 +326,8 @@ MeshData AssetManager::LoadMesh(const Path modelPath, uint32_t meshIndex)
         }
     }
 
+    BoundingBox localAABB(minBounds, maxBounds);
+
     std::vector<unsigned int> indices;
     indices.reserve(mesh->mNumFaces * 3);
 
@@ -315,6 +343,7 @@ MeshData AssetManager::LoadMesh(const Path modelPath, uint32_t meshIndex)
     meshData.name = cacheEntry.meshNames[meshIndex];
     meshData.materialPath = TO_ABSOLUTE_PATH(cacheEntry.materials[mesh->mMaterialIndex]);
     meshData.meshIndex = meshIndex;
+    meshData.localAABB = localAABB;
 
     return meshData;
 }

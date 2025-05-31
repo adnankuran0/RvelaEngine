@@ -73,7 +73,13 @@ Entity Scene::LoadAsset(const std::string& path) {
     std::vector<MeshData> meshes = AssetManager::LoadModel(TO_ABSOLUTE_PATH(path));
     if (meshes.size() == 1) {
         auto& m = meshes.back();
-        root.AddComponent<MeshRendererComponent>(m.vertices.data(), m.vertices.size() * sizeof(float), m.indices.data(), m.indices.size() * sizeof(unsigned int), m.indices.size());
+        root.AddComponent<MeshRendererComponent>(
+            m.vertices.data(), 
+            m.vertices.size() * sizeof(float), 
+            m.indices.data(), 
+            m.indices.size() * sizeof(unsigned int), 
+            m.indices.size(),
+            m.localAABB);
         root.AddComponent<MeshComponent>(TO_ABSOLUTE_PATH(path), m.meshIndex);
         root.GetComponent<TagComponent>().tag = m.name;
         root.AddComponent<MaterialComponent>(m.materialPath);
@@ -82,7 +88,13 @@ Entity Scene::LoadAsset(const std::string& path) {
         for (auto& m : meshes) {
             Entity child = CreateEntity("child");
             SetParent(child, root);
-            child.AddComponent<MeshRendererComponent>(m.vertices.data(), m.vertices.size() * sizeof(float), m.indices.data(), m.indices.size() * sizeof(unsigned int), m.indices.size());
+            child.AddComponent<MeshRendererComponent>(
+                m.vertices.data(), 
+                m.vertices.size() * sizeof(float), 
+                m.indices.data(), 
+                m.indices.size() * sizeof(unsigned int), 
+                m.indices.size(),
+                m.localAABB);
             child.AddComponent<MeshComponent>(TO_ABSOLUTE_PATH(path), m.meshIndex);
             child.GetComponent<TagComponent>().tag = m.name;
             child.AddComponent<MaterialComponent>(m.materialPath);
@@ -106,7 +118,7 @@ Entity Scene::LoadPrimitive(const std::string& primitiveMeshName) {
     const auto& cfg = it->second;
     Entity root = CreateEntity(cfg.name);
     auto m = AssetManager::LoadMesh(cfg.meshPath, 0);
-    root.AddComponent<MeshRendererComponent>(m.vertices.data(), m.vertices.size() * sizeof(float), m.indices.data(), m.indices.size() * sizeof(unsigned int), m.indices.size());
+    root.AddComponent<MeshRendererComponent>(m.vertices.data(), m.vertices.size() * sizeof(float), m.indices.data(), m.indices.size() * sizeof(unsigned int), m.indices.size(),m.localAABB);
     root.AddComponent<MeshComponent>(cfg.meshPath, m.meshIndex);
     root.GetComponent<TagComponent>().tag = m.name;
     root.AddComponent<MaterialComponent>(m.materialPath);
@@ -140,6 +152,45 @@ void Scene::UpdateNodeRecursive(entt::entity e, const glm::mat4& parentWorld) {
     glm::decompose(worldMat, scale, rotation, translation, skew, perspective);
 
     t.SetWorldTransform(translation, rotation, scale);
+
+    if (HasComponent<MeshRendererComponent>(e))
+    {
+        auto& c = GetComponent<MeshRendererComponent>(e);
+        auto& localAABB = c.localAABB;
+
+        
+
+        glm::vec3 localMin = localAABB.min;
+        glm::vec3 localMax = localAABB.max;
+
+        glm::vec3 corners[8] = {
+            {localMin.x, localMin.y, localMin.z},
+            {localMax.x, localMin.y, localMin.z},
+            {localMin.x, localMax.y, localMin.z},
+            {localMax.x, localMax.y, localMin.z},
+            {localMin.x, localMin.y, localMax.z},
+            {localMax.x, localMin.y, localMax.z},
+            {localMin.x, localMax.y, localMax.z},
+            {localMax.x, localMax.y, localMax.z},
+        };
+
+        glm::vec3 worldMin(FLT_MAX);
+        glm::vec3 worldMax(-FLT_MAX);
+
+        for (int i = 0; i < 8; ++i) {
+            glm::vec4 worldPos = t.GetWorldMatrix() * glm::vec4(corners[i], 1.0f);
+            glm::vec3 p = glm::vec3(worldPos);
+
+            worldMin = glm::min(worldMin, p);
+            worldMax = glm::max(worldMax, p);
+        }
+
+        BoundingBox worldAABB(worldMin, worldMax);
+        c.worldAABB = worldAABB;
+
+       
+
+    }
 
     auto& node = GetComponent<SceneTreeComponent>(e);
     for (auto c : node.children)

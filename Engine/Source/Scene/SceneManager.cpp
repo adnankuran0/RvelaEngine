@@ -122,7 +122,8 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
                 meshData.vertices.size() * sizeof(float),
                 meshData.indices.data(),
                 meshData.indices.size() * sizeof(unsigned int),
-                meshData.indices.size());
+                meshData.indices.size(),
+                meshData.localAABB);
         }
 
         if (entityJson.contains("PointLightComponent"))

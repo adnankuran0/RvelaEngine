@@ -2,7 +2,7 @@
 #include "Renderer/VertexArray.h"
 #include "Renderer/VertexBuffer.h"
 #include "Renderer/ElementBuffer.h"
-
+#include <Scene/BoundingBox.h>
 
 class MeshRendererComponent {
 public:
@@ -11,12 +11,15 @@ public:
     ElementBuffer EBO;
     BufferLayout Layout;
     unsigned int indexCount = 0;
+    BoundingBox localAABB;
+    BoundingBox worldAABB;
+
     MeshRendererComponent() = default;
     MeshRendererComponent(const MeshRendererComponent&) = delete;
     MeshRendererComponent& operator=(const MeshRendererComponent&) = delete;
     MeshRendererComponent(MeshRendererComponent&&) = default;
     MeshRendererComponent& operator=(MeshRendererComponent&&) = default;
-    MeshRendererComponent(void* vertices, size_t sizeOfVertices, void* indices, size_t sizeOfIndices, unsigned int indexCount)
+    MeshRendererComponent(void* vertices, size_t sizeOfVertices, void* indices, size_t sizeOfIndices, unsigned int indexCount, BoundingBox localAABB)
     {
         this->indexCount = indexCount;
 
@@ -30,6 +33,7 @@ public:
         VAO.SetBufferLayout(Layout);
         EBO.Init(indices, sizeOfIndices);
         EBO.Bind();
+        this->localAABB = localAABB;
     }
 
     void Destroy()

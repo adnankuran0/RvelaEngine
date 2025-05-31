@@ -108,6 +108,8 @@ void LightingPass::Execute()
     shader.setMat4("projection", ctx.camera->projection);
 
     for (auto& command : commands) {
+        if (!ctx.camera->Intersects(command.mesh.worldAABB)) continue;
+
         auto& material = command.material.material;
         if (!material) continue;
 

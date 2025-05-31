@@ -117,6 +117,8 @@ void ShadowPass::RenderDirectionalShadowMap()
         }
 
         for (auto& command : commands) {
+            if (!ctx.camera->Intersects(lightProjection * lightView,command.mesh.worldAABB)) continue;
+
             shadowShader.setMat4("model", command.transform.GetWorldMatrix());
             command.mesh.VAO.Bind();
             glDrawElements(GL_TRIANGLES, command.mesh.indexCount, GL_UNSIGNED_INT, 0);
@@ -147,7 +149,7 @@ void ShadowPass::RenderPointShadowMap()
         float near_plane = 0.1f;
         float far_plane = light.radius;
         glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)POINT_SHADOW_WIDTH / (float)POINT_SHADOW_HEIGHT, near_plane, far_plane);
-        std::array<glm::mat4,6> shadowTransforms;
+        std::array<glm::mat4, 6> shadowTransforms;
         shadowTransforms[0] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
         shadowTransforms[1] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
         shadowTransforms[2] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -155,22 +157,30 @@ void ShadowPass::RenderPointShadowMap()
         shadowTransforms[4] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
         shadowTransforms[5] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
 
-        for (unsigned int i = 0; i < 6; ++i) {
-            pointShadowShader.setMat4("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
-        }
         pointShadowShader.setFloat("far_plane", far_plane);
         pointShadowShader.setVec3("lightPos", lightPos);
         pointShadowShader.setInt("baseLayer", light.shadowIndex * 6);
+
         for (auto& command : commands) {
             pointShadowShader.setMat4("model", command.transform.GetWorldMatrix());
             command.mesh.VAO.Bind();
-            glDrawElementsInstanced(
-                GL_TRIANGLES,
-                command.mesh.indexCount,
-                GL_UNSIGNED_INT,
-                0,
-                6
-            );
+
+            for (unsigned int face = 0; face < 6; ++face) {
+                if (!ctx.camera->Intersects(shadowTransforms[face], command.mesh.worldAABB))
+                    continue;
+
+                // Set the current face's matrix
+                pointShadowShader.setMat4("shadowMatrix", shadowTransforms[face]);
+                // Set the current face layer
+                pointShadowShader.setInt("currentFace", face);
+
+                glDrawElements(
+                    GL_TRIANGLES,
+                    command.mesh.indexCount,
+                    GL_UNSIGNED_INT,
+                    0
+                );
+            }
         }
     }
 

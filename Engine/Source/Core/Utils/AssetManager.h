@@ -2,6 +2,8 @@
 #include "Scene/Components.h"
 #include "assimp/scene.h"
 #include <filesystem>
+#include <Scene/BoundingBox.h>
+
 namespace fs = std::filesystem;
 struct MeshData
 {
@@ -11,6 +13,8 @@ struct MeshData
 	std::string name;
 	Path materialPath;
 	uint16_t meshIndex;
+	BoundingBox localAABB;
+
 };
 
 class AssetManager

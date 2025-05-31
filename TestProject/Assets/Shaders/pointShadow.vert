@@ -6,15 +6,15 @@
 layout (location = 0) in vec3 aPos;
 
 uniform mat4 model;
-uniform mat4 shadowMatrices[6];
+uniform mat4 shadowMatrix;  
 uniform int baseLayer;
+uniform int currentFace;    
 
 out vec4 FragPos;
 
 void main()
 {
-    int face = gl_InstanceID;
     FragPos = model * vec4(aPos, 1.0);
-    gl_Position = shadowMatrices[face] * FragPos;
-    gl_Layer = baseLayer + face;
+    gl_Position = shadowMatrix * FragPos;
+    gl_Layer = baseLayer + currentFace;
 }
