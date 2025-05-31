@@ -18,7 +18,7 @@ private:
     GLuint o_SsaoTexture = 0;
     GLuint ssaoFBO = 0;
     GLuint noiseTexture = 0;
-    glm::vec3 kernel[64];
+    std::vector<glm::vec3> kernel[64];
 
     void GenerateSampleKernel();
     void GenerateNoiseTexture();

@@ -67,10 +67,9 @@ void LightingPass::Execute()
         shader.setFloat("directionalLight.blurRadius", dirLight.blurRadius);
 
         shader.setMat4("lightSpaceMatrix", i_LightSpaceMatrix);
-        shader.setInt("shadowMap", 6);
 
-        glActiveTexture(GL_TEXTURE0 + 6);
-        glBindTexture(GL_TEXTURE_2D, i_DirectionalShadowMap);
+        shader.setInt("shadowMap", 6);
+        glBindTextureUnit(6, i_DirectionalShadowMap);
 
         GLenum err = glGetError();
         if (err != GL_NO_ERROR) LOG_ERROR << "OpenGL Error after directional light setup: " << err;
@@ -99,23 +98,21 @@ void LightingPass::Execute()
         shader.setBool(base + ".castShadows", light.castShadows);
     }
 
-    constexpr int POINT_SHADOW_MAP_SLOT = 10;
+    constexpr int POINT_SHADOW_MAP_SLOT = 7;
     shader.setInt("pointShadowMap", POINT_SHADOW_MAP_SLOT);
-    glActiveTexture(GL_TEXTURE0 + POINT_SHADOW_MAP_SLOT);
-    glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, i_PointShadowMap);
+    glBindTextureUnit(POINT_SHADOW_MAP_SLOT, i_PointShadowMap);
 
     shader.setInt("pointLightCount", pointLightCount);
     shader.setVec3("camPos", ctx.camera->Position);
-    
-
-    
+    shader.setMat4("view", ctx.camera->GetViewMatrix());
+    shader.setMat4("projection", ctx.camera->projection);
 
     for (auto& command : commands) {
         auto& material = command.material.material;
         if (!material) continue;
 
-        shader.setVec3("UVScale", material->UVScale);
-        shader.setVec3("UVOffset", material->UVOffset);
+        shader.setVec2("UVScale", material->UVScale);
+        shader.setVec2("UVOffset", material->UVOffset);
         shader.setVec3("albedoColor", material->albedoColor);
         shader.setFloat("metallicValue", material->metallic);
         shader.setFloat("roughnessValue", material->roughness);
@@ -151,9 +148,9 @@ void LightingPass::Execute()
         }
 
         shader.setMat4("model", command.transform.GetWorldMatrix());
-        shader.setMat4("view", ctx.camera->GetViewMatrix());
-        shader.setMat4("projection", ctx.camera->projection);
-
+        glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(command.transform.GetWorldMatrix())));
+        shader.setMat3("normalMatrix", normalMatrix);
+        
         command.mesh.VAO.Bind();
         glDrawElements(GL_TRIANGLES, command.mesh.indexCount, GL_UNSIGNED_INT, 0);
 
@@ -170,7 +167,6 @@ void LightingPass::Execute()
         0, 0, ctx.viewportWidth, ctx.viewportHeight,
         GL_COLOR_BUFFER_BIT, GL_NEAREST
     );
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     commands.clear();
 }

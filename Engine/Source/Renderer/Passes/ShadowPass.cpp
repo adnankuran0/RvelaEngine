@@ -3,7 +3,13 @@
 
 void ShadowPass::Init()
 {
-    // DIRECTIONAL LIGHT SHADOWMAP SETUP
+    
+    InitDirectionalShadowMap();
+    InitPointShadowMap();
+}
+
+void ShadowPass::InitDirectionalShadowMap()
+{
     glGenFramebuffers(1, &fbo);
 
     glGenTextures(1, &o_DirectionalShadowMap);
@@ -37,9 +43,10 @@ void ShadowPass::Init()
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cerr << "ERROR: Shadow framebuffer not complete!" << std::endl;
+}
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
+void ShadowPass::InitPointShadowMap()
+{
     // POINT LIGHT SHADOWMAP SETUP
     glGenFramebuffers(1, &pointFBO);
 
@@ -75,19 +82,10 @@ void ShadowPass::Init()
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-ShadowPass::~ShadowPass()
+void ShadowPass::RenderDirectionalShadowMap()
 {
-    //TODO: Fill this function
-}
-
-void ShadowPass::Execute()
-{
-    if (commands.empty() || !ctx.IsValid()) return;
-
-    //DIRECTIONAL LIGHT SHADOW MAPPING
     if (ctx.directionalLight && ctx.directionalLight->castShadows)
     {
         Shader& shadowShader = Renderer::GetDirectionalShadowShader();
@@ -108,6 +106,7 @@ void ShadowPass::Execute()
         glEnable(GL_POLYGON_OFFSET_FILL);
         glPolygonOffset(1.0f, 2.0f);
 
+        glEnable(GL_CULL_FACE);
         if (ctx.directionalLight->reverseCullFace)
         {
             glCullFace(GL_BACK);
@@ -116,8 +115,6 @@ void ShadowPass::Execute()
         {
             glCullFace(GL_FRONT);
         }
-        
-        glEnable(GL_CULL_FACE);
 
         for (auto& command : commands) {
             shadowShader.setMat4("model", command.transform.GetWorldMatrix());
@@ -127,50 +124,71 @@ void ShadowPass::Execute()
 
         glCullFace(GL_BACK);
         glDisable(GL_POLYGON_OFFSET_FILL);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    //POINT LIGHT SHADOW MAPPING
+}
+
+void ShadowPass::RenderPointShadowMap()
+{
     Shader& pointShadowShader = Renderer::GetPointShadowShader();
     pointShadowShader.use();
     glBindFramebuffer(GL_FRAMEBUFFER, pointFBO);
     glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, o_PointShadowMap, 0);
-    glClear(GL_DEPTH_BUFFER_BIT);   
+    glClear(GL_DEPTH_BUFFER_BIT);
     glViewport(0, 0, POINT_SHADOW_WIDTH, POINT_SHADOW_HEIGHT);
     glDisable(GL_CULL_FACE);
+
     for (auto& light : ctx.pointLights)
     {
         if (!light.castShadows) continue;
-
 
         glm::vec3 lightPos = light.position;
 
         float near_plane = 0.1f;
         float far_plane = light.radius;
-        glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)POINT_SHADOW_WIDTH/ (float)POINT_SHADOW_HEIGHT, near_plane, far_plane);
-        std::vector<glm::mat4> shadowTransforms;
-        shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-        shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-        shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
-        shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
-        shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-        shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+        glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)POINT_SHADOW_WIDTH / (float)POINT_SHADOW_HEIGHT, near_plane, far_plane);
+        std::array<glm::mat4,6> shadowTransforms;
+        shadowTransforms[0] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+        shadowTransforms[1] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+        shadowTransforms[2] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        shadowTransforms[3] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+        shadowTransforms[4] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+        shadowTransforms[5] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
 
-        
-        for (unsigned int i = 0; i < 6; ++i)
+        for (unsigned int i = 0; i < 6; ++i) {
             pointShadowShader.setMat4("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
+        }
         pointShadowShader.setFloat("far_plane", far_plane);
         pointShadowShader.setVec3("lightPos", lightPos);
-        pointShadowShader.setInt("shadowIndex", light.shadowIndex);
+        pointShadowShader.setInt("baseLayer", light.shadowIndex * 6);
         for (auto& command : commands) {
             pointShadowShader.setMat4("model", command.transform.GetWorldMatrix());
             command.mesh.VAO.Bind();
-            glDrawElements(GL_TRIANGLES, command.mesh.indexCount, GL_UNSIGNED_INT, 0);
+            glDrawElementsInstanced(
+                GL_TRIANGLES,
+                command.mesh.indexCount,
+                GL_UNSIGNED_INT,
+                0,
+                6
+            );
         }
     }
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     glEnable(GL_CULL_FACE);
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
+}
+
+ShadowPass::~ShadowPass()
+{
+    //TODO: Fill this function
+}
+
+void ShadowPass::Execute()
+{
+    if (commands.empty() || !ctx.IsValid()) return;
+
+    RenderDirectionalShadowMap();
+    RenderPointShadowMap();
+
     commands.clear();
 }

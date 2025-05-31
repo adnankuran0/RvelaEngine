@@ -37,7 +37,7 @@ void Renderer::Init(GLFWwindow* window)
 {
     Renderer::activeWindow = window;
     m_GeometryShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\geometry.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\geometry.frag"));
-    m_PointShadowShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\pointShadow.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\pointShadow.frag"), TO_ABSOLUTE_PATH("Assets\\Shaders\\pointShadow.geom"));
+    m_PointShadowShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\pointShadow.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\pointShadow.frag"));
     m_DirectionalShadowShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\directionalShadow.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\directionalShadow.frag"));
     m_SkyboxShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\skybox.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\skybox.frag"));
     m_PBRShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\pbr.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\pbr.frag"));

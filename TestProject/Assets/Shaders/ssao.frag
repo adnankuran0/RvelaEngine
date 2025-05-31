@@ -1,51 +1,43 @@
-#version 400 core
+#version 460 core
 out float FragColor;
 in vec2 TexCoords;
 
-uniform sampler2D gNormal;
-uniform sampler2D gDepth;
-uniform sampler2D texNoise;
+layout(binding = 0) uniform sampler2D gNormal;
+layout(binding = 1) uniform sampler2D gDepth;
+layout(binding = 2) uniform sampler2D texNoise;
 uniform mat4 projection;
 uniform mat4 invProjection; 
-uniform int windowWidth;
-uniform int windowHeight;
+uniform vec2 windowSize;
 uniform vec3 samples[64];
 
 const float radius = 0.5;      
 const float bias = 0.025;
 const float intensity = 1.0;
+const float invSamples = 1.0 / 64.0;
 
 uniform float near;
 uniform float far;
 
-float LinearizeDepth(float depth)
-{
-    float z = depth * 2.0 - 1.0;
-    return (2.0 * near * far) / (far + near - z * (far - near));
-}
-
 vec3 getViewPos(vec2 uv)
 {
-    // DÜZELTME: Ham derinlik değerini kullan
     float depthValue = texture(gDepth, uv).r;
     vec4 ndc = vec4(
-        uv.x * 2.0 - 1.0,
-        uv.y * 2.0 - 1.0,
-        depthValue * 2.0 - 1.0, // Lineerleştirme YOK
+        uv.s * 2.0 - 1.0,
+        uv.t * 2.0 - 1.0,
+        depthValue * 2.0 - 1.0,
         1.0
     );
-    vec4 viewPos = invProjection * ndc; // CPU'dan gelen ters matris
+    vec4 viewPos = invProjection * ndc;
     return viewPos.xyz / viewPos.w;
 }
 
 void main()
 {
-    vec3 fragPos = getViewPos(TexCoords); // Görüş uzayında (z negatif)
+    vec3 fragPos = getViewPos(TexCoords);
     vec3 normal = normalize(texture(gNormal, TexCoords).rgb);
-    vec2 noiseScale = vec2(windowWidth/4.0, windowHeight/4.0);
+    vec2 noiseScale = windowSize * 0.25;
     vec3 randomVec = normalize(texture(texNoise, TexCoords * noiseScale).xyz);
     
-    // TBN matrisi oluştur (aynı)
     vec3 tangent = normalize(randomVec - normal * dot(randomVec, normal));
     vec3 bitangent = cross(normal, tangent);
     mat3 TBN = mat3(tangent, bitangent, normal);
@@ -53,26 +45,17 @@ void main()
     float occlusion = 0.0;
     for(int i = 0; i < 64; ++i)
     {
-        vec3 sampleDir = TBN * samples[i]; // Tangent -> Görüş uzayı
-        vec3 samplePos = fragPos + sampleDir * radius;
+        vec3 samplePos = fragPos + (TBN * samples[i]) * radius;
         
-        // Örnek noktayı ekran koordinatına dönüştür
         vec4 clipPos = projection * vec4(samplePos, 1.0);
-        clipPos.xyz /= clipPos.w;
-        vec2 sampleUV = clipPos.xy * 0.5 + 0.5;
+        vec3 projCoords = clipPos.xyz / clipPos.w;
+        vec2 sampleUV = projCoords.xy * 0.5 + 0.5;
 
-        vec3 sampleViewPos = getViewPos(sampleUV);
-        float sampleViewZ = sampleViewPos.z;
+        float sampleDepth = getViewPos(sampleUV).z;
+        float rangeCheck = smoothstep(0.0, 1.0, radius / abs(fragPos.z - sampleDepth));
 
-        float rangeCheck = smoothstep(0.0, 1.0, radius / abs(fragPos.z - sampleViewZ));
-
-        if (sampleViewZ >= samplePos.z + bias) {
-            occlusion += 1.0 * rangeCheck;
-        }
-
+        occlusion += (sampleDepth >= samplePos.z + bias) ? rangeCheck : 0.0;
     }
     
-    occlusion = 1.0 - (occlusion / 64.0);
-    occlusion = pow(occlusion, intensity);  // <-- Güç eğrisi uygula
-    FragColor = occlusion;
+    FragColor = pow(1.0 - (occlusion * invSamples), intensity);
 }

@@ -14,6 +14,8 @@ void SkyboxPass::Init()
     m_Skybox.Init(faces);
 }
 
+
+
 SkyboxPass::~SkyboxPass()
 {
 	//TODO: Fill this function

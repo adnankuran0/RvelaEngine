@@ -31,18 +31,21 @@ BrightPass::~BrightPass()
 
 void BrightPass::Execute()
 {
+    glDisable(GL_DEPTH_TEST);
 
-	glDisable(GL_DEPTH_TEST);
-	Shader& brightShader = Renderer::GetBrightShader();
-	glBindFramebuffer(GL_FRAMEBUFFER, brightFBO);
-	glClear(GL_COLOR_BUFFER_BIT);
-	brightShader.use();
-	brightShader.setInt("hdrTexture", 0);
-	brightShader.setFloat("threshold", 1.0f);
-	brightShader.setFloat("knee", 0.5f);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, i_ScreenTexture);
-	Renderer::DrawFullScreenQuad();
-	glEnable(GL_DEPTH_TEST);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    Shader& brightShader = Renderer::GetBrightShader();
+    brightShader.use();
+
+    brightShader.setInt("hdrTexture", 0);
+    brightShader.setFloat("threshold", 1.0f);
+    brightShader.setFloat("knee", 0.5f);
+
+    glBindTextureUnit(0, i_ScreenTexture); 
+
+    glBindFramebuffer(GL_FRAMEBUFFER, brightFBO);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    Renderer::DrawFullScreenQuad();
+
+    glEnable(GL_DEPTH_TEST);
 }

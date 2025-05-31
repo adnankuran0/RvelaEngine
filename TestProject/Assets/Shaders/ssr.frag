@@ -1,13 +1,13 @@
-#version 410 core
+#version 460 core
 
 layout(location = 0) in vec2 TexCoord;
 layout(location = 0) out vec4 FragColor;
 
-uniform sampler2D uScreenTexture;
-uniform sampler2D uNormalTexture;
-uniform sampler2D uDepthTexture;
-uniform sampler2D uRoughnessTexture;
-uniform sampler2D uMetallicTexture;
+layout(binding = 0) uniform sampler2D uDepthTexture;
+layout(binding = 1) uniform sampler2D uNormalTexture;
+layout(binding = 2) uniform sampler2D uMetallicTexture;
+layout(binding = 3) uniform sampler2D uRoughnessTexture;
+layout(binding = 4) uniform sampler2D uScreenTexture;
 
 uniform mat4 uViewMatrix;
 uniform mat4 uProjectionMatrix;
@@ -27,113 +27,98 @@ const float MAX_DISTANCE = 50.0;
 const float MIN_RAY_STEP = 0.01;
 const float RAY_HIT_THRESHOLD = 0.01;
 
-// View space position from non-linear depth texture
+// Precomputed values
+const float linearDepthConst = 2.0 * near * far;
+const float depthDenomConst = far - near;
+
 vec3 getViewPosition(vec2 texCoord, float depthSample) {
-    // Screen space to NDC
     vec2 ndc = texCoord * 2.0 - 1.0;
-    
-    // Depth buffer to linear depth
     float z_ndc = depthSample * 2.0 - 1.0;
-    float z_eye = (2.0 * near * far) / (far + near - z_ndc * (far - near));
     
-    // View space position
+    float z_eye = linearDepthConst / (far + near - z_ndc * depthDenomConst);
+    
     vec4 viewPos = uInverseProjectionMatrix * vec4(ndc, z_ndc, 1.0);
-    viewPos.xyz /= viewPos.w;
-    
-    return viewPos.xyz;
+    return viewPos.xyz / viewPos.w;
 }
 
-// World space position
-vec3 getWorldPosition(vec3 viewPos) {
-    vec4 worldPos = uInverseViewMatrix * vec4(viewPos, 1.0);
-    return worldPos.xyz;
-}
-
-// World position to screen space
 vec3 projectToScreen(vec3 worldPos) {
-    vec4 clipPos = uProjectionMatrix * uViewMatrix * vec4(worldPos, 1.0);
+    vec4 clipPos = uProjectionMatrix * (uViewMatrix * vec4(worldPos, 1.0));
     vec3 ndcPos = clipPos.xyz / clipPos.w;
     return vec3(ndcPos.xy * 0.5 + 0.5, ndcPos.z * 0.5 + 0.5);
 }
 
-// Improved ray marching with adaptive step size
-vec3 rayMarch(vec3 rayStart, vec3 rayDir, float roughness, out bool hit) {
+vec3 rayMarch(vec3 rayStart, vec3 rayDir, float roughness, out bool hit) 
+{
     hit = false;
     vec3 currentPos = rayStart;
     
-    // Adaptive step size based on roughness
+    // Precomputed adaptive step factors
     float rayStep = mix(INITIAL_RAY_STEP, INITIAL_RAY_STEP * 2.0, roughness);
-    vec3 step = rayDir * rayStep;
+    float stepFactor = 0.95;
+    vec3 stepVec = rayDir * rayStep;
+    float maxDistSq = MAX_DISTANCE * MAX_DISTANCE;
+    float distSq = 0.0;
     
-    for (int i = 0; i < MAX_STEPS; i++) {
-        currentPos += step;
-        
-        // Project to screen space
+    for (int i = 0; i < MAX_STEPS; i++) 
+    {
+        currentPos += stepVec;
         vec3 screenPos = projectToScreen(currentPos);
         
-        // Screen boundaries check
-        if (screenPos.x < 0.0 || screenPos.x > 1.0 || 
-            screenPos.y < 0.0 || screenPos.y > 1.0) {
-            break;
-        }
+        // Early exit checks
+        if (any(lessThan(screenPos.xy, vec2(0.0)))) break;
+        if (any(greaterThan(screenPos.xy, vec2(1.0)))) break;
         
-        // Max distance check
-        if (distance(currentPos, rayStart) > MAX_DISTANCE) {
-            break;
-        }
+        vec3 toCurrent = currentPos - uCameraPos;
+        distSq = dot(toCurrent, toCurrent);
+        if (distSq > maxDistSq) break;
         
-        // Read depth at this point
         float sampledDepth = texture(uDepthTexture, screenPos.xy).r;
-        
-        // Skip background
         if (sampledDepth > 0.999) continue;
         
+        float rayDepth = sqrt(distSq);
         vec3 sampledViewPos = getViewPosition(screenPos.xy, sampledDepth);
-        vec3 sampledWorldPos = getWorldPosition(sampledViewPos);
+        vec4 sampledWorldPosTemp = uInverseViewMatrix * vec4(sampledViewPos, 1.0);
+        vec3 sampledWorldPos = sampledWorldPosTemp.xyz / sampledWorldPosTemp.w;
         
-        // Calculate hit distance
-        float rayDepth = distance(uCameraPos, currentPos);
         float surfaceDepth = distance(uCameraPos, sampledWorldPos);
-        
-        if (rayDepth > surfaceDepth + DEPTH_BIAS) {
-            // Hit found, refine with binary search
-            vec3 hitPos = currentPos - step;
-            vec3 refinedStep = step * 0.5;
+        if (rayDepth > surfaceDepth + DEPTH_BIAS) 
+        {
+            vec3 hitPos = currentPos - stepVec;
+            vec3 refineStep = stepVec * 0.5;
             
             for (int j = 0; j < BINARY_SEARCH_STEPS; j++) {
-                hitPos += refinedStep;
+                hitPos += refineStep;
                 vec3 refinedScreenPos = projectToScreen(hitPos);
                 
-                if (refinedScreenPos.x >= 0.0 && refinedScreenPos.x <= 1.0 && 
-                    refinedScreenPos.y >= 0.0 && refinedScreenPos.y <= 1.0) {
+                if (all(greaterThanEqual(refinedScreenPos.xy, vec2(0.0))) && 
+                    all(lessThanEqual(refinedScreenPos.xy, vec2(1.0)))) {
                     
-                    float refinedSampledDepth = texture(uDepthTexture, refinedScreenPos.xy).r;
-                    if (refinedSampledDepth > 0.999) continue;
-                    
-                    vec3 refinedSampledViewPos = getViewPosition(refinedScreenPos.xy, refinedSampledDepth);
-                    vec3 refinedSampledWorldPos = getWorldPosition(refinedSampledViewPos);
-                    
-                    float refinedRayDepth = distance(uCameraPos, hitPos);
-                    float refinedSurfaceDepth = distance(uCameraPos, refinedSampledWorldPos);
-                    
-                    if (abs(refinedRayDepth - refinedSurfaceDepth) < RAY_HIT_THRESHOLD) {
-                        break; // Good enough hit
-                    }
-                    
-                    if (refinedRayDepth > refinedSurfaceDepth + DEPTH_BIAS) {
-                        hitPos -= refinedStep;
+                    float refinedDepth = texture(uDepthTexture, refinedScreenPos.xy).r;
+                    if (refinedDepth < 0.999) {
+                        vec3 refinedSampledViewPos = getViewPosition(refinedScreenPos.xy, refinedDepth);
+                        vec4 refinedSampledWorldPosTemp = uInverseViewMatrix * vec4(refinedSampledViewPos, 1.0);
+                        vec3 refinedSampledWorldPos = refinedSampledWorldPosTemp.xyz / refinedSampledWorldPosTemp.w;
+                        
+                        float refinedRayDepth = distance(uCameraPos, hitPos);
+                        float refinedSurfaceDepth = distance(uCameraPos, refinedSampledWorldPos);
+                        
+                        if (abs(refinedRayDepth - refinedSurfaceDepth) < RAY_HIT_THRESHOLD) break;
+                        
+                        if (refinedRayDepth > refinedSurfaceDepth + DEPTH_BIAS) {
+                            hitPos -= refineStep;
+                        }
                     }
                 }
-                refinedStep *= 0.5;
+                refineStep *= 0.5;
             }
+        
             
             hit = true;
             return projectToScreen(hitPos);
         }
         
-        // Adaptive step size reduction
-        rayStep = max(rayStep * 0.95, MIN_RAY_STEP);
-        step = rayDir * rayStep;
+        rayStep = max(rayStep * stepFactor, MIN_RAY_STEP);
+        stepVec = rayDir * rayStep;
     }
     
     return vec3(0.0);
@@ -142,84 +127,75 @@ vec3 rayMarch(vec3 rayStart, vec3 rayDir, float roughness, out bool hit) {
 void main() {
     vec2 texCoord = TexCoord;
     
-    // Read G-Buffer data
-    vec3 normal = normalize(texture(uNormalTexture, texCoord).xyz);
     float depth = texture(uDepthTexture, texCoord).r;
-    float roughness = texture(uRoughnessTexture, texCoord).r;
-    float metallic = texture(uMetallicTexture, texCoord).r;
-    
-    // Skip background
     if (depth > 0.999) {
         FragColor = vec4(0.0);
         return;
     }
     
-    // Calculate reflection probability based on material properties
+    vec3 normal = texture(uNormalTexture, texCoord).xyz;
+    float roughness = texture(uRoughnessTexture, texCoord).r;
+    float metallic = texture(uMetallicTexture, texCoord).r;
+    
+    // Early exit for non-reflective surfaces
     float reflectionProbability = mix(1.0 - roughness, 1.0, metallic);
     if (reflectionProbability < 0.1) {
         FragColor = vec4(0.0);
         return;
     }
     
-    // View space position
     vec3 viewPos = getViewPosition(texCoord, depth);
-    vec3 worldPos = getWorldPosition(viewPos);
+    vec4 worldPosTemp = uInverseViewMatrix * vec4(viewPos, 1.0);
+    vec3 worldPos = worldPosTemp.xyz / worldPosTemp.w;
     
-    // View direction and reflection direction
     vec3 viewDir = normalize(worldPos - uCameraPos);
     vec3 worldNormal = mat3(uInverseViewMatrix) * normal;
     vec3 reflectionDir = reflect(viewDir, normalize(worldNormal));
     
-    // Jitter reflection direction based on roughness
     float roughnessJitter = roughness * roughness * 0.2;
-    reflectionDir = normalize(reflectionDir + roughnessJitter * vec3(
-        fract(sin(dot(texCoord, vec2(12.9898, 78.233))) * 43758.5453) * 2.0 - 1.0,
-        fract(sin(dot(texCoord, vec2(39.346, 11.135))) * 87653.2315) * 2.0 - 1.0,
-        0.0
-    ));
+    float rand1 = fract(sin(dot(texCoord, vec2(12.9898, 78.233))) * 43758.5453);
+    float rand2 = fract(sin(dot(texCoord, vec2(39.346, 11.135))) * 87653.2315);
+    vec3 jitter = vec3(rand1 * 2.0 - 1.0, rand2 * 2.0 - 1.0, 0.0);
+    reflectionDir = normalize(reflectionDir + roughnessJitter * jitter);
     
-    // Ray marching
     bool hit;
     vec3 hitScreenPos = rayMarch(worldPos, reflectionDir, roughness, hit);
     
     if (hit) {
-        // Sample reflection color
-        vec3 reflectionColor = texture(uScreenTexture, hitScreenPos.xy).rgb;
-        
-        // Fresnel effect
-        float fresnel = pow(1.0 - max(dot(-viewDir, worldNormal), 0.0), 5.0);
-        fresnel = mix(mix(0.04, 0.2, fresnel), mix(0.7, 1.0, fresnel), metallic);
-        
-        // Roughness attenuation (more physically accurate)
-        float roughnessAttenuation = 1.0 / (1.0 + roughness * roughness * 10.0);
-        
-        // Metallic factor
-        float metallicFactor = mix(0.3, 1.0, metallic);
-        
-        // Final reflection strength
-        float reflectionStrength = fresnel * roughnessAttenuation * metallicFactor;
-        
-        // Edge fade
         vec2 edgeFade = smoothstep(0.0, 0.1, hitScreenPos.xy) * 
                        smoothstep(1.0, 0.9, hitScreenPos.xy);
-        reflectionStrength *= edgeFade.x * edgeFade.y;
+        float fadeFactor = edgeFade.x * edgeFade.y;
         
-        // Apply screen-space blur based on roughness
-        if (roughness > 0.3) {
+        if (fadeFactor < 0.01) {
+            FragColor = vec4(0.0);
+            return;
+        }
+        
+        vec3 reflectionColor = texture(uScreenTexture, hitScreenPos.xy).rgb;
+        
+        float fresnel = pow(1.0 - max(dot(-viewDir, worldNormal), 0.0), 5.0);
+        float fresnelFactor = mix(mix(0.04, 0.2, fresnel), mix(0.7, 1.0, fresnel), metallic);
+        
+        // Material attenuation
+        float roughnessAtt = 1.0 / (1.0 + roughness * roughness * 10.0);
+        float reflectionStrength = fresnelFactor * roughnessAtt * mix(0.3, 1.0, metallic) * fadeFactor;
+        
+        // Blur for rough surfaces
+        if (roughness > 0.1) {
             float blurRadius = roughness * 5.0;
-            vec3 blurredReflection = vec3(0.0);
+            vec2 texelSize = 1.0 / textureSize(uScreenTexture, 0);
+            vec3 blurred = vec3(0.0);
             float totalWeight = 0.0;
             
-            for (int x = -2; x <= 2; x++) {
-                for (int y = -2; y <= 2; y++) {
-                    vec2 offset = vec2(x, y) * (blurRadius / 512.0);
-                    float weight = 1.0 / (1.0 + length(vec2(x, y)));
-                    blurredReflection += texture(uScreenTexture, hitScreenPos.xy + offset).rgb * weight;
+            for (int x = -2; x <= 2; ++x) {
+                for (int y = -2; y <= 2; ++y) {
+                    vec2 offset = vec2(x, y) * texelSize * blurRadius;
+                    float weight = 1.0 / (1.0 + abs(x) + abs(y)); // Manhattan distance
+                    blurred += texture(uScreenTexture, hitScreenPos.xy + offset).rgb * weight;
                     totalWeight += weight;
                 }
             }
-            
-            reflectionColor = blurredReflection / totalWeight;
+            reflectionColor = blurred / totalWeight;
         }
         
         FragColor = vec4(reflectionColor, reflectionStrength);

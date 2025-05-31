@@ -20,8 +20,8 @@ std::string Material::Serialize() const
 	j["roughness"] = roughness;
 	j["ao"] = ao;
 
-    j["UVScale"] = { UVScale.x , UVScale.y, UVScale.z };
-    j["UVOffset"] = { UVOffset.x , UVOffset.y, UVOffset.z };
+    j["UVScale"] = { UVScale.x , UVScale.y };
+    j["UVOffset"] = { UVOffset.x , UVOffset.y };
 
 	j["albedoMapPath"] = albedoMapPath.GetVirtualStr();
 	j["normalMapPath"] = normalMapPath.GetVirtualStr();
@@ -45,10 +45,10 @@ void Material::Deserialize(const std::string& jsonStr)
     ao = j["ao"];
 
     auto uvScale = j["UVScale"];
-    UVScale = glm::vec3(uvScale[0], uvScale[1], uvScale[2]);
+    UVScale = glm::vec2(uvScale[0], uvScale[1]);
 
     auto uvOffset = j["UVOffset"];
-    UVOffset = glm::vec3(uvOffset[0], uvOffset[1], uvOffset[2]);
+    UVOffset = glm::vec2(uvOffset[0], uvOffset[1]);
 
     albedoMapPath = TO_ABSOLUTE_PATH(j["albedoMapPath"]);
     normalMapPath = TO_ABSOLUTE_PATH(j["normalMapPath"]);
@@ -66,8 +66,8 @@ std::string MaterialData::Serialize() const
     j["roughness"] = roughness;
     j["ao"] = ao;
 
-    j["UVScale"] = { UVScale.x , UVScale.y, UVScale.z };
-    j["UVOffset"] = { UVOffset.x , UVOffset.y, UVOffset.z };
+    j["UVScale"] = { UVScale.x , UVScale.y};
+    j["UVOffset"] = { UVOffset.x , UVOffset.y};
 
     j["albedoMapPath"] = albedoMapPath.GetVirtualStr();
     j["normalMapPath"] = normalMapPath.GetVirtualStr();
@@ -90,10 +90,10 @@ void MaterialData::Deserialize(const std::string& jsonStr)
     ao = j["ao"];
 
     auto uvScale = j["UVScale"];
-    UVScale = glm::vec3(uvScale[0], uvScale[1], uvScale[2]);
+    UVScale = glm::vec2(uvScale[0], uvScale[1]);
 
     auto uvOffset = j["UVOffset"];
-    UVOffset = glm::vec3(uvOffset[0], uvOffset[1], uvOffset[2]);
+    UVOffset = glm::vec2(uvOffset[0], uvOffset[1]);
 
     albedoMapPath = TO_ABSOLUTE_PATH(j["albedoMapPath"]);
     normalMapPath = TO_ABSOLUTE_PATH(j["normalMapPath"]);

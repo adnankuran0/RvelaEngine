@@ -11,6 +11,7 @@ public:
 
 	GLuint screenFBO = 0;
 private:
+
 	Skybox m_Skybox;
 };
 

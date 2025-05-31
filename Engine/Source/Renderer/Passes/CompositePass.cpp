@@ -19,14 +19,10 @@ void CompositePass::Execute()
 	compositeShader.setInt("aoTexture", 2);
 	compositeShader.setInt("ssrTexture", 3);
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, i_ScreenTexture);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, i_BloomBlurTexture);
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, i_AoTexture);
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, i_SsrTexture);
+	glBindTextureUnit(0, i_ScreenTexture);
+	glBindTextureUnit(1, i_BloomBlurTexture);
+	glBindTextureUnit(2, i_AoTexture);
+	glBindTextureUnit(3, i_SsrTexture);
 
 	Renderer::DrawFullScreenQuad();
 	glEnable(GL_DEPTH_TEST);

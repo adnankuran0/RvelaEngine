@@ -37,8 +37,7 @@ void Texture::Init()
 
 void Texture::Bind(unsigned int activeTexture) const
 {
-    glActiveTexture(GL_TEXTURE0 + activeTexture);
-    glBindTexture(GL_TEXTURE_2D, m_Texture);
+    glBindTextureUnit(activeTexture, m_Texture);
 }
 
 void Texture::Bind() const

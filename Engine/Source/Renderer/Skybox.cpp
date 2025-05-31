@@ -45,14 +45,13 @@ void Skybox::Render(Shader& shader, const glm::mat4& projection, const glm::mat4
     shader.setMat4("view", viewNoTranslation);
     shader.setMat4("projection", projection);
 
+
     glBindVertexArray(skyboxVAO);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
+    glBindTextureUnit(3, skyboxTexture);
     glDrawArrays(GL_TRIANGLES, 0, 36);
-    glBindVertexArray(0);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 }
 

@@ -48,29 +48,23 @@ void SSRPass::Execute()
     ssrShader.setFloat("uMaxRayDistance", 100.0f);
 
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, i_Depth);
+    glBindTextureUnit(0, i_Depth);
     ssrShader.setInt("uDepthTexture", 0);
 
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, i_Normal);
+    glBindTextureUnit(1, i_Normal);
     ssrShader.setInt("uNormalTexture", 1);
 
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, i_Roughness);
+    glBindTextureUnit(2, i_Roughness);
     ssrShader.setInt("uRoughnessTexture", 2);
 
-    glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, i_Metallic);
+    glBindTextureUnit(3, i_Metallic);
     ssrShader.setInt("uMetallicTexture", 3);
 
-    glActiveTexture(GL_TEXTURE4);
-    glBindTexture(GL_TEXTURE_2D, i_Screen);
+    glBindTextureUnit(4, i_Screen);
     ssrShader.setInt("uScreenTexture", 4);
 
     Renderer::DrawFullScreenQuad();
 
     glEnable(GL_DEPTH_TEST);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 }

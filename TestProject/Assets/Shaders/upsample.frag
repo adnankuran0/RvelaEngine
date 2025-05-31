@@ -1,18 +1,20 @@
-#version 400 core
-out vec4 FragColor;
+#version 460 core
+precision highp float;
+
+layout(location = 0) out vec4 FragColor;
 
 in vec2 TexCoords;
 
-uniform sampler2D u_UpsampleTex;
-uniform sampler2D u_BaseTex;
-uniform vec2 u_TexelSize;
+layout(binding = 0) uniform sampler2D u_UpsampleTex;
+layout(binding = 1) uniform sampler2D u_BaseTex;
+
+const float upsampleWeight = 0.7;
+const float baseWeight = 0.3;
 
 void main()
 {
-    vec3 upsampled = texture(u_UpsampleTex, TexCoords).rgb;
-    vec3 base = texture(u_BaseTex, TexCoords).rgb;
-    float upsampleWeight = 0.7;
-    float baseWeight = 0.3;
-
-    FragColor = vec4(upsampled * upsampleWeight + base * baseWeight, 1.0);
+    vec3 upsampled = textureLod(u_UpsampleTex, TexCoords, 0.0).rgb;
+    vec3 base = textureLod(u_BaseTex, TexCoords, 0.0).rgb;
+    
+    FragColor = vec4(mix(base, upsampled, upsampleWeight), 1.0);
 }

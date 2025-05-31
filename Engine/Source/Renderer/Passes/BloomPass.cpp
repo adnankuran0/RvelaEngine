@@ -56,21 +56,9 @@ void BloomPass::Init()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-BloomPass::~BloomPass()
+void BloomPass::Downsample()
 {
-    //TODO: Fill this function
-}
-
-void BloomPass::Execute()
-{
-    glDisable(GL_DEPTH_TEST);
-
     Shader& downsampleShader = Renderer::GetDownsampleShader();
-    Shader& upsampleShader = Renderer::GetUpsampleShader();
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, i_BrightTexture);
-
     for (int i = 0; i < mipLevels; ++i)
     {
         glBindFramebuffer(GL_FRAMEBUFFER, downsampleFBOs[i]);
@@ -84,12 +72,17 @@ void BloomPass::Execute()
         downsampleShader.setVec2("u_TexelSize", glm::vec2(1.0f / w, 1.0f / h));
 
         if (i == 0)
-            glBindTexture(GL_TEXTURE_2D, i_BrightTexture);
+            glBindTextureUnit(0, i_BrightTexture);
         else
-            glBindTexture(GL_TEXTURE_2D, downsampleTextures[i - 1]);
+            glBindTextureUnit(0, downsampleTextures[i - 1]);
 
         Renderer::DrawFullScreenQuad();
     }
+}
+
+void BloomPass::Upsample()
+{
+    Shader& upsampleShader = Renderer::GetUpsampleShader();
 
     for (int i = mipLevels - 2; i >= 0; --i)
     {
@@ -104,14 +97,26 @@ void BloomPass::Execute()
         upsampleShader.setInt("u_BaseTex", 1);
         upsampleShader.setVec2("u_TexelSize", glm::vec2(1.0f / w, 1.0f / h));
 
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, upsampleTextures[i + 1]);
-
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, downsampleTextures[i]);
+        glBindTextureUnit(0, upsampleTextures[i + 1]);
+        glBindTextureUnit(1, downsampleTextures[i]);
 
         Renderer::DrawFullScreenQuad();
     }
+}
+
+BloomPass::~BloomPass()
+{
+    //TODO: Fill this function
+}
+
+void BloomPass::Execute()
+{
+    glDisable(GL_DEPTH_TEST);
+
+    glBindTextureUnit(0, i_BrightTexture);
+
+    Downsample();
+    Upsample();
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     o_BlurredTexture = upsampleTextures[0];

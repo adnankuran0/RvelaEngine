@@ -1,11 +1,11 @@
-#version 400 core
+#version 460 core
 out vec4 FragColor;
 in vec2 TexCoords;
 
-uniform sampler2D screenTexture;
-uniform sampler2D bloomTexture;
-uniform sampler2D aoTexture;
-uniform sampler2D ssrTexture;
+layout(binding = 0) uniform sampler2D screenTexture;
+layout(binding = 1) uniform sampler2D bloomTexture;
+layout(binding = 2) uniform sampler2D aoTexture;
+layout(binding = 3) uniform sampler2D ssrTexture;
 uniform float exposure;
 
 vec3 ACESFilm(vec3 x)
@@ -22,10 +22,7 @@ void main()
 {
     vec3 hdrColor = texture(screenTexture, TexCoords).rgb;
     vec3 bloomColor = texture(bloomTexture, TexCoords).rgb;
-    
     vec4 ssrSample = texture(ssrTexture, TexCoords);
-    vec3 ssrColor = ssrSample.rgb;
-    float ssrStrength = ssrSample.a;
     
     float blurredAO = 0.0;
     for (int x = -1; x <= 1; ++x) {
@@ -38,7 +35,7 @@ void main()
     vec3 ambient = hdrColor * 0.03;
     hdrColor -= ambient * (1.0 - ao) * 50.0;
     
-    hdrColor = mix(hdrColor, hdrColor + ssrColor, ssrStrength);
+    hdrColor = mix(hdrColor, hdrColor + ssrSample.rgb, ssrSample.a);
     
     vec3 combined = hdrColor + bloomColor;
 

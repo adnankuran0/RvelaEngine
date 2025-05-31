@@ -16,6 +16,11 @@ public:
     glm::mat4 GetLightSpaceMatrix() const { return o_LightSpaceMatrix; }
 
 private:
+    void InitDirectionalShadowMap();
+    void InitPointShadowMap();
+    void RenderDirectionalShadowMap();
+    void RenderPointShadowMap();
+
     GLuint fbo = 0;
     GLuint o_DirectionalShadowMap = 0;
     GLuint pointFBO = 0;

@@ -7,14 +7,16 @@ std::shared_ptr<Texture> TextureManager::LoadOrGetTexture(const Path path)
 {
 	if (!path.IsValid()) return nullptr;
 
-	auto it = textureMap.find(path.GetAbsoluteStr());
+	auto absPath = path.GetAbsoluteStr();
+
+	auto it = textureMap.find(absPath);
 	if (it != textureMap.end())
 		return it->second;
 
 
 	auto texture = std::make_shared<Texture>();
-	texture->GenerateFromImage(path.GetAbsoluteStr());
-	textureMap[path.GetAbsoluteStr()] = texture;
+	texture->GenerateFromImage(absPath);
+	textureMap[absPath] = texture;
 	return texture;
 }
 

@@ -18,6 +18,8 @@ public:
     
 
 private:
+    void Downsample();
+    void Upsample();
 
     GLuint i_BrightTexture = 0;
     GLuint o_BlurredTexture = 0;

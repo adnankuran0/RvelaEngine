@@ -22,16 +22,18 @@ void GeometryPass::Init()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, o_Depth, 0);
 
+    // GL_R16F
     glGenTextures(1, &o_Roughness);
     glBindTexture(GL_TEXTURE_2D, o_Roughness);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, ctx.viewportWidth, ctx.viewportHeight, 0, GL_RED, GL_FLOAT, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, ctx.viewportWidth, ctx.viewportHeight, 0, GL_RED, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, o_Roughness, 0);
 
+    // GL_R16F
     glGenTextures(1, &o_Metallic);
     glBindTexture(GL_TEXTURE_2D, o_Metallic);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, ctx.viewportWidth, ctx.viewportHeight, 0, GL_RED, GL_FLOAT, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, ctx.viewportWidth, ctx.viewportHeight, 0, GL_RED, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, o_Metallic, 0);
@@ -52,7 +54,11 @@ void GeometryPass::Init()
 
 GeometryPass::~GeometryPass()
 {
-    //TODO: fill this function
+    glDeleteFramebuffers(1, &gBuffer);
+    glDeleteTextures(1, &o_Normal);
+    glDeleteTextures(1, &o_Depth);
+    glDeleteTextures(1, &o_Roughness);
+    glDeleteTextures(1, &o_Metallic);
 }
 
 void GeometryPass::Execute()
@@ -65,13 +71,22 @@ void GeometryPass::Execute()
 
     geometryShader.use();
 
-    geometryShader.setMat4("view", ctx.camera->GetViewMatrix());
-    geometryShader.setMat4("projection", ctx.camera->projection);
+
+    glm::mat4 projection = ctx.camera->projection;
+    glm::mat4 view = ctx.camera->GetViewMatrix();
+
+    geometryShader.setMat4("view", view);
+    geometryShader.setMat4("projection", projection);
+
 
     for (auto& command : commands) {
         auto& material = command.material.material;
+        glm::mat4 model = command.transform.GetWorldMatrix();
 
-        geometryShader.setMat4("model", command.transform.GetWorldMatrix());
+        geometryShader.setMat4("model", model);
+        glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(view * model)));
+        geometryShader.setMat3("normalMatrix", normalMatrix);
+
         auto& roughnessMapPath = material->roughnessMapPath;
         auto& metallicMapPath = material->metallicMapPath;
 
@@ -106,7 +121,6 @@ void GeometryPass::Execute()
         glDrawElements(GL_TRIANGLES, command.mesh.indexCount, GL_UNSIGNED_INT, 0);
     }
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     commands.clear();
 }
 
