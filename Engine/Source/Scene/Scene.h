@@ -5,6 +5,8 @@
 #include "Components.h"
 #include "Core/RvelaMath.h"
 #include "Core/Utils/ISerializable.h"
+#include "Renderer/Renderer.h"
+
 
 class Entity;
 
@@ -62,14 +64,15 @@ public:
     void UpdateHierarchy();
 
     void UpdateNodeRecursive(entt::entity entity,
-        const glm::vec3& parentPos,
-        const glm::quat& parentRot,
-        const glm::vec3& parentScale);
+        const glm::mat4& parentWorld);
 
     void Update();
 
     entt::registry& GetRegistry();
     std::unordered_map<UUID, entt::entity> GetUUIDEntityMap() { return m_EntityMap; }
+
+    std::vector<PointLightData> CollectPointLights() noexcept;
+    std::optional<DirectionalLightData>  CollectDirectionalLight() noexcept;
 
 private:
     entt::registry m_Registry;

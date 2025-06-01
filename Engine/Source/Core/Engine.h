@@ -11,6 +11,7 @@
 #include "Core/Utils/MaterialManager.h"
 #include "Core/Utils/TextureManager.h"
 #include "LayerStack.h"
+#include <Renderer/RenderPipeline.h>
 
 class Engine
 {
@@ -33,14 +34,14 @@ public:
 	inline Scene* GetScene() const noexcept { return m_Scene.get(); }
 	inline ProjectManager* GetProjectManager() const noexcept { return m_ProjectManager.get(); }
 	inline SceneManager* GetSceneManager() const noexcept { return m_SceneManager.get(); }
+	inline EditorCamera* GetCamera() const noexcept { return editorCamera; }
 
 	inline void SetEditorCamera(EditorCamera* editorCam) { editorCamera = editorCam; }
 private:
 	LayerStack m_LayerStack;
 
 	void HandleEvents() noexcept;
-	std::vector<PointLightData> CollectPointLights() noexcept;
-	std::optional<DirectionalLightData>  CollectDirectionalLight() noexcept;
+	
 
 	static Engine* s_Instance;
 

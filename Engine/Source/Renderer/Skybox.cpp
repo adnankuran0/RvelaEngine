@@ -31,8 +31,11 @@ void Skybox::Init(const std::vector<Path>& faces)
     setupSkybox();
 }
 
-void Skybox::Render(Shader& shader, const glm::mat4& projection, const glm::mat4& view)
+void Skybox::Render(Shader& shader, const glm::mat4& projection, const glm::mat4& view,GLuint screenFBO)
 {
+    glBindFramebuffer(GL_FRAMEBUFFER, screenFBO);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
 
@@ -42,10 +45,10 @@ void Skybox::Render(Shader& shader, const glm::mat4& projection, const glm::mat4
     shader.setMat4("view", viewNoTranslation);
     shader.setMat4("projection", projection);
 
+
     glBindVertexArray(skyboxVAO);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
+    glBindTextureUnit(3, skyboxTexture);
     glDrawArrays(GL_TRIANGLES, 0, 36);
-    glBindVertexArray(0);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);

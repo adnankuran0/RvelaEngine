@@ -12,7 +12,7 @@ public:
     Skybox();
     ~Skybox();
     void Init(const std::vector<Path>& faces);
-    void Render(Shader& shader, const glm::mat4& projection, const glm::mat4& view);
+    void Render(Shader& shader, const glm::mat4& projection, const glm::mat4& view,GLuint screenFBO);
 
 private:
     GLuint skyboxVAO, skyboxVBO;

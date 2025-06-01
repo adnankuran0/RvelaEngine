@@ -17,9 +17,7 @@ Editor::Editor()
 
 void Editor::Run()
 {
-    std::cout << "Engine has started!" << std::endl;
     m_Engine->Run();
-    std::cout << "Engine has stopped!" << std::endl;
 }
 
 

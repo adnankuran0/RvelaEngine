@@ -5,8 +5,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "../Core/Input/Input.h"
 #include "../Core/Time.h"
+#include "Camera.h"
+#include "Frustum.h"
 
-class EditorCamera
+class EditorCamera 
 {
 
 public:
@@ -71,6 +73,17 @@ public:
 
         Position = glm::mix(Position, targetPosition, Time::GetDeltaTime() * positionSmoothness);
         updateCameraVectors();
+        frustum.Update(projection * GetViewMatrix());
+    }
+
+    bool Intersects(const BoundingBox& AABB)
+    {
+        return frustum.Intersects(AABB);
+    }
+
+    bool Intersects(const glm::mat4& projView,const BoundingBox& AABB)
+    {
+        return frustum.Intersects(projView,AABB);
     }
 
     void onMouseMoved(double xPosIn, double yPosIn, GLFWwindow* window)
@@ -153,6 +166,8 @@ public:
     }
 
 private:
+    Frustum frustum;
+
     void updateCameraVectors()
     {
         glm::vec3 front;

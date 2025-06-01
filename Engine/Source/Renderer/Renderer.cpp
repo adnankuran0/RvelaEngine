@@ -9,11 +9,20 @@
 #include <algorithm>
 
 GLFWwindow* Renderer::activeWindow = nullptr;
-Shader Renderer::m_DefaultShader;
+Shader Renderer::m_DirectionalShadowShader;
+Shader Renderer::m_PointShadowShader;
+Shader Renderer::m_GeometryShader;
 Shader Renderer::m_SkyboxShader;
-Skybox Renderer::m_Skybox;
+Shader Renderer::m_PBRShader;
+Shader Renderer::m_BrightShader;
+Shader Renderer::m_DownsampleShader;
+Shader Renderer::m_UpsampleShader;
+Shader Renderer::m_SSAOShader;
+Shader Renderer::m_SSRShader;
+Shader Renderer::m_CompositeShader;
+Shader Renderer::m_LuminanceShader;
 
-
+ScreenQuad Renderer::m_ScreenQuad;
 
 Renderer::Renderer()
 {
@@ -28,18 +37,25 @@ Renderer::~Renderer()
 void Renderer::Init(GLFWwindow* window)
 {
     Renderer::activeWindow = window;
-    m_DefaultShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\vertex.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\fragment.glsl"));
-    m_SkyboxShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\skyboxVert.glsl"), TO_ABSOLUTE_PATH("Assets\\Shaders\\skyboxFrag.glsl"));
+    m_GeometryShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\geometry.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\geometry.frag"));
+    m_PointShadowShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\pointShadow.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\pointShadow.frag"));
+    m_DirectionalShadowShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\directionalShadow.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\directionalShadow.frag"));
+    m_SkyboxShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\skybox.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\skybox.frag"));
+    m_PBRShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\pbr.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\pbr.frag"));
+    m_BrightShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\brightPass.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\brightPass.frag"));
+    m_DownsampleShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\downsample.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\downsample.frag"));
+    m_UpsampleShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\upsample.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\upsample.frag"));
+    m_SSAOShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\ssao.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\ssao.frag"));
+    m_SSRShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\ssr.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\ssr.frag"));
+    m_CompositeShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\composite.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\composite.frag"));
+    m_LuminanceShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\luminance.comp"));
 
-    std::vector<Path> faces = {
-    TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\right.jpg"),
-    TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\left.jpg"),
-    TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\top.jpg"),
-    TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\bottom.jpg"),
-    TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\front.jpg"),
-    TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\back.jpg")
-    };
-    m_Skybox.Init(faces);
+    
+
+    m_ScreenQuad.Init();
+
+    
+
 }
 
 void Renderer::StartFrame()
@@ -59,100 +75,23 @@ void Renderer::EndFrame()
 
 }
 
-void Renderer::RenderSkybox(EditorCamera* camera)
-{
-    m_Skybox.Render(m_SkyboxShader, camera->projection, camera->GetViewMatrix());
-}
-
-void Renderer::Render(WorldTransformComponent& transform,
-    MeshRendererComponent& meshComponent,
-    MaterialComponent& materialComponent,
-    EditorCamera* camera,
-    const std::vector<PointLightData>& pointLights,
-    const DirectionalLightData* directionalLight)
-{
-    auto material = materialComponent.material;
-    if (!material) return;
-
-
-    m_DefaultShader.use();
-
-    m_DefaultShader.setBool("hasDirectionalLight", directionalLight != nullptr);
-    if (directionalLight) {
-        m_DefaultShader.setVec3("directionalLight.direction", directionalLight->direction);
-        m_DefaultShader.setVec3("directionalLight.color", directionalLight->color); 
-        m_DefaultShader.setFloat("directionalLight.intensity", directionalLight->intensity); 
-        m_DefaultShader.setBool("directionalLight.castShadows", false);
-    }
-
-    m_DefaultShader.setFloat("heightScale", 0.0f);
-
-    const int MAX_POINT_LIGHTS = 10;
-    for (int i = 0; i < std::min(static_cast<int>(pointLights.size()), MAX_POINT_LIGHTS); ++i) {
-        std::string baseName = "pointLights[" + std::to_string(i) + "]";
-        m_DefaultShader.setVec3(baseName + ".position", pointLights[i].position);
-        m_DefaultShader.setVec3(baseName + ".color", pointLights[i].color);
-        m_DefaultShader.setFloat(baseName + ".intensity", pointLights[i].intensity);
-        m_DefaultShader.setFloat(baseName + ".radius", pointLights[i].radius);
-    }
-    m_DefaultShader.setInt("pointLightCount", std::min(static_cast<int>(pointLights.size()), MAX_POINT_LIGHTS));
-
-    m_DefaultShader.setVec3("camPos", camera->Position);
-
-    m_DefaultShader.setVec3("UVScale", material->UVScale);
-    m_DefaultShader.setVec3("UVOffset", material->UVOffset);
-    m_DefaultShader.setVec3("albedoColor", material->albedoColor);
-    m_DefaultShader.setFloat("metallicValue", material->metallic);
-    m_DefaultShader.setFloat("roughnessValue", material->roughness);
-    m_DefaultShader.setFloat("aoValue", material->ao);
-
-    struct MapInfo {
-        Path path;
-        std::string uniformName;
-        int slot;
-        std::string useUniform;
-    };
-
-    std::vector<MapInfo> maps = {
-        { material->albedoMapPath,    "albedoMap",    0, "useAlbedoMap" },
-        { material->normalMapPath,    "normalMap",    1, "useNormalMap" },
-        { material->metallicMapPath,  "metallicMap",  2, "useMetallicMap" },
-        { material->roughnessMapPath, "roughnessMap", 3, "useRoughnessMap" },
-        { material->aoMapPath,        "aoMap",        4, "useAOMap" },
-        { material->heightMapPath,    "heightMap",    5, "useHeightMap" },
-    };
-
-
-
-    for (const auto& map : maps) {
-        bool hasMap = map.path.IsValid();
-        m_DefaultShader.setBool(map.useUniform, hasMap);
-        if (hasMap) {
-            auto tex = TextureManager::LoadOrGetTexture(map.path);
-            if (tex) {
-                m_DefaultShader.setInt(map.uniformName, map.slot);
-                tex->Bind(map.slot);
-            }
-        }
-    }
-
-
-    m_DefaultShader.setMat4("model", transform.GetMatrix());
-    m_DefaultShader.setMat4("view", camera->GetViewMatrix());
-    m_DefaultShader.setMat4("projection", camera->projection);
-
-    meshComponent.VAO.Bind();
-    glDrawElements(GL_TRIANGLES, meshComponent.indexCount, GL_UNSIGNED_INT, 0);
-
-    GLenum err;
-    while ((err = glGetError()) != GL_NO_ERROR) {
-        LOG_ERROR << "OpenGL Error: " << err;
-    }
-}
-
-
 
 void Renderer::Shutdown()
 {
-    m_DefaultShader.Destroy();
+    m_GeometryShader.Destroy();
+    m_DirectionalShadowShader.Destroy();
+    m_PointShadowShader.Destroy();
+    m_SkyboxShader.Destroy();
+    m_PBRShader.Destroy();
+    m_BrightShader.Destroy();
+    m_DownsampleShader.Destroy();
+    m_UpsampleShader.Destroy();
+    m_SSAOShader.Destroy();
+    m_SSRShader.Destroy();
+    m_CompositeShader.Destroy();
+}
+
+void Renderer::DrawFullScreenQuad()
+{
+    m_ScreenQuad.Draw();
 }

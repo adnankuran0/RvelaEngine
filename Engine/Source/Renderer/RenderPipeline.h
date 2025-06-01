@@ -2,23 +2,39 @@
 #include <vector>
 #include <memory>
 #include "RenderPass.h"
+#include "Renderer/Passes/LightingPass.h"
+#include "Renderer/Passes/SkyboxPass.h"
+#include "Renderer/Passes/ShadowPass.h"
+#include "Renderer/Passes/CompositePass.h"
+#include "Renderer/Passes/BrightPass.h"
+#include "Renderer/Passes/BloomPass.h"
+#include "Renderer/Passes/GeometryPass.h"
+#include "Renderer/Passes/SSAOPass.h"
+#include "Renderer/Passes/SSRPass.h"
 
 class RenderPipeline
 {
 public:
-	void AddPass(std::shared_ptr<RenderPass> pass)
-	{
-		passes.push_back(pass);
-	}
 
-	void Execute()
-	{
-		for (auto& pass : passes)
-		{
-			pass->Execute();
-		}
-	}
+	RenderPipeline();
+	void EnsureInitialized();
+	void SetRenderContext(const RenderContext& context);
+	void SubmitRenderCommand(const RenderCommand& cmd);
+	void Execute();
+
 private:
-	std::vector <std::shared_ptr<RenderPass>> passes;
+	bool isInitialized = false;
+
+	//Render Passes
+	std::vector<RenderPass*> renderPasses;
+	GeometryPass geometryPass;
+	ShadowPass shadowPass;
+	SkyboxPass skyboxPass;
+	LightingPass lightingPass;
+	BrightPass brightPass;
+	BloomPass bloomPass;
+	SSAOPass ssaoPass;
+	SSRPass ssrPass;
+	CompositePass compositePass;
 };
 

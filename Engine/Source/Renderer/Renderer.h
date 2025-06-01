@@ -11,12 +11,19 @@
 #include "../Core/Time.h"
 #include "Scene/Components.h"
 #include "Skybox.h"
+#include "ScreenQuad.h"
 
 struct PointLightData {
     glm::vec3 position;
     glm::vec3 color;
     float intensity;
     float radius;
+    float falloff;
+    bool castShadows;
+    int shadowIndex;
+    bool reverseCullFace;
+    float blurRadius;
+    float shadowBias;
 };
 
 struct DirectionalLightData {
@@ -24,6 +31,9 @@ struct DirectionalLightData {
     glm::vec3 color;
     float intensity;
     bool castShadows;
+    bool reverseCullFace;
+    float blurRadius;
+    float shadowBias;
 };
 
 
@@ -36,19 +46,37 @@ public:
     static void Init(GLFWwindow* window);
     static void StartFrame();
     static void EndFrame();
-    static void RenderSkybox(EditorCamera* camera);
-    static void Render(WorldTransformComponent& transform,
-        MeshRendererComponent& data,
-        MaterialComponent& metarial,
-        EditorCamera* camera,
-        const std::vector<PointLightData>& pointLights,
-        const DirectionalLightData* directionalLight
-        );
     static void Shutdown();
+
+    static void DrawFullScreenQuad();
+
+    static Shader& GetPBRShader() { return m_PBRShader; }
+    static Shader& GetSkyboxShader() { return m_SkyboxShader; }
+    static Shader& GetDirectionalShadowShader() { return m_DirectionalShadowShader; }
+    static Shader& GetPointShadowShader() { return m_PointShadowShader; }
+    static Shader& GetBrightShader() { return m_BrightShader; }
+    static Shader& GetDownsampleShader() { return m_DownsampleShader; }
+    static Shader& GetUpsampleShader() { return m_UpsampleShader; }
+    static Shader& GetGeometryShader() { return m_GeometryShader; }
+    static Shader& GetSSAOShader() { return m_SSAOShader; }
+    static Shader& GetSSRShader() { return m_SSRShader; }
+    static Shader& GetCompositeShader() { return m_CompositeShader; }
+    static Shader& GetLuminanceShader() { return m_LuminanceShader; }
 
 private:
     static GLFWwindow* activeWindow;
-    static Shader m_DefaultShader;
+    static Shader m_PBRShader;
     static Shader m_SkyboxShader;
-    static Skybox m_Skybox;
+    static Shader m_DirectionalShadowShader;
+    static Shader m_PointShadowShader;
+    static Shader m_BrightShader;
+    static Shader m_DownsampleShader;
+    static Shader m_UpsampleShader;
+    static Shader m_GeometryShader;
+    static Shader m_SSAOShader;
+    static Shader m_SSRShader;
+    static Shader m_CompositeShader;
+    static Shader m_LuminanceShader;
+
+    static ScreenQuad m_ScreenQuad;
 };

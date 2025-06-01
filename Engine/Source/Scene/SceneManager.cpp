@@ -5,6 +5,7 @@
 #include "Core/Utils/AssetManager.h"
 #include "UUIDGenerator.h"  
 #include <future>
+#include "../RvelaLog.h"
 
 using json = nlohmann::json;
 
@@ -23,9 +24,6 @@ void SceneManager::SaveScene(Scene& scene, const std::string& path)
 
             if (scene.HasComponent<TransformComponent>(entity))
                 entityJson["TransformComponent"] = scene.GetComponent<TransformComponent>(entity).Serialize();
-
-            if (scene.HasComponent<WorldTransformComponent>(entity))
-                entityJson["WorldTransformComponent"] = scene.GetComponent<WorldTransformComponent>(entity).Serialize();
 
             if (scene.HasComponent<MaterialComponent>(entity))
                 entityJson["MaterialComponent"] = scene.GetComponent<MaterialComponent>(entity).Serialize();
@@ -67,7 +65,7 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
     file.close();
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    std::cout << "Json loading took " << duration.count() << "ms\n";
+    LOG_INFO << "Json loading took " << duration.count() << "ms";
 
     auto& registry = scene.GetRegistry();
     for (auto entity : registry.view<UUIDComponent>())
@@ -93,9 +91,6 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
 
         if (entityJson.contains("TransformComponent"))
             scene.GetComponent<TransformComponent>(entity).Deserialize(entityJson["TransformComponent"]);
-
-        if (entityJson.contains("WorldTransformComponent"))
-            scene.GetComponent<WorldTransformComponent>(entity).Deserialize(entityJson["WorldTransformComponent"]);
 
         if (entityJson.contains("MaterialComponent"))
         {
@@ -127,7 +122,8 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
                 meshData.vertices.size() * sizeof(float),
                 meshData.indices.data(),
                 meshData.indices.size() * sizeof(unsigned int),
-                meshData.indices.size());
+                meshData.indices.size(),
+                meshData.localAABB);
         }
 
         if (entityJson.contains("PointLightComponent"))
@@ -157,8 +153,8 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
 
     end = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    std::cout << "Scene loading took " << duration.count() << "ms\n";
-    std::cout << "Total mesh loading took " << meshLoadTotal.count() << "ms\n";
+    LOG_INFO << "Scene loading took " << duration.count() << "ms";
+    LOG_INFO << "Total mesh loading took " << meshLoadTotal.count() << "ms";
 
     for (auto& [uuid, entity] : uuidToEntity)
     {
@@ -179,7 +175,5 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
 
     scene.UpdateHierarchy();
 
-    std::cout << "Scene loading complete\n";
-    
-    
+    LOG_INFO << "Scene loading complete";
 }

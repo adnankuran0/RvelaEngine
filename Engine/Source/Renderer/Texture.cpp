@@ -30,15 +30,14 @@ void Texture::Init()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    float maxAniso = 0.0f;
+    float maxAniso = 8.0f;
     glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &maxAniso);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, maxAniso);
 }
 
 void Texture::Bind(unsigned int activeTexture) const
 {
-    glActiveTexture(GL_TEXTURE0 + activeTexture);
-    glBindTexture(GL_TEXTURE_2D, m_Texture);
+    glBindTextureUnit(activeTexture, m_Texture);
 }
 
 void Texture::Bind() const

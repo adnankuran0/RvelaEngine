@@ -1,3 +1,4 @@
+#pragma once
 #include "Renderer/Texture.h"
 #include <string>
 #include <unordered_map>

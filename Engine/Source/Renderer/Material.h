@@ -17,11 +17,12 @@ public:
 
 	glm::vec3 albedoColor = glm::vec3(1.0f);
 	float metallic = 0.0f;
-	float roughness = 0.5f;
+	float roughness = 1.0f;
 	float ao = 1.0f;
+	float normalScale = 1.0f;
 
-	glm::vec3 UVScale = glm::vec3(1.0f);
-	glm::vec3 UVOffset = glm::vec3(0.0f);
+	glm::vec2 UVScale = glm::vec2(1.0f);
+	glm::vec2 UVOffset = glm::vec2(0.0f);
 
 	Path albedoMapPath;
 	Path normalMapPath;
@@ -44,9 +45,10 @@ public:
 	float metallic = 0.0f;
 	float roughness = 0.5f;
 	float ao = 1.0f;
+	float normalScale = 1.0f;
 
-	glm::vec3 UVScale = glm::vec3(1.0f);
-	glm::vec3 UVOffset = glm::vec3(0.0f);
+	glm::vec2 UVScale = glm::vec2(1.0f);
+	glm::vec2 UVOffset = glm::vec2(0.0f);
 
 	Path albedoMapPath;
 	Path normalMapPath;

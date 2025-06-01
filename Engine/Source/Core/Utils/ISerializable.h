@@ -1,6 +1,5 @@
 #pragma once
 #include "rvelapch.h"
-
 class ISerializable
 {
 public:

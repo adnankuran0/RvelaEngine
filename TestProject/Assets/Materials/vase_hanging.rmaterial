@@ -1,11 +1,9 @@
 {
     "UVOffset": [
         0.0,
-        0.0,
         0.0
     ],
     "UVScale": [
-        1.0,
         1.0,
         1.0
     ],
@@ -21,6 +19,6 @@
     "metallic": 0.0,
     "metallicMapPath": "",
     "normalMapPath": "",
-    "roughness": 0.46700000762939453,
+    "roughness": 0.5,
     "roughnessMapPath": ""
 }
