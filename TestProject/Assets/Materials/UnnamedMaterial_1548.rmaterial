@@ -1,0 +1,24 @@
+{
+    "UVOffset": [
+        0.0,
+        0.0
+    ],
+    "UVScale": [
+        1.0,
+        1.0
+    ],
+    "albedoColor": [
+        0.5879999995231628,
+        0.5879999995231628,
+        0.5879999995231628
+    ],
+    "albedoMapPath": "C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/5775677410124227070.png",
+    "ao": 1.0,
+    "aoMapPath": "",
+    "heightMapPath": "",
+    "metallic": 0.0,
+    "metallicMapPath": "C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/7385312956576678639.png",
+    "normalMapPath": "C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/7151673072344121468.png",
+    "roughness": 0.5,
+    "roughnessMapPath": ""
+}

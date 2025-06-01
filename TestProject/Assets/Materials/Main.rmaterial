@@ -1,0 +1,24 @@
+{
+    "UVOffset": [
+        0.0,
+        0.0
+    ],
+    "UVScale": [
+        1.0,
+        1.0
+    ],
+    "albedoColor": [
+        1.0,
+        1.0,
+        1.0
+    ],
+    "albedoMapPath": "C:/Users/adnan/Desktop/flashlight (1)/textures/Main_baseColor.png",
+    "ao": 1.0,
+    "aoMapPath": "C:/Users/adnan/Desktop/flashlight (1)/textures/Main_metallicRoughness.png",
+    "heightMapPath": "",
+    "metallic": 0.0,
+    "metallicMapPath": "C:/Users/adnan/Desktop/flashlight (1)/textures/Main_metallicRoughness.png",
+    "normalMapPath": "C:/Users/adnan/Desktop/flashlight (1)/textures/Main_normal.png",
+    "roughness": 0.5,
+    "roughnessMapPath": ""
+}

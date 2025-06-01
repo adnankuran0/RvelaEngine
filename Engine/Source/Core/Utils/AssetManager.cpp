@@ -7,6 +7,7 @@
 #include <mutex>
 #include "FileUtils.h"
 #include "RvelaLog.h"
+#include <random>
 
 //TODO: Move this function to its own place
 bool doesFileExist(const std::string& path) {
@@ -65,11 +66,21 @@ void AssetManager::LoadMaterials(const aiScene* scene, std::unordered_map<unsign
         aiMaterial* aiMat = scene->mMaterials[i];
         MaterialData materialData;
 
-
+        LOG_INFO << "Model has " << scene->mNumMaterials << "materials";
 
         aiString name;
         if (AI_FAILURE == aiMat->Get(AI_MATKEY_NAME, name))
-            std::cout << "Can't load material!" << std::endl;
+        {
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::uniform_int_distribution<> dis(1000, 9999);
+            int randomNum = dis(gen);
+
+            std::string fallbackName = "UnnamedMaterial_" + std::to_string(randomNum);
+            name = aiString(fallbackName.c_str());
+
+            std::cout << "Can't load material! Assigned random name: " << name.C_Str() << std::endl;
+        }
 
         
         
@@ -114,6 +125,7 @@ void AssetManager::LoadMaterials(const aiScene* scene, std::unordered_map<unsign
                 }
             }
         }
+
 
         materialData.albedoMapPath = TO_ABSOLUTE_PATH(albedoPath);
         materialData.normalMapPath = TO_ABSOLUTE_PATH(normalPath);

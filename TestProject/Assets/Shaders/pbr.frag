@@ -87,6 +87,7 @@ vec2 parallaxMapping(vec2 texCoords, vec3 viewDir) {
 vec3 getNormalFromMap() {
     if (!useNormalMap) return normalize(Normal);
     vec3 tangentNormal = texture(normalMap, TexCoords).xyz * 2.0 - 1.0;
+    tangentNormal.y = -tangentNormal.y;
     tangentNormal.xy *= normalScale; 
     tangentNormal = normalize(tangentNormal);
 
@@ -190,7 +191,7 @@ void main()
 {
     // Early alpha test
     vec4 albedoTex = useAlbedoMap ? texture(albedoMap, TexCoords) : vec4(albedoColor, 1.0);
-    if(albedoTex.a < 0.1) discard;
+    if(albedoTex.a < 0.2) discard;
 
     // Material properties
     vec3 albedo = pow(albedoTex.rgb, vec3(2.2));

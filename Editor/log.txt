@@ -4064,3 +4064,1451 @@
 [INFO ] Total mesh loading took 459ms
 [INFO ] Scene loading complete
 [INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 866ms
+[INFO ] Total mesh loading took 409ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 4ms
+[INFO ] Scene loading took 32316ms
+[INFO ] Total mesh loading took 2459ms
+[INFO ] Scene loading complete
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 4ms
+[INFO ] Scene loading took 1038ms
+[INFO ] Total mesh loading took 570ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 884ms
+[INFO ] Total mesh loading took 432ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 943ms
+[INFO ] Total mesh loading took 486ms
+[INFO ] Scene loading complete
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 410ms
+[INFO ] Total mesh loading took 1ms
+[INFO ] Scene loading complete
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 418ms
+[INFO ] Total mesh loading took 1ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 817ms
+[INFO ] Total mesh loading took 386ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 18123ms
+[INFO ] Total mesh loading took 1294ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 48219ms
+[INFO ] Total mesh loading took 2308ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9902244931375451333.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/2476780530225283311.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/13403324930296584722.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/15763468896848997518.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14889877426847768220.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9690544065500475605.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1542529576189667841.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/12594002301861873831.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/5664105101133334238.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1032882375854590004.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/3024505075340887865.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16629179577494203696.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/8759994149281352776.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1180362371129094107.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/8131002636958089324.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/5832062518599983612.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/7972573899771518506.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1028279501752930479.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/8296618020194622850.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/3923303327751769896.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16356796650360613890.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/11951833815537665903.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14756318304758091217.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/11767032366500980006.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/17895787136451829206.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/2079865044350246831.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/11730337235035663189.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1998971870295487297.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/12329509035612604735.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/13409925532914268225.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/18323644941784144220.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1122449420293395305.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/13595501589012174731.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16011208436118768083.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14205398132421384128.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1584091021348870901.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16477962303174451462.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/3978994262251708158.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14579308432899259383.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1140786120295422654.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14688151170495968673.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16821249183869841744.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14930275953430797156.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/6310083497554052894.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16821249183869841744.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/2882036392247032076.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/10052086730298500641.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16821249183869841744.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/6868100442424064722.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/11135942082434865011.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9324166217220601391.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/10048691058615206298.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/11767596326202387460.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9324166217220601391.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/2763628767906623784.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/5884384475331579104.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9324166217220601391.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/10522109282340384846.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1580937199681144457.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/6589266898288282879.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/3466468048949695469.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/5341784451809001011.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9502968375209926516.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1774157975403286845.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/7377890232508786340.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/8114265492436541323.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/5775677410124227070.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/7151673072344121468.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/7385312956576678639.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/17644577987043643793.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/8148743991790068494.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/823547076410903191.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9902244931375451333.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/2476780530225283311.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/13403324930296584722.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/15763468896848997518.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14889877426847768220.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9690544065500475605.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1542529576189667841.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/12594002301861873831.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/5664105101133334238.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1032882375854590004.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/3024505075340887865.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16629179577494203696.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/8759994149281352776.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1180362371129094107.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/8131002636958089324.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/5832062518599983612.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/7972573899771518506.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1028279501752930479.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/8296618020194622850.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/3923303327751769896.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16356796650360613890.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/11951833815537665903.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14756318304758091217.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/11767032366500980006.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/17895787136451829206.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/2079865044350246831.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/11730337235035663189.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1998971870295487297.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/12329509035612604735.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/13409925532914268225.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/18323644941784144220.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1122449420293395305.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/13595501589012174731.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16011208436118768083.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14205398132421384128.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1584091021348870901.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16477962303174451462.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/3978994262251708158.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14579308432899259383.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1140786120295422654.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14688151170495968673.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16821249183869841744.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14930275953430797156.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/6310083497554052894.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16821249183869841744.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/2882036392247032076.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/10052086730298500641.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16821249183869841744.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/6868100442424064722.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/11135942082434865011.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9324166217220601391.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/10048691058615206298.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/11767596326202387460.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9324166217220601391.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/2763628767906623784.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/5884384475331579104.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9324166217220601391.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/10522109282340384846.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1580937199681144457.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/6589266898288282879.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/3466468048949695469.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/5341784451809001011.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9502968375209926516.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1774157975403286845.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/7377890232508786340.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/8114265492436541323.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/5775677410124227070.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/7151673072344121468.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/7385312956576678639.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/17644577987043643793.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/8148743991790068494.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/823547076410903191.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9902244931375451333.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/2476780530225283311.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/13403324930296584722.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/15763468896848997518.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14889877426847768220.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9690544065500475605.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1542529576189667841.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/12594002301861873831.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/5664105101133334238.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1032882375854590004.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/3024505075340887865.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16629179577494203696.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/8759994149281352776.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1180362371129094107.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/8131002636958089324.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/5832062518599983612.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/7972573899771518506.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1028279501752930479.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/8296618020194622850.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/3923303327751769896.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16356796650360613890.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/11951833815537665903.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14756318304758091217.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/11767032366500980006.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/17895787136451829206.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/2079865044350246831.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/11730337235035663189.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1998971870295487297.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/12329509035612604735.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/13409925532914268225.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/18323644941784144220.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1122449420293395305.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/13595501589012174731.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16011208436118768083.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14205398132421384128.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1584091021348870901.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16477962303174451462.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/3978994262251708158.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14579308432899259383.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1140786120295422654.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14688151170495968673.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16821249183869841744.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14930275953430797156.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/6310083497554052894.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16821249183869841744.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/2882036392247032076.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/10052086730298500641.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16821249183869841744.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/6868100442424064722.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/11135942082434865011.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9324166217220601391.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/10048691058615206298.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/11767596326202387460.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9324166217220601391.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/2763628767906623784.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/5884384475331579104.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9324166217220601391.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/10522109282340384846.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1580937199681144457.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/6589266898288282879.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/3466468048949695469.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/5341784451809001011.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9502968375209926516.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1774157975403286845.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/7377890232508786340.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/8114265492436541323.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/5775677410124227070.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/7151673072344121468.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/7385312956576678639.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/17644577987043643793.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/8148743991790068494.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/823547076410903191.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9902244931375451333.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/2476780530225283311.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/13403324930296584722.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/15763468896848997518.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14889877426847768220.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9690544065500475605.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1542529576189667841.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/12594002301861873831.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/5664105101133334238.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1032882375854590004.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/3024505075340887865.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16629179577494203696.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/8759994149281352776.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1180362371129094107.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/8131002636958089324.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/5832062518599983612.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/7972573899771518506.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1028279501752930479.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/8296618020194622850.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/3923303327751769896.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16356796650360613890.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/11951833815537665903.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14756318304758091217.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/11767032366500980006.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/17895787136451829206.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/2079865044350246831.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/11730337235035663189.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1998971870295487297.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/12329509035612604735.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/13409925532914268225.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/18323644941784144220.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1122449420293395305.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/13595501589012174731.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16011208436118768083.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14205398132421384128.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1584091021348870901.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16477962303174451462.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/3978994262251708158.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14579308432899259383.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1140786120295422654.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14688151170495968673.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16821249183869841744.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14930275953430797156.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/6310083497554052894.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16821249183869841744.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/2882036392247032076.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/10052086730298500641.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16821249183869841744.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/6868100442424064722.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/11135942082434865011.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9324166217220601391.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/10048691058615206298.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/11767596326202387460.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9324166217220601391.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/2763628767906623784.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/5884384475331579104.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9324166217220601391.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/10522109282340384846.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1580937199681144457.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/6589266898288282879.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/3466468048949695469.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/5341784451809001011.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9502968375209926516.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1774157975403286845.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/7377890232508786340.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/8114265492436541323.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/5775677410124227070.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/7151673072344121468.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/7385312956576678639.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/17644577987043643793.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/8148743991790068494.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/823547076410903191.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Model has 1materials
+[INFO ] D:/GitHub/RvelaEngine/TestProject/Assets/Models/utility_box_02_1k/textures/utility_box_02_diff_1k.png
+[INFO ] D:/GitHub/RvelaEngine/TestProject/Assets/Models/utility_box_02_1k/textures/utility_box_02_nor_gl_1k.png
+[INFO ] D:/GitHub/RvelaEngine/TestProject/Assets/Models/utility_box_02_1k/textures/utility_box_02_rough_1k.png
+[INFO ] D:/GitHub/RvelaEngine/TestProject/Assets/Models/utility_box_02_1k/textures/utility_box_02_metal_1k.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] D:/GitHub/RvelaEngine/TestProject/Assets/Models/Sponza-master/Sponza-master/textures/lion.tga
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] D:/GitHub/RvelaEngine/TestProject/Assets/Models/Sponza-master/Sponza-master/textures/background.tga
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] D:/GitHub/RvelaEngine/TestProject/Assets/Models/Sponza-master/Sponza-master/textures/vase_plant.tga
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] D:/GitHub/RvelaEngine/TestProject/Assets/Models/Sponza-master/Sponza-master/textures/sponza_arch_diff.tga
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] D:/GitHub/RvelaEngine/TestProject/Assets/Models/Sponza-master/Sponza-master/textures/spnza_bricks_a_diff.tga
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] D:/GitHub/RvelaEngine/TestProject/Assets/Models/Sponza-master/Sponza-master/textures/sponza_ceiling_a_diff.tga
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] D:/GitHub/RvelaEngine/TestProject/Assets/Models/Sponza-master/Sponza-master/textures/chain_texture.tga
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] D:/GitHub/RvelaEngine/TestProject/Assets/Models/Sponza-master/Sponza-master/textures/sponza_column_a_diff.tga
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] D:/GitHub/RvelaEngine/TestProject/Assets/Models/Sponza-master/Sponza-master/textures/sponza_column_b_diff.tga
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] D:/GitHub/RvelaEngine/TestProject/Assets/Models/Sponza-master/Sponza-master/textures/sponza_column_c_diff.tga
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] D:/GitHub/RvelaEngine/TestProject/Assets/Models/Sponza-master/Sponza-master/textures/sponza_details_diff.tga
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] D:/GitHub/RvelaEngine/TestProject/Assets/Models/Sponza-master/Sponza-master/textures/sponza_fabric_diff.tga
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] D:/GitHub/RvelaEngine/TestProject/Assets/Models/Sponza-master/Sponza-master/textures/sponza_curtain_diff.tga
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] D:/GitHub/RvelaEngine/TestProject/Assets/Models/Sponza-master/Sponza-master/textures/sponza_fabric_blue_diff.tga
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] D:/GitHub/RvelaEngine/TestProject/Assets/Models/Sponza-master/Sponza-master/textures/sponza_fabric_green_diff.tga
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] D:/GitHub/RvelaEngine/TestProject/Assets/Models/Sponza-master/Sponza-master/textures/sponza_curtain_green_diff.tga
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] D:/GitHub/RvelaEngine/TestProject/Assets/Models/Sponza-master/Sponza-master/textures/sponza_curtain_blue_diff.tga
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] D:/GitHub/RvelaEngine/TestProject/Assets/Models/Sponza-master/Sponza-master/textures/sponza_flagpole_diff.tga
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] D:/GitHub/RvelaEngine/TestProject/Assets/Models/Sponza-master/Sponza-master/textures/sponza_floor_a_diff.tga
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] D:/GitHub/RvelaEngine/TestProject/Assets/Models/Sponza-master/Sponza-master/textures/sponza_thorn_diff.tga
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] D:/GitHub/RvelaEngine/TestProject/Assets/Models/Sponza-master/Sponza-master/textures/sponza_roof_diff.tga
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] D:/GitHub/RvelaEngine/TestProject/Assets/Models/Sponza-master/Sponza-master/textures/vase_dif.tga
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] D:/GitHub/RvelaEngine/TestProject/Assets/Models/Sponza-master/Sponza-master/textures/vase_hanging.tga
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] D:/GitHub/RvelaEngine/TestProject/Assets/Models/Sponza-master/Sponza-master/textures/vase_round.tga
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Scene loading took 921ms
+[INFO ] Total mesh loading took 449ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9902244931375451333.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/2476780530225283311.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/13403324930296584722.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/15763468896848997518.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14889877426847768220.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9690544065500475605.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1542529576189667841.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/12594002301861873831.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/5664105101133334238.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1032882375854590004.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/3024505075340887865.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16629179577494203696.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/8759994149281352776.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1180362371129094107.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/8131002636958089324.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/5832062518599983612.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/7972573899771518506.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1028279501752930479.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/8296618020194622850.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/3923303327751769896.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16356796650360613890.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/11951833815537665903.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14756318304758091217.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/11767032366500980006.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/17895787136451829206.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/2079865044350246831.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/11730337235035663189.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1998971870295487297.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/12329509035612604735.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/13409925532914268225.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/18323644941784144220.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1122449420293395305.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/13595501589012174731.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16011208436118768083.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14205398132421384128.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1584091021348870901.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16477962303174451462.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/3978994262251708158.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14579308432899259383.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1140786120295422654.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14688151170495968673.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16821249183869841744.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/14930275953430797156.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/6310083497554052894.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16821249183869841744.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/2882036392247032076.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/10052086730298500641.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/16821249183869841744.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/6868100442424064722.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/11135942082434865011.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9324166217220601391.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/10048691058615206298.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/11767596326202387460.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9324166217220601391.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/2763628767906623784.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/5884384475331579104.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9324166217220601391.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/10522109282340384846.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1580937199681144457.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/6589266898288282879.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/3466468048949695469.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/5341784451809001011.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/9502968375209926516.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/1774157975403286845.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/7377890232508786340.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/8114265492436541323.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/5775677410124227070.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/7151673072344121468.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/7385312956576678639.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/17644577987043643793.png
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/8148743991790068494.png
+[INFO ] 
+[INFO ] C:/Users/adnan/Desktop/sponza-gltf-pbr/sponza-gltf-pbr/823547076410903191.png
+[INFO ] 
+[INFO ] 
+[INFO ] Model has 26materials
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] 
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 4ms
+[INFO ] Model has 1materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Scene loading took 53444ms
+[INFO ] Total mesh loading took 7707ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Model has 1materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Model has 1materials
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Model has 1materials
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Model has 1materials
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Model has 1materials
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Model has 1materials
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Model has 1materials
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Model has 1materials
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Model has 1materials
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Model has 1materials
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Model has 1materials
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Model has 1materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Scene loading took 3873ms
+[INFO ] Total mesh loading took 819ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!

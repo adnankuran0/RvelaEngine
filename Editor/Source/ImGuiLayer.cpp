@@ -4,6 +4,7 @@
 #define TINYFD_IMPLEMENTATION
 #include "ImGui/tinyfiledialogs.h"
 #include "Core/Utils/Serializer.h"
+#include "ImGui/ImGuizmo.h"
 
 
 static bool createProjectRequested = false;
@@ -74,8 +75,8 @@ void SetModernDarkImGuiStyle()
 
 std::string OpenFileDialog()
 {
-    const char* filterPatterns[] = { "*.fbx", "*.obj", "*.gltf"};
-    const char* filePath = tinyfd_openFileDialog("Select a file", "", 3, filterPatterns, NULL, 0);
+    const char* filterPatterns[] = { "*.fbx", "*.obj", "*.gltf", "*.glb"};
+    const char* filePath = tinyfd_openFileDialog("Select a file", "", 4, filterPatterns, NULL, 0);
 
     return filePath ? std::string(filePath) : "";
 }
@@ -105,7 +106,7 @@ void ImGuiLayer::OnAttach()
 #endif
 
     ImGui_ImplGlfw_InitForOpenGL(m_Engine->GetWindow()->GetGLFWWindow(), true);
-    ImGui_ImplOpenGL3_Init("#version 330 core");
+    ImGui_ImplOpenGL3_Init("#version 460 core");
 
     ImGui::StyleColorsDark();
 }
@@ -156,6 +157,51 @@ void ImGuiLayer::OnRender()
         glfwSetWindowShouldClose(m_Engine->GetWindow()->GetGLFWWindow(), true);
     }
     ImGui::End();
+
+    /*
+    ImGui::Begin("Viewport");
+    ImGuizmo::BeginFrame();
+    ImGuizmo::SetOrthographic(false);
+    ImGuizmo::SetDrawlist();
+
+
+    ImGuizmo::SetRect(0, 0, 1280, 720);
+
+    // Eğer entity seçiliyse ve transform component varsa
+    if (selectedEntity != entt::null && m_Engine->GetScene()->GetRegistry().any_of<TransformComponent>(selectedEntity)) {
+        auto& tc = m_Engine->GetScene()->GetRegistry().get<TransformComponent>(selectedEntity);
+
+        glm::mat4 transform = tc.GetWorldMatrix();
+
+        glm::mat4 view = m_EditorCamera->GetViewMatrix(); // Kamera sistemi nasıl çalışıyorsa oradan al
+        glm::mat4 projection = m_EditorCamera->projection;
+
+        static ImGuizmo::OPERATION currentGizmoOperation = ImGuizmo::TRANSLATE;
+        static ImGuizmo::MODE currentGizmoMode = ImGuizmo::LOCAL;
+
+        // Kısayollarla değiştirmek istersen
+        if (ImGui::IsKeyPressed(ImGuiKey_T)) currentGizmoOperation = ImGuizmo::TRANSLATE;
+        if (ImGui::IsKeyPressed(ImGuiKey_R)) currentGizmoOperation = ImGuizmo::ROTATE;
+        if (ImGui::IsKeyPressed(ImGuiKey_S)) currentGizmoOperation = ImGuizmo::SCALE;
+
+        ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection),
+            currentGizmoOperation, currentGizmoMode,
+            glm::value_ptr(transform));
+
+        if (ImGuizmo::IsUsing()) {
+            glm::vec3 translation, rotation, scale;
+            ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(transform),
+                glm::value_ptr(translation),
+                glm::value_ptr(rotation),
+                glm::value_ptr(scale));
+
+            tc.SetPosition(translation);
+            tc.SetEulerRotation(glm::radians(rotation));
+            tc.SetScale(scale);
+        }
+    }
+    ImGui::End();
+    */
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

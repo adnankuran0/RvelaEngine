@@ -11,7 +11,8 @@ Editor::Editor()
     m_Engine->SetEditorCamera(&editorLayer->GetEditorCamera());
 
     m_Engine->PushLayer(editorLayer);
-    Layer* imGuiLayer = new ImGuiLayer(m_Engine);
+    ImGuiLayer* imGuiLayer = new ImGuiLayer(m_Engine);
+    imGuiLayer->SetEditorCamera(&editorLayer->GetEditorCamera());
     m_Engine->PushLayer(imGuiLayer);
 }
 

@@ -15,9 +15,10 @@ public:
     void OnDetach() override;
     void OnUpdate() override;
     void OnRender() override;
-
+    void SetEditorCamera(EditorCamera* editorCamera) { m_EditorCamera = editorCamera; }
 private:
     Engine* m_Engine;
+    EditorCamera* m_EditorCamera;
     void DrawSceneHierarchyPanel(entt::registry& registry, entt::entity& selectedEntity);
     void DrawEntityCreationPanel(entt::registry& registry, entt::entity& selectedEntity);
     void DrawTransformEditor(entt::registry& registry, entt::entity selectedEntity);
