@@ -61,6 +61,7 @@ public:
     static Shader& GetSSAOShader() { return m_SSAOShader; }
     static Shader& GetSSRShader() { return m_SSRShader; }
     static Shader& GetCompositeShader() { return m_CompositeShader; }
+    static Shader& GetLuminanceShader() { return m_LuminanceShader; }
 
 private:
     static GLFWwindow* activeWindow;
@@ -75,6 +76,7 @@ private:
     static Shader m_SSAOShader;
     static Shader m_SSRShader;
     static Shader m_CompositeShader;
+    static Shader m_LuminanceShader;
 
     static ScreenQuad m_ScreenQuad;
 };

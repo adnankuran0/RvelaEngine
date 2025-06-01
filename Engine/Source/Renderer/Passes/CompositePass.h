@@ -12,7 +12,7 @@ public:
 
     ~CompositePass() {}
 	void Execute() override;
-    void Init() override {}
+    void Init() override;
 
     void SetScreenTexture(GLuint screenTexture) { i_ScreenTexture = screenTexture; }
     void SetBloomBlurTexture(GLuint bloomBlurTexture) { i_BloomBlurTexture = bloomBlurTexture; }
@@ -24,6 +24,7 @@ private:
     GLuint i_BloomBlurTexture = 0;
     GLuint i_AoTexture = 0;
     GLuint i_SsrTexture = 0;
+    GLuint m_LuminanceBuffer = 0;
     float exposure = 1.0f;
     void UpdateExposure(float deltaTime);
 };

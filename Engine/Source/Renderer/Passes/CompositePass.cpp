@@ -1,6 +1,10 @@
-#include "rvelapch.h"
+﻿#include "rvelapch.h"
 #include "CompositePass.h"
 #include "../Renderer.h"
+
+void CompositePass::Init()
+{
+}
 
 void CompositePass::Execute()
 {
@@ -11,8 +15,8 @@ void CompositePass::Execute()
 
 
 	compositeShader.use();
-	//UpdateExposure(Time::GetDeltaTime());
-	//postProcessShader.setFloat("exposure", glm::clamp(exposure, 0.1f, 5.0f)); TODO: take a look at this
+	/*UpdateExposure(Time::GetDeltaTime());
+	compositeShader.setFloat("exposure", glm::clamp(exposure, 0.5f, 1.5f));*/
 	compositeShader.setFloat("exposure", 1.0f);
 	compositeShader.setInt("screenTexture", 0);
 	compositeShader.setInt("bloomTexture", 1);
@@ -40,7 +44,7 @@ void CompositePass::UpdateExposure(float deltaTime)
 
 	float luminance = 0.2126f * avgColor[0] + 0.7152f * avgColor[1] + 0.0722f * avgColor[2];
 
-	float targetLuminance = 0.5f;
+	float targetLuminance = 0.3f;
 	float key = 0.1f;
 	float targetExposure = key * (targetLuminance / (luminance + 0.001f));
 

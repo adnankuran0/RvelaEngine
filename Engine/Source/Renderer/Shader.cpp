@@ -12,6 +12,11 @@ Shader::Shader(const Path& vertexPath, const Path& fragmentPath, const Path& geo
     Init(vertexPath, fragmentPath, geometryPath);
 }
 
+Shader::Shader(const Path& computePath)
+{
+    Init(computePath);
+}
+
 bool Shader::Init(const Path& vertexPath, const Path& fragmentPath)
 {
     std::string vertexCode;
@@ -159,6 +164,48 @@ bool Shader::Init(const Path& vertexPath, const Path& fragmentPath, const Path& 
     return true;
 }
 
+bool Shader::Init(const Path& computePath)
+{
+    std::string computeCode;
+    std::ifstream cShaderFile;
+    cShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+
+    try
+    {
+        cShaderFile.open(computePath.GetAbsolute());
+        std::stringstream cShaderStream;
+        cShaderStream << cShaderFile.rdbuf();
+        cShaderFile.close();
+        computeCode = cShaderStream.str();
+    }
+    catch (std::ifstream::failure& e)
+    {
+        LOG_ERROR << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: " << e.what();
+        return false;
+    }
+
+    const char* cShaderCode = computeCode.c_str();
+
+    unsigned int compute = glCreateShader(GL_COMPUTE_SHADER);
+    glShaderSource(compute, 1, &cShaderCode, NULL);
+    glCompileShader(compute);
+    if (!checkCompileErrors(compute, "COMPUTE")) {
+        return false;
+    }
+
+    ID = glCreateProgram();
+    glAttachShader(ID, compute);
+    glLinkProgram(ID);
+    if (!checkCompileErrors(ID, "PROGRAM")) {
+        glDeleteShader(compute);
+        return false;
+    }
+
+    glDeleteShader(compute);
+
+    return true;
+}
+
 void Shader::Destroy()
 {
     glDeleteProgram(ID);
@@ -168,6 +215,16 @@ void Shader::Destroy()
 void Shader::use()
 {
     glUseProgram(ID);
+}
+
+void Shader::dispatch(unsigned int x, unsigned int y, unsigned int z) const
+{
+    glUseProgram(ID);
+    glDispatchCompute(x, y, z);
+}
+
+void Shader::wait() const {
+    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 }
 
 void Shader::setBool(const std::string& name, bool value) const

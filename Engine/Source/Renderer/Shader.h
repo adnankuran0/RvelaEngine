@@ -13,15 +13,19 @@ public:
     unsigned int ID;
     Shader(const Path& vertexPath, const Path& fragmentPath);
     Shader(const Path& vertexPath, const Path& fragmentPath, const Path& geometryPath);
+    Shader(const Path& computePath);
     Shader() = default;
 
     bool Init(const Path& vertexPath, const Path& fragmentPath);
     bool Init(const Path& vertexPath, const Path& fragmentPath, const Path& geometryPath);
+    bool Init(const Path& computePath);
 
     void Destroy();
 
 
     void use();
+    void dispatch(unsigned int x, unsigned int y = 1, unsigned int z = 1) const;
+    void wait() const;
 
     void setBool(const std::string& name, bool value) const;
 
