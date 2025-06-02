@@ -66,8 +66,6 @@ void AssetManager::LoadMaterials(const aiScene* scene, std::unordered_map<unsign
         aiMaterial* aiMat = scene->mMaterials[i];
         MaterialData materialData;
 
-        LOG_INFO << "Model has " << scene->mNumMaterials << "materials";
-
         aiString name;
         if (AI_FAILURE == aiMat->Get(AI_MATKEY_NAME, name))
         {

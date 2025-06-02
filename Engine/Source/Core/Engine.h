@@ -12,6 +12,7 @@
 #include "Core/Utils/TextureManager.h"
 #include "LayerStack.h"
 #include <Renderer/RenderPipeline.h>
+#include "EditorConxtext.h"
 
 class Engine
 {
@@ -35,6 +36,7 @@ public:
 	inline ProjectManager* GetProjectManager() const noexcept { return m_ProjectManager.get(); }
 	inline SceneManager* GetSceneManager() const noexcept { return m_SceneManager.get(); }
 	inline EditorCamera* GetCamera() const noexcept { return editorCamera; }
+	inline unsigned int GetFinalTexture() { return EditorContext::GetFinalTexture(); }
 
 	inline void SetEditorCamera(EditorCamera* editorCam) { editorCamera = editorCam; }
 private:

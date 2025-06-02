@@ -5512,3 +5512,846 @@
 [INFO ] Total mesh loading took 819ms
 [INFO ] Scene loading complete
 [INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 102ms
+[INFO ] Model has 1materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Model has 26materials
+[INFO ] Scene loading took 3494ms
+[INFO ] Total mesh loading took 953ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 817ms
+[INFO ] Total mesh loading took 416ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 2ms
+[INFO ] Scene loading took 831ms
+[INFO ] Total mesh loading took 442ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 119ms
+[INFO ] Scene loading took 3270ms
+[INFO ] Total mesh loading took 759ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 2ms
+[INFO ] Scene loading took 756ms
+[INFO ] Total mesh loading took 360ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 829ms
+[INFO ] Total mesh loading took 432ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 740ms
+[INFO ] Total mesh loading took 350ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 749ms
+[INFO ] Total mesh loading took 336ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 754ms
+[INFO ] Total mesh loading took 350ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 744ms
+[INFO ] Total mesh loading took 347ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 737ms
+[INFO ] Total mesh loading took 346ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 755ms
+[INFO ] Total mesh loading took 357ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 762ms
+[INFO ] Total mesh loading took 371ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 749ms
+[INFO ] Total mesh loading took 356ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 752ms
+[INFO ] Total mesh loading took 365ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 794ms
+[INFO ] Total mesh loading took 407ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 783ms
+[INFO ] Total mesh loading took 354ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 697ms
+[INFO ] Total mesh loading took 332ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 737ms
+[INFO ] Total mesh loading took 331ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 2ms
+[INFO ] Scene loading took 726ms
+[INFO ] Total mesh loading took 333ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 4ms
+[INFO ] Scene loading took 736ms
+[INFO ] Total mesh loading took 358ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 370ms
+[INFO ] Scene loading took 20212ms
+[INFO ] Total mesh loading took 833ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 109ms
+[INFO ] Scene loading took 3275ms
+[INFO ] Total mesh loading took 769ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 764ms
+[INFO ] Total mesh loading took 360ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 723ms
+[INFO ] Total mesh loading took 350ms
+[INFO ] Scene loading complete
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 2ms
+[INFO ] Scene loading took 735ms
+[INFO ] Total mesh loading took 343ms
+[INFO ] Scene loading complete
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 2ms
+[INFO ] Scene loading took 733ms
+[INFO ] Total mesh loading took 353ms
+[INFO ] Scene loading complete
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 2ms
+[INFO ] Scene loading took 706ms
+[INFO ] Total mesh loading took 345ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 698ms
+[INFO ] Total mesh loading took 333ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 711ms
+[INFO ] Total mesh loading took 347ms
+[INFO ] Scene loading complete
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 714ms
+[INFO ] Total mesh loading took 342ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!

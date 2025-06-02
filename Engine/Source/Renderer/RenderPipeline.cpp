@@ -23,6 +23,8 @@ void RenderPipeline::EnsureInitialized()
 		for (auto* pass : renderPasses)
 			pass->Init();
 
+
+
 		isInitialized = true;
 	}
 }

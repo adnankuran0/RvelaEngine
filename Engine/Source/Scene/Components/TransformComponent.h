@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Scene/Component.h"
 #include "glm/glm.hpp"
 #define GLM_ENABLE_EXPERIMENTAL

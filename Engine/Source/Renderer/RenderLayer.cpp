@@ -11,8 +11,10 @@ void RenderLayer::OnRender()
 	context.camera = camera;
 	context.pointLights = scene->CollectPointLights();
 	context.directionalLight = scene->CollectDirectionalLight();
-	context.viewportWidth = m_Engine->GetWindow()->GetSize().width;
-	context.viewportHeight = m_Engine->GetWindow()->GetSize().height;
+	context.viewportWidth = 1920;
+	context.viewportHeight = 1080;
+	//context.viewportWidth = m_Engine->GetWindow()->GetSize().width;
+	//context.viewportHeight = m_Engine->GetWindow()->GetSize().height;
 
 
 	m_RenderPipeline->SetRenderContext(context);
