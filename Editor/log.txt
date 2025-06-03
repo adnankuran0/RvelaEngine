@@ -9469,3 +9469,2103 @@
 [INFO ] Total mesh loading took 782ms
 [INFO ] Scene loading complete
 [INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[INFO ] Engine has started!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[INFO ] Engine has started!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[INFO ] Engine has started!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[INFO ] Engine has started!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[INFO ] Engine has started!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] D:\GitHub\RvelaEngine\TestProject
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[INFO ] Engine has started!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] D:\GitHub\RvelaEngine\TestProject 1
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[ERROR] ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: ios_base::failbit set: iostream stream error
+[INFO ] Engine has started!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] C:\RvelaEngine\TestProject 1
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 4ms
+[INFO ] Scene loading took 223ms
+[INFO ] Total mesh loading took 0ms
+[INFO ] Scene loading complete
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 193ms
+[INFO ] Total mesh loading took 0ms
+[INFO ] Scene loading complete
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 791ms
+[INFO ] Total mesh loading took 328ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 775ms
+[INFO ] Total mesh loading took 338ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 759ms
+[INFO ] Total mesh loading took 331ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 829ms
+[INFO ] Total mesh loading took 354ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[ERROR] ERROR::SHADER_COMPILATION_ERROR of type: FRAGMENT
+0(31) : error C1115: unable to find compatible overloaded function "sqrt(float, int)"
+
+ -- --------------------------------------------------- -- 
+[INFO ] Engine has started!
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[ERROR] OpenGL Error after directional light setup: 1281
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!

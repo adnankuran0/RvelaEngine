@@ -1,5 +1,6 @@
 ﻿#include "SceneHierarchyPanel.h"
 #include "ImGui/imgui.h"
+#include <ImGui/tinyfiledialogs.h>
 
 void SceneHierarchyPanel::Draw(Scene* scene,entt::entity& selectedEntity)
 {
@@ -116,11 +117,14 @@ void SceneHierarchyPanel::Draw(Scene* scene,entt::entity& selectedEntity)
         }
 
         if (ImGui::MenuItem("Load Asset")) {
-           /* std::string file = OpenFileDialog();
+            const char* filterPatterns[] = { "*.fbx", "*.obj", "*.gltf", "*.glb" };
+            const char* filePath = tinyfd_openFileDialog("Select a file", "", 4, filterPatterns, NULL, 0);
+
+            std::string file = filePath ? std::string(filePath) : "";
             if (!file.empty())
             {
-                selectedEntity = m_Engine->GetScene()->LoadAsset(file);
-            }*/
+                selectedEntity = scene->LoadAsset(file);
+            }
         }
         if (ImGui::MenuItem("Delete Entity")) {
 

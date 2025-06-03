@@ -9,11 +9,11 @@ void MenuBar::Draw(Engine* engine)
             if (ImGui::MenuItem("New scene")) {}
             if (ImGui::MenuItem("Open scene")) 
             {
-                engine->GetSceneManager()->LoadScene(*engine->GetScene(), "D:\\GitHub\\RvelaEngine\\TestProject\\Scenes\\Test.rscene");
+                engine->GetSceneManager()->LoadScene(*engine->GetScene(), "C:\\RvelaEngine\\TestProject\\Scenes\\Test.rscene");
             }
             if (ImGui::MenuItem("Save scene")) 
             {
-                engine->GetSceneManager()->SaveScene(*engine->GetScene(), "D:\\GitHub\\RvelaEngine\\TestProject\\Scenes\\Test.rscene");
+                engine->GetSceneManager()->SaveScene(*engine->GetScene(), "C:\\RvelaEngine\\TestProject\\Scenes\\Test.rscene");
             }
             ImGui::Separator();
             if (ImGui::MenuItem("Quit")) 

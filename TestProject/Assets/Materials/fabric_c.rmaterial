@@ -12,7 +12,7 @@
         0.47040000557899475,
         0.47040000557899475
     ],
-    "albedoMapPath": "D:/GitHub/RvelaEngine/TestProject/Assets/Models/Sponza-master/Sponza-master/textures/sponza_curtain_diff.tga",
+    "albedoMapPath": "C:/RvelaEngine/TestProject/Assets/Models/Sponza-master/Sponza-master/textures/sponza_curtain_diff.tga",
     "ao": 1.0,
     "aoMapPath": "",
     "heightMapPath": "",

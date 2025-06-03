@@ -2,7 +2,7 @@
 #include "Scene/Entity.h"
 
 EditorLayer::EditorLayer()
-    : Layer("EditorLayer"), m_EditorCamera(glm::vec3(0.0f, 2.0f, 1.0f))
+    : Layer("EditorLayer"), m_EditorCamera(glm::vec3(0.0f, 2.0f, 10.0f))
 {
 }
 

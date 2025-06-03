@@ -12,13 +12,13 @@
         0.800000011920929,
         0.800000011920929
     ],
-    "albedoMapPath": "D:/GitHub/RvelaEngine/TestProject/Assets/Models/utility_box_02_1k/textures/utility_box_02_diff_1k.png",
+    "albedoMapPath": "C:/RvelaEngine/TestProject/Assets/Models/utility_box_02_1k/textures/utility_box_02_diff_1k.png",
     "ao": 1.0,
     "aoMapPath": "",
     "heightMapPath": "",
     "metallic": 0.0,
-    "metallicMapPath": "D:/GitHub/RvelaEngine/TestProject/Assets/Models/utility_box_02_1k/textures/utility_box_02_metal_1k.png",
-    "normalMapPath": "D:/GitHub/RvelaEngine/TestProject/Assets/Models/utility_box_02_1k/textures/utility_box_02_nor_gl_1k.png",
-    "roughness": 1.0,
-    "roughnessMapPath": "D:/GitHub/RvelaEngine/TestProject/Assets/Models/utility_box_02_1k/textures/utility_box_02_rough_1k.png"
+    "metallicMapPath": "C:/RvelaEngine/TestProject/Assets/Models/utility_box_02_1k/textures/utility_box_02_metal_1k.png",
+    "normalMapPath": "C:/RvelaEngine/TestProject/Assets/Models/utility_box_02_1k/textures/utility_box_02_nor_gl_1k.png",
+    "roughness": 0.5,
+    "roughnessMapPath": "C:/RvelaEngine/TestProject/Assets/Models/utility_box_02_1k/textures/utility_box_02_rough_1k.png"
 }

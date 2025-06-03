@@ -1,7 +1,7 @@
 #version 460 core
 in vec3 worldDir;
 
-uniform vec3 lightDirection; // Directional light direction (normalized)
+uniform vec3 lightDirection = vec3(-60, -90, 0); 
 
 out vec4 FragColor;
 
@@ -15,7 +15,7 @@ vec3 calculateSkyColor(vec3 dir, vec3 lightDir)
     float isNight = 1.0 - isDay;
     
     // Gün ve gece için gökyüzü renkleri
-    vec3 zenithColorDay = vec3(0.2, 0.4, 0.85);
+    vec3 zenithColorDay = vec3(0.2, 0.4, 0.9);
     vec3 horizonColorDay = vec3(0.9, 0.9, 1.0);
     vec3 zenithColorNight = vec3(0.02, 0.02, 0.05);
     vec3 horizonColorNight = vec3(0.05, 0.05, 0.1);
@@ -28,7 +28,7 @@ vec3 calculateSkyColor(vec3 dir, vec3 lightDir)
     float height = (nDir.y + 1.0) / 2.0;
     
     // Gökyüzü renk gradyanı
-    vec3 skyColor = mix(horizonColor, zenithColor, smoothstep(0.0, 1.0, height));
+    vec3 skyColor = mix(horizonColor, zenithColor, pow(smoothstep(0.0, 1.0, height),1/10));
     
     // Işık ufka yakınken kırmızılaşma efekti
     float reddeningFactor = 1.0 - smoothstep(0.0, 0.2, abs(nLightDir.y));
