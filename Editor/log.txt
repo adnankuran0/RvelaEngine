@@ -9460,3 +9460,12 @@
 [INFO ] Total mesh loading took 962ms
 [INFO ] Scene loading complete
 [INFO ] Engine has stopped!
+[INFO ] GLFW Initialized
+[INFO ] GLEW Initialized
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 572.70
+[INFO ] Engine has started!
+[INFO ] Json loading took 4ms
+[INFO ] Scene loading took 1247ms
+[INFO ] Total mesh loading took 782ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
