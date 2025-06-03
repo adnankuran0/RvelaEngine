@@ -21,6 +21,7 @@ Shader Renderer::m_SSAOShader;
 Shader Renderer::m_SSRShader;
 Shader Renderer::m_CompositeShader;
 Shader Renderer::m_LuminanceShader;
+Shader Renderer::m_ProceduralSkyShader;
 
 ScreenQuad Renderer::m_ScreenQuad;
 
@@ -49,6 +50,7 @@ void Renderer::Init(GLFWwindow* window)
     m_SSRShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\ssr.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\ssr.frag"));
     m_CompositeShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\composite.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\composite.frag"));
     m_LuminanceShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\luminance.comp"));
+    m_ProceduralSkyShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\proceduralSky.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\proceduralSky.frag"));
 
     
 

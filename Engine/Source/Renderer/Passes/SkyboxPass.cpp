@@ -22,5 +22,24 @@ SkyboxPass::~SkyboxPass()
 }
 void SkyboxPass::Execute()
 {
-	m_Skybox.Render(Renderer::GetSkyboxShader(), ctx.camera->projection, ctx.camera->GetViewMatrix(),screenFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, screenFBO);
+    Shader& proceduralSkyShader = Renderer::GetProceduralSkyShader();
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
+
+    proceduralSkyShader.use();
+    proceduralSkyShader.setMat4("invProjection", glm::inverse(ctx.camera->projection));
+    proceduralSkyShader.setMat4("invView", glm::inverse(ctx.camera->GetViewMatrix()));
+    proceduralSkyShader.setVec3("lightDirection", ctx.directionalLight->direction);
+
+    Renderer::DrawFullScreenQuad();
+   
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+   
+   
+	//m_Skybox.Render(Renderer::GetSkyboxShader(), ctx.camera->projection, ctx.camera->GetViewMatrix(),screenFBO);
 }

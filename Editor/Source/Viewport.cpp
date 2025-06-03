@@ -1,6 +1,7 @@
 ﻿#include "Viewport.h"
 #include <iostream>
 #include "ImGui/ImGuizmo.h"
+#include "Core/Engine.h"
 
 
 void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
@@ -58,13 +59,13 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
         if (selectedEntity != entt::null && engine->GetScene()->GetRegistry().any_of<TransformComponent>(selectedEntity)) {
             auto& tc = engine->GetScene()->GetRegistry().get<TransformComponent>(selectedEntity);
 
-            glm::mat4 transform = tc.GetWorldMatrix();
+            glm::mat4 transform = tc.GetLocalMatrix();
 
             glm::mat4 view = engine->GetCamera()->GetViewMatrix(); // Kamera sistemi nasıl çalışıyorsa oradan al
             glm::mat4 projection = engine->GetCamera()->projection;
 
             static ImGuizmo::OPERATION currentGizmoOperation = ImGuizmo::TRANSLATE;
-            static ImGuizmo::MODE currentGizmoMode = ImGuizmo::LOCAL;
+            static ImGuizmo::MODE currentGizmoMode = ImGuizmo::WORLD;
 
             // Kısayollarla değiştirmek istersen
             if (!ImGui::IsMouseDown(ImGuiMouseButton_Right))
@@ -80,6 +81,7 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
 
             if (ImGuizmo::IsUsing()) {
                 glm::vec3 translation, rotation, scale;
+               
                 ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(transform),
                     glm::value_ptr(translation),
                     glm::value_ptr(rotation),
@@ -87,7 +89,7 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
                  
                 tc.SetPosition(translation);
                 tc.SetScale(scale);
-                tc.SetEulerRotation(glm::radians(rotation));
+                tc.SetEulerRotation(rotation);
             }
         }
 
