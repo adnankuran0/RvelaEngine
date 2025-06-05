@@ -100,8 +100,9 @@ void Engine::Run()
 		Render();
 
 		EventManager::ClearEvents();
+		Input::Update();
 
-		glfwSwapBuffers(GetWindow()->GetGLFWWindow());
+		
 	}
 	LOG_INFO << "Engine has stopped!";
 }
@@ -150,6 +151,8 @@ void Engine::Render()
 		layer->OnRender();
 
 	Renderer::EndFrame();
+
+	glfwSwapBuffers(GetWindow()->GetGLFWWindow());
 }
 
 

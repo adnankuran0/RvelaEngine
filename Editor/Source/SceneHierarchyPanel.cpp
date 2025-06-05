@@ -43,8 +43,8 @@ void SceneHierarchyPanel::Draw(Scene* scene,entt::entity& selectedEntity)
         }
 
         auto& tagComponent = scene->GetComponent<TagComponent>(entity);
-        std::string entityName = tagComponent.tag;
-        bool nodeOpen = ImGui::TreeNodeEx(entityName.c_str(), flags);
+        std::string nodeId = tagComponent.tag + "##" + std::to_string((uint32_t)entity);
+        bool nodeOpen = ImGui::TreeNodeEx(nodeId.c_str(), flags);
 
         // Sol veya sağ tıkla entity seçimi
         if (ImGui::IsItemClicked(ImGuiMouseButton_Left) || ImGui::IsItemClicked(ImGuiMouseButton_Right)) {

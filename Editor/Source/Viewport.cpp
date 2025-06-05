@@ -119,72 +119,75 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
             float closestDist = std::numeric_limits<float>::max();
 
             auto& registry = engine->GetScene()->GetRegistry();
-            registry.view<MeshRendererComponent>().each([&](entt::entity entity, MeshRendererComponent& mrc) {
+            registry.view<TransformComponent,
+                MeshRendererComponent,
+                MeshComponent>().each([&](entt::entity entity, 
+                    TransformComponent& tc,
+                    MeshRendererComponent& mrc,
+                    MeshComponent& mc) {
+                
                 BoundingBox box = mrc.worldAABB;
+                //Frustum culling
+                if (!engine->GetCamera()->Intersects(box)) return;
 
-                float t;
-                if (RayIntersectsAABB(rayOrigin, rayDirection, box, t)) {
-                    glm::vec3 hitPoint = rayOrigin + rayDirection * t;
+                MeshData& mesh = mc.mesh;
+                glm::mat4 modelMatrix = tc.GetWorldMatrix();
 
-                    glm::mat4 view = engine->GetCamera()->GetViewMatrix();
-                    glm::mat4 projection = engine->GetCamera()->projection;
-                    glm::vec4 viewport = glm::vec4(0, 0, displaySize.x, displaySize.y);
+                for (size_t i = 0; i < mesh.GetTriangleCount(); ++i)
+                {
+                    glm::vec3 v0, v1, v2;
+                    mesh.GetTriangle(i, v0, v1, v2);
 
-                    glm::vec3 screenPos = glm::project(hitPoint, view, projection, viewport);
+                    v0 = modelMatrix * glm::vec4(v0, 1.0f);
+                    v1 = modelMatrix * glm::vec4(v1, 1.0f);
+                    v2 = modelMatrix * glm::vec4(v2, 1.0f);
 
-                    glm::vec2 screenHitPos(screenPos.x, displaySize.y - screenPos.y); // ImGui y-up
-                    glm::vec2 mouseViewportPos = {
-                        mousePos.x - displayPos.x,
-                        mousePos.y - displayPos.y
-                    };
-
-                    float distance2D = glm::distance(mouseViewportPos, screenHitPos);
-
-                    if (distance2D < closestDist) {
-                        closestDist = distance2D;
-                        closest = entity;
+                    float t;
+                    if (RayIntersectsTriangle(rayOrigin, rayDirection, v0, v1, v2, t))
+                    {
+                        if (t < closestDist)
+                        {
+                            closestDist = t;
+                            selectedEntity = entity;
+                            engine->GetScene()->SetSelectedEntity(entity);
+                        }
                     }
                 }
                 });
 
-            selectedEntity = closest;
+            
         }
     }
     ImGui::End();
     ImGui::PopStyleVar();
 }
 
-bool Viewport::RayIntersectsAABB(const glm::vec3& rayOrigin, const glm::vec3& rayDir,
-    const BoundingBox& box, float& t)
+bool Viewport::RayIntersectsTriangle(const glm::vec3& rayOrigin, const glm::vec3& rayDir,
+    const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2,
+    float& t)
 {
-    float tmin = 0.0f;
-    float tmax = std::numeric_limits<float>::max();
+    const float EPSILON = 1e-8;
+    glm::vec3 edge1 = v1 - v0;
+    glm::vec3 edge2 = v2 - v0;
 
-    for (int i = 0; i < 3; ++i)
-    {
-        if (abs(rayDir[i]) < 1e-8f)
-        {
-            if (rayOrigin[i] < box.min[i] || rayOrigin[i] > box.max[i])
-                return false;
-        }
-        else
-        {
-            float invD = 1.0f / rayDir[i];
-            float t0 = (box.min[i] - rayOrigin[i]) * invD;
-            float t1 = (box.max[i] - rayOrigin[i]) * invD;
+    glm::vec3 h = cross(rayDir, edge2);
+    float a = dot(edge1, h);
+    if (a > -EPSILON && a < EPSILON)
+        return false;
 
-            if (t0 > t1) std::swap(t0, t1);
+    float f = 1.0f / a;
+    glm::vec3 s = rayOrigin - v0;
+    float u = f * dot(s, h);
+    if (u < 0.0f || u > 1.0f)
+        return false;
 
-            tmin = std::max(tmin, t0);
-            tmax = std::min(tmax, t1);
+    glm::vec3 q = cross(s, edge1);
+    float v = f * dot(rayDir, q);
+    if (v < 0.0f || u + v > 1.0f)
+        return false;
 
-            if (tmax < tmin)
-                return false;
-        }
-    }
-
-    t = tmin;
-    return true;
+    t = f * dot(edge2, q);
+    return t > EPSILON;
 }
 
 glm::vec3 Viewport::ScreenPosToWorldRay(const glm::vec2& mousePos, const glm::vec2& viewportSize,

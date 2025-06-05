@@ -162,30 +162,55 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
             }
         }
 
-        if (registry.any_of<SceneTreeComponent>(selectedEntity)) {
+        if (registry.any_of<SceneTreeComponent>(selectedEntity))
+        {
             auto& selectedNode = registry.get<SceneTreeComponent>(selectedEntity);
-            if (ImGui::CollapsingHeader("Parent/Child", ImGuiTreeNodeFlags_DefaultOpen)) {
-                if (ImGui::BeginCombo("Parent", selectedNode.parent == entt::null ? "None" : std::to_string((uint32_t)selectedNode.parent).c_str())) {
-                    if (ImGui::Selectable("None", selectedNode.parent == entt::null)) {
+
+            if (ImGui::CollapsingHeader("Hierarchy", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                std::string parentName;
+                if (selectedNode.parent == entt::null)
+                {
+                    parentName = "None";
+                }
+                else
+                {
+                    parentName = registry.get<TagComponent>(selectedNode.parent).tag;
+                    parentName += "##" + std::to_string((uint32_t)selectedNode.parent);
+                }
+
+                if (ImGui::BeginCombo("Parent", parentName.c_str()))
+                {
+                    if (ImGui::Selectable("None", selectedNode.parent == entt::null))
+                    {
                         scene->RemoveParent(selectedEntity);
                     }
-                    registry.view<SceneTreeComponent>().each([&](entt::entity entity, SceneTreeComponent&) {
-                        if (entity != selectedEntity) {
-                            if (ImGui::Selectable(std::to_string((uint32_t)entity).c_str(), selectedNode.parent == entity)) {
-                                scene->SetParent(selectedEntity, entity);
+
+                    registry.view<SceneTreeComponent, TagComponent>().each([&](entt::entity entity, SceneTreeComponent&, TagComponent& tag)
+                        {
+                            if (entity != selectedEntity)
+                            {
+                                std::string displayName = tag.tag + "##" + std::to_string((uint32_t)entity);
+                                if (ImGui::Selectable(displayName.c_str(), selectedNode.parent == entity))
+                                {
+                                    scene->SetParent(selectedEntity, entity);
+                                }
                             }
-                        }
                         });
+
                     ImGui::EndCombo();
                 }
+
                 auto& uuid = selectedNode.parentUUID;
                 ImGui::Text("Parent UUID: %s", std::to_string(uuid).c_str());
                 ImGui::Text("Children UUIDs:");
-                for (const auto& childUUID : selectedNode.childrenUUIDs) {
+                for (const auto& childUUID : selectedNode.childrenUUIDs)
+                {
                     ImGui::Text("- %s", std::to_string(childUUID).c_str());
                 }
             }
         }
+
 
     }
     else {

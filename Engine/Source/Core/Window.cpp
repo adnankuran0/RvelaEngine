@@ -35,8 +35,6 @@ void Window::Init()
         throw std::runtime_error("Failed to initialize GLFW");
     }
 
-    LOG_INFO << "GLFW Initialized";
-
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
@@ -55,7 +53,6 @@ void Window::Init()
         throw std::runtime_error("Failed to initialize GLEW");
     }
 
-    LOG_INFO << "GLEW Initialized";
     const GLubyte* glVersion = glGetString(GL_VERSION);
     LOG_INFO << "OpenGL Version: " << (glVersion ? reinterpret_cast<const char*>(glVersion) : "Unknown");
 

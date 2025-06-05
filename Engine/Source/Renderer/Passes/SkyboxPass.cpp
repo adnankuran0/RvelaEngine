@@ -33,6 +33,7 @@ void SkyboxPass::Execute()
     proceduralSkyShader.setMat4("invProjection", glm::inverse(ctx.camera->projection));
     proceduralSkyShader.setMat4("invView", glm::inverse(ctx.camera->GetViewMatrix()));
     proceduralSkyShader.setVec3("lightDirection", ctx.directionalLight->direction);
+    proceduralSkyShader.setFloat("time", Time::GetCurrentTime());
 
     Renderer::DrawFullScreenQuad();
    

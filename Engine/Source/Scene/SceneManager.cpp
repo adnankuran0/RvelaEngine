@@ -9,6 +9,10 @@
 
 using json = nlohmann::json;
 
+void SceneManager::CreateScene(Scene& scene, const std::string& path)
+{
+}
+
 void SceneManager::SaveScene(Scene& scene, const std::string& path)
 {
     json sceneJson;
@@ -117,7 +121,7 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
             auto meshEnd = std::chrono::high_resolution_clock::now();
             meshLoadTotal += std::chrono::duration_cast<std::chrono::milliseconds>(meshEnd - meshStart);
 
-            scene.AddComponent<MeshComponent>(entity, TO_ABSOLUTE_PATH(newModelPath), meshIndex);
+            scene.AddComponent<MeshComponent>(entity, TO_ABSOLUTE_PATH(newModelPath), meshIndex, meshData);
             scene.AddComponent<MeshRendererComponent>(entity, meshData.vertices.data(),
                 meshData.vertices.size() * sizeof(float),
                 meshData.indices.data(),

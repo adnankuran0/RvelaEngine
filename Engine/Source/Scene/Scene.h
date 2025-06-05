@@ -74,8 +74,12 @@ public:
     std::vector<PointLightData> CollectPointLights() noexcept;
     std::optional<DirectionalLightData>  CollectDirectionalLight() noexcept;
 
+    void SetSelectedEntity(entt::entity selectedEntity) { this->selectedEntity = selectedEntity; }
+    entt::entity GetSelectedEntity() { return selectedEntity; }
+
 private:
     entt::registry m_Registry;
     std::unordered_map<UUID, entt::entity> m_EntityMap;
     friend class Entity;
+    entt::entity selectedEntity;
 };
