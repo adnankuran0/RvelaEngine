@@ -1,3 +1,3 @@
 # Rvela 3D Game Engine
 For Windows run Setup-Windows.bat for build.
-![Gemini_Generated_Image_2f89i02f89i02f89](https://github.com/user-attachments/assets/ea625f3b-1a53-4684-9ae7-ad04dca5e7b0)
+![Rvela (1)](https://github.com/user-attachments/assets/5161adb6-d52d-40f4-a914-e138b1c54670)
