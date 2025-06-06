@@ -13,6 +13,8 @@ struct MeshData
     Path materialPath;
     uint16_t meshIndex;
     BoundingBox localAABB;
+    glm::mat4 localTransform;
+    glm::mat4 worldTransform;
 
     int GetTriangleCount()
     {

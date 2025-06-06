@@ -15,6 +15,7 @@ public:
 
 	GLuint GetScreenTexture() { return o_IntermediateColorTex; }
     GLuint GetScreenFBO() { return o_ScreenFBO; }
+    GLuint GetIntermediateFBO() { return intermediateFBO; }
 
 	void SetDirectionalShadowMap(GLuint directionalShadowMap) { i_DirectionalShadowMap = directionalShadowMap; }
 	void SetPointShadowMap(GLuint pointShadowMap) { i_PointShadowMap = pointShadowMap; }

@@ -22,7 +22,7 @@ SkyboxPass::~SkyboxPass()
 }
 void SkyboxPass::Execute()
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, screenFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, i_ScreenFBO);
     Shader& proceduralSkyShader = Renderer::GetProceduralSkyShader();
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -32,7 +32,14 @@ void SkyboxPass::Execute()
     proceduralSkyShader.use();
     proceduralSkyShader.setMat4("invProjection", glm::inverse(ctx.camera->projection));
     proceduralSkyShader.setMat4("invView", glm::inverse(ctx.camera->GetViewMatrix()));
-    proceduralSkyShader.setVec3("lightDirection", ctx.directionalLight->direction);
+    if (ctx.directionalLight.has_value())
+    {
+        proceduralSkyShader.setVec3("lightDirection", ctx.directionalLight->direction);
+    }
+    else
+    {
+        proceduralSkyShader.setVec3("lightDirection", glm::vec3(60.0f,-90.0f,0.0f));
+    }
     proceduralSkyShader.setFloat("time", Time::GetCurrentTime());
 
     Renderer::DrawFullScreenQuad();

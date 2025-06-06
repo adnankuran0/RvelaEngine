@@ -49,7 +49,11 @@ void LightingPass::Execute()
 {
     if (commands.empty() || !ctx.IsValid()) return;
 
+    
+
     glBindFramebuffer(GL_FRAMEBUFFER, o_ScreenFBO);
+
+    glClear(GL_STENCIL_BUFFER_BIT);
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
 
     Shader& shader = Renderer::GetPBRShader();
@@ -110,6 +114,16 @@ void LightingPass::Execute()
     for (auto& command : commands) {
         if (!ctx.camera->Intersects(command.mesh.worldAABB)) continue;
 
+        if (command.isSelected) {
+            glEnable(GL_STENCIL_TEST);
+            glStencilFunc(GL_ALWAYS, 1, 0xFF); 
+            glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+            glStencilMask(0xFF);
+        }
+        else {
+            glDisable(GL_STENCIL_TEST);
+        }
+
         auto& material = command.material.material;
         if (!material) continue;
 
@@ -162,6 +176,7 @@ void LightingPass::Execute()
         }
 
     }
+
     glBindFramebuffer(GL_READ_FRAMEBUFFER, o_ScreenFBO);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, intermediateFBO);
     glBlitFramebuffer(

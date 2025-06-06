@@ -8,6 +8,7 @@ RenderPipeline::RenderPipeline()
 		&shadowPass,
 		&skyboxPass,
 		&lightingPass,
+		&outlinePass,
 		&brightPass,
 		&bloomPass,
 		&ssaoPass,
@@ -22,8 +23,6 @@ void RenderPipeline::EnsureInitialized()
 	{
 		for (auto* pass : renderPasses)
 			pass->Init();
-
-
 
 		isInitialized = true;
 	}
@@ -53,7 +52,7 @@ void RenderPipeline::Execute()
 
 	shadowPass.Execute();
 
-	skyboxPass.screenFBO = lightingPass.GetScreenFBO();
+	skyboxPass.SetScreenFBO(lightingPass.GetScreenFBO());
 	skyboxPass.Execute();
 
 	lightingPass.SetDirectionalShadowMap(shadowPass.GetDirectionalShadowMap());
@@ -61,7 +60,9 @@ void RenderPipeline::Execute()
 	lightingPass.SetLightSpaceMatrix(shadowPass.GetLightSpaceMatrix());
 	lightingPass.Execute();
 
-
+	//outlinePass.SetScreenFBO(lightingPass.GetScreenFBO());
+	//outlinePass.SetIntermediateFBO(lightingPass.GetIntermediateFBO());
+	//outlinePass.Execute();
 
 	brightPass.SetScreenTexture(lightingPass.GetScreenTexture());
 	brightPass.Execute();

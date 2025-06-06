@@ -9,8 +9,9 @@ public:
 	void Execute() override;
 	void Init() override;
 
-	GLuint screenFBO = 0;
+	void SetScreenFBO(GLuint screenFBO) { i_ScreenFBO = screenFBO; }
 private:
+	GLuint i_ScreenFBO = 0;
 
 	Skybox m_Skybox;
 };

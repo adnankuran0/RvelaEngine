@@ -63,6 +63,7 @@ public:
     static Shader& GetCompositeShader() { return m_CompositeShader; }
     static Shader& GetLuminanceShader() { return m_LuminanceShader; }
     static Shader& GetProceduralSkyShader() { return m_ProceduralSkyShader;  }
+    static Shader& GetOutlineShader() { return m_OutlineShader; }
 
 private:
     static GLFWwindow* activeWindow;
@@ -79,6 +80,7 @@ private:
     static Shader m_CompositeShader;
     static Shader m_LuminanceShader;
     static Shader m_ProceduralSkyShader;
+    static Shader m_OutlineShader;
 
     static ScreenQuad m_ScreenQuad;
 };
