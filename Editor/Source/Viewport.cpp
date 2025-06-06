@@ -149,7 +149,7 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
                         {
                             closestDist = t;
                             selectedEntity = entity;
-                            engine->GetScene()->SetSelectedEntity(entity);
+                            engine->GetScene()->SetSelectedEntity(selectedEntity);
                         }
                     }
                 }

@@ -11,6 +11,7 @@ public:
 	std::optional<DirectionalLightData> directionalLight;
 	unsigned int viewportWidth;
 	unsigned int viewportHeight;
+	Scene* scene;
 
 	bool IsValid()
 	{

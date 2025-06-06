@@ -11,6 +11,7 @@
 #include "Renderer/Passes/GeometryPass.h"
 #include "Renderer/Passes/SSAOPass.h"
 #include "Renderer/Passes/SSRPass.h"
+#include "Renderer/Passes/OutlinePass.h"
 
 class RenderPipeline
 {
@@ -24,13 +25,13 @@ public:
 
 private:
 	bool isInitialized = false;
-
 	//Render Passes
 	std::vector<RenderPass*> renderPasses;
 	GeometryPass geometryPass;
 	ShadowPass shadowPass;
 	SkyboxPass skyboxPass;
 	LightingPass lightingPass;
+	OutlinePass outlinePass;
 	BrightPass brightPass;
 	BloomPass bloomPass;
 	SSAOPass ssaoPass;
