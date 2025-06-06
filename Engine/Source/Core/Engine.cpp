@@ -16,7 +16,7 @@ Engine::Engine()
 	m_Renderer = std::make_unique<Renderer>();
 	m_Scene = std::make_unique<Scene>();
 	m_ProjectManager = std::make_unique<ProjectManager>();
-	m_ProjectManager->LoadProject("D:\\Github\\RvelaEngine\\TestProject\\TestProject.rproj");
+	m_ProjectManager->LoadProject("C:\\RvelaEngine\\TestProject\\TestProject.rproj");
 	m_SceneManager = std::make_unique<SceneManager>();
 	editorCamera = nullptr;
 
@@ -100,8 +100,9 @@ void Engine::Run()
 		Render();
 
 		EventManager::ClearEvents();
+		Input::Update();
 
-		glfwSwapBuffers(GetWindow()->GetGLFWWindow());
+		
 	}
 	LOG_INFO << "Engine has stopped!";
 }
@@ -150,6 +151,8 @@ void Engine::Render()
 		layer->OnRender();
 
 	Renderer::EndFrame();
+
+	glfwSwapBuffers(GetWindow()->GetGLFWWindow());
 }
 
 

@@ -1,0 +1,19 @@
+{
+                "Entities": [
+                                {
+                                                "MaterialComponent": "{\n    \"materialPath\": \"C:\\\\RvelaEngine\\\\TestProject\\\\Assets/Materials/DefaultMaterial.rmaterial\"\n}",
+                                                "MeshComponent": "{\n    \"meshIndex\": 0,\n    \"modelPath\": \"Assets\\\\Models\\\\Primitives\\\\Cube.fbx\"\n}",
+                                                "SceneTreeComponent": "{\n    \"childrenUUIDs\": [],\n    \"parentUUID\": 0\n}",
+                                                "TagComponent": "{\n    \"tag\": \"Cube\"\n}",
+                                                "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        0.0,\n        0.0,\n        0.0\n    ],\n    \"rotation\": [\n        0.0,\n        0.0,\n        0.0\n    ],\n    \"scale\": [\n        1.0,\n        1.0,\n        1.0\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
+                                                "UUID": 1
+                                },
+                                {
+                                                "DirectionalLightComponent": "{\n    \"castShadows\": true,\n    \"color\": [\n        1.0,\n        1.0,\n        1.0\n    ],\n    \"intensity\": 5.0\n}",
+                                                "SceneTreeComponent": "{\n    \"childrenUUIDs\": [],\n    \"parentUUID\": 0\n}",
+                                                "TagComponent": "{\n    \"tag\": \"DirectionalLight\"\n}",
+                                                "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        0.0,\n        0.0,\n        0.0\n    ],\n    \"rotation\": [\n        130.27764892578125,\n        -0.0,\n        0.0\n    ],\n    \"scale\": [\n        1.0,\n        0.9999299049377441,\n        0.9999299049377441\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
+                                                "UUID": 2
+                                }
+                ]
+}

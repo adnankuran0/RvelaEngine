@@ -23,6 +23,8 @@ void RenderPipeline::EnsureInitialized()
 		for (auto* pass : renderPasses)
 			pass->Init();
 
+
+
 		isInitialized = true;
 	}
 }
@@ -45,6 +47,10 @@ void RenderPipeline::Execute()
 {
 	geometryPass.Execute();
 
+	ssaoPass.SetDepthTexture(geometryPass.GetDepthTexure());
+	ssaoPass.SetNormalTexture(geometryPass.GetNormalTexure());
+	ssaoPass.Execute();
+
 	shadowPass.Execute();
 
 	skyboxPass.screenFBO = lightingPass.GetScreenFBO();
@@ -55,9 +61,7 @@ void RenderPipeline::Execute()
 	lightingPass.SetLightSpaceMatrix(shadowPass.GetLightSpaceMatrix());
 	lightingPass.Execute();
 
-	ssaoPass.SetDepthTexture(geometryPass.GetDepthTexure());
-	ssaoPass.SetNormalTexture(geometryPass.GetNormalTexure());
-	ssaoPass.Execute();
+
 
 	brightPass.SetScreenTexture(lightingPass.GetScreenTexture());
 	brightPass.Execute();

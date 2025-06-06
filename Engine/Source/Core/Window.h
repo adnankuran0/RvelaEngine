@@ -19,7 +19,7 @@ struct WindowData
 	std::string title;
 	WindowSize size;
 
-	WindowData() noexcept : title("Rvela Engine"), size(1280,720) {}
+	WindowData() noexcept : title("Rvela Engine"), size(1920,1080) {}
 	WindowData(const std::string& title, int width, int height) noexcept : title(title), size(width,height) {}
 };
 

@@ -80,7 +80,7 @@ Entity Scene::LoadAsset(const std::string& path) {
             m.indices.size() * sizeof(unsigned int), 
             m.indices.size(),
             m.localAABB);
-        root.AddComponent<MeshComponent>(TO_ABSOLUTE_PATH(path), m.meshIndex);
+        root.AddComponent<MeshComponent>(TO_ABSOLUTE_PATH(path), m.meshIndex,m);
         root.GetComponent<TagComponent>().tag = m.name;
         root.AddComponent<MaterialComponent>(m.materialPath);
     }
@@ -95,7 +95,7 @@ Entity Scene::LoadAsset(const std::string& path) {
                 m.indices.size() * sizeof(unsigned int), 
                 m.indices.size(),
                 m.localAABB);
-            child.AddComponent<MeshComponent>(TO_ABSOLUTE_PATH(path), m.meshIndex);
+            child.AddComponent<MeshComponent>(TO_ABSOLUTE_PATH(path), m.meshIndex,m);
             child.GetComponent<TagComponent>().tag = m.name;
             child.AddComponent<MaterialComponent>(m.materialPath);
         }
@@ -119,7 +119,7 @@ Entity Scene::LoadPrimitive(const std::string& primitiveMeshName) {
     Entity root = CreateEntity(cfg.name);
     auto m = AssetManager::LoadMesh(cfg.meshPath, 0);
     root.AddComponent<MeshRendererComponent>(m.vertices.data(), m.vertices.size() * sizeof(float), m.indices.data(), m.indices.size() * sizeof(unsigned int), m.indices.size(),m.localAABB);
-    root.AddComponent<MeshComponent>(cfg.meshPath, m.meshIndex);
+    root.AddComponent<MeshComponent>(cfg.meshPath, m.meshIndex,m);
     root.GetComponent<TagComponent>().tag = m.name;
     root.AddComponent<MaterialComponent>(m.materialPath);
     return root;

@@ -5,17 +5,7 @@
 #include <Scene/BoundingBox.h>
 
 namespace fs = std::filesystem;
-struct MeshData
-{
-	std::vector<float> vertices;
-	std::vector<unsigned int> indices;
-	unsigned int indexCount;
-	std::string name;
-	Path materialPath;
-	uint16_t meshIndex;
-	BoundingBox localAABB;
 
-};
 
 class AssetManager
 {

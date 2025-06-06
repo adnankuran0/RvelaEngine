@@ -87,7 +87,6 @@ vec2 parallaxMapping(vec2 texCoords, vec3 viewDir) {
 vec3 getNormalFromMap() {
     if (!useNormalMap) return normalize(Normal);
     vec3 tangentNormal = texture(normalMap, TexCoords).xyz * 2.0 - 1.0;
-    tangentNormal.y = -tangentNormal.y;
     tangentNormal.xy *= normalScale; 
     tangentNormal = normalize(tangentNormal);
 
