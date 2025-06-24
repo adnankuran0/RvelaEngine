@@ -1,6 +1,6 @@
 #pragma once
-#include "../Renderer/Camera.h"
-#include"../Scene/Scene.h"
+#include "Renderer/Camera.h"
+#include "Scene/Scene.h"
 
 struct RenderContext
 {

@@ -24,15 +24,8 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
             }
         }
 
-        if (registry.any_of<UUIDComponent>(selectedEntity)) {
-            if (ImGui::CollapsingHeader("UUID")) {
-                auto& uuid = registry.get<UUIDComponent>(selectedEntity);
-                ImGui::Text("UUID: %s", std::to_string(uuid.uuid).c_str());
-            }
-        }
-
         if (registry.any_of<TransformComponent>(selectedEntity)) {
-            if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
+            if (ImGui::CollapsingHeader("Transform")) {
                 auto& transform = registry.get<TransformComponent>(selectedEntity);
 
 
@@ -73,17 +66,16 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
 
         if (registry.any_of<MeshComponent>(selectedEntity))
         {
-            if (ImGui::CollapsingHeader("Mesh", ImGuiTreeNodeFlags_DefaultOpen))
+            if (ImGui::CollapsingHeader("Mesh"))
             {
                 auto& meshComponent = registry.get<MeshComponent>(selectedEntity);
-                ImGui::Text("Model Path: %s", meshComponent.modelPath.GetAbsoluteStr().c_str());
                 ImGui::Text("Mesh Index: %s", std::to_string(meshComponent.meshIndex));
             }
         }
 
         if (registry.any_of<PointLightComponent>(selectedEntity))
         {
-            if (ImGui::CollapsingHeader("PointLight", ImGuiTreeNodeFlags_DefaultOpen))
+            if (ImGui::CollapsingHeader("PointLight"))
             {
                 auto& pointLightComponent = registry.get<PointLightComponent>(selectedEntity);
                 glm::vec3 lightColor = pointLightComponent.color;
@@ -108,7 +100,7 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
 
         if (registry.any_of<DirectionalLightComponent>(selectedEntity))
         {
-            if (ImGui::CollapsingHeader("DirectionalLight", ImGuiTreeNodeFlags_DefaultOpen))
+            if (ImGui::CollapsingHeader("DirectionalLight"))
             {
                 auto& directionalLightComponent = registry.get<DirectionalLightComponent>(selectedEntity);
                 glm::vec3 lightColor = directionalLightComponent.color;
@@ -128,35 +120,192 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
         }
 
         if (registry.any_of<MaterialComponent>(selectedEntity)) {
-            if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_DefaultOpen)) {
+            if (ImGui::CollapsingHeader("Material")) {
+                
                 MaterialComponent& materialComponent = registry.get<MaterialComponent>(selectedEntity);
                 const ISerializable* materialSerializable = std::static_pointer_cast<const ISerializable>(materialComponent.material).get();
 
-                ImGui::Text("Material Path: %s", materialComponent.GetMaterialPath().GetAbsoluteStr().c_str());
-
-                glm::vec3 albedoColor = materialComponent.material->albedoColor;
-                float color[3] = { albedoColor.r, albedoColor.g, albedoColor.b };
-
-                if (ImGui::ColorPicker3("Albedo", color)) {
-                    materialComponent.material->albedoColor = glm::vec3(color[0], color[1], color[2]);
-
-                    //Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath().GetAbsoluteStr());
+                ImGui::Button("Material Slot", ImVec2(200, 20));
+                if (ImGui::BeginDragDropTarget())
+                {
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
+                    {
+                        const char* path = (const char*)payload->Data;
+                        std::string pathStr(path);
+                        if (pathStr.ends_with(".rmaterial"))
+                        {
+                            // .rmaterial dosyası bırakıldı, işle
+                            // Örneğin: materialComponent->LoadFromFile(pathStr);
+                            materialComponent.SetMaterialPath(ABS_PATH(pathStr));
+                        }
+                    }
+                    ImGui::EndDragDropTarget();
                 }
 
-                if (ImGui::SliderFloat("AO", &materialComponent.material->ao, 0.0f, 1.0f)) {
-                    //Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath().GetAbsoluteStr());
+                
+
+               
+                if (ImGui::CollapsingHeader("Albedo")) {
+                    glm::vec3 albedoColor = materialComponent.material->albedoColor;
+                    float color[3] = { albedoColor.r, albedoColor.g, albedoColor.b };
+
+                    ImGui::Button("Albedo Slot", ImVec2(200, 20));
+                    if (ImGui::BeginDragDropTarget())
+                    {
+                        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
+                        {
+                            const char* path = (const char*)payload->Data;
+                            std::string pathStr(path);
+                            if (pathStr.ends_with(".png") || pathStr.ends_with(".jpeg") || pathStr.ends_with(".jpg") || pathStr.ends_with(".tga"))
+                            {
+                                // .rmaterial dosyası bırakıldı, işle
+                                // Örneğin: materialComponent->LoadFromFile(pathStr);
+                                materialComponent.material->albedoMapPath = ABS_PATH(pathStr);
+                            }
+                        }
+                        ImGui::EndDragDropTarget();
+                    }
+                    ImGui::SameLine();
+                    if ( ImGui::Button("X##alb", ImVec2(20, 20)) )
+                    {
+                        materialComponent.material->albedoMapPath = ABS_PATH("");
+                    }
+                   
+
+                    if (ImGui::ColorPicker3("Albedo", color)) {
+                        materialComponent.material->albedoColor = glm::vec3(color[0], color[1], color[2]);
+
+                        //Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath().GetAbsoluteStr());
+                    }
+                }
+                if (ImGui::CollapsingHeader("Normal"))
+                {
+                    ImGui::Button("Normal Slot", ImVec2(200, 20));
+                    if (ImGui::BeginDragDropTarget())
+                    {
+                        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
+                        {
+                            const char* path = (const char*)payload->Data;
+                            std::string pathStr(path);
+                            if (pathStr.ends_with(".png") || pathStr.ends_with(".jpeg") || pathStr.ends_with(".jpg") || pathStr.ends_with(".tga"))
+                            {
+                                // .rmaterial dosyası bırakıldı, işle
+                                // Örneğin: materialComponent->LoadFromFile(pathStr);
+                                materialComponent.material->normalMapPath = ABS_PATH(pathStr);
+                            }
+                        }
+                        ImGui::EndDragDropTarget();
+
+                        
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button("X##nrm", ImVec2(20, 20)))
+                    {
+                        materialComponent.material->normalMapPath = ABS_PATH("");
+                    }
+                    if (ImGui::SliderFloat("Normal Scale", &materialComponent.material->normalScale, -10.0f, 10.0f)) {
+                        //Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath().GetAbsoluteStr());
+                    }
+                }
+                
+                if (ImGui::CollapsingHeader("Roughness##31"))
+                {
+                    ImGui::Button("Rougness Slot", ImVec2(200, 20));
+                    if (ImGui::BeginDragDropTarget())
+                    {
+                        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
+                        {
+                            const char* path = (const char*)payload->Data;
+                            std::string pathStr(path);
+                            if (pathStr.ends_with(".png") || pathStr.ends_with(".jpeg") || pathStr.ends_with(".jpg") || pathStr.ends_with(".tga"))
+                            {
+                                // .rmaterial dosyası bırakıldı, işle
+                                // Örneğin: materialComponent->LoadFromFile(pathStr);
+                                materialComponent.material->roughnessMapPath = ABS_PATH(pathStr);
+                            }
+                        }
+                        ImGui::EndDragDropTarget();
+
+                        
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button("X##rgh", ImVec2(20, 20)))
+                    {
+                        materialComponent.material->roughnessMapPath = ABS_PATH("");
+                    }
+                    if (ImGui::SliderFloat("Roughness##32", &materialComponent.material->roughness, 0.0f, 1.0f)) {
+                        //Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath().GetAbsoluteStr());
+                    }
                 }
 
-                if (ImGui::SliderFloat("Metallic", &materialComponent.material->metallic, 0.0f, 1.0f)) {
-                    //Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath().GetAbsoluteStr());
+                if (ImGui::CollapsingHeader("Metallic##33"))
+                {
+                    ImGui::Button("Metallic Slot", ImVec2(200, 20));
+                    if (ImGui::BeginDragDropTarget())
+                    {
+                        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
+                        {
+                            const char* path = (const char*)payload->Data;
+                            std::string pathStr(path);
+                            if (pathStr.ends_with(".png") || pathStr.ends_with(".jpeg") || pathStr.ends_with(".jpg") || pathStr.ends_with(".tga"))
+                            {
+                                // .rmaterial dosyası bırakıldı, işle
+                                // Örneğin: materialComponent->LoadFromFile(pathStr);
+                                materialComponent.material->metallicMapPath = ABS_PATH(pathStr);
+                            }
+                        }
+                        ImGui::EndDragDropTarget();
+
+                        
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button("X##mtl", ImVec2(20, 20)))
+                    {
+                        materialComponent.material->metallicMapPath = ABS_PATH("");
+                    }
+                    if (ImGui::SliderFloat("Metallic##34", &materialComponent.material->metallic, 0.0f, 1.0f)) {
+                        //Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath().GetAbsoluteStr());
+                    }
                 }
 
-                if (ImGui::SliderFloat("Roughness", &materialComponent.material->roughness, 0.0f, 1.0f)) {
-                    //Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath().GetAbsoluteStr());
+                if (ImGui::CollapsingHeader("AO##35"))
+                {
+                    ImGui::Button("AO Slot", ImVec2(200, 20));
+                    if (ImGui::BeginDragDropTarget())
+                    {
+                        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
+                        {
+                            const char* path = (const char*)payload->Data;
+                            std::string pathStr(path);
+                            if (pathStr.ends_with(".png") || pathStr.ends_with(".jpeg") || pathStr.ends_with(".jpg") || pathStr.ends_with(".tga"))
+                            {
+                                // .rmaterial dosyası bırakıldı, işle
+                                // Örneğin: materialComponent->LoadFromFile(pathStr);
+                                //
+                                materialComponent.material->aoMapPath = ABS_PATH(pathStr);
+                            }
+                        }
+                        ImGui::EndDragDropTarget();
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button("X##ao", ImVec2(20, 20)))
+                    {
+                        materialComponent.material->aoMapPath = ABS_PATH("");
+                    }
+                    if (ImGui::SliderFloat("AO##36", &materialComponent.material->ao, 0.0f, 1.0f)) {
+                        //Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath().GetAbsoluteStr());
+                    }
                 }
 
-                if (ImGui::SliderFloat("Normal Scale", &materialComponent.material->normalScale, 0.0f, 10.0f)) {
-                    //Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath().GetAbsoluteStr());
+
+                glm::vec2 uvOffset = materialComponent.material->UVOffset;
+                glm::vec2 uvScale = materialComponent.material->UVScale;
+
+                if (ImGui::DragFloat2("UV Offset", &uvOffset[0], 0.05f)) {
+                    materialComponent.material->UVOffset = uvOffset;
+                }
+                if (ImGui::DragFloat2("UV Scale", &uvScale[0], 0.05f)) {
+                    materialComponent.material->UVScale = uvScale;
                 }
 
             }
@@ -166,7 +315,7 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
         {
             auto& selectedNode = registry.get<SceneTreeComponent>(selectedEntity);
 
-            if (ImGui::CollapsingHeader("Hierarchy", ImGuiTreeNodeFlags_DefaultOpen))
+            if (ImGui::CollapsingHeader("Hierarchy"))
             {
                 std::string parentName;
                 if (selectedNode.parent == entt::null)
@@ -199,14 +348,6 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                         });
 
                     ImGui::EndCombo();
-                }
-
-                auto& uuid = selectedNode.parentUUID;
-                ImGui::Text("Parent UUID: %s", std::to_string(uuid).c_str());
-                ImGui::Text("Children UUIDs:");
-                for (const auto& childUUID : selectedNode.childrenUUIDs)
-                {
-                    ImGui::Text("- %s", std::to_string(childUUID).c_str());
                 }
             }
         }

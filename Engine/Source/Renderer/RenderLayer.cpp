@@ -46,8 +46,5 @@ void RenderLayer::CollectRenderCommands(Scene* scene, const std::function<void(c
 				false);
 			submitCallback(cmd);
 		}
-		
-
-		
 	}
 }

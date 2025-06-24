@@ -1,0 +1,16 @@
+#pragma once
+#include "Scene/Components.h"
+#include "assimp/scene.h"
+
+namespace fs = std::filesystem;
+
+
+class AssetManager
+{
+public:
+	static std::vector<MeshData> LoadModel(const Path path);
+	static MeshData LoadMesh(const Path modelPath, uint32_t meshIndex);
+private:
+	static void LoadMaterials(const aiScene* scene, std::unordered_map<unsigned int, std::string>& materials, const Path modelPath);
+	static fs::path FindTexturePath(const Path modelPath, const aiString& texPath);
+};

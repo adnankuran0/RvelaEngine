@@ -1,14 +1,14 @@
 ﻿#include "rvelapch.h"
 #include "Scene.h"
 #include "Entity.h"
-#include "../Core/Time.h"
-#include "RvelaLog.h"
-#include "../Core/Utils/AssetManager.h"
-#include "../Core/Utils/Serializer.h"
-#include "../Core/Utils/MaterialManager.h"
-#include "../Core/Utils/ProjectManager.h"
+#include "Core/Time.h"
+#include "Core/Log.h"
+#include "Utils/AssetManager.h"
+#include "Utils/Serializer.h"
+#include "Utils/MaterialManager.h"
+#include "Utils/ProjectManager.h"
 #include "UUIDGenerator.h"
-#include <glm/gtx/matrix_decompose.hpp>
+
 
 Scene::Scene() : m_Registry() {}
 
@@ -70,7 +70,7 @@ Entity Scene::CreateDirectionalLight() {
 
 Entity Scene::LoadAsset(const std::string& path) {
     Entity root = CreateEntity("Model");
-    std::vector<MeshData> meshes = AssetManager::LoadModel(TO_ABSOLUTE_PATH(path));
+    std::vector<MeshData> meshes = AssetManager::LoadModel(VRT_PATH(path));
     if (meshes.size() == 1) {
         auto& m = meshes.back();
         root.AddComponent<MeshRendererComponent>(
@@ -80,7 +80,7 @@ Entity Scene::LoadAsset(const std::string& path) {
             m.indices.size() * sizeof(unsigned int), 
             m.indices.size(),
             m.localAABB);
-        root.AddComponent<MeshComponent>(TO_ABSOLUTE_PATH(path), m.meshIndex,m);
+        root.AddComponent<MeshComponent>(VRT_PATH(path), m.meshIndex,m);
         root.GetComponent<TagComponent>().tag = m.name;
         root.AddComponent<MaterialComponent>(m.materialPath);
     }
@@ -95,7 +95,7 @@ Entity Scene::LoadAsset(const std::string& path) {
                 m.indices.size() * sizeof(unsigned int), 
                 m.indices.size(),
                 m.localAABB);
-            child.AddComponent<MeshComponent>(TO_ABSOLUTE_PATH(path), m.meshIndex,m);
+            child.AddComponent<MeshComponent>(VRT_PATH(path), m.meshIndex,m);
             child.GetComponent<TagComponent>().tag = m.name;
             child.AddComponent<MaterialComponent>(m.materialPath);
         }
@@ -106,12 +106,12 @@ Entity Scene::LoadAsset(const std::string& path) {
 struct PrimitiveConfig { std::string name; Path meshPath; };
 Entity Scene::LoadPrimitive(const std::string& primitiveMeshName) {
     static const std::unordered_map<std::string, PrimitiveConfig> map = {
-        {"Cube", {"Cube", TO_ABSOLUTE_PATH("Assets\\Models\\Primitives\\Cube.fbx")}},
-        {"Sphere", {"Sphere", TO_ABSOLUTE_PATH("Assets\\Models\\Primitives\\Sphere.fbx")}},
-        {"Cylinder", {"Cylinder", TO_ABSOLUTE_PATH("Assets\\Models\\Primitives\\Cylinder.fbx")}},
-        {"Cone", {"Cone", TO_ABSOLUTE_PATH("Assets\\Models\\Primitives\\Cone.fbx")}},
-        {"Capsule", {"Capsule", TO_ABSOLUTE_PATH("Assets\\Models\\Primitives\\Capsule.fbx")}},
-        {"Torus", {"Torus", TO_ABSOLUTE_PATH("Assets\\Models\\Primitives\\Torus.fbx")}}
+        {"Cube", {"Cube", VRT_PATH("Assets\\Models\\Primitives\\Cube.fbx")}},
+        {"Sphere", {"Sphere", VRT_PATH("Assets\\Models\\Primitives\\Sphere.fbx")}},
+        {"Cylinder", {"Cylinder", VRT_PATH("Assets\\Models\\Primitives\\Cylinder.fbx")}},
+        {"Cone", {"Cone", VRT_PATH("Assets\\Models\\Primitives\\Cone.fbx")}},
+        {"Capsule", {"Capsule", VRT_PATH("Assets\\Models\\Primitives\\Capsule.fbx")}},
+        {"Torus", {"Torus", VRT_PATH("Assets\\Models\\Primitives\\Torus.fbx")}}
     };
     auto it = map.find(primitiveMeshName);
     if (it == map.end()) return Entity{};

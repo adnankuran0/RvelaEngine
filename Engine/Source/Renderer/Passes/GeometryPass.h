@@ -1,7 +1,7 @@
 #pragma once
-#include "../RenderPass.h"
-#include "../Renderer.h"
-#include "../../Core/Utils/TextureManager.h"
+#include "Renderer/RenderPass.h"
+#include "Renderer/Renderer.h"
+#include "Utils/TextureManager.h"
 
 class GeometryPass : public RenderPass
 {

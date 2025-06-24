@@ -2,8 +2,11 @@
 #include "ImGui/imgui.h"
 #include <ImGui/tinyfiledialogs.h>
 
+
+
 void SceneHierarchyPanel::Draw(Scene* scene,entt::entity& selectedEntity)
 {
+
 
     entt::registry& registry = scene->GetRegistry();
     ImGui::Begin("Scene Hierarchy", nullptr, ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse);

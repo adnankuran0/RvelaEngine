@@ -3,8 +3,8 @@
 #include <entt/entt.h>
 
 #include "Components.h"
-#include "Core/RvelaMath.h"
-#include "Core/Utils/ISerializable.h"
+#include "Math/RvelaMath.h"
+#include "Utils/ISerializable.h"
 #include "Renderer/Renderer.h"
 
 

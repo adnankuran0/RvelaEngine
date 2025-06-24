@@ -1,8 +1,8 @@
 #include "rvelapch.h"
 #include "Material.h"
-#include "../nlohmann/json.hpp"
-#include "Core/Utils/TextureManager.h"
-#include "RvelaLog.h"
+#include "json.hpp"
+#include "Utils/TextureManager.h"
+#include "Core/Log.h"
 
 using json = nlohmann::json;
 
@@ -50,12 +50,12 @@ void Material::Deserialize(const std::string& jsonStr)
     auto uvOffset = j["UVOffset"];
     UVOffset = glm::vec2(uvOffset[0], uvOffset[1]);
 
-    albedoMapPath = TO_ABSOLUTE_PATH(j["albedoMapPath"]);
-    normalMapPath = TO_ABSOLUTE_PATH(j["normalMapPath"]);
-    metallicMapPath = TO_ABSOLUTE_PATH(j["metallicMapPath"]);
-    roughnessMapPath = TO_ABSOLUTE_PATH(j["roughnessMapPath"]);
-    aoMapPath = TO_ABSOLUTE_PATH(j["aoMapPath"]);
-    heightMapPath = TO_ABSOLUTE_PATH(j["heightMapPath"]);
+    albedoMapPath = VRT_PATH(j["albedoMapPath"]);
+    normalMapPath = VRT_PATH(j["normalMapPath"]);
+    metallicMapPath = VRT_PATH(j["metallicMapPath"]);
+    roughnessMapPath = VRT_PATH(j["roughnessMapPath"]);
+    aoMapPath = VRT_PATH(j["aoMapPath"]);
+    heightMapPath = VRT_PATH(j["heightMapPath"]);
 }
 
 std::string MaterialData::Serialize() const
@@ -95,12 +95,12 @@ void MaterialData::Deserialize(const std::string& jsonStr)
     auto uvOffset = j["UVOffset"];
     UVOffset = glm::vec2(uvOffset[0], uvOffset[1]);
 
-    albedoMapPath = TO_ABSOLUTE_PATH(j["albedoMapPath"]);
-    normalMapPath = TO_ABSOLUTE_PATH(j["normalMapPath"]);
-    metallicMapPath = TO_ABSOLUTE_PATH(j["metallicMapPath"]);
-    roughnessMapPath = TO_ABSOLUTE_PATH(j["roughnessMapPath"]);
-    aoMapPath = TO_ABSOLUTE_PATH(j["aoMapPath"]);
-    heightMapPath = TO_ABSOLUTE_PATH(j["heightMapPath"]);
+    albedoMapPath = VRT_PATH(j["albedoMapPath"]);
+    normalMapPath = VRT_PATH(j["normalMapPath"]);
+    metallicMapPath = VRT_PATH(j["metallicMapPath"]);
+    roughnessMapPath = VRT_PATH(j["roughnessMapPath"]);
+    aoMapPath = VRT_PATH(j["aoMapPath"]);
+    heightMapPath = VRT_PATH(j["heightMapPath"]);
 }
 
 void Material::LoadTextures()

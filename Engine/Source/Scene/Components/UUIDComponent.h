@@ -25,7 +25,6 @@ public:
         json j = json::parse(jsonStr);
         auto UUIDData = j["UUID"];
         uuid = UUIDData;
-
     }
 
 };

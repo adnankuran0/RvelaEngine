@@ -2,17 +2,14 @@
 #include "Window.h"
 #include "Input/Input.h"
 #include "Event/EventManager.h"
-#include "../Renderer/Renderer.h"
 #include "Time.h"
-#include "../Scene/Scene.h"
-#include "../Scene/Components.h"
-#include "../Scene/SceneManager.h"
-#include "Core/Utils/ProjectManager.h"
-#include "Core/Utils/MaterialManager.h"
-#include "Core/Utils/TextureManager.h"
+#include "Scene/Scene.h"
+#include "Scene/Components.h"
+#include "Scene/SceneManager.h"
+#include "Scene/Entity.h"
+#include "Utils/ProjectManager.h"
 #include "LayerStack.h"
-#include <Renderer/RenderPipeline.h>
-#include "EditorConxtext.h"
+#include "Renderer/Renderer.h"
 
 class Engine
 {
@@ -35,9 +32,8 @@ public:
 	inline Scene* GetScene() const noexcept { return m_Scene.get(); }
 	inline ProjectManager* GetProjectManager() const noexcept { return m_ProjectManager.get(); }
 	inline SceneManager* GetSceneManager() const noexcept { return m_SceneManager.get(); }
-	inline EditorCamera* GetCamera() const noexcept { return editorCamera; }
-	inline unsigned int GetFinalTexture() { return EditorContext::GetFinalTexture(); }
 
+	inline EditorCamera* GetCamera() const noexcept { return editorCamera; }
 	inline void SetEditorCamera(EditorCamera* editorCam) { editorCamera = editorCam; }
 private:
 	LayerStack m_LayerStack;

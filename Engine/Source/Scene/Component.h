@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/Utils/ISerializable.h"
+#include "Utils/ISerializable.h"
 
 class Component : public ISerializable
 {

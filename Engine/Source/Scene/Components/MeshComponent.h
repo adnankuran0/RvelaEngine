@@ -1,7 +1,7 @@
 #pragma once
 #include "Scene/Component.h"
-#include "Core/Utils/FileUtils.h"
-#include "../nlohmann/json.hpp"
+#include "Utils/FileUtils.h"
+#include "nlohmann/json.hpp"
 
 
 struct MeshData
@@ -69,7 +69,7 @@ struct MeshComponent : public Component {
     void Deserialize(const std::string& str) override {
         json j = json::parse(str);
         std::string modelPathData = j["modelPath"];
-        modelPath = TO_ABSOLUTE_PATH(modelPathData);
+        modelPath = VRT_PATH(modelPathData);
         meshIndex = j["meshIndex"];
     }
 };

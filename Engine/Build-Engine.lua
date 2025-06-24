@@ -13,6 +13,7 @@ project "Engine"
    includedirs
    {
       "Source",
+      "../Vendor",
       "../Vendor/GLFW/include",
       "../Vendor/GLEW/include",
       "../Vendor/glm",

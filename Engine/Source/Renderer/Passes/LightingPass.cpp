@@ -1,8 +1,8 @@
 ﻿#include "rvelapch.h"
 #include "LightingPass.h"
-#include "Core/Utils/TextureManager.h"
-#include "Core/Utils/MaterialManager.h"
-#include "../../RvelaLog.h"
+#include "Utils/TextureManager.h"
+#include "Utils/MaterialManager.h"
+#include "Core/Log.h"
 
 void LightingPass::Init()
 {

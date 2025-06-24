@@ -7,7 +7,7 @@
 #include "Shader.h"
 #include "EditorCamera.h"
 #include "GLFW/glfw3.h"
-#include "../Core/Time.h"
+#include "Core/Time.h"
 #include "Scene/Components.h"
 #include "Skybox.h"
 #include "ScreenQuad.h"

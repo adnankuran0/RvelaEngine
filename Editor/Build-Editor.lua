@@ -5,19 +5,22 @@ project "Editor"
    targetdir "Binaries/%{cfg.buildcfg}"
    staticruntime "off"
 
-   files { "Source/**.h", "Source/**.cpp","Vendor/ImGui/*.cpp","Vendor/ImGui/*.c" }
+   files { "Source/**.h", "Source/**.cpp","../Vendor/ImGui/*.cpp","../Vendor/ImGui/*.c" }
 
    includedirs
    {
       "Source",
-      "Vendor",
       "../Vendor/GLFW/include",
       "../Vendor/GLEW/include",
 	  -- Include Core
 	  "../Engine/Source",
       "../Vendor/entt",
+      "../Vendor",
       "../Vendor/tiny_obj_loader",
-      "../Vendor/glm"
+      "../Vendor/glm",
+      "../Vendor/Assimp/include",
+      "../Vendor/ImGui",
+      "../Vendor/nlohmann"
    }
 
    libdirs

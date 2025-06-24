@@ -1,7 +1,5 @@
 #include "rvelapch.h"
 #include "SSAOPass.h"
-#include <random>
-#include <array>
 
 // Pre-declare constants
 namespace {

@@ -1,11 +1,9 @@
 ﻿#include "rvelapch.h"
 #include "SceneManager.h"
-#include <fstream>
-#include "../nlohmann/json.hpp"
-#include "Core/Utils/AssetManager.h"
+#include "json.hpp"
+#include "Utils/AssetManager.h"
 #include "UUIDGenerator.h"  
-#include <future>
-#include "../RvelaLog.h"
+#include "Core/Log.h"
 
 using json = nlohmann::json;
 
@@ -101,7 +99,7 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
             std::string serializedMat = entityJson["MaterialComponent"];
             json j = json::parse(serializedMat);
             std::string newMaterialPathData = j["materialPath"];
-            Path newMaterialPath = TO_ABSOLUTE_PATH(newMaterialPathData);
+            Path newMaterialPath = VRT_PATH(newMaterialPathData);
 
             scene.AddComponent<MaterialComponent>(entity, newMaterialPath);
             auto& mat = scene.GetComponent<MaterialComponent>(entity);
@@ -117,11 +115,11 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
 
             auto meshStart = std::chrono::high_resolution_clock::now();
                 
-            MeshData meshData = AssetManager::LoadMesh(TO_ABSOLUTE_PATH(newModelPath), meshIndex);
+            MeshData meshData = AssetManager::LoadMesh(VRT_PATH(newModelPath), meshIndex);
             auto meshEnd = std::chrono::high_resolution_clock::now();
             meshLoadTotal += std::chrono::duration_cast<std::chrono::milliseconds>(meshEnd - meshStart);
 
-            scene.AddComponent<MeshComponent>(entity, TO_ABSOLUTE_PATH(newModelPath), meshIndex, meshData);
+            scene.AddComponent<MeshComponent>(entity, VRT_PATH(newModelPath), meshIndex, meshData);
             scene.AddComponent<MeshRendererComponent>(entity, meshData.vertices.data(),
                 meshData.vertices.size() * sizeof(float),
                 meshData.indices.data(),

@@ -3,8 +3,8 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "../Core/Input/Input.h"
-#include "../Core/Time.h"
+#include "Input/Input.h"
+#include "Core/Time.h"
 #include "Camera.h"
 #include "Frustum.h"
 

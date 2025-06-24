@@ -1,8 +1,6 @@
 #pragma once
 
 #include "GLFW/glfw3.h"
-#include <thread>
-#include <chrono>
 
 class Time {
 private:

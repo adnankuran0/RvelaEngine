@@ -1,10 +1,7 @@
 ﻿#include "rvelapch.h"
-
-#include "RvelaLog.h"
 #include "Engine.h"
-#include "Scene/Entity.h"
+#include "Core/Log.h"
 #include "Renderer/RenderLayer.h"
-#include "Renderer/Passes/LightingPass.h"
 
 Engine* Engine::s_Instance = nullptr;
 

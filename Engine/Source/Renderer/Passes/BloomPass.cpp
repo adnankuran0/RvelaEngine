@@ -1,6 +1,5 @@
 #include "rvelapch.h"
 #include "BloomPass.h"
-#include <algorithm>
 
 
 

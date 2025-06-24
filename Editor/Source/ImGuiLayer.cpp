@@ -3,7 +3,7 @@
 #include "Scene/Entity.h"
 #define TINYFD_IMPLEMENTATION
 #include "ImGui/tinyfiledialogs.h"
-#include "Core/Utils/Serializer.h"
+#include "Utils/Serializer.h"
 #include "ImGui/ImGuizmo.h"
 #include "MenuBar.h"
 #include "ToolBar.h"
@@ -79,7 +79,7 @@ void ImGuiLayer::Render()
 
     InspectorPanel::Draw(m_Engine->GetScene(), selectedEntity);
 
-    AssetBrowserPanel::Draw();
+    AssetBrowserPanel::Draw(m_Engine,m_Engine->GetProjectManager()->GetProjectPath() / "Assets");
 
     Viewport::Draw(m_Engine,selectedEntity);
 

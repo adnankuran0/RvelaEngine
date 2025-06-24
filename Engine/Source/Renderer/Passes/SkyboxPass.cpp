@@ -4,12 +4,12 @@
 void SkyboxPass::Init()
 {
     std::vector<Path> faces = {
-    TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\right.jpg"),
-    TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\left.jpg"),
-    TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\top.jpg"),
-    TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\bottom.jpg"),
-    TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\front.jpg"),
-    TO_ABSOLUTE_PATH("Assets\\Textures\\skybox\\back.jpg")
+    VRT_PATH("Assets\\Textures\\skybox\\right.jpg"),
+    VRT_PATH("Assets\\Textures\\skybox\\left.jpg"),
+    VRT_PATH("Assets\\Textures\\skybox\\top.jpg"),
+    VRT_PATH("Assets\\Textures\\skybox\\bottom.jpg"),
+    VRT_PATH("Assets\\Textures\\skybox\\front.jpg"),
+    VRT_PATH("Assets\\Textures\\skybox\\back.jpg")
     };
     m_Skybox.Init(faces);
 }

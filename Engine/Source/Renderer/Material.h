@@ -3,7 +3,7 @@
 #include "Shader.h"
 #include "Renderer/Texture.h"
 #include <memory>
-#include "Core/Utils/ISerializable.h"
+#include "Utils/ISerializable.h"
 
 class Material : public ISerializable
 {

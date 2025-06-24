@@ -1,8 +1,8 @@
 #pragma once
 #include "Scene/Component.h"
-#include "Core/Utils/FileUtils.h"
-#include "Core/Utils/MaterialManager.h"
-#include "../nlohmann/json.hpp"
+#include "Utils/FileUtils.h"
+#include "Utils/MaterialManager.h"
+#include "json.hpp"
 
 using json = nlohmann::json;
 
@@ -58,7 +58,7 @@ public:
     {
         json j = json::parse(jsonStr);
         std::string materialPathData = j["materialPath"];
-        materialPath = TO_ABSOLUTE_PATH(materialPathData);
+        materialPath = VRT_PATH(materialPathData);
 
     }
 
