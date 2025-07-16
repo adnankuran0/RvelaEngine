@@ -2169,3 +2169,37 @@
 [INFO ] OpenGL Version: 4.6.0 NVIDIA 576.52
 [INFO ] Engine has started!
 [INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.52
+[INFO ] Engine has started!
+[INFO ] Json loading took 7ms
+[INFO ] Scene loading took 789ms
+[INFO ] Total mesh loading took 329ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.52
+[INFO ] Engine has started!
+[INFO ] Json loading took 5ms
+[INFO ] Scene loading took 1063ms
+[INFO ] Total mesh loading took 519ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.52
+[INFO ] Engine has started!
+[INFO ] Json loading took 4ms
+[INFO ] Scene loading took 799ms
+[INFO ] Total mesh loading took 349ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.52
+[INFO ] Engine has started!
+[INFO ] Json loading took 4ms
+[INFO ] Scene loading took 811ms
+[INFO ] Total mesh loading took 361ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.52
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.52
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!

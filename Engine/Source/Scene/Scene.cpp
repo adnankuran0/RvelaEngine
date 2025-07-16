@@ -153,6 +153,7 @@ void Scene::UpdateNodeRecursive(entt::entity e, const glm::mat4& parentWorld) {
 
     t.SetWorldTransform(translation, rotation, scale);
 
+    //Update AABBs
     if (HasComponent<MeshRendererComponent>(e))
     {
         auto& c = GetComponent<MeshRendererComponent>(e);
@@ -187,9 +188,6 @@ void Scene::UpdateNodeRecursive(entt::entity e, const glm::mat4& parentWorld) {
 
         BoundingBox worldAABB(worldMin, worldMax);
         c.worldAABB = worldAABB;
-
-       
-
     }
 
     auto& node = GetComponent<SceneTreeComponent>(e);

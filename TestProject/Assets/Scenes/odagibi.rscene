@@ -1,0 +1,73 @@
+{
+                "Entities": [
+                                {
+                                                "PointLightComponent": "{\n    \"castShadows\": false,\n    \"color\": [\n        0.8108108043670654,\n        0.5065840482711792,\n        0.32140249013900757\n    ],\n    \"falloff\": 3.7100000381469727,\n    \"intensity\": 100.0,\n    \"radius\": 5.734000205993652\n}",
+                                                "SceneTreeComponent": "{\n    \"childrenUUIDs\": [],\n    \"parentUUID\": 0\n}",
+                                                "TagComponent": "{\n    \"tag\": \"PointLight\"\n}",
+                                                "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        -6.264471530914307,\n        2.1542253494262695,\n        0.0\n    ],\n    \"rotation\": [\n        0.0,\n        -0.0,\n        0.0\n    ],\n    \"scale\": [\n        1.0,\n        1.0,\n        1.0\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
+                                                "UUID": 10
+                                },
+                                {
+                                                "MaterialComponent": "{\n    \"materialPath\": \"C:\\\\RvelaEngine\\\\TestProject\\\\Assets/Materials/DefaultMaterial.rmaterial\"\n}",
+                                                "MeshComponent": "{\n    \"meshIndex\": 0,\n    \"modelPath\": \"Assets\\\\Models\\\\Primitives\\\\Capsule.fbx\"\n}",
+                                                "SceneTreeComponent": "{\n    \"childrenUUIDs\": [],\n    \"parentUUID\": 0\n}",
+                                                "TagComponent": "{\n    \"tag\": \"Sphere.001\"\n}",
+                                                "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        0.0,\n        2.0,\n        0.0\n    ],\n    \"rotation\": [\n        89.99995422363281,\n        -0.0,\n        0.0\n    ],\n    \"scale\": [\n        1.0,\n        0.999998927116394,\n        0.999998927116394\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
+                                                "UUID": 9
+                                },
+                                {
+                                                "PointLightComponent": "{\n    \"castShadows\": false,\n    \"color\": [\n        0.9909909963607788,\n        0.6609019637107849,\n        0.34818604588508606\n    ],\n    \"falloff\": 2.0160000324249268,\n    \"intensity\": 20.0,\n    \"radius\": 9.427000045776367\n}",
+                                                "SceneTreeComponent": "{\n    \"childrenUUIDs\": [],\n    \"parentUUID\": 0\n}",
+                                                "TagComponent": "{\n    \"tag\": \"PointLight\"\n}",
+                                                "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        9.105636596679688,\n        2.1141839027404785,\n        7.894026279449463\n    ],\n    \"rotation\": [\n        0.0,\n        -0.0,\n        0.0\n    ],\n    \"scale\": [\n        1.0,\n        1.0,\n        1.0\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
+                                                "UUID": 7
+                                },
+                                {
+                                                "MaterialComponent": "{\n    \"materialPath\": \"C:\\\\RvelaEngine\\\\TestProject\\\\Assets/Materials/DefaultMaterial.rmaterial\"\n}",
+                                                "MeshComponent": "{\n    \"meshIndex\": 0,\n    \"modelPath\": \"Assets\\\\Models\\\\Primitives\\\\Cube.fbx\"\n}",
+                                                "SceneTreeComponent": "{\n    \"childrenUUIDs\": [],\n    \"parentUUID\": 0\n}",
+                                                "TagComponent": "{\n    \"tag\": \"Cube\"\n}",
+                                                "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        6.0,\n        10.0,\n        6.0\n    ],\n    \"rotation\": [\n        0.0,\n        -0.0,\n        0.0\n    ],\n    \"scale\": [\n        4.0,\n        0.4088937044143677,\n        4.0\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
+                                                "UUID": 6
+                                },
+                                {
+                                                "MaterialComponent": "{\n    \"materialPath\": \"C:\\\\RvelaEngine\\\\TestProject\\\\Assets/Materials/DefaultMaterial.rmaterial\"\n}",
+                                                "MeshComponent": "{\n    \"meshIndex\": 0,\n    \"modelPath\": \"Assets\\\\Models\\\\Primitives\\\\Cube.fbx\"\n}",
+                                                "SceneTreeComponent": "{\n    \"childrenUUIDs\": [],\n    \"parentUUID\": 0\n}",
+                                                "TagComponent": "{\n    \"tag\": \"Cube\"\n}",
+                                                "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        0.0,\n        10.0,\n        10.0\n    ],\n    \"rotation\": [\n        0.0,\n        -0.0,\n        0.0\n    ],\n    \"scale\": [\n        10.0,\n        10.0,\n        0.08034464716911316\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
+                                                "UUID": 5
+                                },
+                                {
+                                                "MaterialComponent": "{\n    \"materialPath\": \"C:\\\\RvelaEngine\\\\TestProject\\\\Assets/Materials/DefaultMaterial.rmaterial\"\n}",
+                                                "MeshComponent": "{\n    \"meshIndex\": 0,\n    \"modelPath\": \"Assets\\\\Models\\\\Primitives\\\\Cube.fbx\"\n}",
+                                                "SceneTreeComponent": "{\n    \"childrenUUIDs\": [],\n    \"parentUUID\": 0\n}",
+                                                "TagComponent": "{\n    \"tag\": \"Cube\"\n}",
+                                                "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        -10.0,\n        10.0,\n        0.0\n    ],\n    \"rotation\": [\n        0.0,\n        -0.0,\n        0.0\n    ],\n    \"scale\": [\n        0.10869063436985016,\n        10.0,\n        10.0\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
+                                                "UUID": 4
+                                },
+                                {
+                                                "MaterialComponent": "{\n    \"materialPath\": \"C:\\\\RvelaEngine\\\\TestProject\\\\Assets/Materials/DefaultMaterial.rmaterial\"\n}",
+                                                "MeshComponent": "{\n    \"meshIndex\": 0,\n    \"modelPath\": \"Assets\\\\Models\\\\Primitives\\\\Cube.fbx\"\n}",
+                                                "SceneTreeComponent": "{\n    \"childrenUUIDs\": [],\n    \"parentUUID\": 0\n}",
+                                                "TagComponent": "{\n    \"tag\": \"Cube\"\n}",
+                                                "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        10.0,\n        10.0,\n        0.0\n    ],\n    \"rotation\": [\n        0.0,\n        -0.0,\n        0.0\n    ],\n    \"scale\": [\n        0.09841667115688324,\n        10.0,\n        10.0\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
+                                                "UUID": 3
+                                },
+                                {
+                                                "DirectionalLightComponent": "{\n    \"castShadows\": true,\n    \"color\": [\n        1.0,\n        1.0,\n        1.0\n    ],\n    \"intensity\": 7.257999897003174\n}",
+                                                "SceneTreeComponent": "{\n    \"childrenUUIDs\": [],\n    \"parentUUID\": 0\n}",
+                                                "TagComponent": "{\n    \"tag\": \"DirectionalLight\"\n}",
+                                                "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        0.0,\n        -0.30437564849853516,\n        0.0\n    ],\n    \"rotation\": [\n        -172.5659942626953,\n        -86.86185455322266,\n        104.9969711303711\n    ],\n    \"scale\": [\n        0.9999998211860657,\n        1.0000016689300537,\n        0.999981701374054\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
+                                                "UUID": 2
+                                },
+                                {
+                                                "MaterialComponent": "{\n    \"materialPath\": \"C:\\\\RvelaEngine\\\\TestProject\\\\Assets/Materials/DefaultMaterial.rmaterial\"\n}",
+                                                "MeshComponent": "{\n    \"meshIndex\": 0,\n    \"modelPath\": \"Assets\\\\Models\\\\Primitives\\\\Cube.fbx\"\n}",
+                                                "SceneTreeComponent": "{\n    \"childrenUUIDs\": [],\n    \"parentUUID\": 0\n}",
+                                                "TagComponent": "{\n    \"tag\": \"Cube\"\n}",
+                                                "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        0.0,\n        0.0,\n        0.0\n    ],\n    \"rotation\": [\n        0.0,\n        -0.0,\n        0.0\n    ],\n    \"scale\": [\n        10.0,\n        0.09989525377750397,\n        10.0\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
+                                                "UUID": 1
+                                }
+                ]
+}
