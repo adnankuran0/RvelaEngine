@@ -55,5 +55,3 @@ std::shared_ptr<Project> ProjectManager::GetActiveProject()
 {
 	return m_ActiveProject;
 }
-
-

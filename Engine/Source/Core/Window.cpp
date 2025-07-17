@@ -6,7 +6,6 @@
 
 Window::Window() noexcept
 {
-	Init();
 }
 
 Window::Window(const std::string& title, int width, int height) noexcept
@@ -17,7 +16,6 @@ Window::Window(const std::string& title, int width, int height) noexcept
 
 Window::~Window()
 {
-	Shutdown();
 }
 
 void Window::SetCallbacks() noexcept

@@ -1,7 +1,7 @@
 #include "rvelapch.h"
 #include "FileUtils.h"
 #include "ProjectManager.h"
-
+#include "Core/Engine.h"
 
 
 Path::Path(const std::filesystem::path& path, bool isVirual)
@@ -12,7 +12,7 @@ Path::Path(const std::filesystem::path& path, bool isVirual)
 	}
 	else
 	{
-		m_VirtualPath = std::filesystem::relative(path, ProjectManager::GetProjectPath());
+		m_VirtualPath = std::filesystem::relative(path, Engine::Get()->GetProjectManager().GetProjectPath());
 	}
 }
 
@@ -33,7 +33,7 @@ std::filesystem::path Path::GetVirtual() const
 
 std::filesystem::path Path::GetAbsolute() const
 {
-	return ProjectManager::GetProjectPath() / m_VirtualPath;
+	return Engine::Get()->GetProjectManager().GetProjectPath() / m_VirtualPath;
 }
 
 std::string Path::String() const

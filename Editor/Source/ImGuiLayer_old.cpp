@@ -105,7 +105,7 @@ void ImGuiLayer_old::OnAttach()
 #else
 #endif
 
-    ImGui_ImplGlfw_InitForOpenGL(m_Engine->GetWindow()->GetGLFWWindow(), true);
+    ImGui_ImplGlfw_InitForOpenGL(m_Engine->GetWindow().GetGLFWWindow(), true);
     ImGui_ImplOpenGL3_Init("#version 460 core");
 
     ImGui::StyleColorsDark();
@@ -154,7 +154,7 @@ void ImGuiLayer_old::OnRender()
     ImGui::Begin("Engine Debug");
     ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
     if (ImGui::Button("Exit Engine")) {
-        glfwSetWindowShouldClose(m_Engine->GetWindow()->GetGLFWWindow(), true);
+        glfwSetWindowShouldClose(m_Engine->GetWindow().GetGLFWWindow(), true);
     }
     ImGui::End();
 
@@ -219,7 +219,7 @@ void ImGuiLayer_old::DrawCreateProjectPopup(Engine* engine)
         if (ImGui::Button("Create")) {
             std::string folder = OpenFolderDialog();
             if (!folder.empty()) {
-                engine->GetProjectManager()->CreateProject(projectNameBuffer, folder);
+                engine->GetProjectManager().CreateProject(projectNameBuffer, folder);
                 createProjectRequested = false;
             }
         }
@@ -363,11 +363,11 @@ void ImGuiLayer_old::DrawSceneHierarchyPanel(entt::registry& registry, entt::ent
         }
         if (ImGui::MenuItem("Save Scene"))
         {
-            m_Engine->GetSceneManager()->SaveScene(*m_Engine->GetScene(), "D:\\GitHub\\RvelaEngine\\TestProject\\Scenes\\Test.rscene");
+            m_Engine->GetSceneManager().SaveScene(*m_Engine->GetScene(), "D:\\GitHub\\RvelaEngine\\TestProject\\Scenes\\Test.rscene");
         }
         if (ImGui::MenuItem("Load Scene"))
         {
-            m_Engine->GetSceneManager()->LoadScene(*m_Engine->GetScene(), "D:\\GitHub\\RvelaEngine\\TestProject\\Scenes\\Test.rscene");
+            m_Engine->GetSceneManager().LoadScene(*m_Engine->GetScene(), "D:\\GitHub\\RvelaEngine\\TestProject\\Scenes\\Test.rscene");
         }
         if (ImGui::MenuItem("Create Project"))
         {

@@ -23,17 +23,12 @@ void Input::Update() noexcept
 }
 
 bool Input::IsKeyPressed(KeyCode key) noexcept {
-    auto* window = Engine::Get();
-    if (!window || !window->GetWindow()) {
+    GLFWwindow* window = Engine::Get()->GetWindow().GetGLFWWindow();
+    if (!window) {
         return false;
     }
 
-    GLFWwindow* glfwWindow = window->GetWindow()->GetGLFWWindow();
-    if (!glfwWindow) {
-        return false;
-    }
-
-    return glfwGetKey(glfwWindow, static_cast<int>(key)) == GLFW_PRESS;
+    return glfwGetKey(window, static_cast<int>(key)) == GLFW_PRESS;
 }
 
 bool Input::IsKeyJustPressed(KeyCode key) noexcept
@@ -51,17 +46,12 @@ bool Input::IsKeyJustReleased(KeyCode key) noexcept
 }
 
 bool Input::IsMouseButtonPressed(MouseCode button) noexcept {
-    auto* window = Engine::Get();
-    if (!window || !window->GetWindow()) {
+    auto* window = Engine::Get()->GetWindow().GetGLFWWindow();
+    if (!window) {
         return false;
     }
 
-    GLFWwindow* glfwWindow = window->GetWindow()->GetGLFWWindow();
-    if (!glfwWindow) {
-        return false;
-    }
-
-    return glfwGetMouseButton(glfwWindow, static_cast<int>(button)) == GLFW_PRESS;
+    return glfwGetMouseButton(window, static_cast<int>(button)) == GLFW_PRESS;
 }
 
 bool Input::IsMouseButtonJustPressed(MouseCode button) noexcept
@@ -79,18 +69,13 @@ bool Input::IsMouseButtonJustReleased(MouseCode button) noexcept
 }
 
 glm::vec2 Input::GetMousePosition() noexcept {
-    auto* window = Engine::Get();
-    if (!window || !window->GetWindow()) {
-        return { 0.0f, 0.0f };
-    }
-
-    GLFWwindow* glfwWindow = window->GetWindow()->GetGLFWWindow();
-    if (!glfwWindow) {
+    auto* window = Engine::Get()->GetWindow().GetGLFWWindow();
+    if (!window) {
         return { 0.0f, 0.0f };
     }
 
     double xPos, yPos;
-    glfwGetCursorPos(glfwWindow, &xPos, &yPos);
+    glfwGetCursorPos(window, &xPos, &yPos);
     s_LastMousePosition = { static_cast<float>(xPos), static_cast<float>(yPos) };
     return s_LastMousePosition;
 }

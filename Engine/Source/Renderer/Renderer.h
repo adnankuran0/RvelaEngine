@@ -43,10 +43,10 @@ class Renderer
 public:
     Renderer();
     ~Renderer();
-    static void Init(GLFWwindow* window);
-    static void StartFrame();
-    static void EndFrame();
-    static void Shutdown();
+    void Init(GLFWwindow* window);
+    void StartFrame();
+    void EndFrame();
+    void Shutdown();
 
     static void DrawFullScreenQuad();
 

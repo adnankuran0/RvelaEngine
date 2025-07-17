@@ -32,12 +32,12 @@ void ImGuiLayer::OnAttach()
         style.Colors[ImGuiCol_WindowBg].w = 1.0f;
     }
 
-    if (!m_Engine || !m_Engine->GetWindow())
+    if (!m_Engine || !m_Engine->GetWindow().GetGLFWWindow())
     {
         std::cerr << "Error: Engine or Window is null!" << std::endl;
         return;
     }
-    ImGui_ImplGlfw_InitForOpenGL(m_Engine->GetWindow()->GetGLFWWindow(), true);
+    ImGui_ImplGlfw_InitForOpenGL(m_Engine->GetWindow().GetGLFWWindow(), true);
     ImGui_ImplOpenGL3_Init("#version 460");
 
     SetStyle();
@@ -79,7 +79,7 @@ void ImGuiLayer::Render()
 
     InspectorPanel::Draw(m_Engine->GetScene(), selectedEntity);
 
-    AssetBrowserPanel::Draw(m_Engine,m_Engine->GetProjectManager()->GetProjectPath() / "Assets");
+    AssetBrowserPanel::Draw(m_Engine,m_Engine->GetProjectManager().GetProjectPath() / "Assets");
 
     Viewport::Draw(m_Engine,selectedEntity);
 

@@ -33,7 +33,6 @@ Renderer::Renderer()
 
 Renderer::~Renderer()
 {
-    Shutdown();
 }
 
 void Renderer::Init(GLFWwindow* window)

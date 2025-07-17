@@ -9,13 +9,10 @@ Engine::Engine()
 {
 	RvelaLog::Init("log.txt");
 
-	m_Window = std::make_unique<Window>();
-	m_Renderer = std::make_unique<Renderer>();
+	m_Window.Init();
+	m_ProjectManager.LoadProject("C:\\RvelaEngine\\TestProject\\TestProject.rproj");
 	m_Scene = std::make_unique<Scene>();
-	m_ProjectManager = std::make_unique<ProjectManager>();
-	m_ProjectManager->LoadProject("C:\\RvelaEngine\\TestProject\\TestProject.rproj");
-	m_SceneManager = std::make_unique<SceneManager>();
-	editorCamera = nullptr;
+	m_Renderer.Init(m_Window.GetGLFWWindow());
 
 	PushLayer(new RenderLayer(this));
 
@@ -27,9 +24,6 @@ Engine::Engine()
 	{
 		LOG_WARNING << "Another instance of Engine already exists!";
 	}
-
-	m_Renderer->Init(m_Window->GetGLFWWindow());
-
 }
 
 Engine::~Engine()
@@ -78,7 +72,7 @@ void Engine::LateUpdate()
 void Engine::Run()
 {
 	LOG_INFO << "Engine has started!";
-	while (!glfwWindowShouldClose(GetWindow()->GetGLFWWindow()))
+	while (!glfwWindowShouldClose(GetWindow().GetGLFWWindow()))
 	{
 		glfwPollEvents();
 		HandleEvents();
@@ -116,7 +110,7 @@ void Engine::HandleEvents() noexcept
 				editorCamera->onMouseMoved(
 					mouseEvent->GetX(),
 					mouseEvent->GetY(),
-					m_Window->GetGLFWWindow()
+					m_Window.GetGLFWWindow()
 				);
 			}
 			break;
@@ -142,21 +136,21 @@ void Engine::HandleEvents() noexcept
 
 void Engine::Render()
 {
-	Renderer::StartFrame();
+	m_Renderer.StartFrame();
 
 	for (Layer* layer : m_LayerStack)
 		layer->OnRender();
 
-	Renderer::EndFrame();
+	m_Renderer.EndFrame();
 
-	glfwSwapBuffers(GetWindow()->GetGLFWWindow());
+	glfwSwapBuffers(GetWindow().GetGLFWWindow());
 }
 
 
 void Engine::Shutdown()
 {
-	if (m_Renderer)
-		m_Renderer->Shutdown();
+	m_Window.Shutdown();
+	m_Renderer.Shutdown();
 
 	glfwTerminate();
 }

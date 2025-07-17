@@ -109,7 +109,7 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
                 std::string extension = entry.path().extension().string();
                 if (extension == ".rscene")
                 {
-                    engine->GetSceneManager()->LoadScene(*engine->GetScene(), entry.path().string());
+                    engine->GetSceneManager().LoadScene(*engine->GetScene(), entry.path().string());
                 }
                 if (extension == ".glsl")
                 {
@@ -147,7 +147,7 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
                     std::string extension = entry.path().extension().string();
                     if (extension == ".rscene")
                     {
-                        engine->GetSceneManager()->LoadScene(*engine->GetScene(), entry.path().string());
+                        engine->GetSceneManager().LoadScene(*engine->GetScene(), entry.path().string());
                     }
                     if (extension == ".glsl")
                     {

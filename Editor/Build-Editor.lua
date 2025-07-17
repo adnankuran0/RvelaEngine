@@ -12,7 +12,6 @@ project "Editor"
       "Source",
       "../Vendor/GLFW/include",
       "../Vendor/GLEW/include",
-	  -- Include Core
 	  "../Engine/Source",
       "../Vendor/entt",
       "../Vendor",

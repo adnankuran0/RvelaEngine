@@ -28,10 +28,10 @@ public:
 	void PopLayer(Layer* layer);
 
 	inline static Engine* Get() noexcept { return s_Instance; } 
-	inline Window* GetWindow() const noexcept { return m_Window.get(); }
+	inline Window& GetWindow() noexcept { return m_Window; }
 	inline Scene* GetScene() const noexcept { return m_Scene.get(); }
-	inline ProjectManager* GetProjectManager() const noexcept { return m_ProjectManager.get(); }
-	inline SceneManager* GetSceneManager() const noexcept { return m_SceneManager.get(); }
+	inline ProjectManager& GetProjectManager() noexcept { return m_ProjectManager; }
+	inline SceneManager& GetSceneManager() noexcept { return m_SceneManager; }
 
 	inline EditorCamera* GetCamera() const noexcept { return editorCamera; }
 	inline void SetEditorCamera(EditorCamera* editorCam) { editorCamera = editorCam; }
@@ -43,11 +43,11 @@ private:
 
 	static Engine* s_Instance;
 
-	EditorCamera* editorCamera;
-	std::unique_ptr<Window> m_Window;
-	std::unique_ptr<Renderer> m_Renderer;
+	EditorCamera* editorCamera = nullptr;
 	std::unique_ptr<Scene> m_Scene;
-	std::unique_ptr<ProjectManager> m_ProjectManager;
-	std::unique_ptr<SceneManager> m_SceneManager;
+	Window m_Window;
+	Renderer m_Renderer;
+	ProjectManager m_ProjectManager;
+	SceneManager m_SceneManager;
 
 };

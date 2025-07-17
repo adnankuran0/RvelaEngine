@@ -20,7 +20,7 @@ void MenuBar::Draw(Engine* engine)
                 std::string file = filePath ? std::string(filePath) : "";
                 if (!file.empty())
                 {
-                    engine->GetSceneManager()->LoadScene(*engine->GetScene(), file);
+                    engine->GetSceneManager().LoadScene(*engine->GetScene(), file);
                 }
                 
             }
@@ -37,14 +37,14 @@ void MenuBar::Draw(Engine* engine)
                     if (ofs.is_open())
                     {
                         ofs.close();
-                        engine->GetSceneManager()->SaveScene(*engine->GetScene(), file);
+                        engine->GetSceneManager().SaveScene(*engine->GetScene(), file);
                     }
                 }
             }
             ImGui::Separator();
             if (ImGui::MenuItem("Quit")) 
             {
-                glfwSetWindowShouldClose(engine->GetWindow()->GetGLFWWindow(), true);
+                glfwSetWindowShouldClose(engine->GetWindow().GetGLFWWindow(), true);
             }
             ImGui::EndMenu();
         }
