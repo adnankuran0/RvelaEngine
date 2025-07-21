@@ -2,17 +2,17 @@
 #include <cstdint>
 #include <random>
 
-using UUID = uint64_t;
+using EntityUUID = uint64_t;
 
-class UUIDGenerator {
+class EntityUUIDGenerator {
 public:
     static uint64_t Generate() {
         return ++m_CurrentID;
     }
 
-    static UUID GeneratePersistent() {
+    static EntityUUID GeneratePersistent() {
         static std::mt19937_64 rng(std::random_device{}());
-        static std::uniform_int_distribution<UUID> dist;
+        static std::uniform_int_distribution<EntityUUID> dist;
         return dist(rng);
     }
 

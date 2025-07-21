@@ -3,15 +3,14 @@
 #include "../nlohmann/json.hpp"
 
 using json = nlohmann::json;
-using UUID = uint64_t;
 
 class UUIDComponent : public Component
 {
 public:
-    UUID uuid;
+    EntityUUID uuid;
 
     UUIDComponent() = default;
-    UUIDComponent(UUID uuid) :uuid(uuid) {}
+    UUIDComponent(EntityUUID uuid) :uuid(uuid) {}
 
     std::string Serialize() const override
     {

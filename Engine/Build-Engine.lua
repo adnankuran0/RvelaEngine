@@ -22,7 +22,8 @@ project "Engine"
       "../Vendor/entt",
       "../Vendor/tiny_obj_loader",
       "../Vendor/Assimp/include",
-      "../Vendor/nlohmann"
+      "../Vendor/nlohmann",
+      "../Vendor/uuid_v4"
       
    }
 

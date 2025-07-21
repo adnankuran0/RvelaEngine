@@ -2,7 +2,7 @@
 #include "SceneManager.h"
 #include "json.hpp"
 #include "Utils/AssetManager.h"
-#include "UUIDGenerator.h"  
+#include "EntityUUID.h"  
 #include "Core/Log.h"
 
 using json = nlohmann::json;
@@ -75,15 +75,15 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
         scene.DestroyEntity(entity);
     }
 
-    std::unordered_map<UUID, entt::entity> uuidToEntity;
+    std::unordered_map<EntityUUID, entt::entity> uuidToEntity;
 
     start = std::chrono::high_resolution_clock::now();
     auto meshLoadTotal = std::chrono::milliseconds(0);
 
     for (auto& entityJson : sceneJson["Entities"])
     {
-        UUID uuid = entityJson["UUID"];
-        UUIDGenerator::RegisterExternalUUID(uuid);
+        EntityUUID uuid = entityJson["UUID"];
+        EntityUUIDGenerator::RegisterExternalUUID(uuid);
         Entity e = scene.CreateEntityWithUUID("am", uuid);
         entt::entity entity = e.GetHandle();
         uuidToEntity[uuid] = entity;
@@ -145,8 +145,8 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
         if (entityJson.contains("SceneTreeComponent"))
         {
             auto& sceneTreeComp = scene.GetComponent<SceneTreeComponent>(entity);
-            std::unordered_set<UUID> uniqueChildren;
-            for (UUID childUUID : sceneTreeComp.childrenUUIDs)
+            std::unordered_set<EntityUUID> uniqueChildren;
+            for (EntityUUID childUUID : sceneTreeComp.childrenUUIDs)
                 uniqueChildren.insert(childUUID);
             sceneTreeComp.childrenUUIDs.assign(uniqueChildren.begin(), uniqueChildren.end());
             sceneTreeComp.Deserialize(entityJson["SceneTreeComponent"]);
@@ -168,7 +168,7 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
             scene.SetParent(entity, uuidToEntity[tree.parentUUID]);
 
         tree.children.clear();
-        for (UUID childUUID : tree.childrenUUIDs)
+        for (EntityUUID childUUID : tree.childrenUUIDs)
         {
             if (uuidToEntity.contains(childUUID))
                 tree.children.push_back(uuidToEntity[childUUID]);

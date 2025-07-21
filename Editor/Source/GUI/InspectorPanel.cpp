@@ -35,10 +35,12 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                 glm::vec3 pos = transform.GetPosition();
                 if (ImGui::DragFloat3("Position", &pos[0], 0.1f)) {
                     transform.SetPosition(pos);
+                    transform.SetDirty();
                 }
 
                 if (ImGui::DragFloat3("Rotation", &euler[0], 0.1f, -360, 360)) {
                     transform.SetEulerRotation(euler);
+                    transform.SetDirty();
                 }
 
                 ImGui::PushID("ScaleControls");
@@ -46,6 +48,7 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                 if (ImGui::DragFloat3("Scale", &scale[0], 0.1f, 0.01f, 10.0f))
                 {
                     transform.SetScale(scale);
+                    transform.SetDirty();
                 }
                 if (ImGui::Checkbox("Lock Ratio", &isScaleRatioLocked))
                 {

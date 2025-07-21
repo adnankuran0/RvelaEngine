@@ -2,6 +2,7 @@
 #include "Engine.h"
 #include "Core/Log.h"
 #include "Renderer/RenderLayer.h"
+#include "Assets/AssetImporterRegistry.h"
 
 Engine* Engine::s_Instance = nullptr;
 
@@ -24,6 +25,10 @@ Engine::Engine()
 	{
 		LOG_WARNING << "Another instance of Engine already exists!";
 	}
+
+	AssetImporterRegistry::Get().Import("asasda");
+	AssetImporterRegistry::Get().Import("asasda");
+
 }
 
 Engine::~Engine()

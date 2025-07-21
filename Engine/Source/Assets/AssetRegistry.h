@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <unordered_map>
 #include <filesystem>
-#include "Scene/UUIDGenerator.h"
+#include "AssetUUID.h"
 #include "Asset.h"
 #include "AssetMeta.h"
 #include "TextureAsset.h"
@@ -13,7 +13,7 @@ public:
         ScanAssets(assetDir);
     }
 
-    static Ref<Asset> GetAsset(UUID uuid) {
+    static Ref<Asset> GetAsset(AssetUUID uuid) {
         if (s_LoadedAssets.contains(uuid))
             return s_LoadedAssets[uuid];
 
@@ -28,7 +28,7 @@ public:
         return asset;
     }
 
-    static std::filesystem::path GetAssetPath(UUID uuid) {
+    static std::filesystem::path GetAssetPath(AssetUUID uuid) {
         if (s_UUIDToPath.contains(uuid))
             return s_UUIDToPath[uuid];
         return {};
@@ -42,10 +42,10 @@ private:
             auto path = entry.path();
             if (path.extension() == ".meta") {
                 try {
-                    AssetMeta meta = AssetMeta::LoadFromFile(path);
+                    // read meta header
                     std::filesystem::path assetPath = path;
-                    assetPath.replace_extension(""); // Remove ".meta"
 
+                    AssetMeta meta;
                     s_UUIDToPath[meta.uuid] = assetPath;
                 }
                 catch (...) {
@@ -69,6 +69,6 @@ private:
     }
 
     inline static std::filesystem::path s_AssetDirectory;
-    inline static std::unordered_map<UUID, std::filesystem::path> s_UUIDToPath;
-    inline static std::unordered_map<UUID, Ref<Asset>> s_LoadedAssets;
+    inline static std::unordered_map<AssetUUID, std::filesystem::path> s_UUIDToPath;
+    inline static std::unordered_map<AssetUUID, Ref<Asset>> s_LoadedAssets;
 };

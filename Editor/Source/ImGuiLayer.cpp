@@ -5,14 +5,14 @@
 #include "ImGui/tinyfiledialogs.h"
 #include "Utils/Serializer.h"
 #include "ImGui/ImGuizmo.h"
-#include "MenuBar.h"
-#include "ToolBar.h"
-#include "Dockspace.h"
-#include "Viewport.h"
-#include "SceneHierarchyPanel.h"
-#include "InspectorPanel.h"
-#include "AssetBrowserPanel.h"
-#include "Style.h"
+#include "GUI/MenuBar.h"
+#include "GUI/ToolBar.h"
+#include "GUI/Dockspace.h"
+#include "GUI/Viewport.h"
+#include "GUI/SceneHierarchyPanel.h"
+#include "GUI/InspectorPanel.h"
+#include "GUI/AssetBrowserPanel.h"
+#include "GUI/Style.h"
 #include <ImGui/imgui_internal.h>
 
 void ImGuiLayer::OnAttach()

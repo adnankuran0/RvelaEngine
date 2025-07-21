@@ -7,7 +7,7 @@
 #include "Utils/Serializer.h"
 #include "Utils/MaterialManager.h"
 #include "Utils/ProjectManager.h"
-#include "UUIDGenerator.h"
+#include "EntityUUID.h"
 
 
 Scene::Scene() : m_Registry() {}
@@ -17,12 +17,12 @@ Entity Scene::CreateEntity(const std::string& name) {
     entity.AddComponent<TransformComponent>(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f));
     entity.AddComponent<SceneTreeComponent>();
     entity.AddComponent<TagComponent>(name);
-    entity.AddComponent<UUIDComponent>(UUIDGenerator::Generate());
+    entity.AddComponent<UUIDComponent>(EntityUUIDGenerator::Generate());
     m_EntityMap[entity.GetUUID()] = (entt::entity)entity;
     return entity;
 }
 
-Entity Scene::CreateEntityWithUUID(const std::string& name, UUID uuid) {
+Entity Scene::CreateEntityWithUUID(const std::string& name, EntityUUID uuid) {
     Entity entity(m_Registry.create(), this);
     entity.AddComponent<TransformComponent>(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f));
     entity.AddComponent<SceneTreeComponent>();
@@ -136,8 +136,9 @@ void Scene::UpdateHierarchy() {
         if (node.parent == entt::null || !m_Registry.valid(node.parent))
             roots.push_back(e);
     }
-    for (auto root : roots)
-        UpdateNodeRecursive(root, glm::mat4(1.0f));
+    for (entt::entity root : roots)
+        if(GetComponent<TransformComponent>(root).IsDirty())
+            UpdateNodeRecursive(root, glm::mat4(1.0f));
 }
 
 void Scene::UpdateNodeRecursive(entt::entity e, const glm::mat4& parentWorld) {
@@ -190,6 +191,8 @@ void Scene::UpdateNodeRecursive(entt::entity e, const glm::mat4& parentWorld) {
         c.worldAABB = worldAABB;
     }
 
+    t.ClearDirty();
+
     auto& node = GetComponent<SceneTreeComponent>(e);
     for (auto c : node.children)
         UpdateNodeRecursive(c, worldMat);
@@ -198,7 +201,7 @@ void Scene::UpdateNodeRecursive(entt::entity e, const glm::mat4& parentWorld) {
 void Scene::SetParent(entt::entity child, entt::entity parent) {
     if (parent != entt::null && !HasComponent<SceneTreeComponent>(parent)) AddComponent<SceneTreeComponent>(parent);
     auto& node = GetComponent<SceneTreeComponent>(child);
-    UUID id = GetComponent<UUIDComponent>(child).uuid;
+    EntityUUID id = GetComponent<UUIDComponent>(child).uuid;
     glm::mat4 childWorld = GetComponent<TransformComponent>(child).GetWorldMatrix();
     if (node.parent != entt::null) {
         auto& old = GetComponent<SceneTreeComponent>(node.parent);
@@ -236,7 +239,7 @@ void Scene::SetParent(entt::entity child, entt::entity parent) {
 void Scene::RemoveParent(entt::entity child) {
     if (!HasComponent<SceneTreeComponent>(child)) return;
     auto& node = GetComponent<SceneTreeComponent>(child);
-    UUID id = GetComponent<UUIDComponent>(child).uuid;
+    EntityUUID id = GetComponent<UUIDComponent>(child).uuid;
     glm::mat4 worldM = GetComponent<TransformComponent>(child).GetWorldMatrix();
     if (node.parent != entt::null) {
         auto& pnode = GetComponent<SceneTreeComponent>(node.parent);

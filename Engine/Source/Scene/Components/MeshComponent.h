@@ -4,57 +4,44 @@
 #include "nlohmann/json.hpp"
 
 
-struct MeshData
+struct alignas(16) MeshData
 {
-    std::vector<float> vertices;
-    std::vector<unsigned int> indices;
-    unsigned int indexCount;
-    std::string name;
-    Path materialPath;
-    uint16_t meshIndex;
-    BoundingBox localAABB;
     glm::mat4 localTransform;
     glm::mat4 worldTransform;
+    BoundingBox localAABB;
 
-    int GetTriangleCount()
-    {
+    uint32_t indexCount;
+    uint16_t meshIndex;
+
+    std::vector<float> vertices;
+    std::vector<unsigned int> indices;
+
+    Path materialPath;
+    std::string name;
+
+    int GetTriangleCount() const {
         return indexCount / 3;
     }
 
-    void GetTriangle(int triangleIndex, glm::vec3& v0, glm::vec3& v1, glm::vec3& v2)
-    {
-        constexpr int stride = 8; 
+    void GetTriangle(int triangleIndex, glm::vec3& v0, glm::vec3& v1, glm::vec3& v2) const {
+        constexpr int stride = 8;
 
-        int i0 = indices[triangleIndex * 3 + 0];
-        int i1 = indices[triangleIndex * 3 + 1];
-        int i2 = indices[triangleIndex * 3 + 2];
+        const int i0 = indices[triangleIndex * 3 + 0];
+        const int i1 = indices[triangleIndex * 3 + 1];
+        const int i2 = indices[triangleIndex * 3 + 2];
 
-        v0 = glm::vec3(
-            vertices[i0 * stride + 0],
-            vertices[i0 * stride + 1],
-            vertices[i0 * stride + 2]
-        );
-
-        v1 = glm::vec3(
-            vertices[i1 * stride + 0],
-            vertices[i1 * stride + 1],
-            vertices[i1 * stride + 2]
-        );
-
-        v2 = glm::vec3(
-            vertices[i2 * stride + 0],
-            vertices[i2 * stride + 1],
-            vertices[i2 * stride + 2]
-        );
+        v0 = glm::vec3(vertices[i0 * stride]);
+        v1 = glm::vec3(vertices[i1 * stride]);
+        v2 = glm::vec3(vertices[i2 * stride]);
     }
 };
 
 using json = nlohmann::json;
 
 struct MeshComponent : public Component {
+    MeshData mesh;
     Path modelPath;
     uint32_t meshIndex;
-    MeshData mesh;
 
     MeshComponent() = delete;
     MeshComponent(const Path modelPath, uint16_t meshIndex, MeshData& mesh) : modelPath(modelPath), meshIndex(meshIndex), mesh(mesh) {}

@@ -6,7 +6,7 @@
 #include "Core/Layer.h"
 #include <vector>
 #include <memory>
-#include "SceneHierarchyPanel.h"
+#include "GUI/SceneHierarchyPanel.h"
 
 class ImGuiLayer : public Layer
 {

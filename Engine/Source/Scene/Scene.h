@@ -18,7 +18,7 @@ public:
     bool isLoading = false;
 
     Entity CreateEntity(const std::string& name);
-    Entity CreateEntityWithUUID(const std::string& name, UUID uuid);
+    Entity CreateEntityWithUUID(const std::string& name, EntityUUID uuid);
     void DestroyEntity(entt::entity entity);
 
     Entity CreatePointLight();
@@ -69,7 +69,7 @@ public:
     void Update();
 
     entt::registry& GetRegistry();
-    std::unordered_map<UUID, entt::entity> GetUUIDEntityMap() { return m_EntityMap; }
+    std::unordered_map<EntityUUID, entt::entity> GetUUIDEntityMap() { return m_EntityMap; }
 
     std::vector<PointLightData> CollectPointLights() noexcept;
     std::optional<DirectionalLightData>  CollectDirectionalLight() noexcept;
@@ -79,7 +79,7 @@ public:
 
 private:
     entt::registry m_Registry;
-    std::unordered_map<UUID, entt::entity> m_EntityMap;
+    std::unordered_map<EntityUUID, entt::entity> m_EntityMap;
     friend class Entity;
     entt::entity selectedEntity;
 };

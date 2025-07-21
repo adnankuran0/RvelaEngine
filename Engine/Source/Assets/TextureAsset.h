@@ -1,15 +1,15 @@
 #pragma once
 #include "Renderer/Texture.h"
 #include "Core/Ref.h"
-#include "Scene/UUIDGenerator.h"
+#include "AssetUUID.h"
 #include <string>
 #include "Asset.h"
 
+
+
 class TextureAsset : public Asset {
 public:
-    TextureAsset(const std::string& path)
-        : m_Path(path) , m_Loaded(false) {
-    }
+    TextureAsset(const std::string& path) : m_Path(path) , m_Loaded(false) { }
 
     ~TextureAsset() {
         Unload();
@@ -36,10 +36,6 @@ public:
 
     const std::string& GetPath() const {
         return m_Path;
-    }
-
-    UUID GetUUID() const {
-        return uuid;
     }
 
     bool IsLoaded() const {

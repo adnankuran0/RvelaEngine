@@ -18236,3 +18236,112 @@
 [INFO ] Total mesh loading took 278ms
 [INFO ] Scene loading complete
 [INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 646ms
+[INFO ] Total mesh loading took 278ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 652ms
+[INFO ] Total mesh loading took 276ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 655ms
+[INFO ] Total mesh loading took 282ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 635ms
+[INFO ] Total mesh loading took 273ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 966ms
+[INFO ] Total mesh loading took 318ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 692ms
+[INFO ] Total mesh loading took 277ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 844ms
+[INFO ] Total mesh loading took 303ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 837ms
+[INFO ] Total mesh loading took 303ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 679ms
+[INFO ] Total mesh loading took 280ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 694ms
+[INFO ] Total mesh loading took 311ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Json loading took 18ms
+[INFO ] Scene loading took 7919ms
+[INFO ] Total mesh loading took 7034ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Json loading took 4ms
+[INFO ] Scene loading took 807ms
+[INFO ] Total mesh loading took 299ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!

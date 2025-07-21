@@ -4,15 +4,15 @@
 #include "Renderer/ElementBuffer.h"
 #include <Scene/BoundingBox.h>
 
-class MeshRendererComponent {
+class alignas(16) MeshRendererComponent {
 public:
+    BufferLayout Layout;
+    BoundingBox localAABB;
+    BoundingBox worldAABB;
     VertexArray VAO;
     VertexBuffer VBO;
     ElementBuffer EBO;
-    BufferLayout Layout;
     unsigned int indexCount = 0;
-    BoundingBox localAABB;
-    BoundingBox worldAABB;
 
     MeshRendererComponent() = default;
     MeshRendererComponent(const MeshRendererComponent&) = delete;
