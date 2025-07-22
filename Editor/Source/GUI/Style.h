@@ -1,7 +1,7 @@
 #pragma once
 #include "ImGui/imgui.h"
 
-void SetStyle()
+static void SetStyle()
 {
     ImGuiIO& io = ImGui::GetIO();
     io.Fonts->AddFontFromFileTTF("C:\\RvelaEngine\\Resources\\Editor\\roboto.ttf", 16.0f);

@@ -10,6 +10,7 @@
 #include "Utils/ProjectManager.h"
 #include "LayerStack.h"
 #include "Renderer/Renderer.h"
+#include "Assets/AssetRegistry.h"
 
 class Engine
 {
@@ -32,6 +33,7 @@ public:
 	inline Scene* GetScene() const noexcept { return m_Scene.get(); }
 	inline ProjectManager& GetProjectManager() noexcept { return m_ProjectManager; }
 	inline SceneManager& GetSceneManager() noexcept { return m_SceneManager; }
+	inline AssetRegistry& GetAssetRegistry() noexcept { return m_AssetRegistry; }
 
 	inline EditorCamera* GetCamera() const noexcept { return editorCamera; }
 	inline void SetEditorCamera(EditorCamera* editorCam) { editorCamera = editorCam; }
@@ -49,5 +51,6 @@ private:
 	Renderer m_Renderer;
 	ProjectManager m_ProjectManager;
 	SceneManager m_SceneManager;
+	AssetRegistry m_AssetRegistry;
 
 };

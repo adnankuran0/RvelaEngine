@@ -18345,3 +18345,136 @@
 [INFO ] Total mesh loading took 299ms
 [INFO ] Scene loading complete
 [INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Json loading took 3ms
+[INFO ] Scene loading took 894ms
+[INFO ] Total mesh loading took 303ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Json loading took 47ms
+[INFO ] Scene loading took 2839ms
+[INFO ] Total mesh loading took 1380ms
+[INFO ] Scene loading complete
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] OpenGL Version: 4.6.0 NVIDIA 576.88
+[INFO ] Engine has started!
+[INFO ] Engine has stopped!

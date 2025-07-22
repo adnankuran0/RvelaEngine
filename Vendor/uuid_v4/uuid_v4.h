@@ -376,6 +376,7 @@ class UUID {
       return stream;
     }
 
+public:
     size_t hash() const {
       const uint64_t a = *((uint64_t*)data);
       const uint64_t b = *((uint64_t*)&data[8]);

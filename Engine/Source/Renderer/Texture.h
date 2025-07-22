@@ -14,17 +14,18 @@ public:
     void Bind(unsigned int activeTexture) const;
     void Bind() const;
     void GenerateFromImage(const std::string& path);
+    void GenerateFromMemory(const unsigned char* data, int length, GLenum format = GL_RGBA8, bool srgb = false);
 
     static Texture Create();
     static void ToImage(int width, int height, const unsigned char* data,int nrChannels);
     static void GenerateMipmaps();
 
-    unsigned int GetID() const;
-    unsigned char* GetTexture() const;
-    int GetWidth() const;
-    int GetHeight() const;
-    int GetNrChannels() const;
-    const std::string& GetPath() ;
+    inline unsigned int GetID() const;
+    inline unsigned char* GetTexture() const;
+    inline int GetWidth() const;
+    inline int GetHeight() const;
+    inline int GetNrChannels() const;
+    inline const std::string& GetPath() ;
 
 private:
     std::string m_Path;

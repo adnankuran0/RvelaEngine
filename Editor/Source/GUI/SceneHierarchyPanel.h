@@ -3,5 +3,5 @@
 class SceneHierarchyPanel
 {
 public:
-	static void Draw(Scene* scene, entt::entity& selectedEntity);
+	void Draw(Scene* scene, entt::entity& selectedEntity);
 };

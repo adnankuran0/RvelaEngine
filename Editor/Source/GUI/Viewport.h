@@ -5,7 +5,7 @@
 class Viewport
 {
 public:
-	static void Draw(Engine* engine, entt::entity& selectedEntity);
+	void Draw(Engine* engine, entt::entity& selectedEntity);
 private:
 	static bool RayIntersectsTriangle(const glm::vec3& rayOrigin, const glm::vec3& rayDir,
 		const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2,

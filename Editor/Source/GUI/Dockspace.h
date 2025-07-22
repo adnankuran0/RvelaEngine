@@ -3,5 +3,5 @@
 class Dockspace
 {
 public:
-	static void Draw();
+	void Draw();
 };

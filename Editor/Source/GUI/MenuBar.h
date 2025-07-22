@@ -1,10 +1,11 @@
 #pragma once
 #include "ImGui/imgui.h"
 #include "Core/Engine.h"
+#include "AssetImporter/AssetImporterRegistry.h"
 
 class MenuBar
 {
 public:
-	static void Draw(Engine* engine);
+	void Draw(Engine* engine, AssetImporterRegistry& assetImporter);
 };
 

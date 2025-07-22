@@ -1,5 +1,5 @@
 #pragma once
-#include "uuid_v4.h"
+#include "uuid_v4/uuid_v4.h"
 
 class AssetUUID
 {
@@ -39,3 +39,12 @@ public:
 private:
     UUIDv4::UUID m_UUID;
 };
+
+namespace std {
+    template <>
+    struct hash<AssetUUID> {
+        size_t operator()(const AssetUUID& uuid) const noexcept {
+            return uuid.Raw().hash();
+        }
+    };
+}

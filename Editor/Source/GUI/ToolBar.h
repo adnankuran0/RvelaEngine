@@ -2,6 +2,6 @@
 class ToolBar
 {
 public:
-	static void Draw();
+	void Draw();
 };
 

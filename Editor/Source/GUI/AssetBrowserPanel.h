@@ -5,6 +5,6 @@
 class AssetBrowserPanel
 {
 public:
-	static void Draw(Engine* engine ,const std::filesystem::path& rootDirectory);
+	void Draw(Engine* engine ,const std::filesystem::path& rootDirectory);
 
 };

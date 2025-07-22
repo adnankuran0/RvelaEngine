@@ -2,7 +2,7 @@
 #include <ImGui/tinyfiledialogs.h>
 #include <fstream>
 
-void MenuBar::Draw(Engine* engine)
+void MenuBar::Draw(Engine* engine,AssetImporterRegistry& assetImporter)
 {
     if (ImGui::BeginMainMenuBar())
     {
@@ -30,7 +30,6 @@ void MenuBar::Draw(Engine* engine)
                 const char* filePath = tinyfd_saveFileDialog("Save Scene As", "scene.rscene", 1, filterPatterns, NULL);
 
                 std::string file = filePath ? std::string(filePath) : "";
-                std::cout << "Scene tried to save at " << file << "\n";
                 if (!file.empty())
                 {
                     std::ofstream ofs(file);
@@ -39,6 +38,17 @@ void MenuBar::Draw(Engine* engine)
                         ofs.close();
                         engine->GetSceneManager().SaveScene(*engine->GetScene(), file);
                     }
+                }
+            }
+            if (ImGui::MenuItem("Import asset"))
+            {
+                const char* filterPatterns[] = { "*.png", "*.jpeg", "*.jpg", "*.tga"};
+                const char* filePath = tinyfd_openFileDialog("Select asset to import", "", 4, filterPatterns, NULL,0);
+
+                std::string file = filePath ? std::string(filePath) : "";
+                if (!file.empty())
+                {
+                    assetImporter.Import(file);
                 }
             }
             ImGui::Separator();

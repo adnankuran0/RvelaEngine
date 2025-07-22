@@ -56,8 +56,6 @@ void Texture::GenerateFromImage(const std::string& path)
 
     m_Data = stbi_load(path.c_str(), &m_Width, &m_Height, &m_NrChannels, 0);
 
-
-
     if (m_Data)
     {
         ToImage(m_Width, m_Height, m_Data, m_NrChannels);
@@ -69,6 +67,24 @@ void Texture::GenerateFromImage(const std::string& path)
     }
     stbi_image_free(m_Data);
 
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void Texture::GenerateFromMemory(const unsigned char* compressedData, int length, GLenum format, bool srgb)
+{
+    m_Data = stbi_load_from_memory(compressedData, length, &m_Width, &m_Height, &m_NrChannels, 4);
+
+    if (m_Data)
+    {
+        ToImage(m_Width, m_Height, m_Data, 4); // zorlama RGBA olduğundan dolayı
+        GenerateMipmaps();
+    }
+    else
+    {
+        std::cerr << "Failed to load texture from memory.";
+    }
+
+    stbi_image_free(m_Data);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
