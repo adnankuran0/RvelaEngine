@@ -11,7 +11,7 @@ bool Shader::Init(const Path& shaderPath)
 {
     std::ifstream shaderFile(shaderPath.GetAbsolute());
     if (!shaderFile.is_open()) {
-        LOG_ERROR << "ERROR::SHADER::FILE_NOT_OPENED";
+        LOG_ERROR("ERROR::SHADER::FILE_NOT_OPENED");
         return false;
     }
 
@@ -52,7 +52,7 @@ bool Shader::Init(const Path& shaderPath)
         else if (type == "geometry") shaderType = GL_GEOMETRY_SHADER;
         else if (type == "compute") shaderType = GL_COMPUTE_SHADER;
         else {
-            LOG_ERROR << "ERROR::SHADER::UNKNOWN_SHADER_TYPE: " << type;
+            LOG_ERROR("ERROR::SHADER::UNKNOWN_SHADER_TYPE: {}", type);
             continue;
         }
 
@@ -158,7 +158,7 @@ bool Shader::checkCompileErrors(unsigned int shader, const std::string type)
         if (!success)
         {
             glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-            LOG_ERROR << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog;
+            LOG_ERROR("ERROR::SHADER_COMPILATION_ERROR of type: {} \n {}" ,type , infoLog);
             return false;
         }
     }
@@ -168,7 +168,7 @@ bool Shader::checkCompileErrors(unsigned int shader, const std::string type)
         if (!success)
         {
             glGetProgramInfoLog(shader, 1024, NULL, infoLog);
-            LOG_ERROR << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog;
+            LOG_ERROR("ERROR::PROGRAM_LINKING_ERROR of type: {} \n {}", type, infoLog);
             return false;
         }
     }

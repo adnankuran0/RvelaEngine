@@ -28,11 +28,11 @@ public:
         return !(*this == other);
     }
 
-    bool IsValid() const {
+    inline bool IsValid() const {
         return m_UUID != UUIDv4::UUID{};
     }
 
-    const UUIDv4::UUID& Raw() const {
+    inline const UUIDv4::UUID& Raw() const {
         return m_UUID;
     }
 

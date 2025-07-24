@@ -1,5 +1,5 @@
 #pragma once
-#include "GL/glew.h"
+#include "GLAD/gl.h"
 
 
 class Texture
@@ -8,19 +8,19 @@ public:
     Texture();
     ~Texture();
     Texture(const std::string& path);
-
+    Texture(const Texture&) { std::cout << "Texture copied! (" << this << ")\n"; }
     void Init();
     void Destroy() const;
     void Bind(unsigned int activeTexture) const;
     void Bind() const;
     void GenerateFromImage(const std::string& path);
-    void GenerateFromMemory(const unsigned char* data, int length, GLenum format = GL_RGBA8, bool srgb = false);
+    void GenerateFromMemory(const uint8_t* data, int width, int height, GLenum format = GL_RGBA8, bool srgb = false);
 
     static Texture Create();
     static void ToImage(int width, int height, const unsigned char* data,int nrChannels);
     static void GenerateMipmaps();
 
-    inline unsigned int GetID() const;
+    unsigned int GetID() const;
     inline unsigned char* GetTexture() const;
     inline int GetWidth() const;
     inline int GetHeight() const;

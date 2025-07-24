@@ -67,7 +67,7 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
     file.close();
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    LOG_INFO << "Json loading took " << duration.count() << "ms";
+    LOG_INFO("Json loading took {} ms", duration.count());
 
     auto& registry = scene.GetRegistry();
     for (auto entity : registry.view<UUIDComponent>())
@@ -155,8 +155,8 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
 
     end = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    LOG_INFO << "Scene loading took " << duration.count() << "ms";
-    LOG_INFO << "Total mesh loading took " << meshLoadTotal.count() << "ms";
+    LOG_INFO("Scene loading took {} ms" ,duration.count());
+    LOG_INFO("Total mesh loading took {} ms" , meshLoadTotal.count());
 
     for (auto& [uuid, entity] : uuidToEntity)
     {
@@ -177,5 +177,5 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
 
     scene.UpdateHierarchy();
 
-    LOG_INFO << "Scene loading complete";
+    LOG_INFO("Scene loading complete");
 }

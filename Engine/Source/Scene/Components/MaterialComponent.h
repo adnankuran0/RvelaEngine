@@ -15,6 +15,7 @@ public:
         : materialPath(materialPath)
     {
         material = MaterialManager::LoadOrGetMaterial(materialPath);
+
     }
 
     MaterialComponent(const MaterialComponent& other)
@@ -64,6 +65,7 @@ public:
 
     std::shared_ptr<Material> material;
 
+    Ref<TextureAsset> albedo;
 
 private:
     Path materialPath;

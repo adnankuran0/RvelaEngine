@@ -161,8 +161,6 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                             std::string pathStr(path);
                             if (pathStr.ends_with(".png") || pathStr.ends_with(".jpeg") || pathStr.ends_with(".jpg") || pathStr.ends_with(".tga"))
                             {
-                                // .rmaterial dosyası bırakıldı, işle
-                                // Örneğin: materialComponent->LoadFromFile(pathStr);
                                 materialComponent.material->albedoMapPath = ABS_PATH(pathStr);
                             }
                         }

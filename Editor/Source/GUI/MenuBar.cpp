@@ -40,15 +40,34 @@ void MenuBar::Draw(Engine* engine,AssetImporterRegistry& assetImporter)
                     }
                 }
             }
-            if (ImGui::MenuItem("Import asset"))
+            if (ImGui::MenuItem("Import assets"))
             {
-                const char* filterPatterns[] = { "*.png", "*.jpeg", "*.jpg", "*.tga"};
-                const char* filePath = tinyfd_openFileDialog("Select asset to import", "", 4, filterPatterns, NULL,0);
+                const char* filterPatterns[] = { "*.png", "*.jpeg", "*.jpg", "*.tga" };
+                char const* lTheOpenFileName = tinyfd_openFileDialog(
+                    "Select assets to import",
+                    "",
+                    4,
+                    filterPatterns,
+                    NULL,
+                    1); //multi-select
 
-                std::string file = filePath ? std::string(filePath) : "";
-                if (!file.empty())
+                if (lTheOpenFileName)
                 {
-                    assetImporter.Import(file);
+                    // tinyfd returns paths separated by '|'
+                    std::string pathsStr(lTheOpenFileName);
+                    size_t start = 0;
+                    size_t end = pathsStr.find('|');
+                    while (end != std::string::npos)
+                    {
+                        std::string file = pathsStr.substr(start, end - start);
+                        assetImporter.Import(file);
+                        start = end + 1;
+                        end = pathsStr.find('|', start);
+                    }
+                    // Last file (or only file if no '|')
+                    std::string lastFile = pathsStr.substr(start);
+                    if (!lastFile.empty())
+                        assetImporter.Import(lastFile);
                 }
             }
             ImGui::Separator();

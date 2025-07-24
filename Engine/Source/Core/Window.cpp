@@ -30,7 +30,7 @@ void Window::SetCallbacks() noexcept
 void Window::Init()
 {
     if (!glfwInit()) {
-        LOG_ERROR << "Failed to initialize GLFW";
+        LOG_ERROR("Failed to initialize GLFW");
         throw std::runtime_error("Failed to initialize GLFW");
     }
 
@@ -41,7 +41,7 @@ void Window::Init()
 
     m_Window = glfwCreateWindow(m_WindowData.size.width, m_WindowData.size.height, m_WindowData.title.c_str(), nullptr, nullptr);
     if (!m_Window) {
-        LOG_ERROR << "Failed to create GLFW window";
+        LOG_ERROR("Failed to create GLFW window");
         glfwTerminate();
         throw std::runtime_error("Failed to create GLFW window");
     }
@@ -52,13 +52,13 @@ void Window::Init()
     stbi_image_free(images[0].pixels);
 
     glfwMakeContextCurrent(m_Window);
-    if (glewInit() != GLEW_OK) {
-        LOG_ERROR << "Failed to initialize GLEW";
-        throw std::runtime_error("Failed to initialize GLEW");
+    if (!gladLoadGL((GLADloadfunc)glfwGetProcAddress)) {
+        
+        LOG_ERROR("Failed to initialize GLAD");
     }
 
     const GLubyte* glVersion = glGetString(GL_VERSION);
-    LOG_INFO << "OpenGL Version: " << (glVersion ? reinterpret_cast<const char*>(glVersion) : "Unknown");
+    LOG_INFO("OpenGL Version: {}", (glVersion ? reinterpret_cast<const char*>(glVersion) : "Unknown"));
 
     SetCallbacks();
 }

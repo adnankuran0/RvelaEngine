@@ -22,8 +22,9 @@ Engine::Engine()
 	}
 	else
 	{
-		LOG_WARNING << "Another instance of Engine already exists!";
+		LOG_WARN("Another instance of Engine already exists!");
 	}
+	
 }
 
 Engine::~Engine()
@@ -52,6 +53,7 @@ void Engine::Update()
 	m_Scene->Update();
 
 
+
 }
 
 void Engine::FixedUpdate()
@@ -71,7 +73,7 @@ void Engine::LateUpdate()
 
 void Engine::Run()
 {
-	LOG_INFO << "Engine has started!";
+	LOG_INFO("Engine has started!");
 	while (!glfwWindowShouldClose(GetWindow().GetGLFWWindow()))
 	{
 		glfwPollEvents();
@@ -88,14 +90,19 @@ void Engine::Run()
 		Update();
 		LateUpdate();
 
+		
+
 		Render();
+
+		
+
 
 		EventManager::ClearEvents();
 		Input::Update();
 
 		
 	}
-	LOG_INFO << "Engine has stopped!";
+	LOG_INFO("Engine has stopped!");
 }
 
 void Engine::HandleEvents() noexcept

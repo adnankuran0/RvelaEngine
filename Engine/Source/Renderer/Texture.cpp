@@ -6,6 +6,8 @@
 
 Texture::Texture()
 {
+    std::cout << "Texture created!\n";
+
 	Init();
 }
 
@@ -47,6 +49,7 @@ void Texture::Bind() const
 
 void Texture::Destroy() const
 {
+    std::cout << "Texture destroyed!\n";
     glDeleteTextures(1, &m_Texture);
 }
 
@@ -70,21 +73,17 @@ void Texture::GenerateFromImage(const std::string& path)
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Texture::GenerateFromMemory(const unsigned char* compressedData, int length, GLenum format, bool srgb)
+void Texture::GenerateFromMemory(const uint8_t* data, int width, int height, GLenum format, bool srgb)
 {
-    m_Data = stbi_load_from_memory(compressedData, length, &m_Width, &m_Height, &m_NrChannels, 4);
+    Bind();
 
-    if (m_Data)
-    {
-        ToImage(m_Width, m_Height, m_Data, 4); // zorlama RGBA olduğundan dolayı
-        GenerateMipmaps();
-    }
-    else
-    {
-        std::cerr << "Failed to load texture from memory.";
-    }
+    GLenum internalFormat = srgb ? GL_SRGB8_ALPHA8 : GL_RGBA8;
+    GLenum dataFormat = GL_RGBA; // assuming 4 channels
 
-    stbi_image_free(m_Data);
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, dataFormat, GL_UNSIGNED_BYTE, data);
+
+    GenerateMipmaps();
+
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 

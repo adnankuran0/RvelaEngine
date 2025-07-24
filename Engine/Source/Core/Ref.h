@@ -2,24 +2,34 @@
 #include <utility>
 #include <type_traits>
 
+
+
 class RefCounted {
 public:
     void AddRef() { ++refCount; }
-    void ReleaseRef() {
-        if (--refCount == 0 && weakCount == 0)
-            delete this;
-    }
+   
 
     void AddWeak() { ++weakCount; }
-    void ReleaseWeak() {
-        if (--weakCount == 0 && refCount == 0)
+   
+    void ReleaseRef() {
+        --refCount;
+        if (refCount == 0) {
+            // Destroy the object
             delete this;
+            // After deletion, weakCount may still be > 0, but object is gone.
+            // So should reset weakCount too? Or have a separate flag to indicate destruction?
+        }
     }
 
+    void ReleaseWeak() {
+        --weakCount;
+        // Delete the control block or something else if needed
+    }
     int GetRefCount() const { return refCount; }
     int GetWeakCount() const { return weakCount; }
 
 protected:
+    RefCounted() = default;
     virtual ~RefCounted() = default;
 
 private:
@@ -43,6 +53,16 @@ public:
         if (ptr) ptr->AddRef();
     }
 
+    template<typename U>
+    Ref(const Ref<U>& other) {
+        static_assert(std::is_base_of<RefCounted, U>::value, "U must inherit RefCounted");
+        ptr = dynamic_cast<T*>(other.Get());
+        if (ptr)
+            ptr->AddRef();
+        else
+            ptr = nullptr;
+    }
+
     Ref(const Ref& other) : ptr(other.ptr) {
         if (ptr) ptr->AddRef();
     }
@@ -55,6 +75,8 @@ public:
         if (ptr) ptr->AddRef();
         return *this;
     }
+
+    
 
     ~Ref() {
         if (ptr) ptr->ReleaseRef();
@@ -96,6 +118,9 @@ public:
     ~WeakRef() {
         if (ptr) ptr->ReleaseWeak();
     }
+    T* operator->() const { return ptr; }
+    T& operator*() const { return *ptr; }
+    T* Get() const { return ptr; }
 
     Ref<T> Lock() const {
         if (ptr && ptr->GetRefCount() > 0)
@@ -117,3 +142,8 @@ Ref<T> CreateRef(Args&&... args) {
     return Ref<T>(new T(std::forward<Args>(args)...));
 }
 
+template<typename T, typename U>
+Ref<T> DynamicCast(const Ref<U>& other)
+{
+    return Ref<T>(other);
+}

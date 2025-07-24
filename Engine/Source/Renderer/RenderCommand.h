@@ -6,11 +6,11 @@
 struct RenderCommand
 {
 public:
-	RenderCommand(const TransformComponent& t, const MeshRendererComponent& m, const MaterialComponent& mat, bool isSelected)
+	RenderCommand(const TransformComponent& t, const MeshRendererComponent& m, MaterialComponent& mat, bool isSelected)
 		: transform(t), mesh(m), material(mat), isSelected(isSelected) {
 	}
 	const TransformComponent& transform;
 	const MeshRendererComponent& mesh;
-	const MaterialComponent& material;
+	MaterialComponent& material;
 	const bool isSelected;
 };

@@ -4,15 +4,17 @@
 #include "Renderer/Texture.h"
 #include <memory>
 #include "Utils/ISerializable.h"
+#include "Assets/TextureAsset.h"
+#include "Core/Ref.h"
 
 class Material : public ISerializable
 {
 public:
-
-	~Material();
 	Material()
 	{
+		std::cout << "Material created!\n";
 	}
+	~Material();
 	Material(const Material&) { std::cout << "Material copied! (" << this << ")\n"; }
 
 	glm::vec3 albedoColor = glm::vec3(1.0f);

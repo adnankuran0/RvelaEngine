@@ -1,5 +1,5 @@
 #pragma once
-#include <GL/glew.h>
+#include "GLAD/gl.h"
 #include "BufferLayout.h"
 
 class VertexArray

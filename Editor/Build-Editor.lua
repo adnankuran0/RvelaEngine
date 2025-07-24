@@ -5,15 +5,16 @@ project "Editor"
    targetdir "Binaries/%{cfg.buildcfg}"
    staticruntime "off"
 
-   files { "Source/**.h", "Source/**.cpp","../Vendor/ImGui/*.cpp","../Vendor/ImGui/*.c" }
+   files { "Source/**.h", "Source/**.cpp","../Vendor/ImGui/*.cpp","../Vendor/ImGui/*.c", "../Vendor/GLAD/src/**.c", }
 
    includedirs
    {
       "Source",
       "../Vendor/GLFW/include",
-      "../Vendor/GLEW/include",
+      "../Vendor/GLAD/include",
 	  "../Engine/Source",
       "../Vendor/entt",
+      "../Vendor/spdlog/include",
       "../Vendor",
       "../Vendor/tiny_obj_loader",
       "../Vendor/glm",
@@ -25,14 +26,12 @@ project "Editor"
    libdirs
    {
       "../Vendor/GLFW/lib",
-      "../Vendor/GLEW/lib"
    }
 
    links
    {
       "Engine",
         "glfw3",
-      "glew32s"
    }
 
    targetdir ("../Binaries/" .. OutputDir .. "/%{prj.name}")
@@ -41,6 +40,7 @@ project "Editor"
    filter "system:windows"
        systemversion "latest"
        defines { "WINDOWS","GLFW_INCLUDE_NONE" }
+       buildoptions { "/utf-8" }
 
    filter "configurations:Debug"
        defines { "DEBUG" }
@@ -63,4 +63,5 @@ project "Editor"
        optimize "On"
        symbols "Off"
 
-   
+    filter "files:../Vendor/GLAD/src/gl.c"
+        flags { "NoPCH" }

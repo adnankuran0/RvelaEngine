@@ -54,7 +54,7 @@ public:
     }
 
 private:
-    static int s_ShadowIndexCounter;
+    inline static int s_ShadowIndexCounter = 0;
 
 };
 

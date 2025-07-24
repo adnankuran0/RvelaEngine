@@ -21,7 +21,7 @@ std::shared_ptr<Texture> TextureManager::LoadOrGetTexture(const Path path)
 }
 
 void TextureManager::UnloadTexture(const Path path) {
-	if (!path.IsValid()) return;
+	/*if (!path.IsValid()) return;
 
 	auto it = textureMap.find(path.GetAbsoluteStr());
 	if (it != textureMap.end()) {
@@ -29,7 +29,7 @@ void TextureManager::UnloadTexture(const Path path) {
 	}
 	else {
 		std::cout << "Unload failed: Texture not found: " << path.GetAbsoluteStr() << std::endl;
-	}
+	}*/
 }
 
 void TextureManager::ClearTextures()

@@ -3,6 +3,8 @@
 #include "Utils/TextureManager.h"
 #include "Utils/MaterialManager.h"
 #include "Core/Log.h"
+#include "Assets/AssetUUID.h"
+#include "Assets/AssetRegistry.h"
 
 void LightingPass::Init()
 {
@@ -76,7 +78,7 @@ void LightingPass::Execute()
         glBindTextureUnit(6, i_DirectionalShadowMap);
 
         GLenum err = glGetError();
-        if (err != GL_NO_ERROR) LOG_ERROR << "OpenGL Error after directional light setup: " << err;
+        if (err != GL_NO_ERROR) LOG_ERROR("OpenGL Error after directional light setup: {}",err);
     }
 
     shader.setFloat("heightScale", 0.0f);
@@ -154,12 +156,14 @@ void LightingPass::Execute()
         for (const auto& map : maps) {
             bool hasMap = map.path.IsValid();
             shader.setBool(map.useUniform, hasMap);
-            if (hasMap) {
-                auto tex = TextureManager::LoadOrGetTexture(map.path);
-                if (tex) {
-                    shader.setInt(map.uniformName, map.slot);
-                    tex->Bind(map.slot);
-                }
+            if (hasMap) 
+            {
+                //auto tex = TextureManager::LoadOrGetTexture(map.path);
+                //if (tex) {
+                shader.setInt(map.uniformName, map.slot);
+                command.material.albedo = AssetRegistry::GetAsset<TextureAsset>(AssetUUID::FromString("637676d3-c555-4c1e-9d6d-bc92ea480d5c"));
+                command.material.albedo->GetTexture().Bind(map.slot);
+                //}
             }
         }
 
@@ -172,7 +176,7 @@ void LightingPass::Execute()
 
         GLenum err;
         while ((err = glGetError()) != GL_NO_ERROR) {
-            LOG_ERROR << "OpenGL Error: " << err;
+            LOG_ERROR("OpenGL Error: {}", err);
         }
 
     }

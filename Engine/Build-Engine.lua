@@ -5,7 +5,7 @@ project "Engine"
    targetdir "Binaries/%{cfg.buildcfg}"
    staticruntime "off"
 
-   files { "Source/**.h", "Source/**.cpp" }
+   files { "Source/**.h", "Source/**.cpp", "../Vendor/GLAD/src/**.c" }
 
    pchheader "rvelapch.h"
     pchsource "Source/rvelapch.cpp"
@@ -15,9 +15,9 @@ project "Engine"
       "Source",
       "../Vendor",
       "../Vendor/GLFW/include",
-      "../Vendor/GLEW/include",
+      "../Vendor/GLAD/include",
       "../Vendor/glm",
-      "../Vendor/plog",
+      "../Vendor/spdlog/include",
       "../Vendor/stb_image",
       "../Vendor/entt",
       "../Vendor/tiny_obj_loader",
@@ -30,14 +30,12 @@ project "Engine"
    libdirs
    {
       "../Vendor/GLFW/lib",
-      "../Vendor/GLEW/lib",
       "../Vendor/Assimp/lib"
    }
 
    links
    {
       "glfw3",
-      "glew32s",
       "opengl32",
       "assimp-vc143-mt"
    }
@@ -47,7 +45,8 @@ project "Engine"
 
    filter "system:windows"
        systemversion "latest"
-       defines { "GLFW_INCLUDE_NONE", "GLEW_STATIC" }
+       defines { "GLFW_INCLUDE_NONE" }
+       buildoptions { "/utf-8" }
 
    filter "configurations:Debug"
        defines { "DEBUG" }
@@ -65,3 +64,6 @@ project "Engine"
        runtime "Release"
        optimize "On"
        symbols "Off"
+
+    filter "files:../Vendor/GLAD/src/gl.c"
+        flags { "NoPCH" }

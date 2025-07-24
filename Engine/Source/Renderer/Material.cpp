@@ -3,13 +3,14 @@
 #include "json.hpp"
 #include "Utils/TextureManager.h"
 #include "Core/Log.h"
+#include "Assets/AssetRegistry.h"
 
 using json = nlohmann::json;
 
 Material::~Material()
 {
     DestroyTextures();
-
+    std::cout << "Material Destroyed!\n";
 }
 
 std::string Material::Serialize() const

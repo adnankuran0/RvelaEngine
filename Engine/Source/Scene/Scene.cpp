@@ -10,7 +10,7 @@
 #include "EntityUUID.h"
 
 
-Scene::Scene() : m_Registry() {}
+Scene::Scene() : m_Registry() { LoadPrimitive("Cube"); CreateDirectionalLight(); }
 
 Entity Scene::CreateEntity(const std::string& name) {
     Entity entity(m_Registry.create(), this);
