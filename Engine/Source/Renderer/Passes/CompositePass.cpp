@@ -10,7 +10,7 @@ void CompositePass::Init()
 
 	// Texture oluştur
 	glGenTextures(1, &o_FinalTexture);
-	std::cout << o_FinalTexture << std::endl;
+	LOG_INFO("Final texture ID: {}", o_FinalTexture);
 	glBindTexture(GL_TEXTURE_2D, o_FinalTexture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, ctx.viewportWidth, ctx.viewportHeight,
 		0, GL_RGBA, GL_FLOAT, nullptr);

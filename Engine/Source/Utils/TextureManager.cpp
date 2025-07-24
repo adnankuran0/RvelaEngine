@@ -28,14 +28,13 @@ void TextureManager::UnloadTexture(const Path path) {
 		textureMap.erase(it); 
 	}
 	else {
-		std::cout << "Unload failed: Texture not found: " << path.GetAbsoluteStr() << std::endl;
+		LOG_WARN("Unload failed: Texture not found: {}", path.GetAbsoluteStr());
 	}*/
 }
 
 void TextureManager::ClearTextures()
 {
 	textureMap.clear();
-	std::cout << "All textures cleared." << std::endl;
 }
 
 size_t TextureManager::GetTextureCount() 

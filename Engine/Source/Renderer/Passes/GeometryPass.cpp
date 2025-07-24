@@ -46,7 +46,7 @@ void GeometryPass::Init()
     glDrawBuffers(3, attachments);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cout << "Geometry framebuffer not complete!" << std::endl;
+        LOG_WARN("Geometry framebuffer not complete!");
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

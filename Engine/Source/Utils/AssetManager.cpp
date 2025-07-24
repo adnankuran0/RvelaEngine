@@ -43,7 +43,7 @@ fs::path AssetManager::FindTexturePath(const Path modelPath, const aiString& tex
             return altPath;
     }
 
-    std::cout << "Texture not found: " << textureFullPath << std::endl;
+    LOG_WARN("Texture not found: {}", textureFullPath.string());
     return "";
 }
 
@@ -67,7 +67,7 @@ void AssetManager::LoadMaterials(const aiScene* scene, std::unordered_map<unsign
             std::string fallbackName = "UnnamedMaterial_" + std::to_string(randomNum);
             name = aiString(fallbackName.c_str());
 
-            std::cout << "Can't load material! Assigned random name: " << name.C_Str() << std::endl;
+            LOG_WARN("Can't load material! Assigned random name: {}", name.C_Str());;
         }
 
         
@@ -144,7 +144,7 @@ std::vector<MeshData> AssetManager::LoadModel(const Path path)
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
-        std::cout << "Model could not be loaded!\n";
+        LOG_WARN("Model could not be loaded!");
     }
     
     // MaterialIndex  Path

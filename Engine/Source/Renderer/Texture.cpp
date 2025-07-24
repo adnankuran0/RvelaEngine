@@ -6,8 +6,7 @@
 
 Texture::Texture()
 {
-    std::cout << "Texture created!\n";
-
+    LOG_INFO("Texture created!");
 	Init();
 }
 
@@ -49,7 +48,7 @@ void Texture::Bind() const
 
 void Texture::Destroy() const
 {
-    std::cout << "Texture destroyed!\n";
+    LOG_INFO("Texture destroyed!");
     glDeleteTextures(1, &m_Texture);
 }
 

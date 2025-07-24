@@ -14,7 +14,7 @@ void SSRPass::Init()
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, o_SsrTexture, 0);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cout << "SSR framebuffer not complete!" << std::endl;
+        LOG_WARN("SSR framebuffer not complete!");
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

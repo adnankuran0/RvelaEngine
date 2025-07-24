@@ -4,3 +4,10 @@
 [info] Asset found with uuid: a6b76922-ef29-463f-854f-eada529177d9
 [info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
 [info] Engine has started!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: a6b76922-ef29-463f-854f-eada529177d9
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[info] Engine has started!
+[info] Final texture ID: 26

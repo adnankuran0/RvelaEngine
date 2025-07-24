@@ -10,12 +10,9 @@
 class Material : public ISerializable
 {
 public:
-	Material()
-	{
-		std::cout << "Material created!\n";
-	}
+	Material() = default;
 	~Material();
-	Material(const Material&) { std::cout << "Material copied! (" << this << ")\n"; }
+	Material(const Material&) { LOG_INFO("Material copied!"); }
 
 	glm::vec3 albedoColor = glm::vec3(1.0f);
 	float metallic = 0.0f;

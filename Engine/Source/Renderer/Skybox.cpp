@@ -71,7 +71,7 @@ GLuint Skybox::loadCubemap(const std::vector<Path>& faces)
         }
         else
         {
-            std::cout << "Cubemap texture failed to load at path: " << faces[i].GetAbsoluteStr().c_str() << std::endl;
+            LOG_WARN("Cubemap texture failed to load at path: {}", faces[i].GetAbsoluteStr().c_str());
             stbi_image_free(data);
         }
     }

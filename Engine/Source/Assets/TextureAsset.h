@@ -92,13 +92,13 @@ public:
     TextureAsset(const std::string& path, std::unique_ptr<TextureMeta> textureMeta)
         : m_Path(path), m_Loaded(false), Asset(std::move(textureMeta)) 
     {
-        std::cout << "Texture asset created!\n";
+        LOG_INFO("Texture asset created!");
         m_Texture.Init();
     }
 
     ~TextureAsset() 
     {
-        std::cout << "Texture asset destroyed!\n";
+        LOG_INFO("Texture asset destroyed!");
         Unload();
     }
 
@@ -122,7 +122,7 @@ public:
         
         m_Texture.GenerateFromMemory(data.data(), meta->width, meta->height);
         GLenum err = glGetError();
-        if (err != GL_NO_ERROR) std::cout << "AAAAAAAAAA: " << err << "\n";
+        if (err != GL_NO_ERROR) LOG_ERROR("Error while loading texture from memory: {}", err);
 
         if (m_Texture.GetID() == 0)
         {

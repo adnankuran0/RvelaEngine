@@ -10,7 +10,7 @@ using json = nlohmann::json;
 Material::~Material()
 {
     DestroyTextures();
-    std::cout << "Material Destroyed!\n";
+    LOG_INFO("Material Destroyed!");
 }
 
 std::string Material::Serialize() const

@@ -51,7 +51,7 @@ bool TextureImporter::Import(const std::filesystem::path& path)
 	outFile.close();
 
 	stbi_image_free(textureData);
-	std::cout << "Texture asset imported with UUID: " << meta.uuid.ToString() << std::endl;
+	LOG_INFO("Texture asset imported with UUID: {}", meta.uuid.ToString());
 	return true;
 }
 
