@@ -1,4 +1,4 @@
-project "Engine"
+project "RvelaEngine"
    kind "StaticLib"
    language "C++"
    cppdialect "C++20"

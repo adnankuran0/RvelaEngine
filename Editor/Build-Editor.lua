@@ -1,4 +1,4 @@
-project "Editor"
+project "RvelaEditor"
    kind "ConsoleApp"
    language "C++"
    cppdialect "C++20"
@@ -30,7 +30,7 @@ project "Editor"
 
    links
    {
-      "Engine",
+      "RvelaEngine",
         "glfw3",
    }
 
