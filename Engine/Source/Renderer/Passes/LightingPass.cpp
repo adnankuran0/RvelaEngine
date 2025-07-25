@@ -23,7 +23,7 @@ void LightingPass::Init()
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, screenRBO);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cerr << "MSAA Framebuffer not complete" << std::endl;
+        LOG_ERROR("MSAA Framebuffer not complete");
 
     // Intermediate framebuffer (non-MSAA)
     glGenFramebuffers(1, &intermediateFBO);
@@ -37,7 +37,7 @@ void LightingPass::Init()
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, o_IntermediateColorTex, 0);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cerr << "Intermediate Framebuffer not complete" << std::endl;
+        LOG_ERROR("Intermediate Framebuffer not complete");
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

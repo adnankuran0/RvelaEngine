@@ -10,7 +10,7 @@ static std::vector<uint8_t> ReadTextureData(const std::filesystem::path& filePat
     std::ifstream file(filePath, std::ios::binary | std::ios::ate); // go to end
     if (!file)
     {
-        std::cerr << "Failed to open file: " << filePath << "\n";
+        LOG_ERROR("Failed to open file: {}", filePath.string());
         return {};
     }
 
@@ -18,7 +18,7 @@ static std::vector<uint8_t> ReadTextureData(const std::filesystem::path& filePat
     size_t dataOffset = headerSize + metaSize;
     if (fileSize <= dataOffset)
     {
-        std::cerr << "Invalid asset file size.\n";
+        LOG_ERROR("Invalid asset file size.");
         return {};
     }
 
@@ -109,14 +109,14 @@ public:
         TextureMeta* meta = GetMetaAs<TextureMeta>();
         if (!meta)
         {
-            std::cerr << "Failed to get TextureMeta\n";
+            LOG_ERROR("Failed to get TextureMeta");
             return false;
         }
 
         std::vector<uint8_t> data = ReadTextureData(m_Path, sizeof(AssetHeader), sizeof(TextureMeta));
         if (data.empty())
         {
-            std::cerr << "Failed to read texture data from file\n";
+            LOG_ERROR("Failed to read texture data from file");
             return false;
         }
         
@@ -126,7 +126,7 @@ public:
 
         if (m_Texture.GetID() == 0)
         {
-            std::cerr << "Texture OpenGL ID is 0, loading failed\n";
+            LOG_ERROR("Texture OpenGL ID is 0, loading failed");
             return false;
         }
 

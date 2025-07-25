@@ -25,7 +25,7 @@ void EditorLayer::OnAttach()
 
     if (!m_Engine || !m_Engine->GetWindow().GetGLFWWindow())
     {
-        std::cerr << "Error: Engine or Window is null!" << std::endl;
+        LOG_ERROR("Error: Engine or Window is null!");
         return;
     }
     ImGui_ImplGlfw_InitForOpenGL(m_Engine->GetWindow().GetGLFWWindow(), true);

@@ -42,7 +42,7 @@ void ShadowPass::InitDirectionalShadowMap()
     glReadBuffer(GL_NONE);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cerr << "ERROR: Shadow framebuffer not complete!" << std::endl;
+        LOG_ERROR("Shadow framebuffer not complete!");
 }
 
 void ShadowPass::InitPointShadowMap()
@@ -75,7 +75,7 @@ void ShadowPass::InitPointShadowMap()
     for (int layer = 0; layer < 6 * 20; ++layer) {
         glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, o_PointShadowMap, 0, layer);
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-            std::cerr << "ERROR: Point shadow framebuffer layer " << layer << " not complete!" << std::endl;
+            LOG_ERROR("Point shadow framebuffer layer {} not complete!", layer);
         }
     }
 

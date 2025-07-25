@@ -263,7 +263,7 @@ MeshData AssetManager::LoadMesh(const Path modelPath, uint32_t meshIndex)
 
         if (!scene || (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) || !scene->mRootNode) {
             modelCache.erase(modelPath.GetAbsoluteStr());
-            std::cerr << "Failed to load model: " << modelPath.GetAbsoluteStr() << "\n";
+            LOG_ERROR("Failed to load model: {}" ,modelPath.GetAbsoluteStr());
             return {};
         }
 
@@ -280,7 +280,7 @@ MeshData AssetManager::LoadMesh(const Path modelPath, uint32_t meshIndex)
 
     const aiScene* scene = cacheEntry.scene;
     if (meshIndex >= scene->mNumMeshes) {
-        std::cerr << "Invalid mesh index: " << meshIndex << " for model: " << modelPath.GetAbsoluteStr() << "\n";
+        LOG_ERROR("Invalid mesh index: {} for model: {}", meshIndex, modelPath.GetAbsoluteStr());
         return {};
     }
 

@@ -37,7 +37,7 @@ std::shared_ptr<Material> MaterialManager::LoadOrGetMaterial(const Path path)
     std::ifstream file(path.GetAbsoluteStr());
     if (!file.is_open())
     {
-        std::cerr << "Material file could not be opened: " << path.GetAbsoluteStr() << std::endl;
+        LOG_ERROR("Material file could not be opened: {}", path.GetAbsoluteStr());
         return nullptr;
     }
 

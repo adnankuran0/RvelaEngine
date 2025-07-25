@@ -10,7 +10,7 @@ void Serializer::SaveToFile(const ISerializable& obj, const std::string& path)
 		std::ofstream file(path);
 		if (!file.is_open())
 		{
-			std::cerr << "File can not be opened: " << path << std::endl;
+			LOG_ERROR("File can not be opened: {}", path);
 			return;
 		}
 
@@ -20,7 +20,7 @@ void Serializer::SaveToFile(const ISerializable& obj, const std::string& path)
 	}
 	catch (const std::exception& e)
 	{
-		std::cerr << "Serializer::SaveToFile error: " << e.what() << std::endl;
+		LOG_ERROR("Serializer::SaveToFile error: {}", e.what());
 	}
 }
 void Serializer::LoadFromFile(ISerializable& obj, const std::string& path)
@@ -28,7 +28,7 @@ void Serializer::LoadFromFile(ISerializable& obj, const std::string& path)
 	std::ifstream file(path);
 	if (!file.is_open())
 	{
-		std::cerr << "File can not be opened: " << path << std::endl;
+		LOG_ERROR("File can not be opened: {}", path);
 	}
 	std::string str((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 	obj.Deserialize(str.c_str());

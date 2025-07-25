@@ -29,7 +29,7 @@ void AssetRegistry::ScanAssets(const std::filesystem::path& dir)
             std::ifstream inFile(path, std::ios::binary);
             if (!inFile.is_open()) 
             {
-                std::cerr << "Failed to open file: " << path << std::endl;
+                LOG_ERROR("Failed to open file: {}", path.string());
                 continue;
             }
 
@@ -44,17 +44,17 @@ void AssetRegistry::ScanAssets(const std::filesystem::path& dir)
 
 Ref<Asset> AssetRegistry::LoadAssetFromFile(const std::filesystem::path& path)
 {
+    std::ifstream inFile(path, std::ios::binary);
+    if (!inFile.is_open())
+    {
+        LOG_ERROR("Failed to open file: {}", path.string());
+    }
+
     auto ext = path.extension().string();
 
     //Texture Asset
     if (ext == ".rtex")
     {
-        std::ifstream inFile(path, std::ios::binary);
-        if (!inFile.is_open()) 
-        {
-            std::cerr << "Failed to open file: " << path << std::endl;
-        }
-
         AssetHeader header = ReadHeader(inFile,MAGIC_TEXTURE);
         std::unique_ptr<TextureMeta> meta = ReadMeta<TextureMeta>(inFile,header);
 
@@ -65,6 +65,12 @@ Ref<Asset> AssetRegistry::LoadAssetFromFile(const std::filesystem::path& path)
         }
     }
 
+    //Material Asset
+    if (ext == ".rmat")
+    {
+
+    }
+
     return nullptr;
 }
 
@@ -73,13 +79,13 @@ AssetHeader AssetRegistry::ReadHeader(std::ifstream& inFile, uint32_t expectedMa
 {
     if (!inFile) 
     {
-        std::cerr << "Failed to read AssetHeader\n";
+        LOG_ERROR("Failed to read AssetHeader");
     }
     AssetHeader header{};
     inFile.read(reinterpret_cast<char*>(&header), sizeof(header));
     if (header.magic != expectedMagic) 
     {
-        std::cerr << "Invalid file magic\n";
+        LOG_ERROR("Invalid file magic");
     }
 
     return header;

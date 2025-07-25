@@ -65,7 +65,7 @@ void Texture::GenerateFromImage(const std::string& path)
     }
     else
     {
-        std::cerr << "Failed to load texture: " << path;
+        LOG_ERROR("Failed to load texture: {}", path);
     }
     stbi_image_free(m_Data);
 
@@ -95,7 +95,7 @@ void Texture::ToImage(int width, int height, const unsigned char* data, int nrCh
         case 3: format = GL_RGB; break;
         case 4: format = GL_RGBA; break;
         default:
-            std::cerr << "Unsupported number of channels: " << nrChannels << std::endl;
+            LOG_ERROR("Unsupported number of channels: {}", nrChannels);
             return;
     }
     glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);

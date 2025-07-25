@@ -8,7 +8,7 @@ bool TextureImporter::Import(const std::filesystem::path& path)
 	uint8_t* textureData = stbi_load(path.string().c_str(), &width, &height, &channels, 4);
 	if (!textureData)
 	{
-		std::cerr << "Failed to load image: " << path << std::endl;
+		LOG_ERROR("Failed to load image: {}", path.string());
 		return false;
 	}
 
@@ -40,7 +40,7 @@ bool TextureImporter::Import(const std::filesystem::path& path)
 	std::ofstream outFile(outputPath, std::ios::binary);
 	if (!outFile)
 	{
-		std::cerr << "Failed to open output file." << std::endl;
+		LOG_ERROR("Failed to open output file.");
 		stbi_image_free(textureData);
 		return false;
 	}

@@ -61,7 +61,7 @@ private:
         inFile.read(metaBuffer.data(), header.metaSize);
         if (!inFile) 
         {
-            std::cerr << "Failed to read metadata\n";
+            LOG_ERROR("Failed to read metadata");
             return nullptr;
         }
 
