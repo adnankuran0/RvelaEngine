@@ -55,7 +55,8 @@ project "RvelaEditor"
        optimize "On"
        symbols "On"
        postbuildcommands {
-        "{COPY} ../Vendor/Assimp/lib/assimp-vc143-mt.dll ../Binaries/" .. OutputDir .. "/Editor/"}
+      "{COPY} ../Vendor/Assimp/lib/assimp-vc143-mt.dll ../Binaries/" .. OutputDir .. "/%{prj.name}/"
+}
 
    filter "configurations:Dist"
        defines { "DIST" }
