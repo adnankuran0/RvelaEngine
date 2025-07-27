@@ -23,7 +23,8 @@ project "RvelaEngine"
       "../Vendor/tiny_obj_loader",
       "../Vendor/Assimp/include",
       "../Vendor/nlohmann",
-      "../Vendor/uuid_v4"
+      "../Vendor/uuid_v4",
+      "../Vendor/robin_map/include"
       
    }
 

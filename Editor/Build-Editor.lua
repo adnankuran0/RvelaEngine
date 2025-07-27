@@ -20,7 +20,8 @@ project "RvelaEditor"
       "../Vendor/glm",
       "../Vendor/Assimp/include",
       "../Vendor/ImGui",
-      "../Vendor/nlohmann"
+      "../Vendor/nlohmann",
+      "../Vendor/robin_map/include"
    }
 
    libdirs

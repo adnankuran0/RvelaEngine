@@ -138,6 +138,7 @@ public:
     {
         if (m_Loaded) 
         {
+            m_Texture.Destroy();
             m_Loaded = false;
         }
     }

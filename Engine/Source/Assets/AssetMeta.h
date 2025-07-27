@@ -4,6 +4,7 @@
 #include "AssetUUID.h"
 
 constexpr uint32_t MAGIC_TEXTURE = 0x52544558; // RTEX ASCII
+constexpr uint32_t MAGIC_MATERIAL = 0x524D4154; // RMAT ASCII
 
 enum struct AssetType : uint8_t
 {
