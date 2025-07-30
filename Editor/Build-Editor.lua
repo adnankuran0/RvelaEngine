@@ -47,8 +47,8 @@ project "RvelaEditor"
        defines { "DEBUG" }
        runtime "Debug"
        symbols "On"
-       postbuildcommands {
-        "{COPY} ../Vendor/Assimp/lib/assimp-vc143-mt.dll ../Binaries/" .. OutputDir .. "/Editor/" }
+       --postbuildcommands 
+       --{ "{COPY} ../Vendor/Assimp/lib/assimp-vc143-mt.dll ../Binaries/" .. OutputDir .. "/Editor/" }
 
    filter "configurations:Release"
        defines { "RELEASE" }

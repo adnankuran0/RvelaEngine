@@ -1,4 +1,5 @@
 #include "rvelapch.h"
+#if 0
 #include "TextureManager.h"
 
 std::unordered_map<std::string, std::shared_ptr<Texture>> TextureManager::textureMap;
@@ -41,3 +42,4 @@ size_t TextureManager::GetTextureCount()
 {
 	return textureMap.size();
 }
+#endif

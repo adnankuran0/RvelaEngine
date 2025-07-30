@@ -4,6 +4,8 @@
 #include "AssetUUID.h"
 #include <string>
 #include "Asset.h"
+#include <Core/Log.h>
+#include "stb_image/stb_image_write.h"
 
 static std::vector<uint8_t> ReadTextureData(const std::filesystem::path& filePath, size_t headerSize, size_t metaSize)
 {
@@ -32,14 +34,7 @@ static std::vector<uint8_t> ReadTextureData(const std::filesystem::path& filePat
     return data;
 }
 
-enum class TextureFormat : uint8_t
-{
-    Unknown = 0,
-    RGBA8,
-    RGB8,
-    BC1, //DXT1
-    BC3  //DXT5
-};
+
 
 class TextureMeta : public AssetMeta
 {
@@ -113,6 +108,9 @@ public:
             return false;
         }
 
+        LOG_DEBUG("Load: format = {}, isSRGB = {}, width = {}, height = {}",
+            (uint8_t)meta->format, meta->isSRGB, meta->width, meta->height);
+
         std::vector<uint8_t> data = ReadTextureData(m_Path, sizeof(AssetHeader), sizeof(TextureMeta));
         if (data.empty())
         {
@@ -120,7 +118,8 @@ public:
             return false;
         }
         
-        m_Texture.GenerateFromMemory(data.data(), meta->width, meta->height);
+        m_Texture.GenerateFromMemory(data.data(), meta->width, meta->height, meta->format, meta->isSRGB);
+        //m_Texture.GenerateFromImage(std::filesystem::path(m_Path).replace_extension(".png").string());
         GLenum err = glGetError();
         if (err != GL_NO_ERROR) LOG_ERROR("Error while loading texture from memory: {}", err);
 
@@ -138,7 +137,6 @@ public:
     {
         if (m_Loaded) 
         {
-            m_Texture.Destroy();
             m_Loaded = false;
         }
     }

@@ -5,6 +5,7 @@
 #include "Core/Log.h"
 #include "TextureAsset.h"
 #include "MaterialAsset.h"
+#include "Assets/AssetMagic.h"
 
 class AssetLoader
 {
@@ -32,4 +33,33 @@ public:
 
         return meta;
     }
+
+   /* template<typename T>
+    static AssetUUID ReadUUID(const std::string& path)
+    {
+        std::ifstream inFile(path, std::ios::binary);
+        if (!inFile.is_open())
+        {
+            LOG_ERROR("File could not be opened: {}", path);
+            return nullptr; 
+        }
+
+        AssetHeader header = ReadHeader(inFile, AssetMagic<T>::magic);
+        if (header.magic != AssetMagic<T>::magic)
+        {
+            LOG_ERROR("Magic mismatch in file: {}", path);
+            return nullptr;
+        }
+
+        std::unique_ptr<T> meta = ReadMeta<T>(inFile, header);
+        if (!meta)
+        {
+            LOG_ERROR("Meta could not be read from file: {}", path);
+            return nullptr;
+        }
+
+        return meta->uuid;
+    }*/
+
+    
 };

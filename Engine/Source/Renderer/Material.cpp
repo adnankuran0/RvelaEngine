@@ -1,4 +1,5 @@
 #include "rvelapch.h"
+#if 0
 #include "Material.h"
 #include "json.hpp"
 #include "Utils/TextureManager.h"
@@ -123,3 +124,4 @@ void Material::DestroyTextures()
     TextureManager::UnloadTexture(aoMapPath);
     TextureManager::UnloadTexture(heightMapPath);
 }
+#endif

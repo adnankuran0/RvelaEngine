@@ -7,7 +7,6 @@
 #include "Assets/AssetUUID.h"
 #include <memory>
 
-#if 0
 struct MaterialMeta : public AssetMeta
 {
 	std::unique_ptr<AssetMeta> Clone() const override
@@ -28,116 +27,75 @@ class MaterialAsset : public Asset
 {
 public:
 	MaterialAsset(const std::string& path, std::unique_ptr<MaterialMeta> meta)
-		: Asset(std::move(meta)), m_Path(path) {}
-
-	inline glm::vec3 GetAlbedoColor() const noexcept { return albedoColor; }
-	inline void SetAlbedoColor(const glm::vec3& albedoColor) noexcept { this->albedoColor = albedoColor; }
-	inline float GetMetallic() const noexcept { return metallic; }
-	inline void SetMetallic(float metallic) noexcept { this->metallic = metallic; }
-	inline float GetRoughness() const noexcept { return roughness; }
-	inline void SetRoughness(float roughness) noexcept { this->roughness = roughness; }
-	inline float GetAO() const noexcept { return ao; }
-	inline void SetAO(float ao) noexcept { this->ao = ao; }
-	inline float GetNormalScale() const noexcept { return normalScale; }
-	inline void SetNormalScale(float normalScale) noexcept { this->normalScale = normalScale; }
-	inline glm::vec2 GetUVScale() const noexcept { return UVScale; }
-	inline void SetUVScale(const glm::vec2& UVScale) noexcept { this->UVScale = UVScale; }
-	inline glm::vec2 GetUVOffset() const noexcept { return UVOffset; }
-	inline void SetUVOffset(const glm::vec2& UVOffset) noexcept { this->UVOffset = UVOffset; }
-
-	inline Ref<TextureAsset> GetAlbedoTexture() const { return albedoTexture; }
-	inline void SetAlbedoTexture(const AssetUUID& textureUIID) 
-	{
-		albedoTextureUUID = textureUIID.IsValid() ? textureUIID : AssetUUID();
-		albedoTexture = AssetRegistry::GetAsset<TextureAsset>(textureUIID);
+		: Asset(std::move(meta)), m_Path(path) {
 	}
 
-	inline Ref<TextureAsset> GetNormalTexture() const { return normalTexture; }
-	inline void SetNormalTexture(const AssetUUID& textureUIID)
-	{
-		normalTextureUUID = textureUIID.IsValid() ? textureUIID : AssetUUID();
-		normalTexture = AssetRegistry::GetAsset<TextureAsset>(textureUIID);
-	}	
-
-	inline Ref<TextureAsset> GetMetallicTexture() const { return metallicTexture; }
-	inline void SetMetallicTexture(const AssetUUID& textureUIID)
-	{
-		metallicTextureUUID = textureUIID.IsValid() ? textureUIID : AssetUUID();
-		metallicTexture = AssetRegistry::GetAsset<TextureAsset>(textureUIID);
-	}	
-
-	inline Ref<TextureAsset> GetRoughnessTexture() const { return roughnessTexture; }
-	inline void SetRoughnessTexture(const AssetUUID& textureUIID)
-	{
-		roughnessTextureUUID = textureUIID.IsValid() ? textureUIID : AssetUUID();
-		roughnessTexture = AssetRegistry::GetAsset<TextureAsset>(textureUIID);
-	}	
-
-	inline Ref<TextureAsset> GetAOTexture() const { return aoTexture; }
-	inline void SetAOTexture(const AssetUUID& textureUIID)
-	{
-		aoTextureUUID = textureUIID.IsValid() ? textureUIID : AssetUUID();
-		aoTexture = AssetRegistry::GetAsset<TextureAsset>(textureUIID);
-	}
-
-	inline Ref<TextureAsset> GetHeightTexture() const { return heightTexture; }
-	inline void SetHeightTexture(const AssetUUID& textureUIID)
-	{
-		heightTextureUUID = textureUIID.IsValid() ? textureUIID : AssetUUID();
-		heightTexture = AssetRegistry::GetAsset<TextureAsset>(textureUIID);
-	}
-
-	inline bool Load() 
+	bool Load()
 	{
 		std::ifstream file(m_Path, std::ios::binary);
-		if (!file) {
+		if (!file)
+		{
 			LOG_ERROR("Failed to open .rmat: {}", m_Path);
 			return false;
 		}
 
-		std::vector<char> buffer((std::istreambuf_iterator<char>(file)), {});
-		file.close();
+		AssetHeader header;
+		file.read(reinterpret_cast<char*>(&header), sizeof(header));
+		if (header.magic != MAGIC_MATERIAL)
+		{
+			LOG_ERROR("Invalid material magic!");
+			return false;
+		}
+
+		std::vector<char> metaBuffer(header.metaSize);
+		file.read(metaBuffer.data(), header.metaSize);
 
 		size_t offset = 0;
-		GetMetaAs<MaterialMeta>()->Deserialize(buffer, offset);
+		GetMetaAs<MaterialMeta>()->Deserialize(metaBuffer, offset);
 
-		memcpy(&albedoColor, buffer.data() + offset, sizeof(glm::vec3)); offset += sizeof(glm::vec3);
-		memcpy(&metallic, buffer.data() + offset, sizeof(float)); offset += sizeof(float);
-		memcpy(&roughness, buffer.data() + offset, sizeof(float)); offset += sizeof(float);
-		memcpy(&ao, buffer.data() + offset, sizeof(float)); offset += sizeof(float);
-		memcpy(&normalScale, buffer.data() + offset, sizeof(float)); offset += sizeof(float);
-		memcpy(&UVScale, buffer.data() + offset, sizeof(glm::vec2)); offset += sizeof(glm::vec2);
-		memcpy(&UVOffset, buffer.data() + offset, sizeof(glm::vec2)); offset += sizeof(glm::vec2);
+		std::vector<char> dataBuffer((std::istreambuf_iterator<char>(file)), {});
+		offset = 0;
 
-		memcpy(&albedoTextureUUID, buffer.data() + offset, sizeof(AssetUUID)); offset += sizeof(AssetUUID);
-		memcpy(&normalTextureUUID, buffer.data() + offset, sizeof(AssetUUID)); offset += sizeof(AssetUUID);
-		memcpy(&metallicTextureUUID, buffer.data() + offset, sizeof(AssetUUID)); offset += sizeof(AssetUUID);
-		memcpy(&roughnessTextureUUID, buffer.data() + offset, sizeof(AssetUUID)); offset += sizeof(AssetUUID);
-		memcpy(&aoTextureUUID, buffer.data() + offset, sizeof(AssetUUID)); offset += sizeof(AssetUUID);
-		memcpy(&heightTextureUUID, buffer.data() + offset, sizeof(AssetUUID)); offset += sizeof(AssetUUID);
+		memcpy(&albedoColor, dataBuffer.data() + offset, sizeof(glm::vec3)); offset += sizeof(glm::vec3);
+		memcpy(&metallic, dataBuffer.data() + offset, sizeof(float)); offset += sizeof(float);
+		memcpy(&roughness, dataBuffer.data() + offset, sizeof(float)); offset += sizeof(float);
+		memcpy(&ao, dataBuffer.data() + offset, sizeof(float)); offset += sizeof(float);
+		memcpy(&normalScale, dataBuffer.data() + offset, sizeof(float)); offset += sizeof(float);
+		memcpy(&UVScale, dataBuffer.data() + offset, sizeof(glm::vec2)); offset += sizeof(glm::vec2);
+		memcpy(&UVOffset, dataBuffer.data() + offset, sizeof(glm::vec2)); offset += sizeof(glm::vec2);
 
-		albedoTexture = AssetRegistry::GetAsset<TextureAsset>(albedoTextureUUID);
-		normalTexture = AssetRegistry::GetAsset<TextureAsset>(normalTextureUUID);
-		metallicTexture = AssetRegistry::GetAsset<TextureAsset>(metallicTextureUUID);
-		roughnessTexture = AssetRegistry::GetAsset<TextureAsset>(roughnessTextureUUID);
-		aoTexture = AssetRegistry::GetAsset<TextureAsset>(aoTextureUUID);
-		heightTexture = AssetRegistry::GetAsset<TextureAsset>(heightTextureUUID);
+		memcpy(&albedoTextureUUID, dataBuffer.data() + offset, sizeof(AssetUUID)); offset += sizeof(AssetUUID);
+		memcpy(&normalTextureUUID, dataBuffer.data() + offset, sizeof(AssetUUID)); offset += sizeof(AssetUUID);
+		memcpy(&metallicTextureUUID, dataBuffer.data() + offset, sizeof(AssetUUID)); offset += sizeof(AssetUUID);
+		memcpy(&roughnessTextureUUID, dataBuffer.data() + offset, sizeof(AssetUUID)); offset += sizeof(AssetUUID);
+		memcpy(&aoTextureUUID, dataBuffer.data() + offset, sizeof(AssetUUID)); offset += sizeof(AssetUUID);
+		memcpy(&heightTextureUUID, dataBuffer.data() + offset, sizeof(AssetUUID)); offset += sizeof(AssetUUID);
 
+		memcpy(&useAlbedoMap, dataBuffer.data() + offset, sizeof(bool)); offset += sizeof(bool);
+		memcpy(&useNormalMap, dataBuffer.data() + offset, sizeof(bool)); offset += sizeof(bool);
+		memcpy(&useMetallicMap, dataBuffer.data() + offset, sizeof(bool)); offset += sizeof(bool);
+		memcpy(&useRoughnessMap, dataBuffer.data() + offset, sizeof(bool)); offset += sizeof(bool);
+		memcpy(&useAOMap, dataBuffer.data() + offset, sizeof(bool)); offset += sizeof(bool);
+		memcpy(&useHeightMap, dataBuffer.data() + offset, sizeof(bool)); offset += sizeof(bool);
+
+		file.close();
 		return true;
 	}
 
-	inline void Serialize() 
+	void Serialize()
 	{
-		std::vector<char> buffer;
-		size_t offset = 0;
-		GetMetaAs<MaterialMeta>()->Serialize(buffer, offset);
+		std::vector<char> metaBuffer;
+		size_t metaOffset = 0;
+		GetMetaAs<MaterialMeta>()->Serialize(metaBuffer, metaOffset);
 
-		auto write = [&](const void* data, size_t size) 
-		{
-			if (buffer.size() < offset + size) buffer.resize(offset + size);
-			memcpy(buffer.data() + offset, data, size);
-			offset += size;
-		};
+		std::vector<char> dataBuffer;
+		size_t dataOffset = 0;
+		auto write = [&](const void* data, size_t size)
+			{
+				if (dataBuffer.size() < dataOffset + size) dataBuffer.resize(dataOffset + size);
+				memcpy(dataBuffer.data() + dataOffset, data, size);
+				dataOffset += size;
+			};
 
 		write(&albedoColor, sizeof(glm::vec3));
 		write(&metallic, sizeof(float));
@@ -154,18 +112,42 @@ public:
 		write(&aoTextureUUID, sizeof(AssetUUID));
 		write(&heightTextureUUID, sizeof(AssetUUID));
 
+		write(&useAlbedoMap, sizeof(bool));
+		write(&useNormalMap, sizeof(bool));
+		write(&useMetallicMap, sizeof(bool));
+		write(&useRoughnessMap, sizeof(bool));
+		write(&useAOMap, sizeof(bool));
+		write(&useHeightMap, sizeof(bool));
+
+		AssetHeader header;
+		header.magic = MAGIC_MATERIAL; 
+		header.version = 1;
+		header.type = AssetType::Material;
+		header.metaSize = static_cast<uint32_t>(metaBuffer.size());
+		header.dataOffset = sizeof(AssetHeader) + header.metaSize;
+		header.reserved = 0;
+
 		std::ofstream out(m_Path, std::ios::binary);
-		if (!out) 
+		if (!out)
 		{
 			LOG_ERROR("Failed to write .rmat file: {}", m_Path);
 			return;
 		}
 
-		out.write(buffer.data(), buffer.size());
+		out.write(reinterpret_cast<const char*>(&header), sizeof(header));
+		out.write(metaBuffer.data(), metaBuffer.size());
+		out.write(dataBuffer.data(), dataBuffer.size());
 		out.close();
 	}
 
-private:
+public:
+	bool useAlbedoMap = false;
+	bool useNormalMap = false;
+	bool useMetallicMap = false;
+	bool useRoughnessMap = false;
+	bool useAOMap = false;
+	bool useHeightMap = false;
+
 	glm::vec3 albedoColor = glm::vec3(1.0f);
 	float metallic = 0.0f;
 	float roughness = 1.0f;
@@ -181,28 +163,7 @@ private:
 	AssetUUID aoTextureUUID;
 	AssetUUID heightTextureUUID;
 
-	Ref<TextureAsset> albedoTexture;
-	Ref<TextureAsset> normalTexture;
-	Ref<TextureAsset> metallicTexture;
-	Ref<TextureAsset> roughnessTexture;
-	Ref<TextureAsset> aoTexture;
-	Ref<TextureAsset> heightTexture;
-
 	std::string m_Path;
-
 };
 
-struct MatComponent 
-{
-	Ref<MaterialAsset> Material;
-	AssetUUID MaterialUUID;
 
-	void Load()
-	{
-		if (MaterialUUID.IsValid()) 
-		{
-			Material = AssetRegistry::GetAsset<MaterialAsset>(MaterialUUID);
-		}
-	}
-};
-#endif

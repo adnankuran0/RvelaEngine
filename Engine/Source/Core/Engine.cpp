@@ -11,9 +11,9 @@ Engine::Engine()
 
 	m_Window.Init();
 	m_ProjectManager.LoadProject("C:\\RvelaEngine\\TestProject\\TestProject.rproj");
-	m_Scene = std::make_unique<Scene>();
 	m_Renderer.Init(m_Window.GetGLFWWindow());
 	m_AssetRegistry.Init(m_ProjectManager.GetProjectPath()); //TODO: Make this works with assets path
+	m_Scene = std::make_unique<Scene>();
 	PushLayer(new RenderLayer(this));
 
 	if (s_Instance == nullptr)

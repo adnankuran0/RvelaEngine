@@ -1,6 +1,7 @@
 ﻿#include "MenuBar.h"
 #include <ImGui/tinyfiledialogs.h>
 #include <fstream>
+#include <AssetImporter/MaterialImporter.h>
 
 void MenuBar::Draw(Engine* engine,AssetImporterRegistry& assetImporter)
 {
@@ -68,6 +69,22 @@ void MenuBar::Draw(Engine* engine,AssetImporterRegistry& assetImporter)
                     std::string lastFile = pathsStr.substr(start);
                     if (!lastFile.empty())
                         assetImporter.Import(lastFile);
+                }
+            }
+            if (ImGui::MenuItem("Create Material"))
+            {
+                const char* filterPatterns[] = { "*.rmat" };
+                const char* filePath = tinyfd_saveFileDialog("Create material as", "material.rmat", 1, filterPatterns, NULL);
+
+                std::string file = filePath ? std::string(filePath) : "";
+                if (!file.empty())
+                {
+                    std::ofstream ofs(file);
+                    if (ofs.is_open())
+                    {
+                        ofs.close();
+                        MaterialImporter::CreateMaterialAsset(file);
+                    }
                 }
             }
             ImGui::Separator();

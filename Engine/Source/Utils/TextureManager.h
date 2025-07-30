@@ -1,3 +1,4 @@
+#if 0
 #pragma once
 #include "Renderer/Texture.h"
 #include <string>
@@ -14,3 +15,4 @@ public:
 private:
 	static std::unordered_map<std::string, std::shared_ptr<Texture>> textureMap;
 };
+#endif

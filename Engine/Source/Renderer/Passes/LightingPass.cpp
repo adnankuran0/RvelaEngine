@@ -6,6 +6,16 @@
 #include "Assets/AssetUUID.h"
 #include "Assets/AssetRegistry.h"
 
+
+
+struct MapInfo {
+    bool isUsing;
+    std::string uniformName;
+    int slot;
+    std::string useUniform;
+    Ref<TextureAsset> texture;
+};
+
 void LightingPass::Init()
 {
     // MSAA framebuffer
@@ -126,44 +136,33 @@ void LightingPass::Execute()
             glDisable(GL_STENCIL_TEST);
         }
 
-        auto& material = command.material.material;
-        if (!material) continue;
+        auto& material = command.material;
 
-        shader.setVec2("UVScale", material->UVScale);
-        shader.setVec2("UVOffset", material->UVOffset);
-        shader.setVec3("albedoColor", material->albedoColor);
-        shader.setFloat("metallicValue", material->metallic);
-        shader.setFloat("roughnessValue", material->roughness);
-        shader.setFloat("aoValue", material->ao);
-        shader.setFloat("normalScale", material->normalScale);
+        shader.setVec2("UVScale", material.GetUVScale());
+        shader.setVec2("UVOffset", material.GetUVScale());
+        shader.setVec3("albedoColor", material.GetAlbedoColor());
+        shader.setFloat("metallicValue", material.GetMetallic());
+        shader.setFloat("roughnessValue", material.GetRoughness());
+        shader.setFloat("aoValue", material.GetAO());
+        shader.setFloat("normalScale", material.GetNormalScale());
 
-        struct MapInfo {
-            Path path;
-            std::string uniformName;
-            int slot;
-            std::string useUniform;
+        std::vector<MapInfo> maps = 
+        {
+        { material.IsUsingAlbedoMap(),    "albedoMap",    0, "useAlbedoMap",    material.GetAlbedoTexture() },
+        { material.IsUsingNormalMap(),    "normalMap",    1, "useNormalMap",    material.GetNormalTexture() },
+        { material.IsUsingMetallicMap(),  "metallicMap",  2, "useMetallicMap",  material.GetMetallicTexture() },
+        { material.IsUsingRoughnessMap(), "roughnessMap", 3, "useRoughnessMap", material.GetRoughnessTexture() },
+        { material.IsUsingAOMap(),        "aoMap",        4, "useAOMap",        material.GetAOTexture() },
+        { material.IsUsingHeightMap(),    "heightMap",    5, "useHeightMap",    material.GetHeightTexture() }
         };
 
-        std::vector<MapInfo> maps = {
-            { material->albedoMapPath,    "albedoMap",    0, "useAlbedoMap" },
-            { material->normalMapPath,    "normalMap",    1, "useNormalMap" },
-            { material->metallicMapPath,  "metallicMap",  2, "useMetallicMap" },
-            { material->roughnessMapPath, "roughnessMap", 3, "useRoughnessMap" },
-            { material->aoMapPath,        "aoMap",        4, "useAOMap" },
-            { material->heightMapPath,    "heightMap",    5, "useHeightMap" },
-        };
-
-        for (const auto& map : maps) {
-            bool hasMap = map.path.IsValid();
-            shader.setBool(map.useUniform, hasMap);
-            if (hasMap) 
+        for (const auto& map : maps) 
+        {
+            shader.setBool(map.useUniform, map.isUsing);
+            if (map.isUsing)
             {
-                //auto tex = TextureManager::LoadOrGetTexture(map.path);
-                //if (tex) {
                 shader.setInt(map.uniformName, map.slot);
-                command.material.albedo = AssetRegistry::GetAsset<TextureAsset>(AssetUUID::FromString("637676d3-c555-4c1e-9d6d-bc92ea480d5c"));
-                command.material.albedo->GetTexture().Bind(map.slot);
-                //}
+                map.texture->GetTexture().Bind(map.slot);
             }
         }
 

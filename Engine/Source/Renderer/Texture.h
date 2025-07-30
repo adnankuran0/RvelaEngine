@@ -1,6 +1,15 @@
 #pragma once
 #include "GLAD/gl.h"
 
+enum TextureFormat : uint8_t
+{
+    Unknown = 0,
+    RGBA8,
+    RGB8,
+    R8,
+    BC1, //DXT1
+    BC3  //DXT5
+};
 
 class Texture
 {
@@ -14,7 +23,7 @@ public:
     void Bind(unsigned int activeTexture) const;
     void Bind() const;
     void GenerateFromImage(const std::string& path);
-    void GenerateFromMemory(const uint8_t* data, int width, int height, GLenum format = GL_RGBA8, bool srgb = false);
+    void GenerateFromMemory(const uint8_t* data, int width, int height, TextureFormat format = TextureFormat::RGBA8, bool srgb = false);
 
     static Texture Create();
     static void ToImage(int width, int height, const unsigned char* data,int nrChannels);

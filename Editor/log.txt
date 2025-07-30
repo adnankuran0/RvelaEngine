@@ -239,3 +239,755 @@
 [info] Engine has started!
 [info] Final texture ID: 26
 [info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: a6b76922-ef29-463f-854f-eada529177d9
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: a6b76922-ef29-463f-854f-eada529177d9
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Json loading took 0 ms
+[info] Material Destroyed!
+[info] Scene loading took 7 ms
+[info] Total mesh loading took 6 ms
+[info] Scene loading complete
+[info] Texture created!
+[info] Texture asset created!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: a6b76922-ef29-463f-854f-eada529177d9
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: a6b76922-ef29-463f-854f-eada529177d9
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: a6b76922-ef29-463f-854f-eada529177d9
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: a6b76922-ef29-463f-854f-eada529177d9
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: a6b76922-ef29-463f-854f-eada529177d9
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: a6b76922-ef29-463f-854f-eada529177d9
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: a6b76922-ef29-463f-854f-eada529177d9
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: a6b76922-ef29-463f-854f-eada529177d9
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[warning] Material UUID is not valid!
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: a6b76922-ef29-463f-854f-eada529177d9
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[warning] Material UUID is not valid!
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: a6b76922-ef29-463f-854f-eada529177d9
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[warning] Material UUID is not valid!
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: a6b76922-ef29-463f-854f-eada529177d9
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[info] Engine has started!
+[info] Final texture ID: 26
+[warning] Material UUID is not valid!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[warning] Material UUID is not valid!
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: a6b76922-ef29-463f-854f-eada529177d9
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: a6b76922-ef29-463f-854f-eada529177d9
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: a6b76922-ef29-463f-854f-eada529177d9
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[error] Asset UUID is not exist in the asset registry!
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture created!
+[info] Texture asset created!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: a6b76922-ef29-463f-854f-eada529177d9
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[error] Asset UUID is not exist in the asset registry!
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture created!
+[info] Texture asset created!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: a6b76922-ef29-463f-854f-eada529177d9
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[error] Asset UUID is not exist in the asset registry!
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: a6b76922-ef29-463f-854f-eada529177d9
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[error] Asset UUID is not exist in the asset registry!
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: a6b76922-ef29-463f-854f-eada529177d9
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[error] Failed to open file: 
+[debug] Texture dropped to albedo with uuid : 637676d3-c555-4c1e-9d6d-bc92ea480d5c 
+[info] Texture created!
+[info] Texture asset created!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: a6b76922-ef29-463f-854f-eada529177d9
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture created!
+[info] Texture asset created!
+[info] Texture created!
+[info] Texture asset created!
+[info] Texture asset destroyed!
+[info] Texture destroyed!
+[info] Texture destroyed!
+[info] Texture created!
+[info] Texture asset created!
+[info] Texture asset destroyed!
+[info] Texture destroyed!
+[info] Texture destroyed!
+[info] Texture created!
+[info] Texture asset created!
+[info] Texture asset destroyed!
+[info] Texture destroyed!
+[info] Texture destroyed!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: a6b76922-ef29-463f-854f-eada529177d9
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture created!
+[info] Texture asset created!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: a6b76922-ef29-463f-854f-eada529177d9
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture created!
+[info] Texture asset created!
+[info] Texture created!
+[info] Texture asset created!
+[info] Texture created!
+[info] Texture asset created!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: a6b76922-ef29-463f-854f-eada529177d9
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: a6b76922-ef29-463f-854f-eada529177d9
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: a6b76922-ef29-463f-854f-eada529177d9
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture asset imported with UUID: b21169c0-6076-43ab-b908-88d484c50ec7
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: b21169c0-6076-43ab-b908-88d484c50ec7
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture created!
+[info] Texture asset created!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture asset imported with UUID: fb46759a-7603-4885-86dd-a37456541f42
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture asset imported with UUID: c17394d5-f225-4a0c-a7e2-97a79d3e977a
+[error] Failed to open file: 
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 637676d3-c555-4c1e-9d6d-bc92ea480d5c
+[info] Asset found with uuid: c17394d5-f225-4a0c-a7e2-97a79d3e977a
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture created!
+[info] Texture asset created!
+[info] Texture created!
+[info] Texture asset created!
+[info] Texture asset destroyed!
+[info] Texture destroyed!
+[info] Texture destroyed!
+[info] Texture created!
+[info] Texture asset created!
+[info] Texture asset destroyed!
+[info] Texture destroyed!
+[info] Texture destroyed!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 1d105880-74d1-44a6-b891-909f65af64c1
+[info] Asset found with uuid: 9dca3123-25ea-40a0-a567-8cde1ba3dbc9
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture asset imported with UUID: 532b7f4a-9144-4d75-96e0-540698d8d3f0
+[info] Texture asset imported with UUID: 063092c4-aaa5-4b79-8c10-436ca5d13cf2
+[error] Failed to open file: 
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture asset imported with UUID: 6939b563-f9a8-42d1-ac6f-d6a929648c12
+[info] Texture asset imported with UUID: a19f20bc-c502-4dd3-a216-328adfeca227
+[info] Texture asset imported with UUID: 6f3c0e0b-1bdd-44f3-9b06-c83aadcefdf6
+[info] Texture asset imported with UUID: eb6e5de1-06d5-4bf6-a7c3-a4ab00f85f6a
+[error] Failed to open file: 
+[error] Failed to open file: 
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 6939b563-f9a8-42d1-ac6f-d6a929648c12
+[info] Asset found with uuid: a19f20bc-c502-4dd3-a216-328adfeca227
+[info] Asset found with uuid: 6f3c0e0b-1bdd-44f3-9b06-c83aadcefdf6
+[info] Asset found with uuid: eb6e5de1-06d5-4bf6-a7c3-a4ab00f85f6a
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture created!
+[info] Texture asset created!
+[info] Texture created!
+[info] Texture asset created!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 6939b563-f9a8-42d1-ac6f-d6a929648c12
+[info] Asset found with uuid: a19f20bc-c502-4dd3-a216-328adfeca227
+[info] Asset found with uuid: 6f3c0e0b-1bdd-44f3-9b06-c83aadcefdf6
+[info] Asset found with uuid: eb6e5de1-06d5-4bf6-a7c3-a4ab00f85f6a
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture created!
+[info] Texture asset created!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 6939b563-f9a8-42d1-ac6f-d6a929648c12
+[info] Asset found with uuid: a19f20bc-c502-4dd3-a216-328adfeca227
+[info] Asset found with uuid: 6f3c0e0b-1bdd-44f3-9b06-c83aadcefdf6
+[info] Asset found with uuid: eb6e5de1-06d5-4bf6-a7c3-a4ab00f85f6a
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture created!
+[info] Texture asset created!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 6939b563-f9a8-42d1-ac6f-d6a929648c12
+[info] Asset found with uuid: a19f20bc-c502-4dd3-a216-328adfeca227
+[info] Asset found with uuid: 6f3c0e0b-1bdd-44f3-9b06-c83aadcefdf6
+[info] Asset found with uuid: eb6e5de1-06d5-4bf6-a7c3-a4ab00f85f6a
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture created!
+[info] Texture asset created!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 6939b563-f9a8-42d1-ac6f-d6a929648c12
+[info] Asset found with uuid: a19f20bc-c502-4dd3-a216-328adfeca227
+[info] Asset found with uuid: 6f3c0e0b-1bdd-44f3-9b06-c83aadcefdf6
+[info] Asset found with uuid: eb6e5de1-06d5-4bf6-a7c3-a4ab00f85f6a
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[debug] Width: 1024 Height: 1024 Channels: 1 
+[info] Texture asset imported with UUID: 3a05e483-02f8-4901-b66f-e68b48d9999a
+[debug] Width: 1024 Height: 1024 Channels: 3 
+[info] Texture asset imported with UUID: 392db702-7d60-4b80-a4d0-c6cbecb9e92d
+[debug] Width: 1024 Height: 1024 Channels: 3 
+[info] Texture asset imported with UUID: 33f93259-6f8c-4a28-92c7-b5aca54b2b46
+[debug] Width: 1024 Height: 1024 Channels: 1 
+[info] Texture asset imported with UUID: 33d3fcc1-a88d-4ad3-ab1b-83a8c85ff2d0
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[debug] Width: 1024 Height: 1024 Channels: 1 
+[info] Texture asset imported with UUID: 40ea0593-49a2-4ce6-a8d5-1a3e8468bbc2
+[debug] Width: 1024 Height: 1024 Channels: 3 
+[info] Texture asset imported with UUID: 44d66bb6-d49c-466c-89f4-150d545442e0
+[debug] Width: 1024 Height: 1024 Channels: 3 
+[info] Texture asset imported with UUID: 27cb6d76-149a-4af0-b8bf-69471a536295
+[debug] Width: 1024 Height: 1024 Channels: 1 
+[info] Texture asset imported with UUID: 1f81f4dc-2665-4db7-896a-0e949a1f6e53
+[error] Failed to open file: 
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 40ea0593-49a2-4ce6-a8d5-1a3e8468bbc2
+[info] Asset found with uuid: 44d66bb6-d49c-466c-89f4-150d545442e0
+[info] Asset found with uuid: 27cb6d76-149a-4af0-b8bf-69471a536295
+[info] Asset found with uuid: 1f81f4dc-2665-4db7-896a-0e949a1f6e53
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture created!
+[info] Texture asset created!
+[info] Texture created!
+[info] Texture asset created!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 40ea0593-49a2-4ce6-a8d5-1a3e8468bbc2
+[info] Asset found with uuid: 44d66bb6-d49c-466c-89f4-150d545442e0
+[info] Asset found with uuid: 27cb6d76-149a-4af0-b8bf-69471a536295
+[info] Asset found with uuid: 1f81f4dc-2665-4db7-896a-0e949a1f6e53
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture created!
+[info] Texture asset created!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 40ea0593-49a2-4ce6-a8d5-1a3e8468bbc2
+[info] Asset found with uuid: 44d66bb6-d49c-466c-89f4-150d545442e0
+[info] Asset found with uuid: 27cb6d76-149a-4af0-b8bf-69471a536295
+[info] Asset found with uuid: 1f81f4dc-2665-4db7-896a-0e949a1f6e53
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[error] Failed to open file: 
+[info] Texture created!
+[info] Texture asset created!
+[info] Texture created!
+[info] Texture asset created!
+[info] Texture asset destroyed!
+[info] Texture destroyed!
+[info] Texture destroyed!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 40ea0593-49a2-4ce6-a8d5-1a3e8468bbc2
+[info] Asset found with uuid: 44d66bb6-d49c-466c-89f4-150d545442e0
+[info] Asset found with uuid: 27cb6d76-149a-4af0-b8bf-69471a536295
+[info] Asset found with uuid: 1f81f4dc-2665-4db7-896a-0e949a1f6e53
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture created!
+[info] Texture asset created!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 40ea0593-49a2-4ce6-a8d5-1a3e8468bbc2
+[info] Asset found with uuid: 44d66bb6-d49c-466c-89f4-150d545442e0
+[info] Asset found with uuid: 27cb6d76-149a-4af0-b8bf-69471a536295
+[info] Asset found with uuid: 1f81f4dc-2665-4db7-896a-0e949a1f6e53
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture created!
+[info] Texture asset created!
+[info] Texture asset destroyed!
+[info] Texture destroyed!
+[error] Failed to open file: 
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 40ea0593-49a2-4ce6-a8d5-1a3e8468bbc2
+[info] Asset found with uuid: 44d66bb6-d49c-466c-89f4-150d545442e0
+[info] Asset found with uuid: 27cb6d76-149a-4af0-b8bf-69471a536295
+[info] Asset found with uuid: 1f81f4dc-2665-4db7-896a-0e949a1f6e53
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture created!
+[info] Texture asset created!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 40ea0593-49a2-4ce6-a8d5-1a3e8468bbc2
+[info] Asset found with uuid: 44d66bb6-d49c-466c-89f4-150d545442e0
+[info] Asset found with uuid: 27cb6d76-149a-4af0-b8bf-69471a536295
+[info] Asset found with uuid: 1f81f4dc-2665-4db7-896a-0e949a1f6e53
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 40ea0593-49a2-4ce6-a8d5-1a3e8468bbc2
+[info] Asset found with uuid: 44d66bb6-d49c-466c-89f4-150d545442e0
+[info] Asset found with uuid: 27cb6d76-149a-4af0-b8bf-69471a536295
+[info] Asset found with uuid: 1f81f4dc-2665-4db7-896a-0e949a1f6e53
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 40ea0593-49a2-4ce6-a8d5-1a3e8468bbc2
+[info] Asset found with uuid: 44d66bb6-d49c-466c-89f4-150d545442e0
+[info] Asset found with uuid: 27cb6d76-149a-4af0-b8bf-69471a536295
+[info] Asset found with uuid: 1f81f4dc-2665-4db7-896a-0e949a1f6e53
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[error] Failed to open file: 
+[info] Texture created!
+[info] Texture asset created!
+[error] Failed to load texture: C:\RvelaEngine\TestProject\Assets\Textures\floor\worn_tile_floor_diff_1k.rtex
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 40ea0593-49a2-4ce6-a8d5-1a3e8468bbc2
+[info] Asset found with uuid: 44d66bb6-d49c-466c-89f4-150d545442e0
+[info] Asset found with uuid: 27cb6d76-149a-4af0-b8bf-69471a536295
+[info] Asset found with uuid: 1f81f4dc-2665-4db7-896a-0e949a1f6e53
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture created!
+[info] Texture asset created!
+[info] Texture created!
+[info] Texture asset created!
+[info] Texture asset destroyed!
+[info] Texture destroyed!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: f1d3d649-7c4b-4872-8d1e-952a620859d0
+[info] Asset found with uuid: 6ecdf7a3-485f-4d90-8923-0bae3ba7a9aa
+[info] Asset found with uuid: 66b3c569-247f-436f-b2c1-be79662efef9
+[info] Asset found with uuid: c04bda7c-129b-4a13-9308-11e5377c5e7d
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture created!
+[info] Texture asset created!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture imported: worn_tile_floor_ao_1k.png (1024x1024 1ch) Format: 3 UUID: 4ed5acf9-076c-4103-8279-b2a64a5c7acb
+[info] Texture imported: worn_tile_floor_diff_1k.png (1024x1024 3ch) Format: 2 UUID: 9ba19b6b-ca2f-4a12-b657-2a1741674135
+[info] Texture imported: worn_tile_floor_nor_gl_1k.png (1024x1024 3ch) Format: 2 UUID: 0edac6fc-192f-4036-9520-61e3c99ac080
+[info] Texture imported: worn_tile_floor_rough_1k.png (1024x1024 1ch) Format: 3 UUID: 99845935-76ab-4705-8d19-d2382a313c6d
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 4ed5acf9-076c-4103-8279-b2a64a5c7acb
+[info] Asset found with uuid: 9ba19b6b-ca2f-4a12-b657-2a1741674135
+[info] Asset found with uuid: 0edac6fc-192f-4036-9520-61e3c99ac080
+[info] Asset found with uuid: 99845935-76ab-4705-8d19-d2382a313c6d
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture created!
+[info] Texture asset created!
+[debug] Load: format = 2, isSRGB = 1, width = 1024, height = 1024
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture imported: worn_tile_floor_ao_1k.png (1024x1024 RGBA8) UUID: f8fa727e-1468-4d67-b8d3-5d792e361520
+[info] Texture imported: worn_tile_floor_diff_1k.png (1024x1024 RGBA8) UUID: 7342fca5-1b42-4d88-bb85-f1d663a1dc09
+[info] Texture imported: worn_tile_floor_nor_gl_1k.png (1024x1024 RGBA8) UUID: cad2ce38-3564-4c2c-97ef-eb2056c9ed79
+[info] Texture imported: worn_tile_floor_rough_1k.png (1024x1024 RGBA8) UUID: b8ad9c61-49f9-4f7b-b4c3-a9cbbb2dfa62
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: f8fa727e-1468-4d67-b8d3-5d792e361520
+[info] Asset found with uuid: 7342fca5-1b42-4d88-bb85-f1d663a1dc09
+[info] Asset found with uuid: cad2ce38-3564-4c2c-97ef-eb2056c9ed79
+[info] Asset found with uuid: b8ad9c61-49f9-4f7b-b4c3-a9cbbb2dfa62
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture created!
+[info] Texture asset created!
+[debug] Load: format = 1, isSRGB = 1, width = 1024, height = 1024
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture imported: worn_tile_floor_ao_1k.png (1024x1024 RGBA8) UUID: 6ad74602-257a-4909-9f5e-f55ebecf894d
+[info] Texture imported: worn_tile_floor_diff_1k.png (1024x1024 RGBA8) UUID: 04ae2d57-a338-48c9-96e4-beeb2c5247fe
+[info] Texture imported: worn_tile_floor_nor_gl_1k.png (1024x1024 RGBA8) UUID: 6131ee99-7c77-4860-823a-a7a2a755ffdb
+[info] Texture imported: worn_tile_floor_rough_1k.png (1024x1024 RGBA8) UUID: 90ad6782-2896-4006-8866-a96bae796ef1
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 6ad74602-257a-4909-9f5e-f55ebecf894d
+[info] Asset found with uuid: 04ae2d57-a338-48c9-96e4-beeb2c5247fe
+[info] Asset found with uuid: 6131ee99-7c77-4860-823a-a7a2a755ffdb
+[info] Asset found with uuid: 90ad6782-2896-4006-8866-a96bae796ef1
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture created!
+[info] Texture asset created!
+[debug] Load: format = 1, isSRGB = 0, width = 1024, height = 1024
+[info] Texture created!
+[info] Texture asset created!
+[debug] Load: format = 1, isSRGB = 0, width = 1024, height = 1024
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 6ad74602-257a-4909-9f5e-f55ebecf894d
+[info] Asset found with uuid: 04ae2d57-a338-48c9-96e4-beeb2c5247fe
+[info] Asset found with uuid: 6131ee99-7c77-4860-823a-a7a2a755ffdb
+[info] Asset found with uuid: 90ad6782-2896-4006-8866-a96bae796ef1
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: 6ad74602-257a-4909-9f5e-f55ebecf894d
+[info] Asset found with uuid: 04ae2d57-a338-48c9-96e4-beeb2c5247fe
+[info] Asset found with uuid: 6131ee99-7c77-4860-823a-a7a2a755ffdb
+[info] Asset found with uuid: 90ad6782-2896-4006-8866-a96bae796ef1
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture created!
+[info] Texture asset created!
+[debug] Load: format = 1, isSRGB = 0, width = 1024, height = 1024
+[info] Texture created!
+[info] Texture asset created!
+[debug] Load: format = 1, isSRGB = 0, width = 1024, height = 1024
+[info] Texture asset destroyed!
+[info] Texture destroyed!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture imported: worn_tile_floor_ao_1k.png (1024x1024 1ch) UUID: a273e4d3-f246-4d24-9fbf-c6fe8dafdd07
+[info] Texture imported: worn_tile_floor_diff_1k.png (1024x1024 3ch) UUID: 2df6b0b5-556c-4878-8ac4-ecf94ef73f67
+[info] Texture imported: worn_tile_floor_nor_gl_1k.png (1024x1024 3ch) UUID: df56ca67-ac2c-4622-9407-5fcbf1f41c85
+[info] Texture imported: worn_tile_floor_rough_1k.png (1024x1024 1ch) UUID: e81710ac-f264-4074-beb6-aa76e53d1bd2
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: a273e4d3-f246-4d24-9fbf-c6fe8dafdd07
+[info] Asset found with uuid: 2df6b0b5-556c-4878-8ac4-ecf94ef73f67
+[info] Asset found with uuid: df56ca67-ac2c-4622-9407-5fcbf1f41c85
+[info] Asset found with uuid: e81710ac-f264-4074-beb6-aa76e53d1bd2
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture created!
+[info] Texture asset created!
+[debug] Load: format = 2, isSRGB = 0, width = 1024, height = 1024
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: a273e4d3-f246-4d24-9fbf-c6fe8dafdd07
+[info] Asset found with uuid: 2df6b0b5-556c-4878-8ac4-ecf94ef73f67
+[info] Asset found with uuid: df56ca67-ac2c-4622-9407-5fcbf1f41c85
+[info] Asset found with uuid: e81710ac-f264-4074-beb6-aa76e53d1bd2
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture created!
+[info] Texture asset created!
+[debug] Load: format = 2, isSRGB = 0, width = 1024, height = 1024
+[info] Texture created!
+[info] Texture asset created!
+[debug] Load: format = 2, isSRGB = 0, width = 1024, height = 1024
+[info] Texture asset destroyed!
+[info] Texture destroyed!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: a273e4d3-f246-4d24-9fbf-c6fe8dafdd07
+[info] Asset found with uuid: 2df6b0b5-556c-4878-8ac4-ecf94ef73f67
+[info] Asset found with uuid: df56ca67-ac2c-4622-9407-5fcbf1f41c85
+[info] Asset found with uuid: e81710ac-f264-4074-beb6-aa76e53d1bd2
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Asset found with uuid: ee3dde12-6263-4f11-bb1d-812b3e196ab7
+[info] Asset found with uuid: a273e4d3-f246-4d24-9fbf-c6fe8dafdd07
+[info] Asset found with uuid: 2df6b0b5-556c-4878-8ac4-ecf94ef73f67
+[info] Asset found with uuid: df56ca67-ac2c-4622-9407-5fcbf1f41c85
+[info] Asset found with uuid: e81710ac-f264-4074-beb6-aa76e53d1bd2
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture created!
+[info] Texture asset created!
+[debug] Load: format = 2, isSRGB = 0, width = 1024, height = 1024
+[info] Engine has stopped!

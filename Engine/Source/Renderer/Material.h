@@ -1,3 +1,4 @@
+#if 0
 #pragma once
 #include "glm/glm.hpp"
 #include "Shader.h"
@@ -60,3 +61,5 @@ public:
 	void Deserialize(const std::string& jsonStr) override;
 };
 
+
+#endif

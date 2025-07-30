@@ -52,7 +52,6 @@ void Scene::DestroyEntity(entt::entity entity) {
     if (HasComponent<MeshRendererComponent>(entity)) GetComponent<MeshRendererComponent>(entity).Destroy();
     if (HasComponent<UUIDComponent>(entity)) m_EntityMap.erase(GetComponent<UUIDComponent>(entity).uuid);
     m_Registry.destroy(entity);
-    MaterialManager::ClearExpiredMaterials();
 }
 
 Entity Scene::CreatePointLight() {
@@ -82,7 +81,7 @@ Entity Scene::LoadAsset(const std::string& path) {
             m.localAABB);
         root.AddComponent<MeshComponent>(VRT_PATH(path), m.meshIndex,m);
         root.GetComponent<TagComponent>().tag = m.name;
-        root.AddComponent<MaterialComponent>(m.materialPath);
+        root.AddComponent<MaterialComponent>(AssetUUID::FromString("ee3dde12-6263-4f11-bb1d-812b3e196ab7"));
     }
     else {
         for (auto& m : meshes) {
@@ -97,7 +96,7 @@ Entity Scene::LoadAsset(const std::string& path) {
                 m.localAABB);
             child.AddComponent<MeshComponent>(VRT_PATH(path), m.meshIndex,m);
             child.GetComponent<TagComponent>().tag = m.name;
-            child.AddComponent<MaterialComponent>(m.materialPath);
+            child.AddComponent<MaterialComponent>(AssetUUID::FromString("ee3dde12-6263-4f11-bb1d-812b3e196ab7"));
         }
     }
     return root;
@@ -121,7 +120,8 @@ Entity Scene::LoadPrimitive(const std::string& primitiveMeshName) {
     root.AddComponent<MeshRendererComponent>(m.vertices.data(), m.vertices.size() * sizeof(float), m.indices.data(), m.indices.size() * sizeof(unsigned int), m.indices.size(),m.localAABB);
     root.AddComponent<MeshComponent>(cfg.meshPath, m.meshIndex,m);
     root.GetComponent<TagComponent>().tag = m.name;
-    root.AddComponent<MaterialComponent>(m.materialPath);
+    AssetUUID id = AssetUUID::FromString("ee3dde12-6263-4f11-bb1d-812b3e196ab7");
+    root.AddComponent<MaterialComponent>(id);
     return root;
 }
 

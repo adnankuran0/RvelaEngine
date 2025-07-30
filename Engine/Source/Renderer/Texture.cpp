@@ -72,15 +72,29 @@ void Texture::GenerateFromImage(const std::string& path)
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Texture::GenerateFromMemory(const uint8_t* data, int width, int height, GLenum format, bool srgb)
+void Texture::GenerateFromMemory(const uint8_t* data, int width, int height, TextureFormat format, bool srgb)
 {
     Bind();
 
-    GLenum internalFormat = srgb ? GL_SRGB8_ALPHA8 : GL_RGBA8;
-    GLenum dataFormat = GL_RGBA; // assuming 4 channels
+    GLenum internalFormat;
+    GLenum dataFormat;
+    
+    switch (format)
+    {
+    case TextureFormat::RGBA8:
+        internalFormat = srgb ? GL_SRGB8_ALPHA8 : GL_RGBA8;
+        dataFormat = GL_RGBA;
+        break;
+    case TextureFormat::RGB8:
+        internalFormat = srgb ? GL_SRGB8 : GL_RGB8;
+        dataFormat = GL_RGB;
+        break;
+    default:
+        LOG_ERROR("Unsupported texture format.");
+        return;
+    }
 
     glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, dataFormat, GL_UNSIGNED_BYTE, data);
-
     GenerateMipmaps();
 
     glBindTexture(GL_TEXTURE_2D, 0);

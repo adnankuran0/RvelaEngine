@@ -1,4 +1,5 @@
 ﻿#include "rvelapch.h"
+#if 0
 #include "MaterialManager.h"
 #include "Utils/Serializer.h"
 
@@ -84,3 +85,4 @@ size_t MaterialManager::GetMaterialCount()
 {
     return materialMap.size();
 }
+#endif

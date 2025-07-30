@@ -51,6 +51,7 @@ void AssetManager::LoadMaterials(const aiScene* scene, std::unordered_map<unsign
 {
     if (!scene->HasMaterials()) return;
 
+#if 0
     for (unsigned int i = 0; i < scene->mNumMaterials; i++)
     {
         aiMaterial* aiMat = scene->mMaterials[i];
@@ -126,10 +127,10 @@ void AssetManager::LoadMaterials(const aiScene* scene, std::unordered_map<unsign
             std::string(name.C_Str()) + ".rmaterial").GetAbsolute();
         materials[i] = matSavePath.GetAbsoluteStr();
         
-        MaterialManager::CreateMaterial(matSavePath, materialData);
+        //MaterialManager::CreateMaterial(matSavePath, materialData);
         
     }
-
+#endif
 }
 
 std::vector<MeshData> AssetManager::LoadModel(const Path path)

@@ -1,3 +1,4 @@
+#if 0
 #pragma once
 #include "Renderer/Material.h"
 #include <unordered_map>
@@ -16,3 +17,4 @@ public:
 private:
     static std::unordered_map<std::string, std::weak_ptr<Material>> materialMap;
 };
+#endif

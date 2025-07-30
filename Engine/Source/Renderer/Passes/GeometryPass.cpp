@@ -82,40 +82,38 @@ void GeometryPass::Execute()
     for (auto& command : commands) {
         if (!ctx.camera->Intersects(command.mesh.worldAABB)) continue;
 
-        auto& material = command.material.material;
+        auto& material = command.material;
         glm::mat4 model = command.transform.GetWorldMatrix();
 
         geometryShader.setMat4("model", model);
         glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(view * model)));
         geometryShader.setMat3("normalMatrix", normalMatrix);
 
-        auto& roughnessMapPath = material->roughnessMapPath;
-        auto& metallicMapPath = material->metallicMapPath;
 
-        if (roughnessMapPath.IsValid())
+        if (material.IsUsingRoughnessMap())
         {
-            auto roughnessTexture = TextureManager::LoadOrGetTexture(roughnessMapPath);
+            Ref<TextureAsset> roughnessTexture = material.GetRoughnessTexture();
             geometryShader.setBool("useRoughnessMap", true);
             geometryShader.setInt("roughnessMap", 0);
-            roughnessTexture->Bind(0);
+            roughnessTexture->GetTexture().Bind(0);
         }
         else
         {
             geometryShader.setBool("useRoughnessMap", false);
-            geometryShader.setFloat("roughness", material->roughness);
+            geometryShader.setFloat("roughness", material.GetRoughness());
         }
 
-        if (metallicMapPath.IsValid())
+        if (material.IsUsingMetallicMap())
         {
-            auto metallicTexture = TextureManager::LoadOrGetTexture(metallicMapPath);
+            Ref<TextureAsset> metallicTexture = material.GetMetallicTexture();
             geometryShader.setBool("useMetallicMap", true);
             geometryShader.setInt("metallicMap", 1);
-            metallicTexture->Bind(1);
+            metallicTexture->GetTexture().Bind(1);
         }
         else
         {
             geometryShader.setBool("useMetallicMap", false);
-            geometryShader.setFloat("metallic", material->metallic);
+            geometryShader.setFloat("metallic", material.GetMetallic());
         }
 
 
