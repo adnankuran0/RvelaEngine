@@ -24,8 +24,10 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
             }
         }
 
-        if (registry.any_of<TransformComponent>(selectedEntity)) {
-            if (ImGui::CollapsingHeader("Transform")) {
+        if (registry.any_of<TransformComponent>(selectedEntity)) 
+        {
+            if (ImGui::CollapsingHeader("Transform")) 
+            {
                 auto& transform = registry.get<TransformComponent>(selectedEntity);
 
 
@@ -123,8 +125,9 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
         }
 
         if (registry.any_of<MaterialComponent>(selectedEntity)) {
-            if (ImGui::CollapsingHeader("Material")) {
-                
+            if (ImGui::CollapsingHeader("Material")) 
+            {
+                ImGui::Indent();
                 MaterialComponent& material = registry.get<MaterialComponent>(selectedEntity);
 
                 ImGui::Button("Material Slot", ImVec2(200, 20));
@@ -134,10 +137,16 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                     {
                         const char* path = (const char*)payload->Data;
                         std::string pathStr(path);
-                        if (pathStr.ends_with(".rmaterial"))
+                        if (pathStr.ends_with(".rmat"))
                         {
-                            // .rmaterial dosyası bırakıldı, işle
-                            // Örneğin: materialComponent->LoadFromFile(pathStr);
+                            std::ifstream inFile(pathStr, std::ios::binary);
+                            if (!inFile.is_open()) {
+                                LOG_ERROR("file not opened");
+                                return;
+                            }
+                            AssetHeader header = AssetLoader::ReadHeader(inFile, MAGIC_MATERIAL);
+                            std::unique_ptr<MaterialMeta> meta = AssetLoader::ReadMeta<MaterialMeta>(inFile, header);
+                            material.SetMaterial(meta->uuid);
                         }
                     }
                     ImGui::EndDragDropTarget();
@@ -146,7 +155,9 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                 
 
                
-                if (ImGui::CollapsingHeader("Albedo")) {
+                if (ImGui::CollapsingHeader("Albedo")) 
+                {
+                    ImGui::Indent();
                     glm::vec3 albedoColor = material.GetAlbedoColor();
                     float color[3] = { albedoColor.r, albedoColor.g, albedoColor.b };
 
@@ -184,9 +195,11 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                         material.SetAlbedoColor(glm::vec3(color[0], color[1], color[2]));
                         //Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath().GetAbsoluteStr());
                     }
+                    ImGui::Unindent();
                 }
                 if (ImGui::CollapsingHeader("Normal"))
                 {
+                    ImGui::Indent();
                     ImGui::Button("Normal Slot", ImVec2(200, 20));
                     if (ImGui::BeginDragDropTarget())
                     {
@@ -221,10 +234,12 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                     {
                         material.SetNormalScale(normalScale);
                     }
+                    ImGui::Unindent();
                 }
                 
                 if (ImGui::CollapsingHeader("Roughness##31"))
                 {
+                    ImGui::Indent();
                     ImGui::Button("Rougness Slot", ImVec2(200, 20));
                     if (ImGui::BeginDragDropTarget())
                     {
@@ -242,7 +257,7 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                                 AssetHeader header = AssetLoader::ReadHeader(inFile, MAGIC_TEXTURE);
                                 std::unique_ptr<TextureMeta> meta = AssetLoader::ReadMeta<TextureMeta>(inFile, header);
                                 material.SetRoughnessTexture(meta->uuid);
-                                material.SetUseNormalMap(true);
+                                material.SetUseRoughnessMap(true);
                             }
                         }
                         ImGui::EndDragDropTarget();
@@ -260,10 +275,12 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                         material.SetRoughness(roughness);
                         //Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath().GetAbsoluteStr());
                     }
-                }
+                    ImGui::Unindent();
+;                }
 
                 if (ImGui::CollapsingHeader("Metallic##33"))
                 {
+                    ImGui::Indent();
                     ImGui::Button("Metallic Slot", ImVec2(200, 20));
                     if (ImGui::BeginDragDropTarget())
                     {
@@ -294,10 +311,12 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                         material.SetMetallic(metallic);
                         //Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath().GetAbsoluteStr());
                     }
+                    ImGui::Unindent();
                 }
 
                 if (ImGui::CollapsingHeader("AO##35"))
                 {
+                    ImGui::Indent();
                     ImGui::Button("AO Slot", ImVec2(200, 20));
                     if (ImGui::BeginDragDropTarget())
                     {
@@ -326,6 +345,7 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                         material.SetAO(ao);
                         //Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath().GetAbsoluteStr());
                     }
+                    ImGui::Unindent();
                 }
 
 
@@ -339,7 +359,7 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                 if (ImGui::DragFloat2("UV Scale", &uvScale[0], 0.05f)) {
                     material.SetUVScale(uvScale);
                 }
-
+                ImGui::Unindent();
             }
         }
 

@@ -38,7 +38,6 @@ void AssetRegistry::ScanAssets(const std::filesystem::path& dir)
             AssetHeader header = AssetLoader::ReadHeader(inFile, MAGIC_TEXTURE);
             std::unique_ptr<TextureMeta> meta = AssetLoader::ReadMeta<TextureMeta>(inFile,header);
 
-            LOG_INFO("Asset found with uuid: {}", meta->uuid.ToString());
             s_UUIDToPath[meta->uuid] = path;
         }
 
@@ -55,7 +54,6 @@ void AssetRegistry::ScanAssets(const std::filesystem::path& dir)
             AssetHeader header = AssetLoader::ReadHeader(inFile, MAGIC_MATERIAL);
             std::unique_ptr<MaterialMeta> meta = AssetLoader::ReadMeta<MaterialMeta>(inFile, header);
 
-            LOG_INFO("Asset found with uuid: {}", meta->uuid.ToString());
             s_UUIDToPath[meta->uuid] = path;
         }
     }

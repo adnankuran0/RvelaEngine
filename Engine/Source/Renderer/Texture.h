@@ -27,7 +27,7 @@ public:
 
     static Texture Create();
     static void ToImage(int width, int height, const unsigned char* data,int nrChannels);
-    static void GenerateMipmaps();
+    void GenerateMipmaps();
 
     unsigned int GetID() const;
     inline unsigned char* GetTexture() const;

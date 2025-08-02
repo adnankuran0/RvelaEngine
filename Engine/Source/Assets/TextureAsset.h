@@ -7,18 +7,28 @@
 #include <Core/Log.h>
 #include "stb_image/stb_image_write.h"
 
-static std::vector<uint8_t> ReadTextureData(const std::filesystem::path& filePath, size_t headerSize, size_t metaSize)
+static std::vector<uint8_t> ReadTextureData(const std::filesystem::path& filePath)
 {
-    std::ifstream file(filePath, std::ios::binary | std::ios::ate); // go to end
+    std::ifstream file(filePath, std::ios::binary);
     if (!file)
     {
         LOG_ERROR("Failed to open file: {}", filePath.string());
         return {};
     }
 
+    AssetHeader header;
+    file.read(reinterpret_cast<char*>(&header), sizeof(header));
+    if (!file)
+    {
+        LOG_ERROR("Failed to read asset header.");
+        return {};
+    }
+
+    size_t dataOffset = sizeof(AssetHeader) + header.metaSize;
+
+    file.seekg(0, std::ios::end);
     size_t fileSize = file.tellg();
-    size_t dataOffset = headerSize + metaSize;
-    if (fileSize <= dataOffset)
+    if (fileSize < dataOffset)
     {
         LOG_ERROR("Invalid asset file size.");
         return {};
@@ -97,6 +107,7 @@ public:
         Unload();
     }
 
+
     inline bool Load()
     {
         if (m_Loaded) return true;
@@ -111,12 +122,14 @@ public:
         LOG_DEBUG("Load: format = {}, isSRGB = {}, width = {}, height = {}",
             (uint8_t)meta->format, meta->isSRGB, meta->width, meta->height);
 
-        std::vector<uint8_t> data = ReadTextureData(m_Path, sizeof(AssetHeader), sizeof(TextureMeta));
+        std::vector<uint8_t> data = ReadTextureData(m_Path);
+        //stbi_write_png("debug_readed.png", meta->width, meta->height, 4, data.data(), meta->width * 4);
         if (data.empty())
         {
             LOG_ERROR("Failed to read texture data from file");
             return false;
         }
+
         
         m_Texture.GenerateFromMemory(data.data(), meta->width, meta->height, meta->format, meta->isSRGB);
         //m_Texture.GenerateFromImage(std::filesystem::path(m_Path).replace_extension(".png").string());

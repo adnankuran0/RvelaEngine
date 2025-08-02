@@ -76,9 +76,12 @@ void Texture::GenerateFromMemory(const uint8_t* data, int width, int height, Tex
 {
     Bind();
 
+    GLint defaultSwizzle[4] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
+    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, defaultSwizzle);
+
     GLenum internalFormat;
     GLenum dataFormat;
-    
+
     switch (format)
     {
     case TextureFormat::RGBA8:
@@ -88,13 +91,21 @@ void Texture::GenerateFromMemory(const uint8_t* data, int width, int height, Tex
     case TextureFormat::RGB8:
         internalFormat = srgb ? GL_SRGB8 : GL_RGB8;
         dataFormat = GL_RGB;
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ONE);
+        break;
+    case TextureFormat::R8:
+        internalFormat = GL_R8;
+        dataFormat = GL_RED;
         break;
     default:
         LOG_ERROR("Unsupported texture format.");
         return;
     }
 
-    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, dataFormat, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat,
+        width, height, 0,
+        dataFormat, GL_UNSIGNED_BYTE, data);
+
     GenerateMipmaps();
 
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -119,16 +130,11 @@ void Texture::GenerateMipmaps()
 {
     glGenerateMipmap(GL_TEXTURE_2D);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    int maxLevel = static_cast<int>(std::floor(std::log2(std::max(m_Width, m_Height))));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, maxLevel);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    float maxAniso = 0.0f;
-    glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &maxAniso);
-    if (maxAniso > 0.0f)
-    {
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, maxAniso);
-    }
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+        maxLevel > 0 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
 }
 
 Texture Texture::Create()
