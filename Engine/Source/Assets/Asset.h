@@ -12,7 +12,7 @@ public:
     inline AssetUUID GetUUID() const { return m_Meta.get()->uuid; }
     inline void SetUUID(const AssetUUID& uuid) { m_Meta.get()->uuid = uuid; }
     inline AssetType GetAssetType() const { return m_Meta.get()->type; }
-    inline bool IsAlive() const { return GetRefCount() > 1; }
+    //inline bool IsAlive() const { return !IsDestroyed(); }
 
     template<typename T>
     inline T* GetMetaAs() 

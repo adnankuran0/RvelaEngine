@@ -45,6 +45,11 @@ public:
             Ref<Asset> asset = s_LoadedAssets[uuid].Lock();
             if (asset)
                 return DynamicCast<T>(asset);
+            else
+            {
+                // Asset was deleted, we should remove it from loaded assets so we can reload
+                s_LoadedAssets.erase(uuid);
+            }
         }
         
         //If asset exists but not loaded yet then we are doing lazy loading

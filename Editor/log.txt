@@ -8112,3 +8112,116 @@
 [info] Texture destroyed!
 [error] Failed to open file: 
 [info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Material asset created
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Material asset created
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Material asset destroed
+[info] Material asset created
+[info] Texture created!
+[info] Texture asset created!
+[debug] Load: format = 1, isSRGB = 0, width = 1024, height = 1024
+[error] Error while loading texture from memory: 1281
+[info] Texture created!
+[info] Texture asset created!
+[debug] Load: format = 2, isSRGB = 0, width = 1024, height = 1024
+[error] Error while loading texture from memory: 1281
+[info] Texture created!
+[info] Texture asset created!
+[debug] Load: format = 3, isSRGB = 0, width = 1024, height = 1024
+[error] Error while loading texture from memory: 1281
+[info] Material asset destroed
+[info] Texture asset destroyed!
+[info] Texture destroyed!
+[info] Texture asset destroyed!
+[info] Texture destroyed!
+[info] Texture asset destroyed!
+[info] Texture destroyed!
+[info] Material asset created
+[info] Material asset destroed
+[info] Material asset created
+[info] Texture created!
+[info] Texture asset created!
+[debug] Load: format = 1, isSRGB = 0, width = 1024, height = 1024
+[error] Error while loading texture from memory: 1281
+[info] Texture created!
+[info] Texture asset created!
+[debug] Load: format = 2, isSRGB = 0, width = 1024, height = 1024
+[error] Error while loading texture from memory: 1281
+[info] Texture created!
+[info] Texture asset created!
+[debug] Load: format = 3, isSRGB = 0, width = 1024, height = 1024
+[error] Error while loading texture from memory: 1281
+[info] Material asset destroed
+[info] Texture asset destroyed!
+[info] Texture destroyed!
+[info] Texture asset destroyed!
+[info] Texture destroyed!
+[info] Texture asset destroyed!
+[info] Texture destroyed!
+[info] Material asset created
+[info] Material asset destroed
+[info] Material asset created
+[info] Texture created!
+[info] Texture asset created!
+[debug] Load: format = 1, isSRGB = 0, width = 1024, height = 1024
+[error] Error while loading texture from memory: 1281
+[info] Texture created!
+[info] Texture asset created!
+[debug] Load: format = 2, isSRGB = 0, width = 1024, height = 1024
+[error] Error while loading texture from memory: 1281
+[info] Texture created!
+[info] Texture asset created!
+[debug] Load: format = 3, isSRGB = 0, width = 1024, height = 1024
+[error] Error while loading texture from memory: 1281
+[info] Material asset destroed
+[info] Texture asset destroyed!
+[info] Texture destroyed!
+[info] Texture asset destroyed!
+[info] Texture destroyed!
+[info] Texture asset destroyed!
+[info] Texture destroyed!
+[info] Material asset created
+[info] Material asset destroed
+[info] Material asset created
+[info] Texture created!
+[info] Texture asset created!
+[debug] Load: format = 1, isSRGB = 0, width = 1024, height = 1024
+[error] Error while loading texture from memory: 1281
+[info] Texture created!
+[info] Texture asset created!
+[debug] Load: format = 2, isSRGB = 0, width = 1024, height = 1024
+[error] Error while loading texture from memory: 1281
+[info] Texture created!
+[info] Texture asset created!
+[debug] Load: format = 3, isSRGB = 0, width = 1024, height = 1024
+[error] Error while loading texture from memory: 1281
+[info] Material asset destroed
+[info] Texture asset destroyed!
+[info] Texture destroyed!
+[info] Texture asset destroyed!
+[info] Texture destroyed!
+[info] Texture asset destroyed!
+[info] Texture destroyed!
+[info] Material asset created
+[info] Material asset destroed
+[info] Material asset created
+[info] Texture created!
+[info] Texture asset created!
+[debug] Load: format = 1, isSRGB = 0, width = 1024, height = 1024
+[error] Error while loading texture from memory: 1281
+[info] Texture created!
+[info] Texture asset created!
+[debug] Load: format = 2, isSRGB = 0, width = 1024, height = 1024
+[error] Error while loading texture from memory: 1281
+[info] Texture created!
+[info] Texture asset created!
+[debug] Load: format = 3, isSRGB = 0, width = 1024, height = 1024
+[error] Error while loading texture from memory: 1281
+[info] 

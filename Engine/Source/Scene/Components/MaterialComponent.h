@@ -123,6 +123,8 @@ private:
 	{
 		if (!materialUUID.IsValid()) return;
 
+		// Clear existing
+		material = nullptr;
 		albedoTexture = nullptr;
 		normalTexture = nullptr;
 		metallicTexture = nullptr;
@@ -131,6 +133,11 @@ private:
 		heightTexture = nullptr;
 		
 		material = AssetRegistry::GetAsset<MaterialAsset>(materialUUID);
+		if (!material)
+		{
+			LOG_ERROR("Material asset not found for UUID {}", materialUUID.ToString());
+			return;
+		}
 		if(material->useAlbedoMap)
 			albedoTexture = AssetRegistry::GetAsset<TextureAsset>(material->albedoTextureUUID);
 		if(material->useNormalMap)
@@ -141,7 +148,7 @@ private:
 			roughnessTexture = AssetRegistry::GetAsset<TextureAsset>(material->roughnessTextureUUID);
 		if(material->useAOMap)
 			aoTexture = AssetRegistry::GetAsset<TextureAsset>(material->aoTextureUUID);
-		if (material->useHeightMap);
+		if (material->useHeightMap)
 			heightTexture = AssetRegistry::GetAsset<TextureAsset>(material->heightTextureUUID);
 		
 	}
