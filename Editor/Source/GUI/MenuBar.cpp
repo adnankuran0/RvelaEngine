@@ -3,17 +3,17 @@
 #include <fstream>
 #include <AssetImporter/MaterialImporter.h>
 
-void MenuBar::Draw(Engine* engine,AssetImporterRegistry& assetImporter)
+void MenuBar::Draw(Engine* engine, AssetImporterRegistry& assetImporter)
 {
     if (ImGui::BeginMainMenuBar())
     {
         if (ImGui::BeginMenu("File"))
         {
-            if (ImGui::MenuItem("New scene")) 
+            if (ImGui::MenuItem("New scene"))
             {
 
             }
-            if (ImGui::MenuItem("Open scene")) 
+            if (ImGui::MenuItem("Open scene"))
             {
                 const char* filterPatterns[] = { "*.rscene" };
                 const char* filePath = tinyfd_openFileDialog("Select a scene", "", 1, filterPatterns, NULL, 0);
@@ -23,7 +23,7 @@ void MenuBar::Draw(Engine* engine,AssetImporterRegistry& assetImporter)
                 {
                     engine->GetSceneManager().LoadScene(*engine->GetScene(), file);
                 }
-                
+
             }
             if (ImGui::MenuItem("Save scene"))
             {
@@ -88,7 +88,7 @@ void MenuBar::Draw(Engine* engine,AssetImporterRegistry& assetImporter)
                 }
             }
             ImGui::Separator();
-            if (ImGui::MenuItem("Quit")) 
+            if (ImGui::MenuItem("Quit"))
             {
                 glfwSetWindowShouldClose(engine->GetWindow().GetGLFWWindow(), true);
             }

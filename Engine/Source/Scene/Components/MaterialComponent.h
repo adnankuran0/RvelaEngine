@@ -1,7 +1,6 @@
 #pragma once
 #include "Scene/Component.h"
 #include "Utils/FileUtils.h"
-#include "Utils/MaterialManager.h"
 #include "json.hpp"
 #include "Core/Ref.h"
 #include "Assets/AssetRegistry.h"
@@ -124,13 +123,13 @@ private:
 		if (!materialUUID.IsValid()) return;
 
 		// Clear existing
-		material = nullptr;
-		albedoTexture = nullptr;
-		normalTexture = nullptr;
-		metallicTexture = nullptr;
-		roughnessTexture = nullptr;
-		aoTexture = nullptr;
-		heightTexture = nullptr;
+		//material.Reset();
+		//albedoTexture.Reset();
+		//normalTexture.Reset();
+		//metallicTexture.Reset();
+		//roughnessTexture.Reset();
+		//aoTexture.Reset();
+		//heightTexture.Reset();
 		
 		material = AssetRegistry::GetAsset<MaterialAsset>(materialUUID);
 		if (!material)

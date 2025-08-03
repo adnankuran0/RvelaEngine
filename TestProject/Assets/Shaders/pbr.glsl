@@ -228,6 +228,7 @@ void main()
 {
     // Early alpha test
     vec4 albedoTex = useAlbedoMap ? texture(albedoMap, TexCoords) : vec4(albedoColor, 1.0);
+    albedoTex *= vec4(albedoColor, 1.0);
     if(albedoTex.a < 0.2) discard;
 
     // Material properties

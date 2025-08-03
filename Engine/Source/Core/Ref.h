@@ -5,11 +5,13 @@ template<typename T>
 class Ref {
 public:
     Ref() = default;
-
+    Ref(std::nullptr_t) : ptr(nullptr) {}
     Ref(std::shared_ptr<T> ptr) : ptr(std::move(ptr)) {}
 
     template<typename U>
-    Ref(const Ref<U>& other) {
+        explicit Ref(const Ref<U>& other) {
+        static_assert(std::is_base_of<U, T>::value || std::is_base_of<T, U>::value,
+            "Incompatible Ref conversion");
         ptr = std::dynamic_pointer_cast<T>(other.GetShared());
     }
 
@@ -19,10 +21,17 @@ public:
     T* operator->() const { return ptr.get(); }
     T& operator*() const { return *ptr; }
     T* Get() const { return ptr.get(); }
-
+    void Reset() {
+        ptr.reset();
+    }
     std::shared_ptr<T> GetShared() const { return ptr; }
 
     operator bool() const { return ptr != nullptr; }
+
+    Ref& operator=(std::nullptr_t) {
+        ptr.reset();
+        return *this;
+    }
 
 private:
     std::shared_ptr<T> ptr;
@@ -58,6 +67,7 @@ public:
         return !weakPtr.expired();
     }
 
+    
 private:
     std::weak_ptr<T> weakPtr;
 };
@@ -72,3 +82,4 @@ template<typename T, typename U>
 Ref<T> DynamicCast(const Ref<U>& other) {
     return Ref<T>(std::dynamic_pointer_cast<T>(other.GetShared()));
 }
+

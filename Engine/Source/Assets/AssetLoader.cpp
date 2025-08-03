@@ -21,7 +21,7 @@ Ref<Asset> AssetLoader::Load(const std::filesystem::path& path)
         Ref<TextureAsset> asset = CreateRef<TextureAsset>(path.string(), std::move(meta));
         if (asset->Load())
         {
-            return Ref<Asset>(static_cast<Asset*>(asset.Get()));
+            return Ref<Asset>(asset);
         }
     }
 
@@ -34,7 +34,7 @@ Ref<Asset> AssetLoader::Load(const std::filesystem::path& path)
         Ref<MaterialAsset> asset = CreateRef<MaterialAsset>(path.string(), std::move(meta));
         if (asset->Load())
         {
-            return Ref<Asset>(static_cast<Asset*>(asset.Get()));
+            return Ref<Asset>(asset);
         }
     }
     return nullptr;

@@ -24,9 +24,9 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
             }
         }
 
-        if (registry.any_of<TransformComponent>(selectedEntity)) 
+        if (registry.any_of<TransformComponent>(selectedEntity))
         {
-            if (ImGui::CollapsingHeader("Transform")) 
+            if (ImGui::CollapsingHeader("Transform"))
             {
                 auto& transform = registry.get<TransformComponent>(selectedEntity);
 
@@ -125,7 +125,7 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
         }
 
         if (registry.any_of<MaterialComponent>(selectedEntity)) {
-            if (ImGui::CollapsingHeader("Material")) 
+            if (ImGui::CollapsingHeader("Material"))
             {
                 ImGui::Indent();
                 MaterialComponent& material = registry.get<MaterialComponent>(selectedEntity);
@@ -152,10 +152,10 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                     ImGui::EndDragDropTarget();
                 }
 
-                
 
-               
-                if (ImGui::CollapsingHeader("Albedo")) 
+
+
+                if (ImGui::CollapsingHeader("Albedo"))
                 {
                     ImGui::Indent();
                     glm::vec3 albedoColor = material.GetAlbedoColor();
@@ -184,13 +184,13 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                         ImGui::EndDragDropTarget();
                     }
                     ImGui::SameLine();
-                    if ( ImGui::Button("X##alb", ImVec2(20, 20)) )
+                    if (ImGui::Button("X##alb", ImVec2(20, 20)))
                     {
                         material.SetUseAlbedoMap(!material.IsUsingAlbedoMap());
                     }
-                   
 
-                    if (ImGui::ColorPicker3("Albedo", color)) 
+
+                    if (ImGui::ColorPicker3("Albedo", color))
                     {
                         material.SetAlbedoColor(glm::vec3(color[0], color[1], color[2]));
                         //Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath().GetAbsoluteStr());
@@ -222,7 +222,7 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                         }
                         ImGui::EndDragDropTarget();
 
-                        
+
                     }
                     ImGui::SameLine();
                     if (ImGui::Button("X##nrm", ImVec2(20, 20)))
@@ -230,13 +230,13 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                         material.SetUseNormalMap(!material.IsUsingNormalMap());
                     }
                     float normalScale = material.GetNormalScale();
-                    if (ImGui::SliderFloat("Normal Scale", &normalScale, -10.0f, 10.0f)) 
+                    if (ImGui::SliderFloat("Normal Scale", &normalScale, -10.0f, 10.0f))
                     {
                         material.SetNormalScale(normalScale);
                     }
                     ImGui::Unindent();
                 }
-                
+
                 if (ImGui::CollapsingHeader("Roughness##31"))
                 {
                     ImGui::Indent();
@@ -262,7 +262,7 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                         }
                         ImGui::EndDragDropTarget();
 
-                        
+
                     }
                     ImGui::SameLine();
                     if (ImGui::Button("X##rgh", ImVec2(20, 20)))
@@ -270,13 +270,14 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                         //materialComponent.material->roughnessMapPath = ABS_PATH("");
                     }
                     float roughness = material.GetRoughness();
-                    if (ImGui::SliderFloat("Roughness##32", &roughness, 0.0f, 1.0f)) 
+                    if (ImGui::SliderFloat("Roughness##32", &roughness, 0.0f, 1.0f))
                     {
                         material.SetRoughness(roughness);
                         //Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath().GetAbsoluteStr());
                     }
                     ImGui::Unindent();
-;                }
+                    ;
+                }
 
                 if (ImGui::CollapsingHeader("Metallic##33"))
                 {
@@ -297,7 +298,7 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                         }
                         ImGui::EndDragDropTarget();
 
-                        
+
                     }
                     ImGui::SameLine();
                     if (ImGui::Button("X##mtl", ImVec2(20, 20)))
@@ -306,7 +307,7 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                     }
 
                     float metallic = material.GetMetallic();
-                    if (ImGui::SliderFloat("Metallic##34", &metallic, 0.0f, 1.0f)) 
+                    if (ImGui::SliderFloat("Metallic##34", &metallic, 0.0f, 1.0f))
                     {
                         material.SetMetallic(metallic);
                         //Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath().GetAbsoluteStr());
@@ -340,7 +341,7 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                         //materialComponent.material->aoMapPath = ABS_PATH("");
                     }
                     float ao = material.GetAO();
-                    if (ImGui::SliderFloat("AO##36", &ao, 0.0f, 1.0f)) 
+                    if (ImGui::SliderFloat("AO##36", &ao, 0.0f, 1.0f))
                     {
                         material.SetAO(ao);
                         //Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath().GetAbsoluteStr());
@@ -352,7 +353,7 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                 glm::vec2 uvOffset = material.GetUVOffset();
                 glm::vec2 uvScale = material.GetUVScale();
 
-                if (ImGui::DragFloat2("UV Offset", &uvOffset[0], 0.05f)) 
+                if (ImGui::DragFloat2("UV Offset", &uvOffset[0], 0.05f))
                 {
                     material.SetUVOffset(uvOffset);
                 }

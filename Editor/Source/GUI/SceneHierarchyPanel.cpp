@@ -4,7 +4,7 @@
 
 
 
-void SceneHierarchyPanel::Draw(Scene* scene,entt::entity& selectedEntity)
+void SceneHierarchyPanel::Draw(Scene* scene, entt::entity& selectedEntity)
 {
 
 
@@ -134,11 +134,11 @@ void SceneHierarchyPanel::Draw(Scene* scene,entt::entity& selectedEntity)
             scene->DestroyEntity(selectedEntity);
             selectedEntity = entt::null;
         }
-       /* if (ImGui::MenuItem("Create Project"))
-        {
-            createProjectRequested = true;
-            strcpy(projectNameBuffer, "");
-        }*/
+        /* if (ImGui::MenuItem("Create Project"))
+         {
+             createProjectRequested = true;
+             strcpy(projectNameBuffer, "");
+         }*/
 
 
         ImGui::EndPopup();

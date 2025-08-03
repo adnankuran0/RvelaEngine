@@ -117,6 +117,8 @@ void GeometryPass::Execute()
         }
 
 
+
+
         command.mesh.VAO.Bind();
         glDrawElements(GL_TRIANGLES, command.mesh.indexCount, GL_UNSIGNED_INT, 0);
     }

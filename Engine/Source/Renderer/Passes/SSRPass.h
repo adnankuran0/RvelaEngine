@@ -13,6 +13,7 @@ public:
     void SetRoughnessTexture(GLuint roughnessTexture) { i_Roughness = roughnessTexture; }
     void SetMetallicTexture(GLuint metallicTexture) { i_Metallic = metallicTexture; }
     void SetScreenTexture(GLuint screenTexture) { i_Screen = screenTexture; }
+    void SetSkyboxTexture(GLuint skyboxTexture) { i_Skybox = skyboxTexture; }
 
     GLuint GetSSRTexture() const { return o_SsrTexture; }
 
@@ -22,6 +23,7 @@ private:
     GLuint i_Roughness = 0;
     GLuint i_Metallic = 0;
     GLuint i_Screen = 0;
+    GLuint i_Skybox = 0;
     GLuint o_SsrTexture = 0;
 
     GLuint ssrFBO = 0;

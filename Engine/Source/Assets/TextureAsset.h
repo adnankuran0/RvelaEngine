@@ -97,13 +97,11 @@ public:
     TextureAsset(const std::string& path, std::unique_ptr<TextureMeta> textureMeta)
         : m_Path(path), m_Loaded(false), Asset(std::move(textureMeta)) 
     {
-        LOG_INFO("Texture asset created!");
         m_Texture.Init();
     }
 
     ~TextureAsset() 
     {
-        LOG_INFO("Texture asset destroyed!");
         Unload();
     }
 
@@ -119,8 +117,6 @@ public:
             return false;
         }
 
-        LOG_DEBUG("Load: format = {}, isSRGB = {}, width = {}, height = {}",
-            (uint8_t)meta->format, meta->isSRGB, meta->width, meta->height);
 
         std::vector<uint8_t> data = ReadTextureData(m_Path);
         //stbi_write_png("debug_readed.png", meta->width, meta->height, 4, data.data(), meta->width * 4);
@@ -129,7 +125,6 @@ public:
             LOG_ERROR("Failed to read texture data from file");
             return false;
         }
-
         
         m_Texture.GenerateFromMemory(data.data(), meta->width, meta->height, meta->format, meta->isSRGB);
         //m_Texture.GenerateFromImage(std::filesystem::path(m_Path).replace_extension(".png").string());

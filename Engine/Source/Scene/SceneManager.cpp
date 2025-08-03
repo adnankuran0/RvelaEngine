@@ -96,15 +96,13 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
 
         if (entityJson.contains("MaterialComponent"))
         {
-            /*std::string serializedMat = entityJson["MaterialComponent"];
+            std::string serializedMat = entityJson["MaterialComponent"];
             json j = json::parse(serializedMat);
-            std::string newMaterialPathData = j["materialPath"];
-            Path newMaterialPath = VRT_PATH(newMaterialPathData);*/
+            std::string uuidString = j["material"];
 
             scene.AddComponent<MaterialComponent>(entity);
             auto& mat = scene.GetComponent<MaterialComponent>(entity);
-            mat.SetMaterial(AssetUUID::FromString("ee3dde12-6263-4f11-bb1d-812b3e196ab7"));
-            LOG_DEBUG("Albedo color r {}", mat.GetAlbedoColor().x);
+            mat.SetMaterial(AssetUUID::FromString(uuidString));
             //mat.Deserialize(serializedMat);
         }
 

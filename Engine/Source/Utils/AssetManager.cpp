@@ -1,6 +1,5 @@
 ﻿#include "rvelapch.h"
 #include "AssetManager.h"
-#include "Utils/MaterialManager.h"
 #include "FileUtils.h"
 #include "Core/Log.h"
 

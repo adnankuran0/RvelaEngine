@@ -15,12 +15,6 @@ int Time::frameCount = 0;
 
 void Time::Update() noexcept
 {
-    // Ensure GLFW is initialized
-    if (!glfwGetTime()) {
-        deltaTime = 0.0;
-        return;
-    }
-
     double currentFrameTime = glfwGetTime() * 1000.0;
 
     double frameTimeTarget = (maxFPS == 0) ? 0.0 : (1000.0 / maxFPS);

@@ -6,7 +6,6 @@
 
 Texture::Texture()
 {
-    LOG_INFO("Texture created!");
 	Init();
 }
 
@@ -48,7 +47,6 @@ void Texture::Bind() const
 
 void Texture::Destroy() const
 {
-    LOG_INFO("Texture destroyed!");
     glDeleteTextures(1, &m_Texture);
 }
 
@@ -76,8 +74,20 @@ void Texture::GenerateFromMemory(const uint8_t* data, int width, int height, Tex
 {
     Bind();
 
-    GLint defaultSwizzle[4] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
-    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, defaultSwizzle);
+    if (!data)
+    {
+        LOG_ERROR("Texture data is null!");
+        return;
+    }
+
+    if (width <= 0 || height <= 0)
+    {
+        LOG_ERROR("Invalid texture dimensions: {}x{}", width, height);
+        return;
+    }
+
+    m_Width = width;
+    m_Height = height;
 
     GLenum internalFormat;
     GLenum dataFormat;
@@ -91,7 +101,6 @@ void Texture::GenerateFromMemory(const uint8_t* data, int width, int height, Tex
     case TextureFormat::RGB8:
         internalFormat = srgb ? GL_SRGB8 : GL_RGB8;
         dataFormat = GL_RGB;
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_A, GL_ONE);
         break;
     case TextureFormat::R8:
         internalFormat = GL_R8;
@@ -101,6 +110,7 @@ void Texture::GenerateFromMemory(const uint8_t* data, int width, int height, Tex
         LOG_ERROR("Unsupported texture format.");
         return;
     }
+
 
     glTexImage2D(GL_TEXTURE_2D, 0, internalFormat,
         width, height, 0,
@@ -128,8 +138,9 @@ void Texture::ToImage(int width, int height, const unsigned char* data, int nrCh
 
 void Texture::GenerateMipmaps()
 {
-    glGenerateMipmap(GL_TEXTURE_2D);
+    Bind();
 
+    glGenerateMipmap(GL_TEXTURE_2D);
     int maxLevel = static_cast<int>(std::floor(std::log2(std::max(m_Width, m_Height))));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, maxLevel);
 

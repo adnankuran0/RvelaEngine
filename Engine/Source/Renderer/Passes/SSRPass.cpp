@@ -63,6 +63,9 @@ void SSRPass::Execute()
     glBindTextureUnit(4, i_Screen);
     ssrShader.setInt("uScreenTexture", 4);
 
+    glBindTextureUnit(5, i_Skybox);
+    ssrShader.setInt("uSkybox", 5);
+
     Renderer::DrawFullScreenQuad();
 
     glEnable(GL_DEPTH_TEST);

@@ -3,7 +3,7 @@
 #include "AssetUUID.h"
 #include "AssetMeta.h"
 
-class Asset : public RefCounted 
+class Asset 
 {
 public:
     Asset(std::unique_ptr<AssetMeta> assetMeta) : m_Meta(std::move(assetMeta)) {}

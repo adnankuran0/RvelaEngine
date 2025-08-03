@@ -64,6 +64,7 @@ public:
     static Shader& GetLuminanceShader() { return m_LuminanceShader; }
     static Shader& GetProceduralSkyShader() { return m_ProceduralSkyShader;  }
     static Shader& GetOutlineShader() { return m_OutlineShader; }
+    static Shader& GetEquirectangularToCubemapShader() { return m_EquirectangularToCubemap; }
 
 private:
     static GLFWwindow* activeWindow;
@@ -81,6 +82,7 @@ private:
     static Shader m_LuminanceShader;
     static Shader m_ProceduralSkyShader;
     static Shader m_OutlineShader;
+    static Shader m_EquirectangularToCubemap;
 
     static ScreenQuad m_ScreenQuad;
 };

@@ -5,7 +5,6 @@
 #include "Core/Log.h"
 #include "Utils/AssetManager.h"
 #include "Utils/Serializer.h"
-#include "Utils/MaterialManager.h"
 #include "Utils/ProjectManager.h"
 #include "EntityUUID.h"
 

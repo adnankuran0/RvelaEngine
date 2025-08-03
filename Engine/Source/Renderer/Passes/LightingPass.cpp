@@ -1,7 +1,6 @@
 ﻿#include "rvelapch.h"
 #include "LightingPass.h"
 #include "Utils/TextureManager.h"
-#include "Utils/MaterialManager.h"
 #include "Core/Log.h"
 #include "Assets/AssetUUID.h"
 #include "Assets/AssetRegistry.h"
@@ -87,8 +86,7 @@ void LightingPass::Execute()
         shader.setInt("shadowMap", 6);
         glBindTextureUnit(6, i_DirectionalShadowMap);
 
-        GLenum err = glGetError();
-        if (err != GL_NO_ERROR) LOG_ERROR("OpenGL Error after directional light setup: {}",err);
+       
     }
 
     shader.setFloat("heightScale", 0.0f);
@@ -96,7 +94,7 @@ void LightingPass::Execute()
     GLint maxTextureUnits = 0;
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextureUnits);
 
-    constexpr int RESERVED_SLOTS = 7;
+    static constexpr int RESERVED_SLOTS = 7;
     int maxPointLights = std::max(0, maxTextureUnits - RESERVED_SLOTS);
     int pointLightCount = std::min(static_cast<int>(ctx.pointLights.size()), maxPointLights);
 
@@ -173,10 +171,10 @@ void LightingPass::Execute()
         command.mesh.VAO.Bind();
         glDrawElements(GL_TRIANGLES, command.mesh.indexCount, GL_UNSIGNED_INT, 0);
 
-        GLenum err;
-        while ((err = glGetError()) != GL_NO_ERROR) {
-            LOG_ERROR("OpenGL Error: {}", err);
-        }
+        //GLenum err;
+        //while ((err = glGetError()) != GL_NO_ERROR) {
+        //    LOG_ERROR("OpenGL Error: {}", err);
+        //}
 
     }
 

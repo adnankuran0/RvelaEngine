@@ -29,12 +29,9 @@ public:
 	MaterialAsset(const std::string& path, std::unique_ptr<MaterialMeta> meta)
 		: Asset(std::move(meta)), m_Path(path) 
 	{
-		LOG_INFO("Material asset created");
 	}
 	~MaterialAsset()
 	{
-		LOG_INFO("Material asset destroed");
-
 	}
 
 	bool Load()

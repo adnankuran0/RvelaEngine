@@ -1,8 +1,6 @@
 #shader vertex
-#version 460 core
-
-layout (location = 0) in vec3 aPosition;
-
+#version 330 core
+layout(location = 0) in vec3 aPosition;
 out vec3 TexCoords;
 
 uniform mat4 projection;
@@ -10,8 +8,9 @@ uniform mat4 view;
 
 void main()
 {
-    TexCoords = aPosition;
-    gl_Position = projection * view * vec4(aPosition, 1.0);
+    TexCoords = aPosition; // Vertex pozisyonlarını doku koordinatları olarak kullan
+    vec4 pos = projection * view * vec4(aPosition, 1.0);
+    gl_Position = pos.xyww; // Derinlik testinde her zaman en uzakta kalmasını sağlar
 }
 
 #shader fragment
@@ -21,7 +20,7 @@ in vec3 TexCoords;
 
 out vec4 FragColor;
 
-layout(binding = 3) uniform samplerCube skybox;
+uniform samplerCube skybox;
 
 void main()
 {

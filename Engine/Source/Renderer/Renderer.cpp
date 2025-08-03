@@ -3,7 +3,6 @@
 #include "Core/Log.h"
 #include "Core/Time.h"
 #include "Input/Input.h"
-#include "Utils/MaterialManager.h"
 #include "Utils/TextureManager.h"
 #include "Utils/FileUtils.h"
 
@@ -23,6 +22,7 @@ Shader Renderer::m_CompositeShader;
 Shader Renderer::m_LuminanceShader;
 Shader Renderer::m_ProceduralSkyShader;
 Shader Renderer::m_OutlineShader;
+Shader Renderer::m_EquirectangularToCubemap;
 
 ScreenQuad Renderer::m_ScreenQuad;
 
@@ -52,6 +52,7 @@ void Renderer::Init(GLFWwindow* window)
     m_LuminanceShader.Init(VRT_PATH("Assets\\Shaders\\luminance.glsl"));
     m_ProceduralSkyShader.Init(VRT_PATH("Assets\\Shaders\\proceduralSky.glsl"));
     m_OutlineShader.Init(VRT_PATH("Assets\\Shaders\\outline.glsl"));
+    m_EquirectangularToCubemap.Init(VRT_PATH("Assets\\Shaders\\equirectangularToCubemap.glsl"));
 
     
 

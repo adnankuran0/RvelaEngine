@@ -21,6 +21,7 @@ layout(binding = 1) uniform sampler2D uNormalTexture;
 layout(binding = 2) uniform sampler2D uMetallicTexture;
 layout(binding = 3) uniform sampler2D uRoughnessTexture;
 layout(binding = 4) uniform sampler2D uScreenTexture;
+layout(binding = 5) uniform samplerCube uSkybox;
 
 uniform mat4 uViewMatrix;
 uniform mat4 uProjectionMatrix;
@@ -213,6 +214,12 @@ void main() {
         
         FragColor = vec4(reflectionColor, reflectionStrength);
     } else {
+        float fresnel = pow(1.0 - max(dot(-viewDir, worldNormal), 0.0), 5.0);
+        float fresnelFactor = mix(0.04, 1.0, fresnel);
+
+        vec3 envColor = texture(uSkybox, reflectionDir).rgb;
+        //FragColor = vec4(envColor * fresnelFactor, fresnelFactor);
         FragColor = vec4(0.0);
+
     }
 }

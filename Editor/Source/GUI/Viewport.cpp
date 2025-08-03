@@ -29,7 +29,7 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
         displayPos.x += (viewportSize.x - displaySize.x) * 0.5f;
         displayPos.y += (viewportSize.y - displaySize.y) * 0.5f;
 
-        
+
 
         ImTextureID textureID = (ImTextureID)(intptr_t)26; //TODO: make this dynamic
 
@@ -53,7 +53,7 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
 
         ImGuizmo::SetRect(displayPos.x, displayPos.y, displaySize.x, displaySize.y);
 
-        
+
 
         // Eğer entity seçiliyse ve transform component varsa
         if (selectedEntity != entt::null && engine->GetScene()->GetRegistry().any_of<TransformComponent>(selectedEntity)) {
@@ -141,41 +141,41 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
             auto& registry = engine->GetScene()->GetRegistry();
             registry.view<TransformComponent,
                 MeshRendererComponent,
-                MeshComponent>().each([&](entt::entity entity, 
+                MeshComponent>().each([&](entt::entity entity,
                     TransformComponent& tc,
                     MeshRendererComponent& mrc,
                     MeshComponent& mc) {
-                
-                BoundingBox box = mrc.worldAABB;
-                //Frustum culling
-                if (!engine->GetCamera()->Intersects(box)) return;
 
-                MeshData& mesh = mc.mesh;
-                glm::mat4 modelMatrix = tc.GetWorldMatrix();
+                        BoundingBox box = mrc.worldAABB;
+                        //Frustum culling
+                        if (!engine->GetCamera()->Intersects(box)) return;
 
-                for (size_t i = 0; i < mesh.GetTriangleCount(); ++i)
-                {
-                    glm::vec3 v0, v1, v2;
-                    mesh.GetTriangle(i, v0, v1, v2);
+                        MeshData& mesh = mc.mesh;
+                        glm::mat4 modelMatrix = tc.GetWorldMatrix();
 
-                    v0 = modelMatrix * glm::vec4(v0, 1.0f);
-                    v1 = modelMatrix * glm::vec4(v1, 1.0f);
-                    v2 = modelMatrix * glm::vec4(v2, 1.0f);
-
-                    float t;
-                    if (RayIntersectsTriangle(rayOrigin, rayDirection, v0, v1, v2, t))
-                    {
-                        if (t < closestDist)
+                        for (size_t i = 0; i < mesh.GetTriangleCount(); ++i)
                         {
-                            closestDist = t;
-                            selectedEntity = entity;
-                            engine->GetScene()->SetSelectedEntity(selectedEntity);
-                        }
-                    }
-                }
-                });
+                            glm::vec3 v0, v1, v2;
+                            mesh.GetTriangle(i, v0, v1, v2);
 
-            
+                            v0 = modelMatrix * glm::vec4(v0, 1.0f);
+                            v1 = modelMatrix * glm::vec4(v1, 1.0f);
+                            v2 = modelMatrix * glm::vec4(v2, 1.0f);
+
+                            float t;
+                            if (RayIntersectsTriangle(rayOrigin, rayDirection, v0, v1, v2, t))
+                            {
+                                if (t < closestDist)
+                                {
+                                    closestDist = t;
+                                    selectedEntity = entity;
+                                    engine->GetScene()->SetSelectedEntity(selectedEntity);
+                                }
+                            }
+                        }
+                    });
+
+
         }
     }
     ImGui::End();
