@@ -2,6 +2,7 @@
 #include "AssetLoader.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
+
 Ref<Asset> AssetLoader::Load(const std::filesystem::path& path)
 {
     std::ifstream inFile(path, std::ios::binary);

@@ -1,6 +1,5 @@
 ﻿#include "rvelapch.h"
 #include "LightingPass.h"
-#include "Utils/TextureManager.h"
 #include "Core/Log.h"
 #include "Assets/AssetUUID.h"
 #include "Assets/AssetRegistry.h"

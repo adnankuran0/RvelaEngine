@@ -4,7 +4,6 @@
 void SkyboxPass::Init()
 {
     Path path = VRT_PATH("Assets\\Textures\\skybox\\environment.hdr");
-    LOG_DEBUG("hdr path: {}", path.GetAbsoluteStr());
     m_Skybox.InitHDR(path, Renderer::GetEquirectangularToCubemapShader());
 }
 

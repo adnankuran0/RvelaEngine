@@ -12516,3 +12516,167 @@
 [debug] Skybox texture ID: 8
 [info] Final texture ID: 26
 [info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[debug] hdr path: C:\RvelaEngine\TestProject\Assets\Textures\skybox\environment.hdr
+[debug] Skybox texture ID: 8
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[debug] hdr path: C:\RvelaEngine\TestProject\Assets\Textures\skybox\environment.hdr
+[debug] Skybox texture ID: 8
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[debug] hdr path: C:\RvelaEngine\TestProject\Assets\Textures\skybox\environment.hdr
+[debug] Skybox texture ID: 8
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[error] ERROR::SHADER_COMPILATION_ERROR of type: fragment 
+ 0(11) : error C1115: unable to find compatible overloaded function "pow(vec4, float)"
+
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[error] ERROR::SHADER_COMPILATION_ERROR of type: fragment 
+ 0(12) : error C1503: undefined variable "mapped"
+0(13) : error C1503: undefined variable "mapped"
+
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Json loading took 0 ms
+[info] Scene loading took 43 ms
+[info] Total mesh loading took 0 ms
+[info] Scene loading complete
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[error] ERROR::SHADER_COMPILATION_ERROR of type: fragment 
+ 0(11) : error C1035: assignment of incompatible types
+
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Json loading took 0 ms
+[info] Scene loading took 38 ms
+[info] Total mesh loading took 0 ms
+[info] Scene loading complete
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Json loading took 0 ms
+[info] Scene loading took 34 ms
+[info] Total mesh loading took 0 ms
+[info] Scene loading complete
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Json loading took 0 ms
+[info] Scene loading took 35 ms
+[info] Total mesh loading took 0 ms
+[info] Scene loading complete
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Json loading took 0 ms
+[info] Scene loading took 35 ms
+[info] Total mesh loading took 0 ms
+[info] Scene loading complete
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!

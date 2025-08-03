@@ -35,8 +35,7 @@ void Skybox::InitHDR(const Path& hdrFilePath, Shader& conversionShader)
     GLuint hdrTexture = LoadHDRTexture(hdrFilePath);
     setupSkybox();
     skyboxTexture = ConvertEquirectangularToCubemap(hdrTexture, conversionShader);
-    glDeleteTextures(1, &hdrTexture); // Geçici HDR dokusunu sil
-    LOG_DEBUG("Skybox texture ID: {}", skyboxTexture);
+    glDeleteTextures(1, &hdrTexture); 
 }
 
 void Skybox::Render(Shader& shader, const glm::mat4& projection, const glm::mat4& view, GLuint screenFBO)
@@ -136,6 +135,7 @@ GLuint Skybox::ConvertEquirectangularToCubemap(GLuint hdrTexture, Shader& shader
 
 GLuint Skybox::LoadHDRTexture(const Path& hdrPath)
 {
+    stbi_set_flip_vertically_on_load(true);
     int width, height, nrComponents;
     float* data = stbi_loadf(hdrPath.GetAbsoluteStr().c_str(), &width, &height, &nrComponents, 0);
     if (!data)
