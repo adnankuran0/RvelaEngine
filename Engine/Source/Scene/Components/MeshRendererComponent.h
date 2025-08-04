@@ -6,7 +6,7 @@
 
 class alignas(16) MeshRendererComponent {
 public:
-    BufferLayout Layout;
+    BufferLayout layout;
     BoundingBox localAABB;
     BoundingBox worldAABB;
     VertexArray VAO;
@@ -26,11 +26,11 @@ public:
         VAO.Bind();
         VBO.Init(vertices, sizeOfVertices);
         VBO.Bind();
-        Layout.BindVertexBuffer(VBO.getID());
-        Layout.Push<float>(3);
-        Layout.Push<float>(3);
-        Layout.Push<float>(2);
-        VAO.SetBufferLayout(Layout);
+        layout.BindVertexBuffer(VBO.getID());
+        layout.Push<float>(3);
+        layout.Push<float>(3);
+        layout.Push<float>(2);
+        VAO.SetBufferLayout(layout);
         EBO.Init(indices, sizeOfIndices);
         EBO.Bind();
         this->localAABB = localAABB;
