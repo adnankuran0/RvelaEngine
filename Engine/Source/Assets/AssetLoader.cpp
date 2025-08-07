@@ -2,6 +2,7 @@
 #include "AssetLoader.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
+#include "MeshAsset.h"
 
 Ref<Asset> AssetLoader::Load(const std::filesystem::path& path)
 {
@@ -33,6 +34,19 @@ Ref<Asset> AssetLoader::Load(const std::filesystem::path& path)
         std::unique_ptr<MaterialMeta> meta = ReadMeta<MaterialMeta>(inFile, header);
 
         Ref<MaterialAsset> asset = CreateRef<MaterialAsset>(path.string(), std::move(meta));
+        if (asset->Load())
+        {
+            return Ref<Asset>(asset);
+        }
+    }
+
+    //Mesh Asset
+    if (ext == ".rmesh")
+    {
+        AssetHeader header = ReadHeader(inFile, MAGIC_MESH);
+        std::unique_ptr<MeshMeta> meta = ReadMeta<MeshMeta>(inFile, header);
+
+        Ref<MeshAsset> asset = CreateRef<MeshAsset>(path.string(), std::move(meta));
         if (asset->Load())
         {
             return Ref<Asset>(asset);

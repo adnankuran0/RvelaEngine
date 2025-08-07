@@ -158,7 +158,7 @@ std::vector<MeshData> AssetManager::LoadModel(const Path path)
     for (unsigned int i = 0; i < scene->mNumMeshes; i++)
     {
         aiMesh* mesh = scene->mMeshes[i];
-
+        
         std::vector<float> vertices;
         vertices.reserve(mesh->mNumVertices * 8);
 

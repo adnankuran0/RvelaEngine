@@ -2,6 +2,7 @@
 #include "Engine.h"
 #include "Core/Log.h"
 #include "Renderer/RenderLayer.h"
+#include <Assets/MeshAsset.h>
 
 Engine* Engine::s_Instance = nullptr;
 
@@ -24,7 +25,6 @@ Engine::Engine()
 	{
 		LOG_WARN("Another instance of Engine already exists!");
 	}
-	
 }
 
 Engine::~Engine()

@@ -2,5 +2,9 @@
 
 bool ModelImporter::Import(const std::filesystem::path& path)
 {
-	return true;
+	
+	//bool resultTextureImport = m_TextureImporter.Import(path);
+	//bool resultMaterialImport = m_MaterialImporter.Import(path);
+	bool resultMeshImport = m_MeshImporter.Import(path);
+	return resultMeshImport;
 }

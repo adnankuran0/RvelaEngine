@@ -43,11 +43,11 @@ void MenuBar::Draw(Engine* engine, AssetImporterRegistry& assetImporter)
             }
             if (ImGui::MenuItem("Import assets"))
             {
-                const char* filterPatterns[] = { "*.png", "*.jpeg", "*.jpg", "*.tga" };
+                const char* filterPatterns[] = { "*.png", "*.jpeg", "*.jpg", "*.tga", "*.fbx", "*.gltf", "*.obj", "*.glb"};
                 char const* lTheOpenFileName = tinyfd_openFileDialog(
                     "Select assets to import",
                     "",
-                    4,
+                    8,
                     filterPatterns,
                     NULL,
                     1); //multi-select

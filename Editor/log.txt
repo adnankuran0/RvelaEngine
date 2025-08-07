@@ -12776,3 +12776,162 @@
 [info] Total mesh loading took 1 ms
 [info] Scene loading complete
 [info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Json loading took 0 ms
+[info] Scene loading took 137 ms
+[info] Total mesh loading took 8 ms
+[info] Scene loading complete
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Json loading took 0 ms
+[info] Scene loading took 72 ms
+[info] Total mesh loading took 0 ms
+[info] Scene loading complete
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Json loading took 0 ms
+[info] Scene loading took 90 ms
+[info] Total mesh loading took 7 ms
+[info] Scene loading complete
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture imported: worn_planks_diff_2k.png (2048x2048 4ch) UUID: 509b801f-631e-47a1-9a95-27ee6ed7e4d7
+[info] Texture imported: worn_planks_nor_gl_2k.png (2048x2048 3ch) UUID: 01439368-750b-4c0d-98ba-9ef0ff142bc7
+[info] Texture imported: worn_planks_rough_2k.png (2048x2048 1ch) UUID: abb36f55-9e35-4355-9f12-05eb7d748f36
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Json loading took 0 ms
+[info] Scene loading took 139 ms
+[info] Total mesh loading took 1 ms
+[info] Scene loading complete
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Json loading took 0 ms
+[info] Scene loading took 51 ms
+[info] Total mesh loading took 0 ms
+[info] Scene loading complete
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Json loading took 0 ms
+[info] Scene loading took 116 ms
+[info] Total mesh loading took 0 ms
+[info] Scene loading complete
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Texture imported: painted_wooden_cabinet_ao_1k.png (1024x1024 1ch) UUID: 75469725-81a8-4309-868e-4740e48b6d3b
+[info] Texture imported: painted_wooden_cabinet_diff_1k.png (1024x1024 4ch) UUID: d96f87fe-a1a1-41ca-bc9f-e9d58dd7b0db
+[info] Texture imported: painted_wooden_cabinet_metal_1k.png (1024x1024 1ch) UUID: 6eda17f7-711d-48f1-9669-bfe4ef700b0c
+[info] Texture imported: painted_wooden_cabinet_nor_gl_1k.png (1024x1024 3ch) UUID: f357accc-e486-41df-a95d-dd89948aac2a
+[info] Texture imported: painted_wooden_cabinet_rough_1k.png (1024x1024 1ch) UUID: 280fa83b-e426-42ce-8b73-23ed6decd34c
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Json loading took 0 ms
+[info] Scene loading took 232 ms
+[info] Total mesh loading took 7 ms
+[info] Scene loading complete
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Mesh [commode.001] imported to: C:\Users\adnan\Desktop\Untitled_commode.001.rmesh (1042 vertices, 3279 indices) UUID: 3a8cf30f-36f4-4800-87a1-a4116b742964
+[info] Mesh [commode.003] imported to: C:\Users\adnan\Desktop\Untitled_commode.003.rmesh (119 vertices, 240 indices) UUID: d2e1032c-a6ef-4250-b3d1-6040e9e38ce8
+[info] Mesh [commode.002] imported to: C:\Users\adnan\Desktop\Untitled_commode.002.rmesh (321 vertices, 1212 indices) UUID: 52042b50-839a-4644-94a6-b07ffd9295b1
+[info] Mesh [commode.005] imported to: C:\Users\adnan\Desktop\Untitled_commode.005.rmesh (291 vertices, 975 indices) UUID: 11470fce-4005-4c99-bd08-5012743e2ad8
+[info] Mesh [commode.004] imported to: C:\Users\adnan\Desktop\Untitled_commode.004.rmesh (290 vertices, 975 indices) UUID: 92917c3a-0b0d-4cf6-85d1-35fa81a254db
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Mesh [commode.001] imported to: C:\RvelaEngine\TestProject\Assets\Models\Test\Untitled_commode.001.rmesh (1042 vertices, 3279 indices) UUID: e4b85337-692e-4106-94a9-dde57e4062a2
+[info] Mesh [commode.003] imported to: C:\RvelaEngine\TestProject\Assets\Models\Test\Untitled_commode.003.rmesh (119 vertices, 240 indices) UUID: 4ebd9cac-9b04-4711-98aa-3df4ee49be34
+[info] Mesh [commode.002] imported to: C:\RvelaEngine\TestProject\Assets\Models\Test\Untitled_commode.002.rmesh (321 vertices, 1212 indices) UUID: af766610-b609-40b9-9ba1-a5cba444840e
+[info] Mesh [commode.005] imported to: C:\RvelaEngine\TestProject\Assets\Models\Test\Untitled_commode.005.rmesh (291 vertices, 975 indices) UUID: 14758443-39bb-47f9-ab24-2710ae423f68
+[info] Mesh [commode.004] imported to: C:\RvelaEngine\TestProject\Assets\Models\Test\Untitled_commode.004.rmesh (290 vertices, 975 indices) UUID: 05fb7d1b-9316-45f9-af13-0554da5de5a2
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Mesh [commode.001] imported to: C:\RvelaEngine\TestProject\Assets\Models\Test\Untitled_commode.001.rmesh (1042 vertices, 3279 indices) UUID: 1e442d7f-9280-41ba-b5ca-72077e114a5b
+[info] Mesh [commode.003] imported to: C:\RvelaEngine\TestProject\Assets\Models\Test\Untitled_commode.003.rmesh (119 vertices, 240 indices) UUID: 480cc0a3-2a76-4c1a-ad6e-67ab50bd2680
+[info] Mesh [commode.002] imported to: C:\RvelaEngine\TestProject\Assets\Models\Test\Untitled_commode.002.rmesh (321 vertices, 1212 indices) UUID: d6a3ea9c-cdf1-4be5-ac35-09292644bd17
+[info] Mesh [commode.005] imported to: C:\RvelaEngine\TestProject\Assets\Models\Test\Untitled_commode.005.rmesh (291 vertices, 975 indices) UUID: 8550ebd4-a482-4167-9836-3d9f8d46696c
+[info] Mesh [commode.004] imported to: C:\RvelaEngine\TestProject\Assets\Models\Test\Untitled_commode.004.rmesh (290 vertices, 975 indices) UUID: b3973152-2eeb-4104-b593-34de4fb1301f
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[error] Failed to open file: 
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[debug] -0.5490457
+[info] Engine has started!
+[info] Final texture ID: 26

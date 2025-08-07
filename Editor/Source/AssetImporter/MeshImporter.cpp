@@ -1,6 +1,139 @@
+#include "rvelapch.h"
 #include "MeshImporter.h"
+
+const aiScene* MeshImporter::LoadScene(const std::filesystem::path& path)
+{
+    return m_Importer.ReadFile(path.string(),
+        aiProcess_CalcTangentSpace |
+        aiProcess_Triangulate |
+        aiProcess_JoinIdenticalVertices |
+        aiProcess_FlipUVs |
+        aiProcess_GenSmoothNormals |
+        aiProcess_ImproveCacheLocality);
+}
+
+std::vector<Vertex> MeshImporter::ProcessVertices(aiMesh* mesh)
+{
+    std::vector<Vertex> vertices(mesh->mNumVertices);
+    bool hasNormals = mesh->HasNormals();
+    bool hasTangents = mesh->HasTangentsAndBitangents();
+    bool hasTexCoords = mesh->mTextureCoords[0] != nullptr;
+
+    for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+    {
+        const auto& pos = mesh->mVertices[i];
+        vertices[i].position = glm::vec3(pos.x, pos.y, pos.z);
+
+        if (hasNormals)
+            vertices[i].normal = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
+        else
+            vertices[i].normal = glm::vec3(0.0f);
+
+        if (hasTangents)
+        {
+            vertices[i].tangent = glm::vec3(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
+            vertices[i].bitangent = glm::vec3(mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z);
+        }
+        else
+        {
+            vertices[i].tangent = glm::vec3(0.0f);
+            vertices[i].bitangent = glm::vec3(0.0f);
+        }
+
+        if (hasTexCoords)
+            vertices[i].texCoord = glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
+        else
+            vertices[i].texCoord = glm::vec2(0.0f);
+    }
+
+    return vertices;
+}
+
+std::vector<unsigned int> MeshImporter::ProcessIndices(aiMesh* mesh)
+{
+    std::vector<unsigned int> indices;
+    indices.reserve(mesh->mNumFaces * 3);
+
+    for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+    {
+        const aiFace& face = mesh->mFaces[i];
+        assert(face.mNumIndices == 3);
+        indices.insert(indices.end(), face.mIndices, face.mIndices + face.mNumIndices);
+    }
+
+    return indices;
+}
+
+MeshMeta MeshImporter::CreateMeshMeta(const std::filesystem::path& path, aiMesh* mesh)
+{
+    MeshMeta meta;
+    meta.sourcePath = path;
+    meta.type = AssetType::Mesh;
+    meta.vertexCount = mesh->mNumVertices;
+    meta.indexCount = mesh->mNumFaces * 3;
+    return meta;
+}
 
 bool MeshImporter::Import(const std::filesystem::path& path)
 {
-	return false;
+    const aiScene* scene = LoadScene(path);
+    if (!scene)
+    {
+        LOG_ERROR("Failed to load model scene: {}", path.string());
+        return false;
+    }
+
+    if (scene->mNumMeshes == 0)
+    {
+        LOG_WARN("No meshes found in file: {}", path.string());
+        return false;
+    }
+
+    for (unsigned int meshIndex = 0; meshIndex < scene->mNumMeshes; meshIndex++)
+    {
+        aiMesh* mesh = scene->mMeshes[meshIndex];
+        std::vector<Vertex> vertices = ProcessVertices(mesh);
+        std::vector<unsigned int> indices = ProcessIndices(mesh);
+        MeshMeta meta = CreateMeshMeta(path, mesh);
+
+        std::vector<char> metaBuffer;
+        size_t offset = 0;
+        meta.Serialize(metaBuffer, offset);
+
+        AssetHeader header;
+        header.magic = MAGIC_MESH;
+        header.version = 1;
+        header.type = AssetType::Mesh;
+        header.metaSize = static_cast<uint32_t>(metaBuffer.size());
+        header.dataOffset = sizeof(AssetHeader) + header.metaSize;
+        header.reserved = 0;
+
+        std::filesystem::path outputPath = path;
+        std::string meshName = mesh->mName.C_Str();
+
+        if (meshName.empty() || std::all_of(meshName.begin(), meshName.end(), isspace)) 
+        {
+            meshName = "Mesh" + std::to_string(meshIndex);
+        }
+
+        outputPath.replace_filename(outputPath.stem().string() + "_" + meshName + ".rmesh");
+
+        std::ofstream outFile(outputPath, std::ios::binary);
+        if (!outFile)
+        {
+            LOG_ERROR("Failed to open output file: {}", outputPath.string());
+            continue;
+        }
+
+        outFile.write(reinterpret_cast<const char*>(&header), sizeof(header));
+        outFile.write(metaBuffer.data(), metaBuffer.size());
+        outFile.write(reinterpret_cast<const char*>(vertices.data()), vertices.size() * sizeof(Vertex));
+        outFile.write(reinterpret_cast<const char*>(indices.data()), indices.size() * sizeof(unsigned int));
+        outFile.close();
+
+        LOG_INFO("Mesh [{}] imported to: {} ({} vertices, {} indices) UUID: {}",
+            meshName, outputPath.string(), vertices.size(), indices.size(), meta.uuid.ToString());
+    }
+
+    return true;
 }
