@@ -12935,3 +12935,15 @@
 [debug] -0.5490457
 [info] Engine has started!
 [info] Final texture ID: 26
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Json loading took 2 ms
+[info] Scene loading took 245 ms
+[info] Total mesh loading took 6 ms
+[info] Scene loading complete
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!

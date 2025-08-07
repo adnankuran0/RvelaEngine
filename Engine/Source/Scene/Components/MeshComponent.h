@@ -6,8 +6,6 @@
 
 struct alignas(16) MeshData
 {
-    glm::mat4 localTransform;
-    glm::mat4 worldTransform;
     BoundingBox localAABB;
 
     uint32_t indexCount;

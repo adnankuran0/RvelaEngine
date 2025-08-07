@@ -14,13 +14,7 @@ public:
 	MaterialComponent() {}
 	MaterialComponent(const AssetUUID& uuid) 
 	{
-		if (!uuid.IsValid())
-		{
-			LOG_WARN("Material UUID is not valid!");
-			return;
-		}
-		materialUUID = uuid;
-		Load();
+		Load(uuid);
 	}
 
 	inline glm::vec3 GetAlbedoColor() const noexcept { return material->albedoColor; }
@@ -96,8 +90,7 @@ public:
 	Ref<MaterialAsset> GetMaterial() { return material; }
 	void SetMaterial(AssetUUID newMaterialUUID)
 	{
-		materialUUID = newMaterialUUID;
-		Load();
+		Load(newMaterialUUID);
 	}
 
 	std::string Serialize() const override
@@ -112,24 +105,29 @@ public:
 		json j = json::parse(jsonStr);
 		std::string materialUUIDstr = j["material"];
 		materialUUID = AssetUUID::FromString(materialUUIDstr);
-		Load();
+		Load(materialUUID);
 
 	}
 
 private:
 
-	void Load()
+	void Load(const AssetUUID& uuid)
 	{
-		if (!materialUUID.IsValid()) return;
+		if (!uuid.IsValid())
+		{
+			LOG_WARN("Material UUID is not valid!");
+			return;
+		}
+		materialUUID = uuid;
 
 		// Clear existing
-		//material.Reset();
-		//albedoTexture.Reset();
-		//normalTexture.Reset();
-		//metallicTexture.Reset();
-		//roughnessTexture.Reset();
-		//aoTexture.Reset();
-		//heightTexture.Reset();
+		material.Reset();
+		albedoTexture.Reset();
+		normalTexture.Reset();
+		metallicTexture.Reset();
+		roughnessTexture.Reset();
+		aoTexture.Reset();
+		heightTexture.Reset();
 		
 		material = AssetRegistry::GetAsset<MaterialAsset>(materialUUID);
 		if (!material)

@@ -115,9 +115,34 @@ private:
 
 #if 0
 
-struct MeshComponent
+class MeshComponent : public Component
 {
+public:
+    MeshComponent() = default;
+    MeshComponent(const AssetUUID& uuid)
+    {
+        
+    }
+
+    inline void SetMesh(const AssetUUID& uuid)
+    {
+        Load(uuid);
+    }
+
+private:
+    inline void Load(const AssetUUID& uuid)
+    {
+        if (!uuid.IsValid())
+        {
+            LOG_WARN("Material UUID is not valid!");
+            return;
+        }
+        meshUUID = uuid;
+        mesh = AssetRegistry::GetAsset<MeshAsset>(meshUUID);
+    }
+
     Ref<MeshAsset> mesh;
+    AssetUUID meshUUID;
 };
 
 class alignas(16) MeshRendererComponent {
