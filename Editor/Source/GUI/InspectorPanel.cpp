@@ -102,6 +102,22 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
             }
         }
 
+        if (registry.any_of<MeshRendererComponent>(selectedEntity))
+        {
+            if (ImGui::CollapsingHeader("Mesh Renderer"))
+            {
+                ImGui::Indent();
+                MeshRendererComponent& meshRenderer = registry.get<MeshRendererComponent>(selectedEntity);
+                bool isCastShadow = meshRenderer.IsCastShadow();
+                if (ImGui::Checkbox("Cast Shadow",&isCastShadow))
+                {
+                    meshRenderer.SetCastShadow(isCastShadow);
+                }
+
+                ImGui::Unindent();
+            }
+        }
+
         if (registry.any_of<PointLightComponent>(selectedEntity))
         {
             if (ImGui::CollapsingHeader("PointLight"))

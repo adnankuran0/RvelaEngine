@@ -60,4 +60,27 @@ public:
 
         return result;
     }
+
+    inline AABB CalculateWorldAABB(const glm::mat4& worldMatrix) noexcept
+    {
+        static constexpr glm::vec3 corners[8] = 
+        {
+            {0, 0, 0}, {1, 0, 0}, {0, 1, 0}, {1, 1, 0},
+            {0, 0, 1}, {1, 0, 1}, {0, 1, 1}, {1, 1, 1}
+        };
+
+        glm::vec3 worldMin(std::numeric_limits<float>::max());
+        glm::vec3 worldMax(std::numeric_limits<float>::lowest());
+
+        for (int i = 0; i < 8; ++i) {
+            glm::vec3 corner = glm::mix(min, max, corners[i]); 
+            glm::vec4 worldPos = worldMatrix * glm::vec4(corner, 1.0f);
+            glm::vec3 p(worldPos);
+
+            worldMin = glm::min(worldMin, p);
+            worldMax = glm::max(worldMax, p);
+        }
+
+        return AABB(worldMin, worldMax);
+    }
 };

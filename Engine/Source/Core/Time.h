@@ -46,7 +46,7 @@ public:
         return timeScale;
     }
 
-    inline static float GetMaxFPS() noexcept
+    inline static int GetMaxFPS() noexcept
     {
         return maxFPS;
     }

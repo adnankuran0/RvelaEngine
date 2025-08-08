@@ -120,42 +120,14 @@ void Scene::UpdateNodeRecursive(entt::entity e, const glm::mat4& parentWorld) {
     glm::decompose(worldMat, scale, rotation, translation, skew, perspective);
 
     t.SetWorldTransform(translation, rotation, scale);
-
+    
+    //Update AABB
     if (HasComponent<MeshRendererComponent>(e))
     {
         auto& c = GetComponent<MeshRendererComponent>(e);
-        auto& localAABB = c.localAABB;
-
-        
-
-        glm::vec3 localMin = localAABB.min;
-        glm::vec3 localMax = localAABB.max;
-
-        glm::vec3 corners[8] = {
-            {localMin.x, localMin.y, localMin.z},
-            {localMax.x, localMin.y, localMin.z},
-            {localMin.x, localMax.y, localMin.z},
-            {localMax.x, localMax.y, localMin.z},
-            {localMin.x, localMin.y, localMax.z},
-            {localMax.x, localMin.y, localMax.z},
-            {localMin.x, localMax.y, localMax.z},
-            {localMax.x, localMax.y, localMax.z},
-        };
-
-        glm::vec3 worldMin(FLT_MAX);
-        glm::vec3 worldMax(-FLT_MAX);
-
-        for (int i = 0; i < 8; ++i) {
-            glm::vec4 worldPos = t.GetWorldMatrix() * glm::vec4(corners[i], 1.0f);
-            glm::vec3 p = glm::vec3(worldPos);
-
-            worldMin = glm::min(worldMin, p);
-            worldMax = glm::max(worldMax, p);
-        }
-
-        AABB worldAABB(worldMin, worldMax);
-        c.worldAABB = worldAABB;
+        c.worldAABB = c.localAABB.CalculateWorldAABB(t.GetWorldMatrix());
     }
+
     t.ClearDirty();
 
     auto& node = GetComponent<SceneTreeComponent>(e);

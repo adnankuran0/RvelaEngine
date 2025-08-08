@@ -169,10 +169,7 @@ void LightingPass::Execute()
         command.mesh.VAO.Bind();
         glDrawElements(GL_TRIANGLES, command.mesh.indexCount, GL_UNSIGNED_INT, 0);
 
-        //GLenum err;
-        //while ((err = glGetError()) != GL_NO_ERROR) {
-        //    LOG_ERROR("OpenGL Error: {}", err);
-        //}
+      
 
     }
 

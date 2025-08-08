@@ -63,4 +63,9 @@ public:
         VBO.Destroy();
         EBO.Destroy();
     }
+
+    inline bool IsCastShadow() const { return castShadow; }
+    void SetCastShadow(bool isCastsShadow) { castShadow = isCastsShadow; }
+ private:
+    bool castShadow = true;
 };
