@@ -2,59 +2,60 @@
 #include "Scene/Component.h"
 #include "Utils/FileUtils.h"
 #include "nlohmann/json.hpp"
-
-
-struct alignas(16) MeshData
-{
-    BoundingBox localAABB;
-
-    uint32_t indexCount;
-    uint16_t meshIndex;
-
-    std::vector<float> vertices;
-    std::vector<unsigned int> indices;
-
-    Path materialPath;
-    std::string name;
-
-    int GetTriangleCount() const {
-        return indexCount / 3;
-    }
-
-    void GetTriangle(int triangleIndex, glm::vec3& v0, glm::vec3& v1, glm::vec3& v2) const {
-        constexpr int stride = 8;
-
-        const int i0 = indices[triangleIndex * 3 + 0];
-        const int i1 = indices[triangleIndex * 3 + 1];
-        const int i2 = indices[triangleIndex * 3 + 2];
-
-        v0 = glm::vec3(vertices[i0 * stride]);
-        v1 = glm::vec3(vertices[i1 * stride]);
-        v2 = glm::vec3(vertices[i2 * stride]);
-    }
-};
+#include "Assets/MeshAsset.h"
+#include "Assets/AssetRegistry.h"
 
 using json = nlohmann::json;
 
-struct MeshComponent : public Component {
-    MeshData mesh;
-    Path modelPath;
-    uint32_t meshIndex;
+class MeshComponent : public Component
+{
+public:
+    MeshComponent() = default;
+    MeshComponent(const AssetUUID& uuid)
+    {
+        Load(uuid);
+    }
 
-    MeshComponent() = delete;
-    MeshComponent(const Path modelPath, uint16_t meshIndex, MeshData& mesh) : modelPath(modelPath), meshIndex(meshIndex), mesh(mesh) {}
+    inline Ref<MeshAsset> GetMesh() { return mesh; }
+    inline void SetMesh(const AssetUUID& uuid)
+    {
+        Load(uuid);
+        isDirty = true;
+    }
 
-    std::string Serialize() const override {
+    std::string Serialize() const override 
+{
         json j;
-        j["modelPath"] = modelPath.GetVirtualStr();
-        j["meshIndex"] = meshIndex;
+        j["mesh"] = meshUUID.ToString();
         return j.dump(4);
     }
 
-    void Deserialize(const std::string& str) override {
+    void Deserialize(const std::string& str) override 
+    {
         json j = json::parse(str);
-        std::string modelPathData = j["modelPath"];
-        modelPath = VRT_PATH(modelPathData);
-        meshIndex = j["meshIndex"];
+        meshUUID = AssetUUID::FromString(j["mesh"]);
+        Load(meshUUID);
     }
+
+    inline bool IsDirty() { return isDirty; }
+    inline void SetDirty(bool isDirty) { this->isDirty = isDirty; }
+
+private:
+    inline void Load(const AssetUUID& uuid)
+    {
+        if (!uuid.IsValid())
+        {
+            LOG_WARN("Material UUID is not valid!");
+            return;
+        }
+        meshUUID = uuid;
+        mesh.Reset();
+        mesh = AssetRegistry::GetAsset<MeshAsset>(meshUUID);
+    }
+
+    Ref<MeshAsset> mesh;
+    AssetUUID meshUUID;
+
+    bool isDirty = false;
 };
+

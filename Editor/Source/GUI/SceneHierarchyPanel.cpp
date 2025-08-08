@@ -126,7 +126,7 @@ void SceneHierarchyPanel::Draw(Scene* scene, entt::entity& selectedEntity)
             std::string file = filePath ? std::string(filePath) : "";
             if (!file.empty())
             {
-                selectedEntity = scene->LoadAsset(file);
+                //selectedEntity = scene->LoadAsset(file);
             }
         }
         if (ImGui::MenuItem("Delete Entity")) {

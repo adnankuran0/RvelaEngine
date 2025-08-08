@@ -1,7 +1,6 @@
 ﻿#include "rvelapch.h"
 #include "SceneManager.h"
 #include "json.hpp"
-#include "Utils/AssetManager.h"
 #include "EntityUUID.h"  
 #include "Core/Log.h"
 
@@ -109,23 +108,18 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
         if (entityJson.contains("MeshComponent"))
         {
             std::string serializedMesh = entityJson["MeshComponent"];
-            json j = json::parse(serializedMesh);
-            std::string newModelPath = j["modelPath"];
-            uint16_t meshIndex = j["meshIndex"];
-
-            auto meshStart = std::chrono::high_resolution_clock::now();
-                
-            MeshData meshData = AssetManager::LoadMesh(VRT_PATH(newModelPath), meshIndex);
-            auto meshEnd = std::chrono::high_resolution_clock::now();
-            meshLoadTotal += std::chrono::duration_cast<std::chrono::milliseconds>(meshEnd - meshStart);
-
-            scene.AddComponent<MeshComponent>(entity, VRT_PATH(newModelPath), meshIndex, meshData);
-            scene.AddComponent<MeshRendererComponent>(entity, meshData.vertices.data(),
-                meshData.vertices.size() * sizeof(float),
-                meshData.indices.data(),
-                meshData.indices.size() * sizeof(unsigned int),
-                meshData.indices.size(),
-                meshData.localAABB);
+            scene.AddComponent<MeshComponent>(entity);
+            MeshComponent comp = scene.GetComponent<MeshComponent>(entity);
+            comp.Deserialize(serializedMesh);
+            Ref<MeshAsset> mesh = comp.GetMesh();
+            std::vector<float> vertices;
+            PackVertices(mesh->vertices,vertices);
+            scene.AddComponent<MeshRendererComponent>(entity,
+                vertices.data(), 
+                vertices.size() * sizeof(float), 
+                mesh->indices.data(),
+                mesh->indices.size() * sizeof(unsigned int), 
+                mesh->indices.size());
         }
 
         if (entityJson.contains("PointLightComponent"))

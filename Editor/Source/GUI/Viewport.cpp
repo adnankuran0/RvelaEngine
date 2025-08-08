@@ -114,6 +114,7 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
 
 
         // selecing
+        /*
         ImVec2 mousePos = ImGui::GetIO().MousePos;
 
         bool isMouseInViewport =
@@ -177,6 +178,7 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
 
 
         }
+        */
     }
     ImGui::End();
     ImGui::PopStyleVar();

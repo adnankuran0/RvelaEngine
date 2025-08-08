@@ -24,7 +24,7 @@ public:
     Entity CreatePointLight();
     Entity CreateDirectionalLight();
 
-    Entity LoadAsset(const std::string& path);
+    //Entity LoadAsset(const std::string& path);
     Entity LoadPrimitive(const std::string& primitiveMeshName);
 
     template<typename Component, typename... Args>

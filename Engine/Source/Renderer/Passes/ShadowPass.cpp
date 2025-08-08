@@ -117,7 +117,7 @@ void ShadowPass::RenderDirectionalShadowMap()
         }
 
         for (auto& command : commands) {
-            if (!ctx.camera->Intersects(lightProjection * lightView,command.mesh.worldAABB)) continue;
+            //if (!ctx.camera->Intersects(lightProjection * lightView,command.mesh.worldAABB)) continue;
 
             shadowShader.setMat4("model", command.transform.GetWorldMatrix());
             command.mesh.VAO.Bind();
@@ -166,8 +166,8 @@ void ShadowPass::RenderPointShadowMap()
             command.mesh.VAO.Bind();
 
             for (unsigned int face = 0; face < 6; ++face) {
-                if (!ctx.camera->Intersects(shadowTransforms[face], command.mesh.worldAABB))
-                    continue;
+                //if (!ctx.camera->Intersects(shadowTransforms[face], command.mesh.worldAABB))
+                    //continue;
 
                 // Set the current face's matrix
                 pointShadowShader.setMat4("shadowMatrix", shadowTransforms[face]);

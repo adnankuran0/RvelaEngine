@@ -80,7 +80,7 @@ void GeometryPass::Execute()
 
 
     for (auto& command : commands) {
-        if (!ctx.camera->Intersects(command.mesh.worldAABB)) continue;
+        //if (!ctx.camera->Intersects(command.mesh.worldAABB)) continue;
 
         auto& material = command.material;
         glm::mat4 model = command.transform.GetWorldMatrix();

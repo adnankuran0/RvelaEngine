@@ -121,7 +121,7 @@ void LightingPass::Execute()
     shader.setMat4("projection", ctx.camera->projection);
 
     for (auto& command : commands) {
-        if (!ctx.camera->Intersects(command.mesh.worldAABB)) continue;
+        //if (!ctx.camera->Intersects(command.mesh.worldAABB)) continue;
 
         if (command.isSelected) {
             glEnable(GL_STENCIL_TEST);

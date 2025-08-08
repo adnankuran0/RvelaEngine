@@ -3,7 +3,6 @@
 #include "Entity.h"
 #include "Core/Time.h"
 #include "Core/Log.h"
-#include "Utils/AssetManager.h"
 #include "Utils/Serializer.h"
 #include "Utils/ProjectManager.h"
 #include "EntityUUID.h"
@@ -66,61 +65,30 @@ Entity Scene::CreateDirectionalLight() {
     return entity;
 }
 
-Entity Scene::LoadAsset(const std::string& path) {
-    Entity root = CreateEntity("Model");
-    std::vector<MeshData> meshes = AssetManager::LoadModel(VRT_PATH(path));
-    if (meshes.size() == 1) {
-        auto& m = meshes.back();
-        root.AddComponent<MeshRendererComponent>(
-            m.vertices.data(), 
-            m.vertices.size() * sizeof(float), 
-            m.indices.data(), 
-            m.indices.size() * sizeof(unsigned int), 
-            m.indices.size(),
-            m.localAABB);
-        root.AddComponent<MeshComponent>(VRT_PATH(path), m.meshIndex,m);
-        root.GetComponent<TagComponent>().tag = m.name;
-        root.AddComponent<MaterialComponent>(AssetUUID::FromString("ee3dde12-6263-4f11-bb1d-812b3e196ab7"));
-    }
-    else {
-        for (auto& m : meshes) {
-            Entity child = CreateEntity("child");
-            SetParent(child, root);
-            child.AddComponent<MeshRendererComponent>(
-                m.vertices.data(), 
-                m.vertices.size() * sizeof(float), 
-                m.indices.data(), 
-                m.indices.size() * sizeof(unsigned int), 
-                m.indices.size(),
-                m.localAABB);
-            child.AddComponent<MeshComponent>(VRT_PATH(path), m.meshIndex,m);
-            child.GetComponent<TagComponent>().tag = m.name;
-            child.AddComponent<MaterialComponent>(AssetUUID::FromString("ee3dde12-6263-4f11-bb1d-812b3e196ab7"));
-        }
-    }
-    return root;
-}
-
-struct PrimitiveConfig { std::string name; Path meshPath; };
-Entity Scene::LoadPrimitive(const std::string& primitiveMeshName) {
-    static const std::unordered_map<std::string, PrimitiveConfig> map = {
-        {"Cube", {"Cube", VRT_PATH("Assets\\Models\\Primitives\\Cube.fbx")}},
-        {"Sphere", {"Sphere", VRT_PATH("Assets\\Models\\Primitives\\Sphere.fbx")}},
-        {"Cylinder", {"Cylinder", VRT_PATH("Assets\\Models\\Primitives\\Cylinder.fbx")}},
-        {"Cone", {"Cone", VRT_PATH("Assets\\Models\\Primitives\\Cone.fbx")}},
-        {"Capsule", {"Capsule", VRT_PATH("Assets\\Models\\Primitives\\Capsule.fbx")}},
-        {"Torus", {"Torus", VRT_PATH("Assets\\Models\\Primitives\\Torus.fbx")}}
+struct PrimitiveConfig { std::string name; AssetUUID uuid; };
+Entity Scene::LoadPrimitive(const std::string& primitiveMeshName) 
+{
+    static const std::unordered_map<std::string, PrimitiveConfig> map = 
+    {
+        {"Cube", {"Cube", AssetUUID::FromString("56a20581-8969-43a9-921a-78b6742af99b")}},
+        {"Sphere", {"Sphere", AssetUUID::FromString("69e4373b-f928-4987-846b-db727a8f8b99")}},
+        {"Cylinder", {"Cylinder", AssetUUID::FromString("700e980b-fc10-4d38-9d10-52c0b6c7f260")}},
+        {"Cone", {"Cone", AssetUUID::FromString("53e160ea-674b-4535-a0e6-53ad3516148f")}},
+        {"Capsule", {"Capsule", AssetUUID::FromString("643639c5-0ce8-491c-b75b-b659a7176931")}},
+        {"Torus", {"Torus", AssetUUID::FromString("9fcfe65e-24ec-4d6c-a777-c26556fee817")}}
     };
     auto it = map.find(primitiveMeshName);
     if (it == map.end()) return Entity{};
     const auto& cfg = it->second;
     Entity root = CreateEntity(cfg.name);
-    auto m = AssetManager::LoadMesh(cfg.meshPath, 0);
-    root.AddComponent<MeshRendererComponent>(m.vertices.data(), m.vertices.size() * sizeof(float), m.indices.data(), m.indices.size() * sizeof(unsigned int), m.indices.size(),m.localAABB);
-    root.AddComponent<MeshComponent>(cfg.meshPath, m.meshIndex,m);
-    root.GetComponent<TagComponent>().tag = m.name;
-    AssetUUID id = AssetUUID::FromString("ee3dde12-6263-4f11-bb1d-812b3e196ab7");
-    root.AddComponent<MaterialComponent>(id);
+    Ref<MeshAsset> m = AssetRegistry::GetAsset<MeshAsset>(cfg.uuid);
+    std::vector<float> vertices;
+    PackVertices(m->vertices, vertices);
+    root.AddComponent<MeshRendererComponent>(vertices.data(), vertices.size() * sizeof(float), m->indices.data(), m->indices.size() * sizeof(unsigned int), m->indices.size());
+    root.AddComponent<MeshComponent>(m->GetUUID());
+    root.GetComponent<TagComponent>().tag = cfg.name;
+    AssetUUID defaultMaterialId = AssetUUID::FromString("ee3dde12-6263-4f11-bb1d-812b3e196ab7");
+    root.AddComponent<MaterialComponent>(defaultMaterialId);
     return root;
 }
 
@@ -154,6 +122,7 @@ void Scene::UpdateNodeRecursive(entt::entity e, const glm::mat4& parentWorld) {
     t.SetWorldTransform(translation, rotation, scale);
 
     //Update AABBs
+    /*
     if (HasComponent<MeshRendererComponent>(e))
     {
         auto& c = GetComponent<MeshRendererComponent>(e);
@@ -189,7 +158,7 @@ void Scene::UpdateNodeRecursive(entt::entity e, const glm::mat4& parentWorld) {
         BoundingBox worldAABB(worldMin, worldMax);
         c.worldAABB = worldAABB;
     }
-
+    */
     t.ClearDirty();
 
     auto& node = GetComponent<SceneTreeComponent>(e);

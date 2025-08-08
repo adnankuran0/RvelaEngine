@@ -73,8 +73,32 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
         {
             if (ImGui::CollapsingHeader("Mesh"))
             {
-                auto& meshComponent = registry.get<MeshComponent>(selectedEntity);
-                ImGui::Text("Mesh Index: %s", std::to_string(meshComponent.meshIndex));
+                ImGui::Indent();
+                MeshComponent& mesh = registry.get<MeshComponent>(selectedEntity);
+
+                ImGui::Button("Mesh Slot", ImVec2(200, 20));
+                if (ImGui::BeginDragDropTarget())
+                {
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
+                    {
+                        const char* path = (const char*)payload->Data;
+                        std::string pathStr(path);
+                        if (pathStr.ends_with(".rmesh"))
+                        {
+                            std::ifstream inFile(pathStr, std::ios::binary);
+                            if (!inFile.is_open()) {
+                                LOG_ERROR("file not opened");
+                                return;
+                            }
+                            AssetHeader header = AssetLoader::ReadHeader(inFile, MAGIC_MESH);
+                            std::unique_ptr<MeshMeta> meta = AssetLoader::ReadMeta<MeshMeta>(inFile, header);
+                            mesh.SetMesh(meta->uuid);
+                        }
+                    }
+                    ImGui::EndDragDropTarget();
+                }
+
+                ImGui::Unindent();
             }
         }
 

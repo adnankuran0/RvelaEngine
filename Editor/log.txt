@@ -12947,3 +12947,342 @@
 [info] Engine has started!
 [info] Final texture ID: 26
 [info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[debug] Pos: -1, -1, -1
+[debug] Pos: -1, -1, 1
+[debug] Pos: -1, 1, 1
+[debug] Pos: -1, 1, -1
+[debug] Pos: -1, 1, -1
+[debug] Pos: -1, 1, 1
+[debug] Pos: 1, 1, 1
+[debug] Pos: 1, 1, -1
+[debug] Pos: 1, 1, -1
+[debug] Pos: 1, 1, 1
+[debug] Pos: 1, -1, 1
+[debug] Pos: 1, -1, -1
+[debug] Pos: 1, -1, -1
+[debug] Pos: 1, -1, 1
+[debug] Pos: -1, -1, 1
+[debug] Pos: -1, -1, -1
+[debug] Pos: -1, 1, -1
+[debug] Pos: 1, 1, -1
+[debug] Pos: 1, -1, -1
+[debug] Pos: -1, -1, -1
+[debug] Pos: 1, 1, 1
+[debug] Pos: -1, 1, 1
+[debug] Pos: -1, -1, 1
+[debug] Pos: 1, -1, 1
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[debug] Pos: -1, -1, -1
+[debug] Pos: -1, -1, 1
+[debug] Pos: -1, 1, 1
+[debug] Pos: -1, 1, -1
+[debug] Pos: -1, 1, -1
+[debug] Pos: -1, 1, 1
+[debug] Pos: 1, 1, 1
+[debug] Pos: 1, 1, -1
+[debug] Pos: 1, 1, -1
+[debug] Pos: 1, 1, 1
+[debug] Pos: 1, -1, 1
+[debug] Pos: 1, -1, -1
+[debug] Pos: 1, -1, -1
+[debug] Pos: 1, -1, 1
+[debug] Pos: -1, -1, 1
+[debug] Pos: -1, -1, -1
+[debug] Pos: -1, 1, -1
+[debug] Pos: 1, 1, -1
+[debug] Pos: 1, -1, -1
+[debug] Pos: -1, -1, -1
+[debug] Pos: 1, 1, 1
+[debug] Pos: -1, 1, 1
+[debug] Pos: -1, -1, 1
+[debug] Pos: 1, -1, 1
+[debug] Index: 0
+[debug] Index: 1
+[debug] Index: 2
+[debug] Index: 0
+[debug] Index: 2
+[debug] Index: 3
+[debug] Index: 4
+[debug] Index: 5
+[debug] Index: 6
+[debug] Index: 4
+[debug] Index: 6
+[debug] Index: 7
+[debug] Index: 8
+[debug] Index: 9
+[debug] Index: 10
+[debug] Index: 8
+[debug] Index: 10
+[debug] Index: 11
+[debug] Index: 12
+[debug] Index: 13
+[debug] Index: 14
+[debug] Index: 12
+[debug] Index: 14
+[debug] Index: 15
+[debug] Index: 16
+[debug] Index: 17
+[debug] Index: 18
+[debug] Index: 16
+[debug] Index: 18
+[debug] Index: 19
+[debug] Index: 20
+[debug] Index: 21
+[debug] Index: 22
+[debug] Index: 20
+[debug] Index: 22
+[debug] Index: 23
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[debug] Pos: -1, -1, -1
+[debug] Nor: -1, 0, 0
+[debug] Tan: 0, 0, 1
+[debug] Bit: 0, 1, 0
+[debug] Uv: 0.375, 1
+[debug] Pos: -1, -1, 1
+[debug] Nor: -1, 0, 0
+[debug] Tan: 0, 0, 1
+[debug] Bit: 0, 1, 0
+[debug] Uv: 0.625, 1
+[debug] Pos: -1, 1, 1
+[debug] Nor: -1, 0, 0
+[debug] Tan: 0, 0, 1
+[debug] Bit: 0, 1, 0
+[debug] Uv: 0.625, 0.75
+[debug] Pos: -1, 1, -1
+[debug] Nor: -1, 0, 0
+[debug] Tan: 0, 0, 1
+[debug] Bit: 0, 1, 0
+[debug] Uv: 0.375, 0.75
+[debug] Pos: -1, 1, -1
+[debug] Nor: 0, 1, 0
+[debug] Tan: 0, 0, 1
+[debug] Bit: 1, 0, 0
+[debug] Uv: 0.375, 0.75
+[debug] Pos: -1, 1, 1
+[debug] Nor: 0, 1, 0
+[debug] Tan: 0, 0, 1
+[debug] Bit: 1, 0, 0
+[debug] Uv: 0.625, 0.75
+[debug] Pos: 1, 1, 1
+[debug] Nor: 0, 1, 0
+[debug] Tan: 0, 0, 1
+[debug] Bit: 1, 0, 0
+[debug] Uv: 0.625, 0.5
+[debug] Pos: 1, 1, -1
+[debug] Nor: 0, 1, 0
+[debug] Tan: 0, 0, 1
+[debug] Bit: 1, 0, 0
+[debug] Uv: 0.375, 0.5
+[debug] Pos: 1, 1, -1
+[debug] Nor: 1, 0, 0
+[debug] Tan: 0, 0, 1
+[debug] Bit: 0, -1, 0
+[debug] Uv: 0.375, 0.5
+[debug] Pos: 1, 1, 1
+[debug] Nor: 1, 0, 0
+[debug] Tan: 0, 0, 1
+[debug] Bit: 0, -1, 0
+[debug] Uv: 0.625, 0.5
+[debug] Pos: 1, -1, 1
+[debug] Nor: 1, 0, 0
+[debug] Tan: 0, 0, 1
+[debug] Bit: 0, -1, 0
+[debug] Uv: 0.625, 0.25
+[debug] Pos: 1, -1, -1
+[debug] Nor: 1, 0, 0
+[debug] Tan: 0, 0, 1
+[debug] Bit: 0, -1, 0
+[debug] Uv: 0.375, 0.25
+[debug] Pos: 1, -1, -1
+[debug] Nor: 0, -1, 0
+[debug] Tan: 0, 0, 1
+[debug] Bit: -1, 0, 0
+[debug] Uv: 0.375, 0.25
+[debug] Pos: 1, -1, 1
+[debug] Nor: 0, -1, 0
+[debug] Tan: 0, 0, 1
+[debug] Bit: -1, 0, 0
+[debug] Uv: 0.625, 0.25
+[debug] Pos: -1, -1, 1
+[debug] Nor: 0, -1, 0
+[debug] Tan: 0, 0, 1
+[debug] Bit: -1, 0, 0
+[debug] Uv: 0.625, 0
+[debug] Pos: -1, -1, -1
+[debug] Nor: 0, -1, 0
+[debug] Tan: 0, 0, 1
+[debug] Bit: -1, 0, 0
+[debug] Uv: 0.375, 0
+[debug] Pos: -1, 1, -1
+[debug] Nor: 0, 0, -1
+[debug] Tan: 1, 0, 0
+[debug] Bit: 0, -1, 0
+[debug] Uv: 0.125, 0.5
+[debug] Pos: 1, 1, -1
+[debug] Nor: 0, 0, -1
+[debug] Tan: 1, 0, 0
+[debug] Bit: 0, -1, 0
+[debug] Uv: 0.375, 0.5
+[debug] Pos: 1, -1, -1
+[debug] Nor: 0, 0, -1
+[debug] Tan: 1, 0, 0
+[debug] Bit: 0, -1, 0
+[debug] Uv: 0.375, 0.25
+[debug] Pos: -1, -1, -1
+[debug] Nor: 0, 0, -1
+[debug] Tan: 1, 0, 0
+[debug] Bit: 0, -1, 0
+[debug] Uv: 0.125, 0.25
+[debug] Pos: 1, 1, 1
+[debug] Nor: 0, 0, 1
+[debug] Tan: -1, 0, 0
+[debug] Bit: 0, -1, 0
+[debug] Uv: 0.625, 0.5
+[debug] Pos: -1, 1, 1
+[debug] Nor: 0, 0, 1
+[debug] Tan: -1, 0, 0
+[debug] Bit: 0, -1, 0
+[debug] Uv: 0.875, 0.5
+[debug] Pos: -1, -1, 1
+[debug] Nor: 0, 0, 1
+[debug] Tan: -1, 0, 0
+[debug] Bit: 0, -1, 0
+[debug] Uv: 0.875, 0.25
+[debug] Pos: 1, -1, 1
+[debug] Nor: 0, 0, 1
+[debug] Tan: -1, 0, 0
+[debug] Bit: 0, -1, 0
+[debug] Uv: 0.625, 0.25
+[debug] Index: 0
+[debug] Index: 1
+[debug] Index: 2
+[debug] Index: 0
+[debug] Index: 2
+[debug] Index: 3
+[debug] Index: 4
+[debug] Index: 5
+[debug] Index: 6
+[debug] Index: 4
+[debug] Index: 6
+[debug] Index: 7
+[debug] Index: 8
+[debug] Index: 9
+[debug] Index: 10
+[debug] Index: 8
+[debug] Index: 10
+[debug] Index: 11
+[debug] Index: 12
+[debug] Index: 13
+[debug] Index: 14
+[debug] Index: 12
+[debug] Index: 14
+[debug] Index: 15
+[debug] Index: 16
+[debug] Index: 17
+[debug] Index: 18
+[debug] Index: 16
+[debug] Index: 18
+[debug] Index: 19
+[debug] Index: 20
+[debug] Index: 21
+[debug] Index: 22
+[debug] Index: 20
+[debug] Index: 22
+[debug] Index: 23
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[error] Invalid file magic
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Json loading took 0 ms
+[info] Scene loading took 60 ms
+[info] Total mesh loading took 0 ms
+[info] Scene loading complete
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Json loading took 0 ms
+[info] Scene loading took 80 ms
+[info] Total mesh loading took 0 ms
+[info] Scene loading complete
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Json loading took 0 ms
+[info] Scene loading took 55 ms
+[info] Total mesh loading took 0 ms
+[info] Scene loading complete
+[info] Engine has stopped!

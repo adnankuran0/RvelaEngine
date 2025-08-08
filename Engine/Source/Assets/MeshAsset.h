@@ -2,8 +2,10 @@
 #include "Assets/AssetMeta.h"
 #include "Assets/Asset.h"
 #include "glm/glm.hpp"
+#include <glm/gtc/type_ptr.hpp>
 #include "Core/Log.h"
 #include <fstream>
+#include <span>
 
 struct Vertex 
 {
@@ -13,6 +15,21 @@ struct Vertex
     glm::vec3 bitangent;
     glm::vec2 texCoord;
 };
+
+inline void PackVertices(std::span<const Vertex> verts, std::vector<float>& out)
+{
+    out.clear();
+    out.reserve(verts.size() * 14);
+
+    for (const auto& v : verts)
+    {
+        out.insert(out.end(), glm::value_ptr(v.position), glm::value_ptr(v.position) + 3);
+        out.insert(out.end(), glm::value_ptr(v.normal), glm::value_ptr(v.normal) + 3);
+        out.insert(out.end(), glm::value_ptr(v.tangent), glm::value_ptr(v.tangent) + 3);
+        out.insert(out.end(), glm::value_ptr(v.bitangent), glm::value_ptr(v.bitangent) + 3);
+        out.insert(out.end(), glm::value_ptr(v.texCoord), glm::value_ptr(v.texCoord) + 2);
+    }
+}
 
 class MeshMeta : public AssetMeta
 {
@@ -115,35 +132,7 @@ private:
 
 #if 0
 
-class MeshComponent : public Component
-{
-public:
-    MeshComponent() = default;
-    MeshComponent(const AssetUUID& uuid)
-    {
-        
-    }
 
-    inline void SetMesh(const AssetUUID& uuid)
-    {
-        Load(uuid);
-    }
-
-private:
-    inline void Load(const AssetUUID& uuid)
-    {
-        if (!uuid.IsValid())
-        {
-            LOG_WARN("Material UUID is not valid!");
-            return;
-        }
-        meshUUID = uuid;
-        mesh = AssetRegistry::GetAsset<MeshAsset>(meshUUID);
-    }
-
-    Ref<MeshAsset> mesh;
-    AssetUUID meshUUID;
-};
 
 class alignas(16) MeshRendererComponent {
 public:
