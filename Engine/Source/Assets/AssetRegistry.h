@@ -12,8 +12,8 @@ class AssetRegistry
 public:
     void Init(const std::filesystem::path& assetDir);
     static std::filesystem::path GetAssetPath(const AssetUUID& uuid);
-    void ScanAssets(const std::filesystem::path& dir);
-
+    inline static std::filesystem::path GetAssetDirectory() { return s_AssetDirectory; }
+    static void ScanAssets(const std::filesystem::path& dir = s_AssetDirectory);
     static inline bool IsExist(const AssetUUID& uuid)
     {
         return s_UUIDToPath.contains(uuid);

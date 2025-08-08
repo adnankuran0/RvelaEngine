@@ -94,6 +94,10 @@ void SceneHierarchyPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                 selectedEntity = scene->LoadPrimitive("Capsule");
             if (ImGui::MenuItem("Torus"))
                 selectedEntity = scene->LoadPrimitive("Torus");
+            if (ImGui::MenuItem("Plane"))
+                selectedEntity = scene->LoadPrimitive("Plane");
+            if (ImGui::MenuItem("Monkey"))
+                selectedEntity = scene->LoadPrimitive("Monkey");
 
             ImGui::EndMenu();
         }

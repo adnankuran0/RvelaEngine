@@ -2,7 +2,7 @@
 
 #include "glm/glm.hpp"
 #include <array>
-#include "Scene/BoundingBox.h"
+#include "Scene/AABB.h"
 class Frustum
 {
 public:
@@ -36,7 +36,7 @@ public:
         }
     }
 
-    bool Intersects(const BoundingBox& AABB) const
+    bool Intersects(const AABB& AABB) const
     {
         for (const auto& plane : planes)
         {
@@ -56,7 +56,7 @@ public:
         return true; 
     }
 
-    bool Intersects(const glm::mat4& projView, const BoundingBox& AABB) const
+    bool Intersects(const glm::mat4& projView, const AABB& AABB) const
     {
         std::array<glm::vec4, Count> planes;
 

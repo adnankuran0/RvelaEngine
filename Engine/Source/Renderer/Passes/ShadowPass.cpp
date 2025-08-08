@@ -117,7 +117,7 @@ void ShadowPass::RenderDirectionalShadowMap()
         }
 
         for (auto& command : commands) {
-            //if (!ctx.camera->Intersects(lightProjection * lightView,command.mesh.worldAABB)) continue;
+            if (!ctx.camera->Intersects(lightProjection * lightView,command.mesh.worldAABB)) continue;
 
             shadowShader.setMat4("model", command.transform.GetWorldMatrix());
             command.mesh.VAO.Bind();

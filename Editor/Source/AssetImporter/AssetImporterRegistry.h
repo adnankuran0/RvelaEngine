@@ -11,14 +11,19 @@ public:
 		RegisterImporter({ ".png", ".jpg", ".jpeg", ".tga" }, std::make_shared<TextureImporter>());
 		RegisterImporter({ ".gltf", ".fbx", ".obj", ".glb" }, std::make_shared<ModelImporter>());
 	}
-	bool Import(const std::filesystem::path& assetPath)
+
+	AssetUUID Import(const std::filesystem::path& assetPath)
 	{
 		std::string extension = assetPath.extension().string();
 		std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower); 
 		auto it = m_ImporterMap.find(extension);
 		if (it != m_ImporterMap.end())
-			return it->second->Import(assetPath);
-		return false;
+		{
+			AssetUUID uuid = it->second->Import(assetPath);
+			AssetRegistry::ScanAssets();
+			return uuid;
+		}
+		return AssetUUID::Invalid();
 	}
 
 private:

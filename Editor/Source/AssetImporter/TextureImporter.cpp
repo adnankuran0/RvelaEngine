@@ -2,14 +2,14 @@
 #include "TextureImporter.h"
 #include "Assets/TextureAsset.h"
 
-bool TextureImporter::Import(const std::filesystem::path& path)
+AssetUUID TextureImporter::Import(const std::filesystem::path& path)
 {
     //Read original file info
     int width, height, originalChannels;
     if (!stbi_info(path.string().c_str(), &width, &height, &originalChannels))
     {
         LOG_ERROR("Failed to read image info: {}", path.string());
-        return false;
+        return AssetUUID::Invalid();
     }
 
     std::string filename = path.filename().string();
@@ -65,7 +65,7 @@ bool TextureImporter::Import(const std::filesystem::path& path)
     if (!textureData)
     {
         LOG_ERROR("Failed to load image data: {}", path.string());
-        return false;
+        return AssetUUID::Invalid();
     }
 
     if (loadWidth != width || loadHeight != height)
@@ -83,7 +83,7 @@ bool TextureImporter::Import(const std::filesystem::path& path)
     default:
         LOG_ERROR("Unsupported channel count: {}", usedChannels);
         stbi_image_free(textureData);
-        return false;
+        return AssetUUID::Invalid();
     }
 
     TextureMeta meta;
@@ -115,7 +115,7 @@ bool TextureImporter::Import(const std::filesystem::path& path)
     {
         LOG_ERROR("Failed to open output file.");
         stbi_image_free(textureData);
-        return false;
+        return AssetUUID::Invalid();
     }
 
     int dataSize = width * height * usedChannels;
@@ -130,5 +130,5 @@ bool TextureImporter::Import(const std::filesystem::path& path)
     LOG_INFO("Texture imported: {} ({}x{} {}ch) UUID: {}",
         path.filename().string(), width, height, usedChannels, meta.uuid.ToString());
 
-    return true;
+    return meta.uuid;
 }

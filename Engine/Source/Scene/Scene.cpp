@@ -8,7 +8,7 @@
 #include "EntityUUID.h"
 
 
-Scene::Scene() : m_Registry() { LoadPrimitive("Cube"); CreateDirectionalLight(); }
+Scene::Scene() : m_Registry() {  CreateDirectionalLight(); }
 
 Entity Scene::CreateEntity(const std::string& name) {
     Entity entity(m_Registry.create(), this);
@@ -70,21 +70,21 @@ Entity Scene::LoadPrimitive(const std::string& primitiveMeshName)
 {
     static const std::unordered_map<std::string, PrimitiveConfig> map = 
     {
-        {"Cube", {"Cube", AssetUUID::FromString("56a20581-8969-43a9-921a-78b6742af99b")}},
-        {"Sphere", {"Sphere", AssetUUID::FromString("69e4373b-f928-4987-846b-db727a8f8b99")}},
-        {"Cylinder", {"Cylinder", AssetUUID::FromString("700e980b-fc10-4d38-9d10-52c0b6c7f260")}},
-        {"Cone", {"Cone", AssetUUID::FromString("53e160ea-674b-4535-a0e6-53ad3516148f")}},
-        {"Capsule", {"Capsule", AssetUUID::FromString("643639c5-0ce8-491c-b75b-b659a7176931")}},
-        {"Torus", {"Torus", AssetUUID::FromString("9fcfe65e-24ec-4d6c-a777-c26556fee817")}}
+        {"Cube", {"Cube", AssetUUID::FromString("4e05374f-8157-4c0e-bb3a-1c72c9039e05")}},
+        {"Sphere", {"Sphere", AssetUUID::FromString("c6796853-cbdc-4b28-ae32-4c1354b46320")}},
+        {"Cylinder", {"Cylinder", AssetUUID::FromString("19026e98-b5fc-4dfc-b769-62685e56d39e")}},
+        {"Cone", {"Cone", AssetUUID::FromString("0efc8bdb-fdcc-40f3-ab83-a482f6412ec5")}},
+        {"Capsule", {"Capsule", AssetUUID::FromString("a0b4d440-3b37-4a4e-959b-86757f27aaff")}},
+        {"Plane", {"Plane", AssetUUID::FromString("3155a9bc-ef89-40b3-9126-3de1a9b7d811")}},
+        {"Monkey", {"Monkey", AssetUUID::FromString("9415233b-dbe0-451d-ad84-15d3b16d7525")}},
+        {"Torus", {"Torus", AssetUUID::FromString("fb8f40fc-8511-4a0b-aeb8-47d20466f01a")}}
     };
     auto it = map.find(primitiveMeshName);
     if (it == map.end()) return Entity{};
     const auto& cfg = it->second;
     Entity root = CreateEntity(cfg.name);
     Ref<MeshAsset> m = AssetRegistry::GetAsset<MeshAsset>(cfg.uuid);
-    std::vector<float> vertices;
-    PackVertices(m->vertices, vertices);
-    root.AddComponent<MeshRendererComponent>(vertices.data(), vertices.size() * sizeof(float), m->indices.data(), m->indices.size() * sizeof(unsigned int), m->indices.size());
+    root.AddComponent<MeshRendererComponent>(m);
     root.AddComponent<MeshComponent>(m->GetUUID());
     root.GetComponent<TagComponent>().tag = cfg.name;
     AssetUUID defaultMaterialId = AssetUUID::FromString("ee3dde12-6263-4f11-bb1d-812b3e196ab7");
@@ -121,8 +121,6 @@ void Scene::UpdateNodeRecursive(entt::entity e, const glm::mat4& parentWorld) {
 
     t.SetWorldTransform(translation, rotation, scale);
 
-    //Update AABBs
-    /*
     if (HasComponent<MeshRendererComponent>(e))
     {
         auto& c = GetComponent<MeshRendererComponent>(e);
@@ -155,10 +153,9 @@ void Scene::UpdateNodeRecursive(entt::entity e, const glm::mat4& parentWorld) {
             worldMax = glm::max(worldMax, p);
         }
 
-        BoundingBox worldAABB(worldMin, worldMax);
+        AABB worldAABB(worldMin, worldMax);
         c.worldAABB = worldAABB;
     }
-    */
     t.ClearDirty();
 
     auto& node = GetComponent<SceneTreeComponent>(e);

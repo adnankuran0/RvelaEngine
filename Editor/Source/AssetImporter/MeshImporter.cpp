@@ -1,16 +1,8 @@
 #include "rvelapch.h"
 #include "MeshImporter.h"
+#include <Scene/AABB.h>
 
-const aiScene* MeshImporter::LoadScene(const std::filesystem::path& path)
-{
-    return m_Importer.ReadFile(path.string(),
-        aiProcess_CalcTangentSpace |
-        aiProcess_Triangulate |
-        aiProcess_JoinIdenticalVertices |
-        aiProcess_FlipUVs |
-        aiProcess_GenSmoothNormals |
-        aiProcess_ImproveCacheLocality);
-}
+
 
 std::vector<Vertex> MeshImporter::ProcessVertices(aiMesh* mesh)
 {
@@ -74,14 +66,8 @@ MeshMeta MeshImporter::CreateMeshMeta(const std::filesystem::path& path, aiMesh*
     return meta;
 }
 
-bool MeshImporter::Import(const std::filesystem::path& path)
+bool MeshImporter::Import(const std::filesystem::path& path, const aiScene* scene)
 {
-    const aiScene* scene = LoadScene(path);
-    if (!scene)
-    {
-        LOG_ERROR("Failed to load model scene: {}", path.string());
-        return false;
-    }
 
     if (scene->mNumMeshes == 0)
     {
@@ -110,11 +96,15 @@ bool MeshImporter::Import(const std::filesystem::path& path)
 
         std::filesystem::path outputPath = path;
         std::string meshName = mesh->mName.C_Str();
-
+        LOG_DEBUG("Mesh name: {}", meshName);
         if (meshName.empty() || std::all_of(meshName.begin(), meshName.end(), isspace)) 
         {
             meshName = "Mesh" + std::to_string(meshIndex);
         }
+
+        aiVector3D min = mesh->mAABB.mMin;
+        aiVector3D max = mesh->mAABB.mMax;
+        AABB localAABB(glm::vec3(min.x, min.y, min.z), glm::vec3(max.x, max.y, max.z));
 
         outputPath.replace_filename(outputPath.stem().string() + "_" + meshName + ".rmesh");
 
@@ -127,6 +117,7 @@ bool MeshImporter::Import(const std::filesystem::path& path)
 
         outFile.write(reinterpret_cast<const char*>(&header), sizeof(header));
         outFile.write(metaBuffer.data(), metaBuffer.size());
+        outFile.write(reinterpret_cast<const char*>(&localAABB), sizeof(AABB));
         outFile.write(reinterpret_cast<const char*>(vertices.data()), vertices.size() * sizeof(Vertex));
         outFile.write(reinterpret_cast<const char*>(indices.data()), indices.size() * sizeof(unsigned int));
         outFile.close();

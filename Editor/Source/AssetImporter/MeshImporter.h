@@ -5,14 +5,12 @@
 #include "Assimp/Importer.hpp"
 #include "Assimp/scene.h"
 
-class MeshImporter : public IAssetImporter
+class MeshImporter 
 {
 public:
-	bool Import(const std::filesystem::path& path) override;
+	bool Import(const std::filesystem::path& path, const aiScene* scene);
 private:
-	const aiScene* LoadScene(const std::filesystem::path& path);
 	std::vector<Vertex> ProcessVertices(aiMesh* mesh);
 	std::vector<unsigned int> ProcessIndices(aiMesh* mesh);
 	MeshMeta CreateMeshMeta(const std::filesystem::path& path, aiMesh* mesh);
-	Assimp::Importer m_Importer;
 };

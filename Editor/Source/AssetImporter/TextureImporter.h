@@ -6,5 +6,5 @@
 class TextureImporter : public IAssetImporter
 {
 public:
-	bool Import(const std::filesystem::path& path) override;
+	AssetUUID Import(const std::filesystem::path& path) override;
 };

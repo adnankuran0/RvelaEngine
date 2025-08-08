@@ -76,12 +76,12 @@ public:
         frustum.Update(projection * GetViewMatrix());
     }
 
-    bool Intersects(const BoundingBox& AABB)
+    bool Intersects(const AABB& AABB)
     {
         return frustum.Intersects(AABB);
     }
 
-    bool Intersects(const glm::mat4& projView,const BoundingBox& AABB)
+    bool Intersects(const glm::mat4& projView,const AABB& AABB)
     {
         return frustum.Intersects(projView,AABB);
     }

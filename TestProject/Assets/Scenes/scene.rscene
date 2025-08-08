@@ -1,0 +1,59 @@
+{
+                "Entities": [
+                                {
+                                                "MaterialComponent": "{\n    \"material\": \"ee3dde12-6263-4f11-bb1d-812b3e196ab7\"\n}",
+                                                "MeshComponent": "{\n    \"mesh\": \"9fcfe65e-24ec-4d6c-a777-c26556fee817\"\n}",
+                                                "SceneTreeComponent": "{\n    \"childrenUUIDs\": [],\n    \"parentUUID\": 0\n}",
+                                                "TagComponent": "{\n    \"tag\": \"Torus\"\n}",
+                                                "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        -8.445537567138672,\n        0.0,\n        0.0\n    ],\n    \"rotation\": [\n        0.0,\n        -0.0,\n        0.0\n    ],\n    \"scale\": [\n        1.0,\n        1.0,\n        1.0\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
+                                                "UUID": 8
+                                },
+                                {
+                                                "MaterialComponent": "{\n    \"material\": \"ee3dde12-6263-4f11-bb1d-812b3e196ab7\"\n}",
+                                                "MeshComponent": "{\n    \"mesh\": \"643639c5-0ce8-491c-b75b-b659a7176931\"\n}",
+                                                "SceneTreeComponent": "{\n    \"childrenUUIDs\": [],\n    \"parentUUID\": 0\n}",
+                                                "TagComponent": "{\n    \"tag\": \"Capsule\"\n}",
+                                                "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        5.0305962562561035,\n        0.0,\n        0.0\n    ],\n    \"rotation\": [\n        0.0,\n        -0.0,\n        0.0\n    ],\n    \"scale\": [\n        1.0,\n        1.0,\n        1.0\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
+                                                "UUID": 7
+                                },
+                                {
+                                                "MaterialComponent": "{\n    \"material\": \"ee3dde12-6263-4f11-bb1d-812b3e196ab7\"\n}",
+                                                "MeshComponent": "{\n    \"mesh\": \"53e160ea-674b-4535-a0e6-53ad3516148f\"\n}",
+                                                "SceneTreeComponent": "{\n    \"childrenUUIDs\": [],\n    \"parentUUID\": 0\n}",
+                                                "TagComponent": "{\n    \"tag\": \"Cone\"\n}",
+                                                "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        -6.073160171508789,\n        0.0,\n        0.0\n    ],\n    \"rotation\": [\n        0.0,\n        -0.0,\n        0.0\n    ],\n    \"scale\": [\n        1.0,\n        1.0,\n        1.0\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
+                                                "UUID": 6
+                                },
+                                {
+                                                "MaterialComponent": "{\n    \"material\": \"ee3dde12-6263-4f11-bb1d-812b3e196ab7\"\n}",
+                                                "MeshComponent": "{\n    \"mesh\": \"700e980b-fc10-4d38-9d10-52c0b6c7f260\"\n}",
+                                                "SceneTreeComponent": "{\n    \"childrenUUIDs\": [],\n    \"parentUUID\": 0\n}",
+                                                "TagComponent": "{\n    \"tag\": \"Cylinder\"\n}",
+                                                "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        -2.8602914810180664,\n        0.0,\n        0.0\n    ],\n    \"rotation\": [\n        0.0,\n        -0.0,\n        0.0\n    ],\n    \"scale\": [\n        1.0,\n        1.0,\n        1.0\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
+                                                "UUID": 5
+                                },
+                                {
+                                                "MaterialComponent": "{\n    \"material\": \"ee3dde12-6263-4f11-bb1d-812b3e196ab7\"\n}",
+                                                "MeshComponent": "{\n    \"mesh\": \"69e4373b-f928-4987-846b-db727a8f8b99\"\n}",
+                                                "SceneTreeComponent": "{\n    \"childrenUUIDs\": [],\n    \"parentUUID\": 0\n}",
+                                                "TagComponent": "{\n    \"tag\": \"Sphere\"\n}",
+                                                "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        2.3911914825439453,\n        0.0,\n        0.0\n    ],\n    \"rotation\": [\n        0.0,\n        -0.0,\n        0.0\n    ],\n    \"scale\": [\n        1.0,\n        1.0,\n        1.0\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
+                                                "UUID": 4
+                                },
+                                {
+                                                "DirectionalLightComponent": "{\n    \"castShadows\": true,\n    \"color\": [\n        1.0,\n        1.0,\n        1.0\n    ],\n    \"intensity\": 5.0\n}",
+                                                "SceneTreeComponent": "{\n    \"childrenUUIDs\": [],\n    \"parentUUID\": 0\n}",
+                                                "TagComponent": "{\n    \"tag\": \"DirectionalLight\"\n}",
+                                                "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        0.0,\n        0.0,\n        0.0\n    ],\n    \"rotation\": [\n        -60.0,\n        -90.0,\n        0.0\n    ],\n    \"scale\": [\n        1.0,\n        1.0,\n        1.0\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
+                                                "UUID": 2
+                                },
+                                {
+                                                "MaterialComponent": "{\n    \"material\": \"ee3dde12-6263-4f11-bb1d-812b3e196ab7\"\n}",
+                                                "MeshComponent": "{\n    \"mesh\": \"56a20581-8969-43a9-921a-78b6742af99b\"\n}",
+                                                "SceneTreeComponent": "{\n    \"childrenUUIDs\": [],\n    \"parentUUID\": 0\n}",
+                                                "TagComponent": "{\n    \"tag\": \"Cube\"\n}",
+                                                "TransformComponent": "{\n    \"lockScaleRatio\": false,\n    \"position\": [\n        0.0,\n        0.0,\n        0.0\n    ],\n    \"rotation\": [\n        0.0,\n        0.0,\n        0.0\n    ],\n    \"scale\": [\n        1.0,\n        1.0,\n        1.0\n    ],\n    \"scaleRatio\": [\n        1.0,\n        1.0,\n        1.0\n    ]\n}",
+                                                "UUID": 1
+                                }
+                ]
+}

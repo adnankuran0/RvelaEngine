@@ -2,15 +2,15 @@
 #include "Renderer/VertexArray.h"
 #include "Renderer/VertexBuffer.h"
 #include "Renderer/ElementBuffer.h"
-#include <Scene/BoundingBox.h>
+#include <Scene/AABB.h>
 #include "Assets/MeshAsset.h"
 #include "Core/Ref.h"
 
 class alignas(16) MeshRendererComponent {
 public:
     BufferLayout layout;
-    //BoundingBox localAABB;
-    //BoundingBox worldAABB;
+    AABB localAABB;
+    AABB worldAABB;
     VertexArray VAO;
     VertexBuffer VBO;
     ElementBuffer EBO;
@@ -21,24 +21,9 @@ public:
     MeshRendererComponent& operator=(const MeshRendererComponent&) = delete;
     MeshRendererComponent(MeshRendererComponent&&) = default;
     MeshRendererComponent& operator=(MeshRendererComponent&&) = default;
-    MeshRendererComponent(void* vertices, size_t sizeOfVertices, void* indices, size_t sizeOfIndices, unsigned int indexCount )
+    MeshRendererComponent(Ref<MeshAsset> mesh)
     {
-        this->indexCount = indexCount;
-
-        VAO.Init();
-        VAO.Bind();
-        VBO.Init(vertices, sizeOfVertices);
-        VBO.Bind();
-        layout.BindVertexBuffer(VBO.getID());
-        layout.Push<float>(3); // Position
-        layout.Push<float>(3); // Normal
-        layout.Push<float>(3); // Tangent
-        layout.Push<float>(3); // Bitangent
-        layout.Push<float>(2); // UV
-        VAO.SetBufferLayout(layout);
-        EBO.Init(indices, sizeOfIndices);
-        EBO.Bind();
-        //this->localAABB = localAABB;
+        RecreateFromMesh(mesh);
     }
 
     void RecreateFromMesh(Ref<MeshAsset> mesh)
@@ -68,6 +53,8 @@ public:
 
         EBO.Init(mesh->indices.data(), mesh->indices.size() * sizeof(unsigned int));
         EBO.Bind();
+        localAABB = mesh->localAABB;
+        worldAABB = localAABB;
     }
 
     void Destroy()

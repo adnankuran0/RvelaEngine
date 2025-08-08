@@ -112,14 +112,7 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
             MeshComponent comp = scene.GetComponent<MeshComponent>(entity);
             comp.Deserialize(serializedMesh);
             Ref<MeshAsset> mesh = comp.GetMesh();
-            std::vector<float> vertices;
-            PackVertices(mesh->vertices,vertices);
-            scene.AddComponent<MeshRendererComponent>(entity,
-                vertices.data(), 
-                vertices.size() * sizeof(float), 
-                mesh->indices.data(),
-                mesh->indices.size() * sizeof(unsigned int), 
-                mesh->indices.size());
+            scene.AddComponent<MeshRendererComponent>(entity, mesh);
         }
 
         if (entityJson.contains("PointLightComponent"))

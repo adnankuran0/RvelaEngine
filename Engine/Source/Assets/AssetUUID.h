@@ -10,6 +10,10 @@ public:
 
     explicit AssetUUID(const UUIDv4::UUID& uuid) : m_UUID(uuid) {}
 
+    inline static AssetUUID Invalid() {
+        return AssetUUID(UUIDv4::UUID{});
+    }
+
     std::string ToString() const {
         return m_UUID.str();
     }

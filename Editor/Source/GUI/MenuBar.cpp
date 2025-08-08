@@ -68,7 +68,10 @@ void MenuBar::Draw(Engine* engine, AssetImporterRegistry& assetImporter)
                     // Last file (or only file if no '|')
                     std::string lastFile = pathsStr.substr(start);
                     if (!lastFile.empty())
+                    {
                         assetImporter.Import(lastFile);
+                    }
+
                 }
             }
             if (ImGui::MenuItem("Create Material"))
@@ -84,6 +87,7 @@ void MenuBar::Draw(Engine* engine, AssetImporterRegistry& assetImporter)
                     {
                         ofs.close();
                         MaterialImporter::CreateMaterialAsset(file);
+                        AssetRegistry::ScanAssets();
                     }
                 }
             }

@@ -3,9 +3,9 @@
 #include <filesystem>
 #include "AssetUUID.h"
 
-constexpr uint32_t MAGIC_TEXTURE = 0x52544558; // RTEX ASCII
+constexpr uint32_t MAGIC_TEXTURE  = 0x52544558; // RTEX ASCII
 constexpr uint32_t MAGIC_MATERIAL = 0x524D4154; // RMAT ASCII
-constexpr uint32_t MAGIC_MESH = 0x524D5348;
+constexpr uint32_t MAGIC_MESH     = 0x524D5348; // RMSH ASCII
 
 enum struct AssetType : uint8_t
 {
@@ -13,10 +13,10 @@ enum struct AssetType : uint8_t
 	Texture,
 	Mesh,
 	Material,
+	Prefab,
 	Audio,
 	Shader,
 	Scene,
-	Prefab,
 };
 
 struct AssetHeader

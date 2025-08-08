@@ -6,6 +6,7 @@
 #include "Core/Log.h"
 #include <fstream>
 #include <span>
+#include "Scene/AABB.h"
 
 struct Vertex 
 {
@@ -98,6 +99,7 @@ public:
         }
 
         file.seekg(sizeof(AssetHeader) + header.metaSize, std::ios::beg);
+        file.read(reinterpret_cast<char*>(&localAABB), sizeof(AABB));
 
         vertices.resize(meta->vertexCount);
         indices.resize(meta->indexCount);
@@ -118,6 +120,7 @@ public:
     }
 
 public:
+    AABB localAABB;
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
     //AssetUUID materialUUID;
@@ -130,50 +133,3 @@ private:
 
 
 
-#if 0
-
-
-
-class alignas(16) MeshRendererComponent {
-public:
-    BufferLayout layout;
-    BoundingBox localAABB;
-    BoundingBox worldAABB;
-    VertexArray VAO;
-    VertexBuffer VBO;
-    ElementBuffer EBO;
-    unsigned int indexCount = 0;
-
-    MeshRendererComponent() = default;
-    MeshRendererComponent(const MeshRendererComponent&) = delete;
-    MeshRendererComponent& operator=(const MeshRendererComponent&) = delete;
-    MeshRendererComponent(MeshRendererComponent&&) = default;
-    MeshRendererComponent& operator=(MeshRendererComponent&&) = default;
-    MeshRendererComponent(void* vertices, size_t sizeOfVertices, void* indices, size_t sizeOfIndices, unsigned int indexCount, BoundingBox localAABB)
-    {
-        this->indexCount = indexCount;
-
-        VAO.Bind();
-        VBO.Init(vertices, sizeOfVertices);
-        VBO.Bind();
-        layout.BindVertexBuffer(VBO.getID());
-        layout.Push<float>(3); // Position
-        layout.Push<float>(3); // Normal
-        layout.Push<float>(3); // Tangent
-        layout.Push<float>(3); // Bitangent
-        layout.Push<float>(2); // UV
-        VAO.SetBufferLayout(layout);
-        EBO.Init(indices, sizeOfIndices);
-        EBO.Bind();
-        this->localAABB = localAABB;
-    }
-
-    void Destroy()
-    {
-        VAO.Destroy();
-        VBO.Destroy();
-        EBO.Destroy();
-    }
-};
-
-#endif
