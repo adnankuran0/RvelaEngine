@@ -2,9 +2,12 @@
 #include "AssetImporter.h"
 #include "Core/Ref.h"
 #include "Assets/MaterialAsset.h"
-class MaterialImporter : public IAssetImporter
+#include <assimp/scene.h>
+
+class MaterialImporter 
 {
 public:
+
     inline static Ref<MaterialAsset> CreateMaterialAsset(const std::string& path)
     {
         std::unique_ptr<MaterialMeta> meta = std::make_unique<MaterialMeta>();
@@ -13,4 +16,5 @@ public:
         asset->Serialize();
         return asset;
     }
+
 };

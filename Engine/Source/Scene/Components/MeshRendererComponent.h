@@ -6,7 +6,7 @@
 #include "Assets/MeshAsset.h"
 #include "Core/Ref.h"
 
-class alignas(16) MeshRendererComponent {
+struct alignas(16) MeshRendererComponent {
 public:
     BufferLayout layout;
     AABB localAABB;
@@ -65,7 +65,11 @@ public:
     }
 
     inline bool IsCastShadow() const { return castShadow; }
-    void SetCastShadow(bool isCastsShadow) { castShadow = isCastsShadow; }
+    inline void SetCastShadow(bool isCastsShadow) { castShadow = isCastsShadow; }
+
+    inline bool IsDoubleSided() const { return isDoubleSided; }
+    inline void SetDoubleSided(bool isDoubleSided) { this->isDoubleSided = isDoubleSided; }
  private:
     bool castShadow = true;
+    bool isDoubleSided = false;
 };

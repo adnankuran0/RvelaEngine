@@ -11,7 +11,8 @@ public:
     explicit AssetUUID(const UUIDv4::UUID& uuid) : m_UUID(uuid) {}
 
     inline static AssetUUID Invalid() {
-        return AssetUUID(UUIDv4::UUID{});
+        static const UUIDv4::UUID emptyUUID{}; 
+        return AssetUUID(emptyUUID);
     }
 
     std::string ToString() const {
@@ -33,7 +34,8 @@ public:
     }
 
     inline bool IsValid() const {
-        return m_UUID != UUIDv4::UUID{};
+        static const UUIDv4::UUID emptyUUID{};
+        return !(m_UUID == emptyUUID);
     }
 
     inline const UUIDv4::UUID& Raw() const {

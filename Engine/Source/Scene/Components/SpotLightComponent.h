@@ -1,10 +1,9 @@
 #pragma once
-#include "Scene/Component.h"
 #include "glm/glm.hpp"
 #include "../nlohmann/json.hpp"
 
 using json = nlohmann::json;
-class SpotLightComponent : public Component
+struct SpotLightComponent 
 {
 public:
     SpotLightComponent() = default;
@@ -18,7 +17,7 @@ public:
     float innerCutoff = glm::cos(glm::radians(15.0f));
     float outerCutoff = glm::cos(glm::radians(30.0f));
 
-    std::string Serialize() const override
+    std::string Serialize() const 
     {
         json j;
         j["color"] = { color.r,color.g,color.b };
@@ -29,7 +28,7 @@ public:
         return j.dump(4);
     }
 
-    void Deserialize(const std::string& jsonStr) override
+    void Deserialize(const std::string& jsonStr) 
     {
         json j = json::parse(jsonStr);
         auto colorData = j["color"];

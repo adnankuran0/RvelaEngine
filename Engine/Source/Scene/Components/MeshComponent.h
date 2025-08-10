@@ -1,5 +1,4 @@
 #pragma once
-#include "Scene/Component.h"
 #include "Utils/FileUtils.h"
 #include "nlohmann/json.hpp"
 #include "Assets/MeshAsset.h"
@@ -7,7 +6,7 @@
 
 using json = nlohmann::json;
 
-class MeshComponent : public Component
+struct MeshComponent 
 {
 public:
     MeshComponent() = default;
@@ -23,14 +22,14 @@ public:
         isDirty = true;
     }
 
-    std::string Serialize() const override 
+    std::string Serialize() const 
 {
         json j;
         j["mesh"] = meshUUID.ToString();
         return j.dump(4);
     }
 
-    void Deserialize(const std::string& str) override 
+    void Deserialize(const std::string& str) 
     {
         json j = json::parse(str);
         meshUUID = AssetUUID::FromString(j["mesh"]);

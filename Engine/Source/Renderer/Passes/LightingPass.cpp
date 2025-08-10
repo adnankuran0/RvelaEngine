@@ -122,6 +122,7 @@ void LightingPass::Execute()
 
     for (auto& command : commands) {
         if (!ctx.camera->Intersects(command.mesh.worldAABB)) continue;
+        LOG_DEBUG("Rendering something");
         if (command.isSelected) {
             glEnable(GL_STENCIL_TEST);
             glStencilFunc(GL_ALWAYS, 1, 0xFF); 
@@ -130,6 +131,15 @@ void LightingPass::Execute()
         }
         else {
             glDisable(GL_STENCIL_TEST);
+        }
+
+        if (!command.mesh.IsDoubleSided())
+        {
+            glEnable(GL_CULL_FACE);
+        }
+        else
+        {
+            glDisable(GL_CULL_FACE);
         }
 
         auto& material = command.material;

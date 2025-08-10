@@ -114,6 +114,12 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                     meshRenderer.SetCastShadow(isCastShadow);
                 }
 
+                bool isDoubleSided = meshRenderer.IsDoubleSided();
+                if (ImGui::Checkbox("Double Sided", &isDoubleSided))
+                {
+                    meshRenderer.SetDoubleSided(isDoubleSided);
+                }
+
                 ImGui::Unindent();
             }
         }
@@ -307,13 +313,12 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                     ImGui::SameLine();
                     if (ImGui::Button("X##rgh", ImVec2(20, 20)))
                     {
-                        //materialComponent.material->roughnessMapPath = ABS_PATH("");
+                        material.SetUseRoughnessMap(!material.IsUsingRoughnessMap());
                     }
                     float roughness = material.GetRoughness();
                     if (ImGui::SliderFloat("Roughness##32", &roughness, 0.0f, 1.0f))
                     {
                         material.SetRoughness(roughness);
-                        //Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath().GetAbsoluteStr());
                     }
                     ImGui::Unindent();
                     ;

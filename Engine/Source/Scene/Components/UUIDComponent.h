@@ -1,10 +1,9 @@
 #pragma once
-#include "Scene/Component.h"
 #include "../nlohmann/json.hpp"
 
 using json = nlohmann::json;
 
-class UUIDComponent : public Component
+struct UUIDComponent 
 {
 public:
     EntityUUID uuid;
@@ -12,14 +11,14 @@ public:
     UUIDComponent() = default;
     UUIDComponent(EntityUUID uuid) :uuid(uuid) {}
 
-    std::string Serialize() const override
+    std::string Serialize() const
     {
         json j;
         j["UUID"] = uuid;
 
         return j.dump(4);
     }
-    void Deserialize(const std::string& jsonStr) override
+    void Deserialize(const std::string& jsonStr)
     {
         json j = json::parse(jsonStr);
         auto UUIDData = j["UUID"];

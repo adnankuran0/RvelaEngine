@@ -7,8 +7,7 @@
 #include "Utils/ISerializable.h"
 #include "Renderer/Renderer.h"
 
-
-class Entity;
+class Entity; // Forward Declaration
 
 class Scene 
 {

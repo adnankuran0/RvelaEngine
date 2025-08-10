@@ -2,7 +2,19 @@
 #include "MeshImporter.h"
 #include <Scene/AABB.h>
 
-
+static std::string SanitizeFilename(const std::string& name)
+{
+    std::string result = name;
+    for (char& c : result)
+    {
+        if (c == ':' || c == '/' || c == '\\' || c == '?' || c == '*' ||
+            c == '"' || c == '<' || c == '>' || c == '|')
+        {
+            c = '_';
+        }
+    }
+    return result;
+}
 
 std::vector<Vertex> MeshImporter::ProcessVertices(aiMesh* mesh)
 {
@@ -97,10 +109,11 @@ bool MeshImporter::Import(const std::filesystem::path& path, const aiScene* scen
         std::filesystem::path outputPath = path;
         std::string meshName = mesh->mName.C_Str();
         LOG_DEBUG("Mesh name: {}", meshName);
-        if (meshName.empty() || std::all_of(meshName.begin(), meshName.end(), isspace)) 
+        if (meshName.empty() || std::all_of(meshName.begin(), meshName.end(), isspace))
         {
             meshName = "Mesh" + std::to_string(meshIndex);
         }
+        meshName = SanitizeFilename(meshName);
 
         aiVector3D min = mesh->mAABB.mMin;
         aiVector3D max = mesh->mAABB.mMax;

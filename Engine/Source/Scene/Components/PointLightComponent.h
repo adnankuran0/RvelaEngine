@@ -1,5 +1,4 @@
 #pragma once
-#include "Scene/Component.h"
 #include "glm/glm.hpp"
 #include "../nlohmann/json.hpp"
 
@@ -7,7 +6,7 @@ using json = nlohmann::json;
 
 
 
-class PointLightComponent : public Component
+struct PointLightComponent 
 {
 public:
 
@@ -31,7 +30,7 @@ public:
         s_ShadowIndexCounter++;
     }
 
-    std::string Serialize() const override
+    std::string Serialize() const 
     {
         json j;
         j["color"] = { color.r,color.g,color.b };
@@ -42,7 +41,7 @@ public:
         return j.dump(4);
     }
 
-    void Deserialize(const std::string& jsonStr) override
+    void Deserialize(const std::string& jsonStr)
     {
         json j = json::parse(jsonStr);
         auto colorData = j["color"];

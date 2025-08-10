@@ -1,5 +1,4 @@
 #pragma once
-#include "Scene/Component.h"
 #include "Utils/FileUtils.h"
 #include "json.hpp"
 #include "Core/Ref.h"
@@ -8,7 +7,7 @@
 
 using json = nlohmann::json;
 
-class MaterialComponent : public Component
+struct MaterialComponent
 {
 public:
 	MaterialComponent() {}
@@ -93,14 +92,14 @@ public:
 		Load(newMaterialUUID);
 	}
 
-	std::string Serialize() const override
+	std::string Serialize() const
 	{
 		json j;
 		j["material"] = materialUUID.ToString();
 		material->Serialize();
 		return j.dump(4);
 	}
-	void Deserialize(const std::string& jsonStr) override
+	void Deserialize(const std::string& jsonStr)
 	{
 		json j = json::parse(jsonStr);
 		std::string materialUUIDstr = j["material"];
