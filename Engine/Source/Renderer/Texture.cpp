@@ -56,8 +56,6 @@ void Texture::GenerateFromImage(const std::string& path)
 
     m_Data = stbi_load(path.c_str(), &m_Width, &m_Height, &m_NrChannels, 0);
 
-
-
     if (m_Data)
     {
         ToImage(m_Width, m_Height, m_Data, m_NrChannels);
@@ -65,9 +63,60 @@ void Texture::GenerateFromImage(const std::string& path)
     }
     else
     {
-        std::cerr << "Failed to load texture: " << path;
+        LOG_ERROR("Failed to load texture: {}", path);
     }
     stbi_image_free(m_Data);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void Texture::GenerateFromMemory(const uint8_t* data, int width, int height, TextureFormat format, bool srgb)
+{
+    Bind();
+
+    if (!data)
+    {
+        LOG_ERROR("Texture data is null!");
+        return;
+    }
+
+    if (width <= 0 || height <= 0)
+    {
+        LOG_ERROR("Invalid texture dimensions: {}x{}", width, height);
+        return;
+    }
+
+    m_Width = width;
+    m_Height = height;
+
+    GLenum internalFormat;
+    GLenum dataFormat;
+
+    switch (format)
+    {
+    case TextureFormat::RGBA8:
+        internalFormat = srgb ? GL_SRGB8_ALPHA8 : GL_RGBA8;
+        dataFormat = GL_RGBA;
+        break;
+    case TextureFormat::RGB8:
+        internalFormat = srgb ? GL_SRGB8 : GL_RGB8;
+        dataFormat = GL_RGB;
+        break;
+    case TextureFormat::R8:
+        internalFormat = GL_R8;
+        dataFormat = GL_RED;
+        break;
+    default:
+        LOG_ERROR("Unsupported texture format.");
+        return;
+    }
+
+
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat,
+        width, height, 0,
+        dataFormat, GL_UNSIGNED_BYTE, data);
+
+    GenerateMipmaps();
 
     glBindTexture(GL_TEXTURE_2D, 0);
 }
@@ -81,7 +130,7 @@ void Texture::ToImage(int width, int height, const unsigned char* data, int nrCh
         case 3: format = GL_RGB; break;
         case 4: format = GL_RGBA; break;
         default:
-            std::cerr << "Unsupported number of channels: " << nrChannels << std::endl;
+            LOG_ERROR("Unsupported number of channels: {}", nrChannels);
             return;
     }
     glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
@@ -89,18 +138,14 @@ void Texture::ToImage(int width, int height, const unsigned char* data, int nrCh
 
 void Texture::GenerateMipmaps()
 {
+    Bind();
+
     glGenerateMipmap(GL_TEXTURE_2D);
+    int maxLevel = static_cast<int>(std::floor(std::log2(std::max(m_Width, m_Height))));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, maxLevel);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    float maxAniso = 0.0f;
-    glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &maxAniso);
-    if (maxAniso > 0.0f)
-    {
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, maxAniso);
-    }
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+        maxLevel > 0 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
 }
 
 Texture Texture::Create()

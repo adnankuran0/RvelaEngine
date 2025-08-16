@@ -1,11 +1,11 @@
 #include "rvelapch.h"
 #include "Window.h"
-#include "RvelaLog.h"
+#include "Core/Log.h"
 #include "Event/EventManager.h"
+#include <stb_image.h>
 
 Window::Window() noexcept
 {
-	Init();
 }
 
 Window::Window(const std::string& title, int width, int height) noexcept
@@ -16,7 +16,6 @@ Window::Window(const std::string& title, int width, int height) noexcept
 
 Window::~Window()
 {
-	Shutdown();
 }
 
 void Window::SetCallbacks() noexcept
@@ -31,7 +30,7 @@ void Window::SetCallbacks() noexcept
 void Window::Init()
 {
     if (!glfwInit()) {
-        LOG_ERROR << "Failed to initialize GLFW";
+        LOG_ERROR("Failed to initialize GLFW");
         throw std::runtime_error("Failed to initialize GLFW");
     }
 
@@ -42,19 +41,24 @@ void Window::Init()
 
     m_Window = glfwCreateWindow(m_WindowData.size.width, m_WindowData.size.height, m_WindowData.title.c_str(), nullptr, nullptr);
     if (!m_Window) {
-        LOG_ERROR << "Failed to create GLFW window";
+        LOG_ERROR("Failed to create GLFW window");
         glfwTerminate();
         throw std::runtime_error("Failed to create GLFW window");
     }
 
+    GLFWimage images[1];
+    images[0].pixels = stbi_load("C:\\RvelaEngine\\Binaries\\windows-x86_64\\Release\\Editor\\icon.png", &images[0].width, &images[0].height, 0, 4);
+    glfwSetWindowIcon(m_Window, 1, images);
+    stbi_image_free(images[0].pixels);
+
     glfwMakeContextCurrent(m_Window);
-    if (glewInit() != GLEW_OK) {
-        LOG_ERROR << "Failed to initialize GLEW";
-        throw std::runtime_error("Failed to initialize GLEW");
+    if (!gladLoadGL((GLADloadfunc)glfwGetProcAddress)) {
+        
+        LOG_ERROR("Failed to initialize GLAD");
     }
 
     const GLubyte* glVersion = glGetString(GL_VERSION);
-    LOG_INFO << "OpenGL Version: " << (glVersion ? reinterpret_cast<const char*>(glVersion) : "Unknown");
+    LOG_INFO("OpenGL Version: {}", (glVersion ? reinterpret_cast<const char*>(glVersion) : "Unknown"));
 
     SetCallbacks();
 }

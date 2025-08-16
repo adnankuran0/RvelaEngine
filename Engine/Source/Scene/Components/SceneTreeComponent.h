@@ -1,20 +1,20 @@
 #pragma once
-#include "Scene/Component.h"
 #include "entt/entt.h"
 #include "../nlohmann/json.hpp"
+#include "Scene/EntityUUID.h"
 
 using json = nlohmann::json;
-using UUID = uint64_t;
 
-class SceneTreeComponent : public Component {
+class SceneTreeComponent 
+{
 public:
-    entt::entity parent = entt::null;
+    std::vector<EntityUUID> childrenUUIDs;
     std::vector<entt::entity> children;
+    EntityUUID parentUUID = 0;
+    entt::entity parent = entt::null;
 
-    UUID parentUUID = 0;
-    std::vector<UUID> childrenUUIDs;
 
-    std::string Serialize() const override
+    std::string Serialize() const
     {
         json j;
         j["parentUUID"] = parentUUID;
@@ -23,14 +23,14 @@ public:
         return j.dump(4);
     }
 
-    void Deserialize(const std::string& jsonStr) override
+    void Deserialize(const std::string& jsonStr) 
     {
         json j = json::parse(jsonStr);
         parentUUID = j["parentUUID"];
         childrenUUIDs.clear();
         for (auto& id : j["childrenUUIDs"])
         {
-            childrenUUIDs.push_back(id.get<UUID>());
+            childrenUUIDs.push_back(id.get<EntityUUID>());
         }
     }
 

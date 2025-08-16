@@ -3,12 +3,11 @@
 #include <entt/entt.h>
 
 #include "Components.h"
-#include "Core/RvelaMath.h"
-#include "Core/Utils/ISerializable.h"
+#include "Math/RvelaMath.h"
+#include "Utils/ISerializable.h"
 #include "Renderer/Renderer.h"
 
-
-class Entity;
+class Entity; // Forward Declaration
 
 class Scene 
 {
@@ -18,13 +17,13 @@ public:
     bool isLoading = false;
 
     Entity CreateEntity(const std::string& name);
-    Entity CreateEntityWithUUID(const std::string& name, UUID uuid);
+    Entity CreateEntityWithUUID(const std::string& name, EntityUUID uuid);
     void DestroyEntity(entt::entity entity);
 
     Entity CreatePointLight();
     Entity CreateDirectionalLight();
 
-    Entity LoadAsset(const std::string& path);
+    //Entity LoadAsset(const std::string& path);
     Entity LoadPrimitive(const std::string& primitiveMeshName);
 
     template<typename Component, typename... Args>
@@ -69,7 +68,7 @@ public:
     void Update();
 
     entt::registry& GetRegistry();
-    std::unordered_map<UUID, entt::entity> GetUUIDEntityMap() { return m_EntityMap; }
+    std::unordered_map<EntityUUID, entt::entity> GetUUIDEntityMap() { return m_EntityMap; }
 
     std::vector<PointLightData> CollectPointLights() noexcept;
     std::optional<DirectionalLightData>  CollectDirectionalLight() noexcept;
@@ -79,7 +78,7 @@ public:
 
 private:
     entt::registry m_Registry;
-    std::unordered_map<UUID, entt::entity> m_EntityMap;
+    std::unordered_map<EntityUUID, entt::entity> m_EntityMap;
     friend class Entity;
     entt::entity selectedEntity;
 };

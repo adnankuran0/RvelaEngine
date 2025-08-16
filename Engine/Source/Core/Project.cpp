@@ -1,7 +1,7 @@
 #include "rvelapch.h"
 #include "Project.h"
 
-#include "../nlohmann/json.hpp"
+#include "json.hpp"
 
 using json = nlohmann::json;
 

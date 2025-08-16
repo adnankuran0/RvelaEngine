@@ -2,7 +2,7 @@
 workspace "Rvela"
    architecture "x64"
    configurations { "Debug", "Release", "Dist" }
-   startproject "Editor"
+   startproject "RvelaEditor"
 
    -- Workspace-wide build options for MSVC
    filter "system:windows"
@@ -10,8 +10,5 @@ workspace "Rvela"
 
 OutputDir = "%{cfg.system}-%{cfg.architecture}/%{cfg.buildcfg}"
 
-group "Engine"
-	include "Engine/Build-Engine.lua"
-group ""
-
 include "Editor/Build-Editor.lua"
+include "Engine/Build-Engine.lua"

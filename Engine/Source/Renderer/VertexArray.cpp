@@ -2,7 +2,7 @@
 
 #include "VertexArray.h"
 
-VertexArray::VertexArray()
+void VertexArray::Init()
 {
 	ID = 0;
 	glGenVertexArrays(1, &ID);

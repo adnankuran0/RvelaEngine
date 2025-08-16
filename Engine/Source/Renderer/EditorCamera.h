@@ -1,10 +1,10 @@
 #pragma once
 
-#include <GL/glew.h>
+#include "GLAD/gl.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "../Core/Input/Input.h"
-#include "../Core/Time.h"
+#include "Input/Input.h"
+#include "Core/Time.h"
 #include "Camera.h"
 #include "Frustum.h"
 
@@ -21,10 +21,10 @@ public:
     float Yaw = -90.0f;
     float Pitch = 0.0f;
 
-    float MovementSpeed = 2.5f;
-    float SprintSpeed = 5.0f;
+    float MovementSpeed = 5.0f;
+    float SprintSpeed = 10.0f;
     float MouseSensitivity = 0.075f;
-    float Zoom = 90.0f;
+    float Zoom = 70.0f;
 
     float lastX = 0.0f;
     float lastY = 0.0f;
@@ -35,7 +35,7 @@ public:
     float positionSmoothness = 20.0f;
     glm::vec3 targetPosition;
 
-    EditorCamera(glm::vec3 position = glm::vec3(0.0f, 2.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), int width = 1920, int height = 1080)
+    EditorCamera(glm::vec3 position = glm::vec3(0.0f, 4.0f, 10.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), int width = 1920, int height = 1080)
         : Front(glm::vec3(0.0f, 0.0f, -1.0f))
     {
         Position = targetPosition = position;
@@ -76,12 +76,12 @@ public:
         frustum.Update(projection * GetViewMatrix());
     }
 
-    bool Intersects(const BoundingBox& AABB)
+    bool Intersects(const AABB& AABB)
     {
         return frustum.Intersects(AABB);
     }
 
-    bool Intersects(const glm::mat4& projView,const BoundingBox& AABB)
+    bool Intersects(const glm::mat4& projView,const AABB& AABB)
     {
         return frustum.Intersects(projView,AABB);
     }

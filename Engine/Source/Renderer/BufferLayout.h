@@ -1,6 +1,6 @@
 #pragma once
 #include "rvelapch.h"
-#include"GL/glew.h"
+#include "GLAD/gl.h"
 
 struct BufferElement
 {

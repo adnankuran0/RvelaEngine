@@ -1,8 +1,18 @@
 ﻿#include "rvelapch.h"
 #include "LightingPass.h"
-#include "Core/Utils/TextureManager.h"
-#include "Core/Utils/MaterialManager.h"
-#include "../../RvelaLog.h"
+#include "Core/Log.h"
+#include "Assets/AssetUUID.h"
+#include "Assets/AssetRegistry.h"
+
+
+
+struct MapInfo {
+    bool isUsing;
+    std::string uniformName;
+    int slot;
+    std::string useUniform;
+    Ref<TextureAsset> texture;
+};
 
 void LightingPass::Init()
 {
@@ -21,7 +31,7 @@ void LightingPass::Init()
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, screenRBO);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cerr << "MSAA Framebuffer not complete" << std::endl;
+        LOG_ERROR("MSAA Framebuffer not complete");
 
     // Intermediate framebuffer (non-MSAA)
     glGenFramebuffers(1, &intermediateFBO);
@@ -35,7 +45,7 @@ void LightingPass::Init()
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, o_IntermediateColorTex, 0);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cerr << "Intermediate Framebuffer not complete" << std::endl;
+        LOG_ERROR("Intermediate Framebuffer not complete");
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -75,8 +85,7 @@ void LightingPass::Execute()
         shader.setInt("shadowMap", 6);
         glBindTextureUnit(6, i_DirectionalShadowMap);
 
-        GLenum err = glGetError();
-        if (err != GL_NO_ERROR) LOG_ERROR << "OpenGL Error after directional light setup: " << err;
+       
     }
 
     shader.setFloat("heightScale", 0.0f);
@@ -84,7 +93,7 @@ void LightingPass::Execute()
     GLint maxTextureUnits = 0;
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextureUnits);
 
-    constexpr int RESERVED_SLOTS = 7;
+    static constexpr int RESERVED_SLOTS = 7;
     int maxPointLights = std::max(0, maxTextureUnits - RESERVED_SLOTS);
     int pointLightCount = std::min(static_cast<int>(ctx.pointLights.size()), maxPointLights);
 
@@ -113,7 +122,7 @@ void LightingPass::Execute()
 
     for (auto& command : commands) {
         if (!ctx.camera->Intersects(command.mesh.worldAABB)) continue;
-
+        LOG_DEBUG("Rendering something");
         if (command.isSelected) {
             glEnable(GL_STENCIL_TEST);
             glStencilFunc(GL_ALWAYS, 1, 0xFF); 
@@ -124,42 +133,42 @@ void LightingPass::Execute()
             glDisable(GL_STENCIL_TEST);
         }
 
-        auto& material = command.material.material;
-        if (!material) continue;
+        if (!command.mesh.IsDoubleSided())
+        {
+            glEnable(GL_CULL_FACE);
+        }
+        else
+        {
+            glDisable(GL_CULL_FACE);
+        }
 
-        shader.setVec2("UVScale", material->UVScale);
-        shader.setVec2("UVOffset", material->UVOffset);
-        shader.setVec3("albedoColor", material->albedoColor);
-        shader.setFloat("metallicValue", material->metallic);
-        shader.setFloat("roughnessValue", material->roughness);
-        shader.setFloat("aoValue", material->ao);
-        shader.setFloat("normalScale", material->normalScale);
+        auto& material = command.material;
 
-        struct MapInfo {
-            Path path;
-            std::string uniformName;
-            int slot;
-            std::string useUniform;
+        shader.setVec2("UVScale", material.GetUVScale());
+        shader.setVec2("UVOffset", material.GetUVScale());
+        shader.setVec3("albedoColor", material.GetAlbedoColor());
+        shader.setFloat("metallicValue", material.GetMetallic());
+        shader.setFloat("roughnessValue", material.GetRoughness());
+        shader.setFloat("aoValue", material.GetAO());
+        shader.setFloat("normalScale", material.GetNormalScale());
+
+        std::vector<MapInfo> maps = 
+        {
+        { material.IsUsingAlbedoMap(),    "albedoMap",    0, "useAlbedoMap",    material.GetAlbedoTexture() },
+        { material.IsUsingNormalMap(),    "normalMap",    1, "useNormalMap",    material.GetNormalTexture() },
+        { material.IsUsingMetallicMap(),  "metallicMap",  2, "useMetallicMap",  material.GetMetallicTexture() },
+        { material.IsUsingRoughnessMap(), "roughnessMap", 3, "useRoughnessMap", material.GetRoughnessTexture() },
+        { material.IsUsingAOMap(),        "aoMap",        4, "useAOMap",        material.GetAOTexture() },
+        { material.IsUsingHeightMap(),    "heightMap",    5, "useHeightMap",    material.GetHeightTexture() }
         };
 
-        std::vector<MapInfo> maps = {
-            { material->albedoMapPath,    "albedoMap",    0, "useAlbedoMap" },
-            { material->normalMapPath,    "normalMap",    1, "useNormalMap" },
-            { material->metallicMapPath,  "metallicMap",  2, "useMetallicMap" },
-            { material->roughnessMapPath, "roughnessMap", 3, "useRoughnessMap" },
-            { material->aoMapPath,        "aoMap",        4, "useAOMap" },
-            { material->heightMapPath,    "heightMap",    5, "useHeightMap" },
-        };
-
-        for (const auto& map : maps) {
-            bool hasMap = map.path.IsValid();
-            shader.setBool(map.useUniform, hasMap);
-            if (hasMap) {
-                auto tex = TextureManager::LoadOrGetTexture(map.path);
-                if (tex) {
-                    shader.setInt(map.uniformName, map.slot);
-                    tex->Bind(map.slot);
-                }
+        for (const auto& map : maps) 
+        {
+            shader.setBool(map.useUniform, map.isUsing);
+            if (map.isUsing)
+            {
+                shader.setInt(map.uniformName, map.slot);
+                map.texture->GetTexture().Bind(map.slot);
             }
         }
 
@@ -170,10 +179,7 @@ void LightingPass::Execute()
         command.mesh.VAO.Bind();
         glDrawElements(GL_TRIANGLES, command.mesh.indexCount, GL_UNSIGNED_INT, 0);
 
-        GLenum err;
-        while ((err = glGetError()) != GL_NO_ERROR) {
-            LOG_ERROR << "OpenGL Error: " << err;
-        }
+      
 
     }
 

@@ -1,6 +1,15 @@
 #pragma once
-#include "GL/glew.h"
+#include "GLAD/gl.h"
 
+enum TextureFormat : uint8_t
+{
+    Unknown = 0,
+    RGBA8,
+    RGB8,
+    R8,
+    BC1, //DXT1
+    BC3  //DXT5
+};
 
 class Texture
 {
@@ -8,23 +17,24 @@ public:
     Texture();
     ~Texture();
     Texture(const std::string& path);
-
+    Texture(const Texture&) { LOG_INFO("Texture copied!"); }
     void Init();
     void Destroy() const;
     void Bind(unsigned int activeTexture) const;
     void Bind() const;
     void GenerateFromImage(const std::string& path);
+    void GenerateFromMemory(const uint8_t* data, int width, int height, TextureFormat format = TextureFormat::RGBA8, bool srgb = false);
 
     static Texture Create();
     static void ToImage(int width, int height, const unsigned char* data,int nrChannels);
-    static void GenerateMipmaps();
+    void GenerateMipmaps();
 
     unsigned int GetID() const;
-    unsigned char* GetTexture() const;
-    int GetWidth() const;
-    int GetHeight() const;
-    int GetNrChannels() const;
-    const std::string& GetPath() ;
+    inline unsigned char* GetTexture() const;
+    inline int GetWidth() const;
+    inline int GetHeight() const;
+    inline int GetNrChannels() const;
+    inline const std::string& GetPath() ;
 
 private:
     std::string m_Path;

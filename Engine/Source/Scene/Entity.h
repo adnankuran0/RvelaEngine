@@ -44,7 +44,7 @@ public:
 		m_Scene->GetRegistry().remove<T>(m_EntityHandle);
 	}
 
-	UUID GetUUID() 
+	EntityUUID GetUUID()
 	{
 		return GetComponent<UUIDComponent>().uuid;
 	}

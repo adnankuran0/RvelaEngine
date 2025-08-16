@@ -1,11 +1,8 @@
 ﻿#include "rvelapch.h"
 #include "SceneManager.h"
-#include <fstream>
-#include "../nlohmann/json.hpp"
-#include "Core/Utils/AssetManager.h"
-#include "UUIDGenerator.h"  
-#include <future>
-#include "../RvelaLog.h"
+#include "json.hpp"
+#include "EntityUUID.h"  
+#include "Core/Log.h"
 
 using json = nlohmann::json;
 
@@ -69,7 +66,7 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
     file.close();
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    LOG_INFO << "Json loading took " << duration.count() << "ms";
+    LOG_INFO("Json loading took {} ms", duration.count());
 
     auto& registry = scene.GetRegistry();
     for (auto entity : registry.view<UUIDComponent>())
@@ -77,15 +74,15 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
         scene.DestroyEntity(entity);
     }
 
-    std::unordered_map<UUID, entt::entity> uuidToEntity;
+    std::unordered_map<EntityUUID, entt::entity> uuidToEntity;
 
     start = std::chrono::high_resolution_clock::now();
     auto meshLoadTotal = std::chrono::milliseconds(0);
 
     for (auto& entityJson : sceneJson["Entities"])
     {
-        UUID uuid = entityJson["UUID"];
-        UUIDGenerator::RegisterExternalUUID(uuid);
+        EntityUUID uuid = entityJson["UUID"];
+        EntityUUIDGenerator::RegisterExternalUUID(uuid);
         Entity e = scene.CreateEntityWithUUID("am", uuid);
         entt::entity entity = e.GetHandle();
         uuidToEntity[uuid] = entity;
@@ -100,34 +97,22 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
         {
             std::string serializedMat = entityJson["MaterialComponent"];
             json j = json::parse(serializedMat);
-            std::string newMaterialPathData = j["materialPath"];
-            Path newMaterialPath = TO_ABSOLUTE_PATH(newMaterialPathData);
+            std::string uuidString = j["material"];
 
-            scene.AddComponent<MaterialComponent>(entity, newMaterialPath);
+            scene.AddComponent<MaterialComponent>(entity);
             auto& mat = scene.GetComponent<MaterialComponent>(entity);
-            mat.Deserialize(serializedMat);
+            mat.SetMaterial(AssetUUID::FromString(uuidString));
+            //mat.Deserialize(serializedMat);
         }
 
         if (entityJson.contains("MeshComponent"))
         {
             std::string serializedMesh = entityJson["MeshComponent"];
-            json j = json::parse(serializedMesh);
-            std::string newModelPath = j["modelPath"];
-            uint16_t meshIndex = j["meshIndex"];
-
-            auto meshStart = std::chrono::high_resolution_clock::now();
-                
-            MeshData meshData = AssetManager::LoadMesh(TO_ABSOLUTE_PATH(newModelPath), meshIndex);
-            auto meshEnd = std::chrono::high_resolution_clock::now();
-            meshLoadTotal += std::chrono::duration_cast<std::chrono::milliseconds>(meshEnd - meshStart);
-
-            scene.AddComponent<MeshComponent>(entity, TO_ABSOLUTE_PATH(newModelPath), meshIndex, meshData);
-            scene.AddComponent<MeshRendererComponent>(entity, meshData.vertices.data(),
-                meshData.vertices.size() * sizeof(float),
-                meshData.indices.data(),
-                meshData.indices.size() * sizeof(unsigned int),
-                meshData.indices.size(),
-                meshData.localAABB);
+            scene.AddComponent<MeshComponent>(entity);
+            MeshComponent comp = scene.GetComponent<MeshComponent>(entity);
+            comp.Deserialize(serializedMesh);
+            Ref<MeshAsset> mesh = comp.GetMesh();
+            scene.AddComponent<MeshRendererComponent>(entity, mesh);
         }
 
         if (entityJson.contains("PointLightComponent"))
@@ -147,8 +132,8 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
         if (entityJson.contains("SceneTreeComponent"))
         {
             auto& sceneTreeComp = scene.GetComponent<SceneTreeComponent>(entity);
-            std::unordered_set<UUID> uniqueChildren;
-            for (UUID childUUID : sceneTreeComp.childrenUUIDs)
+            std::unordered_set<EntityUUID> uniqueChildren;
+            for (EntityUUID childUUID : sceneTreeComp.childrenUUIDs)
                 uniqueChildren.insert(childUUID);
             sceneTreeComp.childrenUUIDs.assign(uniqueChildren.begin(), uniqueChildren.end());
             sceneTreeComp.Deserialize(entityJson["SceneTreeComponent"]);
@@ -157,8 +142,8 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
 
     end = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    LOG_INFO << "Scene loading took " << duration.count() << "ms";
-    LOG_INFO << "Total mesh loading took " << meshLoadTotal.count() << "ms";
+    LOG_INFO("Scene loading took {} ms" ,duration.count());
+    LOG_INFO("Total mesh loading took {} ms" , meshLoadTotal.count());
 
     for (auto& [uuid, entity] : uuidToEntity)
     {
@@ -170,7 +155,7 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
             scene.SetParent(entity, uuidToEntity[tree.parentUUID]);
 
         tree.children.clear();
-        for (UUID childUUID : tree.childrenUUIDs)
+        for (EntityUUID childUUID : tree.childrenUUIDs)
         {
             if (uuidToEntity.contains(childUUID))
                 tree.children.push_back(uuidToEntity[childUUID]);
@@ -179,5 +164,5 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
 
     scene.UpdateHierarchy();
 
-    LOG_INFO << "Scene loading complete";
+    LOG_INFO("Scene loading complete");
 }

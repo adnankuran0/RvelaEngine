@@ -42,7 +42,7 @@ void ShadowPass::InitDirectionalShadowMap()
     glReadBuffer(GL_NONE);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cerr << "ERROR: Shadow framebuffer not complete!" << std::endl;
+        LOG_ERROR("Shadow framebuffer not complete!");
 }
 
 void ShadowPass::InitPointShadowMap()
@@ -75,7 +75,7 @@ void ShadowPass::InitPointShadowMap()
     for (int layer = 0; layer < 6 * 20; ++layer) {
         glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, o_PointShadowMap, 0, layer);
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-            std::cerr << "ERROR: Point shadow framebuffer layer " << layer << " not complete!" << std::endl;
+            LOG_ERROR("Point shadow framebuffer layer {} not complete!", layer);
         }
     }
 
@@ -118,6 +118,7 @@ void ShadowPass::RenderDirectionalShadowMap()
 
         for (auto& command : commands) {
             if (!ctx.camera->Intersects(lightProjection * lightView,command.mesh.worldAABB)) continue;
+            if (!command.mesh.IsCastShadow()) continue;
 
             shadowShader.setMat4("model", command.transform.GetWorldMatrix());
             command.mesh.VAO.Bind();
@@ -161,14 +162,15 @@ void ShadowPass::RenderPointShadowMap()
         pointShadowShader.setVec3("lightPos", lightPos);
         pointShadowShader.setInt("baseLayer", light.shadowIndex * 6);
 
-        for (auto& command : commands) {
+        for (auto& command : commands) 
+        {
             pointShadowShader.setMat4("model", command.transform.GetWorldMatrix());
             command.mesh.VAO.Bind();
 
-            for (unsigned int face = 0; face < 6; ++face) {
-                if (!ctx.camera->Intersects(shadowTransforms[face], command.mesh.worldAABB))
-                    continue;
-
+            for (unsigned int face = 0; face < 6; ++face) 
+            {
+                if (!ctx.camera->Intersects(shadowTransforms[face], command.mesh.worldAABB)) continue;
+                if (!command.mesh.IsCastShadow()) continue;
                 // Set the current face's matrix
                 pointShadowShader.setMat4("shadowMatrix", shadowTransforms[face]);
                 // Set the current face layer

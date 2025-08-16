@@ -19,7 +19,7 @@ void BrightPass::Init()
 
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		std::cerr << "Bright FBO not complete!" << std::endl;
+		LOG_ERROR("Bright FBO not complete!");
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

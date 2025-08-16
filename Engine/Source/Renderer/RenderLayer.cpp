@@ -27,9 +27,16 @@ void RenderLayer::OnRender()
 
 void RenderLayer::CollectRenderCommands(Scene* scene, const std::function<void(const RenderCommand&)>& submitCallback)
 {
-	auto view = scene->GetRegistry().view<TransformComponent, MeshRendererComponent, MaterialComponent>();
+	auto view = scene->GetRegistry().view<TransformComponent, MeshComponent ,MeshRendererComponent, MaterialComponent>();
 	for (auto entity : view)
 	{
+		MeshComponent meshComp = scene->GetComponent<MeshComponent>(entity);
+		if (meshComp.IsDirty())
+		{
+			scene->GetComponent<MeshRendererComponent>(entity).RecreateFromMesh(meshComp.GetMesh());
+			meshComp.SetDirty(false);
+		}
+
 		if (entity == scene->GetSelectedEntity())
 		{
 			RenderCommand cmd(scene->GetComponent<TransformComponent>(entity),
@@ -46,8 +53,5 @@ void RenderLayer::CollectRenderCommands(Scene* scene, const std::function<void(c
 				false);
 			submitCallback(cmd);
 		}
-		
-
-		
 	}
 }

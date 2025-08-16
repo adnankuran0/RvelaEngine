@@ -2,6 +2,7 @@
 #include <string>
 #include <chrono>
 #include <iostream>
+#include "Core/Log.h"
 
 #define PROFILE_SCOPE(name) ScopedTimer timer##__LINE__(name);
 
@@ -12,7 +13,7 @@ public:
     ~ScopedTimer() {
         auto end = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration<double, std::milli>(end - m_Start).count();
-        std::cout << m_Name << ": " << duration << "ms" << std::endl;
+        LOG_INFO("{} : {} ms", m_Name , duration);
     }
 
 private:

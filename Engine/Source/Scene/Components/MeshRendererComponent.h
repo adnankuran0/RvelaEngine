@@ -2,38 +2,59 @@
 #include "Renderer/VertexArray.h"
 #include "Renderer/VertexBuffer.h"
 #include "Renderer/ElementBuffer.h"
-#include <Scene/BoundingBox.h>
+#include <Scene/AABB.h>
+#include "Assets/MeshAsset.h"
+#include "Core/Ref.h"
 
-class MeshRendererComponent {
+struct alignas(16) MeshRendererComponent {
 public:
+    BufferLayout layout;
+    AABB localAABB;
+    AABB worldAABB;
     VertexArray VAO;
     VertexBuffer VBO;
     ElementBuffer EBO;
-    BufferLayout Layout;
     unsigned int indexCount = 0;
-    BoundingBox localAABB;
-    BoundingBox worldAABB;
 
     MeshRendererComponent() = default;
     MeshRendererComponent(const MeshRendererComponent&) = delete;
     MeshRendererComponent& operator=(const MeshRendererComponent&) = delete;
     MeshRendererComponent(MeshRendererComponent&&) = default;
     MeshRendererComponent& operator=(MeshRendererComponent&&) = default;
-    MeshRendererComponent(void* vertices, size_t sizeOfVertices, void* indices, size_t sizeOfIndices, unsigned int indexCount, BoundingBox localAABB)
+    MeshRendererComponent(Ref<MeshAsset> mesh)
     {
-        this->indexCount = indexCount;
+        RecreateFromMesh(mesh);
+    }
 
+    void RecreateFromMesh(Ref<MeshAsset> mesh)
+    {
+        Destroy();
+
+        std::vector<float> packedVertices;
+        PackVertices(mesh->vertices, packedVertices);
+
+        indexCount = mesh->indices.size();
+
+        VAO.Init();
         VAO.Bind();
-        VBO.Init(vertices, sizeOfVertices);
+
+        VBO.Init(packedVertices.data(), packedVertices.size() * sizeof(float));
         VBO.Bind();
-        Layout.BindVertexBuffer(VBO.getID());
-        Layout.Push<float>(3);
-        Layout.Push<float>(3);
-        Layout.Push<float>(2);
-        VAO.SetBufferLayout(Layout);
-        EBO.Init(indices, sizeOfIndices);
+
+        layout = BufferLayout(); // Reset layout before pushing again
+        layout.BindVertexBuffer(VBO.getID());
+        layout.Push<float>(3); // Position
+        layout.Push<float>(3); // Normal
+        layout.Push<float>(3); // Tangent
+        layout.Push<float>(3); // Bitangent
+        layout.Push<float>(2); // UV
+
+        VAO.SetBufferLayout(layout);
+
+        EBO.Init(mesh->indices.data(), mesh->indices.size() * sizeof(unsigned int));
         EBO.Bind();
-        this->localAABB = localAABB;
+        localAABB = mesh->localAABB;
+        worldAABB = localAABB;
     }
 
     void Destroy()
@@ -42,4 +63,13 @@ public:
         VBO.Destroy();
         EBO.Destroy();
     }
+
+    inline bool IsCastShadow() const { return castShadow; }
+    inline void SetCastShadow(bool isCastsShadow) { castShadow = isCastsShadow; }
+
+    inline bool IsDoubleSided() const { return isDoubleSided; }
+    inline void SetDoubleSided(bool isDoubleSided) { this->isDoubleSided = isDoubleSided; }
+ private:
+    bool castShadow = true;
+    bool isDoubleSided = false;
 };

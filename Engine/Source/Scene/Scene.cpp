@@ -1,28 +1,26 @@
 ﻿#include "rvelapch.h"
 #include "Scene.h"
 #include "Entity.h"
-#include "../Core/Time.h"
-#include "RvelaLog.h"
-#include "../Core/Utils/AssetManager.h"
-#include "../Core/Utils/Serializer.h"
-#include "../Core/Utils/MaterialManager.h"
-#include "../Core/Utils/ProjectManager.h"
-#include "UUIDGenerator.h"
-#include <glm/gtx/matrix_decompose.hpp>
+#include "Core/Time.h"
+#include "Core/Log.h"
+#include "Utils/Serializer.h"
+#include "Utils/ProjectManager.h"
+#include "EntityUUID.h"
 
-Scene::Scene() : m_Registry() {}
+
+Scene::Scene() : m_Registry() { LoadPrimitive("Cube");  CreateDirectionalLight(); }
 
 Entity Scene::CreateEntity(const std::string& name) {
     Entity entity(m_Registry.create(), this);
     entity.AddComponent<TransformComponent>(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f));
     entity.AddComponent<SceneTreeComponent>();
     entity.AddComponent<TagComponent>(name);
-    entity.AddComponent<UUIDComponent>(UUIDGenerator::Generate());
+    entity.AddComponent<UUIDComponent>(EntityUUIDGenerator::Generate());
     m_EntityMap[entity.GetUUID()] = (entt::entity)entity;
     return entity;
 }
 
-Entity Scene::CreateEntityWithUUID(const std::string& name, UUID uuid) {
+Entity Scene::CreateEntityWithUUID(const std::string& name, EntityUUID uuid) {
     Entity entity(m_Registry.create(), this);
     entity.AddComponent<TransformComponent>(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f));
     entity.AddComponent<SceneTreeComponent>();
@@ -52,7 +50,6 @@ void Scene::DestroyEntity(entt::entity entity) {
     if (HasComponent<MeshRendererComponent>(entity)) GetComponent<MeshRendererComponent>(entity).Destroy();
     if (HasComponent<UUIDComponent>(entity)) m_EntityMap.erase(GetComponent<UUIDComponent>(entity).uuid);
     m_Registry.destroy(entity);
-    MaterialManager::ClearExpiredMaterials();
 }
 
 Entity Scene::CreatePointLight() {
@@ -68,60 +65,30 @@ Entity Scene::CreateDirectionalLight() {
     return entity;
 }
 
-Entity Scene::LoadAsset(const std::string& path) {
-    Entity root = CreateEntity("Model");
-    std::vector<MeshData> meshes = AssetManager::LoadModel(TO_ABSOLUTE_PATH(path));
-    if (meshes.size() == 1) {
-        auto& m = meshes.back();
-        root.AddComponent<MeshRendererComponent>(
-            m.vertices.data(), 
-            m.vertices.size() * sizeof(float), 
-            m.indices.data(), 
-            m.indices.size() * sizeof(unsigned int), 
-            m.indices.size(),
-            m.localAABB);
-        root.AddComponent<MeshComponent>(TO_ABSOLUTE_PATH(path), m.meshIndex,m);
-        root.GetComponent<TagComponent>().tag = m.name;
-        root.AddComponent<MaterialComponent>(m.materialPath);
-    }
-    else {
-        for (auto& m : meshes) {
-            Entity child = CreateEntity("child");
-            SetParent(child, root);
-            child.AddComponent<MeshRendererComponent>(
-                m.vertices.data(), 
-                m.vertices.size() * sizeof(float), 
-                m.indices.data(), 
-                m.indices.size() * sizeof(unsigned int), 
-                m.indices.size(),
-                m.localAABB);
-            child.AddComponent<MeshComponent>(TO_ABSOLUTE_PATH(path), m.meshIndex,m);
-            child.GetComponent<TagComponent>().tag = m.name;
-            child.AddComponent<MaterialComponent>(m.materialPath);
-        }
-    }
-    return root;
-}
-
-struct PrimitiveConfig { std::string name; Path meshPath; };
-Entity Scene::LoadPrimitive(const std::string& primitiveMeshName) {
-    static const std::unordered_map<std::string, PrimitiveConfig> map = {
-        {"Cube", {"Cube", TO_ABSOLUTE_PATH("Assets\\Models\\Primitives\\Cube.fbx")}},
-        {"Sphere", {"Sphere", TO_ABSOLUTE_PATH("Assets\\Models\\Primitives\\Sphere.fbx")}},
-        {"Cylinder", {"Cylinder", TO_ABSOLUTE_PATH("Assets\\Models\\Primitives\\Cylinder.fbx")}},
-        {"Cone", {"Cone", TO_ABSOLUTE_PATH("Assets\\Models\\Primitives\\Cone.fbx")}},
-        {"Capsule", {"Capsule", TO_ABSOLUTE_PATH("Assets\\Models\\Primitives\\Capsule.fbx")}},
-        {"Torus", {"Torus", TO_ABSOLUTE_PATH("Assets\\Models\\Primitives\\Torus.fbx")}}
+struct PrimitiveConfig { std::string name; AssetUUID uuid; };
+Entity Scene::LoadPrimitive(const std::string& primitiveMeshName) 
+{
+    static const std::unordered_map<std::string, PrimitiveConfig> map = 
+    {
+        {"Cube", {"Cube", AssetUUID::FromString("4e05374f-8157-4c0e-bb3a-1c72c9039e05")}},
+        {"Sphere", {"Sphere", AssetUUID::FromString("c6796853-cbdc-4b28-ae32-4c1354b46320")}},
+        {"Cylinder", {"Cylinder", AssetUUID::FromString("19026e98-b5fc-4dfc-b769-62685e56d39e")}},
+        {"Cone", {"Cone", AssetUUID::FromString("0efc8bdb-fdcc-40f3-ab83-a482f6412ec5")}},
+        {"Capsule", {"Capsule", AssetUUID::FromString("a0b4d440-3b37-4a4e-959b-86757f27aaff")}},
+        {"Plane", {"Plane", AssetUUID::FromString("3155a9bc-ef89-40b3-9126-3de1a9b7d811")}},
+        {"Monkey", {"Monkey", AssetUUID::FromString("9415233b-dbe0-451d-ad84-15d3b16d7525")}},
+        {"Torus", {"Torus", AssetUUID::FromString("fb8f40fc-8511-4a0b-aeb8-47d20466f01a")}}
     };
     auto it = map.find(primitiveMeshName);
     if (it == map.end()) return Entity{};
     const auto& cfg = it->second;
     Entity root = CreateEntity(cfg.name);
-    auto m = AssetManager::LoadMesh(cfg.meshPath, 0);
-    root.AddComponent<MeshRendererComponent>(m.vertices.data(), m.vertices.size() * sizeof(float), m.indices.data(), m.indices.size() * sizeof(unsigned int), m.indices.size(),m.localAABB);
-    root.AddComponent<MeshComponent>(cfg.meshPath, m.meshIndex,m);
-    root.GetComponent<TagComponent>().tag = m.name;
-    root.AddComponent<MaterialComponent>(m.materialPath);
+    Ref<MeshAsset> m = AssetRegistry::GetAsset<MeshAsset>(cfg.uuid);
+    root.AddComponent<MeshRendererComponent>(m);
+    root.AddComponent<MeshComponent>(m->GetUUID());
+    root.GetComponent<TagComponent>().tag = cfg.name;
+    AssetUUID defaultMaterialId = AssetUUID::FromString("ee3dde12-6263-4f11-bb1d-812b3e196ab7");
+    root.AddComponent<MaterialComponent>(defaultMaterialId);
     return root;
 }
 
@@ -136,8 +103,9 @@ void Scene::UpdateHierarchy() {
         if (node.parent == entt::null || !m_Registry.valid(node.parent))
             roots.push_back(e);
     }
-    for (auto root : roots)
-        UpdateNodeRecursive(root, glm::mat4(1.0f));
+    for (entt::entity root : roots)
+        if(GetComponent<TransformComponent>(root).IsDirty())
+            UpdateNodeRecursive(root, glm::mat4(1.0f));
 }
 
 void Scene::UpdateNodeRecursive(entt::entity e, const glm::mat4& parentWorld) {
@@ -152,45 +120,15 @@ void Scene::UpdateNodeRecursive(entt::entity e, const glm::mat4& parentWorld) {
     glm::decompose(worldMat, scale, rotation, translation, skew, perspective);
 
     t.SetWorldTransform(translation, rotation, scale);
-
+    
+    //Update AABB
     if (HasComponent<MeshRendererComponent>(e))
     {
         auto& c = GetComponent<MeshRendererComponent>(e);
-        auto& localAABB = c.localAABB;
-
-        
-
-        glm::vec3 localMin = localAABB.min;
-        glm::vec3 localMax = localAABB.max;
-
-        glm::vec3 corners[8] = {
-            {localMin.x, localMin.y, localMin.z},
-            {localMax.x, localMin.y, localMin.z},
-            {localMin.x, localMax.y, localMin.z},
-            {localMax.x, localMax.y, localMin.z},
-            {localMin.x, localMin.y, localMax.z},
-            {localMax.x, localMin.y, localMax.z},
-            {localMin.x, localMax.y, localMax.z},
-            {localMax.x, localMax.y, localMax.z},
-        };
-
-        glm::vec3 worldMin(FLT_MAX);
-        glm::vec3 worldMax(-FLT_MAX);
-
-        for (int i = 0; i < 8; ++i) {
-            glm::vec4 worldPos = t.GetWorldMatrix() * glm::vec4(corners[i], 1.0f);
-            glm::vec3 p = glm::vec3(worldPos);
-
-            worldMin = glm::min(worldMin, p);
-            worldMax = glm::max(worldMax, p);
-        }
-
-        BoundingBox worldAABB(worldMin, worldMax);
-        c.worldAABB = worldAABB;
-
-       
-
+        c.worldAABB = c.localAABB.CalculateWorldAABB(t.GetWorldMatrix());
     }
+
+    t.ClearDirty();
 
     auto& node = GetComponent<SceneTreeComponent>(e);
     for (auto c : node.children)
@@ -200,7 +138,7 @@ void Scene::UpdateNodeRecursive(entt::entity e, const glm::mat4& parentWorld) {
 void Scene::SetParent(entt::entity child, entt::entity parent) {
     if (parent != entt::null && !HasComponent<SceneTreeComponent>(parent)) AddComponent<SceneTreeComponent>(parent);
     auto& node = GetComponent<SceneTreeComponent>(child);
-    UUID id = GetComponent<UUIDComponent>(child).uuid;
+    EntityUUID id = GetComponent<UUIDComponent>(child).uuid;
     glm::mat4 childWorld = GetComponent<TransformComponent>(child).GetWorldMatrix();
     if (node.parent != entt::null) {
         auto& old = GetComponent<SceneTreeComponent>(node.parent);
@@ -238,7 +176,7 @@ void Scene::SetParent(entt::entity child, entt::entity parent) {
 void Scene::RemoveParent(entt::entity child) {
     if (!HasComponent<SceneTreeComponent>(child)) return;
     auto& node = GetComponent<SceneTreeComponent>(child);
-    UUID id = GetComponent<UUIDComponent>(child).uuid;
+    EntityUUID id = GetComponent<UUIDComponent>(child).uuid;
     glm::mat4 worldM = GetComponent<TransformComponent>(child).GetWorldMatrix();
     if (node.parent != entt::null) {
         auto& pnode = GetComponent<SceneTreeComponent>(node.parent);

@@ -1,16 +1,16 @@
 #pragma once
-#include "../Scene/Components/TransformComponent.h"
-#include "../Scene/Components/MeshRendererComponent.h"
-#include "../Scene/Components/MaterialComponent.h"
+#include "Scene/Components/TransformComponent.h"
+#include "Scene/Components/MeshRendererComponent.h"
+#include "Scene/Components/MaterialComponent.h"
 
 struct RenderCommand
 {
 public:
-	RenderCommand(const TransformComponent& t, const MeshRendererComponent& m, const MaterialComponent& mat, bool isSelected)
+	RenderCommand(const TransformComponent& t, const MeshRendererComponent& m, MaterialComponent& mat, bool isSelected)
 		: transform(t), mesh(m), material(mat), isSelected(isSelected) {
 	}
 	const TransformComponent& transform;
 	const MeshRendererComponent& mesh;
-	const MaterialComponent& material;
+	MaterialComponent& material;
 	const bool isSelected;
 };

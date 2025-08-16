@@ -8,7 +8,7 @@
 #include "Shader.h"
 #include "EditorCamera.h"
 #include "GLFW/glfw3.h"
-#include "../Core/Time.h"
+#include "Core/Time.h"
 #include "Scene/Components.h"
 #include "Skybox.h"
 #include "ScreenQuad.h"
@@ -43,10 +43,10 @@ class Renderer
 public:
     Renderer();
     ~Renderer();
-    static void Init(GLFWwindow* window);
-    static void StartFrame();
-    static void EndFrame();
-    static void Shutdown();
+    void Init(GLFWwindow* window);
+    void StartFrame();
+    void EndFrame();
+    void Shutdown();
 
     static void DrawFullScreenQuad();
 
@@ -64,6 +64,7 @@ public:
     static Shader& GetLuminanceShader() { return m_LuminanceShader; }
     static Shader& GetProceduralSkyShader() { return m_ProceduralSkyShader;  }
     static Shader& GetOutlineShader() { return m_OutlineShader; }
+    static Shader& GetEquirectangularToCubemapShader() { return m_EquirectangularToCubemap; }
 
 private:
     static GLFWwindow* activeWindow;
@@ -81,6 +82,7 @@ private:
     static Shader m_LuminanceShader;
     static Shader m_ProceduralSkyShader;
     static Shader m_OutlineShader;
+    static Shader m_EquirectangularToCubemap;
 
     static ScreenQuad m_ScreenQuad;
 };

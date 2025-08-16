@@ -1,12 +1,10 @@
 ﻿#include "rvelapch.h"
 #include "Renderer.h"
-#include "../RvelaLog.h"
-#include "Core/Input/Input.h"
+#include "Core/Log.h"
 #include "Core/Time.h"
-#include "Core/Utils/MaterialManager.h"
-#include "Core/Utils/TextureManager.h"
-#include "Core/Utils/FileUtils.h"
-#include <algorithm>
+#include "Input/Input.h"
+#include "Utils/FileUtils.h"
+
 
 GLFWwindow* Renderer::activeWindow = nullptr;
 Shader Renderer::m_DirectionalShadowShader;
@@ -23,6 +21,7 @@ Shader Renderer::m_CompositeShader;
 Shader Renderer::m_LuminanceShader;
 Shader Renderer::m_ProceduralSkyShader;
 Shader Renderer::m_OutlineShader;
+Shader Renderer::m_EquirectangularToCubemap;
 
 ScreenQuad Renderer::m_ScreenQuad;
 
@@ -33,26 +32,26 @@ Renderer::Renderer()
 
 Renderer::~Renderer()
 {
-    Shutdown();
 }
 
 void Renderer::Init(GLFWwindow* window)
 {
     Renderer::activeWindow = window;
-    m_GeometryShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\geometry.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\geometry.frag"));
-    m_PointShadowShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\pointShadow.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\pointShadow.frag"));
-    m_DirectionalShadowShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\directionalShadow.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\directionalShadow.frag"));
-    m_SkyboxShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\skybox.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\skybox.frag"));
-    m_PBRShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\pbr.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\pbr.frag"));
-    m_BrightShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\brightPass.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\brightPass.frag"));
-    m_DownsampleShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\downsample.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\downsample.frag"));
-    m_UpsampleShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\upsample.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\upsample.frag"));
-    m_SSAOShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\ssao.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\ssao.frag"));
-    m_SSRShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\ssr.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\ssr.frag"));
-    m_CompositeShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\composite.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\composite.frag"));
-    m_LuminanceShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\luminance.comp"));
-    m_ProceduralSkyShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\proceduralSky.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\proceduralSky.frag"));
-    m_OutlineShader.Init(TO_ABSOLUTE_PATH("Assets\\Shaders\\outline.vert"), TO_ABSOLUTE_PATH("Assets\\Shaders\\outline.frag"));
+    m_GeometryShader.Init(VRT_PATH("Assets\\Shaders\\geometry.glsl"));
+    m_PointShadowShader.Init(VRT_PATH("Assets\\Shaders\\pointShadow.glsl"));
+    m_DirectionalShadowShader.Init(VRT_PATH("Assets\\Shaders\\directionalShadow.glsl"));
+    m_SkyboxShader.Init(VRT_PATH("Assets\\Shaders\\skybox.glsl"));
+    m_PBRShader.Init(VRT_PATH("Assets\\Shaders\\pbr.glsl"));
+    m_BrightShader.Init(VRT_PATH("Assets\\Shaders\\brightPass.glsl"));
+    m_DownsampleShader.Init(VRT_PATH("Assets\\Shaders\\downsample.glsl"));
+    m_UpsampleShader.Init(VRT_PATH("Assets\\Shaders\\upsample.glsl"));
+    m_SSAOShader.Init(VRT_PATH("Assets\\Shaders\\ssao.glsl"));
+    m_SSRShader.Init(VRT_PATH("Assets\\Shaders\\ssr.glsl"));
+    m_CompositeShader.Init(VRT_PATH("Assets\\Shaders\\composite.glsl"));
+    m_LuminanceShader.Init(VRT_PATH("Assets\\Shaders\\luminance.glsl"));
+    m_ProceduralSkyShader.Init(VRT_PATH("Assets\\Shaders\\proceduralSky.glsl"));
+    m_OutlineShader.Init(VRT_PATH("Assets\\Shaders\\outline.glsl"));
+    m_EquirectangularToCubemap.Init(VRT_PATH("Assets\\Shaders\\equirectangularToCubemap.glsl"));
 
     
 

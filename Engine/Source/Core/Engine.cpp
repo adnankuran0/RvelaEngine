@@ -1,10 +1,8 @@
 ﻿#include "rvelapch.h"
-
-#include "RvelaLog.h"
 #include "Engine.h"
-#include "Scene/Entity.h"
+#include "Core/Log.h"
 #include "Renderer/RenderLayer.h"
-#include "Renderer/Passes/LightingPass.h"
+#include <Assets/MeshAsset.h>
 
 Engine* Engine::s_Instance = nullptr;
 
@@ -12,14 +10,11 @@ Engine::Engine()
 {
 	RvelaLog::Init("log.txt");
 
-	m_Window = std::make_unique<Window>();
-	m_Renderer = std::make_unique<Renderer>();
+	m_Window.Init();
+	m_ProjectManager.LoadProject("C:\\RvelaEngine\\TestProject\\TestProject.rproj");
+	m_Renderer.Init(m_Window.GetGLFWWindow());
+	m_AssetRegistry.Init(m_ProjectManager.GetProjectPath()); //TODO: Make this works with assets path
 	m_Scene = std::make_unique<Scene>();
-	m_ProjectManager = std::make_unique<ProjectManager>();
-	m_ProjectManager->LoadProject("C:\\RvelaEngine\\TestProject\\TestProject.rproj");
-	m_SceneManager = std::make_unique<SceneManager>();
-	editorCamera = nullptr;
-
 	PushLayer(new RenderLayer(this));
 
 	if (s_Instance == nullptr)
@@ -28,11 +23,8 @@ Engine::Engine()
 	}
 	else
 	{
-		LOG_WARNING << "Another instance of Engine already exists!";
+		LOG_WARN("Another instance of Engine already exists!");
 	}
-
-	m_Renderer->Init(m_Window->GetGLFWWindow());
-
 }
 
 Engine::~Engine()
@@ -61,6 +53,7 @@ void Engine::Update()
 	m_Scene->Update();
 
 
+
 }
 
 void Engine::FixedUpdate()
@@ -80,8 +73,8 @@ void Engine::LateUpdate()
 
 void Engine::Run()
 {
-	LOG_INFO << "Engine has started!";
-	while (!glfwWindowShouldClose(GetWindow()->GetGLFWWindow()))
+	LOG_INFO("Engine has started!");
+	while (!glfwWindowShouldClose(GetWindow().GetGLFWWindow()))
 	{
 		glfwPollEvents();
 		HandleEvents();
@@ -97,14 +90,19 @@ void Engine::Run()
 		Update();
 		LateUpdate();
 
+		
+
 		Render();
+
+		
+
 
 		EventManager::ClearEvents();
 		Input::Update();
 
 		
 	}
-	LOG_INFO << "Engine has stopped!";
+	LOG_INFO("Engine has stopped!");
 }
 
 void Engine::HandleEvents() noexcept
@@ -119,7 +117,7 @@ void Engine::HandleEvents() noexcept
 				editorCamera->onMouseMoved(
 					mouseEvent->GetX(),
 					mouseEvent->GetY(),
-					m_Window->GetGLFWWindow()
+					m_Window.GetGLFWWindow()
 				);
 			}
 			break;
@@ -145,21 +143,21 @@ void Engine::HandleEvents() noexcept
 
 void Engine::Render()
 {
-	Renderer::StartFrame();
+	m_Renderer.StartFrame();
 
 	for (Layer* layer : m_LayerStack)
 		layer->OnRender();
 
-	Renderer::EndFrame();
+	m_Renderer.EndFrame();
 
-	glfwSwapBuffers(GetWindow()->GetGLFWWindow());
+	glfwSwapBuffers(GetWindow().GetGLFWWindow());
 }
 
 
 void Engine::Shutdown()
 {
-	if (m_Renderer)
-		m_Renderer->Shutdown();
+	m_Window.Shutdown();
+	m_Renderer.Shutdown();
 
 	glfwTerminate();
 }

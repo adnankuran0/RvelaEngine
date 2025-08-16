@@ -2,27 +2,22 @@
 #include "Time.h"
 
 // Static member definitions (all in seconds)
-double Time::deltaTime = 0.0;
-double Time::lastFrameTime = 0.0;
-double Time::fpsUpdateTime = 0.0;
+float Time::deltaTime = 0.0f;
+float Time::lastFrameTime = 0.0f;
+float Time::fps = 0.0f;
+float Time::timeScale = 1.0f;
+float Time::fixedDeltaTime = 1.0f / 60.0f; // 20ms default fixed timestep
+float Time::fixedTimeAccumulator = 0.0f;
+float Time::lastFpsUpdateTime = 0.0f; 
+int Time::maxFPS = 360;
+int Time::fpsUpdateTime = 10; // as miliseconds
 int Time::frameCount = 0;
-double Time::fps = 0.0f;
-double Time::timeScale = 1.0f;
-double Time::maxFPS = 360.0;
-double Time::fixedDeltaTime = 1.0 / 60.0; // 20ms default fixed timestep
-double Time::fixedTimeAccumulator = 0.0;
 
 void Time::Update() noexcept
 {
-    // Ensure GLFW is initialized
-    if (!glfwGetTime()) {
-        deltaTime = 0.0;
-        return;
-    }
-
     double currentFrameTime = glfwGetTime() * 1000.0;
 
-    double frameTimeTarget = (maxFPS == 0.0) ? 0.0 : (1000.0 / maxFPS);
+    double frameTimeTarget = (maxFPS == 0) ? 0.0 : (1000.0 / maxFPS);
 
     double timeElapsed = currentFrameTime - lastFrameTime;
 
@@ -37,11 +32,11 @@ void Time::Update() noexcept
 
     // Update FPS
     frameCount++;
-    if (currentFrameTime - fpsUpdateTime >= 10.0) 
+    if (currentFrameTime - lastFpsUpdateTime >= fpsUpdateTime)
     {
-        fps = static_cast<float>(frameCount) * (1000.0 / (currentFrameTime - fpsUpdateTime));
+        fps = static_cast<float>(frameCount) * (1000.0 / (currentFrameTime - lastFpsUpdateTime));
         frameCount = 0;
-        fpsUpdateTime = currentFrameTime;
+        lastFpsUpdateTime = currentFrameTime;
     }
 
     fixedTimeAccumulator += deltaTime;

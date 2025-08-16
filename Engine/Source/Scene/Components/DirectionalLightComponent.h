@@ -1,11 +1,10 @@
 #pragma once
-#include "Scene/Component.h"
 #include "glm/glm.hpp"
 #include "../nlohmann/json.hpp"
 
 using json = nlohmann::json;
 
-class DirectionalLightComponent : public Component
+struct DirectionalLightComponent 
 {
 public:
     DirectionalLightComponent() = default;
@@ -13,12 +12,12 @@ public:
 
     glm::vec3 color = glm::vec3(1.0f);
     float intensity = 5.0f;
-    bool castShadows = true;
-    bool reverseCullFace = true;
     float shadowBias = 0.001f;
     float blurRadius = 0.5f;
+    bool castShadows = true;
+    bool reverseCullFace = true;
 
-    std::string Serialize() const override
+    std::string Serialize() const 
     {
         json j;
         j["color"] = { color.r,color.g,color.b };
@@ -27,7 +26,7 @@ public:
         return j.dump(4);
     }
 
-    void Deserialize(const std::string& jsonStr) override
+    void Deserialize(const std::string& jsonStr)
     {
         json j = json::parse(jsonStr);
         auto colorData = j["color"];

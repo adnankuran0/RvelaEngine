@@ -75,6 +75,7 @@ void RenderPipeline::Execute()
 	ssrPass.SetRoughnessTexture(geometryPass.GetRoughnessTexure());
 	ssrPass.SetMetallicTexture(geometryPass.GetMetallicTexure());
 	ssrPass.SetScreenTexture(lightingPass.GetScreenTexture());
+	ssrPass.SetSkyboxTexture(skyboxPass.GetSkyboxTexture());
 	ssrPass.Execute();
 
 	compositePass.SetScreenTexture(lightingPass.GetScreenTexture());

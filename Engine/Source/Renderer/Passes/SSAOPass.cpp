@@ -1,7 +1,5 @@
 #include "rvelapch.h"
 #include "SSAOPass.h"
-#include <random>
-#include <array>
 
 // Pre-declare constants
 namespace {
@@ -27,7 +25,7 @@ void SSAOPass::Init()
     glNamedFramebufferTexture(ssaoFBO, GL_COLOR_ATTACHMENT0, o_SsaoTexture, 0);
 
     if (glCheckNamedFramebufferStatus(ssaoFBO, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cerr << "SSAO framebuffer not complete!" << std::endl;
+        LOG_ERROR("SSAO framebuffer not complete");
 
     GenerateSampleKernel();
     GenerateNoiseTexture();

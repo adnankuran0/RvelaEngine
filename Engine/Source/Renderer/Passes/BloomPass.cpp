@@ -1,6 +1,5 @@
 #include "rvelapch.h"
 #include "BloomPass.h"
-#include <algorithm>
 
 
 
@@ -32,7 +31,7 @@ void BloomPass::Init()
         glBindFramebuffer(GL_FRAMEBUFFER, fboDown);
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         {
-            std::cerr << "Downsample framebuffer incomplete at mip level " << i << std::endl;
+            LOG_ERROR("Downsample framebuffer incomplete at mip level {}" ,i);
         }
 
         glGenTextures(1, &texUp);
