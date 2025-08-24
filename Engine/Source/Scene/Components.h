@@ -1,5 +1,19 @@
 ﻿#pragma once
 
+enum class ComponentType
+{
+	Transform,
+	Tag,
+	MeshRenderer,
+	Mesh,
+	SceneTree,
+	UUID,
+	Material,
+	PointLight,
+	DirectionalLight,
+	SpotLight
+};
+
 #include "Scene/Components/TransformComponent.h"
 #include "Scene/Components/TagComponent.h"
 #include "Scene/Components/MeshRendererComponent.h"

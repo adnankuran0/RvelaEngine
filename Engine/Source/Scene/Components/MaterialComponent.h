@@ -92,6 +92,8 @@ public:
 		Load(newMaterialUUID);
 	}
 
+	inline const AssetUUID& GetMaterialID() const noexcept{ return materialUUID; }
+
 	std::string Serialize() const
 	{
 		json j;

@@ -59,16 +59,99 @@ public:
             return false;
         }
 
-        m_Data = ReadPrefabData(m_Path);
-        if (m_Data.empty())
+        std::ifstream file(m_Path, std::ios::binary);
+        if (!file)
         {
-            LOG_ERROR("Failed to read prefab data from file");
+            LOG_ERROR("Failed to open prefab file: {}", m_Path);
+            return false;
+        }
+
+        AssetHeader header;
+        file.read(reinterpret_cast<char*>(&header), sizeof(header));
+        if (!file)
+        {
+            LOG_ERROR("Failed to read prefab header");
+            return false;
+        }
+
+        if (header.magic != MAGIC_PREFAB)
+        {
+            LOG_ERROR("Invalid prefab magic number");
+            return false;
+        }
+
+        std::vector<char> metaBuffer(header.metaSize);
+        file.read(metaBuffer.data(), header.metaSize);
+        if (!file)
+        {
+            LOG_ERROR("Failed to read prefab meta");
+            return false;
+        }
+        size_t metaOffset = 0;
+        meta->Deserialize(metaBuffer, metaOffset);
+
+        file.seekg(header.dataOffset, std::ios::beg);
+        file.seekg(0, std::ios::end);
+        size_t fileSize = file.tellg();
+        if (fileSize < header.dataOffset)
+        {
+            LOG_ERROR("Invalid prefab file size");
+            return false;
+        }
+
+        size_t dataSize = fileSize - header.dataOffset;
+        m_Data.resize(dataSize);
+
+        file.seekg(header.dataOffset, std::ios::beg);
+        file.read(reinterpret_cast<char*>(m_Data.data()), dataSize);
+        if (!file)
+        {
+            LOG_ERROR("Failed to read prefab data");
             return false;
         }
 
         m_Loaded = true;
         return true;
     }
+
+    void Serialize()
+    {
+        PrefabMeta* meta = GetMetaAs<PrefabMeta>();
+        if (!meta)
+        {
+            LOG_ERROR("Failed to get PrefabMeta");
+            return;
+        }
+
+        std::vector<char> metaBuffer;
+        size_t metaOffset = 0;
+        meta->Serialize(metaBuffer, metaOffset);
+
+        AssetHeader header;
+        header.magic = MAGIC_PREFAB;         
+        header.version = 1;
+        header.type = AssetType::Prefab;
+        header.metaSize = static_cast<uint32_t>(metaBuffer.size());
+        header.dataOffset = sizeof(AssetHeader) + header.metaSize;
+        header.reserved = 0;
+
+        std::ofstream out(m_Path, std::ios::binary);
+        if (!out)
+        {
+            LOG_ERROR("Failed to write prefab file: {}", m_Path);
+            return;
+        }
+
+        out.write(reinterpret_cast<const char*>(&header), sizeof(header));
+
+        out.write(metaBuffer.data(), metaBuffer.size());
+
+        if (!m_Data.empty())
+            out.write(reinterpret_cast<const char*>(m_Data.data()), m_Data.size());
+
+        out.close();
+    }
+
 
     void Unload()
     {
@@ -79,6 +162,11 @@ public:
     const std::vector<uint8_t>& GetData() const
     {
         return m_Data;
+    }
+
+    void SetData(std::vector<uint8_t>&& buffer)
+    {
+        m_Data = std::move(buffer);
     }
 
     const std::string& GetPath() const

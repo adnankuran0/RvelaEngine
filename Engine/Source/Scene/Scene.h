@@ -42,6 +42,11 @@ public:
     }
 
     template<typename Component>
+    bool HasComponent(Entity entity) {
+        return m_Registry.any_of<Component>(static_cast<entt::entity>(entity));
+    }
+
+    template<typename Component>
     void RemoveComponent(entt::entity entity) {
         m_Registry.remove<Component>(entity);
     }
@@ -69,6 +74,8 @@ public:
 
     entt::registry& GetRegistry();
     std::unordered_map<EntityUUID, entt::entity> GetUUIDEntityMap() { return m_EntityMap; }
+
+    entt::entity& GetEntityByUUID(EntityUUID& uuid) { return m_EntityMap.at(uuid); }
 
     std::vector<PointLightData> CollectPointLights() noexcept;
     std::optional<DirectionalLightData>  CollectDirectionalLight() noexcept;

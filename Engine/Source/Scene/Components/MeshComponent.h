@@ -16,6 +16,9 @@ public:
     }
 
     inline Ref<MeshAsset> GetMesh() { return mesh; }
+    inline AssetUUID GetMeshID() const noexcept { return meshUUID; }
+
+
     inline void SetMesh(const AssetUUID& uuid)
     {
         Load(uuid);
