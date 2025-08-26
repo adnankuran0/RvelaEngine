@@ -2,7 +2,7 @@
 #include "AssetRegistry.h"
 #include "Core/Log.h"
 #include "MeshAsset.h"
-
+#include "PrefabAsset.h"
 
 void AssetRegistry::Init(const std::filesystem::path& assetDir)
 {
@@ -70,6 +70,22 @@ void AssetRegistry::ScanAssets(const std::filesystem::path& dir)
 
             AssetHeader header = AssetLoader::ReadHeader(inFile, MAGIC_MESH);
             std::unique_ptr<MeshMeta> meta = AssetLoader::ReadMeta<MeshMeta>(inFile, header);
+
+            s_UUIDToPath[meta->uuid] = path;
+        }
+
+        //Prefab Asset
+        if (path.extension() == ".rprefab")
+        {
+            std::ifstream inFile(path, std::ios::binary);
+            if (!inFile.is_open())
+            {
+                LOG_ERROR("Failed to open file: {}", path.string());
+                continue;
+            }
+
+            AssetHeader header = AssetLoader::ReadHeader(inFile, MAGIC_PREFAB);
+            std::unique_ptr<PrefabMeta> meta = AssetLoader::ReadMeta<PrefabMeta>(inFile, header);
 
             s_UUIDToPath[meta->uuid] = path;
         }

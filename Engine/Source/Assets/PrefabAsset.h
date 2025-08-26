@@ -159,12 +159,12 @@ public:
         m_Loaded = false;
     }
 
-    const std::vector<uint8_t>& GetData() const
+    const std::vector<std::byte>& GetData() const
     {
         return m_Data;
     }
 
-    void SetData(std::vector<uint8_t>&& buffer)
+    void SetData(std::vector<std::byte>&& buffer)
     {
         m_Data = std::move(buffer);
     }
@@ -214,6 +214,6 @@ private:
 
 private:
     std::string m_Path;
-    std::vector<uint8_t> m_Data;
+    std::vector<std::byte> m_Data;
     bool m_Loaded;
 };

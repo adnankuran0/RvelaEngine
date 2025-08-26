@@ -122,7 +122,6 @@ void LightingPass::Execute()
 
     for (auto& command : commands) {
         if (!ctx.camera->Intersects(command.mesh.worldAABB)) continue;
-        LOG_DEBUG("Rendering something");
         if (command.isSelected) {
             glEnable(GL_STENCIL_TEST);
             glStencilFunc(GL_ALWAYS, 1, 0xFF); 

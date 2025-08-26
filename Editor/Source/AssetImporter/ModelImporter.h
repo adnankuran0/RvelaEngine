@@ -14,6 +14,7 @@ private:
 	const aiScene* LoadScene(const std::filesystem::path& path);
 	void ExtractTextures(const aiScene* scene, const std::filesystem::path& modelPath);
 	void ExtractMaterials(const aiScene* scene, const std::filesystem::path& modelPath);
+
 	inline std::filesystem::path ResolveRelativePath(const std::string& texPath, const std::filesystem::path& modelPath)
 	{
 		std::filesystem::path textureRelPath = texPath;

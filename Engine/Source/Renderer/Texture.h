@@ -17,7 +17,6 @@ public:
     Texture();
     ~Texture();
     Texture(const std::string& path);
-    Texture(const Texture&) { LOG_INFO("Texture copied!"); }
     void Init();
     void Destroy() const;
     void Bind(unsigned int activeTexture) const;

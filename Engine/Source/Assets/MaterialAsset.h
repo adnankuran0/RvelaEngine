@@ -6,6 +6,7 @@
 #include "AssetMeta.h"
 #include "Assets/AssetUUID.h"
 #include <memory>
+#include <fstream>
 
 struct MaterialMeta : public AssetMeta
 {

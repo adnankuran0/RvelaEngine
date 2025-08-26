@@ -6,6 +6,7 @@
 #include "Asset.h"
 #include <Core/Log.h>
 #include "stb_image/stb_image_write.h"
+#include <fstream>
 
 static std::vector<uint8_t> ReadTextureData(const std::filesystem::path& filePath)
 {

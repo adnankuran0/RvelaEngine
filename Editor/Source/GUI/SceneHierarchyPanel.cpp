@@ -1,7 +1,7 @@
 ﻿#include "SceneHierarchyPanel.h"
 #include "ImGui/imgui.h"
 #include <ImGui/tinyfiledialogs.h>
-
+#include "AssetImporter/PrefabImporter.h"
 
 
 void SceneHierarchyPanel::Draw(Scene* scene, entt::entity& selectedEntity)
@@ -60,6 +60,7 @@ void SceneHierarchyPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                 scene->DestroyEntity(entity);
                 if (selectedEntity == entity) selectedEntity = entt::null;
             }
+            
             ImGui::EndPopup();
         }
 
@@ -133,17 +134,30 @@ void SceneHierarchyPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                 //selectedEntity = scene->LoadAsset(file);
             }
         }
+        if (ImGui::MenuItem("Save as prefab"))
+        {
+            if (selectedEntity == entt::null) return;
+            const char* filterPatterns[] = { "*.rprefab" };
+            const char* filePath = tinyfd_saveFileDialog("Create prefab as", "prefab.rprefab", 1, filterPatterns, NULL);
+
+            std::string file = filePath ? std::string(filePath) : "";
+            if (!file.empty())
+            {
+                std::ofstream ofs(file);
+                if (ofs.is_open())
+                {
+                    ofs.close();
+                    PrefabImporter::CreatePrefabAsset(file, *scene, selectedEntity);
+                    AssetRegistry::ScanAssets();
+                }
+            }
+        }
+
         if (ImGui::MenuItem("Delete Entity")) {
 
             scene->DestroyEntity(selectedEntity);
             selectedEntity = entt::null;
         }
-        /* if (ImGui::MenuItem("Create Project"))
-         {
-             createProjectRequested = true;
-             strcpy(projectNameBuffer, "");
-         }*/
-
 
         ImGui::EndPopup();
     }
