@@ -72,6 +72,8 @@ public:
 
     void Update();
 
+    Entity Instantiate(const AssetUUID& prefabUUID);
+
     entt::registry& GetRegistry();
     std::unordered_map<EntityUUID, entt::entity> GetUUIDEntityMap() { return m_EntityMap; }
 

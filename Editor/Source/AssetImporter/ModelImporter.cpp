@@ -1,16 +1,21 @@
-#include "ModelImporter.h"
+﻿#include "ModelImporter.h"
 #include <Assets/MaterialAsset.h>
+#include <Assets/PrefabAsset.h>
+#include "PrefabImporter.h"
 
 const aiScene* ModelImporter::LoadScene(const std::filesystem::path& path)
 {
     m_Importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
+    m_Importer.SetPropertyFloat(AI_CONFIG_GLOBAL_SCALE_FACTOR_KEY, 1.0f);
+    m_Importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_ALL_GEOMETRY_LAYERS, false);
 
     const aiScene* scene = m_Importer.ReadFile(path.string(),
         aiProcess_CalcTangentSpace |
         aiProcess_Triangulate |
         aiProcess_JoinIdenticalVertices |
         aiProcess_ImproveCacheLocality|
-        aiProcess_GenBoundingBoxes);
+        aiProcess_GenBoundingBoxes
+        );
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
@@ -153,7 +158,90 @@ void ModelImporter::ExtractMaterials(const aiScene* scene, const std::filesystem
         }
 
         material->Serialize();
+        materialIndexToUUID[i] = material->GetUUID();
     }
+}
+
+AssetUUID ModelImporter::ConstructPrefab(const aiScene* scene, const std::filesystem::path& modelPath)
+{
+    Scene prefabScene;
+    entt::entity rootEntity = ProcessNode(scene->mRootNode, scene, entt::null, prefabScene);
+    prefabScene.UpdateHierarchy();
+
+    std::filesystem::path prefabPath = modelPath;
+    prefabPath.replace_extension(".rprefab");
+
+    Ref<PrefabAsset> prefab = PrefabImporter::CreatePrefabAsset(prefabPath.string(), prefabScene, rootEntity);
+    return prefab->GetUUID();
+}
+
+entt::entity ModelImporter::ProcessNode(aiNode* node, const aiScene* modelScene, entt::entity parent, Scene& scene)
+{
+    std::string nodeName = node->mName.C_Str();
+    entt::entity e = scene.CreateEntity(nodeName).GetHandle();
+
+    SetTransformForEntity(node, scene, e);
+
+    if (parent != entt::null)
+    {
+        scene.SetParent(e, parent);
+    }
+
+    if (node->mNumMeshes == 1)
+    {
+        AttachMeshToEntity(0,node, modelScene, scene,e);
+    }
+    else if (node->mNumMeshes > 1)
+    {
+        for (unsigned int i = 0; i < node->mNumMeshes; i++)
+        {
+            entt::entity childEntity = scene.CreateEntity(nodeName + "_" + std::to_string(i)).GetHandle();
+            SetTransformForEntity(node, scene, childEntity);
+            AttachMeshToEntity(i,node, modelScene, scene, childEntity);
+            scene.SetParent(childEntity, e);
+        }
+    }
+
+    //Process childs recursively
+    for (unsigned int i = 0; i < node->mNumChildren; i++)
+        ProcessNode(node->mChildren[i], modelScene, e, scene);
+
+    return e;
+}
+
+void ModelImporter::AttachMeshToEntity(unsigned int meshIndex, aiNode* node, const aiScene* modelScene, Scene& scene,entt::entity e)
+{
+    aiMesh* mesh = modelScene->mMeshes[node->mMeshes[meshIndex]]; 
+
+    auto meshIt = meshIndextoUUID.find(node->mMeshes[meshIndex]); 
+    if (meshIt == meshIndextoUUID.end()) {
+        LOG_DEBUG("Cant find uuid for mesh index");
+        //continue;
+    }
+    AssetUUID meshUUID = meshIt->second;
+
+    auto matIt = materialIndexToUUID.find(mesh->mMaterialIndex);
+    if (matIt == materialIndexToUUID.end()) {
+        LOG_DEBUG("Cant find uuid for material index");
+    }
+    AssetUUID matUUID = matIt->second;
+
+    scene.AddComponent<MeshComponent>(e, meshUUID);
+    Ref<MeshAsset> meshAsset = scene.GetComponent<MeshComponent>(e).GetMesh();
+    scene.AddComponent<MeshRendererComponent>(e, meshAsset);
+    scene.AddComponent<MaterialComponent>(e, matUUID);
+}
+
+void ModelImporter::SetTransformForEntity(aiNode* node, Scene& scene, entt::entity e)
+{
+    auto& tc = scene.GetComponent<TransformComponent>(e);
+    glm::mat4 transform = ConvertToGlmMatrix(node->mTransformation);
+    glm::vec3 pos, scale, rotDeg;
+    DecomposeToEulerAngles(transform, scale, rotDeg, pos);
+    tc.SetPosition(pos);
+    tc.SetScale(scale);
+    tc.SetEulerRotation(rotDeg);
+    scene.UpdateHierarchy();
 }
 
 AssetUUID ModelImporter::Import(const std::filesystem::path& path)
@@ -166,6 +254,7 @@ AssetUUID ModelImporter::Import(const std::filesystem::path& path)
     }
     ExtractTextures(scene, path);
     ExtractMaterials(scene, path);
-	m_MeshImporter.Import(path,scene);
-	return AssetUUID::Invalid(); //TODO: This function must return prefab uuid
+	m_MeshImporter.Import(scene,path, meshIndextoUUID);
+    AssetRegistry::ScanAssets();
+	return ConstructPrefab(scene,path); 
 }

@@ -3,13 +3,14 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 #include "MeshAsset.h"
+#include "PrefabAsset.h"
 
 Ref<Asset> AssetLoader::Load(const std::filesystem::path& path)
 {
     std::ifstream inFile(path, std::ios::binary);
     if (!inFile.is_open())
     {
-        LOG_ERROR("Failed to open file: {}", path.string());
+        LOG_ERROR("[AssetLoader::Load] Failed to open file: {}", path.string());
     }
 
     auto ext = path.extension().string();
@@ -47,6 +48,19 @@ Ref<Asset> AssetLoader::Load(const std::filesystem::path& path)
         std::unique_ptr<MeshMeta> meta = ReadMeta<MeshMeta>(inFile, header);
 
         Ref<MeshAsset> asset = CreateRef<MeshAsset>(path.string(), std::move(meta));
+        if (asset->Load())
+        {
+            return Ref<Asset>(asset);
+        }
+    }
+
+    //Mesh Asset
+    if (ext == ".rprefab")
+    {
+        AssetHeader header = ReadHeader(inFile, MAGIC_PREFAB);
+        std::unique_ptr<PrefabMeta> meta = ReadMeta<PrefabMeta>(inFile, header);
+
+        Ref<PrefabAsset> asset = CreateRef<PrefabAsset>(path.string(), std::move(meta));
         if (asset->Load())
         {
             return Ref<Asset>(asset);

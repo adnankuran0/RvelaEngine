@@ -94,7 +94,8 @@ void ShadowPass::RenderDirectionalShadowMap()
         glm::vec3 lightDir = ctx.directionalLight->direction;
         glm::vec3 sceneCenter = ctx.camera->Position;
         glm::mat4 lightView = glm::lookAt(sceneCenter - lightDir * 50.0f, sceneCenter, glm::vec3(0, 1, 0));
-        glm::mat4 lightProjection = glm::ortho(-35.0f, 35.0f, -35.0f, 35.0f, 0.01f, 120.0f);
+        float orthoSize = 35.0f;
+        glm::mat4 lightProjection = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, 0.1f, 120.0f);
         o_LightSpaceMatrix = lightProjection * lightView;
 
         shadowShader.setMat4("lightSpaceMatrix", o_LightSpaceMatrix);

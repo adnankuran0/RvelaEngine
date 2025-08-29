@@ -3,12 +3,12 @@
 enum class ComponentType
 {
 	Transform,
-	Tag,
+	Tag, 
 	MeshRenderer,
-	Mesh,
-	SceneTree,
-	UUID,
-	Material,
+	Mesh, 
+	SceneTree, 
+	UUID, 
+	Material, 
 	PointLight,
 	DirectionalLight,
 	SpotLight

@@ -33,7 +33,7 @@ public:
         std::vector<float> packedVertices;
         PackVertices(mesh->vertices, packedVertices);
 
-        indexCount = mesh->indices.size();
+        indexCount = (unsigned int)mesh->indices.size();
 
         VAO.Init();
         VAO.Bind();

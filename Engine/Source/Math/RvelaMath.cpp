@@ -2,6 +2,8 @@
 #define GLM_FORCE_INTRINSICS
 #include "RvelaMath.h"
 
+
+
 void DecomposeToEulerAngles(const glm::mat4& worldMatrix, glm::vec3& scale, glm::vec3& rotationDegrees, glm::vec3& translation)
 {
     glm::vec3 skew;

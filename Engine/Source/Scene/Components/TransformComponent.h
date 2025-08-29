@@ -14,12 +14,13 @@ private:
     glm::quat localRotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
     glm::quat worldRotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
 
-    glm::vec3 worldPosition = glm::vec3(0.0f);
     glm::vec3 localPosition = glm::vec3(0.0f);
+    glm::vec3 worldPosition = glm::vec3(0.0f);
     glm::vec3 localScale = glm::vec3(1.0f);
-    glm::vec3 scaleRatio = glm::vec3(1.0f);
     glm::vec3 worldScale = glm::vec3(1.0f);
+    glm::vec3 scaleRatio = glm::vec3(1.0f);
     glm::vec3 localEuler = glm::vec3(0.0f);
+    glm::vec3 worldEuler = glm::vec3(0.0f);
 
     bool lockScaleRatio = false;
     bool dirty = true;
@@ -41,6 +42,16 @@ public:
 
     inline void SetEulerRotation(const glm::vec3& euler) { localEuler = euler; localRotation = EulerToQuat(euler); dirty = true; }
     inline glm::vec3 GetEulerRotation() const { return localEuler; }
+
+    //inline void SetWorldPosition(const glm::vec3& pos) { worldPosition = pos; dirty = true;  }
+    inline const glm::vec3& GetWorldPosition() const { return worldPosition; }
+
+    //inline void SetWorldRotation(const glm::quat& rot) { worldRotation = rot; dirty = true; }
+    inline const glm::quat& GetWorldRotation() const { return worldRotation; }
+
+    //inline void SetWorldScale(const glm::vec3& scl) { worldScale = scl; dirty = true; }
+    inline const glm::vec3& GetWorldScale() const { return worldScale; }
+
 
     inline void SetScale(const glm::vec3& newScale) 
     {
@@ -118,9 +129,6 @@ public:
         worldRotation = rot;
         worldScale = scl;
     }
-    inline const glm::vec3& GetWorldPosition() const { return worldPosition; }
-    inline const glm::quat& GetWorldRotation() const { return worldRotation; }
-    inline const glm::vec3& GetWorldScale() const { return worldScale; }
 
     std::string Serialize() const 
     {

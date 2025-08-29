@@ -8,7 +8,7 @@
 class MeshImporter 
 {
 public:
-	bool Import(const std::filesystem::path& path, const aiScene* scene);
+	bool Import(const aiScene* scene, const std::filesystem::path& path, std::unordered_map<unsigned int, AssetUUID>& meshMap);
 private:
 	std::vector<Vertex> ProcessVertices(aiMesh* mesh);
 	std::vector<unsigned int> ProcessIndices(aiMesh* mesh);

@@ -5,6 +5,7 @@
 #include <vector>
 #include <algorithm>
 #include <cstdlib>
+#include <Assets/PrefabAsset.h>
 
 static std::filesystem::path s_CurrentDirectory;
 static char s_SearchBuffer[256] = "";
@@ -148,6 +149,18 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
                     if (extension == ".rscene")
                     {
                         engine->GetSceneManager().LoadScene(*engine->GetScene(), entry.path().string());
+                    }
+                    if (extension == ".rprefab")
+                    {
+                        std::string pathStr = entry.path().string();
+                        std::ifstream inFile(pathStr, std::ios::binary);
+                        if (!inFile.is_open()) {
+                            LOG_ERROR("file not opened");
+                            return;
+                        }
+                        AssetHeader header = AssetLoader::ReadHeader(inFile, MAGIC_PREFAB);
+                        std::unique_ptr<PrefabMeta> meta = AssetLoader::ReadMeta<PrefabMeta>(inFile, header);
+                        engine->GetScene()->Instantiate(meta->uuid);
                     }
                     if (extension == ".glsl")
                     {

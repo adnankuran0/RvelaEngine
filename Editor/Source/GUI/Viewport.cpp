@@ -59,7 +59,7 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
         if (selectedEntity != entt::null && engine->GetScene()->GetRegistry().any_of<TransformComponent>(selectedEntity)) {
             auto& tc = engine->GetScene()->GetRegistry().get<TransformComponent>(selectedEntity);
 
-            glm::mat4 transform = tc.GetLocalMatrix();
+            glm::mat4 transform = tc.GetWorldMatrix();
 
             glm::mat4 view = engine->GetCamera()->GetViewMatrix();
             glm::mat4 projection = engine->GetCamera()->projection;
@@ -105,9 +105,33 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
                     glm::value_ptr(rotation),
                     glm::value_ptr(scale));
 
-                tc.SetPosition(translation);
-                tc.SetScale(scale);
-                tc.SetEulerRotation(rotation);
+                if (currentGizmoMode == ImGuizmo::LOCAL) {
+                    // directly set local
+                    tc.SetPosition(translation);
+                    tc.SetScale(scale);
+                    tc.SetEulerRotation(rotation);
+                }
+                else if (currentGizmoMode == ImGuizmo::WORLD) {
+                    glm::mat4 parentWorld(1.0f);
+                    auto& scene = *engine->GetScene();
+                    auto& reg = scene.GetRegistry();
+                    auto& node = reg.get<SceneTreeComponent>(selectedEntity);
+
+                    if (node.parent != entt::null && reg.valid(node.parent)) {
+                        parentWorld = reg.get<TransformComponent>(node.parent).GetWorldMatrix();
+                    }
+
+                    glm::mat4 localM = glm::inverse(parentWorld) * transform;
+
+                    glm::vec3 lPos, lScale, skew;
+                    glm::quat lRot;
+                    glm::vec4 persp;
+                    glm::decompose(localM, lScale, lRot, lPos, skew, persp);
+
+                    tc.SetPosition(lPos);
+                    tc.SetScale(lScale);
+                    tc.SetRotation(lRot);
+                }
             }
         }
 

@@ -32,7 +32,7 @@ void AssetRegistry::ScanAssets(const std::filesystem::path& dir)
             std::ifstream inFile(path, std::ios::binary);
             if (!inFile.is_open()) 
             {
-                LOG_ERROR("Failed to open file: {}", path.string());
+                LOG_ERROR("Failed to open rtex file: {}", path.string());
                 continue;
             }
 
@@ -48,7 +48,7 @@ void AssetRegistry::ScanAssets(const std::filesystem::path& dir)
             std::ifstream inFile(path, std::ios::binary);
             if (!inFile.is_open())
             {
-                LOG_ERROR("Failed to open file: {}", path.string());
+                LOG_ERROR("Failed to open rmat file: {}", path.string());
                 continue;
             }
 
@@ -64,7 +64,7 @@ void AssetRegistry::ScanAssets(const std::filesystem::path& dir)
             std::ifstream inFile(path, std::ios::binary);
             if (!inFile.is_open())
             {
-                LOG_ERROR("Failed to open file: {}", path.string());
+                LOG_ERROR("Failed to open rmesh file: {}", path.string());
                 continue;
             }
 
@@ -80,7 +80,7 @@ void AssetRegistry::ScanAssets(const std::filesystem::path& dir)
             std::ifstream inFile(path, std::ios::binary);
             if (!inFile.is_open())
             {
-                LOG_ERROR("Failed to open file: {}", path.string());
+                LOG_ERROR("Failed to open rprefab file: {}", path.string());
                 continue;
             }
 

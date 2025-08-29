@@ -78,7 +78,7 @@ MeshMeta MeshImporter::CreateMeshMeta(const std::filesystem::path& path, aiMesh*
     return meta;
 }
 
-bool MeshImporter::Import(const std::filesystem::path& path, const aiScene* scene)
+bool MeshImporter::Import(const aiScene* scene, const std::filesystem::path& path, std::unordered_map<unsigned int, AssetUUID>& meshMap)
 {
 
     if (scene->mNumMeshes == 0)
@@ -94,6 +94,8 @@ bool MeshImporter::Import(const std::filesystem::path& path, const aiScene* scen
         std::vector<unsigned int> indices = ProcessIndices(mesh);
         MeshMeta meta = CreateMeshMeta(path, mesh);
 
+        meshMap[meshIndex] = meta.uuid;
+
         std::vector<char> metaBuffer;
         size_t offset = 0;
         meta.Serialize(metaBuffer, offset);
@@ -108,7 +110,6 @@ bool MeshImporter::Import(const std::filesystem::path& path, const aiScene* scen
 
         std::filesystem::path outputPath = path;
         std::string meshName = mesh->mName.C_Str();
-        LOG_DEBUG("Mesh name: {}", meshName);
         if (meshName.empty() || std::all_of(meshName.begin(), meshName.end(), isspace))
         {
             meshName = "Mesh" + std::to_string(meshIndex);
