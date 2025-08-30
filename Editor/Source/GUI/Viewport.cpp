@@ -55,7 +55,6 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
 
 
 
-        // Eğer entity seçiliyse ve transform component varsa
         if (selectedEntity != entt::null && engine->GetScene()->GetRegistry().any_of<TransformComponent>(selectedEntity)) {
             auto& tc = engine->GetScene()->GetRegistry().get<TransformComponent>(selectedEntity);
 
@@ -138,7 +137,7 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
 
 
         // selecing
-        /*
+        
         ImVec2 mousePos = ImGui::GetIO().MousePos;
 
         bool isMouseInViewport =
@@ -171,17 +170,17 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
                     MeshRendererComponent& mrc,
                     MeshComponent& mc) {
 
-                        BoundingBox box = mrc.worldAABB;
+                        AABB& box = mrc.worldAABB;
                         //Frustum culling
                         if (!engine->GetCamera()->Intersects(box)) return;
 
-                        MeshData& mesh = mc.mesh;
+                        Ref<MeshAsset> mesh = mc.GetMesh();
                         glm::mat4 modelMatrix = tc.GetWorldMatrix();
 
-                        for (size_t i = 0; i < mesh.GetTriangleCount(); ++i)
+                        for (size_t i = 0; i < mesh->GetTriangleCount(); ++i)
                         {
                             glm::vec3 v0, v1, v2;
-                            mesh.GetTriangle(i, v0, v1, v2);
+                            mesh->GetTriangle(i, v0, v1, v2);
 
                             v0 = modelMatrix * glm::vec4(v0, 1.0f);
                             v1 = modelMatrix * glm::vec4(v1, 1.0f);
@@ -202,7 +201,7 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
 
 
         }
-        */
+        
     }
     ImGui::End();
     ImGui::PopStyleVar();

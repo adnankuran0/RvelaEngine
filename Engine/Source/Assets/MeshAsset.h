@@ -119,6 +119,22 @@ public:
         return true;
     }
 
+    inline int GetTriangleCount() const
+    {
+        return static_cast<int>(indices.size()) / 3;
+    }
+
+    inline void GetTriangle(int triangleIndex, glm::vec3& v0, glm::vec3& v1, glm::vec3& v2) const
+    {
+        const unsigned int i0 = indices[triangleIndex * 3 + 0];
+        const unsigned int i1 = indices[triangleIndex * 3 + 1];
+        const unsigned int i2 = indices[triangleIndex * 3 + 2];
+
+        v0 = vertices[i0].position;
+        v1 = vertices[i1].position;
+        v2 = vertices[i2].position;
+    }
+
 public:
     AABB localAABB;
     std::vector<Vertex> vertices;

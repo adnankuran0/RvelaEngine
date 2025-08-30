@@ -72,7 +72,8 @@ public:
         glm::vec3 worldMin(std::numeric_limits<float>::max());
         glm::vec3 worldMax(std::numeric_limits<float>::lowest());
 
-        for (int i = 0; i < 8; ++i) {
+        for (int i = 0; i < 8; ++i) 
+        {
             glm::vec3 corner = glm::mix(min, max, corners[i]); 
             glm::vec4 worldPos = worldMatrix * glm::vec4(corner, 1.0f);
             glm::vec3 p(worldPos);

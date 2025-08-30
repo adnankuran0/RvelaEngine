@@ -27,8 +27,8 @@ public:
     Entity LoadPrimitive(const std::string& primitiveMeshName);
 
     template<typename Component, typename... Args>
-    void AddComponent(entt::entity entity, Args&&... args) {
-        m_Registry.emplace<Component>(entity, std::forward<Args>(args)...);
+    Component& AddComponent(entt::entity entity, Args&&... args) {
+        return m_Registry.emplace<Component>(entity, std::forward<Args>(args)...);
     }
 
     template<typename Component>

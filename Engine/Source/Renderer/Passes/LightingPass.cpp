@@ -120,7 +120,9 @@ void LightingPass::Execute()
     shader.setMat4("view", ctx.camera->GetViewMatrix());
     shader.setMat4("projection", ctx.camera->projection);
 
+    size_t drawCallCounter = 0;
     for (auto& command : commands) {
+        
         if (!ctx.camera->Intersects(command.mesh.worldAABB)) continue;
         if (command.isSelected) {
             glEnable(GL_STENCIL_TEST);
@@ -177,10 +179,10 @@ void LightingPass::Execute()
         
         command.mesh.VAO.Bind();
         glDrawElements(GL_TRIANGLES, command.mesh.indexCount, GL_UNSIGNED_INT, 0);
-
-      
-
+        drawCallCounter++;
     }
+
+    //LOG_DEBUG("Draw calls: {}", drawCallCounter);
 
     glBindFramebuffer(GL_READ_FRAMEBUFFER, o_ScreenFBO);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, intermediateFBO);

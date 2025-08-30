@@ -15,6 +15,9 @@ public:
         Load(uuid);
     }
 
+    
+
+
     inline Ref<MeshAsset> GetMesh() { return mesh; }
     inline AssetUUID GetMeshID() const noexcept { return meshUUID; }
 
@@ -39,7 +42,7 @@ public:
         Load(meshUUID);
     }
 
-    inline bool IsDirty() { return isDirty; }
+    inline bool IsDirty() { return isDirty;}
     inline void SetDirty(bool isDirty) { this->isDirty = isDirty; }
 
 private:

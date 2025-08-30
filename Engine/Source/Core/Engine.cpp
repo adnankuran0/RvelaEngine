@@ -44,13 +44,14 @@ void Engine::PopLayer(Layer* layer)
 
 void Engine::Update()
 {
+	m_Scene->Update();
 
 	for (Layer* layer : m_LayerStack)
 	{
 		layer->OnUpdate();
 	}
 
-	m_Scene->Update();
+
 
 
 

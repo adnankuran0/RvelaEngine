@@ -127,7 +127,8 @@ void Scene::UpdateNodeRecursive(entt::entity e, const glm::mat4& parentWorld) {
     if (HasComponent<MeshRendererComponent>(e))
     {
         auto& c = GetComponent<MeshRendererComponent>(e);
-        c.worldAABB = c.localAABB.CalculateWorldAABB(t.GetWorldMatrix());
+        c.worldAABB = c.localAABB.CalculateWorldAABB(worldMat);
+       
     }
 
     t.ClearDirty();
@@ -135,6 +136,9 @@ void Scene::UpdateNodeRecursive(entt::entity e, const glm::mat4& parentWorld) {
     auto& node = GetComponent<SceneTreeComponent>(e);
     for (auto c : node.children)
         UpdateNodeRecursive(c, worldMat);
+
+    
+
 }
 
 void Scene::SetParent(entt::entity child, entt::entity parent) {
@@ -249,7 +253,6 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
 
     unsigned int entityCount = prefab->GetMetaAs<PrefabMeta>()->entityCount;
 
-
     const std::vector<std::byte>& buffer = prefab->GetData();
     const std::byte* ptr = buffer.data();
     const std::byte* end = buffer.data() + buffer.size();
@@ -280,21 +283,20 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
             {
                 DirectionalLightComponent dirComp;
                 DeserializeBin_DirectionalLightComp(ptr, dirComp);
-                AddComponent<DirectionalLightComponent>(e, dirComp);
+                AddComponent<DirectionalLightComponent>(e, std::move(dirComp));
                 break;
             }
             case ComponentType::Material:
             {
                 MaterialComponent matComp;
                 DeserializeBin_MaterialComp(ptr, matComp);
-                AddComponent<MaterialComponent>(e, matComp);
+                AddComponent<MaterialComponent>(e, std::move(matComp));
                 break;
             }
             case ComponentType::Mesh:
             {
-                MeshComponent mshComp;
+                auto& mshComp = AddComponent<MeshComponent>(e);
                 DeserializeBin_MeshComp(ptr, mshComp);
-                AddComponent<MeshComponent>(e, mshComp);
                 break;
             }
             case ComponentType::MeshRenderer:
@@ -313,7 +315,7 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
             {
                 PointLightComponent plgComp;
                 DeserializeBin_PointLightComp(ptr, plgComp);
-                AddComponent<PointLightComponent>(e, plgComp);
+                AddComponent<PointLightComponent>(e, std::move(plgComp));
                 break;
             }
             case ComponentType::SceneTree:

@@ -30,7 +30,10 @@ void RenderLayer::CollectRenderCommands(Scene* scene, const std::function<void(c
 	auto view = scene->GetRegistry().view<TransformComponent, MeshComponent ,MeshRendererComponent, MaterialComponent>();
 	for (auto entity : view)
 	{
-		MeshComponent meshComp = scene->GetComponent<MeshComponent>(entity);
+		
+
+		MeshComponent& meshComp = scene->GetComponent<MeshComponent>(entity);
+		
 		if (meshComp.IsDirty())
 		{
 			scene->GetComponent<MeshRendererComponent>(entity).RecreateFromMesh(meshComp.GetMesh());

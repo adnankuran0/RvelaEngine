@@ -6,7 +6,8 @@
 #include "Assets/MeshAsset.h"
 #include "Core/Ref.h"
 
-struct alignas(16) MeshRendererComponent {
+struct alignas(16) MeshRendererComponent 
+{
 public:
     BufferLayout layout;
     AABB localAABB;
@@ -54,7 +55,8 @@ public:
         EBO.Init(mesh->indices.data(), mesh->indices.size() * sizeof(unsigned int));
         EBO.Bind();
         localAABB = mesh->localAABB;
-        worldAABB = localAABB;
+
+        //worldAABB = localAABB;
     }
 
     void Destroy()
