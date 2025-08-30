@@ -2,16 +2,16 @@
 #include <vector>
 #include <memory>
 #include "RenderPass.h"
-#include "Renderer/Passes/LightingPass.h"
-#include "Renderer/Passes/SkyboxPass.h"
-#include "Renderer/Passes/ShadowPass.h"
-#include "Renderer/Passes/CompositePass.h"
-#include "Renderer/Passes/BrightPass.h"
-#include "Renderer/Passes/BloomPass.h"
-#include "Renderer/Passes/GeometryPass.h"
-#include "Renderer/Passes/SSAOPass.h"
-#include "Renderer/Passes/SSRPass.h"
-#include "Renderer/Passes/OutlinePass.h"
+#include "Rendering/RenderPasses/LightingPass.h"
+#include "Rendering/RenderPasses/SkyboxPass.h"
+#include "Rendering/RenderPasses/ShadowPass.h"
+#include "Rendering/RenderPasses/CompositePass.h"
+#include "Rendering/RenderPasses/BrightPass.h"
+#include "Rendering/RenderPasses/BloomPass.h"
+#include "Rendering/RenderPasses/GeometryPass.h"
+#include "Rendering/RenderPasses/SSAOPass.h"
+#include "Rendering/RenderPasses/SSRPass.h"
+#include "Rendering/RenderPasses/OutlinePass.h"
 
 class RenderPipeline
 {

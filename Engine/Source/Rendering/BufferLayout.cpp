@@ -6,7 +6,7 @@ void BufferLayout::AddVertexBuffer(unsigned int newVBO)
 	stride = 0;
 	strides.push_back(0);
 	m_StrideIndex += 1;
-	bufferStartIndex.push_back(elements.size());
+	bufferStartIndex.push_back(static_cast<unsigned int>(elements.size()));
 	buffers.push_back(newVBO);
 }
 

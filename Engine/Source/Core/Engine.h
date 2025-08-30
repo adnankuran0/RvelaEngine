@@ -9,7 +9,7 @@
 #include "Scene/Entity.h"
 #include "Utils/ProjectManager.h"
 #include "LayerStack.h"
-#include "Renderer/Renderer.h"
+#include "Rendering/Renderer.h"
 #include "Assets/AssetRegistry.h"
 
 class Engine

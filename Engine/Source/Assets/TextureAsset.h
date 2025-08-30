@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Renderer/Texture.h"
+#include "Rendering/Texture.h"
 #include "Core/Ref.h"
 #include "AssetUUID.h"
 #include <string>

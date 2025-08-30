@@ -1,7 +1,7 @@
 ﻿#include "rvelapch.h"
 #include "Engine.h"
 #include "Core/Log.h"
-#include "Renderer/RenderLayer.h"
+#include "Rendering/RenderLayer.h"
 #include <Assets/MeshAsset.h>
 
 Engine* Engine::s_Instance = nullptr;
@@ -50,10 +50,6 @@ void Engine::Update()
 	{
 		layer->OnUpdate();
 	}
-
-
-
-
 
 }
 

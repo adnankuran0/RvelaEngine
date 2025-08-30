@@ -3,9 +3,10 @@
 #include "Core/Ref.h"
 #include "Assets/MaterialAsset.h"
 #include <assimp/scene.h>
+#include "Core/Singleton.h"
 
-class MaterialImporter 
+class MaterialImporter : public Singleton<MaterialImporter>
 {
 public:
-	static Ref<MaterialAsset> CreateMaterialAsset(const std::string& path);
+	Ref<MaterialAsset> CreateMaterialAsset(const std::string& path);
 };

@@ -1,5 +1,5 @@
 #pragma once
-#include "Renderer/Camera.h"
+#include "Rendering/Camera.h"
 #include "Scene/Scene.h"
 
 struct RenderContext

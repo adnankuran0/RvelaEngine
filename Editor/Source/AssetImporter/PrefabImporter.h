@@ -4,14 +4,16 @@
 #include "Assets/PrefabAsset.h"
 #include "Scene/Scene.h"
 #include "Utils/Serializer.h"
+#include "Core/Singleton.h"
 
-class PrefabImporter
+
+class PrefabImporter : public Singleton<PrefabImporter>
 {
 public:
 
-    static Ref<PrefabAsset> CreatePrefabAsset(const std::string& path, Scene& scene, entt::entity& rootEntity);
+    Ref<PrefabAsset> CreatePrefabAsset(const std::string& path, Scene& scene, entt::entity& rootEntity);
 private:
-    static void SerializeEntityRecursively(entt::entity& e, Scene& scene, std::vector<std::byte>& buffer,json& j);
-    static unsigned int GetComponentCount(Scene& scene, entt::entity& entity);
-    static unsigned int CountEntitiesRecursively(Scene& scene, entt::entity e);
+    void SerializeEntityRecursively(entt::entity& e, Scene& scene, std::vector<std::byte>& buffer,json& j);
+    unsigned int GetComponentCount(Scene& scene, entt::entity& entity);
+    unsigned int CountEntitiesRecursively(Scene& scene, entt::entity e);
 };

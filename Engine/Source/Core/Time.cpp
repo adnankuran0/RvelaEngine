@@ -15,26 +15,26 @@ int Time::frameCount = 0;
 
 void Time::Update() noexcept
 {
-    double currentFrameTime = glfwGetTime() * 1000.0;
+    float currentFrameTime = static_cast<float>(glfwGetTime()) * 1000.0f;
 
-    double frameTimeTarget = (maxFPS == 0) ? 0.0 : (1000.0 / maxFPS);
+    float frameTimeTarget = (maxFPS == 0) ? 0.0f : (1000.0f / maxFPS);
 
-    double timeElapsed = currentFrameTime - lastFrameTime;
+    float timeElapsed = currentFrameTime - lastFrameTime;
 
     while (timeElapsed < frameTimeTarget)
     {
-        currentFrameTime = glfwGetTime() * 1000.0;
+        currentFrameTime = static_cast<float>(glfwGetTime()) * 1000.0f;
         timeElapsed = currentFrameTime - lastFrameTime;
     }
 
-    deltaTime = (currentFrameTime - lastFrameTime) / 1000.0;
+    deltaTime = (currentFrameTime - lastFrameTime) / 1000.0f;
     lastFrameTime = currentFrameTime;
 
     // Update FPS
     frameCount++;
     if (currentFrameTime - lastFpsUpdateTime >= fpsUpdateTime)
     {
-        fps = static_cast<float>(frameCount) * (1000.0 / (currentFrameTime - lastFpsUpdateTime));
+        fps = static_cast<float>(frameCount) * (1000.0f / (currentFrameTime - lastFpsUpdateTime));
         frameCount = 0;
         lastFpsUpdateTime = currentFrameTime;
     }

@@ -31,18 +31,18 @@ public:
 	inline glm::vec2 GetUVOffset() const noexcept { return material->UVOffset; }
 	inline void SetUVOffset(const glm::vec2& UVOffset) noexcept { material->UVOffset = UVOffset; }
 
-	bool IsUsingAlbedoMap() const noexcept { return material->useAlbedoMap; }
-	void SetUseAlbedoMap(bool value) noexcept { material->useAlbedoMap = value; }
-	bool IsUsingNormalMap() const noexcept { return material->useNormalMap; }
-	void SetUseNormalMap(bool value) noexcept { material->useNormalMap = value; }
-	bool IsUsingMetallicMap() const noexcept { return material->useMetallicMap; }
-	void SetUseMetallicMap(bool value) noexcept { material->useMetallicMap = value; }
-	bool IsUsingRoughnessMap() const noexcept { return material->useRoughnessMap; }
-	void SetUseRoughnessMap(bool value) noexcept { material->useRoughnessMap = value; }
-	bool IsUsingAOMap() const noexcept { return material->useAOMap; }
-	void SetUseAOMap(bool value) noexcept { material->useAOMap = value; }
-	bool IsUsingHeightMap() const noexcept { return material->useHeightMap; }
-	void SetUseHeightMap(bool value) noexcept { material->useHeightMap = value; }
+	inline bool IsUsingAlbedoMap() const noexcept { return material->useAlbedoMap; }
+	inline void SetUseAlbedoMap(bool value) noexcept { material->useAlbedoMap = value; }
+	inline bool IsUsingNormalMap() const noexcept { return material->useNormalMap; }
+	inline void SetUseNormalMap(bool value) noexcept { material->useNormalMap = value; }
+	inline bool IsUsingMetallicMap() const noexcept { return material->useMetallicMap; }
+	inline void SetUseMetallicMap(bool value) noexcept { material->useMetallicMap = value; }
+	inline bool IsUsingRoughnessMap() const noexcept { return material->useRoughnessMap; }
+	inline void SetUseRoughnessMap(bool value) noexcept { material->useRoughnessMap = value; }
+	inline bool IsUsingAOMap() const noexcept { return material->useAOMap; }
+	inline void SetUseAOMap(bool value) noexcept { material->useAOMap = value; }
+	inline bool IsUsingHeightMap() const noexcept { return material->useHeightMap; }
+	inline void SetUseHeightMap(bool value) noexcept { material->useHeightMap = value; }
 
 	inline Ref<TextureAsset> GetAlbedoTexture() const { return albedoTexture; }
 	inline void SetAlbedoTexture(const AssetUUID& textureUIID)
@@ -94,62 +94,12 @@ public:
 
 	inline const AssetUUID& GetMaterialID() const noexcept{ return materialUUID; }
 
-	std::string Serialize() const
-	{
-		json j;
-		j["material"] = materialUUID.ToString();
-		material->Serialize();
-		return j.dump(4);
-	}
-	void Deserialize(const std::string& jsonStr)
-	{
-		json j = json::parse(jsonStr);
-		std::string materialUUIDstr = j["material"];
-		materialUUID = AssetUUID::FromString(materialUUIDstr);
-		Load(materialUUID);
-
-	}
+	std::string Serialize() const;
+	void Deserialize(const std::string& jsonStr);
 
 private:
 
-	void Load(const AssetUUID& uuid)
-	{
-		if (!uuid.IsValid())
-		{
-			LOG_WARN("Material UUID is not valid!");
-			return;
-		}
-		materialUUID = uuid;
-
-		// Clear existing
-		material.Reset();
-		albedoTexture.Reset();
-		normalTexture.Reset();
-		metallicTexture.Reset();
-		roughnessTexture.Reset();
-		aoTexture.Reset();
-		heightTexture.Reset();
-		
-		material = AssetRegistry::GetAsset<MaterialAsset>(materialUUID);
-		if (!material)
-		{
-			LOG_ERROR("Material asset not found for UUID {}", materialUUID.ToString());
-			return;
-		}
-		if(material->useAlbedoMap)
-			albedoTexture = AssetRegistry::GetAsset<TextureAsset>(material->albedoTextureUUID);
-		if(material->useNormalMap)
-			normalTexture = AssetRegistry::GetAsset<TextureAsset>(material->normalTextureUUID);
-		if(material->useMetallicMap)
-			metallicTexture = AssetRegistry::GetAsset<TextureAsset>(material->metallicTextureUUID);
-		if(material->useRoughnessMap)
-			roughnessTexture = AssetRegistry::GetAsset<TextureAsset>(material->roughnessTextureUUID);
-		if(material->useAOMap)
-			aoTexture = AssetRegistry::GetAsset<TextureAsset>(material->aoTextureUUID);
-		if (material->useHeightMap)
-			heightTexture = AssetRegistry::GetAsset<TextureAsset>(material->heightTextureUUID);
-		
-	}
+	void Load(const AssetUUID& uuid);
 
 	Ref<TextureAsset> albedoTexture;
 	Ref<TextureAsset> normalTexture;

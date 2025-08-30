@@ -86,7 +86,7 @@ void MenuBar::Draw(Engine* engine, AssetImporterRegistry& assetImporter)
                     if (ofs.is_open())
                     {
                         ofs.close();
-                        MaterialImporter::CreateMaterialAsset(file);
+                        MaterialImporter::Get().CreateMaterialAsset(file);
                         AssetRegistry::ScanAssets();
                     }
                 }

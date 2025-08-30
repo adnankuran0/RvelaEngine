@@ -15,52 +15,28 @@ public:
         Load(uuid);
     }
 
-    
-
-
     inline Ref<MeshAsset> GetMesh() { return mesh; }
     inline AssetUUID GetMeshID() const noexcept { return meshUUID; }
 
 
-    inline void SetMesh(const AssetUUID& uuid)
+    inline void SetMesh(const AssetUUID& uuid) noexcept
     {
         Load(uuid);
         isDirty = true;
     }
 
-    std::string Serialize() const 
-{
-        json j;
-        j["mesh"] = meshUUID.ToString();
-        return j.dump(4);
-    }
+    std::string Serialize() const;
+    void Deserialize(const std::string& str);
 
-    void Deserialize(const std::string& str) 
-    {
-        json j = json::parse(str);
-        meshUUID = AssetUUID::FromString(j["mesh"]);
-        Load(meshUUID);
-    }
-
-    inline bool IsDirty() { return isDirty;}
-    inline void SetDirty(bool isDirty) { this->isDirty = isDirty; }
+    inline bool IsDirty() noexcept { return isDirty;}
+    inline void SetDirty(bool isDirty) noexcept { this->isDirty = isDirty; }
 
 private:
-    inline void Load(const AssetUUID& uuid)
-    {
-        if (!uuid.IsValid())
-        {
-            LOG_WARN("Material UUID is not valid!");
-            return;
-        }
-        meshUUID = uuid;
-        mesh.Reset();
-        mesh = AssetRegistry::GetAsset<MeshAsset>(meshUUID);
-    }
+    void Load(const AssetUUID& uuid);
 
+private:
     Ref<MeshAsset> mesh;
     AssetUUID meshUUID;
-
     bool isDirty = false;
 };
 

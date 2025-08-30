@@ -147,7 +147,7 @@ void SceneHierarchyPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                 if (ofs.is_open())
                 {
                     ofs.close();
-                    PrefabImporter::CreatePrefabAsset(file, *scene, selectedEntity);
+                    PrefabImporter::Get().CreatePrefabAsset(file, *scene, selectedEntity);
                     AssetRegistry::ScanAssets();
                 }
             }

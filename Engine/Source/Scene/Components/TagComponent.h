@@ -10,18 +10,7 @@ public:
     TagComponent() = default;
     TagComponent(const std::string& tag) : tag(tag) {}
 
-    std::string Serialize() const 
-    {
-        json j;
-        j["tag"] = tag;
-
-        return j.dump(4);
-    }
-    void Deserialize(const std::string& jsonStr) 
-    {
-        json j = json::parse(jsonStr);
-        auto tagData = j["tag"];
-        tag = tagData;
-    }
+    std::string Serialize() const;
+    void Deserialize(const std::string& jsonStr);
 
 };

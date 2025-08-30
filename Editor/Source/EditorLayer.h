@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Layer.h"
-#include "Renderer/EditorCamera.h"
+#include "Rendering/EditorCamera.h"
 #include "Core/Engine.h"
 #include "AssetImporter/AssetImporterRegistry.h"
 #include "ImGui/imgui.h"

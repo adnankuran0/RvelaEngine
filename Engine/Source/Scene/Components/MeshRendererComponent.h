@@ -1,7 +1,7 @@
 #pragma once
-#include "Renderer/VertexArray.h"
-#include "Renderer/VertexBuffer.h"
-#include "Renderer/ElementBuffer.h"
+#include "Rendering/VertexArray.h"
+#include "Rendering/VertexBuffer.h"
+#include "Rendering/ElementBuffer.h"
 #include <Scene/AABB.h>
 #include "Assets/MeshAsset.h"
 #include "Core/Ref.h"
@@ -27,50 +27,20 @@ public:
         RecreateFromMesh(mesh);
     }
 
-    void RecreateFromMesh(Ref<MeshAsset> mesh)
-    {
-        Destroy();
+    void RecreateFromMesh(Ref<MeshAsset> mesh);
 
-        std::vector<float> packedVertices;
-        PackVertices(mesh->vertices, packedVertices);
-
-        indexCount = (unsigned int)mesh->indices.size();
-
-        VAO.Init();
-        VAO.Bind();
-
-        VBO.Init(packedVertices.data(), packedVertices.size() * sizeof(float));
-        VBO.Bind();
-
-        layout = BufferLayout(); // Reset layout before pushing again
-        layout.BindVertexBuffer(VBO.getID());
-        layout.Push<float>(3); // Position
-        layout.Push<float>(3); // Normal
-        layout.Push<float>(3); // Tangent
-        layout.Push<float>(3); // Bitangent
-        layout.Push<float>(2); // UV
-
-        VAO.SetBufferLayout(layout);
-
-        EBO.Init(mesh->indices.data(), mesh->indices.size() * sizeof(unsigned int));
-        EBO.Bind();
-        localAABB = mesh->localAABB;
-
-        //worldAABB = localAABB;
-    }
-
-    void Destroy()
+    inline void Destroy() noexcept
     {
         VAO.Destroy();
         VBO.Destroy();
         EBO.Destroy();
     }
 
-    inline bool IsCastShadow() const { return castShadow; }
-    inline void SetCastShadow(bool isCastsShadow) { castShadow = isCastsShadow; }
+    inline bool IsCastShadow() const noexcept { return castShadow; }
+    inline void SetCastShadow(bool isCastsShadow) noexcept { castShadow = isCastsShadow; }
 
-    inline bool IsDoubleSided() const { return isDoubleSided; }
-    inline void SetDoubleSided(bool isDoubleSided) { this->isDoubleSided = isDoubleSided; }
+    inline bool IsDoubleSided() const noexcept { return isDoubleSided; }
+    inline void SetDoubleSided(bool isDoubleSided) noexcept { this->isDoubleSided = isDoubleSided; }
  private:
     bool castShadow = true;
     bool isDoubleSided = false;

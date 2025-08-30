@@ -1,6 +1,6 @@
 #pragma once
-#include "Renderer/RenderPass.h"
-#include "Renderer/Renderer.h"
+#include "Rendering/RenderPass.h"
+#include "Rendering/Renderer.h"
 
 class GeometryPass : public RenderPass
 {

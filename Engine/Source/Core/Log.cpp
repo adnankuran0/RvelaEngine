@@ -6,7 +6,7 @@ std::shared_ptr<spdlog::logger> RvelaLog::s_Logger;
 void RvelaLog::Init(const std::string& filePath)
 {
     auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-    consoleSink->set_pattern("[%^%l%$] %v"); // örnek: [INFO] mesaj
+    consoleSink->set_pattern("[%^%l%$] %v");
 
     auto fileSink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
         filePath, 1024 * 1024, 5);

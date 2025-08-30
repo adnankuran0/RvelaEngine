@@ -5,7 +5,7 @@
 #include "Components.h"
 #include "Math/RvelaMath.h"
 #include "Utils/ISerializable.h"
-#include "Renderer/Renderer.h"
+#include "Rendering/Renderer.h"
 
 class Entity; // Forward Declaration
 

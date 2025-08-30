@@ -1,8 +1,8 @@
 #include "Core/Engine.h"
 #include "Core/Layer.h"
-#include "Renderer/Passes/LightingPass.h"
-#include "Renderer/Passes/SkyboxPass.h"
-#include "Renderer/Passes/ShadowPass.h"
+#include "Rendering/RenderPasses/LightingPass.h"
+#include "Rendering/RenderPasses/SkyboxPass.h"
+#include "Rendering/RenderPasses/ShadowPass.h"
 #include "RenderContext.h"
 #include "RenderPipeline.h"
 

@@ -17,26 +17,7 @@ public:
     float innerCutoff = glm::cos(glm::radians(15.0f));
     float outerCutoff = glm::cos(glm::radians(30.0f));
 
-    std::string Serialize() const 
-    {
-        json j;
-        j["color"] = { color.r,color.g,color.b };
-        j["intensity"] = intensity;
-        j["radius"] = radius;
-        j["innerCutoff"] = innerCutoff;
-        j["outerCutoff"] = outerCutoff;
-        return j.dump(4);
-    }
-
-    void Deserialize(const std::string& jsonStr) 
-    {
-        json j = json::parse(jsonStr);
-        auto colorData = j["color"];
-        color = glm::vec3(colorData[0], colorData[1], colorData[2]);
-        intensity = j["intensity"];
-        radius = j["radius"];
-        innerCutoff = j["innerCutoff"];
-        outerCutoff = j["outerCutoff"];
-    }
+    std::string Serialize() const;
+    void Deserialize(const std::string& jsonStr);
 
 };

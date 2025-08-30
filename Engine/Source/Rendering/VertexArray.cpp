@@ -28,7 +28,7 @@ void VertexArray::Destroy() const
 void VertexArray::SetBufferLayout(const BufferLayout& layout)
 {
 	unsigned int currentBuffer = 0;
-	unsigned int totalBufferCount = layout.bufferStartIndex.size();
+	size_t totalBufferCount = layout.bufferStartIndex.size();
 	glBindBuffer(GL_ARRAY_BUFFER, layout.buffers[0]);
 
 	for (unsigned int i = 0; i < layout.elements.size(); i++)
@@ -41,7 +41,14 @@ void VertexArray::SetBufferLayout(const BufferLayout& layout)
 		}
 
 		glEnableVertexAttribArray(i);
-		glVertexAttribPointer(i, layout.elements[i].count, GL_FLOAT, GL_FALSE, layout.strides[currentBuffer], (void*)layout.elements[i].offset);
+		glVertexAttribPointer(
+			i,
+			layout.elements[i].count,
+			GL_FLOAT,
+			GL_FALSE,
+			layout.strides[currentBuffer],
+			reinterpret_cast<void*>(static_cast<uintptr_t>(layout.elements[i].offset))
+		);
 		if (layout.elements[i].divisor != 0)
 			glVertexAttribDivisor(i, layout.elements[i].divisor);
 	}
