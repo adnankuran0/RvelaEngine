@@ -35,20 +35,6 @@ void Serializer::LoadFromFile(ISerializable& obj, const std::string& path)
 	obj.Deserialize(str.c_str());
 }
 
-template<typename T>
-void SerializeBinComponent(const T& comp, ComponentType type, std::vector<std::byte>& out, auto writeFunc)
-{
-	std::vector<std::byte> tempOut;
-	writeFunc(comp, tempOut);  
-
-	ComponentHeader header;
-	header.type = static_cast<uint16_t>(type);
-	header.size = static_cast<uint32_t>(tempOut.size());
-
-	WriteToBuffer(out, header);
-	out.insert(out.end(), tempOut.begin(), tempOut.end());
-}
-
 void SerializeBin_DirectionalLightComp(const DirectionalLightComponent& comp, std::vector<std::byte>& out)
 {
 	std::vector<std::byte> tempOut;
@@ -88,12 +74,6 @@ void DeserializeBin_DirectionalLightComp(const std::byte*& cursor, DirectionalLi
 	comp.castShadows = (castShadows != 0);
 	comp.reverseCullFace = (reverseCull != 0);
 }
-void SerializeJson_DirectionalLightComp(const DirectionalLightComponent& comp, json& j)
-{
-	j["color"] = { comp.color.r,comp.color.g,comp.color.b };
-	j["intensity"] = comp.intensity;
-	j["castShadows"] = comp.castShadows;
-}
 
 void SerializeBin_MaterialComp(const MaterialComponent& comp, std::vector<std::byte>& out)
 {
@@ -116,10 +96,6 @@ void DeserializeBin_MaterialComp(const std::byte*& cursor, MaterialComponent& co
 	ReadBytesFromBuffer(cursor, reinterpret_cast<char*>(&raw), sizeof(UUIDv4::UUID));
 	comp.SetMaterial(AssetUUID(raw));
 }
-void SerializeJson_MaterialComp(const MaterialComponent& comp, json& j)
-{
-	j["materialID"] = comp.GetMaterialID().ToString();
-}
 
 void SerializeBin_MeshComp(const MeshComponent& comp, std::vector<std::byte>& out)
 {
@@ -141,10 +117,6 @@ void DeserializeBin_MeshComp(const std::byte*& cursor, MeshComponent& comp)
 	UUIDv4::UUID raw;
 	ReadBytesFromBuffer(cursor, reinterpret_cast<char*>(&raw), 16);
 	comp.SetMesh(AssetUUID(raw));
-}
-void SerializeJson_MeshComp(const MeshComponent& comp, json& j)
-{
-	j["meshID"] = comp.GetMeshID().ToString();
 }
 
 void SerializeBin_MeshRendererComp(const MeshRendererComponent& comp, std::vector<std::byte>& out)
@@ -171,11 +143,6 @@ void DeserializeBin_MeshRendererComp(const std::byte*& cursor, MeshRendererCompo
 
 	comp.SetCastShadow(castShadow != 0);
 	comp.SetDoubleSided(doubleSided != 0);
-}
-void SerializeJson_MeshRendererComp(const MeshRendererComponent& comp, json& j)
-{
-	j["isCastShadow"] = comp.IsCastShadow();
-	j["isDoubleSided"] = comp.IsDoubleSided();
 }
 
 void SerializeBin_PointLightComp(const PointLightComponent& comp, std::vector<std::byte>& out)
@@ -220,17 +187,6 @@ void DeserializeBin_PointLightComp(const std::byte*& cursor, PointLightComponent
 	comp.castShadows = (castShadows != 0);
 	comp.reverseCullFace = (reverseCull != 0);
 }
-void SerializeJson_PointLightComp(const PointLightComponent& comp, json& j)
-{
-	j["color"] = { comp.color.r, comp.color.g, comp.color.b };
-	j["intensity"] = comp.intensity;
-	j["radius"] = comp.radius;
-	j["falloff"] = comp.falloff;
-	j["blurRadius"] = comp.blurRadius;
-	j["shadowBias"] = comp.shadowBias;
-	j["castShadows"] = comp.castShadows;
-	j["reverseCullFace"] = comp.reverseCullFace;
-}
 
 void SerializeBin_SceneTreeComp(const SceneTreeComponent& comp, std::vector<std::byte>& out)
 {
@@ -250,17 +206,8 @@ void DeserializeBin_SceneTreeComp(const std::byte*& cursor, SceneTreeComponent& 
 {
 	ReadFromBuffer(cursor, comp.parentUUID);
 }
-void SerializeJson_SceneTreeComp(const SceneTreeComponent& comp, json& j)
-{
-	j["parentUUID"] = comp.parentUUID;
-	j["childrenUUIDs"] = comp.childrenUUIDs;
-}
 
 void SerializeBin_SpotLightComp(const SpotLightComponent& comp, std::ostream& out)
-{
-
-}
-void SerializeJson_SpotLightComp(const SpotLightComponent& comp)
 {
 
 }
@@ -288,10 +235,6 @@ void DeserializeBin_TagComp(const std::byte*& cursor, TagComponent& comp)
 
 	comp.tag.resize(len);
 	ReadBytesFromBuffer(cursor, comp.tag.data(), len);
-}
-void SerializeJson_TagComp(const TagComponent& comp, json& j)
-{
-	j["tag"] = comp.tag;
 }
 
 void SerializeBin_TransformComp(const TransformComponent& comp, std::vector<std::byte>& out)
@@ -334,18 +277,6 @@ void DeserializeBin_TransformComp(const std::byte*& cursor, TransformComponent& 
 	comp.SetLockScaleRatio(lockScale != 0);
 	comp.SetDirty();
 }
-void SerializeJson_TransformComp(const TransformComponent& comp, json& j)
-{
-	glm::vec3 pos = comp.GetPosition();
-	glm::vec3 euler = comp.GetEulerRotation();
-	glm::vec3 scale = comp.GetScale();
-	bool lockScale = comp.IsScaleRatioLocked();
-
-	j["position"] = { pos.x, pos.y, pos.z };
-	j["rotation"] = { euler.x, euler.y, euler.z };
-	j["scale"] = { scale.x, scale.y, scale.z };
-	j["lockScaleRatio"] = lockScale;
-}
 
 void SerializeBin_UUIDComp(const UUIDComponent& comp, std::vector<std::byte>& out)
 {
@@ -365,8 +296,25 @@ void DeserializeBin_UUIDComp(const std::byte*& cursor, UUIDComponent& comp)
 {
 	ReadFromBuffer(cursor, comp.uuid);
 }
-void SerializeJson_UUIDComp(const UUIDComponent& comp, json& j)
-{
-	j["uuid"] = comp.uuid;
-}
 
+void SerializeBin_PrefabComp(const PrefabComponent& comp, std::vector<std::byte>& out)
+{
+	std::vector<std::byte> tempOut;
+
+	const UUIDv4::UUID& raw = comp.GetPrefabID().Raw();
+	WriteBytesToBuffer(tempOut, reinterpret_cast<const char*>(&raw), sizeof(UUIDv4::UUID));
+
+	size_t payloadSize = tempOut.size();
+
+	ComponentHeader header;
+	header.type = static_cast<uint16_t>(ComponentType::Mesh);
+	header.size = static_cast<uint32_t>(payloadSize);
+	WriteToBuffer(out, header);
+	out.insert(out.end(), tempOut.begin(), tempOut.end());
+}
+void DeserializeBin_PrefabComp(const std::byte*& cursor, PrefabComponent& comp)
+{
+	UUIDv4::UUID raw;
+	ReadBytesFromBuffer(cursor, reinterpret_cast<char*>(&raw), 16);
+	comp.SetPrefabID(AssetUUID(raw));
+}

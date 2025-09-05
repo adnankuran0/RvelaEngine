@@ -33,44 +33,80 @@ void SceneHierarchyPanel::Draw(Scene* scene, entt::entity& selectedEntity)
         return children;
         };
 
+
     // Entity ağaç yapısını çizen rekürsif fonksiyon
     std::function<void(entt::entity)> DrawEntityNode = [&](entt::entity entity) {
         auto children = getChildren(entity);
-        bool isLeaf = children.empty(); // Çocuk yoksa yaprak (leaf) düğüm
+        bool isLeaf = children.empty();
         ImGuiTreeNodeFlags flags = isLeaf ? ImGuiTreeNodeFlags_Leaf : 0;
-        flags |= ImGuiTreeNodeFlags_OpenOnArrow; // Okla açma seçeneği
+        flags |= ImGuiTreeNodeFlags_OpenOnArrow;
 
-        // Eğer bu varlık seçiliyse, ImGuiTreeNodeFlags_Selected bayrağını ekle
         if (entity == selectedEntity) {
             flags |= ImGuiTreeNodeFlags_Selected;
         }
 
         auto& tagComponent = scene->GetComponent<TagComponent>(entity);
         std::string nodeId = tagComponent.tag + "##" + std::to_string((uint32_t)entity);
+
+        // check for PrefabComponent
+        bool isPrefab = scene->HasComponent<PrefabComponent>(entity);
+        if (isPrefab) {
+            // light blue color
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.75f, 1.0f, 1.0f));
+        }
+
         bool nodeOpen = ImGui::TreeNodeEx(nodeId.c_str(), flags);
 
-        // Sol veya sağ tıkla entity seçimi
+        if (isPrefab) {
+            ImGui::PopStyleColor();
+        }
+
         if (ImGui::IsItemClicked(ImGuiMouseButton_Left) || ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
             selectedEntity = entity;
         }
 
-        // Sağ tıkla açılan entity'ye özel menü
         if (ImGui::BeginPopupContextItem()) {
             if (ImGui::MenuItem("Delete Entity")) {
                 scene->DestroyEntity(entity);
                 if (selectedEntity == entity) selectedEntity = entt::null;
             }
-            
             ImGui::EndPopup();
         }
 
-        // Çocukları varsa, açıldığında onları da çiz
-        if (nodeOpen) {
-            for (auto child : children) {
-                DrawEntityNode(child);
+        if (nodeOpen) 
+        {
+            if (!isPrefab) 
+            {
+                for (auto child : children) 
+                {
+                    DrawEntityNode(child);
+                }
             }
             ImGui::TreePop();
         }
+
+
+        // drag source
+        if (ImGui::BeginDragDropSource()) {
+            entt::entity e = entity;
+            ImGui::SetDragDropPayload("ENTITY_DRAG", &e, sizeof(entt::entity));
+            ImGui::Text("%s", tagComponent.tag.c_str());
+            ImGui::EndDragDropSource();
+        }
+
+        // drag target
+        if (ImGui::BeginDragDropTarget()) {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY_DRAG")) {
+                entt::entity child = *(entt::entity*)payload->Data;
+
+                // self veya kendi çocuğuna bırakmayı engelle
+                if (child != entity) {
+                    scene->SetParent(child, entity);
+                }
+            }
+            ImGui::EndDragDropTarget();
+        }
+
         };
 
     // Tüm root entity'leri çiz
@@ -124,16 +160,6 @@ void SceneHierarchyPanel::Draw(Scene* scene, entt::entity& selectedEntity)
             ImGui::EndMenu();
         }
 
-        if (ImGui::MenuItem("Load Asset")) {
-            const char* filterPatterns[] = { "*.fbx", "*.obj", "*.gltf", "*.glb" };
-            const char* filePath = tinyfd_openFileDialog("Select a file", "", 4, filterPatterns, NULL, 0);
-
-            std::string file = filePath ? std::string(filePath) : "";
-            if (!file.empty())
-            {
-                //selectedEntity = scene->LoadAsset(file);
-            }
-        }
         if (ImGui::MenuItem("Save as prefab"))
         {
             if (selectedEntity == entt::null) return;
@@ -147,10 +173,23 @@ void SceneHierarchyPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                 if (ofs.is_open())
                 {
                     ofs.close();
-                    PrefabImporter::Get().CreatePrefabAsset(file, *scene, selectedEntity);
+                    PrefabImporter::CreatePrefabAsset(file, *scene, selectedEntity);
                     AssetRegistry::ScanAssets();
                 }
             }
+        }
+
+        if (scene->HasComponent<PrefabComponent>(selectedEntity))
+        {
+            if (ImGui::MenuItem("Resolve prefab"))
+            {
+                scene->RemoveComponent<PrefabComponent>(selectedEntity);
+            }
+        }
+
+        if (ImGui::MenuItem("Detach from parent")) {
+
+            scene->RemoveParent(selectedEntity);
         }
 
         if (ImGui::MenuItem("Delete Entity")) {

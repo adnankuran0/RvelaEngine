@@ -259,8 +259,7 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
 
     std::unordered_map<EntityUUID, Entity> uuidToEntity;
 
-
-    Entity rootEntity = CreateEntity(std::to_string(entityCount));
+    Entity rootEntity;
 
     for (unsigned int i = 0; i < entityCount; i++)
     {
@@ -354,6 +353,7 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
         }
     }
 
+    // setup hierarchy
     for (auto& [uuid, entity] : uuidToEntity)
     {
         if (!HasComponent<SceneTreeComponent>(entity)) continue;
@@ -367,6 +367,24 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
             pnode.children.push_back(entity);
         }
     }
+
+    // find root node
+    for (auto& [uuid, entity] : uuidToEntity)
+    {
+        if (!HasComponent<SceneTreeComponent>(entity))
+            continue;
+
+        auto& tree = GetComponent<SceneTreeComponent>(entity);
+        if (tree.parentUUID == 0) 
+        {
+            rootEntity = entity;
+            break;
+        }
+    }
+
+    
+
+    AddComponent<PrefabComponent>(rootEntity, prefabUUID);
 
     UpdateHierarchy();
     return rootEntity;

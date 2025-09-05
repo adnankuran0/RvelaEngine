@@ -6263,3 +6263,157 @@
 [info] Engine has started!
 [info] Final texture ID: 26
 [info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Mesh [Torus] imported to: C:\RvelaEngine\TestProject\Assets\Models\Untitled_Torus.rmesh (2304 vertices, 3456 indices) UUID: d0295ab0-a73a-4d0e-81c0-a06f6ee947d7
+[info] Mesh [Cube.002] imported to: C:\RvelaEngine\TestProject\Assets\Models\Untitled_Cube.002.rmesh (24 vertices, 36 indices) UUID: d581b681-d3b5-41e5-b855-2dca1193c6de
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 576.88
+[info] Engine has started!
+[info] Final texture ID: 26
+[info] Engine has stopped!

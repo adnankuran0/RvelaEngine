@@ -19,7 +19,7 @@ public:
     Singleton& operator=(Singleton&&) = delete;
 
 protected:
-    Singleton() noexcept 
+    Singleton() 
     {
         assert(!s_Instance && "Only one instance allowed");
         s_Instance = static_cast<T*>(this);

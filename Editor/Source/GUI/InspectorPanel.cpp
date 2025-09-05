@@ -5,7 +5,14 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
 {
 
     entt::registry& registry = scene->GetRegistry();
-    ImGui::Begin("Inspector", nullptr, ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse);
+    ImGui::Begin("Properties", nullptr, ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse);
+
+    
+    if (ImGui::BeginTabBar("PropertiesTabs"))
+    {
+    if (ImGui::BeginTabItem("Inspector"))
+    {
+        
 
     if (selectedEntity != entt::null) {
         ImGui::Text("Selected Entity: %u", (uint32_t)selectedEntity);
@@ -236,7 +243,7 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                     }
 
 
-                    if (ImGui::ColorPicker3("Albedo", color))
+                    if (ImGui::ColorEdit3("Albedo", color))
                     {
                         material.SetAlbedoColor(glm::vec3(color[0], color[1], color[2]));
                         //Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath().GetAbsoluteStr());
@@ -455,6 +462,16 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
     else {
         ImGui::Text("No entity selected.");
     }
+    ImGui::EndTabItem();
+    }
 
+    if (ImGui::BeginTabItem("Environment"))
+    {
+        ImGui::Text("Environment settings go here.");
+        ImGui::EndTabItem();
+    }
+
+    ImGui::EndTabBar();
+    }
     ImGui::End();
 }

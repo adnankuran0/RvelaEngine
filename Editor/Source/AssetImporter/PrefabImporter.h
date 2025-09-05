@@ -7,13 +7,13 @@
 #include "Core/Singleton.h"
 
 
-class PrefabImporter : public Singleton<PrefabImporter>
+class PrefabImporter 
 {
 public:
 
-    Ref<PrefabAsset> CreatePrefabAsset(const std::string& path, Scene& scene, entt::entity& rootEntity);
+    static Ref<PrefabAsset> CreatePrefabAsset(const std::string& path, Scene& scene, entt::entity& rootEntity);
 private:
-    void SerializeEntityRecursively(entt::entity& e, Scene& scene, std::vector<std::byte>& buffer,json& j);
-    unsigned int GetComponentCount(Scene& scene, entt::entity& entity);
-    unsigned int CountEntitiesRecursively(Scene& scene, entt::entity e);
+    static void SerializeEntityRecursively(entt::entity& e, Scene& scene, std::vector<std::byte>& buffer,json& j);
+    static unsigned int GetComponentCount(Scene& scene, entt::entity& entity);
+    static unsigned int CountEntitiesRecursively(Scene& scene, entt::entity e);
 };

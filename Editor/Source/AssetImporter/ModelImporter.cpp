@@ -171,7 +171,7 @@ AssetUUID ModelImporter::ConstructPrefab(const aiScene* scene, const std::filesy
     std::filesystem::path prefabPath = modelPath;
     prefabPath.replace_extension(".rprefab");
 
-    Ref<PrefabAsset> prefab = PrefabImporter::Get().CreatePrefabAsset(prefabPath.string(), prefabScene, rootEntity);
+    Ref<PrefabAsset> prefab = PrefabImporter::CreatePrefabAsset(prefabPath.string(), prefabScene, rootEntity);
     return prefab->GetUUID();
 }
 
