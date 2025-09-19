@@ -12,18 +12,22 @@
 #include "Rendering/RenderPasses/SSAOPass.h"
 #include "Rendering/RenderPasses/SSRPass.h"
 #include "Rendering/RenderPasses/OutlinePass.h"
+#include "Core/Engine.h"
 
 class RenderPipeline
 {
 public:
 
-	RenderPipeline();
+	RenderPipeline(Engine* engine);
 	void EnsureInitialized();
 	void SetRenderContext(const RenderContext& context);
 	void SubmitRenderCommand(const RenderCommand& cmd);
+	[[nodiscard]] inline GLuint GetFinalTexture() noexcept { return compositePass.GetFinalTexture(); }
 	void Execute();
 
 private:
+	Engine* engine;
+
 	bool isInitialized = false;
 	//Render Passes
 	std::vector<RenderPass*> renderPasses;

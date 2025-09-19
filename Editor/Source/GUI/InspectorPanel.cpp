@@ -17,6 +17,9 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
     if (selectedEntity != entt::null) {
         ImGui::Text("Selected Entity: %u", (uint32_t)selectedEntity);
 
+        bool isPrefab = registry.any_of<PrefabComponent>(selectedEntity);
+
+        
         if (registry.any_of<TagComponent>(selectedEntity)) {
             if (ImGui::CollapsingHeader("Name Tag", ImGuiTreeNodeFlags_DefaultOpen)) {
                 auto& tag = registry.get<TagComponent>(selectedEntity);
@@ -76,6 +79,9 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
             }
         }
 
+        // show only transform component if entity is a prefab instance 
+        if(!isPrefab)
+        {
         if (registry.any_of<MeshComponent>(selectedEntity))
         {
             if (ImGui::CollapsingHeader("Mesh"))
@@ -414,6 +420,7 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                 }
                 ImGui::Unindent();
             }
+        }
         }
 
         if (registry.any_of<SceneTreeComponent>(selectedEntity))

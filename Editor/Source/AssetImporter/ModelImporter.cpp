@@ -250,7 +250,7 @@ AssetUUID ModelImporter::Import(const std::filesystem::path& path)
     if (!scene)
     {
         LOG_ERROR("Failed to load model scene: {}", path.string());
-        return AssetUUID::Invalid();;
+        return AssetUUID::Invalid();
     }
     ExtractTextures(scene, path);
     ExtractMaterials(scene, path);

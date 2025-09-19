@@ -181,7 +181,7 @@ void SceneHierarchyPanel::Draw(Scene* scene, entt::entity& selectedEntity)
 
         if (scene->HasComponent<PrefabComponent>(selectedEntity))
         {
-            if (ImGui::MenuItem("Resolve prefab"))
+            if (ImGui::MenuItem("Make local"))
             {
                 scene->RemoveComponent<PrefabComponent>(selectedEntity);
             }

@@ -1,7 +1,7 @@
 #include "rvelapch.h"
 #include "RenderPipeline.h"
 
-RenderPipeline::RenderPipeline()
+RenderPipeline::RenderPipeline(Engine* engine)
 {
 	renderPasses = {
 		&geometryPass,
@@ -15,6 +15,8 @@ RenderPipeline::RenderPipeline()
 		&ssrPass,
 		&compositePass
 	};
+
+	this->engine = engine;
 }
 
 void RenderPipeline::EnsureInitialized()
@@ -25,6 +27,8 @@ void RenderPipeline::EnsureInitialized()
 			pass->Init();
 
 		isInitialized = true;
+
+		engine->SetFinalTexture(compositePass.GetFinalTexture());
 	}
 }
 

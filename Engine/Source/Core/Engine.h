@@ -37,7 +37,13 @@ public:
 
 	inline EditorCamera* GetCamera() const noexcept { return editorCamera; }
 	inline void SetEditorCamera(EditorCamera* editorCam) { editorCamera = editorCam; }
+
+	[[nodiscard]] inline void SetFinalTexture(GLuint textureID) { finalTexture = textureID; } //TODO: what the fuck are these doing here?
+	[[nodiscard]] inline GLuint GetFinalTexture() { return finalTexture; }
+
 private:
+	GLuint finalTexture;
+
 	LayerStack m_LayerStack;
 
 	void HandleEvents() noexcept;

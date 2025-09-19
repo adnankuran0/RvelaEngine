@@ -31,7 +31,7 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
 
 
 
-        ImTextureID textureID = (ImTextureID)(intptr_t)26; //TODO: make this dynamic
+        ImTextureID textureID = (ImTextureID)(intptr_t)engine->GetFinalTexture(); //TODO: make this dynamic
 
         ImGui::GetWindowDrawList()->AddImage(
             textureID,

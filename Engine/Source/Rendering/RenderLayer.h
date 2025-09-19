@@ -11,7 +11,7 @@ class RenderLayer : public Layer
 public:
 	RenderLayer(Engine* engine) : Layer("RenderLayer"), m_Engine(engine) 
 	{
-		m_RenderPipeline = std::make_unique<RenderPipeline>();
+		m_RenderPipeline = std::make_unique<RenderPipeline>(engine);
 	}
 
 	void OnRender() override;

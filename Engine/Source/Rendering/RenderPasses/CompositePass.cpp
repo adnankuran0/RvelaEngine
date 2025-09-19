@@ -4,13 +4,10 @@
 
 void CompositePass::Init()
 {
-	// Framebuffer oluştur
 	glGenFramebuffers(1, &m_Framebuffer);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer);
 
-	// Texture oluştur
 	glGenTextures(1, &o_FinalTexture);
-	LOG_INFO("Final texture ID: {}", o_FinalTexture);
 	glBindTexture(GL_TEXTURE_2D, o_FinalTexture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, ctx.viewportWidth, ctx.viewportHeight,
 		0, GL_RGBA, GL_FLOAT, nullptr);
@@ -19,7 +16,6 @@ void CompositePass::Init()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-	// Framebuffer'a texture'ı ekle
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, o_FinalTexture, 0);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
