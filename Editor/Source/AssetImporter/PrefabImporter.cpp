@@ -26,7 +26,7 @@ Ref<PrefabAsset> PrefabImporter::CreatePrefabAsset(const std::string& path, Scen
 void PrefabImporter::SerializeEntityRecursively(entt::entity& e, Scene& scene, std::vector<std::byte>& buffer, json& j)
 {
     // serialize component count
-    unsigned int componentCount = GetComponentCount(scene, e);
+    unsigned int componentCount = scene.GetComponentCount(e);
     const std::byte* data = reinterpret_cast<const std::byte*>(&componentCount);
     buffer.insert(buffer.end(), data, data + sizeof(unsigned int));
 
@@ -97,25 +97,7 @@ void PrefabImporter::SerializeEntityRecursively(entt::entity& e, Scene& scene, s
 
 }
 
-unsigned int PrefabImporter::GetComponentCount(Scene& scene, entt::entity& entity)
-{
-    auto& registry = scene.GetRegistry();
-    unsigned int count = 0;
 
-    if (registry.any_of<TransformComponent>(entity)) count++;
-    if (registry.any_of<MeshComponent>(entity)) count++;
-    if (registry.any_of<DirectionalLightComponent>(entity)) count++;
-    if (registry.any_of<MaterialComponent>(entity)) count++;
-    if (registry.any_of<MeshRendererComponent>(entity)) count++;
-    if (registry.any_of<PointLightComponent>(entity)) count++;
-    if (registry.any_of<SceneTreeComponent>(entity)) count++;
-    if (registry.any_of<SpotLightComponent>(entity)) count++;
-    if (registry.any_of<TagComponent>(entity)) count++;
-    if (registry.any_of<UUIDComponent>(entity)) count++;
-    if (registry.any_of<PrefabComponent>(entity)) count++;
-
-    return count;
-}
 
 unsigned int PrefabImporter::CountEntitiesRecursively(Scene& scene, entt::entity e)
 {

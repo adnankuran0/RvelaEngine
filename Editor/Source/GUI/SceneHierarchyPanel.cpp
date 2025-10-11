@@ -12,15 +12,7 @@ void SceneHierarchyPanel::Draw(Scene* scene, entt::entity& selectedEntity)
     ImGui::Begin("Scene Hierarchy", nullptr, ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse);
 
     // Root entity'leri bul (parent'ı olmayanlar)
-    auto rootEntities = [&registry]() {
-        std::vector<entt::entity> roots;
-        registry.view<SceneTreeComponent>().each([&](entt::entity e, SceneTreeComponent& stc) {
-            if (stc.parent == entt::null) {
-                roots.push_back(e);
-            }
-            });
-        return roots;
-        };
+    auto rootEntities = scene->GetRootEntities();
 
     // Bir entity'nin çocuklarını bulan fonksiyon
     auto getChildren = [&registry](entt::entity parent) {

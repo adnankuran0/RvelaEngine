@@ -9,7 +9,7 @@
 
 class Entity; // Forward Declaration
 
-class Scene 
+class Scene
 {
 public:
     Scene();
@@ -51,7 +51,7 @@ public:
         m_Registry.remove<Component>(entity);
     }
 
-    void SetParent(entt::entity child, entt::entity parent); 
+    void SetParent(entt::entity child, entt::entity parent);
 
     const std::vector<entt::entity>& GetChildren(entt::entity entity) {
         return GetComponent<SceneTreeComponent>(entity).children;
@@ -84,6 +84,19 @@ public:
 
     void SetSelectedEntity(entt::entity selectedEntity) { this->selectedEntity = selectedEntity; }
     entt::entity GetSelectedEntity() { return selectedEntity; }
+
+    [[nodiscard]] inline std::vector<entt::entity> GetRootEntities() noexcept
+    {
+        std::vector<entt::entity> roots;
+        m_Registry.view<SceneTreeComponent>().each([&](entt::entity e, SceneTreeComponent& stc) {
+            if (stc.parent == entt::null) {
+                roots.push_back(e);
+            }
+            });
+        return roots;
+    }
+
+    [[nodiscard]] unsigned int GetComponentCount(entt::entity entity) noexcept;
 
 private:
     entt::registry m_Registry;

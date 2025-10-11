@@ -389,3 +389,23 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
     UpdateHierarchy();
     return rootEntity;
 }
+
+[[nodiscard]] unsigned int Scene::GetComponentCount(entt::entity entity) noexcept
+{
+    auto& registry = GetRegistry();
+    unsigned int count = 0;
+
+    if (registry.any_of<TransformComponent>(entity)) count++;
+    if (registry.any_of<MeshComponent>(entity)) count++;
+    if (registry.any_of<DirectionalLightComponent>(entity)) count++;
+    if (registry.any_of<MaterialComponent>(entity)) count++;
+    if (registry.any_of<MeshRendererComponent>(entity)) count++;
+    if (registry.any_of<PointLightComponent>(entity)) count++;
+    if (registry.any_of<SceneTreeComponent>(entity)) count++;
+    if (registry.any_of<SpotLightComponent>(entity)) count++;
+    if (registry.any_of<TagComponent>(entity)) count++;
+    if (registry.any_of<UUIDComponent>(entity)) count++;
+    if (registry.any_of<PrefabComponent>(entity)) count++;
+
+    return count;
+}
