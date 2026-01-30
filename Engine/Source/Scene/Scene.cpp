@@ -7,9 +7,20 @@
 #include "Utils/ProjectManager.h"
 #include "EntityUUID.h"
 #include <Assets/PrefabAsset.h>
+#include "Scene/Entity.h"
 
+Scene::Scene(const std::string& sceneName) : m_Registry() 
+{
+    m_SceneName = sceneName;
+    m_RootEntity = m_Registry.create();
+    Entity entity(m_RootEntity, this);
+    entity.AddComponent<TransformComponent>(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f));
+    entity.AddComponent<SceneTreeComponent>();
+    entity.AddComponent<TagComponent>(sceneName);
+    entity.AddComponent<UUIDComponent>(EntityUUIDGenerator::Generate());
+    m_EntityMap[entity.GetUUID()] = (entt::entity)m_RootEntity;
+}
 
-Scene::Scene() : m_Registry() { LoadPrimitive("Cube");  CreateDirectionalLight(); }
 
 Entity Scene::CreateEntity(const std::string& name) {
     Entity entity(m_Registry.create(), this);
@@ -17,8 +28,18 @@ Entity Scene::CreateEntity(const std::string& name) {
     entity.AddComponent<SceneTreeComponent>();
     entity.AddComponent<TagComponent>(name);
     entity.AddComponent<UUIDComponent>(EntityUUIDGenerator::Generate());
+    SetParent(entity, m_RootEntity);
     m_EntityMap[entity.GetUUID()] = (entt::entity)entity;
     return entity;
+}
+
+Entity Scene::CreateEntityRaw()
+{
+    Entity e(m_Registry.create(), this);
+    e.AddComponent<TransformComponent>();
+    e.AddComponent<SceneTreeComponent>();
+    e.AddComponent<UUIDComponent>();
+    return e;
 }
 
 Entity Scene::CreateEntityWithUUID(const std::string& name, EntityUUID uuid) {
@@ -27,6 +48,7 @@ Entity Scene::CreateEntityWithUUID(const std::string& name, EntityUUID uuid) {
     entity.AddComponent<SceneTreeComponent>();
     entity.AddComponent<TagComponent>(name);
     entity.AddComponent<UUIDComponent>(uuid);
+    SetParent(entity, m_RootEntity);
     m_EntityMap[uuid] = (entt::entity)entity;
     return entity;
 }
@@ -99,110 +121,141 @@ entt::registry& Scene::GetRegistry() { return m_Registry; }
 
 void Scene::UpdateHierarchy() {
     auto view = m_Registry.view<SceneTreeComponent, TransformComponent>();
-    std::vector<entt::entity> roots;
-    for (auto e : view) {
-        auto& node = GetComponent<SceneTreeComponent>(e);
-        if (node.parent == entt::null || !m_Registry.valid(node.parent))
-            roots.push_back(e);
-    }
-    for (entt::entity root : roots)
-        UpdateNodeRecursive(root, glm::mat4(1.0f));
-        //if(GetComponent<TransformComponent>(root).IsDirty()) // child may be dirty
+
+    UpdateNodeRecursive(m_RootEntity, glm::mat4(1.0f));
+    //if(GetComponent<TransformComponent>(root).IsDirty()) // child may be dirty
 }
 
-void Scene::UpdateNodeRecursive(entt::entity e, const glm::mat4& parentWorld) {
-    auto& t = GetComponent<TransformComponent>(e);
+void Scene::UpdateNodeRecursive(entt::entity e, const glm::mat4& parentWorld)
+{
+    auto& transform = GetComponent<TransformComponent>(e);
 
-    glm::mat4 localMat = t.GetLocalMatrix();
-    glm::mat4 worldMat = parentWorld * localMat;
+    glm::mat4 localMatrix = transform.GetLocalMatrix();
+    glm::mat4 worldMatrix = parentWorld * localMatrix;
 
     glm::vec3 scale, skew, translation;
     glm::quat rotation;
     glm::vec4 perspective;
-    glm::decompose(worldMat, scale, rotation, translation, skew, perspective);
+    glm::decompose(worldMatrix, scale, rotation, translation, skew, perspective);
 
-    t.SetWorldTransform(translation, rotation, scale);
-    
-    //Update AABB
+    transform.SetWorldTransform(translation, rotation, scale);
+
     if (HasComponent<MeshRendererComponent>(e))
     {
-        auto& c = GetComponent<MeshRendererComponent>(e);
-        c.worldAABB = c.localAABB.CalculateWorldAABB(worldMat);
-       
+        auto& meshRenderer = GetComponent<MeshRendererComponent>(e);
+        meshRenderer.worldAABB = meshRenderer.localAABB.CalculateWorldAABB(worldMatrix);
     }
 
-    t.ClearDirty();
+    transform.ClearDirty();
 
-    auto& node = GetComponent<SceneTreeComponent>(e);
-    for (auto c : node.children)
-        UpdateNodeRecursive(c, worldMat);
-
-    
-
+    if (HasComponent<SceneTreeComponent>(e))
+    {
+        auto& sceneTree = GetComponent<SceneTreeComponent>(e);
+        for (auto child : sceneTree.children)
+        {
+            if (m_Registry.valid(child))
+            {
+                UpdateNodeRecursive(child, worldMatrix);
+            }
+        }
+    }
 }
 
-void Scene::SetParent(entt::entity child, entt::entity parent) {
-    if (parent != entt::null && !HasComponent<SceneTreeComponent>(parent)) AddComponent<SceneTreeComponent>(parent);
-    auto& node = GetComponent<SceneTreeComponent>(child);
-    EntityUUID id = GetComponent<UUIDComponent>(child).uuid;
-    glm::mat4 childWorld = GetComponent<TransformComponent>(child).GetWorldMatrix();
-    GetComponent<TransformComponent>(parent).SetDirty();
-    if (node.parent != entt::null) {
-        auto& old = GetComponent<SceneTreeComponent>(node.parent);
-        old.children.erase(std::remove(old.children.begin(), old.children.end(), child), old.children.end());
-        old.childrenUUIDs.erase(std::remove(old.childrenUUIDs.begin(), old.childrenUUIDs.end(), id), old.childrenUUIDs.end());
+void Scene::SetParent(entt::entity child, entt::entity parent)
+{
+    if (child == entt::null || !m_Registry.valid(child)) return;
+
+    if (parent != entt::null && !HasComponent<SceneTreeComponent>(parent))
+        AddComponent<SceneTreeComponent>(parent);
+
+    auto& childNode = GetComponent<SceneTreeComponent>(child);
+    EntityUUID childUUID = GetComponent<UUIDComponent>(child).uuid;
+
+    glm::mat4 childWorldMatrix = GetComponent<TransformComponent>(child).GetWorldMatrix();
+
+    if (childNode.parent != entt::null && m_Registry.valid(childNode.parent))
+    {
+        auto& oldParentNode = GetComponent<SceneTreeComponent>(childNode.parent);
+
+        auto it = std::find(oldParentNode.children.begin(), oldParentNode.children.end(), child);
+        if (it != oldParentNode.children.end())
+            oldParentNode.children.erase(it);
+
+        auto uuidIt = std::find(oldParentNode.childrenUUIDs.begin(),
+            oldParentNode.childrenUUIDs.end(), childUUID);
+        if (uuidIt != oldParentNode.childrenUUIDs.end())
+            oldParentNode.childrenUUIDs.erase(uuidIt);
+
+        GetComponent<TransformComponent>(childNode.parent).SetDirty();
     }
-    node.parent = parent;
-    node.parentUUID = parent != entt::null ? GetComponent<UUIDComponent>(parent).uuid : 0;
-    if (parent != entt::null) {
-        auto& pnode = GetComponent<SceneTreeComponent>(parent);
-        pnode.children.push_back(child);
-        if (std::find(pnode.childrenUUIDs.begin(), pnode.childrenUUIDs.end(), id) == pnode.childrenUUIDs.end()) pnode.childrenUUIDs.push_back(id);
-        glm::mat4 pWorld = GetComponent<TransformComponent>(parent).GetWorldMatrix();
-        glm::mat4 inv = glm::inverse(pWorld);
-        glm::mat4 localM = inv * childWorld;
+
+    childNode.parent = parent;
+    childNode.parentUUID = (parent != entt::null) ? GetComponent<UUIDComponent>(parent).uuid : 0;
+
+    if (parent != entt::null)
+    {
+        auto& parentNode = GetComponent<SceneTreeComponent>(parent);
+
+        parentNode.children.push_back(child);
+
+        if (std::find(parentNode.childrenUUIDs.begin(), parentNode.childrenUUIDs.end(), childUUID)
+            == parentNode.childrenUUIDs.end())
+        {
+            parentNode.childrenUUIDs.push_back(childUUID);
+        }
+
+        glm::mat4 parentWorldMatrix = GetComponent<TransformComponent>(parent).GetWorldMatrix();
+        glm::mat4 parentInverse = glm::inverse(parentWorldMatrix);
+
+        glm::mat4 localMatrix = parentInverse * childWorldMatrix;
+
         glm::vec3 scale, translation, skew;
         glm::quat rotation;
-        glm::vec4 persp;
-        glm::decompose(localM, scale, rotation, translation, skew, persp);
-        auto& tc = GetComponent<TransformComponent>(child);
-        tc.SetPosition(translation);
-        tc.SetRotation(rotation);
-        tc.SetScale(scale);
-        tc.SetDirty();
-    }
-    else {
-        glm::vec3 scale, euler, pos;
-        DecomposeToEulerAngles(childWorld, scale, euler, pos);
-        auto& tc = GetComponent<TransformComponent>(child);
-        tc.SetPosition(pos);
-        tc.SetRotation(glm::quat_cast(childWorld));
-        tc.SetScale(scale);
-        tc.SetDirty();
-    }
+        glm::vec4 perspective;
+        glm::decompose(localMatrix, scale, rotation, translation, skew, perspective);
 
+        auto& childTransform = GetComponent<TransformComponent>(child);
+        childTransform.SetPosition(translation);
+        childTransform.SetRotation(rotation);
+        childTransform.SetScale(scale);
+        childTransform.SetDirty();
 
+        GetComponent<TransformComponent>(parent).SetDirty();
+    }
+    else
+    {
+        glm::vec3 scale, euler, position;
+        DecomposeToEulerAngles(childWorldMatrix, scale, euler, position);
+
+        auto& childTransform = GetComponent<TransformComponent>(child);
+        childTransform.SetPosition(position);
+        childTransform.SetRotation(glm::quat(glm::radians(euler)));
+        childTransform.SetScale(scale);
+        childTransform.SetDirty();
+    }
 }
 
-void Scene::RemoveParent(entt::entity child) {
-    if (!HasComponent<SceneTreeComponent>(child)) return;
-    auto& node = GetComponent<SceneTreeComponent>(child);
-    EntityUUID id = GetComponent<UUIDComponent>(child).uuid;
-    glm::mat4 worldM = GetComponent<TransformComponent>(child).GetWorldMatrix();
-    if (node.parent != entt::null) {
-        auto& pnode = GetComponent<SceneTreeComponent>(node.parent);
-        pnode.children.erase(std::remove(pnode.children.begin(), pnode.children.end(), child), pnode.children.end());
-        pnode.childrenUUIDs.erase(std::remove(pnode.childrenUUIDs.begin(), pnode.childrenUUIDs.end(), id), pnode.childrenUUIDs.end());
+void Scene::SetParentKeepLocal(entt::entity child, entt::entity parent)
+{
+    auto& childTree = GetComponent<SceneTreeComponent>(child);
+
+    if (childTree.parent != entt::null)
+    {
+        auto& oldParentTree = GetComponent<SceneTreeComponent>(childTree.parent);
+        std::erase(oldParentTree.children, child);
     }
-    node.parent = entt::null;
-    node.parentUUID = 0;
-    glm::vec3 newScale, newEuler, newPos;
-    DecomposeToEulerAngles(worldM, newScale, newEuler, newPos);
-    glm::quat worldQuat = glm::quat_cast(worldM);
-    auto& tc = GetComponent<TransformComponent>(child);
-    tc.SetPosition(newPos);
-    tc.SetScale(newScale);
-    tc.SetRotation(worldQuat);
+
+    childTree.parent = parent;
+
+    if (parent != entt::null)
+    {
+        GetComponent<SceneTreeComponent>(parent).children.push_back(child);
+    }
+}
+
+void Scene::RemoveParent(entt::entity child)
+{
+    SetParent(child, m_RootEntity);
 }
 
 std::vector<PointLightData> Scene::CollectPointLights() noexcept {
@@ -250,7 +303,6 @@ std::optional<DirectionalLightData> Scene::CollectDirectionalLight() noexcept {
 Entity Scene::Instantiate(const AssetUUID& prefabUUID)
 {
     Ref<PrefabAsset> prefab = AssetRegistry::GetAsset<PrefabAsset>(prefabUUID);
-
     unsigned int entityCount = prefab->GetMetaAs<PrefabMeta>()->entityCount;
 
     const std::vector<std::byte>& buffer = prefab->GetData();
@@ -258,15 +310,14 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
     const std::byte* end = buffer.data() + buffer.size();
 
     std::unordered_map<EntityUUID, Entity> uuidToEntity;
-
     Entity rootEntity;
 
     for (unsigned int i = 0; i < entityCount; i++)
     {
-        Entity e = CreateEntity(std::to_string(i));
+        Entity e = CreateEntityRaw();
+
         unsigned int componentCount;
         memcpy(&componentCount, ptr, sizeof(unsigned int));
-
         ptr += sizeof(unsigned int);
 
         for (unsigned int j = 0; j < componentCount; j++)
@@ -325,7 +376,7 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
             }
             case ComponentType::Tag:
             {
-                auto& comp = GetComponent<TagComponent>(e);
+                auto& comp = AddComponent<TagComponent>(e);
                 DeserializeBin_TagComp(ptr, comp);
                 break;
             }
@@ -338,8 +389,16 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
             case ComponentType::UUID:
             {
                 auto& comp = GetComponent<UUIDComponent>(e);
+                EntityUUID oldUUID;
                 DeserializeBin_UUIDComp(ptr, comp);
-                uuidToEntity[comp.uuid] = e;
+
+                oldUUID = comp.uuid;
+
+                comp.uuid = EntityUUIDGenerator::Generate();
+
+                uuidToEntity[oldUUID] = e;
+
+                m_EntityMap[comp.uuid] = (entt::entity)e;
                 break;
             }
             default:
@@ -348,45 +407,62 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
                 break;
             }
             }
-
-
         }
     }
 
-    // setup hierarchy
-    for (auto& [uuid, entity] : uuidToEntity)
+
+    for (auto& [oldUUID, entity] : uuidToEntity)
     {
         if (!HasComponent<SceneTreeComponent>(entity)) continue;
+
         auto& tree = GetComponent<SceneTreeComponent>(entity);
 
         if (tree.parentUUID != 0 && uuidToEntity.contains(tree.parentUUID))
         {
             entt::entity parent = uuidToEntity[tree.parentUUID].GetHandle();
+
             tree.parent = parent;
+
             auto& pnode = GetComponent<SceneTreeComponent>(parent);
             pnode.children.push_back(entity);
+
+            tree.parentUUID = GetComponent<UUIDComponent>(parent).uuid;
         }
-    }
-
-    // find root node
-    for (auto& [uuid, entity] : uuidToEntity)
-    {
-        if (!HasComponent<SceneTreeComponent>(entity))
-            continue;
-
-        auto& tree = GetComponent<SceneTreeComponent>(entity);
-        if (tree.parentUUID == 0) 
+        else
         {
+            tree.parent = m_RootEntity;
+            tree.parentUUID = GetComponent<UUIDComponent>(m_RootEntity).uuid;
+
+            auto& rootNode = GetComponent<SceneTreeComponent>(m_RootEntity);
+            rootNode.children.push_back(entity);
+            rootNode.childrenUUIDs.push_back(GetComponent<UUIDComponent>(entity).uuid);
+
             rootEntity = entity;
-            break;
         }
     }
 
-    
+    if (rootEntity.GetHandle() == entt::null)
+    {
+        for (auto& [oldUUID, entity] : uuidToEntity)
+        {
+            if (!HasComponent<SceneTreeComponent>(entity)) continue;
 
-    AddComponent<PrefabComponent>(rootEntity, prefabUUID);
+            auto& tree = GetComponent<SceneTreeComponent>(entity);
+            if (tree.parent == m_RootEntity)
+            {
+                rootEntity = entity;
+                break;
+            }
+        }
+    }
+
+    if (rootEntity.GetHandle() != entt::null)
+    {
+        AddComponent<PrefabComponent>(rootEntity, prefabUUID);
+    }
 
     UpdateHierarchy();
+
     return rootEntity;
 }
 

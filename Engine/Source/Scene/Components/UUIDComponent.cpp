@@ -1,16 +1,12 @@
 #include "rvelapch.h"
 #include "UUIDComponent.h"
+#include <iostream>
 
-std::string UUIDComponent::Serialize() const
+json UUIDComponent::Serialize() const
 {
-    json j;
-    j["UUID"] = uuid;
-
-    return j.dump(4);
+    return uuid;
 }
-void UUIDComponent::Deserialize(const std::string& jsonStr)
+void UUIDComponent::Deserialize(const json& j)
 {
-    json j = json::parse(jsonStr);
-    auto UUIDData = j["UUID"];
-    uuid = UUIDData;
+    uuid = j.get<EntityUUID>();
 }

@@ -1,16 +1,13 @@
 #include "rvelapch.h"
 #include "TagComponent.h"
 
-std::string TagComponent::Serialize() const
+json TagComponent::Serialize() const
 {
     json j;
     j["tag"] = tag;
-
-    return j.dump(4);
+    return j;
 }
-void TagComponent::Deserialize(const std::string& jsonStr)
+void TagComponent::Deserialize(const json& j)
 {
-    json j = json::parse(jsonStr);
-    auto tagData = j["tag"];
-    tag = tagData;
+    tag = j.at("tag").get<std::string>();
 }

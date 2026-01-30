@@ -13,16 +13,15 @@ void MeshComponent::Load(const AssetUUID& uuid)
     mesh = AssetRegistry::GetAsset<MeshAsset>(meshUUID);
 }
 
-std::string MeshComponent::Serialize() const
+json MeshComponent::Serialize() const
 {
     json j;
     j["mesh"] = meshUUID.ToString();
-    return j.dump(4);
+    return j;
 }
 
-void MeshComponent::Deserialize(const std::string& str)
+void MeshComponent::Deserialize(const json& j)
 {
-    json j = json::parse(str);
-    meshUUID = AssetUUID::FromString(j["mesh"]);
+    meshUUID = AssetUUID::FromString(j.at("mesh").get<std::string>());
     Load(meshUUID);
 }

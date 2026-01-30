@@ -6,7 +6,6 @@ class Singleton
 public:
 	static T& Get() noexcept
 	{
-		assert(!s_Instance && "Singleton not constructed  yed");
 		return *s_Instance;
 	}
 

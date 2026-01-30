@@ -12,7 +12,6 @@ public:
     UUIDComponent() = default;
     UUIDComponent(EntityUUID uuid) :uuid(uuid) {}
 
-    std::string Serialize() const;
-    void Deserialize(const std::string& jsonStr);
-   
+    json Serialize() const;
+    void Deserialize(const json& j);
 };

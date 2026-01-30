@@ -10,10 +10,9 @@ std::string SceneTreeComponent::Serialize() const
     return j.dump(4);
 }
 
-void SceneTreeComponent::Deserialize(const std::string& jsonStr)
+void SceneTreeComponent::Deserialize(const json& j)
 {
-    json j = json::parse(jsonStr);
-    parentUUID = j["parentUUID"];
+    parentUUID = j.at("parentUUID").get<EntityUUID>();
     childrenUUIDs.clear();
     for (auto& id : j["childrenUUIDs"])
     {

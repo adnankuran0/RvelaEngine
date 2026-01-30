@@ -40,17 +40,16 @@ void MaterialComponent::Load(const AssetUUID& uuid)
 
 }
 
-std::string MaterialComponent::Serialize() const
+json MaterialComponent::Serialize() const
 {
 	json j;
 	j["material"] = materialUUID.ToString();
 	material->Serialize();
-	return j.dump(4);
+	return j;
 }
-void MaterialComponent::Deserialize(const std::string& jsonStr)
+void MaterialComponent::Deserialize(const json& j)
 {
-	json j = json::parse(jsonStr);
-	std::string materialUUIDstr = j["material"];
+	std::string materialUUIDstr = j.at("material").get<std::string>();
 	materialUUID = AssetUUID::FromString(materialUUIDstr);
 	Load(materialUUID);
 

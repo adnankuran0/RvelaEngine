@@ -1,19 +1,18 @@
 #include "rvelapch.h"
 #include "DirectionalLightComponent.h"
 
-std::string DirectionalLightComponent::Serialize() const
+json DirectionalLightComponent::Serialize() const
 {
     json j;
     j["color"] = { color.r,color.g,color.b };
     j["intensity"] = intensity;
     j["castShadows"] = castShadows;
-    return j.dump(4);
+    return j;
 }
 
-void DirectionalLightComponent::Deserialize(const std::string& jsonStr)
+void DirectionalLightComponent::Deserialize(const json& j)
 {
-    json j = json::parse(jsonStr);
-    auto colorData = j["color"];
+    auto colorData = j.at("color");
     color = glm::vec3(colorData[0], colorData[1], colorData[2]);
     intensity = j["intensity"];
 }
