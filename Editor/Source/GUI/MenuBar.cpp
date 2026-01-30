@@ -11,7 +11,8 @@ void MenuBar::Draw(Engine* engine, AssetImporterRegistry& assetImporter)
         {
             if (ImGui::MenuItem("New scene"))
             {
-
+                auto& sm = engine->GetSceneManager();
+                sm.SetActiveScene(sm.CreateScene("NewScene"));
             }
             if (ImGui::MenuItem("Open scene"))
             {
@@ -21,7 +22,7 @@ void MenuBar::Draw(Engine* engine, AssetImporterRegistry& assetImporter)
                 std::string file = filePath ? std::string(filePath) : "";
                 if (!file.empty())
                 {
-                    engine->GetSceneManager().LoadScene(*engine->GetScene(), file);
+                    engine->GetSceneManager().LoadScene(file);
                 }
 
             }
@@ -37,7 +38,7 @@ void MenuBar::Draw(Engine* engine, AssetImporterRegistry& assetImporter)
                     if (ofs.is_open())
                     {
                         ofs.close();
-                        engine->GetSceneManager().SaveScene(*engine->GetScene(), file);
+                        engine->GetSceneManager().SaveScene(file);
                     }
                 }
             }

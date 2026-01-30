@@ -43,7 +43,7 @@ void EditorLayer::OnDetach()
 
 void EditorLayer::OnUpdate()
 {
-    if(m_Engine->GetScene()->GetState() == SceneState::EDIT)
+    if(m_Engine->GetActiveScene().GetState() == SceneState::EDIT)
         m_EditorCamera.Update();
 
 }
@@ -73,13 +73,13 @@ void EditorLayer::Render()
 
     m_MenuBar.Draw(m_Engine,m_AssetImporterRegistry);
 
-    m_ToolBar.Draw(m_Engine->GetScene());
+    m_ToolBar.Draw(m_Engine->GetActiveScene());
 
     m_Dockspace.Draw();
 
-    m_SceneHierarchyPanel.Draw(m_Engine->GetScene(), selectedEntity);
+    m_SceneHierarchyPanel.Draw(m_Engine->GetActiveScene(), selectedEntity);
 
-    m_InspectorPanel.Draw(m_Engine->GetScene(), selectedEntity);
+    m_InspectorPanel.Draw(m_Engine->GetActiveScene(), selectedEntity);
 
     m_AssetBrowserPanel.Draw(m_Engine, m_Engine->GetProjectManager().GetProjectPath() / "Assets");
 

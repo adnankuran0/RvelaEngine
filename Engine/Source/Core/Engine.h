@@ -30,7 +30,7 @@ public:
 
 	inline static Engine* Get() noexcept { return s_Instance; } 
 	inline Window& GetWindow() noexcept { return m_Window; }
-	inline Scene* GetScene() const noexcept { return m_Scene.get(); }
+	inline Scene& GetActiveScene() noexcept { return m_SceneManager.GetActiveScene(); }
 	inline ProjectManager& GetProjectManager() noexcept { return m_ProjectManager; }
 	inline SceneManager& GetSceneManager() noexcept { return m_SceneManager; }
 	inline AssetRegistry& GetAssetRegistry() noexcept { return m_AssetRegistry; }
@@ -52,7 +52,6 @@ private:
 	static Engine* s_Instance;
 
 	EditorCamera* editorCamera = nullptr;
-	std::unique_ptr<Scene> m_Scene;
 	Window m_Window;
 	Renderer m_Renderer;
 	ProjectManager m_ProjectManager;

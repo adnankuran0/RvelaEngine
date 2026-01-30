@@ -4,15 +4,15 @@
 #include "AssetImporter/PrefabImporter.h"
 
 
-void SceneHierarchyPanel::Draw(Scene* scene, entt::entity& selectedEntity)
+void SceneHierarchyPanel::Draw(Scene& scene, entt::entity& selectedEntity)
 {
-    entt::entity rootEntity = scene->GetRootEntity();
+    entt::entity rootEntity = scene.GetRootEntity();
 
 
-    entt::registry& registry = scene->GetRegistry();
+    entt::registry& registry = scene.GetRegistry();
     ImGui::Begin("Scene Hierarchy", nullptr, ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse);
 
-    auto rootEntities = scene->GetRootEntities();
+    auto rootEntities = scene.GetRootEntities();
 
     auto getChildren = [&registry](entt::entity parent) {
         std::vector<entt::entity> children;
@@ -45,10 +45,10 @@ void SceneHierarchyPanel::Draw(Scene* scene, entt::entity& selectedEntity)
             if (!isRoot && entity == selectedEntity)
                 flags |= ImGuiTreeNodeFlags_Selected;
 
-            auto& tagComponent = scene->GetComponent<TagComponent>(entity);
+            auto& tagComponent = scene.GetComponent<TagComponent>(entity);
             std::string nodeId = tagComponent.tag + "##" + std::to_string((uint32_t)entity);
 
-            bool isPrefab = scene->HasComponent<PrefabComponent>(entity);
+            bool isPrefab = scene.HasComponent<PrefabComponent>(entity);
             if (isPrefab)
                 ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.75f, 1.0f, 1.0f));
 
@@ -64,7 +64,7 @@ void SceneHierarchyPanel::Draw(Scene* scene, entt::entity& selectedEntity)
             {
                 if (ImGui::MenuItem("Delete Entity"))
                 {
-                    scene->DestroyEntity(entity);
+                    scene.DestroyEntity(entity);
                     if (selectedEntity == entity)
                         selectedEntity = entt::null;
                 }
@@ -85,7 +85,7 @@ void SceneHierarchyPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                 {
                     entt::entity child = *(entt::entity*)payload->Data;
                     if (child != entity)
-                        scene->SetParent(child, entity);
+                        scene.SetParent(child, entity);
                 }
                 ImGui::EndDragDropTarget();
             }
@@ -113,25 +113,25 @@ void SceneHierarchyPanel::Draw(Scene* scene, entt::entity& selectedEntity)
 
     if (ImGui::BeginPopupContextWindow()) {
         if (ImGui::MenuItem("Create Entity")) {
-            selectedEntity = scene->CreateEntity("New Entity");
+            selectedEntity = scene.CreateEntity("New Entity");
         }
         if (ImGui::BeginMenu("Primitives")) {
             if (ImGui::MenuItem("Cube"))
-                selectedEntity = scene->LoadPrimitive("Cube");
+                selectedEntity = scene.LoadPrimitive("Cube");
             if (ImGui::MenuItem("Sphere"))
-                selectedEntity = scene->LoadPrimitive("Sphere");
+                selectedEntity = scene.LoadPrimitive("Sphere");
             if (ImGui::MenuItem("Cylinder"))
-                selectedEntity = scene->LoadPrimitive("Cylinder");
+                selectedEntity = scene.LoadPrimitive("Cylinder");
             if (ImGui::MenuItem("Cone"))
-                selectedEntity = scene->LoadPrimitive("Cone");
+                selectedEntity = scene.LoadPrimitive("Cone");
             if (ImGui::MenuItem("Capsule"))
-                selectedEntity = scene->LoadPrimitive("Capsule");
+                selectedEntity = scene.LoadPrimitive("Capsule");
             if (ImGui::MenuItem("Torus"))
-                selectedEntity = scene->LoadPrimitive("Torus");
+                selectedEntity = scene.LoadPrimitive("Torus");
             if (ImGui::MenuItem("Plane"))
-                selectedEntity = scene->LoadPrimitive("Plane");
+                selectedEntity = scene.LoadPrimitive("Plane");
             if (ImGui::MenuItem("Monkey"))
-                selectedEntity = scene->LoadPrimitive("Monkey");
+                selectedEntity = scene.LoadPrimitive("Monkey");
 
             ImGui::EndMenu();
         }
@@ -139,11 +139,11 @@ void SceneHierarchyPanel::Draw(Scene* scene, entt::entity& selectedEntity)
         if (ImGui::BeginMenu("Lights")) {
             if (ImGui::MenuItem("Directional Light"))
             {
-                selectedEntity = scene->CreateDirectionalLight();
+                selectedEntity = scene.CreateDirectionalLight();
             }
             if (ImGui::MenuItem("Point Light"))
             {
-                selectedEntity = scene->CreatePointLight();
+                selectedEntity = scene.CreatePointLight();
             }
             if (ImGui::MenuItem("Spot Light"))
             {
@@ -170,28 +170,28 @@ void SceneHierarchyPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                 if (ofs.is_open())
                 {
                     ofs.close();
-                    PrefabImporter::CreatePrefabAsset(file, *scene, selectedEntity);
+                    PrefabImporter::CreatePrefabAsset(file, scene, selectedEntity);
                     AssetRegistry::ScanAssets();
                 }
             }
         }
 
-        if (scene->HasComponent<PrefabComponent>(selectedEntity))
+        if (scene.HasComponent<PrefabComponent>(selectedEntity))
         {
             if (ImGui::MenuItem("Make local"))
             {
-                scene->RemoveComponent<PrefabComponent>(selectedEntity);
+                scene.RemoveComponent<PrefabComponent>(selectedEntity);
             }
         }
 
         if (ImGui::MenuItem("Detach from parent")) {
 
-            scene->RemoveParent(selectedEntity);
+            scene.RemoveParent(selectedEntity);
         }
 
         if (ImGui::MenuItem("Delete Entity")) {
 
-            scene->DestroyEntity(selectedEntity);
+            scene.DestroyEntity(selectedEntity);
             selectedEntity = entt::null;
         }
 

@@ -14,7 +14,7 @@ Engine::Engine()
 	m_ProjectManager.LoadProject("C:\\RvelaEngine\\TestProject\\TestProject.rproj");
 	m_Renderer.Init(m_Window.GetGLFWWindow());
 	m_AssetRegistry.Init(m_ProjectManager.GetProjectPath()); //TODO: Make this works with assets path
-	m_Scene = std::make_unique<Scene>("TestScene");
+	m_SceneManager.SetActiveScene(m_SceneManager.CreateScene("EmptyScene"));
 	PushLayer(new RenderLayer(this));
 
 	if (s_Instance == nullptr)
@@ -44,7 +44,7 @@ void Engine::PopLayer(Layer* layer)
 
 void Engine::Update()
 {
-	m_Scene->Update();
+	GetActiveScene().Update();
 
 	for (Layer* layer : m_LayerStack)
 	{
@@ -105,7 +105,7 @@ void Engine::HandleEvents() noexcept
 		{
 			if (auto* mouseEvent = dynamic_cast<MouseMovedEvent*>(&event) )
 			{
-				if (m_Scene->GetState() == SceneState::EDIT)
+				if (GetActiveScene().GetState() == SceneState::EDIT)
 				{
 					editorCamera->onMouseMoved(
 						mouseEvent->GetX(),

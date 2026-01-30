@@ -4,6 +4,6 @@
 class ToolBar
 {
 public:
-	void Draw(Scene* scene);
+	void Draw(Scene& scene);
 };
 

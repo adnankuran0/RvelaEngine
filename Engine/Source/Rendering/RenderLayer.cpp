@@ -3,22 +3,22 @@
 
 void RenderLayer::OnRender()
 {
-	Scene* scene = m_Engine->GetScene();
+	Scene& scene = m_Engine->GetActiveScene();
 	auto camera = m_Engine->GetCamera();
 
 
 	RenderContext context;
 	context.camera = camera;
-	context.pointLights = scene->CollectPointLights();
-	context.directionalLight = scene->CollectDirectionalLight();
+	context.pointLights = scene.CollectPointLights();
+	context.directionalLight = scene.CollectDirectionalLight();
 	context.viewportWidth = 1920;
 	context.viewportHeight = 1080;
-	context.scene = scene;
+	context.scene = &scene;
 	m_RenderPipeline->SetRenderContext(context);
 	m_RenderPipeline->EnsureInitialized();
 
 	// Collect commands and submit them to render passes via render pipeline
-	CollectRenderCommands(scene, [&](const RenderCommand& cmd) {
+	CollectRenderCommands(&scene, [&](const RenderCommand& cmd) {
 		m_RenderPipeline->SubmitRenderCommand(cmd);
 		});
 

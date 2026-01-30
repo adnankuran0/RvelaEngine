@@ -53,11 +53,11 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
 
         ImGuizmo::SetRect(displayPos.x, displayPos.y, displaySize.x, displaySize.y);
 
-        bool canDrawGizmo = selectedEntity != entt::null && engine->GetScene()->GetRegistry().any_of<TransformComponent>(selectedEntity) &&
-            engine->GetScene()->GetState() == SceneState::EDIT;
+        bool canDrawGizmo = selectedEntity != entt::null && engine->GetActiveScene().GetRegistry().any_of<TransformComponent>(selectedEntity) &&
+            engine->GetActiveScene().GetState() == SceneState::EDIT;
 
         if (canDrawGizmo) {
-            auto& tc = engine->GetScene()->GetRegistry().get<TransformComponent>(selectedEntity);
+            auto& tc = engine->GetActiveScene().GetRegistry().get<TransformComponent>(selectedEntity);
 
             glm::mat4 transform = tc.GetWorldMatrix();
 
@@ -113,7 +113,7 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
                 }
                 else if (currentGizmoMode == ImGuizmo::WORLD) {
                     glm::mat4 parentWorld(1.0f);
-                    auto& scene = *engine->GetScene();
+                    auto& scene = engine->GetActiveScene();
                     auto& reg = scene.GetRegistry();
                     auto& node = reg.get<SceneTreeComponent>(selectedEntity);
 
@@ -163,7 +163,7 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
             entt::entity closest = entt::null;
             float closestDist = std::numeric_limits<float>::max();
 
-            auto& registry = engine->GetScene()->GetRegistry();
+            auto& registry = engine->GetActiveScene().GetRegistry();
             registry.view<TransformComponent,
                 MeshRendererComponent,
                 MeshComponent>().each([&](entt::entity entity,
@@ -194,7 +194,7 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
                                 {
                                     closestDist = t;
                                     selectedEntity = entity;
-                                    engine->GetScene()->SetSelectedEntity(selectedEntity);
+                                    engine->GetActiveScene().SetSelectedEntity(selectedEntity);
                                 }
                             }
                         }

@@ -5,13 +5,27 @@
 class SceneManager
 {
 public:
-    void SaveScene(Scene& scene, const std::string& path);
-    void LoadScene(Scene& scene, const std::string& path);
 
+    std::unique_ptr<Scene> CreateScene(const std::string& sceneName)
+    {
+        return std::make_unique<Scene>(sceneName);
+    }
+    Scene& GetActiveScene()
+    {
+        assert(m_CurrentScene);
+        return *m_CurrentScene;
+    }
+    void SetActiveScene(std::unique_ptr<Scene> newScene)
+    {
+        m_CurrentScene = std::move(newScene);
+    }
+
+
+    void SaveScene(const std::string& path);
+    void LoadScene(const std::string& path);
 private:
-    Scene* m_CurrentScene;
+    std::unique_ptr<Scene> m_CurrentScene = nullptr;
 
     unsigned int CountEntitiesRecursively(entt::entity& rootEntity);
-    void SerializeBinEntityRecursively(entt::entity& e, Scene& scene, std::vector<std::byte>& buffer);
     json SerializeEntity(Scene& scene, entt::entity e);
 };

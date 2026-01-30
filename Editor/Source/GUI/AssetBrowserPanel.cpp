@@ -190,7 +190,7 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
 
                 if (extension == ".rscene")
                 {
-                    engine->GetSceneManager().LoadScene(*engine->GetScene(), entry.path().string());
+                    engine->GetSceneManager().LoadScene(entry.path().string());
                 }
                 else if (extension == ".rprefab")
                 {
@@ -202,7 +202,7 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
                     }
                     AssetHeader header = AssetLoader::ReadHeader(inFile, MAGIC_PREFAB);
                     std::unique_ptr<PrefabMeta> meta = AssetLoader::ReadMeta<PrefabMeta>(inFile, header);
-                    engine->GetScene()->Instantiate(meta->uuid);
+                    engine->GetActiveScene().Instantiate(meta->uuid);
                 }
                 else if (extension == ".glsl")
                 {

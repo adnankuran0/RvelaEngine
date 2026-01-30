@@ -2,7 +2,7 @@
 #include "ImGui/imgui.h"
 
 
-void ToolBar::Draw(Scene* scene)
+void ToolBar::Draw(Scene& scene)
 {
     ImGuiViewport* viewport = ImGui::GetMainViewport();
 
@@ -39,19 +39,19 @@ void ToolBar::Draw(Scene* scene)
 
         if (ImGui::Button("Play", button_size)) 
         {
-            scene->SetState(SceneState::PLAY);
+            scene.SetState(SceneState::PLAY);
         }
         ImGui::SameLine();
 
         if (ImGui::Button("Pause", button_size)) 
         {
-            scene->SetState(SceneState::PAUSE);
+            scene.SetState(SceneState::PAUSE);
         }
         ImGui::SameLine();
 
         if (ImGui::Button("Stop", button_size)) 
         {
-            scene->SetState(SceneState::EDIT);
+            scene.SetState(SceneState::EDIT);
         }
 
         ImGui::PopStyleColor();

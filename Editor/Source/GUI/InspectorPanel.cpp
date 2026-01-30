@@ -1,10 +1,10 @@
 ﻿#include "InspectorPanel.h"
 #include "ImGui/imgui.h"
 
-void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
+void InspectorPanel::Draw(Scene& scene, entt::entity& selectedEntity)
 {
 
-    entt::registry& registry = scene->GetRegistry();
+    entt::registry& registry = scene.GetRegistry();
     ImGui::Begin("Properties", nullptr, ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse);
 
     
@@ -444,7 +444,7 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                 {
                     if (ImGui::Selectable("None", selectedNode.parent == entt::null))
                     {
-                        scene->RemoveParent(selectedEntity);
+                        scene.RemoveParent(selectedEntity);
                     }
 
                     registry.view<SceneTreeComponent, TagComponent>().each([&](entt::entity entity, SceneTreeComponent&, TagComponent& tag)
@@ -454,7 +454,7 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                                 std::string displayName = tag.tag + "##" + std::to_string((uint32_t)entity);
                                 if (ImGui::Selectable(displayName.c_str(), selectedNode.parent == entity))
                                 {
-                                    scene->SetParent(selectedEntity, entity);
+                                    scene.SetParent(selectedEntity, entity);
                                 }
                             }
                         });
@@ -490,7 +490,7 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
                         {
                             scriptComp.luaFile = pathStr;
                             // Optionally bind immediately
-                            scene->BindLuaScript(scriptComp, selectedEntity);
+                            scene.BindLuaScript(scriptComp, selectedEntity);
                         }
                     }
                     ImGui::EndDragDropTarget();

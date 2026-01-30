@@ -1,26 +1,29 @@
 {
     "Entities": [
         {
-            "Material": {
-                "material": "ee3dde12-6263-4f11-bb1d-812b3e196ab7"
+            "DirectionalLight": {
+                "castShadows": true,
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "intensity": 5.0
             },
-            "Mesh": {
-                "mesh": "a0b4d440-3b37-4a4e-959b-86757f27aaff"
-            },
-            "ParentUUID": 2,
+            "ParentUUID": 0,
             "Tag": {
-                "tag": "Capsule"
+                "tag": "DirectionalLight"
             },
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
-                    2.0,
-                    3.0,
+                    0.0,
+                    0.0,
                     0.0
                 ],
                 "rotation": [
-                    0.0,
-                    -0.0,
+                    -60.0,
+                    -90.0,
                     0.0
                 ],
                 "scale": [
@@ -34,7 +37,7 @@
                     1.0
                 ]
             },
-            "UUID": 3
+            "UUID": 419
         },
         {
             "Material": {
@@ -71,6 +74,42 @@
                 ]
             },
             "UUID": 2
+        },
+        {
+            "Material": {
+                "material": "ee3dde12-6263-4f11-bb1d-812b3e196ab7"
+            },
+            "Mesh": {
+                "mesh": "a0b4d440-3b37-4a4e-959b-86757f27aaff"
+            },
+            "ParentUUID": 2,
+            "Tag": {
+                "tag": "Capsule"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    2.0,
+                    3.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 3
         }
     ]
 }

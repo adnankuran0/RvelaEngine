@@ -7,8 +7,9 @@
 
 using json = nlohmann::json;
 
-void SceneManager::SaveScene(Scene& scene, const std::string& path)
+void SceneManager::SaveScene( const std::string& path)
 {
+    Scene& scene = GetActiveScene();
     json sceneJson;
     sceneJson["Entities"] = json::array();
 
@@ -28,8 +29,10 @@ void SceneManager::SaveScene(Scene& scene, const std::string& path)
     ofs << sceneJson.dump(4);
 }
 
-void SceneManager::LoadScene(Scene& scene, const std::string& path)
+void SceneManager::LoadScene(const std::string& path)
 {
+    std::unique_ptr<Scene> scenePtr = CreateScene("NewScene");
+    Scene& scene = *scenePtr;
     json j;
     std::ifstream(path) >> j;
 
@@ -109,6 +112,8 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
     }
 
     scene.UpdateHierarchy();
+
+    SetActiveScene(std::move(scenePtr));
 }
 
 json SceneManager::SerializeEntity(Scene& scene, entt::entity e)
