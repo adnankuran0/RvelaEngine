@@ -72,7 +72,7 @@ void EditorLayer::Render()
 
     m_MenuBar.Draw(m_Engine,m_AssetImporterRegistry);
 
-    m_ToolBar.Draw();
+    m_ToolBar.Draw(m_Engine->GetScene());
 
     m_Dockspace.Draw();
 

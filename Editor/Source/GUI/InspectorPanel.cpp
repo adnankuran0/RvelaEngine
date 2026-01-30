@@ -464,6 +464,36 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
             }
         }
 
+        if (registry.any_of<ScriptComponent>(selectedEntity))
+        {
+            if (ImGui::CollapsingHeader("Script"))
+            {
+                
+
+            }
+        }
+
+        if (ImGui::Button("Add Component"))
+        {
+            ImGui::OpenPopup("AddComponentPopup");
+        }
+
+        if (ImGui::BeginPopup("AddComponentPopup"))
+        {
+            if (!registry.any_of<ScriptComponent>(selectedEntity))
+            {
+                if (ImGui::MenuItem("Script"))
+                {
+                    registry.emplace<ScriptComponent>(selectedEntity);
+                    ImGui::CloseCurrentPopup();
+                }
+            }
+
+            // ileride başka component’ler de buraya gelir
+
+            ImGui::EndPopup();
+        }
+
 
     }
     else {

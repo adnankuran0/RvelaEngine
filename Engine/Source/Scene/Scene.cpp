@@ -7,7 +7,7 @@
 #include "Utils/ProjectManager.h"
 #include "EntityUUID.h"
 #include <Assets/PrefabAsset.h>
-#include "Scene/Entity.h"
+#include "Scene/ScriptableEntity.h"
 
 Scene::Scene(const std::string& sceneName) : m_Registry() 
 {
@@ -21,6 +21,65 @@ Scene::Scene(const std::string& sceneName) : m_Registry()
     m_EntityMap[entity.GetUUID()] = (entt::entity)m_RootEntity;
 }
 
+void Scene::SetState(SceneState newState)
+{
+    if (newState == m_State) return;
+    if (m_State == SceneState::EDIT && newState == SceneState::PLAY)
+        OnStart();
+    if (m_State == SceneState::PLAY && newState == SceneState::EDIT)
+        OnStop();
+    m_State = newState;
+}
+
+void Scene::OnStart()
+{
+    std::cout << "Scene started\n";
+    auto view = m_Registry.view<ScriptComponent>();
+    for (auto entity : view)
+    {
+        auto& scriptComp = view.get<ScriptComponent>(entity);
+        if (scriptComp.instance == nullptr)
+        {
+            
+            scriptComp.instance = new ScriptableEntity();
+            scriptComp.instance->entity = new Entity(entity, this);
+            scriptComp.instance->OnCreate();
+        }
+    }
+}
+
+void Scene::OnUpdate(float dt)
+{
+    auto view = m_Registry.view<ScriptComponent>();
+
+    for (auto entity : view)
+    {
+        auto& sc = view.get<ScriptComponent>(entity);
+
+        if (sc.instance)
+            sc.instance->OnUpdate(dt);
+    }
+
+}
+
+void Scene::OnStop()
+{
+    std::cout << "Scene stopped\n";
+
+    auto view = m_Registry.view<ScriptComponent>();
+
+    for (auto entity : view)
+    {
+        auto& sc = view.get<ScriptComponent>(entity);
+
+        if (sc.instance)
+        {
+            sc.instance->OnDestroy();
+            delete sc.instance;
+            sc.instance = nullptr;
+        }
+    }
+}
 
 Entity Scene::CreateEntity(const std::string& name) {
     Entity entity(m_Registry.create(), this);
@@ -115,7 +174,12 @@ Entity Scene::LoadPrimitive(const std::string& primitiveMeshName)
     return root;
 }
 
-void Scene::Update() { UpdateHierarchy(); }
+void Scene::Update() 
+{
+    if (m_State == SceneState::PLAY)
+        OnUpdate(Time::GetDeltaTime());
+    UpdateHierarchy(); 
+}
 
 entt::registry& Scene::GetRegistry() { return m_Registry; }
 

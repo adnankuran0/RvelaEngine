@@ -1,7 +1,9 @@
 #pragma once
+#include "Core/Engine.h"
+
 class ToolBar
 {
 public:
-	void Draw();
+	void Draw(Scene* scene);
 };
 

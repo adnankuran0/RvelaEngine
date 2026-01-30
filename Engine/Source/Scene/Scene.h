@@ -9,10 +9,24 @@
 
 class Entity; // Forward Declaration
 
+enum class SceneState
+{
+    EDIT,
+    PLAY,
+    PAUSE
+};
+
 class Scene
 {
 public:
     Scene(const std::string& sceneName = "Untitled");
+
+    void SetState(SceneState newState);
+    SceneState GetState() const { return m_State; };
+
+    void OnStart();
+    void OnUpdate(float dt);
+    void OnStop();;
 
     bool isLoading = false;
 
@@ -102,6 +116,7 @@ public:
     [[nodiscard]] unsigned int GetComponentCount(entt::entity entity) noexcept;
 
 private:
+    SceneState m_State = SceneState::EDIT;
     std::string m_SceneName;
     entt::registry m_Registry;
     std::unordered_map<EntityUUID, entt::entity> m_EntityMap;
