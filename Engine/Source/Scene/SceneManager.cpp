@@ -41,7 +41,7 @@ void SceneManager::LoadScene(Scene& scene, const std::string& path)
 
         if (isPrefab)
         {
-            // Instansiate
+            // Instantiate
             AssetUUID prefabUUID = AssetUUID::FromString(entityJson["Prefab"]);
             Entity instance = scene.Instantiate(prefabUUID);
 
