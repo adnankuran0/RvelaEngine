@@ -20,6 +20,34 @@ Scene::Scene(const std::string& sceneName) : m_Registry()
     entity.AddComponent<TagComponent>(sceneName);
     entity.AddComponent<UUIDComponent>(EntityUUIDGenerator::Generate());
     m_EntityMap[entity.GetUUID()] = (entt::entity)m_RootEntity;
+
+    lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::table, sol::lib::string, sol::lib::os);
+
+    lua.new_usertype<glm::vec3>("vec3",
+        "x", &glm::vec3::x,
+        "y", &glm::vec3::y,
+        "z", &glm::vec3::z
+    );
+
+    lua.new_usertype<TransformComponent>("TransformComponent",
+        "GetPosition", &TransformComponent::GetPosition,
+        "SetPosition", &TransformComponent::SetPosition,
+        "Translate", &TransformComponent::Translate,
+        "GetRotation", &TransformComponent::GetRotation,
+        "SetRotation", &TransformComponent::SetRotation,
+        "GetScale", &TransformComponent::GetScale,
+        "SetScale", &TransformComponent::SetScale
+    );
+
+    lua.new_usertype<Entity>("Entity",
+        "GetComponent", [](Entity& e) -> TransformComponent& {
+            return e.GetComponent<TransformComponent>();
+        },
+        "HasComponent", [](Entity& e) -> bool {
+            return e.HasComponent<TransformComponent>();
+        },
+        "GetName", &Entity::GetName
+    );
 }
 
 void Scene::SetState(SceneState newState)
@@ -32,19 +60,46 @@ void Scene::SetState(SceneState newState)
     m_State = newState;
 }
 
+void Scene::BindLuaScript(ScriptComponent& sc, entt::entity& e)
+{
+    sc.luaState = &lua;
+
+    sol::load_result script = sc.luaState->load_file(sc.luaFile);
+    if (!script.valid()) { LOG_ERROR(script); return; }
+
+    sol::protected_function func = script;
+    sol::protected_function_result result = func();
+    if (!result.valid()) { LOG_ERROR(result); return; }
+
+    sc.luaInstance = result;
+
+    sc.luaInstance["entity"] = Entity(e, this);
+
+    sc.OnCreate = sc.luaInstance["OnCreate"];
+    sc.OnUpdate = sc.luaInstance["OnUpdate"];
+    sc.OnDestroy = sc.luaInstance["OnDestroy"];
+
+    if (sc.OnCreate.valid())
+        sc.OnCreate(sc.luaInstance);
+}
+
 void Scene::OnStart()
 {
     std::cout << "Scene started\n";
+
     auto view = m_Registry.view<ScriptComponent>();
     for (auto entity : view)
     {
-        auto& scriptComp = view.get<ScriptComponent>(entity);
-        BindScript<TestScript>(scriptComp);
-        if (!scriptComp.instance && scriptComp.InstantiateScript)
+        auto& sc = view.get<ScriptComponent>(entity);
+
+        if (sc.OnCreate.valid())
         {
-            scriptComp.instance = scriptComp.InstantiateScript();
-            scriptComp.instance->SetEntity(new Entity(entity, this));
-            scriptComp.instance->OnCreate();
+            sol::protected_function_result result = sc.OnCreate(sc.luaInstance);
+            if (!result.valid())
+            {
+                sol::error err = result;
+                LOG_ERROR("Lua OnCreate error: {}", err.what());
+            }
         }
     }
 }
@@ -57,8 +112,12 @@ void Scene::OnUpdate(float dt)
     {
         auto& sc = view.get<ScriptComponent>(entity);
 
-        if (sc.instance)
-            sc.instance->OnUpdate(dt);
+        if (sc.luaInstance.valid())
+        {
+            sol::function onUpdate = sc.luaInstance["OnUpdate"];
+            if (onUpdate.valid())
+                onUpdate(sc.luaInstance, dt);
+        }
     }
 
 }
@@ -68,15 +127,18 @@ void Scene::OnStop()
     std::cout << "Scene stopped\n";
 
     auto view = m_Registry.view<ScriptComponent>();
-
     for (auto entity : view)
     {
         auto& sc = view.get<ScriptComponent>(entity);
 
-        if (sc.instance && sc.DestroyScript)
+        if (sc.OnDestroy.valid())
         {
-            sc.instance->OnDestroy();
-            sc.DestroyScript(&sc);
+            sol::protected_function_result result = sc.OnDestroy(sc.luaInstance);
+            if (!result.valid())
+            {
+                sol::error err = result;
+                LOG_ERROR("Lua OnDestroy error: {}", err.what());
+            }
         }
     }
 }

@@ -43,7 +43,8 @@ void EditorLayer::OnDetach()
 
 void EditorLayer::OnUpdate()
 {
-    m_EditorCamera.Update();
+    if(m_Engine->GetScene()->GetState() == SceneState::EDIT)
+        m_EditorCamera.Update();
 
 }
 

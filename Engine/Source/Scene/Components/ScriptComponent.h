@@ -1,9 +1,12 @@
 #pragma once
-#include "Scene/ScriptableEntity.h"
+#include "sol/sol.hpp"
 
 struct ScriptComponent {
-    ScriptableEntity* instance = nullptr;
+    std::string luaFile;
+    sol::state* luaState = nullptr;
+    sol::table luaInstance;
 
-    ScriptableEntity* (*InstantiateScript)() = nullptr;
-    void (*DestroyScript)(ScriptComponent*) = nullptr;
+    sol::function OnCreate;
+    sol::function OnUpdate;
+    sol::function OnDestroy;
 };

@@ -24,21 +24,26 @@ project "RvelaEngine"
       "../Vendor/Assimp/include",
       "../Vendor/nlohmann",
       "../Vendor/uuid_v4",
-      "../Vendor/robin_map/include"
+      "../Vendor/robin_map/include",
+      "../Vendor/sol",
+      "../Vendor/lua/include"
       
    }
 
    libdirs
    {
       "../Vendor/GLFW/lib",
-      "../Vendor/Assimp/lib"
+      "../Vendor/Assimp/lib",
+      "../Vendor/lua/lib"
+
    }
 
    links
    {
       "glfw3",
       "opengl32",
-      "assimp-vc143-mt"
+      "assimp-vc143-mt",
+      "lua54"
    }
 
    targetdir ("../Binaries/" .. OutputDir .. "/%{prj.name}")

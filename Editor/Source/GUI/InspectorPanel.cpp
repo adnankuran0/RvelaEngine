@@ -468,8 +468,33 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
         {
             if (ImGui::CollapsingHeader("Script"))
             {
-                
+                auto& scriptComp = registry.get<ScriptComponent>(selectedEntity);
 
+                // Lua script path text box
+                char buffer[512];
+                std::strncpy(buffer, scriptComp.luaFile.c_str(), sizeof(buffer));
+                if (ImGui::InputText("Path", buffer, sizeof(buffer)))
+                {
+                    scriptComp.luaFile = buffer;
+                }
+
+                // Drag & Drop target
+                ImGui::Button("Drop Lua Script Here", ImVec2(200, 20));
+                if (ImGui::BeginDragDropTarget())
+                {
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
+                    {
+                        const char* path = (const char*)payload->Data;
+                        std::string pathStr(path);
+                        if (pathStr.ends_with(".lua"))
+                        {
+                            scriptComp.luaFile = pathStr;
+                            // Optionally bind immediately
+                            scene->BindLuaScript(scriptComp, selectedEntity);
+                        }
+                    }
+                    ImGui::EndDragDropTarget();
+                }
             }
         }
 
@@ -484,12 +509,11 @@ void InspectorPanel::Draw(Scene* scene, entt::entity& selectedEntity)
             {
                 if (ImGui::MenuItem("Script"))
                 {
-                    registry.emplace<ScriptComponent>(selectedEntity);
+                    ScriptComponent& comp = registry.emplace<ScriptComponent>(selectedEntity);
                     ImGui::CloseCurrentPopup();
                 }
             }
 
-            // ileride başka component’ler de buraya gelir
 
             ImGui::EndPopup();
         }
