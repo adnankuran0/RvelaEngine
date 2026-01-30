@@ -43,7 +43,8 @@ void EditorLayer::OnDetach()
 
 void EditorLayer::OnUpdate()
 {
-    m_EditorCamera.Update();
+    if(m_Engine->GetScene()->GetState() == SceneState::EDIT)
+        m_EditorCamera.Update();
 
 }
 
@@ -72,7 +73,7 @@ void EditorLayer::Render()
 
     m_MenuBar.Draw(m_Engine,m_AssetImporterRegistry);
 
-    m_ToolBar.Draw();
+    m_ToolBar.Draw(m_Engine->GetScene());
 
     m_Dockspace.Draw();
 

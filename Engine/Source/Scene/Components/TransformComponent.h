@@ -118,7 +118,7 @@ public:
         worldScale = scl;
     }
 
-    std::string Serialize() const noexcept;
-    void Deserialize(const std::string& jsonStr) noexcept;
+    json Serialize() const noexcept;
+    void Deserialize(const json& j) noexcept;
    
 };

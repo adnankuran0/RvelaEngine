@@ -12,10 +12,9 @@ std::string SpotLightComponent::Serialize() const
     return j.dump(4);
 }
 
-void SpotLightComponent::Deserialize(const std::string& jsonStr)
+void SpotLightComponent::Deserialize(const json& j)
 {
-    json j = json::parse(jsonStr);
-    auto colorData = j["color"];
+    auto colorData = j.at("color");
     color = glm::vec3(colorData[0], colorData[1], colorData[2]);
     intensity = j["intensity"];
     radius = j["radius"];

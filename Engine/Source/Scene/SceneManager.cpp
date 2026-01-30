@@ -7,29 +7,168 @@
 
 using json = nlohmann::json;
 
-Scene SceneManager::CreateScene(const std::string& path)
-{
-    Scene newScene;
-    //TODO: set scenes self path
-    m_CurrentScene = &newScene;
-    return newScene;
-}
-
-Scene SceneManager::CreateScene()
-{
-    Scene newScene;
-    m_CurrentScene = &newScene;
-    return newScene;
-}
-
 void SceneManager::SaveScene(Scene& scene, const std::string& path)
 {
-    
+    json sceneJson;
+    sceneJson["Entities"] = json::array();
+
+    auto view = scene.GetRegistry().view<UUIDComponent, SceneTreeComponent>();
+    entt::entity root = scene.GetRootEntity();
+
+    for (auto e : view)
+    {
+        if (e == root) continue;
+
+        sceneJson["Entities"].push_back(
+            SerializeEntity(scene, e)
+        );
+    }
+
+    std::ofstream ofs(path);
+    ofs << sceneJson.dump(4);
 }
 
 void SceneManager::LoadScene(Scene& scene, const std::string& path)
 {
-    
+    json j;
+    std::ifstream(path) >> j;
+
+    std::unordered_map<EntityUUID, entt::entity> uuidToEntity;
+
+    for (auto& entityJson : j["Entities"])
+    {
+        bool isPrefab = entityJson.contains("Prefab");
+
+        if (isPrefab)
+        {
+            // Instantiate
+            AssetUUID prefabUUID = AssetUUID::FromString(entityJson["Prefab"]);
+            Entity instance = scene.Instantiate(prefabUUID);
+
+            if (entityJson.contains("Transform"))
+            {
+                scene.GetComponent<TransformComponent>(instance).Deserialize(entityJson["Transform"]);
+            }
+
+            if (entityJson.contains("UUID"))
+            {
+                EntityUUID savedUUID = entityJson["UUID"];
+                uuidToEntity[savedUUID] = instance.GetHandle();
+            }
+
+            continue;
+        }
+
+        Entity e = scene.CreateEntity("");
+        entt::entity handle = e.GetHandle();
+
+        auto& uuidComp = scene.GetComponent<UUIDComponent>(handle);
+        uuidComp.Deserialize(entityJson["UUID"]);
+        uuidToEntity[uuidComp.uuid] = handle;
+
+        if (entityJson.contains("Tag"))
+            scene.GetComponent<TagComponent>(handle).Deserialize(entityJson["Tag"]);
+
+        if (entityJson.contains("Transform"))
+            scene.GetComponent<TransformComponent>(handle).Deserialize(entityJson["Transform"]);
+
+        if (entityJson.contains("Material"))
+            scene.AddComponent<MaterialComponent>(handle).Deserialize(entityJson["Material"]);
+
+        if (entityJson.contains("Mesh"))
+        {
+            auto& comp = scene.AddComponent<MeshComponent>(handle);
+            comp.Deserialize(entityJson["Mesh"]);
+            scene.AddComponent<MeshRendererComponent>(handle, comp.GetMesh());
+        }
+
+        if (entityJson.contains("PointLight"))
+            scene.AddComponent<PointLightComponent>(handle).Deserialize(entityJson["PointLight"]);
+
+        if (entityJson.contains("DirectionalLight"))
+            scene.AddComponent<DirectionalLightComponent>(handle).Deserialize(entityJson["DirectionalLight"]);
+
+        if (entityJson.contains("ParentUUID"))
+        {
+            auto& tree = scene.GetComponent<SceneTreeComponent>(handle);
+            tree.parentUUID = entityJson["ParentUUID"];
+        }
+    }
+
+    for (auto& [uuid, entity] : uuidToEntity)
+    {
+        auto& tree = scene.GetComponent<SceneTreeComponent>(entity);
+        if (tree.parentUUID != 0 && uuidToEntity.contains(tree.parentUUID))
+        {
+            scene.SetParentKeepLocal(entity, uuidToEntity[tree.parentUUID]);
+        }
+        else
+        {
+            scene.SetParentKeepLocal(entity, scene.GetRootEntity());
+        }
+    }
+
+    scene.UpdateHierarchy();
+}
+
+json SceneManager::SerializeEntity(Scene& scene, entt::entity e)
+{
+    json j;
+
+    bool isPrefab = scene.HasComponent<PrefabComponent>(e);
+    if (isPrefab)
+    {
+        auto& comp = scene.GetComponent<PrefabComponent>(e);
+        j["Prefab"] = comp.Serialize();
+
+        // per instance transform
+        if (scene.HasComponent<TransformComponent>(e))
+            j["Transform"] = scene.GetComponent<TransformComponent>(e).Serialize();
+
+        if (scene.HasComponent<UUIDComponent>(e))
+            j["UUID"] = scene.GetComponent<UUIDComponent>(e).Serialize();
+
+        return j;
+    }
+
+    if (scene.HasComponent<UUIDComponent>(e))
+        j["UUID"] = scene.GetComponent<UUIDComponent>(e).Serialize();
+
+    if (scene.HasComponent<TagComponent>(e))
+        j["Tag"] = scene.GetComponent<TagComponent>(e).Serialize();
+
+    if (scene.HasComponent<TransformComponent>(e))
+        j["Transform"] = scene.GetComponent<TransformComponent>(e).Serialize();
+
+    if (scene.HasComponent<MaterialComponent>(e))
+        j["Material"] = scene.GetComponent<MaterialComponent>(e).Serialize();
+
+    if (scene.HasComponent<MeshComponent>(e))
+        j["Mesh"] = scene.GetComponent<MeshComponent>(e).Serialize();
+
+    if (scene.HasComponent<PointLightComponent>(e))
+        j["PointLight"] = scene.GetComponent<PointLightComponent>(e).Serialize();
+
+    if (scene.HasComponent<DirectionalLightComponent>(e))
+        j["DirectionalLight"] = scene.GetComponent<DirectionalLightComponent>(e).Serialize();
+
+    if (scene.HasComponent<SceneTreeComponent>(e))
+    {
+        auto& tree = scene.GetComponent<SceneTreeComponent>(e);
+        entt::entity parent = tree.parent;
+
+        if (parent != entt::null && parent != scene.GetRootEntity())
+        {
+            auto& parentUUID = scene.GetComponent<UUIDComponent>(parent);
+            j["ParentUUID"] = parentUUID.uuid;
+        }
+        else
+        {
+            j["ParentUUID"] = 0;
+        }
+    }
+
+    return j;
 }
 
 unsigned int SceneManager::CountEntitiesRecursively(entt::entity& rootEntity)
@@ -41,85 +180,6 @@ unsigned int SceneManager::CountEntitiesRecursively(entt::entity& rootEntity)
         for (auto child : children)
             count += CountEntitiesRecursively(child);
     }
-    
+
     return count;
-}
-
-void SceneManager::SerializeEntityRecursively(entt::entity& e, Scene& scene, std::vector<std::byte>& buffer, json& j)
-{
-    // serialize component count
-    unsigned int componentCount = 0; 
-    for (auto& rootEntity : m_CurrentScene->GetRootEntities())
-    {
-        componentCount += scene.GetComponentCount(e);
-    }
-
-    const std::byte* data = reinterpret_cast<const std::byte*>(&componentCount);
-    buffer.insert(buffer.end(), data, data + sizeof(unsigned int));
-
-    // serialize all components
-    auto& uuidComp = scene.GetComponent<UUIDComponent>(e);
-    SerializeBin_UUIDComp(uuidComp, buffer);
-
-    if (scene.HasComponent<TagComponent>(e))
-    {
-        auto& comp = scene.GetComponent<TagComponent>(e);
-        SerializeBin_TagComp(comp, buffer);
-    }
-
-    if (scene.HasComponent<TransformComponent>(e))
-    {
-        auto& comp = scene.GetComponent<TransformComponent>(e);
-        SerializeBin_TransformComp(comp, buffer);
-    }
-
-    if (scene.HasComponent<MaterialComponent>(e))
-    {
-        auto& comp = scene.GetComponent<MaterialComponent>(e);
-        comp.GetMaterial()->Serialize();
-        SerializeBin_MaterialComp(comp, buffer);
-    }
-
-    if (scene.HasComponent<SceneTreeComponent>(e))
-    {
-        auto& comp = scene.GetComponent<SceneTreeComponent>(e);
-        SerializeBin_SceneTreeComp(comp, buffer);
-    }
-
-    if (scene.HasComponent<MeshComponent>(e))
-    {
-        auto& comp = scene.GetComponent<MeshComponent>(e);
-        SerializeBin_MeshComp(comp, buffer);
-    }
-
-    if (scene.HasComponent<MeshRendererComponent>(e))
-    {
-        auto& comp = scene.GetComponent<MeshRendererComponent>(e);
-
-        SerializeBin_MeshRendererComp(comp, buffer);
-    }
-
-    if (scene.HasComponent<PointLightComponent>(e))
-    {
-        auto& comp = scene.GetComponent<PointLightComponent>(e);
-        SerializeBin_PointLightComp(comp, buffer);
-    }
-
-    if (scene.HasComponent<DirectionalLightComponent>(e))
-    {
-        auto& comp = scene.GetComponent<DirectionalLightComponent>(e);
-        SerializeBin_DirectionalLightComp(comp, buffer);
-    }
-
-    if (scene.HasComponent<SceneTreeComponent>(e))
-    {
-        auto& children = scene.GetComponent<SceneTreeComponent>(e).children;
-        if (children.empty()) return;
-
-        for (auto& child : children)
-        {
-            SerializeEntityRecursively(child, scene, buffer, j);
-        }
-    }
-
 }

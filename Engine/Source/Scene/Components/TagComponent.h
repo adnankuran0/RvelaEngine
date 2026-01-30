@@ -10,7 +10,7 @@ public:
     TagComponent() = default;
     TagComponent(const std::string& tag) : tag(tag) {}
 
-    std::string Serialize() const;
-    void Deserialize(const std::string& jsonStr);
+    json Serialize() const;
+    void Deserialize(const json& j);
 
 };

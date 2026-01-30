@@ -94,8 +94,8 @@ public:
 
 	inline const AssetUUID& GetMaterialID() const noexcept{ return materialUUID; }
 
-	std::string Serialize() const;
-	void Deserialize(const std::string& jsonStr);
+	json Serialize() const;
+	void Deserialize(const json& j);
 
 private:
 

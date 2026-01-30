@@ -35,6 +35,8 @@ void Serializer::LoadFromFile(ISerializable& obj, const std::string& path)
 	obj.Deserialize(str.c_str());
 }
 
+
+
 void SerializeBin_DirectionalLightComp(const DirectionalLightComponent& comp, std::vector<std::byte>& out)
 {
 	std::vector<std::byte> tempOut;

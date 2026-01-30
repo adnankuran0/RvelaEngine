@@ -10,7 +10,7 @@ void TransformComponent::LookAt(const glm::vec3& target, const glm::vec3& up) no
     dirty = true;
 }
 
-std::string TransformComponent::Serialize() const noexcept
+json TransformComponent::Serialize() const noexcept
 {
     json j;
     j["position"] = { localPosition.x, localPosition.y, localPosition.z };
@@ -18,21 +18,20 @@ std::string TransformComponent::Serialize() const noexcept
     j["scale"] = { localScale.x, localScale.y, localScale.z };
     j["lockScaleRatio"] = lockScaleRatio;
     j["scaleRatio"] = { scaleRatio.x, scaleRatio.y, scaleRatio.z };
-    return j.dump(4);
+    return j;
 }
-void TransformComponent::Deserialize(const std::string& jsonStr) noexcept
+void TransformComponent::Deserialize(const json& j) noexcept
 {
-    json j = json::parse(jsonStr);
-    auto p = j["position"];
-    auto r = j["rotation"];
-    auto s = j["scale"];
-    auto lsr = j["lockScaleRatio"];
-    auto sr = j["scaleRatio"];
+    auto& p = j.at("position");
+    auto& r = j.at("rotation");
+    auto& s = j.at("scale");
+    auto& lsr = j.at("lockScaleRatio");
+    auto& sr = j.at("scaleRatio");
 
     localPosition = glm::vec3(p[0], p[1], p[2]);
     SetEulerRotation(glm::vec3(r[0], r[1], r[2]));
     localScale = glm::vec3(s[0], s[1], s[2]);
-    lockScaleRatio = lsr;
+    lockScaleRatio = lsr.get<bool>();
     scaleRatio = glm::vec3(sr[0], sr[1], sr[2]);
 
     dirty = true;

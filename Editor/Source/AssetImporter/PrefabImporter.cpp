@@ -14,7 +14,7 @@ Ref<PrefabAsset> PrefabImporter::CreatePrefabAsset(const std::string& path, Scen
     std::vector<std::byte> buffer;
     json j;
 
-    SerializeEntityRecursively(rootEntity, scene, buffer,j);
+    SerializeEntityRecursively(rootEntity, rootEntity,scene, buffer,j);
 
     asset->SetData(std::move(buffer));
 
@@ -23,12 +23,13 @@ Ref<PrefabAsset> PrefabImporter::CreatePrefabAsset(const std::string& path, Scen
     return asset;
 }
 
-void PrefabImporter::SerializeEntityRecursively(entt::entity& e, Scene& scene, std::vector<std::byte>& buffer, json& j)
+void PrefabImporter::SerializeEntityRecursively(entt::entity& e, entt::entity& rootEntity,Scene& scene, std::vector<std::byte>& buffer, json& j)
 {
     // serialize component count
     unsigned int componentCount = scene.GetComponentCount(e);
     const std::byte* data = reinterpret_cast<const std::byte*>(&componentCount);
     buffer.insert(buffer.end(), data, data + sizeof(unsigned int));
+
 
     // serialize all components
     auto& uuidComp = scene.GetComponent<UUIDComponent>(e);
@@ -42,7 +43,14 @@ void PrefabImporter::SerializeEntityRecursively(entt::entity& e, Scene& scene, s
 
     if (scene.HasComponent<TransformComponent>(e))
     {
-        auto& comp = scene.GetComponent<TransformComponent>(e);
+        auto comp = scene.GetComponent<TransformComponent>(e); 
+
+        if (e == rootEntity)
+        {
+            comp.SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+            comp.SetRotation(glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+        }
+
         SerializeBin_TransformComp(comp, buffer);
     }
 
@@ -55,7 +63,11 @@ void PrefabImporter::SerializeEntityRecursively(entt::entity& e, Scene& scene, s
 
     if (scene.HasComponent<SceneTreeComponent>(e))
     {
-        auto& comp = scene.GetComponent<SceneTreeComponent>(e);
+        auto comp = scene.GetComponent<SceneTreeComponent>(e);
+
+        if (e == rootEntity)
+            comp.parentUUID = 0;
+
         SerializeBin_SceneTreeComp(comp, buffer);
     }
 
@@ -91,7 +103,7 @@ void PrefabImporter::SerializeEntityRecursively(entt::entity& e, Scene& scene, s
 
         for (auto& child : children)
         {
-            SerializeEntityRecursively(child, scene, buffer,j);
+            SerializeEntityRecursively(child, rootEntity, scene, buffer,j);
         }
     }
 

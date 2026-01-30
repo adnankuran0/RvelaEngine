@@ -14,7 +14,7 @@ Engine::Engine()
 	m_ProjectManager.LoadProject("C:\\RvelaEngine\\TestProject\\TestProject.rproj");
 	m_Renderer.Init(m_Window.GetGLFWWindow());
 	m_AssetRegistry.Init(m_ProjectManager.GetProjectPath()); //TODO: Make this works with assets path
-	m_Scene = std::make_unique<Scene>();
+	m_Scene = std::make_unique<Scene>("TestScene");
 	PushLayer(new RenderLayer(this));
 
 	if (s_Instance == nullptr)
@@ -87,17 +87,11 @@ void Engine::Run()
 		Update();
 		LateUpdate();
 
-		
-
 		Render();
-
-		
-
 
 		EventManager::ClearEvents();
 		Input::Update();
 
-		
 	}
 	LOG_INFO("Engine has stopped!");
 }
@@ -109,13 +103,17 @@ void Engine::HandleEvents() noexcept
 		{
 		case EventType::MouseMoved:
 		{
-			if (auto* mouseEvent = dynamic_cast<MouseMovedEvent*>(&event))
+			if (auto* mouseEvent = dynamic_cast<MouseMovedEvent*>(&event) )
 			{
-				editorCamera->onMouseMoved(
-					mouseEvent->GetX(),
-					mouseEvent->GetY(),
-					m_Window.GetGLFWWindow()
-				);
+				if (m_Scene->GetState() == SceneState::EDIT)
+				{
+					editorCamera->onMouseMoved(
+						mouseEvent->GetX(),
+						mouseEvent->GetY(),
+						m_Window.GetGLFWWindow()
+					);
+				}
+				
 			}
 			break;
 		}

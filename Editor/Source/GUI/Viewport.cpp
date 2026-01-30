@@ -53,9 +53,10 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
 
         ImGuizmo::SetRect(displayPos.x, displayPos.y, displaySize.x, displaySize.y);
 
+        bool canDrawGizmo = selectedEntity != entt::null && engine->GetScene()->GetRegistry().any_of<TransformComponent>(selectedEntity) &&
+            engine->GetScene()->GetState() == SceneState::EDIT;
 
-
-        if (selectedEntity != entt::null && engine->GetScene()->GetRegistry().any_of<TransformComponent>(selectedEntity)) {
+        if (canDrawGizmo) {
             auto& tc = engine->GetScene()->GetRegistry().get<TransformComponent>(selectedEntity);
 
             glm::mat4 transform = tc.GetWorldMatrix();

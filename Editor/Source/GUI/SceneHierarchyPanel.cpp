@@ -6,6 +6,7 @@
 
 void SceneHierarchyPanel::Draw(Scene* scene, entt::entity& selectedEntity)
 {
+    entt::entity rootEntity = scene->GetRootEntity();
 
 
     entt::registry& registry = scene->GetRegistry();
@@ -24,83 +25,91 @@ void SceneHierarchyPanel::Draw(Scene* scene, entt::entity& selectedEntity)
         };
 
 
-    std::function<void(entt::entity)> DrawEntityNode = [&](entt::entity entity) {
-        auto children = getChildren(entity);
-        bool isLeaf = children.empty();
-        ImGuiTreeNodeFlags flags = isLeaf ? ImGuiTreeNodeFlags_Leaf : 0;
-        flags |= ImGuiTreeNodeFlags_OpenOnArrow;
-
-        if (entity == selectedEntity) {
-            flags |= ImGuiTreeNodeFlags_Selected;
-        }
-
-        auto& tagComponent = scene->GetComponent<TagComponent>(entity);
-        std::string nodeId = tagComponent.tag + "##" + std::to_string((uint32_t)entity);
-
-        // check for PrefabComponent
-        bool isPrefab = scene->HasComponent<PrefabComponent>(entity);
-        if (isPrefab) {
-            // light blue color
-            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.75f, 1.0f, 1.0f));
-        }
-
-        bool nodeOpen = ImGui::TreeNodeEx(nodeId.c_str(), flags);
-
-        if (isPrefab) {
-            ImGui::PopStyleColor();
-        }
-
-        if (ImGui::IsItemClicked(ImGuiMouseButton_Left) || ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
-            selectedEntity = entity;
-        }
-
-        if (ImGui::BeginPopupContextItem()) {
-            if (ImGui::MenuItem("Delete Entity")) {
-                scene->DestroyEntity(entity);
-                if (selectedEntity == entity) selectedEntity = entt::null;
-            }
-            ImGui::EndPopup();
-        }
-
-        if (nodeOpen) 
+    std::function<void(entt::entity)> DrawEntityNode = [&](entt::entity entity)
         {
-            if (!isPrefab) 
+            bool isRoot = (entity == rootEntity);
+
+            auto children = getChildren(entity);
+            ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
+
+            if (isRoot)
             {
-                for (auto child : children) 
+                flags |= ImGuiTreeNodeFlags_DefaultOpen;
+                flags |= ImGuiTreeNodeFlags_NoTreePushOnOpen;
+            }
+            else if (children.empty())
+            {
+                flags |= ImGuiTreeNodeFlags_Leaf;
+            }
+
+            if (!isRoot && entity == selectedEntity)
+                flags |= ImGuiTreeNodeFlags_Selected;
+
+            auto& tagComponent = scene->GetComponent<TagComponent>(entity);
+            std::string nodeId = tagComponent.tag + "##" + std::to_string((uint32_t)entity);
+
+            bool isPrefab = scene->HasComponent<PrefabComponent>(entity);
+            if (isPrefab)
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.75f, 1.0f, 1.0f));
+
+            bool nodeOpen = ImGui::TreeNodeEx(nodeId.c_str(), flags);
+
+            if (isPrefab)
+                ImGui::PopStyleColor();
+
+            if (!isRoot && ImGui::IsItemClicked())
+                selectedEntity = entity;
+
+            if (!isRoot && ImGui::BeginPopupContextItem())
+            {
+                if (ImGui::MenuItem("Delete Entity"))
                 {
+                    scene->DestroyEntity(entity);
+                    if (selectedEntity == entity)
+                        selectedEntity = entt::null;
+                }
+                ImGui::EndPopup();
+            }
+
+            if (!isRoot && ImGui::BeginDragDropSource())
+            {
+                entt::entity e = entity;
+                ImGui::SetDragDropPayload("ENTITY_DRAG", &e, sizeof(entt::entity));
+                ImGui::Text("%s", tagComponent.tag.c_str());
+                ImGui::EndDragDropSource();
+            }
+
+            if (!isRoot && ImGui::BeginDragDropTarget())
+            {
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY_DRAG"))
+                {
+                    entt::entity child = *(entt::entity*)payload->Data;
+                    if (child != entity)
+                        scene->SetParent(child, entity);
+                }
+                ImGui::EndDragDropTarget();
+            }
+
+            if (isRoot)
+            {
+                for (auto child : children)
                     DrawEntityNode(child);
-                }
             }
-            ImGui::TreePop();
-        }
+            else if (nodeOpen)
+            {
+                for (auto child : children)
+                    DrawEntityNode(child);
 
-
-        // drag source
-        if (ImGui::BeginDragDropSource()) {
-            entt::entity e = entity;
-            ImGui::SetDragDropPayload("ENTITY_DRAG", &e, sizeof(entt::entity));
-            ImGui::Text("%s", tagComponent.tag.c_str());
-            ImGui::EndDragDropSource();
-        }
-
-        // drag target
-        if (ImGui::BeginDragDropTarget()) {
-            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY_DRAG")) {
-                entt::entity child = *(entt::entity*)payload->Data;
-
-                // self veya kendi çocuğuna bırakmayı engelle
-                if (child != entity) {
-                    scene->SetParent(child, entity);
-                }
+                ImGui::TreePop();
             }
-            ImGui::EndDragDropTarget();
-        }
-
         };
 
-    for (auto root : rootEntities) {
-        DrawEntityNode(root);
+    auto rootChildren = getChildren(rootEntity);
+    for (auto entity : rootChildren)
+    {
+        DrawEntityNode(entity);
     }
+
 
     if (ImGui::BeginPopupContextWindow()) {
         if (ImGui::MenuItem("Create Entity")) {

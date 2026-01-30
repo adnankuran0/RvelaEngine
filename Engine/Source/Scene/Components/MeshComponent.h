@@ -25,8 +25,8 @@ public:
         isDirty = true;
     }
 
-    std::string Serialize() const;
-    void Deserialize(const std::string& str);
+    json Serialize() const;
+    void Deserialize(const json& j);
 
     inline bool IsDirty() noexcept { return isDirty;}
     inline void SetDirty(bool isDirty) noexcept { this->isDirty = isDirty; }

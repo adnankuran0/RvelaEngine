@@ -14,5 +14,5 @@ public:
     entt::entity parent = entt::null;
 
     std::string Serialize() const;
-    void Deserialize(const std::string& jsonStr);
+    void Deserialize(const json& j);
 };

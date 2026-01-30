@@ -9,21 +9,38 @@
 
 class Entity; // Forward Declaration
 
+enum class SceneState
+{
+    EDIT,
+    PLAY,
+    PAUSE
+};
+
 class Scene
 {
 public:
-    Scene();
+    Scene(const std::string& sceneName = "Untitled");
+
+    void SetState(SceneState newState);
+    SceneState GetState() const { return m_State; };
+
+    void BindLuaScript(ScriptComponent& sc, entt::entity& e);
+    
+
+    void OnStart();
+    void OnUpdate(float dt);
+    void OnStop();;
 
     bool isLoading = false;
 
     Entity CreateEntity(const std::string& name);
+    Entity CreateEntityRaw();
     Entity CreateEntityWithUUID(const std::string& name, EntityUUID uuid);
     void DestroyEntity(entt::entity entity);
 
     Entity CreatePointLight();
     Entity CreateDirectionalLight();
 
-    //Entity LoadAsset(const std::string& path);
     Entity LoadPrimitive(const std::string& primitiveMeshName);
 
     template<typename Component, typename... Args>
@@ -52,6 +69,7 @@ public:
     }
 
     void SetParent(entt::entity child, entt::entity parent);
+    void SetParentKeepLocal(entt::entity child, entt::entity parent);
 
     const std::vector<entt::entity>& GetChildren(entt::entity entity) {
         return GetComponent<SceneTreeComponent>(entity).children;
@@ -77,6 +95,8 @@ public:
     entt::registry& GetRegistry();
     std::unordered_map<EntityUUID, entt::entity> GetUUIDEntityMap() { return m_EntityMap; }
 
+    [[nodiscard]] inline const entt::entity& GetRootEntity() const noexcept { return m_RootEntity; }
+
     entt::entity& GetEntityByUUID(EntityUUID& uuid) { return m_EntityMap.at(uuid); }
 
     std::vector<PointLightData> CollectPointLights() noexcept;
@@ -99,8 +119,12 @@ public:
     [[nodiscard]] unsigned int GetComponentCount(entt::entity entity) noexcept;
 
 private:
+    SceneState m_State = SceneState::EDIT;
+    std::string m_SceneName;
     entt::registry m_Registry;
     std::unordered_map<EntityUUID, entt::entity> m_EntityMap;
     friend class Entity;
     entt::entity selectedEntity;
+    entt::entity m_RootEntity;
+    sol::state lua;
 };

@@ -68,6 +68,7 @@ public:
 
     void Update()
     {
+        
         if (Input::IsMouseButtonPressed(MouseCode::Button1))
             ProcessKeyboard();
 

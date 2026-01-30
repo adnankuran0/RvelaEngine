@@ -2,7 +2,7 @@
 #include "ImGui/imgui.h"
 
 
-void ToolBar::Draw()
+void ToolBar::Draw(Scene* scene)
 {
     ImGuiViewport* viewport = ImGui::GetMainViewport();
 
@@ -37,13 +37,22 @@ void ToolBar::Draw()
             ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offset);
         }
 
-        if (ImGui::Button("Play", button_size)) {}
+        if (ImGui::Button("Play", button_size)) 
+        {
+            scene->SetState(SceneState::PLAY);
+        }
         ImGui::SameLine();
 
-        if (ImGui::Button("Pause", button_size)) {}
+        if (ImGui::Button("Pause", button_size)) 
+        {
+            scene->SetState(SceneState::PAUSE);
+        }
         ImGui::SameLine();
 
-        if (ImGui::Button("Stop", button_size)) {}
+        if (ImGui::Button("Stop", button_size)) 
+        {
+            scene->SetState(SceneState::EDIT);
+        }
 
         ImGui::PopStyleColor();
     }

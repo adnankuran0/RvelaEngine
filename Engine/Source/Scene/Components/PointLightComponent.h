@@ -28,8 +28,8 @@ public:
         s_ShadowIndexCounter++;
     }
 
-    std::string Serialize() const;
-    void Deserialize(const std::string& jsonStr);
+    json Serialize() const;
+    void Deserialize(const json& j);
  
 
 private:

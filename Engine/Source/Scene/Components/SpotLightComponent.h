@@ -18,6 +18,6 @@ public:
     float outerCutoff = glm::cos(glm::radians(30.0f));
 
     std::string Serialize() const;
-    void Deserialize(const std::string& jsonStr);
+    void Deserialize(const json& j);
 
 };
