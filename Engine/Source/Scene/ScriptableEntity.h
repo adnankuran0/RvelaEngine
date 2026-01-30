@@ -11,7 +11,7 @@ public:
     void SetEntity(Entity* entity) { this->entity = entity; }
 
     virtual void OnCreate() {}
-    virtual void OnUpdate(float dt);
+    virtual void OnUpdate(float dt) = 0;
     virtual void OnDestroy() {}
 
     Entity* entity;

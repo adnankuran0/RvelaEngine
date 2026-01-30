@@ -3,4 +3,7 @@
 
 struct ScriptComponent {
     ScriptableEntity* instance = nullptr;
+
+    ScriptableEntity* (*InstantiateScript)() = nullptr;
+    void (*DestroyScript)(ScriptComponent*) = nullptr;
 };

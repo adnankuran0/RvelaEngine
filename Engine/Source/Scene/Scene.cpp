@@ -8,6 +8,7 @@
 #include "EntityUUID.h"
 #include <Assets/PrefabAsset.h>
 #include "Scene/ScriptableEntity.h"
+#include "TestScript.h"
 
 Scene::Scene(const std::string& sceneName) : m_Registry() 
 {
@@ -38,11 +39,11 @@ void Scene::OnStart()
     for (auto entity : view)
     {
         auto& scriptComp = view.get<ScriptComponent>(entity);
-        if (scriptComp.instance == nullptr)
+        BindScript<TestScript>(scriptComp);
+        if (!scriptComp.instance && scriptComp.InstantiateScript)
         {
-            
-            scriptComp.instance = new ScriptableEntity();
-            scriptComp.instance->entity = new Entity(entity, this);
+            scriptComp.instance = scriptComp.InstantiateScript();
+            scriptComp.instance->SetEntity(new Entity(entity, this));
             scriptComp.instance->OnCreate();
         }
     }
@@ -72,11 +73,10 @@ void Scene::OnStop()
     {
         auto& sc = view.get<ScriptComponent>(entity);
 
-        if (sc.instance)
+        if (sc.instance && sc.DestroyScript)
         {
             sc.instance->OnDestroy();
-            delete sc.instance;
-            sc.instance = nullptr;
+            sc.DestroyScript(&sc);
         }
     }
 }

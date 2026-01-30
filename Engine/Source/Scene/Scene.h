@@ -24,6 +24,21 @@ public:
     void SetState(SceneState newState);
     SceneState GetState() const { return m_State; };
 
+    template<typename T>
+    void BindScript(ScriptComponent& sc)
+    {
+        sc.InstantiateScript = []()
+            {
+                return static_cast<ScriptableEntity*>(new T());
+            };
+
+        sc.DestroyScript = [](ScriptComponent* sc)
+            {
+                delete sc->instance;
+                sc->instance = nullptr;
+            };
+    }
+
     void OnStart();
     void OnUpdate(float dt);
     void OnStop();;
