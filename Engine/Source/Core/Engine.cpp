@@ -107,7 +107,7 @@ void Engine::HandleEvents() noexcept
 			{
 				if (GetActiveScene().GetState() == SceneState::EDIT)
 				{
-					editorCamera->onMouseMoved(
+					m_EditorCamera->onMouseMoved(
 						mouseEvent->GetX(),
 						mouseEvent->GetY(),
 						m_Window.GetGLFWWindow()
@@ -124,8 +124,8 @@ void Engine::HandleEvents() noexcept
 				if (auto* scrollEvent = dynamic_cast<MouseScrolledEvent*>(&event))
 				{
 					// Adjust sprint speed based on scroll input
-					editorCamera->SprintSpeed += scrollEvent->GetYOffset();
-					editorCamera->SprintSpeed = std::clamp(editorCamera->SprintSpeed, 2.5f, 30.0f);
+					m_EditorCamera->SprintSpeed += scrollEvent->GetYOffset();
+					m_EditorCamera->SprintSpeed = std::clamp(m_EditorCamera->SprintSpeed, 2.5f, 30.0f);
 				}
 			}
 			break;

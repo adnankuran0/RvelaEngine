@@ -116,9 +116,9 @@ void LightingPass::Execute()
     glBindTextureUnit(POINT_SHADOW_MAP_SLOT, i_PointShadowMap);
 
     shader.setInt("pointLightCount", pointLightCount);
-    shader.setVec3("camPos", ctx.camera->Position);
+    shader.setVec3("camPos", ctx.camera->GetPosition());
     shader.setMat4("view", ctx.camera->GetViewMatrix());
-    shader.setMat4("projection", ctx.camera->projection);
+    shader.setMat4("projection", ctx.camera->GetProjectionMatrix());
 
     size_t drawCallCounter = 0;
     for (auto& command : commands) {

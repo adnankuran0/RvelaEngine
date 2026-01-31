@@ -62,7 +62,7 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
             glm::mat4 transform = tc.GetWorldMatrix();
 
             glm::mat4 view = engine->GetCamera()->GetViewMatrix();
-            glm::mat4 projection = engine->GetCamera()->projection;
+            glm::mat4 projection = engine->GetCamera()->GetProjectionMatrix();
 
             static ImGuizmo::OPERATION currentGizmoOperation = ImGuizmo::TRANSLATE;
             static ImGuizmo::MODE currentGizmoMode = ImGuizmo::WORLD;
@@ -155,9 +155,9 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
 
             glm::vec2 viewportSizeF = { displaySize.x, displaySize.y };
             glm::mat4 view = engine->GetCamera()->GetViewMatrix();
-            glm::mat4 projection = engine->GetCamera()->projection;
+            glm::mat4 projection = engine->GetCamera()->GetProjectionMatrix();
 
-            glm::vec3 rayOrigin = engine->GetCamera()->Position;
+            glm::vec3 rayOrigin = engine->GetCamera()->GetPosition();
             glm::vec3 rayDirection = ScreenPosToWorldRay(mouseViewportPos, viewportSizeF, projection, view);
 
             entt::entity closest = entt::null;

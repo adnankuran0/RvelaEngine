@@ -12,6 +12,7 @@
 #include "Rendering/Renderer.h"
 #include "Assets/AssetRegistry.h"
 #include <Scene/CameraManager.h>
+#include <Scene/EditorCamera.h>
 
 class Engine
 {
@@ -37,8 +38,17 @@ public:
 	inline AssetRegistry& GetAssetRegistry() noexcept { return m_AssetRegistry; }
 	inline CameraManager& GetCameraManager() noexcept { return m_CameraManager; }
 
-	inline EditorCamera* GetCamera() const noexcept { return editorCamera; }
-	inline void SetEditorCamera(EditorCamera* editorCam) { editorCamera = editorCam; }
+	inline EditorCamera* GetEditorCamera() const noexcept { return m_EditorCamera; }
+	inline Camera* GetSceneCamera() noexcept { return m_CameraManager.GetActiveCamera(); }
+	inline ICamera* GetCamera() noexcept 
+	{
+		Camera* camera = m_CameraManager.GetActiveCamera();
+		if (m_SceneManager.GetActiveScene().GetState() == SceneState::EDIT || !camera)
+			return m_EditorCamera;
+		else
+			return camera; 
+	}
+	inline void SetEditorCamera(EditorCamera* editorCam) { m_EditorCamera = editorCam; }
 
 	[[nodiscard]] inline void SetFinalTexture(GLuint textureID) { finalTexture = textureID; } //TODO: what the fuck are these doing here?
 	[[nodiscard]] inline GLuint GetFinalTexture() { return finalTexture; }
@@ -53,7 +63,7 @@ private:
 
 	static Engine* s_Instance;
 	CameraManager m_CameraManager;
-	EditorCamera* editorCamera = nullptr;
+	EditorCamera* m_EditorCamera = nullptr;
 	Window m_Window;
 	Renderer m_Renderer;
 	ProjectManager m_ProjectManager;

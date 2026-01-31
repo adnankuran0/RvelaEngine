@@ -43,7 +43,7 @@ void SSAOPass::Execute()
     Shader& ssaoShader = Renderer::GetSSAOShader();
 
     // Pre-calculate matrices
-    const glm::mat4& projection = ctx.camera->projection;
+    const glm::mat4& projection = ctx.camera->GetProjectionMatrix();
     const glm::mat4 invProjection = glm::inverse(projection);
 
     // Set up framebuffer

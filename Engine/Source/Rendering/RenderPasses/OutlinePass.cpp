@@ -21,7 +21,7 @@ void OutlinePass::Execute()
     outlineShader.use();
     outlineShader.setMat4("u_Model", model);
     outlineShader.setMat4("u_View", ctx.camera->GetViewMatrix());
-    outlineShader.setMat4("u_Projection", ctx.camera->projection);
+    outlineShader.setMat4("u_Projection", ctx.camera->GetProjectionMatrix());
 
     glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_NOTEQUAL, 1, 0xFF); 

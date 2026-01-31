@@ -2,7 +2,7 @@
 #include "Camera.h"
 #include "Scene/Entity.h"
 
-Camera::Camera(Entity* entity, float width = 1920.0f, float height = 1080.0f)
+Camera::Camera(Entity* entity)
 {
     m_Entity = entity;
     m_Component = &entity->GetComponent<CameraComponent>();
@@ -16,6 +16,11 @@ glm::mat4 Camera::GetViewMatrix()
         m_Transform->GetPosition() + m_Transform->GetForward(),
         m_Transform->GetUp()
     );
+}
+
+glm::vec3 Camera::GetPosition()
+{
+    return m_Transform->GetWorldPosition();
 }
 
 glm::mat4 Camera::GetProjectionMatrix()

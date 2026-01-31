@@ -1,7 +1,7 @@
 #pragma once
 #include "../RenderPass.h"
 #include "../Renderer.h"
-#include "../EditorCamera.h"
+#include "Scene/Camera.h"
 class SkyboxPass : public RenderPass
 {
 public:

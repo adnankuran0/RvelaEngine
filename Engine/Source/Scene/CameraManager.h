@@ -14,6 +14,12 @@ public:
 
     Camera* GetActiveCamera() { return m_ActiveCamera; }
 
+    void Update()
+    {
+        if (m_ActiveCamera)
+            m_ActiveCamera->UpdateFrustum();
+    }
+
     const std::vector<Camera>& GetAllCameras() const { return m_Cameras; }
 
 private:

@@ -4,10 +4,10 @@
 void RenderLayer::OnRender()
 {
 	Scene& scene = m_Engine->GetActiveScene();
-	auto camera = m_Engine->GetCamera();
-
+	ICamera* camera = m_Engine->GetCamera();
 
 	RenderContext context;
+	
 	context.camera = camera;
 	context.pointLights = scene.CollectPointLights();
 	context.directionalLight = scene.CollectDirectionalLight();

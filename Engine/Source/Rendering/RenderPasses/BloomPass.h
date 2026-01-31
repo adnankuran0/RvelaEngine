@@ -2,7 +2,7 @@
 #include "../RenderPass.h"
 #include "Scene/Components.h"
 #include "../Renderer.h"
-#include "../EditorCamera.h"
+#include "Scene/Camera.h"
 #include <array>
 #include <algorithm>
 

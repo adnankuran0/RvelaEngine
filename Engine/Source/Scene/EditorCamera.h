@@ -5,9 +5,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "Input/Input.h"
 #include "Core/Time.h"
-#include "Frustum.h"
+#include "Rendering/Frustum.h"
+#include "Scene/ICamera.h"
 
-class EditorCamera 
+class EditorCamera : public ICamera
 {
 
 public:
@@ -60,31 +61,34 @@ public:
         projection = glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.1f, 100.0f);
     }
 
-    inline glm::mat4 GetViewMatrix() noexcept
+    inline glm::mat4 GetViewMatrix() override
     {
         return glm::lookAt(Position, Position + Front, Up);
     }
 
+    inline glm::mat4 GetProjectionMatrix() override
+    {
+        return glm::perspective(glm::radians(60.0f), width / height, 0.1f, 100.0f);
+    }
+
+    inline glm::vec3 GetPosition() override
+    {
+        return Position;
+    }
+
     void Update()
     {
-        
+        UpdateFrustum();
+
         if (Input::IsMouseButtonPressed(MouseCode::Button1))
             ProcessKeyboard();
 
         Position = glm::mix(Position, targetPosition, Time::GetDeltaTime() * positionSmoothness);
         updateCameraVectors();
-        frustum.Update(projection * GetViewMatrix());
+        
     }
 
-    bool Intersects(const AABB& AABB)
-    {
-        return frustum.Intersects(AABB);
-    }
-
-    bool Intersects(const glm::mat4& projView,const AABB& AABB)
-    {
-        return frustum.Intersects(projView,AABB);
-    }
+    
 
     void onMouseMoved(double xPosIn, double yPosIn, GLFWwindow* window)
     {
@@ -166,8 +170,6 @@ public:
     }
 
 private:
-    Frustum frustum;
-
     void updateCameraVectors()
     {
         glm::vec3 front;

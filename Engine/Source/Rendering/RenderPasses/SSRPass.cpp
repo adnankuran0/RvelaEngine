@@ -34,7 +34,7 @@ void SSRPass::Execute()
     ssrShader.use();
 
     glm::mat4 viewMatrix = ctx.camera->GetViewMatrix();
-    glm::mat4 projectionMatrix = ctx.camera->projection;
+    glm::mat4 projectionMatrix = ctx.camera->GetProjectionMatrix();
 
     ssrShader.setMat4("uViewMatrix", viewMatrix);
     ssrShader.setMat4("uProjectionMatrix", projectionMatrix);
@@ -44,7 +44,7 @@ void SSRPass::Execute()
     ssrShader.setFloat("near", 0.1f);
     ssrShader.setFloat("far", 100.0f);
     ssrShader.setFloat("uTime", (float)Time::GetCurrentTime());
-    ssrShader.setVec3("uCameraPos", ctx.camera->Position);
+    ssrShader.setVec3("uCameraPos", ctx.camera->GetPosition());
     ssrShader.setFloat("uMaxRayDistance", 100.0f);
 
 

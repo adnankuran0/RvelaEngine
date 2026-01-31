@@ -13,5 +13,5 @@ SkyboxPass::~SkyboxPass()
 void SkyboxPass::Execute()
 {
 
-	m_Skybox.Render(Renderer::GetSkyboxShader(), ctx.camera->projection, ctx.camera->GetViewMatrix(), i_ScreenFBO);
+	m_Skybox.Render(Renderer::GetSkyboxShader(), ctx.camera->GetProjectionMatrix(), ctx.camera->GetViewMatrix(), i_ScreenFBO);
 }

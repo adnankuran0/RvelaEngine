@@ -1,11 +1,12 @@
 #pragma once
 #include "Scene/Scene.h"
+#include "Scene/ICamera.h"
 
 struct RenderContext
 {
 public:
 	RenderContext() = default;
-	EditorCamera* camera;
+	ICamera* camera;
 	std::vector<PointLightData> pointLights;
 	std::optional<DirectionalLightData> directionalLight;
 	unsigned int viewportWidth;

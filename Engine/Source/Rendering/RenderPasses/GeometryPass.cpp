@@ -72,7 +72,7 @@ void GeometryPass::Execute()
     geometryShader.use();
 
 
-    glm::mat4 projection = ctx.camera->projection;
+    glm::mat4 projection = ctx.camera->GetProjectionMatrix();
     glm::mat4 view = ctx.camera->GetViewMatrix();
 
     geometryShader.setMat4("view", view);
