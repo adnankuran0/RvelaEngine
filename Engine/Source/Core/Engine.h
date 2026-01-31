@@ -11,6 +11,7 @@
 #include "LayerStack.h"
 #include "Rendering/Renderer.h"
 #include "Assets/AssetRegistry.h"
+#include <Scene/CameraManager.h>
 
 class Engine
 {
@@ -34,6 +35,7 @@ public:
 	inline ProjectManager& GetProjectManager() noexcept { return m_ProjectManager; }
 	inline SceneManager& GetSceneManager() noexcept { return m_SceneManager; }
 	inline AssetRegistry& GetAssetRegistry() noexcept { return m_AssetRegistry; }
+	inline CameraManager& GetCameraManager() noexcept { return m_CameraManager; }
 
 	inline EditorCamera* GetCamera() const noexcept { return editorCamera; }
 	inline void SetEditorCamera(EditorCamera* editorCam) { editorCamera = editorCam; }
@@ -50,7 +52,7 @@ private:
 	
 
 	static Engine* s_Instance;
-
+	CameraManager m_CameraManager;
 	EditorCamera* editorCamera = nullptr;
 	Window m_Window;
 	Renderer m_Renderer;

@@ -4,8 +4,9 @@
 #include "AssetImporter/PrefabImporter.h"
 
 
-void SceneHierarchyPanel::Draw(Scene& scene, entt::entity& selectedEntity)
+void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 {
+    Scene& scene = engine->GetActiveScene();
     entt::entity rootEntity = scene.GetRootEntity();
 
 
@@ -115,6 +116,11 @@ void SceneHierarchyPanel::Draw(Scene& scene, entt::entity& selectedEntity)
         if (ImGui::MenuItem("Create Entity")) {
             selectedEntity = scene.CreateEntity("New Entity");
         }
+        
+        if (ImGui::MenuItem("Camera")) {
+            selectedEntity = engine->GetCameraManager().CreateCamera(scene).GetEntity()->GetHandle();
+        }
+
         if (ImGui::BeginMenu("Primitives")) {
             if (ImGui::MenuItem("Cube"))
                 selectedEntity = scene.LoadPrimitive("Cube");

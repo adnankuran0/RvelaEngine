@@ -3,5 +3,5 @@
 class InspectorPanel
 {
 public:
-	void Draw(Scene& scene, entt::entity& selectedEntity);
+	void Draw(Engine* engine, entt::entity& selectedEntity);
 };

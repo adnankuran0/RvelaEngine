@@ -7,8 +7,6 @@
 #include "Utils/ProjectManager.h"
 #include "EntityUUID.h"
 #include <Assets/PrefabAsset.h>
-#include "Scene/ScriptableEntity.h"
-#include "TestScript.h"
 
 Scene::Scene(const std::string& sceneName) : m_Registry() 
 {

@@ -1,9 +1,9 @@
 ﻿#include "InspectorPanel.h"
 #include "ImGui/imgui.h"
 
-void InspectorPanel::Draw(Scene& scene, entt::entity& selectedEntity)
+void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 {
-
+    Scene& scene = engine->GetActiveScene();
     entt::registry& registry = scene.GetRegistry();
     ImGui::Begin("Properties", nullptr, ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse);
 
@@ -115,6 +115,19 @@ void InspectorPanel::Draw(Scene& scene, entt::entity& selectedEntity)
             }
         }
 
+
+        if (registry.any_of<CameraComponent>(selectedEntity))
+        {
+            if (ImGui::CollapsingHeader("Camera"))
+            {
+                auto& cameraComponent = registry.get<CameraComponent>(selectedEntity);
+
+                ImGui::SliderFloat("Fov", &cameraComponent.fov, 0.0f, 120.0f);
+                ImGui::SliderFloat("Near clip", &cameraComponent.nearClip, 0.001f, 1.0f);
+                ImGui::SliderFloat("Far clip", &cameraComponent.farClip, 1.0f, 1000.0f);
+            }
+        }
+
         if (registry.any_of<MeshRendererComponent>(selectedEntity))
         {
             if (ImGui::CollapsingHeader("Mesh Renderer"))
@@ -149,14 +162,14 @@ void InspectorPanel::Draw(Scene& scene, entt::entity& selectedEntity)
 
                 }
 
-                if (ImGui::Checkbox("CastShadows", &pointLightComponent.castShadows)) {}
+                ImGui::Checkbox("CastShadows", &pointLightComponent.castShadows);
 
-                if (ImGui::SliderFloat("Intensity", &pointLightComponent.intensity, 0.0f, 20.0f)) {}
-                if (ImGui::SliderFloat("Radius", &pointLightComponent.radius, 0.1f, 50.0f)) {}
-                if (ImGui::SliderFloat("Falloff", &pointLightComponent.falloff, 0.0f, 10.0f)) {}
-                if (ImGui::SliderFloat("Shadow bias", &pointLightComponent.shadowBias, 0.0f, 0.1f)) {}
-                if (ImGui::SliderFloat("Blur radius", &pointLightComponent.blurRadius, 0.0f, 0.1f)) {}
-                if (ImGui::Checkbox("Reverse cull face", &pointLightComponent.reverseCullFace));
+                ImGui::SliderFloat("Intensity", &pointLightComponent.intensity, 0.0f, 20.0f);
+                ImGui::SliderFloat("Radius", &pointLightComponent.radius, 0.1f, 50.0f);
+                ImGui::SliderFloat("Falloff", &pointLightComponent.falloff, 0.0f, 10.0f);
+                ImGui::SliderFloat("Shadow bias", &pointLightComponent.shadowBias, 0.0f, 0.1f);
+                ImGui::SliderFloat("Blur radius", &pointLightComponent.blurRadius, 0.0f, 0.1f);
+                ImGui::Checkbox("Reverse cull face", &pointLightComponent.reverseCullFace);
 
 
             }

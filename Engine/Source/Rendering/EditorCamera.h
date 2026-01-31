@@ -5,7 +5,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "Input/Input.h"
 #include "Core/Time.h"
-#include "Camera.h"
 #include "Frustum.h"
 
 class EditorCamera 

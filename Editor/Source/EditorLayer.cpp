@@ -77,9 +77,9 @@ void EditorLayer::Render()
 
     m_Dockspace.Draw();
 
-    m_SceneHierarchyPanel.Draw(m_Engine->GetActiveScene(), selectedEntity);
+    m_SceneHierarchyPanel.Draw(m_Engine, selectedEntity);
 
-    m_InspectorPanel.Draw(m_Engine->GetActiveScene(), selectedEntity);
+    m_InspectorPanel.Draw(m_Engine, selectedEntity);
 
     m_AssetBrowserPanel.Draw(m_Engine, m_Engine->GetProjectManager().GetProjectPath() / "Assets");
 
