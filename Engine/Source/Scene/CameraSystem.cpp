@@ -1,27 +1,28 @@
 #include "rvelapch.h"
-#include "CameraManager.h"
+#include "CameraSystem.h"
 #include "Entity.h"
 
-Camera CameraManager::CreateCamera(Scene& scene, const glm::vec3& position)
+Camera& CameraSystem::CreateCamera(Scene& scene, const glm::vec3& position)
 {
     Entity camEntity = scene.CreateEntity("Camera");
     camEntity.AddComponent<CameraComponent>();
     auto& transform = camEntity.GetComponent<TransformComponent>();
     transform.SetPosition(position);
 
-    Camera cam(&camEntity);
-    m_Cameras.push_back(cam);
+    auto cam = std::make_unique<Camera>(&camEntity);
+    Camera& camRef = *cam;
+    m_Cameras.push_back(std::move(cam));
 
     if (!m_ActiveCamera)
-        SetActiveCamera(cam);
+        SetActiveCamera(camRef);
 
-    return cam;
+    return camRef;
 }
 
-void CameraManager::SetActiveCamera(Camera& cam)
+void CameraSystem::SetActiveCamera(Camera& cam)
 {
     for (auto& c : m_Cameras)
-        c.SetActive(false);
+        c->SetActive(false);
 
     cam.SetActive(true);
     m_ActiveCamera = &cam;

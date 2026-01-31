@@ -83,8 +83,6 @@ void Scene::BindLuaScript(ScriptComponent& sc, entt::entity& e)
 
 void Scene::OnStart()
 {
-    std::cout << "Scene started\n";
-
     auto view = m_Registry.view<ScriptComponent>();
     for (auto entity : view)
     {
@@ -122,8 +120,6 @@ void Scene::OnUpdate(float dt)
 
 void Scene::OnStop()
 {
-    std::cout << "Scene stopped\n";
-
     auto view = m_Registry.view<ScriptComponent>();
     for (auto entity : view)
     {

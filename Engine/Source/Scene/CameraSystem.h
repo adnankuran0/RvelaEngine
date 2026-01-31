@@ -1,14 +1,15 @@
 #pragma once
 #include <vector>
 #include "Camera.h"
-#include "Scene.h"
 
-class CameraManager
+class Scene; // forward declaration
+
+class CameraSystem
 {
 public:
-    CameraManager() = default;
+    CameraSystem() = default;
 
-    Camera CreateCamera(Scene& scene, const glm::vec3& position = { 0,0,0 });
+    Camera& CreateCamera(Scene& scene, const glm::vec3& position = { 0,0,0 });
 
     void SetActiveCamera(Camera& cam);
 
@@ -20,9 +21,9 @@ public:
             m_ActiveCamera->UpdateFrustum();
     }
 
-    const std::vector<Camera>& GetAllCameras() const { return m_Cameras; }
+    const std::vector<std::unique_ptr<Camera>>& GetAllCameras() const { return m_Cameras; }
 
 private:
-    std::vector<Camera> m_Cameras;
+    std::vector<std::unique_ptr<Camera>> m_Cameras;
     Camera* m_ActiveCamera = nullptr;
 };

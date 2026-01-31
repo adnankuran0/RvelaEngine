@@ -11,7 +11,6 @@
 #include "LayerStack.h"
 #include "Rendering/Renderer.h"
 #include "Assets/AssetRegistry.h"
-#include <Scene/CameraManager.h>
 #include <Scene/EditorCamera.h>
 
 class Engine
@@ -36,17 +35,17 @@ public:
 	inline ProjectManager& GetProjectManager() noexcept { return m_ProjectManager; }
 	inline SceneManager& GetSceneManager() noexcept { return m_SceneManager; }
 	inline AssetRegistry& GetAssetRegistry() noexcept { return m_AssetRegistry; }
-	inline CameraManager& GetCameraManager() noexcept { return m_CameraManager; }
+	inline CameraSystem& GetCameraSystem() noexcept { return m_SceneManager.GetActiveScene().GetCameraSystem(); }
 
 	inline EditorCamera* GetEditorCamera() const noexcept { return m_EditorCamera; }
-	inline Camera* GetSceneCamera() noexcept { return m_CameraManager.GetActiveCamera(); }
-	inline ICamera* GetCamera() noexcept 
+	inline Camera* GetSceneCamera() noexcept { return GetCameraSystem().GetActiveCamera(); }
+	inline ICamera* GetCamera() noexcept
 	{
-		Camera* camera = m_CameraManager.GetActiveCamera();
+		Camera* camera = GetSceneCamera();
 		if (m_SceneManager.GetActiveScene().GetState() == SceneState::EDIT || !camera)
 			return m_EditorCamera;
 		else
-			return camera; 
+			return camera;
 	}
 	inline void SetEditorCamera(EditorCamera* editorCam) { m_EditorCamera = editorCam; }
 
@@ -62,7 +61,6 @@ private:
 	
 
 	static Engine* s_Instance;
-	CameraManager m_CameraManager;
 	EditorCamera* m_EditorCamera = nullptr;
 	Window m_Window;
 	Renderer m_Renderer;

@@ -6,6 +6,7 @@
 #include "Math/RvelaMath.h"
 #include "Utils/ISerializable.h"
 #include "Rendering/Renderer.h"
+#include "CameraSystem.h"
 
 class Entity; // Forward Declaration
 
@@ -118,13 +119,16 @@ public:
 
     [[nodiscard]] unsigned int GetComponentCount(entt::entity entity) noexcept;
 
+    inline CameraSystem& GetCameraSystem() noexcept { return m_CameraSystem; }
+
 private:
+    friend class Entity;
     SceneState m_State = SceneState::EDIT;
     std::string m_SceneName;
     entt::registry m_Registry;
     std::unordered_map<EntityUUID, entt::entity> m_EntityMap;
-    friend class Entity;
     entt::entity selectedEntity;
     entt::entity m_RootEntity;
     sol::state lua;
+    CameraSystem m_CameraSystem;
 };

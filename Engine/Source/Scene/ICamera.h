@@ -28,5 +28,6 @@ public:
 
 protected:
     Frustum frustum;
-    float width, height;
+    float width = 1920.0f;
+    float height = 1080.0f;
 };
