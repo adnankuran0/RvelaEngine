@@ -12,8 +12,8 @@ Camera::Camera(Entity* entity)
 glm::mat4 Camera::GetViewMatrix()
 {
     return glm::lookAt(
-        m_Transform->GetPosition(),
-        m_Transform->GetPosition() + m_Transform->GetForward(),
+        m_Transform->GetWorldPosition(),
+        m_Transform->GetWorldPosition() + m_Transform->GetForward(),
         m_Transform->GetUp()
     );
 }

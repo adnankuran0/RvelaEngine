@@ -12,6 +12,7 @@
 #include "Rendering/Renderer.h"
 #include "Assets/AssetRegistry.h"
 #include <Scene/EditorCamera.h>
+#include "Script/ScriptEngine.h"
 
 class Engine
 {
@@ -35,8 +36,8 @@ public:
 	inline ProjectManager& GetProjectManager() noexcept { return m_ProjectManager; }
 	inline SceneManager& GetSceneManager() noexcept { return m_SceneManager; }
 	inline AssetRegistry& GetAssetRegistry() noexcept { return m_AssetRegistry; }
-	inline CameraSystem& GetCameraSystem() noexcept { return m_SceneManager.GetActiveScene().GetCameraSystem(); }
 
+	inline CameraSystem& GetCameraSystem() noexcept { return m_SceneManager.GetActiveScene().GetCameraSystem(); }
 	inline EditorCamera* GetEditorCamera() const noexcept { return m_EditorCamera; }
 	inline Camera* GetSceneCamera() noexcept { return GetCameraSystem().GetActiveCamera(); }
 	inline ICamera* GetCamera() noexcept
@@ -48,6 +49,8 @@ public:
 			return camera;
 	}
 	inline void SetEditorCamera(EditorCamera* editorCam) { m_EditorCamera = editorCam; }
+
+	inline ScriptEngine& GetScriptEngine() { return m_ScriptEngine; }
 
 	[[nodiscard]] inline void SetFinalTexture(GLuint textureID) { finalTexture = textureID; } //TODO: what the fuck are these doing here?
 	[[nodiscard]] inline GLuint GetFinalTexture() { return finalTexture; }
@@ -67,5 +70,6 @@ private:
 	ProjectManager m_ProjectManager;
 	SceneManager m_SceneManager;
 	AssetRegistry m_AssetRegistry;
+	ScriptEngine m_ScriptEngine;
 
 };

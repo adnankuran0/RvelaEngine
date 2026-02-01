@@ -25,7 +25,6 @@ public:
     void SetState(SceneState newState);
     SceneState GetState() const { return m_State; };
 
-    void BindLuaScript(ScriptComponent& sc, entt::entity& e);
     
 
     void OnStart();
@@ -129,6 +128,5 @@ private:
     std::unordered_map<EntityUUID, entt::entity> m_EntityMap;
     entt::entity selectedEntity;
     entt::entity m_RootEntity;
-    sol::state lua;
     CameraSystem m_CameraSystem;
 };

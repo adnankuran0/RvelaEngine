@@ -503,7 +503,7 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                         {
                             scriptComp.luaFile = pathStr;
                             // Optionally bind immediately
-                            scene.BindLuaScript(scriptComp, selectedEntity);
+                            engine->GetScriptEngine().BindLuaScript(scriptComp, selectedEntity,scene);
                         }
                     }
                     ImGui::EndDragDropTarget();
