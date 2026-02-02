@@ -18,7 +18,10 @@ Scene::Scene(const std::string& sceneName) : m_Registry()
     entity.AddComponent<TagComponent>(sceneName);
     entity.AddComponent<UUIDComponent>(EntityUUIDGenerator::Generate());
     m_EntityMap[entity.GetUUID()] = (entt::entity)m_RootEntity;
-    
+
+    LoadPrimitive("Cube");
+    CreateDirectionalLight();
+
 }
 
 void Scene::SetState(SceneState newState)
@@ -179,6 +182,7 @@ Entity Scene::LoadPrimitive(const std::string& primitiveMeshName)
     root.GetComponent<TagComponent>().tag = cfg.name;
     AssetUUID defaultMaterialId = AssetUUID::FromString("ee3dde12-6263-4f11-bb1d-812b3e196ab7");
     root.AddComponent<MaterialComponent>(defaultMaterialId);
+    SetParent(root.GetHandle(), GetRootEntity());
     return root;
 }
 

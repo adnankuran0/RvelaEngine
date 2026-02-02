@@ -8,7 +8,11 @@ void SSRPass::Init()
 
     glGenTextures(1, &o_SsrTexture);
     glBindTexture(GL_TEXTURE_2D, o_SsrTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, ctx.viewportWidth, ctx.viewportHeight, 0, GL_RGBA, GL_FLOAT, NULL);
+
+    int w = ctx.viewportWidth / 2.0f;
+    int h = ctx.viewportHeight / 2.0f;
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, w,h, 0, GL_RGBA, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, o_SsrTexture, 0);
@@ -29,6 +33,7 @@ void SSRPass::Execute()
     Shader& ssrShader = Renderer::GetSSRShader();
     glDisable(GL_DEPTH_TEST);
     glBindFramebuffer(GL_FRAMEBUFFER, ssrFBO);
+    glViewport(0, 0, ctx.viewportWidth / 2, ctx.viewportHeight / 2);
     glClear(GL_COLOR_BUFFER_BIT);
 
     ssrShader.use();
@@ -46,6 +51,8 @@ void SSRPass::Execute()
     ssrShader.setFloat("uTime", (float)Time::GetCurrentTime());
     ssrShader.setVec3("uCameraPos", ctx.camera->GetPosition());
     ssrShader.setFloat("uMaxRayDistance", 100.0f);
+    ssrShader.setVec2("uFullResolution",
+        glm::vec2(ctx.viewportWidth, ctx.viewportHeight));
 
 
     glBindTextureUnit(0, i_Depth);
@@ -69,5 +76,8 @@ void SSRPass::Execute()
     Renderer::DrawFullScreenQuad();
 
     glEnable(GL_DEPTH_TEST);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
 
 }

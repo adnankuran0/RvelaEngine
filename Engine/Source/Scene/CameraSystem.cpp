@@ -9,7 +9,13 @@ Camera& CameraSystem::CreateCamera(Scene& scene, const glm::vec3& position)
     auto& transform = camEntity.GetComponent<TransformComponent>();
     transform.SetPosition(position);
 
-    auto cam = std::make_unique<Camera>(&camEntity);
+    return RegisterCamera(camEntity);
+}
+
+Camera& CameraSystem::RegisterCamera(Entity& cameraEntity)
+{
+   
+    auto cam = std::make_unique<Camera>(&cameraEntity);
     Camera& camRef = *cam;
     m_Cameras.push_back(std::move(cam));
 

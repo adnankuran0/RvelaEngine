@@ -1,0 +1,115 @@
+{
+    "Entities": [
+        {
+            "CameraComponent": {
+                "farClip": 100.0,
+                "fov": 75.0,
+                "isActive": true,
+                "nearClip": 0.10000000149011612
+            },
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": "Camera"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    1.645583152770996,
+                    3.329069137573242
+                ],
+                "rotation": [
+                    -11.509791374206543,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    0.9999998211860657,
+                    0.9999999403953552
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 4
+        },
+        {
+            "DirectionalLight": {
+                "castShadows": true,
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "intensity": 5.0
+            },
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": "DirectionalLight"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    -60.0,
+                    -90.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 3
+        },
+        {
+            "Material": {
+                "material": "ee3dde12-6263-4f11-bb1d-812b3e196ab7"
+            },
+            "Mesh": {
+                "mesh": "4e05374f-8157-4c0e-bb3a-1c72c9039e05"
+            },
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": "Cube"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 2
+        }
+    ]
+}
