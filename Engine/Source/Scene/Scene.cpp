@@ -444,6 +444,13 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
                 AddComponent<PointLightComponent>(e, std::move(plgComp));
                 break;
             }
+            case ComponentType::Camera:
+            {
+                auto& comp = AddComponent<CameraComponent>(e);
+                DeserializeBin_CameraComp(ptr, comp);
+                GetCameraSystem().RegisterCamera(e);
+                break;
+            }
             case ComponentType::SceneTree:
             {
                 auto& comp = GetComponent<SceneTreeComponent>(e);
@@ -477,6 +484,7 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
                 m_EntityMap[comp.uuid] = (entt::entity)e;
                 break;
             }
+            
             default:
             {
                 LOG_ERROR("Undefined component type id");
@@ -558,6 +566,7 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
     if (registry.any_of<TagComponent>(entity)) count++;
     if (registry.any_of<UUIDComponent>(entity)) count++;
     if (registry.any_of<PrefabComponent>(entity)) count++;
+    if (registry.any_of<CameraComponent>(entity)) count++;
 
     return count;
 }

@@ -92,7 +92,11 @@ void SceneManager::LoadScene(const std::string& path)
             scene.AddComponent<DirectionalLightComponent>(handle).Deserialize(entityJson["DirectionalLight"]);
 
         if (entityJson.contains("CameraComponent"))
+        {
             scene.AddComponent<CameraComponent>(handle).Deserialize(entityJson["CameraComponent"]);
+            Entity camEntity(handle, &scene);
+            scene.GetCameraSystem().RegisterCamera(camEntity);
+        }
             
 
         if (entityJson.contains("ParentUUID"))

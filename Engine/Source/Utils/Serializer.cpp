@@ -77,6 +77,36 @@ void DeserializeBin_DirectionalLightComp(const std::byte*& cursor, DirectionalLi
 	comp.reverseCullFace = (reverseCull != 0);
 }
 
+void SerializeBin_CameraComp(const CameraComponent& comp, std::vector<std::byte>& out)
+{
+	std::vector<std::byte> tempOut;
+
+	WriteToBuffer(tempOut, comp.fov);
+	WriteToBuffer(tempOut, comp.nearClip);
+	WriteToBuffer(tempOut, comp.farClip);
+
+	uint8_t isActive = comp.isActive ? 1 : 0;
+	WriteToBuffer(tempOut, isActive);
+
+	size_t payloadSize = tempOut.size();
+
+	ComponentHeader header;
+	header.type = static_cast<uint16_t>(ComponentType::Camera);
+	header.size = static_cast<uint32_t>(payloadSize);
+	WriteToBuffer(out, header);
+	out.insert(out.end(), tempOut.begin(), tempOut.end());
+}
+void DeserializeBin_CameraComp(const std::byte*& cursor, CameraComponent& comp)
+{
+	ReadFromBuffer(cursor, comp.fov);
+	ReadFromBuffer(cursor, comp.nearClip);
+	ReadFromBuffer(cursor, comp.farClip);
+
+	uint8_t isActive;
+	ReadFromBuffer(cursor, isActive);
+	comp.isActive = (isActive != 0);
+}
+
 void SerializeBin_MaterialComp(const MaterialComponent& comp, std::vector<std::byte>& out)
 {
 	std::vector<std::byte> tempOut;

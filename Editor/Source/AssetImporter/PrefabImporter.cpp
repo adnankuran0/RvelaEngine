@@ -96,6 +96,13 @@ void PrefabImporter::SerializeEntityRecursively(entt::entity& e, entt::entity& r
         SerializeBin_DirectionalLightComp(comp, buffer);
     }
 
+    if (scene.HasComponent<CameraComponent>(e))
+    {
+        auto& comp = scene.GetComponent<CameraComponent>(e);
+        SerializeBin_CameraComp(comp, buffer);
+    }
+
+
     if (scene.HasComponent<SceneTreeComponent>(e))
     {
         auto& children = scene.GetComponent<SceneTreeComponent>(e).children;

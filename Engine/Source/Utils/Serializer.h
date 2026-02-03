@@ -55,6 +55,9 @@ struct ComponentHeader
 void SerializeBin_DirectionalLightComp(const DirectionalLightComponent& comp, std::vector<std::byte>& out);
 void DeserializeBin_DirectionalLightComp(const std::byte*& cursor, DirectionalLightComponent& comp);
 
+void SerializeBin_CameraComp(const CameraComponent& comp, std::vector<std::byte>& out);
+void DeserializeBin_CameraComp(const std::byte*& cursor, CameraComponent& comp);
+
 void SerializeBin_MaterialComp(const MaterialComponent& comp, std::vector<std::byte>& out);
 void DeserializeBin_MaterialComp(const std::byte*& cursor, MaterialComponent& comp);
 

@@ -13,7 +13,8 @@ enum class ComponentType
 	DirectionalLight,
 	SpotLight,
 	Prefab,
-	Script
+	Script,
+	Camera
 };
 
 #include "Scene/Components/TransformComponent.h"
@@ -28,3 +29,4 @@ enum class ComponentType
 #include "Scene/Components/SpotLightComponent.h"
 #include "Scene/Components/PrefabComponent.h"
 #include "Scene/Components/ScriptComponent.h"
+#include "Scene/Components/CameraComponent.h"
