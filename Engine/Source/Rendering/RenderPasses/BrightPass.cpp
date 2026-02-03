@@ -41,6 +41,8 @@ BrightPass::~BrightPass()
 
 void BrightPass::Execute()
 {
+    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "Bright Pass");
+
     glDisable(GL_DEPTH_TEST);
 
     Shader& brightShader = Renderer::GetBrightShader();
@@ -61,4 +63,5 @@ void BrightPass::Execute()
     glEnable(GL_DEPTH_TEST);
 	glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
 
+    glPopDebugGroup();
 }

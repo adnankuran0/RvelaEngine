@@ -12,6 +12,7 @@ SkyboxPass::~SkyboxPass()
 }
 void SkyboxPass::Execute()
 {
-
+    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "Skybox Pass");
 	m_Skybox.Render(Renderer::GetSkyboxShader(), ctx.camera->GetProjectionMatrix(), ctx.camera->GetViewMatrix(), i_ScreenFBO);
+    glPopDebugGroup();
 }

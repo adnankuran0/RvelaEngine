@@ -63,6 +63,8 @@ void EditorLayer::OnLateUpdate()
 
 void EditorLayer::Render()
 {
+    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "IMGUI Pass");
+
     static entt::entity selectedEntity = entt::null; // TODO: this is not belongs here
 
     ImGui_ImplOpenGL3_NewFrame();
@@ -95,6 +97,8 @@ void EditorLayer::Render()
         ImGui::RenderPlatformWindowsDefault();
         glfwMakeContextCurrent(backup_current_context);
     }
+
+    glPopDebugGroup();
 }
 
 

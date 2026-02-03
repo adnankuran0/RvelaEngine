@@ -17,7 +17,7 @@
 struct RenderFeatures
 {
 	bool ssao = true;
-	bool ssr = true;
+	bool ssr = false;
 	bool bloom = true;
 };
 

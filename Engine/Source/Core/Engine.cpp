@@ -51,6 +51,8 @@ void Engine::Update()
 		layer->OnUpdate();
 	}
 
+	std::printf("FPS: %f\n", Time::GetFPS());
+
 }
 
 void Engine::FixedUpdate()

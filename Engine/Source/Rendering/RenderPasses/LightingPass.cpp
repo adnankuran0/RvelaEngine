@@ -22,12 +22,12 @@ void LightingPass::Init()
 
     glGenTextures(1, &screenColorTex);
     glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, screenColorTex);
-    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGBA32F, ctx.viewportWidth, ctx.viewportHeight, GL_TRUE);
+    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 2, GL_RGBA16F, ctx.viewportWidth, ctx.viewportHeight, GL_TRUE);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, screenColorTex, 0);
 
     glGenRenderbuffers(1, &screenRBO);
     glBindRenderbuffer(GL_RENDERBUFFER, screenRBO);
-    glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, ctx.viewportWidth, ctx.viewportHeight);
+    glRenderbufferStorageMultisample(GL_RENDERBUFFER, 2, GL_DEPTH24_STENCIL8, ctx.viewportWidth, ctx.viewportHeight);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, screenRBO);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -59,7 +59,7 @@ void LightingPass::Execute()
 {
     if (commands.empty() || !ctx.IsValid()) return;
 
-    
+    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "Lighting Pass");
 
     glBindFramebuffer(GL_FRAMEBUFFER, o_ScreenFBO);
 
@@ -193,4 +193,6 @@ void LightingPass::Execute()
     );
 
     commands.clear();
+
+    glPopDebugGroup();
 }

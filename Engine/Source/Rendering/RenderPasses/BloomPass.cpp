@@ -103,25 +103,26 @@ void BloomPass::Downsample()
 void BloomPass::Upsample()
 {
     Shader& upsampleShader = Renderer::GetUpsampleShader();
+    upsampleShader.use();
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glDisable(GL_DEPTH_TEST);
 
     for (int i = mipLevels - 2; i >= 0; --i)
     {
-        glBindFramebuffer(GL_FRAMEBUFFER, upsampleFBOs[i]);
+        glBindFramebuffer(GL_FRAMEBUFFER, downsampleFBOs[i]);
+
         int w = std::max(1, (int)ctx.viewportWidth >> i);
         int h = std::max(1, (int)ctx.viewportHeight >> i);
         glViewport(0, 0, w, h);
-        glClear(GL_COLOR_BUFFER_BIT);
 
-        upsampleShader.use();
-        upsampleShader.setInt("u_UpsampleTex", 0);
-        upsampleShader.setInt("u_BaseTex", 1);
-        upsampleShader.setVec2("u_TexelSize", glm::vec2(1.0f / w, 1.0f / h));
-
-        glBindTextureUnit(0, upsampleTextures[i + 1]);
-        glBindTextureUnit(1, downsampleTextures[i]);
+        glBindTextureUnit(0, (i == mipLevels - 2) ? downsampleTextures[i + 1] : downsampleTextures[i + 1]);
 
         Renderer::DrawFullScreenQuad();
     }
+
+    glDisable(GL_BLEND);
 }
 
 BloomPass::~BloomPass()
@@ -131,15 +132,13 @@ BloomPass::~BloomPass()
 
 void BloomPass::Execute()
 {
-    glDisable(GL_DEPTH_TEST);
-
-    glBindTextureUnit(0, i_BrightTexture);
+    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "Bloom Pass");
 
     Downsample();
+
     Upsample();
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    o_BlurredTexture = upsampleTextures[0];
+    o_BlurredTexture = downsampleTextures[0];
 
-    glEnable(GL_DEPTH_TEST);
+    glPopDebugGroup();
 }

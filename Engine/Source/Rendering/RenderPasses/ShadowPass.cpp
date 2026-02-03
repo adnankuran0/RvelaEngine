@@ -17,7 +17,7 @@ void ShadowPass::InitDirectionalShadowMap()
     glTexImage2D(
         GL_TEXTURE_2D,
         0,
-        GL_DEPTH_COMPONENT32F,
+        GL_DEPTH_COMPONENT16,
         SHADOW_WIDTH,
         SHADOW_HEIGHT,
         0,
@@ -55,7 +55,7 @@ void ShadowPass::InitPointShadowMap()
     glTexImage3D(
         GL_TEXTURE_CUBE_MAP_ARRAY,
         0,
-        GL_DEPTH_COMPONENT32F,
+        GL_DEPTH_COMPONENT16,
         POINT_SHADOW_WIDTH,
         POINT_SHADOW_HEIGHT,
         6 * 20,
@@ -134,6 +134,8 @@ void ShadowPass::RenderDirectionalShadowMap()
 
 void ShadowPass::RenderPointShadowMap()
 {
+
+
     Shader& pointShadowShader = Renderer::GetPointShadowShader();
     pointShadowShader.use();
     glBindFramebuffer(GL_FRAMEBUFFER, pointFBO);
@@ -165,6 +167,8 @@ void ShadowPass::RenderPointShadowMap()
 
         for (auto& command : commands) 
         {
+            // TODO: skip if the mesh is outside of the light's radius
+
             pointShadowShader.setMat4("model", command.transform.GetWorldMatrix());
             command.mesh.VAO.Bind();
 
@@ -198,10 +202,15 @@ ShadowPass::~ShadowPass()
 
 void ShadowPass::Execute()
 {
+    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "Shadow Map Pass");
+
     if (commands.empty() || !ctx.IsValid()) return;
+
+
 
     RenderDirectionalShadowMap();
     RenderPointShadowMap();
 
     commands.clear();
+    glPopDebugGroup();
 }
