@@ -23,12 +23,12 @@ layout(binding = 2) uniform sampler2D texNoise;
 uniform mat4 projection;
 uniform mat4 invProjection; 
 uniform vec2 windowSize;
-uniform vec3 samples[64];
+uniform vec3 samples[32];
 
 const float radius = 0.5;      
 const float bias = 0.025;
 const float intensity = 1.0;
-const float invSamples = 1.0 / 64.0;
+const float invSamples = 1.0 / 32.0;
 
 uniform float near;
 uniform float far;
@@ -58,7 +58,7 @@ void main()
     mat3 TBN = mat3(tangent, bitangent, normal);
     
     float occlusion = 0.0;
-    for(int i = 0; i < 64; ++i)
+    for(int i = 0; i < 32; ++i)
     {
         vec3 samplePos = fragPos + (TBN * samples[i]) * radius;
         

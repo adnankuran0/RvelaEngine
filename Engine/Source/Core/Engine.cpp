@@ -145,7 +145,6 @@ void Engine::Render()
 
 	m_Renderer.EndFrame();
 	glfwSwapBuffers(GetWindow().GetGLFWWindow());
-	std::printf("FPS: %f\n", Time::GetFPS());
 }
 
 

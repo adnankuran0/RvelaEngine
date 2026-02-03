@@ -14,6 +14,14 @@
 #include "Rendering/RenderPasses/OutlinePass.h"
 #include "Core/Engine.h"
 
+struct RenderFeatures
+{
+	bool ssao = true;
+	bool ssr = true;
+	bool bloom = true;
+};
+
+
 class RenderPipeline
 {
 public:
@@ -28,6 +36,9 @@ public:
 private:
 	Engine* engine;
 
+	RenderFeatures m_RenderFeatures;
+	bool isPipelineDirty = true;
+
 	bool isInitialized = false;
 	//Render Passes
 	std::vector<RenderPass*> renderPasses;
@@ -35,11 +46,11 @@ private:
 	ShadowPass shadowPass;
 	SkyboxPass skyboxPass;
 	LightingPass lightingPass;
-	OutlinePass outlinePass;
 	BrightPass brightPass;
 	BloomPass bloomPass;
 	SSAOPass ssaoPass;
 	SSRPass ssrPass;
 	CompositePass compositePass;
+
 };
 

@@ -45,7 +45,8 @@ void ToolBar::Draw(Scene& scene)
 
         if (ImGui::Button("Pause", button_size)) 
         {
-            scene.SetState(SceneState::PAUSE);
+            if (scene.GetState() == SceneState::PLAY)
+                scene.SetState(SceneState::PAUSE);
         }
         ImGui::SameLine();
 

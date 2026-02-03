@@ -13,6 +13,7 @@ void main()
 
 #shader fragment
 #version 460 core
+
 out vec4 FragColor;
 in vec2 TexCoords;
 
@@ -20,23 +21,18 @@ layout(binding = 0) uniform sampler2D hdrTexture;
 uniform float threshold;
 uniform float knee;
 
-float brightness(vec3 color) {
-    return max(color.r, max(color.g, color.b));
+float brightness(vec3 c)
+{
+    return max(c.r, max(c.g, c.b));
 }
 
 void main()
 {
-    vec3 color = textureLod(hdrTexture, TexCoords, 0.0).rgb;
-    
+    vec3 color = texture(hdrTexture, TexCoords).rgb;
     float br = brightness(color);
-    if (br < threshold - knee) {
-        FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-        return;
-    }
 
-    float softFactor = smoothstep(threshold - knee, threshold, br);
-    float contribution = max(br - threshold + knee * softFactor, 0.0);
+    float soft = clamp((br - threshold + knee) / (2.0 * knee), 0.0, 1.0);
+    float contrib = max(br - threshold, 0.0) + soft * knee;
 
-    vec3 result = color * (contribution / max(br, 1e-5));
-    FragColor = vec4(result, 1.0);
+    FragColor = vec4(color * (contrib / max(br, 1e-5)), 1.0);
 }

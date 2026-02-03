@@ -9,7 +9,6 @@ RenderPipeline::RenderPipeline(Engine* engine)
 		&shadowPass,
 		&skyboxPass,
 		&lightingPass,
-		&outlinePass,
 		&brightPass,
 		&bloomPass,
 		&ssaoPass,
@@ -61,23 +60,32 @@ void RenderPipeline::Execute()
 	lightingPass.SetLightSpaceMatrix(shadowPass.GetLightSpaceMatrix());
 	lightingPass.Execute();
 
-	ssaoPass.SetDepthTexture(geometryPass.GetDepthTexure());
-	ssaoPass.SetNormalTexture(geometryPass.GetNormalTexure());
-	ssaoPass.Execute();
+	if (m_RenderFeatures.ssao)
+	{
+		ssaoPass.SetDepthTexture(geometryPass.GetDepthTexure());
+		ssaoPass.SetNormalTexture(geometryPass.GetNormalTexure());
+		ssaoPass.Execute();
+	}
+	
+	if (m_RenderFeatures.ssr)
+	{
+		ssrPass.SetDepthTexture(geometryPass.GetDepthTexure());
+		ssrPass.SetNormalTexture(geometryPass.GetNormalTexure());
+		ssrPass.SetRoughnessTexture(geometryPass.GetRoughnessTexure());
+		ssrPass.SetMetallicTexture(geometryPass.GetMetallicTexure());
+		ssrPass.SetScreenTexture(lightingPass.GetScreenTexture());
+		ssrPass.SetSkyboxTexture(skyboxPass.GetSkyboxTexture());
+		ssrPass.Execute();
+	}
 
-	ssrPass.SetDepthTexture(geometryPass.GetDepthTexure());
-	ssrPass.SetNormalTexture(geometryPass.GetNormalTexure());
-	ssrPass.SetRoughnessTexture(geometryPass.GetRoughnessTexure());
-	ssrPass.SetMetallicTexture(geometryPass.GetMetallicTexure());
-	ssrPass.SetScreenTexture(lightingPass.GetScreenTexture());
-	ssrPass.SetSkyboxTexture(skyboxPass.GetSkyboxTexture());
-	ssrPass.Execute();
+	if (m_RenderFeatures.bloom)
+	{
+		brightPass.SetScreenTexture(lightingPass.GetScreenTexture());
+		brightPass.Execute();
 
-	brightPass.SetScreenTexture(lightingPass.GetScreenTexture());
-	brightPass.Execute();
-
-	bloomPass.SetBrightTexture(brightPass.GetBrightTexture());
-	bloomPass.Execute();
+		bloomPass.SetBrightTexture(brightPass.GetBrightTexture());
+		bloomPass.Execute();
+	}
 
 	compositePass.SetScreenTexture(lightingPass.GetScreenTexture());
 	compositePass.SetBloomBlurTexture(bloomPass.GetBloomBlurTexture());

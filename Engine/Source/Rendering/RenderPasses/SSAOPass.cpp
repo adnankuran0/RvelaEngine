@@ -3,25 +3,25 @@
 
 // Pre-declare constants
 namespace {
-    constexpr int KERNEL_SIZE = 64;
+    constexpr int KERNEL_SIZE = 32;
     constexpr int NOISE_SIZE = 16;
-    constexpr GLenum SSAO_TEXTURE_FORMAT = GL_R16F; // More efficient than GL_RED/GL_FLOAT
+    constexpr GLenum SSAO_TEXTURE_FORMAT = GL_R16F;
     constexpr float NEAR_PLANE = 0.1f;
     constexpr float FAR_PLANE = 100.0f;
 }
 
 void SSAOPass::Init()
 {
-    // Framebuffer setup
     glCreateFramebuffers(1, &ssaoFBO);
 
-    // Texture setup using modern DSA (Direct State Access) functions where available
+    int w = ctx.viewportWidth / 2.0f;
+    int h = ctx.viewportHeight / 2.0f;
+
     glCreateTextures(GL_TEXTURE_2D, 1, &o_SsaoTexture);
-    glTextureStorage2D(o_SsaoTexture, 1, SSAO_TEXTURE_FORMAT, ctx.viewportWidth, ctx.viewportHeight);
+    glTextureStorage2D(o_SsaoTexture, 1, SSAO_TEXTURE_FORMAT,w ,h);
     glTextureParameteri(o_SsaoTexture, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTextureParameteri(o_SsaoTexture, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    // Framebuffer attachment
     glNamedFramebufferTexture(ssaoFBO, GL_COLOR_ATTACHMENT0, o_SsaoTexture, 0);
 
     if (glCheckNamedFramebufferStatus(ssaoFBO, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -42,23 +42,20 @@ void SSAOPass::Execute()
 {
     Shader& ssaoShader = Renderer::GetSSAOShader();
 
-    // Pre-calculate matrices
     const glm::mat4& projection = ctx.camera->GetProjectionMatrix();
     const glm::mat4 invProjection = glm::inverse(projection);
 
-    // Set up framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
+    glViewport(0, 0, ctx.viewportWidth / 2, ctx.viewportHeight / 2);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // Shader setup
     ssaoShader.use();
     ssaoShader.setMat4("projection", projection);
     ssaoShader.setMat4("invProjection", invProjection);
-    ssaoShader.setVec2("windowSize", glm::vec2(ctx.viewportWidth, ctx.viewportHeight));
+    ssaoShader.setVec2("windowSize", glm::vec2(ctx.viewportWidth / 2, ctx.viewportHeight / 2));
     ssaoShader.setFloat("near", NEAR_PLANE);
     ssaoShader.setFloat("far", FAR_PLANE);
 
-    // Texture bindings
     glBindTextureUnit(0, i_Normal);
     glBindTextureUnit(1, i_Depth);
     glBindTextureUnit(2, noiseTexture);
@@ -67,11 +64,12 @@ void SSAOPass::Execute()
     ssaoShader.setInt("gDepth", 1);
     ssaoShader.setInt("texNoise", 2);
 
-    for (unsigned int i = 0; i < 64; ++i)
+    for (unsigned int i = 0; i < KERNEL_SIZE; ++i)
         ssaoShader.setVec3("samples[" + std::to_string(i) + "]", kernel->at(i));
 
     Renderer::DrawFullScreenQuad();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
 }
 
 void SSAOPass::GenerateSampleKernel()
@@ -90,7 +88,6 @@ void SSAOPass::GenerateSampleKernel()
         sample = glm::normalize(sample);
         sample *= randomFloats(generator);
 
-        // Improved distribution
         float scale = static_cast<float>(i) / KERNEL_SIZE;
         scale = glm::mix(0.1f, 1.0f, scale * scale);
         sample *= scale;
