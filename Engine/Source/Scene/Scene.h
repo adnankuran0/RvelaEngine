@@ -121,6 +121,7 @@ public:
     inline CameraSystem& GetCameraSystem() noexcept { return m_CameraSystem; }
 
 private:
+    unsigned int CountEntitiesRecursively(entt::entity& rootEntity);
     friend class Entity;
     SceneState m_State = SceneState::EDIT;
     std::string m_SceneName;

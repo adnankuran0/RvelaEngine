@@ -66,7 +66,9 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
 
             static ImGuizmo::OPERATION currentGizmoOperation = ImGuizmo::TRANSLATE;
             static ImGuizmo::MODE currentGizmoMode = ImGuizmo::WORLD;
-
+            if (ImGui::IsKeyPressed(ImGuiKey_T)) {
+                currentGizmoMode = (currentGizmoMode == ImGuizmo::WORLD) ? ImGuizmo::LOCAL : ImGuizmo::WORLD;
+            }
             if (!ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
                 if (ImGui::IsKeyPressed(ImGuiKey_W)) currentGizmoOperation = ImGuizmo::TRANSLATE;
                 if (ImGui::IsKeyPressed(ImGuiKey_E)) currentGizmoOperation = ImGuizmo::ROTATE;
@@ -74,6 +76,7 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
             }
 
             bool useSnap = ImGui::IsKeyDown(ImGuiKey_LeftCtrl);
+
 
             float snapTranslate[3] = { 1.0f, 1.0f, 1.0f };
             float snapRotate = 15.0f;
@@ -106,28 +109,37 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
                     glm::value_ptr(scale));
 
                 if (currentGizmoMode == ImGuizmo::LOCAL) {
-                    // directly set local
-                    tc.SetPosition(translation);
-                    tc.SetScale(scale);
-                    tc.SetEulerRotation(rotation);
+                    // Local mode için de parent transform'unu hesaba kat
+                    glm::mat4 parentWorld(1.0f);
+                    auto& scene = engine->GetActiveScene();
+                    auto& reg = scene.GetRegistry();
+                    auto& node = reg.get<SceneTreeComponent>(selectedEntity);
+                    if (node.parent != entt::null && reg.valid(node.parent)) {
+                        parentWorld = reg.get<TransformComponent>(node.parent).GetWorldMatrix();
+                    }
+                    glm::mat4 localM = glm::inverse(parentWorld) * transform;
+                    glm::vec3 lPos, lScale, skew;
+                    glm::quat lRot;
+                    glm::vec4 persp;
+                    glm::decompose(localM, lScale, lRot, lPos, skew, persp);
+
+                    tc.SetPosition(lPos);
+                    tc.SetScale(lScale);
+                    tc.SetRotation(lRot);
                 }
                 else if (currentGizmoMode == ImGuizmo::WORLD) {
                     glm::mat4 parentWorld(1.0f);
                     auto& scene = engine->GetActiveScene();
                     auto& reg = scene.GetRegistry();
                     auto& node = reg.get<SceneTreeComponent>(selectedEntity);
-
                     if (node.parent != entt::null && reg.valid(node.parent)) {
                         parentWorld = reg.get<TransformComponent>(node.parent).GetWorldMatrix();
                     }
-
                     glm::mat4 localM = glm::inverse(parentWorld) * transform;
-
                     glm::vec3 lPos, lScale, skew;
                     glm::quat lRot;
                     glm::vec4 persp;
                     glm::decompose(localM, lScale, lRot, lPos, skew, persp);
-
                     tc.SetPosition(lPos);
                     tc.SetScale(lScale);
                     tc.SetRotation(lRot);

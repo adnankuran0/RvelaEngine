@@ -1,6 +1,6 @@
 #pragma once
 #include "Scene.h"
-#include "Entity.h"
+#include "SceneSerializer.h"
 
 class SceneManager
 {
@@ -10,6 +10,7 @@ public:
     {
         return std::make_unique<Scene>(sceneName);
     }
+
     Scene& GetActiveScene()
     {
         assert(m_CurrentScene);
@@ -20,12 +21,10 @@ public:
         m_CurrentScene = std::move(newScene);
     }
 
-
     void SaveScene(const std::string& path);
     void LoadScene(const std::string& path);
 private:
     std::unique_ptr<Scene> m_CurrentScene = nullptr;
-
-    unsigned int CountEntitiesRecursively(entt::entity& rootEntity);
-    json SerializeEntity(Scene& scene, entt::entity e);
+    SceneSerializer m_SceneSerializer;
+    
 };

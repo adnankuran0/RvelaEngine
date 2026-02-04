@@ -10,11 +10,9 @@ public:
     CameraSystem() = default;
 
     Camera& CreateCamera(Scene& scene, const glm::vec3& position = { 0,0,0 });
-
     Camera& RegisterCamera(Entity& cameraEntity);
 
     void SetActiveCamera(Camera& cam);
-
     Camera* GetActiveCamera() { return m_ActiveCamera; }
 
     void Update()

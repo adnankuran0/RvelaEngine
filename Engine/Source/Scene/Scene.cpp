@@ -18,10 +18,6 @@ Scene::Scene(const std::string& sceneName) : m_Registry()
     entity.AddComponent<TagComponent>(sceneName);
     entity.AddComponent<UUIDComponent>(EntityUUIDGenerator::Generate());
     m_EntityMap[entity.GetUUID()] = (entt::entity)m_RootEntity;
-
-    LoadPrimitive("Cube");
-    CreateDirectionalLight();
-
 }
 
 void Scene::SetState(SceneState newState)
@@ -33,8 +29,6 @@ void Scene::SetState(SceneState newState)
         OnStop();
     m_State = newState;
 }
-
-
 
 void Scene::OnStart()
 {
@@ -92,17 +86,6 @@ void Scene::OnStop()
     }
 }
 
-Entity Scene::CreateEntity(const std::string& name) {
-    Entity entity(m_Registry.create(), this);
-    entity.AddComponent<TransformComponent>(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f));
-    entity.AddComponent<SceneTreeComponent>();
-    entity.AddComponent<TagComponent>(name);
-    entity.AddComponent<UUIDComponent>(EntityUUIDGenerator::Generate());
-    SetParent(entity, m_RootEntity);
-    m_EntityMap[entity.GetUUID()] = (entt::entity)entity;
-    return entity;
-}
-
 Entity Scene::CreateEntityRaw()
 {
     Entity e(m_Registry.create(), this);
@@ -112,36 +95,42 @@ Entity Scene::CreateEntityRaw()
     return e;
 }
 
-Entity Scene::CreateEntityWithUUID(const std::string& name, EntityUUID uuid) {
-    Entity entity(m_Registry.create(), this);
-    entity.AddComponent<TransformComponent>(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f));
-    entity.AddComponent<SceneTreeComponent>();
+Entity Scene::CreateEntity(const std::string& name) {
+    Entity entity = CreateEntityRaw();
+    entity.GetComponent<UUIDComponent>().uuid = EntityUUIDGenerator::Generate();
     entity.AddComponent<TagComponent>(name);
-    entity.AddComponent<UUIDComponent>(uuid);
     SetParent(entity, m_RootEntity);
-    m_EntityMap[uuid] = (entt::entity)entity;
+    m_EntityMap[entity.GetUUID()] = (entt::entity)entity;
+    return entity;
+}
+
+Entity Scene::CreateEntityWithUUID(const std::string& name, EntityUUID uuid) {
+    Entity entity = CreateEntityRaw();
+    entity.GetComponent<UUIDComponent>().uuid = uuid;
+    entity.AddComponent<TagComponent>(name);
+    SetParent(entity, m_RootEntity);
+    m_EntityMap[entity.GetUUID()] = (entt::entity)entity;
     return entity;
 }
 
 void Scene::DestroyEntity(entt::entity entity) {
     if (entity == entt::null || !m_Registry.valid(entity)) return;
-    if (HasComponent<SceneTreeComponent>(entity)) {
-        auto& node = GetComponent<SceneTreeComponent>(entity);
-        if (node.parent != entt::null && m_Registry.valid(node.parent)) {
-            auto& parentNode = GetComponent<SceneTreeComponent>(node.parent);
-            auto it = std::find(parentNode.children.begin(), parentNode.children.end(), entity);
-            if (it != parentNode.children.end()) parentNode.children.erase(it);
-            auto uuidIt = std::find(parentNode.childrenUUIDs.begin(), parentNode.childrenUUIDs.end(), GetComponent<UUIDComponent>(entity).uuid);
-            if (uuidIt != parentNode.childrenUUIDs.end()) parentNode.childrenUUIDs.erase(uuidIt);
-        }
+
+    auto& node = GetComponent<SceneTreeComponent>(entity);
+    if (node.parent != entt::null && m_Registry.valid(node.parent)) {
+        auto& parentNode = GetComponent<SceneTreeComponent>(node.parent);
+        auto it = std::find(parentNode.children.begin(), parentNode.children.end(), entity);
+        if (it != parentNode.children.end()) parentNode.children.erase(it);
+        auto uuidIt = std::find(parentNode.childrenUUIDs.begin(), parentNode.childrenUUIDs.end(), GetComponent<UUIDComponent>(entity).uuid);
+        if (uuidIt != parentNode.childrenUUIDs.end()) parentNode.childrenUUIDs.erase(uuidIt);
     }
-    if (HasComponent<SceneTreeComponent>(entity)) {
-        auto& node = GetComponent<SceneTreeComponent>(entity);
-        auto childrenCopy = node.children;
-        for (auto child : childrenCopy) DestroyEntity(child);
-    }
+
+    auto childrenCopy = node.children;
+    for (auto child : childrenCopy) 
+        DestroyEntity(child);
+
     if (HasComponent<MeshRendererComponent>(entity)) GetComponent<MeshRendererComponent>(entity).Destroy();
-    if (HasComponent<UUIDComponent>(entity)) m_EntityMap.erase(GetComponent<UUIDComponent>(entity).uuid);
+    m_EntityMap.erase(GetComponent<UUIDComponent>(entity).uuid);
     m_Registry.destroy(entity);
 }
 
@@ -567,6 +556,19 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
     if (registry.any_of<UUIDComponent>(entity)) count++;
     if (registry.any_of<PrefabComponent>(entity)) count++;
     if (registry.any_of<CameraComponent>(entity)) count++;
+
+    return count;
+}
+
+unsigned int Scene::CountEntitiesRecursively(entt::entity& rootEntity)
+{
+    unsigned int count = 0;
+    if (HasComponent<SceneTreeComponent>(rootEntity))
+    {
+        auto& children = GetComponent<SceneTreeComponent>(rootEntity).children;
+        for (auto child : children)
+            count += CountEntitiesRecursively(child);
+    }
 
     return count;
 }
