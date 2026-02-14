@@ -1,5 +1,4 @@
 #pragma once
-#include "GLAD/gl.h"
 
 enum TextureFormat : uint8_t
 {

@@ -2,6 +2,10 @@
 #include <ImGui/tinyfiledialogs.h>
 #include <fstream>
 #include <AssetImporter/MaterialImporter.h>
+#include "Core/Engine.h"
+#include "AssetImporter/AssetImporterRegistry.h"
+#include <imgui.h>
+
 
 void MenuBar::Draw(Engine* engine, AssetImporterRegistry& assetImporter)
 {

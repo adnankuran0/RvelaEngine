@@ -1,6 +1,11 @@
 #include "rvelapch.h"
 #include "EventManager.h"
 #include "EventDispatcher.h"
+#include <functional>
+#include "Events.h"
+#include "MouseEvents.h"
+#include "WindowEvents.h"
+#include "KeyEvents.h"
 
 std::vector<std::unique_ptr<Event>> EventManager::m_EventQueue;
 

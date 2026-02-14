@@ -1,6 +1,9 @@
 
 #include "PrefabImporter.h"
-#include "json.hpp"
+
+#include "Assets/PrefabAsset.h"
+#include "Scene/Scene.h"
+#include "Utils/Serializer.h"
 
 Ref<PrefabAsset> PrefabImporter::CreatePrefabAsset(const std::string& path, Scene& scene, entt::entity& rootEntity)
 {

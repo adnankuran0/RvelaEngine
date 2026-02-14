@@ -1,5 +1,6 @@
 #include "Editor.h"
 #include "EditorLayer.h"
+#include "Core/Engine.h"
 
 Editor::Editor()
 {

@@ -1,10 +1,9 @@
-#include "Core/Engine.h"
 #include "Core/Layer.h"
-#include "Rendering/RenderPasses/LightingPass.h"
-#include "Rendering/RenderPasses/SkyboxPass.h"
-#include "Rendering/RenderPasses/ShadowPass.h"
 #include "RenderContext.h"
 #include "RenderPipeline.h"
+
+class Engine;
+class Scene;
 
 class RenderLayer : public Layer
 {

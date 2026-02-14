@@ -2,6 +2,8 @@
 #include "ImGui/imgui.h"
 #include <ImGui/tinyfiledialogs.h>
 #include "AssetImporter/PrefabImporter.h"
+#include "Core/Engine.h"
+#include "Scene/Entity.h"
 
 
 void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)

@@ -1,6 +1,7 @@
 #include "rvelapch.h"
 #include "Log.h"
 
+
 std::shared_ptr<spdlog::logger> RvelaLog::s_Logger;
 
 void RvelaLog::Init(const std::string& filePath)

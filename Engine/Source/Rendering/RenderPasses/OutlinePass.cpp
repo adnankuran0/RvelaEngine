@@ -1,5 +1,6 @@
 ﻿#include "rvelapch.h"
 #include "OutlinePass.h"
+#include "Scene/Scene.h"
 
 void OutlinePass::Execute()
 {

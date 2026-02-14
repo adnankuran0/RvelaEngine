@@ -1,15 +1,14 @@
 #pragma once
 #include "AssetImporter.h"
-#include "MeshImporter.h"
-#include "Assimp/Importer.hpp"
-#include "Assimp/scene.h"
-#include <assimp/postprocess.h>
-#include "TextureImporter.h"
-#include "MaterialImporter.h"
 #include "entt/entt.h"
-#include <Scene/Scene.h>
-#include "Scene/Entity.h"
+#include "Assimp/Importer.hpp"
+#include "MeshImporter.h"
+#include "MaterialImporter.h"
+#include "TextureImporter.h"
 
+struct aiScene;
+struct aiNode;
+class Scene;
 
 class ModelImporter : public IAssetImporter
 {

@@ -1,6 +1,8 @@
 #pragma once
-#include "Scene/Scene.h"
-#include "Scene/ICamera.h"
+#include "Rendering/Renderer.h"
+
+class Scene;
+class ICamera;
 
 struct RenderContext
 {

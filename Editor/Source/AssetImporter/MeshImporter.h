@@ -1,9 +1,11 @@
 #pragma once
-#include "AssetImporter.h"
+
 #include "Assets/MeshAsset.h"
-#include "Assets/Asset.h"
-#include "Assimp/Importer.hpp"
-#include "Assimp/scene.h"
+#include <filesystem>
+#include <unordered_map>
+
+struct aiScene;
+struct aiMesh;
 
 class MeshImporter 
 {

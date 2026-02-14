@@ -1,9 +1,14 @@
 #include "rvelapch.h"
 #include "AssetLoader.h"
-#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 #include "MeshAsset.h"
 #include "PrefabAsset.h"
+
+#include "Assets/Asset.h"
+#include "Core/Log.h"
+#include "TextureAsset.h"
+#include "MaterialAsset.h"
+#include "Assets/AssetMagic.h"
 
 Ref<Asset> AssetLoader::Load(const std::filesystem::path& path)
 {

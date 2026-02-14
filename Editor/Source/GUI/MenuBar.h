@@ -1,7 +1,7 @@
 #pragma once
-#include "ImGui/imgui.h"
-#include "Core/Engine.h"
-#include "AssetImporter/AssetImporterRegistry.h"
+
+class Engine;
+class AssetImporterRegistry;
 
 class MenuBar
 {

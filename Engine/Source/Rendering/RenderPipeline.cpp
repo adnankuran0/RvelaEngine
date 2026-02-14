@@ -1,6 +1,7 @@
 #include "rvelapch.h"
 #include "RenderPipeline.h"
 #include "Utils/GPUTimer.h"
+#include "Core/Engine.h"
 
 RenderPipeline::RenderPipeline(Engine* engine)
 {

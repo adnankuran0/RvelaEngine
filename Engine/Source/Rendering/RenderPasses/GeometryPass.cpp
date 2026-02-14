@@ -1,5 +1,6 @@
 #include "rvelapch.h"
 #include "GeometryPass.h"
+#include "Scene/ICamera.h"
 
 void GeometryPass::Init()
 {

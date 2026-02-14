@@ -1,6 +1,13 @@
 #include "rvelapch.h"
+
 #include "MeshImporter.h"
-#include <Scene/AABB.h>
+
+#include "Scene/AABB.h"
+
+#include "Assimp/Importer.hpp"
+#include "Assimp/scene.h"
+#include <Core/Log.h>
+
 
 static std::string SanitizeFilename(const std::string& name)
 {

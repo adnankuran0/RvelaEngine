@@ -1,6 +1,6 @@
 ﻿#include "ToolBar.h"
 #include "ImGui/imgui.h"
-
+#include "Scene/Scene.h"
 
 void ToolBar::Draw(Scene& scene)
 {

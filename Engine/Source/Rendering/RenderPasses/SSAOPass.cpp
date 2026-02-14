@@ -1,5 +1,6 @@
 #include "rvelapch.h"
 #include "SSAOPass.h"
+#include "Scene/ICamera.h"
 
 // Pre-declare constants
 namespace {

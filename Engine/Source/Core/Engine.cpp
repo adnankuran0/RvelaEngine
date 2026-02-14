@@ -2,7 +2,12 @@
 #include "Engine.h"
 #include "Core/Log.h"
 #include "Rendering/RenderLayer.h"
-#include <Assets/MeshAsset.h>
+#include "Input/Input.h"
+#include "Event/EventManager.h"
+#include "Time.h"
+#include <Scene/EditorCamera.h>
+#include <Event/MouseEvents.h>
+
 
 Engine* Engine::s_Instance = nullptr;
 
@@ -107,7 +112,7 @@ void Engine::HandleEvents() noexcept
 			{
 				if (GetActiveScene().GetState() == SceneState::EDIT)
 				{
-					m_EditorCamera->onMouseMoved(
+					m_EditorCamera->OnMouseMoved(
 						mouseEvent->GetX(),
 						mouseEvent->GetY(),
 						m_Window.GetGLFWWindow()
@@ -134,6 +139,15 @@ void Engine::HandleEvents() noexcept
 			break;
 		}
 		});
+}
+
+ICamera* Engine::GetCamera() noexcept
+{
+	Camera* camera = GetSceneCamera();
+	if (m_SceneManager.GetActiveScene().GetState() == SceneState::EDIT || !camera)
+		return m_EditorCamera;
+	else
+		return camera;
 }
 
 void Engine::Render()

@@ -1,5 +1,6 @@
 ﻿#include "InspectorPanel.h"
 #include "ImGui/imgui.h"
+#include "Core/Engine.h"
 
 void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 {

@@ -1,5 +1,4 @@
-#include "Core/Engine.h"
-
+class Engine;
 
 class Editor
 {

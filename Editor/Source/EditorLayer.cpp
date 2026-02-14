@@ -1,5 +1,10 @@
 #include "EditorLayer.h"
 #include "Scene/Entity.h"
+#include "Core/Engine.h"
+#include "GLFW/glfw3.h"
+#include "ImGui/imgui.h"
+#include "ImGui/imgui_impl_glfw.h"
+#include "ImGui/imgui_impl_opengl3.h"
 
 
 EditorLayer::~EditorLayer()
@@ -65,7 +70,7 @@ void EditorLayer::Render()
 {
     glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "IMGUI Pass");
 
-    static entt::entity selectedEntity = entt::null; // TODO: this is not belongs here
+    static entt::entity selectedEntity = entt::null; // TODO: this is not belong here
 
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();

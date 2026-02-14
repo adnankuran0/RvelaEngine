@@ -1,7 +1,9 @@
 ﻿#include "Viewport.h"
 #include <iostream>
+#include "ImGui/imgui.h"
 #include "ImGui/ImGuizmo.h"
 #include "Core/Engine.h"
+#include <glm/gtx/matrix_decompose.hpp>
 
 
 void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)

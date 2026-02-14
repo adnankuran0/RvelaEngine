@@ -1,7 +1,8 @@
 #pragma once
 #include "Assets/Asset.h"
-#include "TextureImporter.h"
-#include "ModelImporter.h"
+#include <unordered_map>
+
+class IAssetImporter;
 
 class AssetImporterRegistry
 {

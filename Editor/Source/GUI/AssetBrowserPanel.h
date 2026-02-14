@@ -1,6 +1,7 @@
 #pragma once
 #include <filesystem>
-#include "Core/Engine.h"
+
+class Engine;
 
 class AssetBrowserPanel
 {

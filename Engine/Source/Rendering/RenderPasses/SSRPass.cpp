@@ -1,5 +1,7 @@
 #include "rvelapch.h"
 #include "SSRPass.h"
+#include "Core/Time.h"
+#include "Scene/ICamera.h" 
 
 void SSRPass::Init()
 {

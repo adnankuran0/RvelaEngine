@@ -1,7 +1,4 @@
 #pragma once
-#include "GLAD/gl.h"
-
-
 class ElementBuffer
 {
 private:

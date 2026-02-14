@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <cstdlib>
 #include <Assets/PrefabAsset.h>
+#include "Core/Engine.h"
+#include "Scene/Entity.h"
 
 static std::filesystem::path s_CurrentDirectory;
 static char s_SearchBuffer[256] = "";

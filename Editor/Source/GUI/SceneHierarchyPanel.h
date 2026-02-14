@@ -1,5 +1,8 @@
 #pragma once
-#include "Core/Engine.h"
+#include "entt/entt.h"
+
+class Engine;
+
 class SceneHierarchyPanel
 {
 public:

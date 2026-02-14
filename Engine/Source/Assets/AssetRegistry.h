@@ -1,12 +1,13 @@
 ﻿#pragma once
 #include <filesystem>
-#include "AssetUUID.h"
-#include "Asset.h"
-#include "AssetMeta.h"
+#include "Core/Ref.h"
 #include "tsl/robin_map.h"
-#include "Assets/AssetLoader.h"
-#include "TextureAsset.h"
-#include "MaterialAsset.h"
+#include "AssetUUID.h"
+#include "AssetLoader.h"
+
+class Asset;
+class AssetLoader;
+
 class AssetRegistry 
 {
 public:
@@ -63,8 +64,6 @@ public:
 
     
 
-private:
-    
 
 private:
     inline static bool m_IsInitialized = false;

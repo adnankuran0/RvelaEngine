@@ -1,10 +1,12 @@
 #pragma once
 
-#include "GLAD/gl.h"
 #include <glm/glm.hpp>
 #include <string>
 #include <vector>
+#include "GLAD/gl.h"
+#include "Utils/FileUtils.h"
 #include "Shader.h"
+
 
 class Skybox
 {

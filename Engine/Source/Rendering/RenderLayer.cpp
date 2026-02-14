@@ -1,5 +1,6 @@
 #include "rvelapch.h"
 #include "RenderLayer.h"
+#include "Core/Engine.h"
 
 void RenderLayer::OnRender()
 {

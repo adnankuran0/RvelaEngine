@@ -1,6 +1,7 @@
 ﻿#include "rvelapch.h"
 #include "Skybox.h"
 #include <stb_image.h>
+#include "Core/Log.h"
 
 Skybox::Skybox() : skyboxVAO(0), skyboxVBO(0), skyboxTexture(0)
 {

@@ -1,7 +1,12 @@
 ﻿#include "ModelImporter.h"
-#include <Assets/MaterialAsset.h>
-#include <Assets/PrefabAsset.h>
+
+#include "Assimp/scene.h"
+#include "assimp/postprocess.h"
+
+#include "Assets/PrefabAsset.h"
 #include "PrefabImporter.h"
+#include "Scene/Scene.h"
+#include "Scene/Entity.h"
 
 const aiScene* ModelImporter::LoadScene(const std::filesystem::path& path)
 {

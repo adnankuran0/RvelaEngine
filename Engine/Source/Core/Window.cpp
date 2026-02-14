@@ -3,6 +3,11 @@
 #include "Core/Log.h"
 #include "Event/EventManager.h"
 #include <stb_image.h>
+#include "GLFW/glfw3.h"
+#include "GLAD/gl.h"
+#include "Event/KeyEvents.h"
+#include "Event/MouseEvents.h"
+#include "Event/WindowEvents.h"
 
 Window::Window() noexcept
 {
@@ -107,4 +112,19 @@ void Window::MouseScrolledCallback(GLFWwindow* window, double xoffset, double yo
 void Window::FramebufferSizeCallback(GLFWwindow* window, int width, int height) noexcept {
     glViewport(0, 0, width, height);
     EventManager::PushEvent(new WindowResizedEvent(width, height));
+}
+
+WindowSize Window::GetSize() noexcept
+{
+    if (!m_Window) {
+        return WindowSize{ 0, 0 };
+    }
+    glfwGetWindowSize(m_Window, &m_WindowData.size.width, &m_WindowData.size.height);
+    return m_WindowData.size;
+}
+
+
+void Window::Shutdown() const
+{
+        glfwDestroyWindow(m_Window);
 }

@@ -1,5 +1,8 @@
 #include "AssetImporterRegistry.h"
-#include <Assets/AssetRegistry.h>
+#include "Assets/AssetRegistry.h"
+
+#include "TextureImporter.h"
+#include "ModelImporter.h"
 
 AssetImporterRegistry::AssetImporterRegistry()
 {

@@ -1,6 +1,9 @@
 ﻿#include "rvelapch.h"
 #include "TextureImporter.h"
 #include "Assets/TextureAsset.h"
+#include "stb_image/stb_image.h"
+#include <Core/Log.h>
+
 
 AssetUUID TextureImporter::Import(const std::filesystem::path& path)
 {

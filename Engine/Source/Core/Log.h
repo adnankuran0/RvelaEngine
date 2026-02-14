@@ -1,8 +1,8 @@
 #pragma once
+#include <memory>
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/sinks/rotating_file_sink.h"
-#include <memory>
 
 #define LOG_TRACE(...)    RvelaLog::GetLogger()->trace(__VA_ARGS__)
 #define LOG_DEBUG(...)    RvelaLog::GetLogger()->debug(__VA_ARGS__)

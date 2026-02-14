@@ -1,6 +1,8 @@
 #pragma once
-#include "ImGui/imgui.h"
-#include "Core/Engine.h"
+#include "entt/entt.h"
+#include "glm/glm.hpp"
+
+class Engine;
 
 class Viewport
 {

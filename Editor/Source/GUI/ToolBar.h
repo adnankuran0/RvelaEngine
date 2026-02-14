@@ -1,5 +1,6 @@
 #pragma once
-#include "Core/Engine.h"
+
+class Scene;
 
 class ToolBar
 {

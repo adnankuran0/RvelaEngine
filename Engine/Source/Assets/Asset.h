@@ -1,17 +1,16 @@
 #pragma once
-#include "Core/Ref.h"
-#include "AssetUUID.h"
+#include <memory>
 #include "AssetMeta.h"
 
 class Asset 
 {
 public:
-    Asset(std::unique_ptr<AssetMeta> assetMeta) : m_Meta(std::move(assetMeta)) {}
+    Asset(std::unique_ptr<AssetMeta> assetMeta);
     virtual ~Asset() = default;
 
-    inline AssetUUID GetUUID() const { return m_Meta.get()->uuid; }
-    inline void SetUUID(const AssetUUID& uuid) { m_Meta.get()->uuid = uuid; }
-    inline AssetType GetAssetType() const { return m_Meta.get()->type; }
+    AssetUUID GetUUID() const; 
+    void SetUUID(const AssetUUID& uuid); 
+    AssetType GetAssetType() const; 
     //inline bool IsAlive() const { return !IsDestroyed(); }
 
     template<typename T>

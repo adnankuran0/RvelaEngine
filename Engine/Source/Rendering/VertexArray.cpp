@@ -1,6 +1,6 @@
 #include "rvelapch.h"
-
 #include "VertexArray.h"
+#include "GLAD/gl.h"
 
 void VertexArray::Init()
 {

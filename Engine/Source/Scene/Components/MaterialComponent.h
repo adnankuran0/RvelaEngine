@@ -3,6 +3,9 @@
 #include "json.hpp"
 #include "Core/Ref.h"
 #include "Assets/AssetRegistry.h"
+#include "Assets/TextureAsset.h"
+#include "Assets/MaterialAsset.h"
+#include "Core/Ref.h"
 
 
 using json = nlohmann::json;

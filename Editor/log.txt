@@ -144,3 +144,60 @@
 [info] OpenGL Version: 4.6.0 NVIDIA 591.74
 [info] Engine has started!
 [info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 591.74
+[info] Engine has started!
+[info] OpenGL Version: 4.6.0 NVIDIA 591.74
+[info] Engine has started!
+[error] Error while loading texture from memory: 1283
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 591.74
+[info] Engine has started!
+[error] Error while loading texture from memory: 1283
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 591.74
+[info] Engine has started!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 591.74
+[info] Engine has started!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 591.74
+[info] Engine has started!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 591.74
+[info] Engine has started!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 591.74
+[info] Engine has started!
+[error] Error while loading texture from memory: 1283
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 591.74
+[info] Engine has started!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 591.74
+[info] Engine has started!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 591.74
+[info] Engine has started!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 591.74
+[info] Engine has started!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 591.74
+[info] Engine has started!
+[info] OpenGL Version: 4.6.0 NVIDIA 591.74
+[info] Engine has started!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 591.74
+[info] Engine has started!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 591.74
+[info] Engine has started!
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 591.74
+[info] Engine has started!
+[error] OpenGL error while loading texture: 1283
+[info] Engine has stopped!
+[info] OpenGL Version: 4.6.0 NVIDIA 591.74
+[info] Engine has started!
+[error] OpenGL error while loading texture: 1283
+[info] Engine has stopped!

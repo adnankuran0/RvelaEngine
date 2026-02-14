@@ -1,5 +1,7 @@
 #include "rvelapch.h"
 #include "Time.h"
+#include "GLFW/glfw3.h"
+
 
 // Static member definitions (all in seconds)
 float Time::deltaTime = 0.0f;
@@ -12,6 +14,11 @@ float Time::lastFpsUpdateTime = 0.0f;
 int Time::maxFPS = 0;
 int Time::fpsUpdateTime = 10; // as miliseconds
 int Time::frameCount = 0;
+
+double Time::GetCurrentTime() noexcept
+{
+    return glfwGetTime();
+}
 
 void Time::Update() noexcept
 {
@@ -41,7 +48,6 @@ void Time::Update() noexcept
 
     fixedTimeAccumulator += deltaTime;
 }
-
 
 
 

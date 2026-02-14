@@ -1,4 +1,5 @@
 #include "MaterialImporter.h"
+#include "Assets/MaterialAsset.h"
 
 Ref<MaterialAsset> MaterialImporter::CreateMaterialAsset(const std::string& path)
 {

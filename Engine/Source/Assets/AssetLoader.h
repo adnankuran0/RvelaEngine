@@ -1,11 +1,12 @@
 #pragma once
 #include <filesystem>
+
 #include "Core/Ref.h"
-#include "Assets/Asset.h"
+#include "AssetMeta.h"
+#include <fstream>
 #include "Core/Log.h"
-#include "TextureAsset.h"
-#include "MaterialAsset.h"
-#include "Assets/AssetMagic.h"
+
+class Asset;
 
 class AssetLoader
 {
