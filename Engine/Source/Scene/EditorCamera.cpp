@@ -89,6 +89,15 @@ void EditorCamera::ProcessKeyboard()
 
 void EditorCamera::OnMouseMoved(double xPosIn, double yPosIn, GLFWwindow* window)
 {
+    if (!Input::IsMouseButtonPressed(MouseCode::Button1))
+    {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        firstMouse = true;
+        return;
+    }
+
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
     float xpos = static_cast<float>(xPosIn);
     float ypos = static_cast<float>(yPosIn);
 
@@ -105,8 +114,7 @@ void EditorCamera::OnMouseMoved(double xPosIn, double yPosIn, GLFWwindow* window
     lastX = xpos;
     lastY = ypos;
 
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
-        ProcessMouseMovement(xoffset, yoffset);
+    ProcessMouseMovement(xoffset, yoffset);
 }
 
 void EditorCamera::ProcessMouseScroll(float yoffset)
