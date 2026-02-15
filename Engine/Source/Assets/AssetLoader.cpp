@@ -1,9 +1,16 @@
 #include "rvelapch.h"
 #include "AssetLoader.h"
-#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 #include "MeshAsset.h"
 #include "PrefabAsset.h"
+
+#include "Assets/Asset.h"
+#include "Core/Log.h"
+#include "TextureAsset.h"
+#include "MaterialAsset.h"
+#include "Assets/AssetMagic.h"
+
+namespace rv { 
 
 Ref<Asset> AssetLoader::Load(const std::filesystem::path& path)
 {
@@ -50,6 +57,7 @@ Ref<Asset> AssetLoader::Load(const std::filesystem::path& path)
         Ref<MeshAsset> asset = CreateRef<MeshAsset>(path.string(), std::move(meta));
         if (asset->Load())
         {
+            LOG_INFO("Mesh asset loaded...");
             return Ref<Asset>(asset);
         }
     }
@@ -83,4 +91,6 @@ AssetHeader AssetLoader::ReadHeader(std::ifstream& inFile, uint32_t expectedMagi
     }
 
     return header;
+}
+
 }

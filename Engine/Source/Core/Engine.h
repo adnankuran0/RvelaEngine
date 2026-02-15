@@ -1,18 +1,16 @@
 #pragma once
 #include "Window.h"
-#include "Input/Input.h"
-#include "Event/EventManager.h"
-#include "Time.h"
-#include "Scene/Scene.h"
-#include "Scene/Components.h"
+#include "Rendering/Renderer.h"
 #include "Scene/SceneManager.h"
-#include "Scene/Entity.h"
+#include "Assets/AssetRegistry.h"
+#include "Script/ScriptEngine.h"
 #include "Utils/ProjectManager.h"
 #include "LayerStack.h"
-#include "Rendering/Renderer.h"
-#include "Assets/AssetRegistry.h"
-#include <Scene/EditorCamera.h>
-#include "Script/ScriptEngine.h"
+
+namespace rv {
+
+class EditorCamera;
+class ICamera;
 
 class Engine
 {
@@ -30,24 +28,18 @@ public:
 	void PushLayer(Layer* layer);
 	void PopLayer(Layer* layer);
 
-	inline static Engine* Get() noexcept { return s_Instance; } 
-	inline Window& GetWindow() noexcept { return m_Window; }
-	inline Scene& GetActiveScene() noexcept { return m_SceneManager.GetActiveScene(); }
-	inline ProjectManager& GetProjectManager() noexcept { return m_ProjectManager; }
-	inline SceneManager& GetSceneManager() noexcept { return m_SceneManager; }
-	inline AssetRegistry& GetAssetRegistry() noexcept { return m_AssetRegistry; }
+	inline static Engine* Get() noexcept { return s_Instance; }
+	Window& GetWindow() noexcept { return m_Window; }
+	Scene& GetActiveScene() noexcept { return m_SceneManager.GetActiveScene(); }
+	ProjectManager& GetProjectManager() noexcept { return m_ProjectManager; }
+	SceneManager& GetSceneManager() noexcept { return m_SceneManager; }
+	AssetRegistry& GetAssetRegistry() noexcept { return m_AssetRegistry; }
 
-	inline CameraSystem& GetCameraSystem() noexcept { return m_SceneManager.GetActiveScene().GetCameraSystem(); }
-	inline EditorCamera* GetEditorCamera() const noexcept { return m_EditorCamera; }
-	inline Camera* GetSceneCamera() noexcept { return GetCameraSystem().GetActiveCamera(); }
-	inline ICamera* GetCamera() noexcept
-	{
-		Camera* camera = GetSceneCamera();
-		if (m_SceneManager.GetActiveScene().GetState() == SceneState::EDIT || !camera)
-			return m_EditorCamera;
-		else
-			return camera;
-	}
+	CameraSystem& GetCameraSystem() noexcept { return m_SceneManager.GetActiveScene().GetCameraSystem(); }
+	EditorCamera* GetEditorCamera() const noexcept { return m_EditorCamera; }
+	Camera* GetSceneCamera() noexcept { return GetCameraSystem().GetActiveCamera(); }
+	ICamera* GetCamera() noexcept;
+
 	inline void SetEditorCamera(EditorCamera* editorCam) { m_EditorCamera = editorCam; }
 
 	inline ScriptEngine& GetScriptEngine() { return m_ScriptEngine; }
@@ -61,7 +53,6 @@ private:
 	LayerStack m_LayerStack;
 
 	void HandleEvents() noexcept;
-	
 
 	static Engine* s_Instance;
 	EditorCamera* m_EditorCamera = nullptr;
@@ -73,3 +64,5 @@ private:
 	ScriptEngine m_ScriptEngine;
 
 };
+
+}

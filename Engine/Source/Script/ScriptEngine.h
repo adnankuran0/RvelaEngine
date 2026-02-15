@@ -2,6 +2,7 @@
 #include "sol/sol.hpp"
 #include "entt/entt.h"
 
+namespace rv {
 // forward declaration
 struct ScriptComponent; 
 class Scene;
@@ -17,3 +18,5 @@ private:
 	sol::state m_State; // TODO: make state per scene
 
 };
+
+}

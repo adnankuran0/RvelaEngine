@@ -1,7 +1,11 @@
 #pragma once
-#include "ImGui/imgui.h"
+
+namespace rv {
+
 class Dockspace
 {
 public:
 	void Draw();
 };
+
+}

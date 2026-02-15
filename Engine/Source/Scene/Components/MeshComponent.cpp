@@ -1,6 +1,8 @@
 #include "rvelapch.h"
 #include "MeshComponent.h"
 
+namespace rv {
+
 void MeshComponent::Load(const AssetUUID& uuid)
 {
     if (!uuid.IsValid())
@@ -24,4 +26,6 @@ void MeshComponent::Deserialize(const json& j)
 {
     meshUUID = AssetUUID::FromString(j.at("mesh").get<std::string>());
     Load(meshUUID);
+}
+
 }

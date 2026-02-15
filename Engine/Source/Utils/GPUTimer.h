@@ -2,6 +2,8 @@
 #include <glad/gl.h>
 #include "Core/Log.h"
 
+namespace rv {
+
 class GPUTimer {
 public:
     GPUTimer(const char* name) : name(name) {
@@ -25,3 +27,5 @@ private:
     GLuint query;
     const char* name;
 };
+
+}

@@ -1,5 +1,6 @@
 #pragma once
-#include "GLAD/gl.h"
+
+namespace rv { 
 
 enum TextureFormat : uint8_t
 {
@@ -42,3 +43,4 @@ private:
     int m_Width{}, m_Height{}, m_NrChannels{};
 };
 
+}

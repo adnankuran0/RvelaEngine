@@ -2,6 +2,8 @@
 #include "RenderContext.h"
 #include "RenderCommand.h"
 
+namespace rv {
+
 class RenderPass
 {
 public:
@@ -16,3 +18,5 @@ protected:
 	RenderContext ctx;
 	std::vector<RenderCommand> commands;
 };
+
+}

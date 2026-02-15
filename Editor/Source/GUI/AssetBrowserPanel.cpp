@@ -6,6 +6,10 @@
 #include <algorithm>
 #include <cstdlib>
 #include <Assets/PrefabAsset.h>
+#include "Core/Engine.h"
+#include "Scene/Entity.h"
+
+namespace rv {
 
 static std::filesystem::path s_CurrentDirectory;
 static char s_SearchBuffer[256] = "";
@@ -225,4 +229,6 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
     ImGui::EndChild();
 
     ImGui::End();
+}
+
 }

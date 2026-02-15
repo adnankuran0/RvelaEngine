@@ -1,6 +1,13 @@
 #include "rvelapch.h"
 #include "EventManager.h"
 #include "EventDispatcher.h"
+#include <functional>
+#include "Events.h"
+#include "MouseEvents.h"
+#include "WindowEvents.h"
+#include "KeyEvents.h"
+
+namespace rv { 
 
 std::vector<std::unique_ptr<Event>> EventManager::m_EventQueue;
 
@@ -25,4 +32,6 @@ void EventManager::DispatchEvents(const std::function<void(Event&)>& handler) no
 
     EventDispatcher::Dispatch(m_EventQueue, handler);
     ClearEvents();
+}
+
 }

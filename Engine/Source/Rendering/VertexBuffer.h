@@ -1,6 +1,7 @@
 #pragma once
-#include "GLAD/gl.h"
 
+
+namespace rv {
 
 class VertexBuffer
 {
@@ -18,3 +19,6 @@ public:
 	void Data(const void* data, unsigned int size) const;
 	unsigned int getID();
 };
+
+
+}

@@ -7,6 +7,8 @@
 #include <string>
 #include <type_traits>
 
+namespace rv {
+
 class Serializer
 {
 public:
@@ -85,3 +87,6 @@ void SerializeBin_UUIDComp(const UUIDComponent& comp, std::vector<std::byte>& ou
 void DeserializeBin_UUIDComp(const std::byte*& cursor, UUIDComponent& comp);
 
 
+
+
+}

@@ -12,7 +12,10 @@
 #include "Rendering/RenderPasses/SSAOPass.h"
 #include "Rendering/RenderPasses/SSRPass.h"
 #include "Rendering/RenderPasses/OutlinePass.h"
-#include "Core/Engine.h"
+
+namespace rv {
+
+class Engine;
 
 struct RenderFeatures
 {
@@ -54,3 +57,4 @@ private:
 
 };
 
+}

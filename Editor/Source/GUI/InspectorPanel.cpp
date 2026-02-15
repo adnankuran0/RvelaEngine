@@ -1,5 +1,8 @@
 ﻿#include "InspectorPanel.h"
 #include "ImGui/imgui.h"
+#include "Core/Engine.h"
+
+namespace rv {
 
 void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 {
@@ -247,6 +250,7 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                                     LOG_ERROR("file not opened");
                                     return;
                                 }
+                                
                                 AssetHeader header = AssetLoader::ReadHeader(inFile, MAGIC_TEXTURE);
                                 std::unique_ptr<TextureMeta> meta = AssetLoader::ReadMeta<TextureMeta>(inFile, header);
                                 material.SetAlbedoTexture(meta->uuid);
@@ -548,4 +552,6 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
     ImGui::EndTabBar();
     }
     ImGui::End();
+}
+
 }

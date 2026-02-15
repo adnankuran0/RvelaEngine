@@ -2,11 +2,12 @@
 
 #include <entt/entt.h>
 
-#include "Components.h"
 #include "Math/RvelaMath.h"
 #include "Utils/ISerializable.h"
 #include "Rendering/Renderer.h"
 #include "CameraSystem.h"
+
+namespace rv {
 
 class Entity; // Forward Declaration
 
@@ -131,3 +132,5 @@ private:
     entt::entity m_RootEntity;
     CameraSystem m_CameraSystem;
 };
+
+}

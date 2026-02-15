@@ -1,7 +1,10 @@
 #pragma once
 #include "Assets/Asset.h"
-#include "TextureImporter.h"
-#include "ModelImporter.h"
+#include <unordered_map>
+
+namespace rv {
+
+class IAssetImporter;
 
 class AssetImporterRegistry
 {
@@ -22,3 +25,6 @@ private:
 private:
 	std::unordered_map<std::string, std::shared_ptr<IAssetImporter>> m_ImporterMap;
 };
+
+
+}

@@ -7,6 +7,9 @@
 #include "Utils/ProjectManager.h"
 #include "EntityUUID.h"
 #include <Assets/PrefabAsset.h>
+#include <glm/gtx/matrix_decompose.hpp>
+
+namespace rv {
 
 Scene::Scene(const std::string& sceneName) : m_Registry() 
 {
@@ -176,7 +179,7 @@ Entity Scene::LoadPrimitive(const std::string& primitiveMeshName)
 }
 
 void Scene::Update() 
-{
+{                
     if (m_State == SceneState::PLAY)
         OnUpdate(Time::GetDeltaTime());
     UpdateHierarchy(); 
@@ -571,4 +574,6 @@ unsigned int Scene::CountEntitiesRecursively(entt::entity& rootEntity)
     }
 
     return count;
+}
+
 }

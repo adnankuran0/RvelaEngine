@@ -2,7 +2,13 @@
 #include "Engine.h"
 #include "Core/Log.h"
 #include "Rendering/RenderLayer.h"
-#include <Assets/MeshAsset.h>
+#include "Input/Input.h"
+#include "Event/EventManager.h"
+#include "Time.h"
+#include <Scene/EditorCamera.h>
+#include <Event/MouseEvents.h>
+
+namespace rv {
 
 Engine* Engine::s_Instance = nullptr;
 
@@ -25,6 +31,9 @@ Engine::Engine()
 	{
 		LOG_WARN("Another instance of Engine already exists!");
 	}
+
+
+	
 }
 
 Engine::~Engine()
@@ -71,12 +80,17 @@ void Engine::LateUpdate()
 void Engine::Run()
 {
 	LOG_INFO("Engine has started!");
+
+	
+
 	while (!glfwWindowShouldClose(GetWindow().GetGLFWWindow()))
 	{
 		glfwPollEvents();
 		HandleEvents();
 
 		Time::Update();
+
+		
 
 		while (Time::ShouldRunFixedUpdate())
 		{
@@ -91,7 +105,7 @@ void Engine::Run()
 
 		EventManager::ClearEvents();
 		Input::Update();
-
+		
 	}
 	LOG_INFO("Engine has stopped!");
 }
@@ -107,7 +121,7 @@ void Engine::HandleEvents() noexcept
 			{
 				if (GetActiveScene().GetState() == SceneState::EDIT)
 				{
-					m_EditorCamera->onMouseMoved(
+					m_EditorCamera->OnMouseMoved(
 						mouseEvent->GetX(),
 						mouseEvent->GetY(),
 						m_Window.GetGLFWWindow()
@@ -136,15 +150,30 @@ void Engine::HandleEvents() noexcept
 		});
 }
 
+ICamera* Engine::GetCamera() noexcept
+{
+	Camera* camera = GetSceneCamera();
+	if (m_SceneManager.GetActiveScene().GetState() == SceneState::EDIT || !camera)
+		return m_EditorCamera;
+	else
+		return camera;
+}
+
 void Engine::Render()
 {
 	m_Renderer.StartFrame();
 
 	for (Layer* layer : m_LayerStack)
 		layer->OnRender();
-
+	
 	m_Renderer.EndFrame();
+	
 	glfwSwapBuffers(GetWindow().GetGLFWWindow());
+	
+	GLenum err;
+	while ((err = glGetError()) != GL_NO_ERROR) {
+		LOG_ERROR("OpenGL hatası: {}", err);
+	}
 }
 
 
@@ -154,4 +183,7 @@ void Engine::Shutdown()
 	m_Renderer.Shutdown();
 
 	glfwTerminate();
+}
+
+
 }

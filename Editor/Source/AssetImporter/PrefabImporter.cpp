@@ -1,6 +1,11 @@
 
 #include "PrefabImporter.h"
-#include "json.hpp"
+
+#include "Assets/PrefabAsset.h"
+#include "Scene/Scene.h"
+#include "Utils/Serializer.h"
+
+namespace rv {
 
 Ref<PrefabAsset> PrefabImporter::CreatePrefabAsset(const std::string& path, Scene& scene, entt::entity& rootEntity)
 {
@@ -128,4 +133,7 @@ unsigned int PrefabImporter::CountEntitiesRecursively(Scene& scene, entt::entity
             count += CountEntitiesRecursively(scene, child);
     }
     return count;
+}
+
+
 }

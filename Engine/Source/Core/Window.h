@@ -1,8 +1,9 @@
 #pragma once
-
-#include "GLAD/gl.h"
-#include "GLFW/glfw3.h"
 #include <string>
+
+struct GLFWwindow;
+
+namespace rv { 
 
 struct WindowSize
 {
@@ -44,19 +45,10 @@ public:
 		return m_WindowData.title;
 	}
 
-	WindowSize GetSize() noexcept {
-		if (!m_Window) {
-			return WindowSize{ 0, 0 };
-		}
-		glfwGetWindowSize(m_Window, &m_WindowData.size.width, &m_WindowData.size.height);
-		return m_WindowData.size;
-	}
+	WindowSize GetSize() noexcept; 
 
-	inline void Shutdown() const
-	{
-		glfwDestroyWindow(m_Window);
-	}
-
+	void Shutdown() const;
+	
 private:
 	GLFWwindow* m_Window;
 	WindowData m_WindowData;
@@ -70,3 +62,5 @@ private:
 	static void FramebufferSizeCallback(GLFWwindow* window, int width, int height) noexcept;
 
 };
+
+}

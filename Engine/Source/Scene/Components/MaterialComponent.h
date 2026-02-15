@@ -3,7 +3,10 @@
 #include "json.hpp"
 #include "Core/Ref.h"
 #include "Assets/AssetRegistry.h"
+#include "Assets/TextureAsset.h"
+#include "Assets/MaterialAsset.h"
 
+namespace rv {
 
 using json = nlohmann::json;
 
@@ -48,6 +51,7 @@ public:
 	inline void SetAlbedoTexture(const AssetUUID& textureUIID)
 	{
 		material->albedoTextureUUID = textureUIID;
+		
 		albedoTexture = AssetRegistry::GetAsset<TextureAsset>(textureUIID);
 	}
 
@@ -113,3 +117,4 @@ private:
 
 };
 
+}

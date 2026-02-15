@@ -5,6 +5,7 @@
 #include "Scene/Camera.h"
 #include <array>
 
+namespace rv {
 
 class BrightPass : public RenderPass
 {
@@ -20,3 +21,5 @@ private:
     GLuint o_BrightColorTex = 0;
     GLuint brightFBO = 0;
 };
+
+}

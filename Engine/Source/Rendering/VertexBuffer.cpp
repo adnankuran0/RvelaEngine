@@ -1,6 +1,8 @@
 #include "rvelapch.h"
 #include "VertexBuffer.h"
 
+namespace rv { 
+
 VertexBuffer::VertexBuffer(const void* data, size_t size)
 {
 	Init(data, size);
@@ -43,5 +45,6 @@ void VertexBuffer::Data(const void* data, unsigned int size) const
 	glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 }
 
+}
 
 

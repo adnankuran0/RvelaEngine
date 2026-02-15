@@ -3,6 +3,8 @@
 #include "../nlohmann/json.hpp"
 #include "Scene/EntityUUID.h"
 
+namespace rv {
+
 using json = nlohmann::json;
 
 class SceneTreeComponent 
@@ -16,3 +18,5 @@ public:
     std::string Serialize() const;
     void Deserialize(const json& j);
 };
+
+}

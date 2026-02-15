@@ -12,6 +12,8 @@
 #include "Skybox.h"
 #include "ScreenQuad.h"
 
+namespace rv {
+
 struct PointLightData {
     glm::vec3 position;
     glm::vec3 color;
@@ -61,7 +63,7 @@ public:
     static Shader& GetSSRShader() { return m_SSRShader; }
     static Shader& GetCompositeShader() { return m_CompositeShader; }
     static Shader& GetLuminanceShader() { return m_LuminanceShader; }
-    static Shader& GetProceduralSkyShader() { return m_ProceduralSkyShader;  }
+    static Shader& GetProceduralSkyShader() { return m_ProceduralSkyShader; }
     static Shader& GetOutlineShader() { return m_OutlineShader; }
     static Shader& GetEquirectangularToCubemapShader() { return m_EquirectangularToCubemap; }
 
@@ -85,3 +87,5 @@ private:
 
     static ScreenQuad m_ScreenQuad;
 };
+
+}

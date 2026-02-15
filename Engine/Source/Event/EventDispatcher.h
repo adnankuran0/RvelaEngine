@@ -4,6 +4,8 @@
 #include <memory>
 #include "Event.h"
 
+namespace rv { 
+
 class EventDispatcher {
 public:
     static void Dispatch(const std::vector<std::unique_ptr<Event>>& events,
@@ -19,3 +21,5 @@ public:
         }
     }
 };
+
+}

@@ -2,6 +2,8 @@
 #include "CompositePass.h"
 #include "../Renderer.h"
 
+namespace rv {
+
 void CompositePass::Init()
 {
 	glGenFramebuffers(1, &m_Framebuffer);
@@ -24,7 +26,6 @@ void CompositePass::Init()
 
 void CompositePass::Execute()
 {
-	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "Composite Pass");
 
 	glDisable(GL_DEPTH_TEST);
 	Shader& compositeShader = Renderer::GetCompositeShader();
@@ -50,7 +51,6 @@ void CompositePass::Execute()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glEnable(GL_DEPTH_TEST);
 
-	glPopDebugGroup();
 
 }
 
@@ -71,4 +71,6 @@ void CompositePass::UpdateExposure(float deltaTime)
 
 	float speed = 1.5f;
 	exposure += (targetExposure - exposure) * deltaTime * speed;
+}
+
 }

@@ -2,6 +2,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "AABB.h"
 #include <Rendering/Frustum.h>
+
+namespace rv {
+
 class ICamera
 {
 public:
@@ -31,3 +34,5 @@ protected:
     float width = 1920.0f;
     float height = 1080.0f;
 };
+
+}

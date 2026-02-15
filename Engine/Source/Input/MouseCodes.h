@@ -1,5 +1,7 @@
 #pragma once
 
+namespace rv {
+
 enum class MouseCode {
     Button0 = 0,
     Button1 = 1,
@@ -15,3 +17,5 @@ enum class MouseCode {
     ButtonRight = Button1,
     ButtonMiddle = Button2
 };
+
+}

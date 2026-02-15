@@ -1,8 +1,11 @@
 ﻿#include "Viewport.h"
 #include <iostream>
+#include "ImGui/imgui.h"
 #include "ImGui/ImGuizmo.h"
 #include "Core/Engine.h"
+#include <glm/gtx/matrix_decompose.hpp>
 
+namespace rv {
 
 void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
 {
@@ -260,4 +263,6 @@ glm::vec3 Viewport::ScreenPosToWorldRay(const glm::vec2& mousePos, const glm::ve
 
     glm::vec4 rayWorld = glm::inverse(viewMatrix) * rayEye;
     return glm::normalize(glm::vec3(rayWorld));
+}
+
 }

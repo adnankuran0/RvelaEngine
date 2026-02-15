@@ -5,6 +5,8 @@
 #include "Core/Log.h"
 #include <Utils/Serializer.h>
 
+namespace rv {
+
 using json = nlohmann::json;
 
 void SceneManager::SaveScene(const std::string& path)
@@ -19,4 +21,4 @@ void SceneManager::LoadScene(const std::string& path)
     SetActiveScene(std::move(scenePtr));
 }
 
-
+}

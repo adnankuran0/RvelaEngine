@@ -1,5 +1,10 @@
 #include "AssetImporterRegistry.h"
-#include <Assets/AssetRegistry.h>
+#include "Assets/AssetRegistry.h"
+
+#include "TextureImporter.h"
+#include "ModelImporter.h"
+
+namespace rv {
 
 AssetImporterRegistry::AssetImporterRegistry()
 {
@@ -19,4 +24,6 @@ AssetUUID AssetImporterRegistry::Import(const std::filesystem::path& assetPath) 
 		return uuid;
 	}
 	return AssetUUID::Invalid();
+}
+
 }

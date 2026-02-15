@@ -5,6 +5,7 @@
 #include "Scene/Camera.h"
 #include <array>
 
+namespace rv {
 
 class CompositePass : public RenderPass
 {
@@ -32,3 +33,5 @@ private:
     float exposure = 1.0f;
     void UpdateExposure(float deltaTime);
 };
+
+}

@@ -2,6 +2,8 @@
 #include "rvelapch.h"
 #include "GLAD/gl.h"
 
+namespace rv {
+
 struct BufferElement
 {
 	unsigned int type;
@@ -47,3 +49,5 @@ private:
 	unsigned int m_StrideIndex = 0;
 
 };
+
+}

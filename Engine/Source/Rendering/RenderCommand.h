@@ -3,6 +3,8 @@
 #include "Scene/Components/MeshRendererComponent.h"
 #include "Scene/Components/MaterialComponent.h"
 
+namespace rv { 
+
 struct RenderCommand
 {
 public:
@@ -14,3 +16,5 @@ public:
 	MaterialComponent& material;
 	const bool isSelected;
 };
+
+}

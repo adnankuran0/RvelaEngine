@@ -2,6 +2,8 @@
 #include "sol/sol.hpp"
 #include "json.hpp"
 
+namespace rv {
+
 using json = nlohmann::json;
 
 struct ScriptComponent {
@@ -16,3 +18,5 @@ struct ScriptComponent {
     json Serialize() const;
     void Deserialize(const json& j);
 };
+
+}

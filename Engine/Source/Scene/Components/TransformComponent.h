@@ -6,6 +6,9 @@
 #include "glm/gtx/quaternion.hpp"
 #include "Math/RvelaMath.h"
 #include "json.hpp"
+
+namespace rv {
+
 using json = nlohmann::json;
 
 struct alignas(16) TransformComponent
@@ -122,3 +125,6 @@ public:
     void Deserialize(const json& j) noexcept;
    
 };
+
+
+}

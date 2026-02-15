@@ -1,0 +1,368 @@
+{
+    "Entities": [
+        {
+            "Material": {
+                "material": "6febaed5-8da7-4794-9f90-de32e70208d2"
+            },
+            "Mesh": {
+                "mesh": "67ca389a-7b6d-415e-9a02-fb6dce14910b"
+            },
+            "ParentUUID": 424,
+            "Tag": {
+                "tag": "Cube"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    -90.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    0.9999996423721313,
+                    1.0000072717666626,
+                    1.0000008344650269
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 425
+        },
+        {
+            "Prefab": "d2f90f91-a58b-41a9-8e89-3389e4f6edff",
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -13.215432167053223,
+                    0.0
+                ],
+                "scale": [
+                    1.4999998807907104,
+                    1.5,
+                    1.4999998807907104
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 424
+        },
+        {
+            "Material": {
+                "material": "5fbc428b-1fbc-4f88-a55d-8ee35575f903"
+            },
+            "Mesh": {
+                "mesh": "4e05374f-8157-4c0e-bb3a-1c72c9039e05"
+            },
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": "Ceil"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    7.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    9.764437675476074,
+                    0.8565868139266968,
+                    10.538721084594727
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 428
+        },
+        {
+            "Material": {
+                "material": "5fbc428b-1fbc-4f88-a55d-8ee35575f903"
+            },
+            "Mesh": {
+                "mesh": "4e05374f-8157-4c0e-bb3a-1c72c9039e05"
+            },
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": "Floor"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    -0.10457421839237213,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    10.0,
+                    0.10565697401762009,
+                    10.0
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 2
+        },
+        {
+            "ParentUUID": 0,
+            "PointLight": {
+                "castShadows": true,
+                "color": [
+                    0.8727272748947144,
+                    0.7477084994316101,
+                    0.5976859331130981
+                ],
+                "falloff": 2.0,
+                "intensity": 20.0,
+                "radius": 5.0
+            },
+            "Tag": {
+                "tag": "PointLight"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    1.6679985523223877,
+                    2.127201795578003,
+                    1.0237915515899658
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 429
+        },
+        {
+            "Material": {
+                "material": "e7ff762f-fd18-46fa-b05c-5e5239eed789"
+            },
+            "Mesh": {
+                "mesh": "4e05374f-8157-4c0e-bb3a-1c72c9039e05"
+            },
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": "Wall1"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    -9.526372909545898,
+                    -3.429638147354126,
+                    -0.003493694355711341
+                ],
+                "rotation": [
+                    -89.97200775146484,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    0.3369617462158203,
+                    10.076395034790039,
+                    10.057031631469727
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 6
+        },
+        {
+            "Material": {
+                "material": "e7ff762f-fd18-46fa-b05c-5e5239eed789"
+            },
+            "Mesh": {
+                "mesh": "4e05374f-8157-4c0e-bb3a-1c72c9039e05"
+            },
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": "Wall2"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    -0.1507524698972702,
+                    -3.2851123809814453,
+                    -9.352716445922852
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    -89.99947357177734
+                ],
+                "scale": [
+                    10.079524993896484,
+                    10.247760772705078,
+                    0.14114220440387726
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 7
+        },
+        {
+            "CameraComponent": {
+                "farClip": 100.0,
+                "fov": 75.0,
+                "isActive": true,
+                "nearClip": 0.10000000149011612
+            },
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": "Camera"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    2.5325276851654053,
+                    1.5149787664413452,
+                    4.396676540374756
+                ],
+                "rotation": [
+                    -5.474432468414307,
+                    27.349069595336914,
+                    -1.9104134480585344e-05
+                ],
+                "scale": [
+                    0.9999964833259583,
+                    0.9999934434890747,
+                    0.9999966621398926
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 8
+        },
+        {
+            "ParentUUID": 0,
+            "PointLight": {
+                "castShadows": true,
+                "color": [
+                    0.33021122217178345,
+                    0.5517321825027466,
+                    0.939393937587738
+                ],
+                "falloff": 2.0,
+                "intensity": 100.0,
+                "radius": 28.975000381469727
+            },
+            "Tag": {
+                "tag": "BlueLight"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    -6.382328987121582,
+                    3.0984561443328857,
+                    -4.142777442932129
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 9
+        },
+        {
+            "Material": {
+                "material": "ee3dde12-6263-4f11-bb1d-812b3e196ab7"
+            },
+            "Mesh": {
+                "mesh": "4e05374f-8157-4c0e-bb3a-1c72c9039e05"
+            },
+            "ParentUUID": 0,
+            "ScriptComponent": {
+                "luaFile": "C:\\RvelaEngine\\TestProject\\Assets\\Scripts\\Test.lua"
+            },
+            "Tag": {
+                "tag": "Cube"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    1.5807451009750366,
+                    0.33614975214004517,
+                    -0.9786798357963562
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    0.3700000047683716,
+                    0.3700000047683716,
+                    0.3700000047683716
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 10
+        }
+    ]
+}

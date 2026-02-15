@@ -3,6 +3,8 @@
 
 #include "json.hpp"
 
+namespace rv { 
+
 using json = nlohmann::json;
 
 std::string Project::Serialize() const
@@ -21,4 +23,6 @@ void Project::Deserialize(const std::string& jsonStr)
 	name = j.value("name", "");
 	projectFolderPath = std::filesystem::path(j.value("projectPath", ""));
 	
+}
+
 }

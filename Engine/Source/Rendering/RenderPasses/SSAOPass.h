@@ -1,6 +1,8 @@
 #pragma once
 #include "../RenderPass.h"
 
+namespace rv {
+
 class SSAOPass : public RenderPass
 {
 public:
@@ -24,3 +26,5 @@ private:
     void GenerateNoiseTexture();
 
 };
+
+}

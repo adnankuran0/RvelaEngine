@@ -1,6 +1,8 @@
 #include "rvelapch.h"
 #include "BufferLayout.h"
 
+namespace rv { 
+
 void BufferLayout::AddVertexBuffer(unsigned int newVBO)
 {
 	stride = 0;
@@ -14,4 +16,6 @@ void BufferLayout::BindVertexBuffer(unsigned int ID)
 {
 	buffers.push_back(ID);
 	glBindBuffer(GL_ARRAY_BUFFER, ID);
+}
+
 }

@@ -1,7 +1,9 @@
 #pragma once
-#include "ImGui/imgui.h"
-#include "Core/Engine.h"
-#include "AssetImporter/AssetImporterRegistry.h"
+
+namespace rv {
+
+class Engine;
+class AssetImporterRegistry;
 
 class MenuBar
 {
@@ -9,3 +11,4 @@ public:
 	void Draw(Engine* engine, AssetImporterRegistry& assetImporter);
 };
 
+}

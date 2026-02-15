@@ -6,6 +6,8 @@
 
 #define PROFILE_SCOPE(name) ScopedTimer timer##__LINE__(name);
 
+namespace rv {
+
 class ScopedTimer {
 public:
     ScopedTimer(const std::string& name) : m_Name(name), m_Start(std::chrono::high_resolution_clock::now()) {}
@@ -20,3 +22,5 @@ private:
     std::string m_Name;
     std::chrono::time_point<std::chrono::high_resolution_clock> m_Start;
 };
+
+}

@@ -1,10 +1,13 @@
 #pragma once
 
-#include "GLAD/gl.h"
 #include <glm/glm.hpp>
 #include <string>
 #include <vector>
+#include "GLAD/gl.h"
+#include "Utils/FileUtils.h"
 #include "Shader.h"
+
+namespace rv { 
 
 class Skybox
 {
@@ -24,3 +27,5 @@ private:
     GLuint loadCubemap(const std::vector<Path>& faces);
     void setupSkybox();
 };
+
+}

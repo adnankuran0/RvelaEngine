@@ -4,6 +4,14 @@
 #include "MeshAsset.h"
 #include "PrefabAsset.h"
 
+#include "Asset.h"
+#include "AssetMeta.h"
+#include "Assets/AssetLoader.h"
+#include "TextureAsset.h"
+#include "MaterialAsset.h"
+
+namespace rv { 
+
 void AssetRegistry::Init(const std::filesystem::path& assetDir)
 {
     s_AssetDirectory = assetDir;
@@ -92,3 +100,5 @@ void AssetRegistry::ScanAssets(const std::filesystem::path& dir)
     }
 }
 
+
+}

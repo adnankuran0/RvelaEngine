@@ -2,6 +2,8 @@
 #include <vector>
 #include "Layer.h"
 
+namespace rv { 
+
 class LayerStack
 {
 public:
@@ -17,3 +19,5 @@ public:
 private:
 	std::vector<Layer*> m_Layers;
 };
+
+}

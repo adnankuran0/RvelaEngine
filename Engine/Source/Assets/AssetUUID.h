@@ -1,5 +1,9 @@
 #pragma once
 #include "uuid_v4/uuid_v4.h"
+#include <string>
+#include <random>
+
+namespace rv {
 
 class AssetUUID
 {
@@ -46,11 +50,14 @@ private:
     UUIDv4::UUID m_UUID;
 };
 
+}
+
 namespace std {
     template <>
-    struct hash<AssetUUID> {
-        size_t operator()(const AssetUUID& uuid) const noexcept {
+    struct hash<rv::AssetUUID> {
+        size_t operator()(const rv::AssetUUID& uuid) const noexcept {
             return uuid.Raw().hash();
         }
     };
 }
+

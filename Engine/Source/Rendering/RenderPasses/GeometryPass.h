@@ -2,6 +2,8 @@
 #include "Rendering/RenderPass.h"
 #include "Rendering/Renderer.h"
 
+namespace rv {
+
 class GeometryPass : public RenderPass
 {
 public:
@@ -22,3 +24,4 @@ private:
 	GLuint gBuffer = 0;
 };
 
+}

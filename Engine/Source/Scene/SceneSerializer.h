@@ -1,6 +1,8 @@
 #pragma once
 #include "Scene.h"
 
+namespace rv {
+
 class SceneSerializer
 {
 public:
@@ -11,3 +13,5 @@ private:
 	json SerializeEntity(Scene& scene, entt::entity e);
 
 };
+
+}

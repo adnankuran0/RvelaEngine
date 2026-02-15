@@ -2,6 +2,8 @@
 #include "Core/Project.h"
 #include <filesystem>
 
+namespace rv {
+
 class ProjectManager
 {
 public:
@@ -24,3 +26,5 @@ private:
 
 
 };
+
+}

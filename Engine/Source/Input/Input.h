@@ -4,6 +4,8 @@
 #include "KeyCodes.h"
 #include "MouseCodes.h"
 
+namespace rv { 
+
 class Input
 {
 public:
@@ -36,3 +38,5 @@ private:
 	static std::unordered_map<KeyCode, bool> s_PreviousKeyState;
 	static std::unordered_map<MouseCode, bool> s_PreviousMouseButtonState;
 };
+
+}

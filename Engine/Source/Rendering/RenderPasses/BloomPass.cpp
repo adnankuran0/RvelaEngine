@@ -1,7 +1,11 @@
 #include "rvelapch.h"
 #include "BloomPass.h"
+#include "Scene/Components.h"
+#include "Scene/Camera.h"
+#include <array>
+#include <algorithm>
 
-
+namespace rv {
 
 void BloomPass::Init()
 {
@@ -132,7 +136,6 @@ BloomPass::~BloomPass()
 
 void BloomPass::Execute()
 {
-    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "Bloom Pass");
 
     Downsample();
 
@@ -140,5 +143,6 @@ void BloomPass::Execute()
 
     o_BlurredTexture = downsampleTextures[0];
 
-    glPopDebugGroup();
+}
+
 }

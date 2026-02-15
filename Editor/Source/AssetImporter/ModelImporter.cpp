@@ -1,7 +1,14 @@
 ﻿#include "ModelImporter.h"
-#include <Assets/MaterialAsset.h>
-#include <Assets/PrefabAsset.h>
+
+#include "Assimp/scene.h"
+#include "assimp/postprocess.h"
+
+#include "Assets/PrefabAsset.h"
 #include "PrefabImporter.h"
+#include "Scene/Scene.h"
+#include "Scene/Entity.h"
+
+namespace rv {
 
 const aiScene* ModelImporter::LoadScene(const std::filesystem::path& path)
 {
@@ -257,4 +264,6 @@ AssetUUID ModelImporter::Import(const std::filesystem::path& path)
 	m_MeshImporter.Import(scene,path, meshIndextoUUID);
     AssetRegistry::ScanAssets();
 	return ConstructPrefab(scene,path); 
+}
+
 }

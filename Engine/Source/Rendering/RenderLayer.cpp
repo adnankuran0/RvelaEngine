@@ -1,8 +1,14 @@
 #include "rvelapch.h"
 #include "RenderLayer.h"
+#include "Core/Engine.h"
+
+namespace rv {
 
 void RenderLayer::OnRender()
 {
+	
+	
+
 	Scene& scene = m_Engine->GetActiveScene();
 	ICamera* camera = m_Engine->GetCamera();
 
@@ -14,14 +20,16 @@ void RenderLayer::OnRender()
 	context.viewportWidth = 1920;
 	context.viewportHeight = 1080;
 	context.scene = &scene;
+	
 	m_RenderPipeline->SetRenderContext(context);
 	m_RenderPipeline->EnsureInitialized();
 
+	
 	// Collect commands and submit them to render passes via render pipeline
 	CollectRenderCommands(&scene, [&](const RenderCommand& cmd) {
 		m_RenderPipeline->SubmitRenderCommand(cmd);
 		});
-
+	
 	m_RenderPipeline->Execute();
 }
 
@@ -57,4 +65,6 @@ void RenderLayer::CollectRenderCommands(Scene* scene, const std::function<void(c
 			submitCallback(cmd);
 		}
 	}
+}
+
 }

@@ -1,6 +1,8 @@
 #pragma once
 #include <cstdint>
 
+namespace rv {
+
 class Framebuffer {
 public:
     virtual void Bind() const = 0;
@@ -9,3 +11,5 @@ public:
     virtual unsigned int GetHandle() const = 0;
     virtual ~Framebuffer() = default;
 };
+
+}

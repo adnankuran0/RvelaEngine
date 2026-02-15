@@ -3,8 +3,9 @@
 #include "Core/Log.h"
 #include "Assets/AssetUUID.h"
 #include "Assets/AssetRegistry.h"
+#include "Scene/Components.h"
 
-
+namespace rv {
 
 struct MapInfo {
     bool isUsing;
@@ -59,7 +60,6 @@ void LightingPass::Execute()
 {
     if (commands.empty() || !ctx.IsValid()) return;
 
-    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "Lighting Pass");
 
     glBindFramebuffer(GL_FRAMEBUFFER, o_ScreenFBO);
 
@@ -122,8 +122,7 @@ void LightingPass::Execute()
 
     size_t drawCallCounter = 0;
     for (auto& command : commands) {
-        
-        if (!ctx.camera->Intersects(command.mesh.worldAABB)) continue;
+        //if (!ctx.camera->Intersects(command.mesh.worldAABB)) continue; //TODO: dont know why but its broken
         if (command.isSelected) {
             glEnable(GL_STENCIL_TEST);
             glStencilFunc(GL_ALWAYS, 1, 0xFF); 
@@ -181,7 +180,6 @@ void LightingPass::Execute()
         glDrawElements(GL_TRIANGLES, command.mesh.indexCount, GL_UNSIGNED_INT, 0);
         drawCallCounter++;
     }
-
     //LOG_DEBUG("Draw calls: {}", drawCallCounter);
 
     glBindFramebuffer(GL_READ_FRAMEBUFFER, o_ScreenFBO);
@@ -193,6 +191,6 @@ void LightingPass::Execute()
     );
 
     commands.clear();
+}
 
-    glPopDebugGroup();
 }

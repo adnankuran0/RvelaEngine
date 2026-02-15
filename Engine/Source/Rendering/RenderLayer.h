@@ -1,10 +1,11 @@
-#include "Core/Engine.h"
 #include "Core/Layer.h"
-#include "Rendering/RenderPasses/LightingPass.h"
-#include "Rendering/RenderPasses/SkyboxPass.h"
-#include "Rendering/RenderPasses/ShadowPass.h"
 #include "RenderContext.h"
 #include "RenderPipeline.h"
+
+namespace rv {
+
+class Engine;
+class Scene;
 
 class RenderLayer : public Layer
 {
@@ -23,3 +24,5 @@ private:
 	void CollectRenderCommands(Scene* scene, const std::function<void(const RenderCommand&)>& submitCallback);
 
 };
+
+}

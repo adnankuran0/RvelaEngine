@@ -1,7 +1,8 @@
 #pragma once
-#include "GLFW/glfw3.h"
 
-class Time 
+namespace rv {
+
+class Time
 {
 public:
     static void Update() noexcept;
@@ -50,16 +51,13 @@ public:
     {
         return maxFPS;
     }
-    
+
     inline static void SetMaxFPS(int maxFPS) noexcept
     {
         Time::maxFPS = maxFPS;
     }
 
-    inline static double GetCurrentTime() noexcept 
-    {
-        return glfwGetTime();
-    }
+    static double GetCurrentTime() noexcept;
 
     inline static void SetFPSUpdateTime(int fpsUpdateTimeAsMiliseconds)
     {
@@ -78,3 +76,5 @@ private:
     static int frameCount;        ///< The number of frames since the last FPS update.
     static int fpsUpdateTime;    ///< How frequent engine updates the fps
 };
+
+}

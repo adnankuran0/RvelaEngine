@@ -1,6 +1,8 @@
 #include "rvelapch.h"
 #include "SpotLightComponent.h"
 
+namespace rv {
+
 std::string SpotLightComponent::Serialize() const
 {
     json j;
@@ -20,4 +22,6 @@ void SpotLightComponent::Deserialize(const json& j)
     radius = j["radius"];
     innerCutoff = j["innerCutoff"];
     outerCutoff = j["outerCutoff"];
+}
+
 }

@@ -2,6 +2,8 @@
 #include "Camera.h"
 #include "Scene/Entity.h"
 
+namespace rv {
+
 Camera::Camera(Entity* entity)
 {
     m_Entity = entity;
@@ -26,4 +28,6 @@ glm::vec3 Camera::GetPosition()
 glm::mat4 Camera::GetProjectionMatrix()
 {
     return glm::perspective(glm::radians(m_Component->fov), width / height, m_Component->nearClip, m_Component->farClip);
+}
+
 }

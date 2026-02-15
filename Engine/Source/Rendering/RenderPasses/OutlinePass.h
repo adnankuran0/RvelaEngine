@@ -1,7 +1,7 @@
 #pragma once
 #include "../RenderPass.h"
-#include "Scene/Components.h"
 
+namespace rv {
 
 class OutlinePass : public RenderPass
 {
@@ -16,3 +16,5 @@ private:
     GLuint i_ScreenFBO;
     GLuint i_IntermiedateFBO;
 };
+
+}

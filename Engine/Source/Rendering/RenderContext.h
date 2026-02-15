@@ -1,6 +1,10 @@
 #pragma once
-#include "Scene/Scene.h"
-#include "Scene/ICamera.h"
+#include "Rendering/Renderer.h"
+
+namespace rv {
+
+class Scene;
+class ICamera;
 
 struct RenderContext
 {
@@ -22,3 +26,5 @@ public:
 		return true;
 	}
 };
+
+}

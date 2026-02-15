@@ -1,6 +1,7 @@
 #pragma once
-#include "GLAD/gl.h"
 #include "BufferLayout.h"
+
+namespace rv { 
 
 class VertexArray
 {
@@ -14,3 +15,5 @@ public:
 private:
 	unsigned int ID = 0;
 };
+
+}

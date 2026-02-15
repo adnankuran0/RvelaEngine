@@ -3,6 +3,7 @@
 #include "ProjectManager.h"
 #include "Core/Engine.h"
 
+namespace rv {
 
 Path::Path(const std::filesystem::path& path, bool isVirual)
 {
@@ -70,4 +71,6 @@ std::string Path::GetFilename() const
 std::string Path::GetExtension() const
 {
 	return m_VirtualPath.extension().string();
+}
+
 }

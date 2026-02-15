@@ -3,6 +3,8 @@
 #include "Scene/Components/ScriptComponent.h"
 #include "Scene/Entity.h"
 
+namespace rv {
+
 ScriptEngine::ScriptEngine()
 {
     m_State.open_libraries(sol::lib::base, sol::lib::math, sol::lib::table, sol::lib::string, sol::lib::os);
@@ -56,4 +58,6 @@ void ScriptEngine::BindLuaScript(ScriptComponent& sc, entt::entity& e,Scene& sce
 
     if (sc.OnCreate.valid())
         sc.OnCreate(sc.luaInstance);
+}
+
 }

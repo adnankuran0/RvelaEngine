@@ -1,12 +1,15 @@
 ﻿#pragma once
 #include <filesystem>
-#include "AssetUUID.h"
-#include "Asset.h"
-#include "AssetMeta.h"
+#include "Core/Ref.h"
 #include "tsl/robin_map.h"
-#include "Assets/AssetLoader.h"
-#include "TextureAsset.h"
-#include "MaterialAsset.h"
+#include "AssetUUID.h"
+#include "AssetLoader.h"
+
+namespace rv { 
+
+class Asset;
+class AssetLoader;
+
 class AssetRegistry 
 {
 public:
@@ -52,6 +55,7 @@ public:
             }
         }
         
+
         //If asset exists but not loaded yet then we are doing lazy loading
         auto path = s_UUIDToPath[uuid];
         Ref<Asset> asset = AssetLoader::Load(path);
@@ -63,8 +67,6 @@ public:
 
     
 
-private:
-    
 
 private:
     inline static bool m_IsInitialized = false;
@@ -72,3 +74,5 @@ private:
     inline static tsl::robin_map<AssetUUID, std::filesystem::path> s_UUIDToPath;
     inline static tsl::robin_map<AssetUUID, WeakRef<Asset>> s_LoadedAssets;
 };
+
+}

@@ -1,6 +1,6 @@
 #pragma once
-#include "GLAD/gl.h"
 
+namespace rv {
 
 class ElementBuffer
 {
@@ -15,3 +15,5 @@ public:
 	void Unbind() const;
 	void Destroy() const;
 };
+
+}

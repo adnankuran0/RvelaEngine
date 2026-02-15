@@ -2,6 +2,8 @@
 #include "Scene.h"
 #include "SceneSerializer.h"
 
+namespace rv {
+
 class SceneManager
 {
 public:
@@ -28,3 +30,5 @@ private:
     SceneSerializer m_SceneSerializer;
     
 };
+
+}

@@ -1,7 +1,15 @@
 #pragma once
-#include "Core/Engine.h"
+#include "entt/entt.h"
+
+namespace rv {
+
+class Engine;
+
 class InspectorPanel
 {
 public:
 	void Draw(Engine* engine, entt::entity& selectedEntity);
 };
+
+
+}

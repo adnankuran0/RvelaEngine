@@ -3,6 +3,8 @@
 #include <filesystem>
 #include "AssetUUID.h"
 
+namespace rv { 
+
 constexpr uint32_t MAGIC_TEXTURE  = 0x52544558; // RTEX ASCII
 constexpr uint32_t MAGIC_MATERIAL = 0x524D4154; // RMAT ASCII
 constexpr uint32_t MAGIC_MESH     = 0x524D5348; // RMSH ASCII
@@ -86,3 +88,6 @@ public:
 	std::filesystem::path sourcePath;
 	AssetType type = AssetType::Unknown;
 };
+
+
+}

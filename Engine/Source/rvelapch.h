@@ -22,16 +22,10 @@
 #include <random>
 
 #include "GLAD/gl.h"
-#include "GLFW/glfw3.h"
 
 #include <glm/glm.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/matrix_decompose.hpp>
 #include <glm/gtx/euler_angles.hpp>
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
 #include "Core/Log.h"
-
