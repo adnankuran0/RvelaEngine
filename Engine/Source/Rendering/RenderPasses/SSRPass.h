@@ -1,6 +1,8 @@
 #pragma once
 #include "../RenderPass.h"
 
+namespace rv {
+
 class SSRPass : public RenderPass
 {
 public:
@@ -28,3 +30,5 @@ private:
 
     GLuint ssrFBO = 0;
 };
+
+}

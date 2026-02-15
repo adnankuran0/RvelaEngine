@@ -5,6 +5,7 @@
 #include "Core/Engine.h"
 #include "Scene/Entity.h"
 
+namespace rv {
 
 void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 {
@@ -207,4 +208,6 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
     }
 
     ImGui::End();
+}
+
 }

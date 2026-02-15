@@ -8,6 +8,8 @@
 #include "Scene/Scene.h"
 #include "Scene/Entity.h"
 
+namespace rv {
+
 const aiScene* ModelImporter::LoadScene(const std::filesystem::path& path)
 {
     m_Importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
@@ -262,4 +264,6 @@ AssetUUID ModelImporter::Import(const std::filesystem::path& path)
 	m_MeshImporter.Import(scene,path, meshIndextoUUID);
     AssetRegistry::ScanAssets();
 	return ConstructPrefab(scene,path); 
+}
+
 }

@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
 
+namespace rv { 
+
 class Layer
 {
 public:
@@ -20,3 +22,5 @@ public:
 protected:
 	std::string m_DebugName;
 };
+
+}

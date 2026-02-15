@@ -7,6 +7,8 @@
 #include "Utils/ProjectManager.h"
 #include "LayerStack.h"
 
+namespace rv {
+
 class EditorCamera;
 class ICamera;
 
@@ -26,7 +28,7 @@ public:
 	void PushLayer(Layer* layer);
 	void PopLayer(Layer* layer);
 
-	inline static Engine* Get() noexcept { return s_Instance; } 
+	inline static Engine* Get() noexcept { return s_Instance; }
 	Window& GetWindow() noexcept { return m_Window; }
 	Scene& GetActiveScene() noexcept { return m_SceneManager.GetActiveScene(); }
 	ProjectManager& GetProjectManager() noexcept { return m_ProjectManager; }
@@ -62,3 +64,5 @@ private:
 	ScriptEngine m_ScriptEngine;
 
 };
+
+}

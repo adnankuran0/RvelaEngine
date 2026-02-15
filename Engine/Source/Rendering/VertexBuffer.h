@@ -1,6 +1,8 @@
 #pragma once
 
 
+namespace rv {
+
 class VertexBuffer
 {
 private:
@@ -17,3 +19,6 @@ public:
 	void Data(const void* data, unsigned int size) const;
 	unsigned int getID();
 };
+
+
+}

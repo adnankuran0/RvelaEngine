@@ -2,6 +2,8 @@
 #include "RenderLayer.h"
 #include "Core/Engine.h"
 
+namespace rv {
+
 void RenderLayer::OnRender()
 {
 	
@@ -63,4 +65,6 @@ void RenderLayer::CollectRenderCommands(Scene* scene, const std::function<void(c
 			submitCallback(cmd);
 		}
 	}
+}
+
 }

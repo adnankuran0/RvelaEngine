@@ -4,6 +4,8 @@
 #include <memory>
 #include "Event.h"
 
+namespace rv { 
+
 class EventManager {
 public:
 
@@ -18,3 +20,5 @@ public:
 private:
     static std::vector<std::unique_ptr<Event>> m_EventQueue;
 };
+
+}

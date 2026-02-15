@@ -6,6 +6,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "Utils/FileUtils.h"
 
+namespace rv {
 
 class Shader
 {
@@ -58,3 +59,6 @@ private:
     bool checkCompileErrors(unsigned int shader, std::string type);
     mutable std::unordered_map<std::string, GLint> uniformLocationCache;
 };
+
+
+}

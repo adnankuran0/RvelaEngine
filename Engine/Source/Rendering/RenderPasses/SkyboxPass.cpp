@@ -1,6 +1,8 @@
 ﻿#include "rvelapch.h"
 #include "SkyboxPass.h"
 
+namespace rv {
+
 void SkyboxPass::Init()
 {
     Path path = VRT_PATH("Assets\\Textures\\skybox\\environment.hdr");
@@ -16,4 +18,6 @@ void SkyboxPass::Execute()
 
 
 	m_Skybox.Render(Renderer::GetSkyboxShader(), ctx.camera->GetProjectionMatrix(), ctx.camera->GetViewMatrix(), i_ScreenFBO);
+}
+
 }

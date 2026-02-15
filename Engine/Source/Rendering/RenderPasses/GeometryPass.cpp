@@ -2,6 +2,8 @@
 #include "GeometryPass.h"
 #include "Scene/ICamera.h"
 
+namespace rv {
+
 void GeometryPass::Init()
 {
     glGenFramebuffers(1, &gBuffer);
@@ -129,3 +131,4 @@ void GeometryPass::Execute()
 
 }
 
+}

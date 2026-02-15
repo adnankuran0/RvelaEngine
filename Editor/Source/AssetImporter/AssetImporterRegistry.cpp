@@ -4,6 +4,8 @@
 #include "TextureImporter.h"
 #include "ModelImporter.h"
 
+namespace rv {
+
 AssetImporterRegistry::AssetImporterRegistry()
 {
 	RegisterImporter({ ".png", ".jpg", ".jpeg", ".tga" }, std::make_shared<TextureImporter>());
@@ -22,4 +24,6 @@ AssetUUID AssetImporterRegistry::Import(const std::filesystem::path& assetPath) 
 		return uuid;
 	}
 	return AssetUUID::Invalid();
+}
+
 }

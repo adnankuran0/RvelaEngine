@@ -3,6 +3,8 @@
 #include "Utils/GPUTimer.h"
 #include "Core/Engine.h"
 
+namespace rv {
+
 RenderPipeline::RenderPipeline(Engine* engine)
 {
 	renderPasses = {
@@ -94,9 +96,6 @@ void RenderPipeline::Execute()
 	compositePass.SetSsrTexture(ssrPass.GetSSRTexture());
 	compositePass.Execute();
 
-	
-
-
 }
 
-	
+}

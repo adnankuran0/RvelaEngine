@@ -5,6 +5,8 @@
 #include <fstream>
 #include <cstring>
 
+namespace rv {
+
 std::unique_ptr<AssetMeta> PrefabMeta::Clone() const
 {
     return std::make_unique<PrefabMeta>(*this);
@@ -149,4 +151,7 @@ const std::string& PrefabAsset::GetPath() const
 bool PrefabAsset::IsLoaded() const
 {
     return m_Loaded;
+}
+
+
 }

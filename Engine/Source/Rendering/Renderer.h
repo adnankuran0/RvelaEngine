@@ -12,6 +12,8 @@
 #include "Skybox.h"
 #include "ScreenQuad.h"
 
+namespace rv {
+
 struct PointLightData {
     glm::vec3 position;
     glm::vec3 color;
@@ -85,3 +87,5 @@ private:
 
     static ScreenQuad m_ScreenQuad;
 };
+
+}

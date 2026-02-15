@@ -5,6 +5,8 @@
 #include <string>
 #include <Rendering/Texture.h>
 
+namespace rv {
+
 class TextureMeta : public AssetMeta
 {
 public:
@@ -41,3 +43,5 @@ private:
     Texture m_Texture;
     bool m_Loaded = false;
 };
+
+}

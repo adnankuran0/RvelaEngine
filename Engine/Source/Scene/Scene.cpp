@@ -9,6 +9,8 @@
 #include <Assets/PrefabAsset.h>
 #include <glm/gtx/matrix_decompose.hpp>
 
+namespace rv {
+
 Scene::Scene(const std::string& sceneName) : m_Registry() 
 {
     m_SceneName = sceneName;
@@ -572,4 +574,6 @@ unsigned int Scene::CountEntitiesRecursively(entt::entity& rootEntity)
     }
 
     return count;
+}
+
 }

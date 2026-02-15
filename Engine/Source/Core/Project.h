@@ -2,6 +2,8 @@
 #include "Utils/ISerializable.h"
 #include <filesystem>
 
+namespace rv { 
+
 class Project : public ISerializable
 {
 public:
@@ -20,3 +22,5 @@ public:
 	std::string Serialize() const override;
 	void Deserialize(const std::string& jsonStr) override;
 };
+
+}

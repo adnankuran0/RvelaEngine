@@ -1,9 +1,9 @@
 #pragma once
 #include "../RenderPass.h"
-#include "Scene/Components.h"
 #include "../Renderer.h"
 #include "Scene/Camera.h"
 
+namespace rv {
 
 class LightingPass : public RenderPass
 {
@@ -32,3 +32,5 @@ private:
 	GLuint screenRBO = 0;
 	GLuint intermediateFBO = 0;
 };
+
+}

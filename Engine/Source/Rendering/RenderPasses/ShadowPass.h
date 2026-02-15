@@ -4,6 +4,8 @@
 #include "../Renderer.h"
 #include "Scene/Camera.h"
 
+namespace rv {
+
 class ShadowPass : public RenderPass
 {
 public:
@@ -30,3 +32,4 @@ private:
     const unsigned int POINT_SHADOW_WIDTH = 512, POINT_SHADOW_HEIGHT = 512;
 };
 
+}

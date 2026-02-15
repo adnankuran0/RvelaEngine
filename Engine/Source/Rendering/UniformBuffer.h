@@ -2,6 +2,8 @@
 #include "GLAD/gl.h"
 #include "GLFW/glfw3.h"
 
+namespace rv {
+
 class UniformBuffer
 {
 public:
@@ -14,3 +16,5 @@ private:
 	unsigned int m_ID;
 
 };
+
+}

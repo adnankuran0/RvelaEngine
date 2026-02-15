@@ -1,6 +1,8 @@
 ﻿#include "rvelapch.h"
 #include "ShadowPass.h"
 
+namespace rv {
+
 void ShadowPass::Init()
 {
     
@@ -211,4 +213,6 @@ void ShadowPass::Execute()
     RenderPointShadowMap();
 
     commands.clear();
+}
+
 }

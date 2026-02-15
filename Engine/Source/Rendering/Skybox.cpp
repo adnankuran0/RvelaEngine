@@ -3,6 +3,8 @@
 #include <stb_image.h>
 #include "Core/Log.h"
 
+namespace rv {
+
 Skybox::Skybox() : skyboxVAO(0), skyboxVBO(0), skyboxTexture(0)
 {
 }
@@ -222,4 +224,6 @@ void Skybox::setupSkybox()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     glBindVertexArray(0);
+}
+
 }

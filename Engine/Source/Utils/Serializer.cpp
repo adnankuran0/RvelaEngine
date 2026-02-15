@@ -1,6 +1,7 @@
 ﻿#include "rvelapch.h"
 #include "Serializer.h"
 
+namespace rv {
 
 void Serializer::SaveToFile(const ISerializable& obj, const std::string& path)
 {
@@ -349,4 +350,6 @@ void DeserializeBin_PrefabComp(const std::byte*& cursor, PrefabComponent& comp)
 	UUIDv4::UUID raw;
 	ReadBytesFromBuffer(cursor, reinterpret_cast<char*>(&raw), 16);
 	comp.SetPrefabID(AssetUUID(raw));
+}
+
 }

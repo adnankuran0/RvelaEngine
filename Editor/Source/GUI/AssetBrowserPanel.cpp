@@ -9,6 +9,8 @@
 #include "Core/Engine.h"
 #include "Scene/Entity.h"
 
+namespace rv {
+
 static std::filesystem::path s_CurrentDirectory;
 static char s_SearchBuffer[256] = "";
 static std::vector<std::filesystem::directory_entry> s_SearchResults;
@@ -227,4 +229,6 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
     ImGui::EndChild();
 
     ImGui::End();
+}
+
 }

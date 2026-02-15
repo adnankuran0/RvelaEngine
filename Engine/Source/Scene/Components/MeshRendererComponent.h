@@ -6,6 +6,8 @@
 #include "Assets/MeshAsset.h"
 #include "Core/Ref.h"
 
+namespace rv {
+
 struct alignas(16) MeshRendererComponent 
 {
 public:
@@ -45,3 +47,5 @@ public:
     bool castShadow = true;
     bool isDoubleSided = false;
 };
+
+}

@@ -1,6 +1,8 @@
 #include "Style.h"
 #include <imgui.h>
 
+namespace rv {
+
 void SetStyle()
 {
     ImGuiIO& io = ImGui::GetIO();
@@ -85,4 +87,4 @@ void SetStyle()
     style.WindowPadding = ImVec2(12, 8);
 }
 
-
+}

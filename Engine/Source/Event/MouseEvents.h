@@ -4,6 +4,8 @@
 #include "Input/MouseCodes.h"
 #include "glm/glm.hpp"
 
+namespace rv { 
+
 class MouseButtonEvent : public Event {
 public:
     
@@ -86,3 +88,5 @@ private:
     float m_XOffset, m_YOffset; 
     static constexpr const char* EVENT_NAME = "MouseScrolled"; 
 };
+
+}

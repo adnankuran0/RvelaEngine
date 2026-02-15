@@ -5,6 +5,8 @@
 
 struct GLFWwindow;
 
+namespace rv {
+
 class EditorCamera : public ICamera
 {
 public:
@@ -55,3 +57,5 @@ public:
     int width{ 1920 };
     int height{ 1080 };
 };
+
+}

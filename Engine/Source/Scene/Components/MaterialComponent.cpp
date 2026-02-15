@@ -1,6 +1,8 @@
 #include "rvelapch.h"
 #include "MaterialComponent.h"
 
+namespace rv {
+
 void MaterialComponent::Load(const AssetUUID& uuid)
 {
 	if (!uuid.IsValid())
@@ -52,5 +54,7 @@ void MaterialComponent::Deserialize(const json& j)
 	std::string materialUUIDstr = j.at("material").get<std::string>();
 	materialUUID = AssetUUID::FromString(materialUUIDstr);
 	Load(materialUUID);
+
+}
 
 }

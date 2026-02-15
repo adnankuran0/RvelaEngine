@@ -3,7 +3,7 @@
 #include "Scene/Scene.h"
 #include "entt/entt.h"
 
-
+namespace rv {
 
 class Entity
 {
@@ -71,3 +71,4 @@ private:
 	Scene* m_Scene = nullptr;
 };
 
+}

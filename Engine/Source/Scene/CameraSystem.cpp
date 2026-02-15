@@ -2,6 +2,8 @@
 #include "CameraSystem.h"
 #include "Entity.h"
 
+namespace rv {
+
 Camera& CameraSystem::CreateCamera(Scene& scene, const glm::vec3& position)
 {
     Entity camEntity = scene.CreateEntity("Camera");
@@ -32,4 +34,6 @@ void CameraSystem::SetActiveCamera(Camera& cam)
 
     cam.SetActive(true);
     m_ActiveCamera = &cam;
+}
+
 }

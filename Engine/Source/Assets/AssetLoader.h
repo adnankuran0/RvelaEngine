@@ -6,6 +6,8 @@
 #include <fstream>
 #include "Core/Log.h"
 
+namespace rv { 
+
 class Asset;
 
 class AssetLoader
@@ -64,3 +66,5 @@ public:
 
     
 };
+
+}

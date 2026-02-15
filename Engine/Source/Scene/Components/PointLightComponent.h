@@ -2,6 +2,8 @@
 #include "glm/glm.hpp"
 #include "../nlohmann/json.hpp"
 
+namespace rv {
+
 using json = nlohmann::json;
 
 struct PointLightComponent 
@@ -37,3 +39,5 @@ private:
 
 };
 
+
+}

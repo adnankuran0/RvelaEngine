@@ -2,6 +2,8 @@
 #include <vector>
 #include "Camera.h"
 
+namespace rv {
+
 class Scene; // forward declaration
 
 class CameraSystem
@@ -27,3 +29,5 @@ private:
     std::vector<std::unique_ptr<Camera>> m_Cameras;
     Camera* m_ActiveCamera = nullptr;
 };
+
+}

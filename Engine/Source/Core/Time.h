@@ -1,5 +1,7 @@
 #pragma once
 
+namespace rv {
+
 class Time
 {
 public:
@@ -74,3 +76,5 @@ private:
     static int frameCount;        ///< The number of frames since the last FPS update.
     static int fpsUpdateTime;    ///< How frequent engine updates the fps
 };
+
+}

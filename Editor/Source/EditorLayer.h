@@ -13,12 +13,14 @@
 #include "GUI/InspectorPanel.h"
 #include "GUI/AssetBrowserPanel.h"
 
+namespace rv {
+
 class Engine;
 
 class EditorLayer : public Layer
 {
 public:
-    EditorLayer(Engine* engine) : m_Engine(engine)
+    EditorLayer(rv::Engine* engine) : m_Engine(engine)
     {
     }
     ~EditorLayer();
@@ -44,7 +46,9 @@ private:
 
     AssetImporterRegistry m_AssetImporterRegistry;
     EditorCamera m_EditorCamera;
-    Engine* m_Engine;
+    rv::Engine* m_Engine;
     bool m_ShowUI = true;
     bool m_ShowGrid = true;
 };
+
+}

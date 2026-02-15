@@ -6,6 +6,8 @@
 #include "Assets/Asset.h"
 #include "Assets/AssetMeta.h"
 
+namespace rv {
+
 class PrefabMeta : public AssetMeta
 {
 public:
@@ -41,3 +43,5 @@ private:
     std::vector<std::byte> m_Data;
     bool m_Loaded = false;
 };
+
+}

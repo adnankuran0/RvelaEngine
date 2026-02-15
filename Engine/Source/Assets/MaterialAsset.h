@@ -6,7 +6,7 @@
 #include "Assets/Asset.h"
 #include "Assets/AssetUUID.h"
 
-
+namespace rv { 
 
 struct MaterialMeta : public AssetMeta
 {
@@ -50,3 +50,5 @@ public:
 private:
     std::string m_Path;
 };
+
+}

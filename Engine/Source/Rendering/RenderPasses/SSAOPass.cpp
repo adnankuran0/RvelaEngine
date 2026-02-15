@@ -2,14 +2,14 @@
 #include "SSAOPass.h"
 #include "Scene/ICamera.h"
 
-// Pre-declare constants
-namespace {
-    constexpr int KERNEL_SIZE = 32;
-    constexpr int NOISE_SIZE = 16;
-    constexpr GLenum SSAO_TEXTURE_FORMAT = GL_R16F;
-    constexpr float NEAR_PLANE = 0.1f;
-    constexpr float FAR_PLANE = 100.0f;
-}
+namespace rv {
+
+constexpr int KERNEL_SIZE = 32;
+constexpr int NOISE_SIZE = 16;
+constexpr GLenum SSAO_TEXTURE_FORMAT = GL_R16F;
+constexpr float NEAR_PLANE = 0.1f;
+constexpr float FAR_PLANE = 100.0f;
+
 
 void SSAOPass::Init()
 {
@@ -116,4 +116,6 @@ void SSAOPass::GenerateNoiseTexture()
     glTextureParameteri(noiseTexture, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTextureParameteri(noiseTexture, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTextureParameteri(noiseTexture, GL_TEXTURE_WRAP_T, GL_REPEAT);
+}
+
 }

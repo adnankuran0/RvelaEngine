@@ -5,6 +5,8 @@
 #include "AssetUUID.h"
 #include "AssetLoader.h"
 
+namespace rv { 
+
 class Asset;
 class AssetLoader;
 
@@ -72,3 +74,5 @@ private:
     inline static tsl::robin_map<AssetUUID, std::filesystem::path> s_UUIDToPath;
     inline static tsl::robin_map<AssetUUID, WeakRef<Asset>> s_LoadedAssets;
 };
+
+}

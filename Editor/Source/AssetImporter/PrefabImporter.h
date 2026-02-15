@@ -5,9 +5,10 @@
 #include <string>
 #include "json.hpp"
 
+namespace rv {
+
 class Scene;
 class PrefabAsset;
-
 
 class PrefabImporter 
 {
@@ -18,3 +19,5 @@ private:
     static void SerializeEntityRecursively(entt::entity& e, entt::entity& rootEntity, Scene& scene, std::vector<std::byte>& buffer,nlohmann::json& j);
     static unsigned int CountEntitiesRecursively(Scene& scene, entt::entity e);
 };
+
+}

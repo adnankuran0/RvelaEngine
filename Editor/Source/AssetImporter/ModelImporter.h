@@ -8,6 +8,9 @@
 
 struct aiScene;
 struct aiNode;
+
+namespace rv {
+
 class Scene;
 
 class ModelImporter : public IAssetImporter
@@ -42,3 +45,6 @@ private:
 
 };
 
+
+
+}

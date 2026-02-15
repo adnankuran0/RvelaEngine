@@ -1,6 +1,8 @@
 #pragma once
 #include "../nlohmann/json.hpp"
 
+namespace rv {
+
 using json = nlohmann::json;
 
 struct TagComponent
@@ -14,3 +16,5 @@ public:
     void Deserialize(const json& j);
 
 };
+
+}

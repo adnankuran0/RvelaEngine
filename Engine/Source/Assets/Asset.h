@@ -2,6 +2,8 @@
 #include <memory>
 #include "AssetMeta.h"
 
+namespace rv {
+
 class Asset 
 {
 public:
@@ -23,3 +25,5 @@ public:
 protected:
     std::unique_ptr<AssetMeta> m_Meta;
 };
+
+}

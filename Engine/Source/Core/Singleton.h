@@ -1,5 +1,7 @@
 #pragma once
 
+namespace rv{
+
 template <typename T>
 class Singleton
 {
@@ -28,4 +30,5 @@ private:
 	inline static T* s_Instance = nullptr;
 };
 
+}
 

@@ -2,6 +2,8 @@
 #include "glm/glm.hpp"
 #include "../nlohmann/json.hpp"
 
+namespace rv {
+
 using json = nlohmann::json;
 struct SpotLightComponent 
 {
@@ -21,3 +23,5 @@ public:
     void Deserialize(const json& j);
 
 };
+
+}

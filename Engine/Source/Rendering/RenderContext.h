@@ -1,6 +1,8 @@
 #pragma once
 #include "Rendering/Renderer.h"
 
+namespace rv {
+
 class Scene;
 class ICamera;
 
@@ -24,3 +26,5 @@ public:
 		return true;
 	}
 };
+
+}

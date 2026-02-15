@@ -3,6 +3,8 @@
 
 struct GLFWwindow;
 
+namespace rv { 
+
 struct WindowSize
 {
 	int width, height;
@@ -60,3 +62,5 @@ private:
 	static void FramebufferSizeCallback(GLFWwindow* window, int width, int height) noexcept;
 
 };
+
+}

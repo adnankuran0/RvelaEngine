@@ -8,6 +8,7 @@
 #include "Assimp/scene.h"
 #include <Core/Log.h>
 
+namespace rv {
 
 static std::string SanitizeFilename(const std::string& name)
 {
@@ -148,4 +149,7 @@ bool MeshImporter::Import(const aiScene* scene, const std::filesystem::path& pat
     }
 
     return true;
+}
+
+
 }

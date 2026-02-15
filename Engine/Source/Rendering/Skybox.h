@@ -7,6 +7,7 @@
 #include "Utils/FileUtils.h"
 #include "Shader.h"
 
+namespace rv { 
 
 class Skybox
 {
@@ -26,3 +27,5 @@ private:
     GLuint loadCubemap(const std::vector<Path>& faces);
     void setupSkybox();
 };
+
+}

@@ -1,8 +1,10 @@
 ﻿#pragma once
-
 #include "glm/glm.hpp"
 #include <array>
 #include "Scene/AABB.h"
+
+namespace rv {
+
 class Frustum
 {
 public:
@@ -91,5 +93,6 @@ public:
         return true;
     }
 
-
 };
+
+}

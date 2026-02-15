@@ -10,6 +10,8 @@
 #include "MaterialAsset.h"
 #include "Assets/AssetMagic.h"
 
+namespace rv { 
+
 Ref<Asset> AssetLoader::Load(const std::filesystem::path& path)
 {
     std::ifstream inFile(path, std::ios::binary);
@@ -89,4 +91,6 @@ AssetHeader AssetLoader::ReadHeader(std::ifstream& inFile, uint32_t expectedMagi
     }
 
     return header;
+}
+
 }

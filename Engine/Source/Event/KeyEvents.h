@@ -3,6 +3,8 @@
 #include "Event.h"
 #include "Input/KeyCodes.h"
 
+namespace rv {
+
 class KeyEvent : public Event {
 public:
     KeyEvent(KeyCode keyCode) noexcept : m_KeyCode(keyCode) {}
@@ -40,3 +42,5 @@ public:
 private:
     static constexpr const char* EVENT_NAME = "KeyReleased";
 };
+
+}

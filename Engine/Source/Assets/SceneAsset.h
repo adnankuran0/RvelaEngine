@@ -7,6 +7,8 @@
 #include <string>
 #include <filesystem>
 
+namespace rv {
+
 class SceneMeta : public AssetMeta
 {
 public:
@@ -43,3 +45,5 @@ private:
     std::vector<std::byte> m_Data;
     bool m_Loaded = false;
 };
+
+}

@@ -4,6 +4,8 @@
 #include <fstream>
 #include <cstring>
 
+namespace rv {
+
 std::unique_ptr<AssetMeta> SceneMeta::Clone() const
 {
     return std::make_unique<SceneMeta>(*this);
@@ -195,4 +197,7 @@ std::vector<uint8_t> SceneAsset::ReadSceneData(const std::filesystem::path& file
     file.read(reinterpret_cast<char*>(data.data()), dataSize);
 
     return data;
+}
+
+
 }

@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include <memory>
 
+namespace rv { 
+
 template<typename T>
 class Ref {
 public:
@@ -83,3 +85,5 @@ Ref<T> DynamicCast(const Ref<U>& other) {
     return Ref<T>(std::dynamic_pointer_cast<T>(other.GetShared()));
 }
 
+
+}

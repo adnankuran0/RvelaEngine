@@ -2,6 +2,7 @@
 #include "Time.h"
 #include "GLFW/glfw3.h"
 
+namespace rv { 
 
 // Static member definitions (all in seconds)
 float Time::deltaTime = 0.0f;
@@ -49,6 +50,7 @@ void Time::Update() noexcept
     fixedTimeAccumulator += deltaTime;
 }
 
+}
 
 
 

@@ -9,6 +9,8 @@
 #include <span>
 #include <glm/glm.hpp>
 
+namespace rv { 
+
 struct Vertex
 {
     glm::vec3 position;
@@ -57,3 +59,5 @@ private:
     std::string m_Path;
     bool m_Loaded = false;
 };
+
+}

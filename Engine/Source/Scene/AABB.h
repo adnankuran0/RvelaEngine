@@ -3,6 +3,8 @@
 #include <glm/glm.hpp>
 #include <limits>
 
+namespace rv {
+
 class AABB {
 public:
     glm::vec3 min;
@@ -85,3 +87,6 @@ public:
         return AABB(worldMin, worldMax);
     }
 };
+
+
+}

@@ -5,6 +5,7 @@
 #include "Input/Input.h"
 #include "Utils/FileUtils.h"
 
+namespace rv {
 
 GLFWwindow * Renderer::activeWindow = nullptr;
 Shader Renderer::m_DirectionalShadowShader;
@@ -97,4 +98,6 @@ void Renderer::Shutdown()
 void Renderer::DrawFullScreenQuad()
 {
     m_ScreenQuad.Draw();
+}
+
 }

@@ -2,6 +2,8 @@
 #include "ImGui/imgui.h"
 #include "Core/Engine.h"
 
+namespace rv {
+
 void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 {
     Scene& scene = engine->GetActiveScene();
@@ -550,4 +552,6 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
     ImGui::EndTabBar();
     }
     ImGui::End();
+}
+
 }

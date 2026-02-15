@@ -2,6 +2,8 @@
 #include "CompositePass.h"
 #include "../Renderer.h"
 
+namespace rv {
+
 void CompositePass::Init()
 {
 	glGenFramebuffers(1, &m_Framebuffer);
@@ -69,4 +71,6 @@ void CompositePass::UpdateExposure(float deltaTime)
 
 	float speed = 1.5f;
 	exposure += (targetExposure - exposure) * deltaTime * speed;
+}
+
 }

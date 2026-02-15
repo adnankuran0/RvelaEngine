@@ -4,6 +4,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "Scene/ICamera.h"
 
+namespace rv {
+
 class Entity; // forward declaration
 
 class Camera : public ICamera
@@ -25,3 +27,5 @@ private:
     CameraComponent* m_Component;
     TransformComponent* m_Transform;
 };
+
+}

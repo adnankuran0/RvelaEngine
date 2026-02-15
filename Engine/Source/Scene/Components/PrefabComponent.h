@@ -2,6 +2,8 @@
 #include "Assets/AssetUUID.h"
 #include "../nlohmann/json.hpp"
 
+namespace rv {
+
 using json = nlohmann::json;
 
 struct PrefabComponent
@@ -17,3 +19,5 @@ struct PrefabComponent
 private:
 	AssetUUID prefabUUID;
 };
+
+}

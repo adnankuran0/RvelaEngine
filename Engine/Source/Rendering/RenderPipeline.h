@@ -13,6 +13,8 @@
 #include "Rendering/RenderPasses/SSRPass.h"
 #include "Rendering/RenderPasses/OutlinePass.h"
 
+namespace rv {
+
 class Engine;
 
 struct RenderFeatures
@@ -55,3 +57,4 @@ private:
 
 };
 
+}

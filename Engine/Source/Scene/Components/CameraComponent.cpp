@@ -1,6 +1,7 @@
 #include "rvelapch.h"
 #include "CameraComponent.h"
 
+namespace rv {
 
 json CameraComponent::Serialize() const
 {
@@ -18,4 +19,6 @@ void CameraComponent::Deserialize(const json& j)
     nearClip = j["nearClip"];
     farClip = j["farClip"];
     isActive = j["isActive"];
+}
+
 }

@@ -2,8 +2,12 @@
 
 #include "AssetImporter.h"
 
+namespace rv {
+
 class TextureImporter : public IAssetImporter
 {
 public:
 	AssetUUID Import(const std::filesystem::path& path) override;
 };
+
+}

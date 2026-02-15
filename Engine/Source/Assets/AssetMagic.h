@@ -2,6 +2,8 @@
 #include "Assets/MaterialAsset.h"
 #include "Assets/TextureAsset.h"
 
+namespace rv { 
+
 template<typename T>
 struct AssetMagic {};
 
@@ -15,3 +17,4 @@ struct AssetMagic<TextureMeta> {
     static constexpr uint32_t magic = MAGIC_TEXTURE;
 };
 
+}

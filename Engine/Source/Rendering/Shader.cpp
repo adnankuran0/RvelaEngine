@@ -2,6 +2,8 @@
 #include "Shader.h"
 #include "Core/Log.h"
 
+namespace rv { 
+
 Shader::Shader(const Path& shaderPath)
 {
     Init(shaderPath);
@@ -145,4 +147,6 @@ GLint Shader::GetUniformLocation(const std::string& name) const {
     GLint location = glGetUniformLocation(ID, name.c_str());
     uniformLocationCache[name] = location;
     return location;
+}
+
 }

@@ -2,6 +2,8 @@
 #include <cstdint>
 #include <random>
 
+namespace rv {
+
 using EntityUUID = uint64_t;
 
 class EntityUUIDGenerator {
@@ -24,3 +26,5 @@ public:
 private:
     inline static uint64_t m_CurrentID = 0;
 };
+
+}

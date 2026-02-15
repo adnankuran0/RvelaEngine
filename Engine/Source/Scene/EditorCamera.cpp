@@ -7,6 +7,7 @@
 #include "Input/Input.h"
 #include "Core/Time.h"
 
+namespace rv {
 
 EditorCamera::EditorCamera(glm::vec3 position,
     glm::vec3 up,
@@ -150,4 +151,6 @@ void EditorCamera::UpdateCameraVectors()
     Front = glm::normalize(front);
     Right = glm::normalize(glm::cross(Front, WorldUp));
     Up = glm::normalize(glm::cross(Right, Front));
+}
+
 }

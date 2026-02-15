@@ -2,6 +2,8 @@
 #include <glm/glm.hpp>
 #include "json.hpp"
 
+namespace rv {
+
 using json = nlohmann::json;
 
 struct CameraComponent
@@ -14,3 +16,5 @@ struct CameraComponent
     json Serialize() const;
     void Deserialize(const json& j);
 };
+
+}

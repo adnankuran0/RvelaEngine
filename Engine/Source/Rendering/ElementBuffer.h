@@ -1,4 +1,7 @@
 #pragma once
+
+namespace rv {
+
 class ElementBuffer
 {
 private:
@@ -12,3 +15,5 @@ public:
 	void Unbind() const;
 	void Destroy() const;
 };
+
+}

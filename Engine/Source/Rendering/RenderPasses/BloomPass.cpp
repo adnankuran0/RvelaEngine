@@ -1,7 +1,11 @@
 #include "rvelapch.h"
 #include "BloomPass.h"
+#include "Scene/Components.h"
+#include "Scene/Camera.h"
+#include <array>
+#include <algorithm>
 
-
+namespace rv {
 
 void BloomPass::Init()
 {
@@ -138,5 +142,7 @@ void BloomPass::Execute()
     Upsample();
 
     o_BlurredTexture = downsampleTextures[0];
+
+}
 
 }

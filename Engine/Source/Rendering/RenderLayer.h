@@ -2,6 +2,8 @@
 #include "RenderContext.h"
 #include "RenderPipeline.h"
 
+namespace rv {
+
 class Engine;
 class Scene;
 
@@ -22,3 +24,5 @@ private:
 	void CollectRenderCommands(Scene* scene, const std::function<void(const RenderCommand&)>& submitCallback);
 
 };
+
+}

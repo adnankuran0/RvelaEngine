@@ -11,6 +11,8 @@
 #define LOG_ERROR(...)    RvelaLog::GetLogger()->error(__VA_ARGS__)
 #define LOG_FATAL(...)    RvelaLog::GetLogger()->critical(__VA_ARGS__)
 
+namespace rv { 
+
 class RvelaLog
 {
 public:
@@ -20,3 +22,5 @@ public:
 private:
     static std::shared_ptr<spdlog::logger> s_Logger;
 };
+
+}

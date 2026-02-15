@@ -4,6 +4,8 @@
 #define VRT_PATH(x) Path::FromVirtual(x)
 #define ABS_PATH(x) Path::FromAbsolute(x)
 
+namespace rv {
+
 class Path
 {
 public:
@@ -41,3 +43,5 @@ private:
 	std::filesystem::path m_VirtualPath;
 
 };
+
+}

@@ -2,6 +2,8 @@
 #include "glm/glm.hpp"
 #include "../nlohmann/json.hpp"
 
+namespace rv {
+
 using json = nlohmann::json;
 
 struct DirectionalLightComponent 
@@ -20,3 +22,5 @@ public:
     json Serialize() const;
     void Deserialize(const json& j);
 };
+
+}

@@ -1,5 +1,7 @@
 #pragma once
 
+namespace rv { 
+
 enum TextureFormat : uint8_t
 {
     Unknown = 0,
@@ -41,3 +43,4 @@ private:
     int m_Width{}, m_Height{}, m_NrChannels{};
 };
 
+}

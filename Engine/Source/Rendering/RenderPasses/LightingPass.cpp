@@ -3,8 +3,9 @@
 #include "Core/Log.h"
 #include "Assets/AssetUUID.h"
 #include "Assets/AssetRegistry.h"
+#include "Scene/Components.h"
 
-
+namespace rv {
 
 struct MapInfo {
     bool isUsing;
@@ -190,4 +191,6 @@ void LightingPass::Execute()
     );
 
     commands.clear();
+}
+
 }

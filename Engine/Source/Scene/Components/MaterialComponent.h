@@ -5,8 +5,8 @@
 #include "Assets/AssetRegistry.h"
 #include "Assets/TextureAsset.h"
 #include "Assets/MaterialAsset.h"
-#include "Core/Ref.h"
 
+namespace rv {
 
 using json = nlohmann::json;
 
@@ -117,3 +117,4 @@ private:
 
 };
 
+}

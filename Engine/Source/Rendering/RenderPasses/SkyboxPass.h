@@ -2,6 +2,9 @@
 #include "../RenderPass.h"
 #include "../Renderer.h"
 #include "Scene/Camera.h"
+
+namespace rv {
+
 class SkyboxPass : public RenderPass
 {
 public:
@@ -16,3 +19,4 @@ private:
 	Skybox m_Skybox;
 };
 
+}

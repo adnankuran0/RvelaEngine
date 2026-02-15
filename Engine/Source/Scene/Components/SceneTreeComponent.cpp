@@ -1,6 +1,8 @@
 #include "rvelapch.h"
 #include "SceneTreeComponent.h"
 
+namespace rv {
+
 std::string SceneTreeComponent::Serialize() const
 {
     json j;
@@ -18,4 +20,6 @@ void SceneTreeComponent::Deserialize(const json& j)
     {
         childrenUUIDs.push_back(id.get<EntityUUID>());
     }
+}
+
 }

@@ -1,6 +1,9 @@
 ﻿#include "rvelapch.h"
 #include "OutlinePass.h"
 #include "Scene/Scene.h"
+#include "Scene/Components.h"
+
+namespace rv {
 
 void OutlinePass::Execute()
 {
@@ -43,4 +46,6 @@ void OutlinePass::Execute()
     glStencilFunc(GL_ALWAYS, 0, 0xFF);
 
     
+}
+
 }

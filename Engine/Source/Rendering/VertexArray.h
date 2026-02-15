@@ -1,6 +1,8 @@
 #pragma once
 #include "BufferLayout.h"
 
+namespace rv { 
+
 class VertexArray
 {
 public:
@@ -13,3 +15,5 @@ public:
 private:
 	unsigned int ID = 0;
 };
+
+}

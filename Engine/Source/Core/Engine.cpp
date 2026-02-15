@@ -8,6 +8,7 @@
 #include <Scene/EditorCamera.h>
 #include <Event/MouseEvents.h>
 
+namespace rv {
 
 Engine* Engine::s_Instance = nullptr;
 
@@ -182,4 +183,7 @@ void Engine::Shutdown()
 	m_Renderer.Shutdown();
 
 	glfwTerminate();
+}
+
+
 }

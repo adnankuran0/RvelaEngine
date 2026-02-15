@@ -2,6 +2,8 @@
 #include "entt/entt.h"
 #include "glm/glm.hpp"
 
+namespace rv {
+
 class Engine;
 
 class Viewport
@@ -15,3 +17,5 @@ private:
 	static glm::vec3 ScreenPosToWorldRay(const glm::vec2& mousePos, const glm::vec2& viewportSize,
 		const glm::mat4& projectionMatrix, const glm::mat4& viewMatrix);
 };
+
+}

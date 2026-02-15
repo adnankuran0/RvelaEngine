@@ -2,6 +2,8 @@
 #include "BrightPass.h"
 #include "../Renderer.h"
 
+namespace rv {
+
 void BrightPass::Init()
 {
 	glGenFramebuffers(1, &brightFBO);
@@ -61,4 +63,6 @@ void BrightPass::Execute()
 
     glEnable(GL_DEPTH_TEST);
 	glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
+}
+
 }

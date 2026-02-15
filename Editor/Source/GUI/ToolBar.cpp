@@ -2,6 +2,8 @@
 #include "ImGui/imgui.h"
 #include "Scene/Scene.h"
 
+namespace rv {
+
 void ToolBar::Draw(Scene& scene)
 {
     ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -66,4 +68,6 @@ void ToolBar::Draw(Scene& scene)
     ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x, dockspace_y));
     ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, dockspace_height));
     ImGui::SetNextWindowViewport(viewport->ID);
+}
+
 }

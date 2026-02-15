@@ -2,6 +2,8 @@
 #include "Asset.h"
 #include "AssetUUID.h"
 
+namespace rv { 
+
 Asset::Asset(std::unique_ptr<AssetMeta> assetMeta)
 {
 	m_Meta = std::move(assetMeta);
@@ -20,4 +22,6 @@ void Asset::SetUUID(const AssetUUID& uuid)
 AssetType Asset::GetAssetType() const
 { 
 	return m_Meta.get()->type; 
+}
+
 }

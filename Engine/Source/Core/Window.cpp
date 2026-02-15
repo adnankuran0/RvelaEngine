@@ -9,6 +9,8 @@
 #include "Event/MouseEvents.h"
 #include "Event/WindowEvents.h"
 
+namespace rv { 
+
 Window::Window() noexcept
 {
 }
@@ -127,4 +129,7 @@ WindowSize Window::GetSize() noexcept
 void Window::Shutdown() const
 {
         glfwDestroyWindow(m_Window);
+}
+
+
 }

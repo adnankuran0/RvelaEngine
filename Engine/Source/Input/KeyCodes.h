@@ -1,5 +1,7 @@
 #pragma once
 
+namespace rv { 
+
 enum class KeyCode : int {
 	// From glfw3.h
 	Space = 32,
@@ -134,3 +136,5 @@ enum class KeyCode : int {
 	Menu = 348
 };
 
+
+}

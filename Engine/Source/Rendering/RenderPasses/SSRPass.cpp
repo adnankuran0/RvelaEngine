@@ -3,6 +3,8 @@
 #include "Core/Time.h"
 #include "Scene/ICamera.h" 
 
+namespace rv {
+
 void SSRPass::Init()
 {
     glGenFramebuffers(1, &ssrFBO);
@@ -81,4 +83,6 @@ void SSRPass::Execute()
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
+}
+
 }

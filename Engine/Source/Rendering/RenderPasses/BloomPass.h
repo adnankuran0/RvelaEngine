@@ -1,10 +1,7 @@
 #pragma once
 #include "../RenderPass.h"
-#include "Scene/Components.h"
-#include "../Renderer.h"
-#include "Scene/Camera.h"
-#include <array>
-#include <algorithm>
+
+namespace rv {
 
 class BloomPass : public RenderPass
 {
@@ -30,3 +27,5 @@ private:
     std::vector<GLuint> upsampleTextures;
     const int mipLevels = 6;
 };
+
+}

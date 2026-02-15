@@ -4,6 +4,8 @@
 #include "Assets/MeshAsset.h"
 #include "Assets/AssetRegistry.h"
 
+namespace rv {
+
 using json = nlohmann::json;
 
 struct MeshComponent 
@@ -40,3 +42,5 @@ private:
     bool isDirty = false;
 };
 
+
+}

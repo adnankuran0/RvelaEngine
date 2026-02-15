@@ -2,6 +2,8 @@
 #include "../nlohmann/json.hpp"
 #include "Scene/EntityUUID.h"
 
+namespace rv {
+
 using json = nlohmann::json;
 
 struct UUIDComponent 
@@ -15,3 +17,5 @@ public:
     json Serialize() const;
     void Deserialize(const json& j);
 };
+
+}

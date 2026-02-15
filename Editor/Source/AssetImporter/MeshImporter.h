@@ -7,6 +7,8 @@
 struct aiScene;
 struct aiMesh;
 
+namespace rv {
+
 class MeshImporter 
 {
 public:
@@ -16,3 +18,5 @@ private:
 	std::vector<unsigned int> ProcessIndices(aiMesh* mesh);
 	MeshMeta CreateMeshMeta(const std::filesystem::path& path, aiMesh* mesh);
 };
+
+}

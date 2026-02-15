@@ -1,5 +1,7 @@
 #pragma once
 
+namespace rv {
+
 class Engine;
 class AssetImporterRegistry;
 
@@ -9,3 +11,4 @@ public:
 	void Draw(Engine* engine, AssetImporterRegistry& assetImporter);
 };
 
+}

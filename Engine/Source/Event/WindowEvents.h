@@ -1,6 +1,7 @@
 #pragma once
-
 #include "Event.h"
+
+namespace rv { 
 
 class WindowResizedEvent : public Event {
 public:
@@ -24,3 +25,5 @@ private:
     unsigned int m_WindowHeight; 
     static constexpr const char* EVENT_NAME = "WindowResized"; 
 };
+
+}

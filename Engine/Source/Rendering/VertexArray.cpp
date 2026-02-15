@@ -2,6 +2,8 @@
 #include "VertexArray.h"
 #include "GLAD/gl.h"
 
+namespace rv {
+
 void VertexArray::Init()
 {
 	ID = 0;
@@ -60,4 +62,6 @@ void VertexArray::SetBufferLayout(const BufferLayout& layout)
 unsigned int VertexArray::getID()
 {
 	return ID;
+}
+
 }
