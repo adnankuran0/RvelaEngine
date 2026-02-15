@@ -24,7 +24,6 @@ void CompositePass::Init()
 
 void CompositePass::Execute()
 {
-	glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "Composite Pass");
 
 	glDisable(GL_DEPTH_TEST);
 	Shader& compositeShader = Renderer::GetCompositeShader();
@@ -50,7 +49,6 @@ void CompositePass::Execute()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glEnable(GL_DEPTH_TEST);
 
-	glPopDebugGroup();
 
 }
 

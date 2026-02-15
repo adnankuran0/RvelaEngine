@@ -32,7 +32,6 @@ SSRPass::~SSRPass()
 
 void SSRPass::Execute()
 {
-    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "SSR Pass");
     Shader& ssrShader = Renderer::GetSSRShader();
     glDisable(GL_DEPTH_TEST);
     glBindFramebuffer(GL_FRAMEBUFFER, ssrFBO);
@@ -82,5 +81,4 @@ void SSRPass::Execute()
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
-    glPopDebugGroup();
 }

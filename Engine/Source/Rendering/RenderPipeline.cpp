@@ -1,4 +1,4 @@
-#include "rvelapch.h"
+﻿#include "rvelapch.h"
 #include "RenderPipeline.h"
 #include "Utils/GPUTimer.h"
 #include "Core/Engine.h"
@@ -49,25 +49,27 @@ void RenderPipeline::SubmitRenderCommand(const RenderCommand& cmd)
 
 void RenderPipeline::Execute()
 {
-	geometryPass.Execute();
 
+	
+	geometryPass.Execute();
 	shadowPass.Execute();
 
-	skyboxPass.SetScreenFBO(lightingPass.GetScreenFBO());
-	skyboxPass.Execute();
 
+	skyboxPass.SetScreenFBO(lightingPass.GetScreenFBO());
+	
+	skyboxPass.Execute();
+	
 	lightingPass.SetDirectionalShadowMap(shadowPass.GetDirectionalShadowMap());
 	lightingPass.SetPointShadowMap(shadowPass.GetPointShadowMap());
 	lightingPass.SetLightSpaceMatrix(shadowPass.GetLightSpaceMatrix());
 	lightingPass.Execute();
-
+	
 	if (m_RenderFeatures.ssao)
 	{
 		ssaoPass.SetDepthTexture(geometryPass.GetDepthTexure());
 		ssaoPass.SetNormalTexture(geometryPass.GetNormalTexure());
 		ssaoPass.Execute();
 	}
-	
 	if (m_RenderFeatures.ssr)
 	{
 		ssrPass.SetDepthTexture(geometryPass.GetDepthTexure());
@@ -78,7 +80,6 @@ void RenderPipeline::Execute()
 		ssrPass.SetSkyboxTexture(skyboxPass.GetSkyboxTexture());
 		ssrPass.Execute();
 	}
-
 	if (m_RenderFeatures.bloom)
 	{
 		brightPass.SetScreenTexture(lightingPass.GetScreenTexture());
@@ -87,12 +88,15 @@ void RenderPipeline::Execute()
 		bloomPass.SetBrightTexture(brightPass.GetBrightTexture());
 		bloomPass.Execute();
 	}
-
 	compositePass.SetScreenTexture(lightingPass.GetScreenTexture());
 	compositePass.SetBloomBlurTexture(bloomPass.GetBloomBlurTexture());
 	compositePass.SetAoTexture(ssaoPass.GetSSAOTexture());
 	compositePass.SetSsrTexture(ssrPass.GetSSRTexture());
 	compositePass.Execute();
+
+	
+
+
 }
 
 	

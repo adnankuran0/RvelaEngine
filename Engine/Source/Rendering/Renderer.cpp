@@ -6,7 +6,7 @@
 #include "Utils/FileUtils.h"
 
 
-GLFWwindow* Renderer::activeWindow = nullptr;
+GLFWwindow * Renderer::activeWindow = nullptr;
 Shader Renderer::m_DirectionalShadowShader;
 Shader Renderer::m_PointShadowShader;
 Shader Renderer::m_GeometryShader;
@@ -53,11 +53,11 @@ void Renderer::Init(GLFWwindow* window)
     m_OutlineShader.Init(VRT_PATH("Assets\\Shaders\\outline.glsl"));
     m_EquirectangularToCubemap.Init(VRT_PATH("Assets\\Shaders\\equirectangularToCubemap.glsl"));
 
-    
+
 
     m_ScreenQuad.Init();
 
-    
+
 
 }
 

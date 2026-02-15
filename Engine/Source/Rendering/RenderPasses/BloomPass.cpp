@@ -132,7 +132,6 @@ BloomPass::~BloomPass()
 
 void BloomPass::Execute()
 {
-    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "Bloom Pass");
 
     Downsample();
 
@@ -140,5 +139,4 @@ void BloomPass::Execute()
 
     o_BlurredTexture = downsampleTextures[0];
 
-    glPopDebugGroup();
 }

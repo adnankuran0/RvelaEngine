@@ -36,6 +36,7 @@ class MeshAsset : public Asset
 {
 public:
     MeshAsset(const std::string& path, std::unique_ptr<MeshMeta> meshMeta);
+    ~MeshAsset();
 
     bool Load();
     bool IsLoaded() const;

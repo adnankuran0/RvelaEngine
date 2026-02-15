@@ -5,9 +5,6 @@
 #include <string>
 #include <Rendering/Texture.h>
 
-class Texture;
-class TextureMeta;
-
 class TextureMeta : public AssetMeta
 {
 public:

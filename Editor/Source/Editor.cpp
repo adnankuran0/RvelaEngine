@@ -11,6 +11,7 @@ Editor::Editor()
     m_Engine->SetEditorCamera(&editorLayer->GetEditorCamera());
 
     m_Engine->PushLayer(editorLayer);
+
 }
 
 void Editor::Run()

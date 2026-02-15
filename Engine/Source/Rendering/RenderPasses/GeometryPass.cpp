@@ -64,7 +64,6 @@ GeometryPass::~GeometryPass()
 
 void GeometryPass::Execute()
 {
-    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "Geometry Pass");
 
     Shader& geometryShader = Renderer::GetGeometryShader();
 
@@ -128,6 +127,5 @@ void GeometryPass::Execute()
 
     commands.clear();
 
-    glPopDebugGroup();
 }
 

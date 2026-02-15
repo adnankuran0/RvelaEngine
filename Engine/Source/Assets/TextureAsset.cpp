@@ -113,6 +113,7 @@ bool TextureAsset::Load()
         return false;
     }
 
+
     m_Texture.GenerateFromMemory(
         data.data(),
         meta->width,

@@ -55,7 +55,8 @@ glm::vec3 EditorCamera::GetPosition()
 
 void EditorCamera::Update()
 {
-    ProcessKeyboard();
+    if (Input::IsMouseButtonPressed(MouseCode::Button1))
+        ProcessKeyboard();
 
     float dt = Time::GetDeltaTime();
     Position = glm::mix(Position, targetPosition, positionSmoothness * dt);

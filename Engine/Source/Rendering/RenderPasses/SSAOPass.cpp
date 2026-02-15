@@ -41,7 +41,6 @@ SSAOPass::~SSAOPass()
 
 void SSAOPass::Execute()
 {
-    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "SSAO Pass");
 
     Shader& ssaoShader = Renderer::GetSSAOShader();
 
@@ -73,7 +72,6 @@ void SSAOPass::Execute()
     Renderer::DrawFullScreenQuad();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
-    glPopDebugGroup();
 }
 
 void SSAOPass::GenerateSampleKernel()

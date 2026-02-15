@@ -30,6 +30,9 @@ Engine::Engine()
 	{
 		LOG_WARN("Another instance of Engine already exists!");
 	}
+
+
+	
 }
 
 Engine::~Engine()
@@ -76,12 +79,17 @@ void Engine::LateUpdate()
 void Engine::Run()
 {
 	LOG_INFO("Engine has started!");
+
+	
+
 	while (!glfwWindowShouldClose(GetWindow().GetGLFWWindow()))
 	{
 		glfwPollEvents();
 		HandleEvents();
 
 		Time::Update();
+
+		
 
 		while (Time::ShouldRunFixedUpdate())
 		{
@@ -96,7 +104,7 @@ void Engine::Run()
 
 		EventManager::ClearEvents();
 		Input::Update();
-
+		
 	}
 	LOG_INFO("Engine has stopped!");
 }
@@ -156,9 +164,15 @@ void Engine::Render()
 
 	for (Layer* layer : m_LayerStack)
 		layer->OnRender();
-
+	
 	m_Renderer.EndFrame();
+	
 	glfwSwapBuffers(GetWindow().GetGLFWWindow());
+	
+	GLenum err;
+	while ((err = glGetError()) != GL_NO_ERROR) {
+		LOG_ERROR("OpenGL hatası: {}", err);
+	}
 }
 
 

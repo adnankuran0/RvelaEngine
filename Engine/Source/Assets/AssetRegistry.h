@@ -53,6 +53,7 @@ public:
             }
         }
         
+
         //If asset exists but not loaded yet then we are doing lazy loading
         auto path = s_UUIDToPath[uuid];
         Ref<Asset> asset = AssetLoader::Load(path);

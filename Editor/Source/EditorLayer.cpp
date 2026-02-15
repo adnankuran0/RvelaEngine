@@ -50,7 +50,7 @@ void EditorLayer::OnUpdate()
 {
     if(m_Engine->GetActiveScene().GetState() == SceneState::EDIT)
         m_EditorCamera.Update();
-    
+   
 }
 
 void EditorLayer::OnRender()
@@ -68,7 +68,8 @@ void EditorLayer::OnLateUpdate()
 
 void EditorLayer::Render()
 {
-    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "IMGUI Pass");
+    
+
 
     static entt::entity selectedEntity = entt::null; // TODO: this is not belong here
 
@@ -102,8 +103,6 @@ void EditorLayer::Render()
         ImGui::RenderPlatformWindowsDefault();
         glfwMakeContextCurrent(backup_current_context);
     }
-
-    glPopDebugGroup();
 }
 
 

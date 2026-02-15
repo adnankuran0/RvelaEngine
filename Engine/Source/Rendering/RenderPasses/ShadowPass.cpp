@@ -202,7 +202,6 @@ ShadowPass::~ShadowPass()
 
 void ShadowPass::Execute()
 {
-    glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 1, -1, "Shadow Map Pass");
 
     if (commands.empty() || !ctx.IsValid()) return;
 
@@ -212,5 +211,4 @@ void ShadowPass::Execute()
     RenderPointShadowMap();
 
     commands.clear();
-    glPopDebugGroup();
 }

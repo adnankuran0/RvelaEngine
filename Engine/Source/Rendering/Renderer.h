@@ -1,9 +1,16 @@
 #pragma once
 
+#include "VertexArray.h"
+#include "VertexBuffer.h"
+#include "ElementBuffer.h"
+#include "BufferLayout.h"
+#include "Texture.h"
 #include "Shader.h"
+#include "GLFW/glfw3.h"
+#include "Core/Time.h"
+#include "Scene/Components.h"
+#include "Skybox.h"
 #include "ScreenQuad.h"
-
-struct GLFWWindow;
 
 struct PointLightData {
     glm::vec3 position;
@@ -54,7 +61,7 @@ public:
     static Shader& GetSSRShader() { return m_SSRShader; }
     static Shader& GetCompositeShader() { return m_CompositeShader; }
     static Shader& GetLuminanceShader() { return m_LuminanceShader; }
-    static Shader& GetProceduralSkyShader() { return m_ProceduralSkyShader;  }
+    static Shader& GetProceduralSkyShader() { return m_ProceduralSkyShader; }
     static Shader& GetOutlineShader() { return m_OutlineShader; }
     static Shader& GetEquirectangularToCubemapShader() { return m_EquirectangularToCubemap; }
 

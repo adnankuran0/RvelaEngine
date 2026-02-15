@@ -41,6 +41,8 @@ void Skybox::InitHDR(const Path& hdrFilePath, Shader& conversionShader)
 
 void Skybox::Render(Shader& shader, const glm::mat4& projection, const glm::mat4& view, GLuint screenFBO)
 {
+   
+
     glBindFramebuffer(GL_FRAMEBUFFER, screenFBO);
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -63,6 +65,8 @@ void Skybox::Render(Shader& shader, const glm::mat4& projection, const glm::mat4
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
+
+   
 }
 
 GLuint Skybox::ConvertEquirectangularToCubemap(GLuint hdrTexture, Shader& shader)

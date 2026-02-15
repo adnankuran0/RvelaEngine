@@ -51,6 +51,7 @@ public:
 	inline void SetAlbedoTexture(const AssetUUID& textureUIID)
 	{
 		material->albedoTextureUUID = textureUIID;
+		
 		albedoTexture = AssetRegistry::GetAsset<TextureAsset>(textureUIID);
 	}
 

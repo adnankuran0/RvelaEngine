@@ -55,6 +55,7 @@ Ref<Asset> AssetLoader::Load(const std::filesystem::path& path)
         Ref<MeshAsset> asset = CreateRef<MeshAsset>(path.string(), std::move(meta));
         if (asset->Load())
         {
+            LOG_INFO("Mesh asset loaded...");
             return Ref<Asset>(asset);
         }
     }

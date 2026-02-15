@@ -1,6 +1,6 @@
 ﻿#include "rvelapch.h"
-#include "Texture.h"
 #include "GLAD/gl.h"
+#include "Texture.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include <Core/Log.h>
