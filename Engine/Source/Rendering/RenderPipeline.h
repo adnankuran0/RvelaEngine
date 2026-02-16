@@ -20,7 +20,7 @@ class Engine;
 struct RenderFeatures
 {
 	bool ssao = true;
-	bool ssr = false;
+	bool ssr = true;
 	bool bloom = true;
 };
 

@@ -1,6 +1,216 @@
 {
     "Entities": [
         {
+            "Material": {
+                "material": "034b121e-dc18-48bb-800d-9ff54a5d7d83"
+            },
+            "Mesh": {
+                "mesh": "135e1d8e-5e85-445f-a1e5-75b4e0701f7b"
+            },
+            "ParentUUID": 14,
+            "Tag": {
+                "tag": "covered_car"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.037599992007017136,
+                    0.0,
+                    0.037599992007017136
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 19
+        },
+        {
+            "Material": {
+                "material": "034b121e-dc18-48bb-800d-9ff54a5d7d83"
+            },
+            "Mesh": {
+                "mesh": "c340b05c-5527-47cc-8d44-a59094941efa"
+            },
+            "ParentUUID": 14,
+            "Tag": {
+                "tag": "covered_car_wheel_04"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.7475999593734741,
+                    0.30000001192092896,
+                    -1.2993998527526855
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 18
+        },
+        {
+            "Material": {
+                "material": "034b121e-dc18-48bb-800d-9ff54a5d7d83"
+            },
+            "Mesh": {
+                "mesh": "f1eadfe1-9561-43af-9dd5-6afce861d5a1"
+            },
+            "ParentUUID": 14,
+            "Tag": {
+                "tag": "covered_car_wheel_03"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    -0.6724001169204712,
+                    0.30000001192092896,
+                    -1.299399971961975
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 17
+        },
+        {
+            "Material": {
+                "material": "034b121e-dc18-48bb-800d-9ff54a5d7d83"
+            },
+            "Mesh": {
+                "mesh": "7dee8ba5-1319-4e06-9e0a-725fe7b291dc"
+            },
+            "ParentUUID": 14,
+            "Tag": {
+                "tag": "covered_car_wheel_02"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    -0.6823999881744385,
+                    0.30000001192092896,
+                    1.2806000709533691
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 16
+        },
+        {
+            "Material": {
+                "material": "034b121e-dc18-48bb-800d-9ff54a5d7d83"
+            },
+            "Mesh": {
+                "mesh": "0bd2c01b-696a-4980-bcef-f25beb1b9c0d"
+            },
+            "ParentUUID": 14,
+            "Tag": {
+                "tag": "covered_car_wheel_01"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.7576000690460205,
+                    0.30000001192092896,
+                    1.2806000709533691
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 15
+        },
+        {
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": "Car"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    -7.622180461883545,
+                    1.9807763237622567e-05,
+                    -6.527714252471924
+                ],
+                "rotation": [
+                    0.0,
+                    9.279326438903809,
+                    0.0
+                ],
+                "scale": [
+                    0.9999977350234985,
+                    1.0,
+                    0.9999977350234985
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 14
+        },
+        {
             "ParentUUID": 0,
             "PointLight": {
                 "castShadows": true,
@@ -366,6 +576,42 @@
                 ]
             },
             "UUID": 10
+        },
+        {
+            "Material": {
+                "material": "99427148-c3b6-47ca-82b7-a71bb37e22fc"
+            },
+            "Mesh": {
+                "mesh": "d7a4a76b-2e35-4788-a599-23dadc39bee2"
+            },
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": "Chair"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    1.8985910415649414,
+                    7.262508006533608e-06,
+                    0.6741580367088318
+                ],
+                "rotation": [
+                    0.0,
+                    -37.24034118652344,
+                    0.0
+                ],
+                "scale": [
+                    0.9999876022338867,
+                    1.0,
+                    0.9999861717224121
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 13
         }
     ]
 }

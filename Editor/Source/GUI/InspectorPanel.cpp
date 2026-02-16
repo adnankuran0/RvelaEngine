@@ -87,7 +87,16 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
         {
         if (registry.any_of<MeshComponent>(selectedEntity))
         {
-            if (ImGui::CollapsingHeader("Mesh"))
+            bool open = ImGui::CollapsingHeader("Mesh");
+
+            if (ImGui::BeginPopupContextItem("MeshComponentContext")) {
+                if (ImGui::MenuItem("Remove Component")) {
+                    registry.remove<MeshComponent>(selectedEntity);
+                }
+                ImGui::EndPopup();
+            }
+
+            if (open)
             {
                 ImGui::Indent();
                 MeshComponent& mesh = registry.get<MeshComponent>(selectedEntity);
@@ -121,7 +130,16 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 
         if (registry.any_of<CameraComponent>(selectedEntity))
         {
-            if (ImGui::CollapsingHeader("Camera"))
+            bool open = ImGui::CollapsingHeader("Camera");
+
+            if (ImGui::BeginPopupContextItem("CameraComponentContext")) {
+                if (ImGui::MenuItem("Remove Component")) {
+                    registry.remove<CameraComponent>(selectedEntity);
+                }
+                ImGui::EndPopup();
+            }
+
+            if (open)
             {
                 auto& cameraComponent = registry.get<CameraComponent>(selectedEntity);
 
@@ -133,7 +151,15 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 
         if (registry.any_of<MeshRendererComponent>(selectedEntity))
         {
-            if (ImGui::CollapsingHeader("Mesh Renderer"))
+            bool open = ImGui::CollapsingHeader("Mesh Renderer");
+
+            if (ImGui::BeginPopupContextItem("MeshRendererComponentContext")) {
+                if (ImGui::MenuItem("Remove Component")) {
+                    registry.remove<MeshRendererComponent>(selectedEntity);
+                }
+                ImGui::EndPopup();
+            }
+            if (open)
             {
                 ImGui::Indent();
                 MeshRendererComponent& meshRenderer = registry.get<MeshRendererComponent>(selectedEntity);
@@ -155,7 +181,16 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 
         if (registry.any_of<PointLightComponent>(selectedEntity))
         {
-            if (ImGui::CollapsingHeader("PointLight"))
+            bool open = ImGui::CollapsingHeader("Point Light");
+
+            if (ImGui::BeginPopupContextItem("PointLightComponentContext")) {
+                if (ImGui::MenuItem("Remove Component")) {
+                    registry.remove<PointLightComponent>(selectedEntity);
+                }
+                ImGui::EndPopup();
+            }
+
+            if (open)
             {
                 auto& pointLightComponent = registry.get<PointLightComponent>(selectedEntity);
                 glm::vec3 lightColor = pointLightComponent.color;
@@ -180,7 +215,16 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 
         if (registry.any_of<DirectionalLightComponent>(selectedEntity))
         {
-            if (ImGui::CollapsingHeader("DirectionalLight"))
+            bool open = ImGui::CollapsingHeader("Directional Light");
+
+            if (ImGui::BeginPopupContextItem("DirectionalLightComponentContext")) {
+                if (ImGui::MenuItem("Remove Component")) {
+                    registry.remove<DirectionalLightComponent>(selectedEntity);
+                }
+                ImGui::EndPopup();
+            }
+
+            if (open)
             {
                 auto& directionalLightComponent = registry.get<DirectionalLightComponent>(selectedEntity);
                 glm::vec3 lightColor = directionalLightComponent.color;
@@ -200,7 +244,16 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
         }
 
         if (registry.any_of<MaterialComponent>(selectedEntity)) {
-            if (ImGui::CollapsingHeader("Material"))
+            bool open = ImGui::CollapsingHeader("Material");
+
+            if (ImGui::BeginPopupContextItem("MaterialComponentContext")) {
+                if (ImGui::MenuItem("Remove Component")) {
+                    registry.remove<MaterialComponent>(selectedEntity);
+                }
+                ImGui::EndPopup();
+            }
+
+            if (open)
             {
                 ImGui::Indent();
                 MaterialComponent& material = registry.get<MaterialComponent>(selectedEntity);
@@ -494,7 +547,16 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 
         if (registry.any_of<ScriptComponent>(selectedEntity))
         {
-            if (ImGui::CollapsingHeader("Script"))
+            bool open = ImGui::CollapsingHeader("Script");
+
+            if (ImGui::BeginPopupContextItem("ScriptComponentContext")) {
+                if (ImGui::MenuItem("Remove Component")) {
+                    registry.remove<ScriptComponent>(selectedEntity);
+                }
+                ImGui::EndPopup();
+            }
+
+            if (open)
             {
                 auto& scriptComp = registry.get<ScriptComponent>(selectedEntity);
 
