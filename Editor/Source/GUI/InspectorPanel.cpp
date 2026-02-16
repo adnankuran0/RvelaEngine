@@ -27,12 +27,12 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             if (ImGui::CollapsingHeader("Name Tag", ImGuiTreeNodeFlags_DefaultOpen)) {
                 auto& tag = registry.get<TagComponent>(selectedEntity);
 
-                static char buffer[256]; // Geçici bir buffer
-                std::strncpy(buffer, tag.tag.c_str(), sizeof(buffer)); // Başlangıçta std::string içeriğini kopyala
+                static char buffer[256]; 
+                std::strncpy(buffer, tag.tag.c_str(), sizeof(buffer)); 
 
                 if (ImGui::InputText("##hidden", buffer, sizeof(buffer))) {
                     if (buffer != "")
-                        tag.tag = buffer; // Kullanıcı değişiklik yaptığında string'i güncelle
+                        tag.tag = buffer; 
                 }
             }
         }
@@ -364,11 +364,17 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                         {
                             const char* path = (const char*)payload->Data;
                             std::string pathStr(path);
-                            if (pathStr.ends_with(".png") || pathStr.ends_with(".jpeg") || pathStr.ends_with(".jpg") || pathStr.ends_with(".tga"))
+                            if (pathStr.ends_with(".rtex"))
                             {
-                                // .rmaterial dosyası bırakıldı, işle
-                                // Örneğin: materialComponent->LoadFromFile(pathStr);
-                                //materialComponent.material->metallicMapPath = ABS_PATH(pathStr);
+                                std::ifstream inFile(pathStr, std::ios::binary);
+                                if (!inFile.is_open()) {
+                                    LOG_ERROR("file not opened");
+                                    return;
+                                }
+                                AssetHeader header = AssetLoader::ReadHeader(inFile, MAGIC_TEXTURE);
+                                std::unique_ptr<TextureMeta> meta = AssetLoader::ReadMeta<TextureMeta>(inFile, header);
+                                material.SetMetallicTexture(meta->uuid);
+                                material.SetUseMetallicMap(true);
                             }
                         }
                         ImGui::EndDragDropTarget();
@@ -378,7 +384,7 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                     ImGui::SameLine();
                     if (ImGui::Button("X##mtl", ImVec2(20, 20)))
                     {
-                        //materialComponent.material->metallicMapPath = ABS_PATH("");
+                        material.SetUseMetallicMap(!material.IsUsingMetallicMap());
                     }
 
                     float metallic = material.GetMetallic();
@@ -400,12 +406,17 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                         {
                             const char* path = (const char*)payload->Data;
                             std::string pathStr(path);
-                            if (pathStr.ends_with(".png") || pathStr.ends_with(".jpeg") || pathStr.ends_with(".jpg") || pathStr.ends_with(".tga"))
+                            if (pathStr.ends_with(".rtex"))
                             {
-                                // .rmaterial dosyası bırakıldı, işle
-                                // Örneğin: materialComponent->LoadFromFile(pathStr);
-                                //
-                                //materialComponent.material->aoMapPath = ABS_PATH(pathStr);
+                                std::ifstream inFile(pathStr, std::ios::binary);
+                                if (!inFile.is_open()) {
+                                    LOG_ERROR("file not opened");
+                                    return;
+                                }
+                                AssetHeader header = AssetLoader::ReadHeader(inFile, MAGIC_TEXTURE);
+                                std::unique_ptr<TextureMeta> meta = AssetLoader::ReadMeta<TextureMeta>(inFile, header);
+                                material.SetAOTexture(meta->uuid);
+                                material.SetUseAOMap(true);
                             }
                         }
                         ImGui::EndDragDropTarget();
@@ -413,7 +424,7 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                     ImGui::SameLine();
                     if (ImGui::Button("X##ao", ImVec2(20, 20)))
                     {
-                        //materialComponent.material->aoMapPath = ABS_PATH("");
+                        material.SetUseAOMap(!material.IsUsingAOMap());
                     }
                     float ao = material.GetAO();
                     if (ImGui::SliderFloat("AO##36", &ao, 0.0f, 1.0f))
