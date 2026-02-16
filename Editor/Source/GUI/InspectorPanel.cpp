@@ -531,6 +531,51 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                 }
             }
 
+            if (!registry.any_of<MaterialComponent>(selectedEntity))
+            {
+                if (ImGui::MenuItem("Material"))
+                {
+                    AssetUUID defaultMaterialId = AssetUUID::FromString("ee3dde12-6263-4f11-bb1d-812b3e196ab7");
+                    MaterialComponent& comp = registry.emplace<MaterialComponent>(selectedEntity, defaultMaterialId);
+                    ImGui::CloseCurrentPopup();
+                }
+            }
+
+            if (!registry.any_of<MeshComponent>(selectedEntity))
+            {
+                if (ImGui::MenuItem("Mesh"))
+                {
+                    MeshComponent& comp = registry.emplace<MeshComponent>(selectedEntity);
+                    ImGui::CloseCurrentPopup();
+                }
+            }
+
+            if (!registry.any_of<MeshRendererComponent>(selectedEntity))
+            {
+                if (ImGui::MenuItem("Mesh renderer"))
+                {
+                    MeshRendererComponent& comp = registry.emplace<MeshRendererComponent>(selectedEntity);
+                    ImGui::CloseCurrentPopup();
+                }
+            }
+
+            if (!registry.any_of<PointLightComponent>(selectedEntity))
+            {
+                if (ImGui::MenuItem("Point light"))
+                {
+                    PointLightComponent& comp = registry.emplace<PointLightComponent>(selectedEntity);
+                    ImGui::CloseCurrentPopup();
+                }
+            }
+
+            if (!registry.any_of<DirectionalLightComponent>(selectedEntity))
+            {
+                if (ImGui::MenuItem("Directional light"))
+                {
+                    DirectionalLightComponent& comp = registry.emplace<DirectionalLightComponent>(selectedEntity);
+                    ImGui::CloseCurrentPopup();
+                }
+            }
 
             ImGui::EndPopup();
         }

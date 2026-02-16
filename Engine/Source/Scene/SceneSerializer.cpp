@@ -98,7 +98,6 @@ void SceneSerializer::LoadScene(Scene& scene, const std::string& path)
 
         }
 
-
         if (entityJson.contains("ParentUUID"))
         {
             auto& tree = scene.GetComponent<SceneTreeComponent>(handle);
