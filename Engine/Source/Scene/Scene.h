@@ -6,6 +6,7 @@
 #include "Utils/ISerializable.h"
 #include "Rendering/Renderer.h"
 #include "CameraSystem.h"
+#include "Script/ScriptSystem.h"
 
 namespace rv {
 
@@ -112,6 +113,7 @@ public:
     [[nodiscard]] unsigned int GetComponentCount(entt::entity entity) noexcept;
 
     inline CameraSystem& GetCameraSystem() noexcept { return m_CameraSystem; }
+    inline ScriptSystem& GetScriptSystem() noexcept { return m_ScriptSystem; }
 
 private:
     unsigned int CountEntitiesRecursively(entt::entity& rootEntity);
@@ -123,6 +125,7 @@ private:
     entt::entity selectedEntity;
     entt::entity m_RootEntity;
     CameraSystem m_CameraSystem;
+    ScriptSystem m_ScriptSystem;
 };
 
 }

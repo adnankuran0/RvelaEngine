@@ -10,7 +10,7 @@ namespace rv {
 class EditorCamera : public ICamera
 {
 public:
-    EditorCamera(glm::vec3 position = { 0.0f, 4.0f, 10.0f },
+    EditorCamera(glm::vec3 position = { 0.0f, 2.0f, 5.0f },
         glm::vec3 up = { 0.0f, 1.0f, 0.0f },
         int width = 1920, int height = 1080);
 

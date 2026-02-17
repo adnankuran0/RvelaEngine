@@ -11,7 +11,7 @@
 
 namespace rv {
 
-Scene::Scene(const std::string& sceneName) : m_Registry() 
+Scene::Scene(const std::string& sceneName) : m_Registry() , m_ScriptSystem(*this)
 {
     m_SceneName = sceneName;
     m_RootEntity = m_Registry.create();
@@ -35,58 +35,17 @@ void Scene::SetState(SceneState newState)
 
 void Scene::OnStart()
 {
-    auto view = m_Registry.view<ScriptComponent>();
-    for (auto entity : view)
-    {
-        auto& sc = view.get<ScriptComponent>(entity);
-
-        if (sc.OnCreate.valid())
-        {
-            sol::protected_function_result result = sc.OnCreate(sc.luaInstance);
-            if (!result.valid())
-            {
-                sol::error err = result;
-                LOG_ERROR("Lua OnCreate error: {}", err.what());
-            }
-        }
-    }
+    m_ScriptSystem.OnStart(m_Registry);
 }
 
 void Scene::OnUpdate(float dt)
 {
-    auto view = m_Registry.view<ScriptComponent>();
-
-    for (auto entity : view)
-    {
-        auto& sc = view.get<ScriptComponent>(entity);
-
-        if (sc.luaInstance.valid())
-        {
-            sol::function onUpdate = sc.luaInstance["OnUpdate"];
-            if (onUpdate.valid())
-                onUpdate(sc.luaInstance, dt);
-        }
-    }
-
+    m_ScriptSystem.OnUpdate(m_Registry, dt);
 }
 
 void Scene::OnStop()
 {
-    auto view = m_Registry.view<ScriptComponent>();
-    for (auto entity : view)
-    {
-        auto& sc = view.get<ScriptComponent>(entity);
-
-        if (sc.OnDestroy.valid())
-        {
-            sol::protected_function_result result = sc.OnDestroy(sc.luaInstance);
-            if (!result.valid())
-            {
-                sol::error err = result;
-                LOG_ERROR("Lua OnDestroy error: {}", err.what());
-            }
-        }
-    }
+    m_ScriptSystem.OnStop(m_Registry);
 }
 
 Entity Scene::CreateEntityRaw()
@@ -132,7 +91,6 @@ void Scene::DestroyEntity(entt::entity entity) {
     for (auto child : childrenCopy) 
         DestroyEntity(child);
 
-    if (HasComponent<MeshRendererComponent>(entity)) GetComponent<MeshRendererComponent>(entity).Destroy();
     m_EntityMap.erase(GetComponent<UUIDComponent>(entity).uuid);
     m_Registry.destroy(entity);
 }

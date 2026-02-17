@@ -3,7 +3,6 @@
 #include "Rendering/Renderer.h"
 #include "Scene/SceneManager.h"
 #include "Assets/AssetRegistry.h"
-#include "Script/ScriptEngine.h"
 #include "Utils/ProjectManager.h"
 #include "LayerStack.h"
 
@@ -42,8 +41,6 @@ public:
 
 	inline void SetEditorCamera(EditorCamera* editorCam) { m_EditorCamera = editorCam; }
 
-	inline ScriptEngine& GetScriptEngine() { return m_ScriptEngine; }
-
 	[[nodiscard]] inline void SetFinalTexture(GLuint textureID) { finalTexture = textureID; } //TODO: what the fuck are these doing here?
 	[[nodiscard]] inline GLuint GetFinalTexture() { return finalTexture; }
 
@@ -61,7 +58,6 @@ private:
 	ProjectManager m_ProjectManager;
 	SceneManager m_SceneManager;
 	AssetRegistry m_AssetRegistry;
-	ScriptEngine m_ScriptEngine;
 
 };
 

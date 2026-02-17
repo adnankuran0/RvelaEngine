@@ -1,11 +1,11 @@
 #include "rvelapch.h"
-#include "ScriptEngine.h"
+#include "ScriptSystem.h"
 #include "Scene/Components/ScriptComponent.h"
 #include "Scene/Entity.h"
 
 namespace rv {
 
-ScriptEngine::ScriptEngine()
+ScriptSystem::ScriptSystem(Scene& scene) : m_Scene(scene)
 {
     m_State.open_libraries(sol::lib::base, sol::lib::math, sol::lib::table, sol::lib::string, sol::lib::os);
 
@@ -36,8 +36,63 @@ ScriptEngine::ScriptEngine()
     );
 }
 
+void ScriptSystem::OnStart(entt::registry& registry)
+{
+    auto view = registry.view<ScriptComponent>();
+    for (auto entity : view)
+    {
+        auto& sc = view.get<ScriptComponent>(entity);
 
-void ScriptEngine::BindLuaScript(ScriptComponent& sc, entt::entity& e,Scene& scene)
+        if (sc.OnCreate.valid())
+        {
+            sol::protected_function_result result = sc.OnCreate(sc.luaInstance);
+            if (!result.valid())
+            {
+                sol::error err = result;
+                LOG_ERROR("Lua OnCreate error: {}", err.what());
+            }
+        }
+    }
+}
+
+void ScriptSystem::OnUpdate(entt::registry& registry, float dt)
+{
+    auto view = registry.view<ScriptComponent>();
+
+    for (auto entity : view)
+    {
+        auto& sc = view.get<ScriptComponent>(entity);
+
+        if (sc.luaInstance.valid())
+        {
+            sol::function onUpdate = sc.luaInstance["OnUpdate"];
+            if (onUpdate.valid())
+                onUpdate(sc.luaInstance, dt);
+        }
+    }
+
+}
+
+void ScriptSystem::OnStop(entt::registry& registry)
+{
+    auto view = registry.view<ScriptComponent>();
+    for (auto entity : view)
+    {
+        auto& sc = view.get<ScriptComponent>(entity);
+
+        if (sc.OnDestroy.valid())
+        {
+            sol::protected_function_result result = sc.OnDestroy(sc.luaInstance);
+            if (!result.valid())
+            {
+                sol::error err = result;
+                LOG_ERROR("Lua OnDestroy error: {}", err.what());
+            }
+        }
+    }
+}
+
+void ScriptSystem::BindLuaScript(ScriptComponent& sc, entt::entity& e)
 {
     sc.luaState = &m_State;
 
@@ -50,7 +105,7 @@ void ScriptEngine::BindLuaScript(ScriptComponent& sc, entt::entity& e,Scene& sce
 
     sc.luaInstance = result;
 
-    sc.luaInstance["entity"] = Entity(e, &scene);
+    sc.luaInstance["entity"] = Entity(e, &m_Scene);
 
     sc.OnCreate = sc.luaInstance["OnCreate"];
     sc.OnUpdate = sc.luaInstance["OnUpdate"];
