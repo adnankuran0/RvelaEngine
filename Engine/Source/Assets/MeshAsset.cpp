@@ -59,7 +59,6 @@ MeshAsset::MeshAsset(const std::string& path, std::unique_ptr<MeshMeta> meshMeta
 
 MeshAsset::~MeshAsset()
 {
-    LOG_INFO("Mesh asset destroyed.");
 }
 
 bool MeshAsset::IsLoaded() const
@@ -115,8 +114,6 @@ bool MeshAsset::Load()
 
     m_Loaded = true;
     return true;
-
-    LOG_INFO("Mesh asset loaded.");
 }
 
 int MeshAsset::GetTriangleCount() const

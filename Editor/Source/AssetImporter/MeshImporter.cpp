@@ -63,6 +63,11 @@ std::vector<Vertex> MeshImporter::ProcessVertices(aiMesh* mesh)
 
 std::vector<unsigned int> MeshImporter::ProcessIndices(aiMesh* mesh)
 {
+    if (!(mesh->mPrimitiveTypes & aiPrimitiveType_TRIANGLE))
+    {
+        std::cout << "Mesh is not triangle type." << std::endl;
+    }
+
     std::vector<unsigned int> indices;
     indices.reserve(mesh->mNumFaces * 3);
 
@@ -101,7 +106,7 @@ bool MeshImporter::Import(const aiScene* scene, const std::filesystem::path& pat
         std::vector<Vertex> vertices = ProcessVertices(mesh);
         std::vector<unsigned int> indices = ProcessIndices(mesh);
         MeshMeta meta = CreateMeshMeta(path, mesh);
-
+        LOG_INFO("Mesh loaded with UUID: {}", meta.uuid.ToString());
         meshMap[meshIndex] = meta.uuid;
 
         std::vector<char> metaBuffer;

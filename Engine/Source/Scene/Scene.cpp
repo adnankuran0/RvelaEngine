@@ -155,14 +155,14 @@ Entity Scene::LoadPrimitive(const std::string& primitiveMeshName)
 {
     static const std::unordered_map<std::string, PrimitiveConfig> map = 
     {
-        {"Cube", {"Cube", AssetUUID::FromString("4e05374f-8157-4c0e-bb3a-1c72c9039e05")}},
-        {"Sphere", {"Sphere", AssetUUID::FromString("c6796853-cbdc-4b28-ae32-4c1354b46320")}},
-        {"Cylinder", {"Cylinder", AssetUUID::FromString("19026e98-b5fc-4dfc-b769-62685e56d39e")}},
-        {"Cone", {"Cone", AssetUUID::FromString("0efc8bdb-fdcc-40f3-ab83-a482f6412ec5")}},
-        {"Capsule", {"Capsule", AssetUUID::FromString("a0b4d440-3b37-4a4e-959b-86757f27aaff")}},
-        {"Plane", {"Plane", AssetUUID::FromString("3155a9bc-ef89-40b3-9126-3de1a9b7d811")}},
-        {"Monkey", {"Monkey", AssetUUID::FromString("9415233b-dbe0-451d-ad84-15d3b16d7525")}},
-        {"Torus", {"Torus", AssetUUID::FromString("fb8f40fc-8511-4a0b-aeb8-47d20466f01a")}}
+        {"Cube", {"Cube", AssetUUID::FromString("36468d32-bba5-4eb4-82db-0d4da5cd6c65")}},
+        {"Sphere", {"Sphere", AssetUUID::FromString("7f8ebf7d-a783-4a96-93e5-effcc76f557d")}},
+        {"Cylinder", {"Cylinder", AssetUUID::FromString("dcb9be97-2538-4f80-8838-881c19d33ac4")}},
+        {"Cone", {"Cone", AssetUUID::FromString("f91f0572-6cf8-4b72-adc0-18a17b7c05d8")}},
+        {"Capsule", {"Capsule", AssetUUID::FromString("395a97e7-2cbe-4d65-95af-dea85f856252")}},
+        {"Plane", {"Plane", AssetUUID::FromString("80da4157-714d-42a6-aedb-54eee61081f1")}},
+        {"Monkey", {"Monkey", AssetUUID::FromString("e2e22656-e04b-4fb6-b7dd-70758a6c4762")}},
+        {"Torus", {"Torus", AssetUUID::FromString("fe4c1c3d-4a95-4d2c-9883-bbf9c3e83530")}}
     };
     auto it = map.find(primitiveMeshName);
     if (it == map.end()) return Entity{};

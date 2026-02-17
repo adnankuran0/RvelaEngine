@@ -45,7 +45,7 @@ public:
     float MovementSpeed{ 5.0f };
     float SprintSpeed{ 10.0f };
     float MouseSensitivity{ 0.075f };
-    float Zoom{ 70.0f };
+    float Zoom{ 90.0f };
 
     float lastX{ 0.0f };
     float lastY{ 0.0f };
