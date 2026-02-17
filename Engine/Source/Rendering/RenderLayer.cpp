@@ -4,6 +4,49 @@
 
 namespace rv {
 
+
+static std::vector<PointLightData> CollectPointLights(Scene& scene) noexcept {
+	std::vector<PointLightData> lights;
+	auto view = scene.GetRegistry().view<PointLightComponent, TransformComponent>();
+	for (auto e : view) {
+		auto& light = scene.GetComponent<PointLightComponent>(e);
+		auto& t = scene.GetComponent<TransformComponent>(e);
+		PointLightData data;
+		data.position = t.GetWorldPosition();
+		data.color = light.color;
+		data.intensity = light.intensity;
+		data.radius = light.radius;
+		data.falloff = light.falloff;
+		data.castShadows = light.castShadows;
+		data.shadowIndex = light.shadowIndex;
+		data.shadowBias = light.shadowBias;
+		data.reverseCullFace = light.reverseCullFace;
+		data.blurRadius = light.blurRadius;
+		lights.push_back(data);
+	}
+	return lights;
+}
+
+static std::optional<DirectionalLightData> CollectDirectionalLight(Scene& scene) noexcept {
+	auto view = scene.GetRegistry().view<DirectionalLightComponent, TransformComponent>();
+	for (auto e : view) {
+		auto& light = scene.GetComponent<DirectionalLightComponent>(e);
+		auto& t = scene.GetComponent<TransformComponent>(e);
+		DirectionalLightData data;
+		data.direction = t.GetForward();
+		data.color = light.color;
+		data.intensity = light.intensity;
+		data.shadowBias = light.shadowBias;
+		data.castShadows = light.castShadows;
+		data.reverseCullFace = light.reverseCullFace;
+		data.blurRadius = light.blurRadius;
+
+		return data;
+	}
+	return std::nullopt;
+}
+
+
 void RenderLayer::OnRender()
 {
 	
@@ -15,8 +58,8 @@ void RenderLayer::OnRender()
 	RenderContext context;
 	
 	context.camera = camera;
-	context.pointLights = scene.CollectPointLights();
-	context.directionalLight = scene.CollectDirectionalLight();
+	context.pointLights = CollectPointLights(scene);
+	context.directionalLight = CollectDirectionalLight(scene);
 	context.viewportWidth = 1920;
 	context.viewportHeight = 1080;
 	context.scene = &scene;

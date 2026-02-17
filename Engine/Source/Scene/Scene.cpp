@@ -137,46 +137,7 @@ void Scene::DestroyEntity(entt::entity entity) {
     m_Registry.destroy(entity);
 }
 
-Entity Scene::CreatePointLight() {
-    Entity entity = CreateEntity("PointLight");
-    AddComponent<PointLightComponent>(entity);
-    return entity;
-}
 
-Entity Scene::CreateDirectionalLight() {
-    Entity entity = CreateEntity("DirectionalLight");
-    GetComponent<TransformComponent>(entity).SetEulerRotation(glm::vec3(-60.0f, -90.0f, 0.0f));
-    AddComponent<DirectionalLightComponent>(entity);
-    return entity;
-}
-
-struct PrimitiveConfig { std::string name; AssetUUID uuid; };
-Entity Scene::LoadPrimitive(const std::string& primitiveMeshName) 
-{
-    static const std::unordered_map<std::string, PrimitiveConfig> map = 
-    {
-        {"Cube", {"Cube", AssetUUID::FromString("36468d32-bba5-4eb4-82db-0d4da5cd6c65")}},
-        {"Sphere", {"Sphere", AssetUUID::FromString("7f8ebf7d-a783-4a96-93e5-effcc76f557d")}},
-        {"Cylinder", {"Cylinder", AssetUUID::FromString("dcb9be97-2538-4f80-8838-881c19d33ac4")}},
-        {"Cone", {"Cone", AssetUUID::FromString("f91f0572-6cf8-4b72-adc0-18a17b7c05d8")}},
-        {"Capsule", {"Capsule", AssetUUID::FromString("395a97e7-2cbe-4d65-95af-dea85f856252")}},
-        {"Plane", {"Plane", AssetUUID::FromString("80da4157-714d-42a6-aedb-54eee61081f1")}},
-        {"Monkey", {"Monkey", AssetUUID::FromString("e2e22656-e04b-4fb6-b7dd-70758a6c4762")}},
-        {"Torus", {"Torus", AssetUUID::FromString("fe4c1c3d-4a95-4d2c-9883-bbf9c3e83530")}}
-    };
-    auto it = map.find(primitiveMeshName);
-    if (it == map.end()) return Entity{};
-    const auto& cfg = it->second;
-    Entity root = CreateEntity(cfg.name);
-    Ref<MeshAsset> m = AssetRegistry::GetAsset<MeshAsset>(cfg.uuid);
-    root.AddComponent<MeshRendererComponent>(m);
-    root.AddComponent<MeshComponent>(m->GetUUID());
-    root.GetComponent<TagComponent>().tag = cfg.name;
-    AssetUUID defaultMaterialId = AssetUUID::FromString("ee3dde12-6263-4f11-bb1d-812b3e196ab7");
-    root.AddComponent<MaterialComponent>(defaultMaterialId);
-    SetParent(root.GetHandle(), GetRootEntity());
-    return root;
-}
 
 void Scene::Update() 
 {                
@@ -326,46 +287,7 @@ void Scene::RemoveParent(entt::entity child)
     SetParent(child, m_RootEntity);
 }
 
-std::vector<PointLightData> Scene::CollectPointLights() noexcept {
-    std::vector<PointLightData> lights;
-    auto view = GetRegistry().view<PointLightComponent, TransformComponent>();
-    for (auto e : view) {
-        auto& light = GetComponent<PointLightComponent>(e);
-        auto& t = GetComponent<TransformComponent>(e);
-        PointLightData data;
-        data.position = t.GetWorldPosition();
-        data.color = light.color;
-        data.intensity = light.intensity;
-        data.radius = light.radius;
-        data.falloff = light.falloff;
-        data.castShadows = light.castShadows;
-        data.shadowIndex = light.shadowIndex;
-        data.shadowBias = light.shadowBias;
-        data.reverseCullFace = light.reverseCullFace;
-        data.blurRadius = light.blurRadius;
-        lights.push_back(data);
-    }
-    return lights;
-}
 
-std::optional<DirectionalLightData> Scene::CollectDirectionalLight() noexcept {
-    auto view = GetRegistry().view<DirectionalLightComponent, TransformComponent>();
-    for (auto e : view) {
-        auto& light = GetComponent<DirectionalLightComponent>(e);
-        auto& t = GetComponent<TransformComponent>(e);
-        DirectionalLightData data;
-        data.direction = t.GetForward();
-        data.color = light.color;
-        data.intensity = light.intensity;
-        data.shadowBias = light.shadowBias;
-        data.castShadows = light.castShadows;
-        data.reverseCullFace = light.reverseCullFace;
-        data.blurRadius = light.blurRadius;
-
-        return data;
-    }
-    return std::nullopt;
-}
 
 
 Entity Scene::Instantiate(const AssetUUID& prefabUUID)

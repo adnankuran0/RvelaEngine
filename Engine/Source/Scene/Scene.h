@@ -26,8 +26,6 @@ public:
     void SetState(SceneState newState);
     SceneState GetState() const { return m_State; };
 
-    
-
     void OnStart();
     void OnUpdate(float dt);
     void OnStop();;
@@ -38,11 +36,6 @@ public:
     Entity CreateEntityRaw();
     Entity CreateEntityWithUUID(const std::string& name, EntityUUID uuid);
     void DestroyEntity(entt::entity entity);
-
-    Entity CreatePointLight();
-    Entity CreateDirectionalLight();
-
-    Entity LoadPrimitive(const std::string& primitiveMeshName);
 
     template<typename Component, typename... Args>
     Component& AddComponent(entt::entity entity, Args&&... args) {
@@ -100,8 +93,7 @@ public:
 
     entt::entity& GetEntityByUUID(EntityUUID& uuid) { return m_EntityMap.at(uuid); }
 
-    std::vector<PointLightData> CollectPointLights() noexcept;
-    std::optional<DirectionalLightData>  CollectDirectionalLight() noexcept;
+    
 
     void SetSelectedEntity(entt::entity selectedEntity) { this->selectedEntity = selectedEntity; }
     entt::entity GetSelectedEntity() { return selectedEntity; }

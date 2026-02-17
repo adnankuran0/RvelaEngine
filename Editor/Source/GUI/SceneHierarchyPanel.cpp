@@ -7,6 +7,34 @@
 
 namespace rv {
 
+struct PrimitiveConfig { std::string name; AssetUUID uuid; };
+static Entity LoadPrimitive(Scene& scene, const std::string& primitiveMeshName)
+{
+    static const std::unordered_map<std::string, PrimitiveConfig> map =
+    {
+        {"Cube", {"Cube", AssetUUID::FromString("36468d32-bba5-4eb4-82db-0d4da5cd6c65")}},
+        {"Sphere", {"Sphere", AssetUUID::FromString("7f8ebf7d-a783-4a96-93e5-effcc76f557d")}},
+        {"Cylinder", {"Cylinder", AssetUUID::FromString("dcb9be97-2538-4f80-8838-881c19d33ac4")}},
+        {"Cone", {"Cone", AssetUUID::FromString("f91f0572-6cf8-4b72-adc0-18a17b7c05d8")}},
+        {"Capsule", {"Capsule", AssetUUID::FromString("395a97e7-2cbe-4d65-95af-dea85f856252")}},
+        {"Plane", {"Plane", AssetUUID::FromString("80da4157-714d-42a6-aedb-54eee61081f1")}},
+        {"Monkey", {"Monkey", AssetUUID::FromString("e2e22656-e04b-4fb6-b7dd-70758a6c4762")}},
+        {"Torus", {"Torus", AssetUUID::FromString("fe4c1c3d-4a95-4d2c-9883-bbf9c3e83530")}}
+    };
+    auto it = map.find(primitiveMeshName);
+    if (it == map.end()) return Entity{};
+    const auto& cfg = it->second;
+    Entity root = scene.CreateEntity(cfg.name);
+    Ref<MeshAsset> m = AssetRegistry::GetAsset<MeshAsset>(cfg.uuid);
+    root.AddComponent<MeshRendererComponent>(m);
+    root.AddComponent<MeshComponent>(m->GetUUID());
+    root.GetComponent<TagComponent>().tag = cfg.name;
+    AssetUUID defaultMaterialId = AssetUUID::FromString("ee3dde12-6263-4f11-bb1d-812b3e196ab7");
+    root.AddComponent<MaterialComponent>(defaultMaterialId);
+    scene.SetParent(root.GetHandle(), scene.GetRootEntity());
+    return root;
+}
+
 void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 {
     Scene& scene = engine->GetActiveScene();
@@ -126,21 +154,21 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 
         if (ImGui::BeginMenu("Primitives")) {
             if (ImGui::MenuItem("Cube"))
-                selectedEntity = scene.LoadPrimitive("Cube");
+                selectedEntity = LoadPrimitive(scene, "Cube");
             if (ImGui::MenuItem("Sphere"))
-                selectedEntity = scene.LoadPrimitive("Sphere");
+                selectedEntity = LoadPrimitive(scene, "Sphere");
             if (ImGui::MenuItem("Cylinder"))
-                selectedEntity = scene.LoadPrimitive("Cylinder");
+                selectedEntity = LoadPrimitive(scene, "Cylinder");
             if (ImGui::MenuItem("Cone"))
-                selectedEntity = scene.LoadPrimitive("Cone");
+                selectedEntity = LoadPrimitive(scene, "Cone");
             if (ImGui::MenuItem("Capsule"))
-                selectedEntity = scene.LoadPrimitive("Capsule");
+                selectedEntity = LoadPrimitive(scene, "Capsule");
             if (ImGui::MenuItem("Torus"))
-                selectedEntity = scene.LoadPrimitive("Torus");
+                selectedEntity = LoadPrimitive(scene, "Torus");
             if (ImGui::MenuItem("Plane"))
-                selectedEntity = scene.LoadPrimitive("Plane");
+                selectedEntity = LoadPrimitive(scene, "Plane");
             if (ImGui::MenuItem("Monkey"))
-                selectedEntity = scene.LoadPrimitive("Monkey");
+                selectedEntity = LoadPrimitive(scene, "Monkey");
 
             ImGui::EndMenu();
         }
@@ -148,11 +176,14 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
         if (ImGui::BeginMenu("Lights")) {
             if (ImGui::MenuItem("Directional Light"))
             {
-                selectedEntity = scene.CreateDirectionalLight();
+                selectedEntity = scene.CreateEntity("DirectionalLight");
+                scene.GetComponent<TransformComponent>(selectedEntity).SetEulerRotation(glm::vec3(-60.0f, -90.0f, 0.0f));
+                scene.AddComponent<DirectionalLightComponent>(selectedEntity);
             }
             if (ImGui::MenuItem("Point Light"))
             {
-                selectedEntity = scene.CreatePointLight();
+                selectedEntity = scene.CreateEntity("PointLight");
+                scene.AddComponent<PointLightComponent>(selectedEntity);
             }
             if (ImGui::MenuItem("Spot Light"))
             {

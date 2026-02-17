@@ -12,3 +12,4 @@ Makefile
 
 # Exclude
 !Vendor/Binaries
+*.txt
