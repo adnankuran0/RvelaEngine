@@ -16,7 +16,9 @@ RenderPipeline::RenderPipeline(Engine* engine)
 		&bloomPass,
 		&ssaoPass,
 		&ssrPass,
-		&compositePass
+		&compositePass,
+		&entityBufferPass
+
 	};
 
 	this->engine = engine;
@@ -47,6 +49,7 @@ void RenderPipeline::SubmitRenderCommand(const RenderCommand& cmd)
 	shadowPass.AddRenderCommand(cmd);
 	geometryPass.AddRenderCommand(cmd);
 	lightingPass.AddRenderCommand(cmd);
+	entityBufferPass.AddRenderCommand(cmd);
 }
 
 void RenderPipeline::Execute()
@@ -56,9 +59,9 @@ void RenderPipeline::Execute()
 	geometryPass.Execute();
 	shadowPass.Execute();
 
+	entityBufferPass.Execute();
 
 	skyboxPass.SetScreenFBO(lightingPass.GetScreenFBO());
-	
 	skyboxPass.Execute();
 	
 	lightingPass.SetDirectionalShadowMap(shadowPass.GetDirectionalShadowMap());

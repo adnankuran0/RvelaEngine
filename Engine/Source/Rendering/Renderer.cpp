@@ -7,22 +7,6 @@
 
 namespace rv {
 
-GLFWwindow * Renderer::activeWindow = nullptr;
-Shader Renderer::m_DirectionalShadowShader;
-Shader Renderer::m_PointShadowShader;
-Shader Renderer::m_GeometryShader;
-Shader Renderer::m_SkyboxShader;
-Shader Renderer::m_PBRShader;
-Shader Renderer::m_BrightShader;
-Shader Renderer::m_DownsampleShader;
-Shader Renderer::m_UpsampleShader;
-Shader Renderer::m_SSAOShader;
-Shader Renderer::m_SSRShader;
-Shader Renderer::m_CompositeShader;
-Shader Renderer::m_LuminanceShader;
-Shader Renderer::m_ProceduralSkyShader;
-Shader Renderer::m_OutlineShader;
-Shader Renderer::m_EquirectangularToCubemap;
 
 ScreenQuad Renderer::m_ScreenQuad;
 
@@ -53,6 +37,7 @@ void Renderer::Init(GLFWwindow* window)
     m_ProceduralSkyShader.Init(VRT_PATH("Assets\\Shaders\\proceduralSky.glsl"));
     m_OutlineShader.Init(VRT_PATH("Assets\\Shaders\\outline.glsl"));
     m_EquirectangularToCubemap.Init(VRT_PATH("Assets\\Shaders\\equirectangularToCubemap.glsl"));
+    m_EntityBuffer.Init(VRT_PATH("Assets\\Shaders\\entityBuffer.glsl"));
 
 
 

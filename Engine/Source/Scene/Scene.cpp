@@ -212,7 +212,7 @@ void Scene::SetParent(entt::entity child, entt::entity parent)
     else
     {
         glm::vec3 scale, euler, position;
-        DecomposeToEulerAngles(childWorldMatrix, scale, euler, position);
+        math::DecomposeToEulerAngles(childWorldMatrix, scale, euler, position);
 
         auto& childTransform = GetComponent<TransformComponent>(child);
         childTransform.SetPosition(position);

@@ -12,6 +12,7 @@
 #include "Rendering/RenderPasses/SSAOPass.h"
 #include "Rendering/RenderPasses/SSRPass.h"
 #include "Rendering/RenderPasses/OutlinePass.h"
+#include "Rendering/RenderPasses/EntityBufferPass.h"
 
 namespace rv {
 
@@ -54,6 +55,7 @@ private:
 	SSAOPass ssaoPass;
 	SSRPass ssrPass;
 	CompositePass compositePass;
+	EntityBufferPass entityBufferPass;
 
 };
 

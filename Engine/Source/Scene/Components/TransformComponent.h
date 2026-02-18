@@ -33,17 +33,17 @@ public:
     TransformComponent(glm::vec3 pos, glm::vec3 rot, glm::vec3 scl)
         : localPosition(pos), localEuler(rot), localScale(scl) 
     {
-        localRotation = EulerToQuat(localEuler);
+        localRotation = math::EulerToQuat(localEuler);
         dirty = true;
     }
 
     inline void SetPosition(const glm::vec3& pos) noexcept { localPosition = pos; dirty = true; }
     inline glm::vec3 GetPosition() const noexcept { return localPosition; }
 
-    inline void SetRotation(const glm::quat& quat) noexcept { localRotation = quat; localEuler = QuatToEuler(quat); dirty = true; }
+    inline void SetRotation(const glm::quat& quat) noexcept { localRotation = quat; localEuler = math::QuatToEuler(quat); dirty = true; }
     inline glm::quat GetRotation() const noexcept { return localRotation; }
 
-    inline void SetEulerRotation(const glm::vec3& euler) noexcept { localEuler = euler; localRotation = EulerToQuat(euler); dirty = true; }
+    inline void SetEulerRotation(const glm::vec3& euler) noexcept { localEuler = euler; localRotation = math::EulerToQuat(euler); dirty = true; }
     inline glm::vec3 GetEulerRotation() const noexcept { return localEuler; }
 
     inline const glm::vec3& GetWorldPosition() const noexcept { return worldPosition; }

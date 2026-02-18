@@ -8,7 +8,7 @@ void TransformComponent::LookAt(const glm::vec3& target, const glm::vec3& up) no
     glm::mat4 lookAt = glm::lookAt(localPosition, target, up);
     glm::mat3 rotMat = glm::mat3(lookAt);
     localRotation = glm::quat_cast(glm::transpose(rotMat));
-    localEuler = QuatToEuler(localRotation);
+    localEuler = math::QuatToEuler(localRotation);
     dirty = true;
 }
 

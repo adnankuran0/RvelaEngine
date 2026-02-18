@@ -242,9 +242,9 @@ void ModelImporter::AttachMeshToEntity(unsigned int meshIndex, aiNode* node, con
 void ModelImporter::SetTransformForEntity(aiNode* node, Scene& scene, entt::entity e)
 {
     auto& tc = scene.GetComponent<TransformComponent>(e);
-    glm::mat4 transform = ConvertToGlmMatrix(node->mTransformation);
+    glm::mat4 transform = math::ConvertToGlmMatrix(node->mTransformation);
     glm::vec3 pos, scale, rotDeg;
-    DecomposeToEulerAngles(transform, scale, rotDeg, pos);
+    math::DecomposeToEulerAngles(transform, scale, rotDeg, pos);
     tc.SetPosition(pos);
     tc.SetScale(scale);
     tc.SetEulerRotation(rotDeg);

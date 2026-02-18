@@ -66,24 +66,26 @@ public:
     static Shader& GetProceduralSkyShader() { return m_ProceduralSkyShader; }
     static Shader& GetOutlineShader() { return m_OutlineShader; }
     static Shader& GetEquirectangularToCubemapShader() { return m_EquirectangularToCubemap; }
+    static Shader& GetEntityBufferShader() { return m_EntityBuffer; }
 
 private:
-    static GLFWwindow* activeWindow;
-    static Shader m_PBRShader;
-    static Shader m_SkyboxShader;
-    static Shader m_DirectionalShadowShader;
-    static Shader m_PointShadowShader;
-    static Shader m_BrightShader;
-    static Shader m_DownsampleShader;
-    static Shader m_UpsampleShader;
-    static Shader m_GeometryShader;
-    static Shader m_SSAOShader;
-    static Shader m_SSRShader;
-    static Shader m_CompositeShader;
-    static Shader m_LuminanceShader;
-    static Shader m_ProceduralSkyShader;
-    static Shader m_OutlineShader;
-    static Shader m_EquirectangularToCubemap;
+    inline static GLFWwindow* activeWindow = nullptr;
+    inline static Shader m_PBRShader;
+    inline static Shader m_SkyboxShader;
+    inline static Shader m_DirectionalShadowShader;
+    inline static Shader m_PointShadowShader;
+    inline static Shader m_BrightShader;
+    inline static Shader m_DownsampleShader;
+    inline static Shader m_UpsampleShader;
+    inline static Shader m_GeometryShader;
+    inline static Shader m_SSAOShader;
+    inline static Shader m_SSRShader;
+    inline static Shader m_CompositeShader;
+    inline static Shader m_LuminanceShader;
+    inline static Shader m_ProceduralSkyShader;
+    inline static Shader m_OutlineShader;
+    inline static Shader m_EquirectangularToCubemap;
+    inline static Shader m_EntityBuffer;
 
     static ScreenQuad m_ScreenQuad;
 };

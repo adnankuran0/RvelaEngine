@@ -152,7 +152,7 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
 
 
 
-        // selecing
+        // selecting
         
         ImVec2 mousePos = ImGui::GetIO().MousePos;
 
@@ -173,7 +173,7 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
             glm::mat4 projection = engine->GetCamera()->GetProjectionMatrix();
 
             glm::vec3 rayOrigin = engine->GetCamera()->GetPosition();
-            glm::vec3 rayDirection = ScreenPosToWorldRay(mouseViewportPos, viewportSizeF, projection, view);
+            glm::vec3 rayDirection = math::ScreenPosToWorldRay(mouseViewportPos, viewportSizeF, projection, view);
 
             entt::entity closest = entt::null;
             float closestDist = std::numeric_limits<float>::max();
@@ -203,7 +203,7 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
                             v2 = modelMatrix * glm::vec4(v2, 1.0f);
 
                             float t;
-                            if (RayIntersectsTriangle(rayOrigin, rayDirection, v0, v1, v2, t))
+                            if (math::RayIntersectsTriangle(rayOrigin, rayDirection, v0, v1, v2, t))
                             {
                                 if (t < closestDist)
                                 {
@@ -223,46 +223,6 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
     ImGui::PopStyleVar();
 }
 
-bool Viewport::RayIntersectsTriangle(const glm::vec3& rayOrigin, const glm::vec3& rayDir,
-    const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2,
-    float& t)
-{
-    const float EPSILON = 1e-8;
-    glm::vec3 edge1 = v1 - v0;
-    glm::vec3 edge2 = v2 - v0;
 
-    glm::vec3 h = cross(rayDir, edge2);
-    float a = dot(edge1, h);
-    if (a > -EPSILON && a < EPSILON)
-        return false;
-
-    float f = 1.0f / a;
-    glm::vec3 s = rayOrigin - v0;
-    float u = f * dot(s, h);
-    if (u < 0.0f || u > 1.0f)
-        return false;
-
-    glm::vec3 q = cross(s, edge1);
-    float v = f * dot(rayDir, q);
-    if (v < 0.0f || u + v > 1.0f)
-        return false;
-
-    t = f * dot(edge2, q);
-    return t > EPSILON;
-}
-
-glm::vec3 Viewport::ScreenPosToWorldRay(const glm::vec2& mousePos, const glm::vec2& viewportSize,
-    const glm::mat4& projectionMatrix, const glm::mat4& viewMatrix)
-{
-    float x = (2.0f * mousePos.x) / viewportSize.x - 1.0f;
-    float y = 1.0f - (2.0f * mousePos.y) / viewportSize.y;
-
-    glm::vec4 rayClip = glm::vec4(x, y, -1.0f, 1.0f);
-    glm::vec4 rayEye = glm::inverse(projectionMatrix) * rayClip;
-    rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0f, 0.0f);
-
-    glm::vec4 rayWorld = glm::inverse(viewMatrix) * rayEye;
-    return glm::normalize(glm::vec3(rayWorld));
-}
 
 }

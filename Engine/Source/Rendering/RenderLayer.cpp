@@ -91,22 +91,14 @@ void RenderLayer::CollectRenderCommands(Scene* scene, const std::function<void(c
 			meshComp.SetDirty(false);
 		}
 
-		if (entity == scene->GetSelectedEntity())
-		{
-			RenderCommand cmd(scene->GetComponent<TransformComponent>(entity),
-				scene->GetComponent<MeshRendererComponent>(entity),
-				scene->GetComponent<MaterialComponent>(entity),
-				true);
-			submitCallback(cmd);
-		}
-		else
-		{
-			RenderCommand cmd(scene->GetComponent<TransformComponent>(entity),
-				scene->GetComponent<MeshRendererComponent>(entity),
-				scene->GetComponent<MaterialComponent>(entity),
-				false);
-			submitCallback(cmd);
-		}
+		
+		RenderCommand cmd(scene->GetComponent<TransformComponent>(entity),
+			scene->GetComponent<MeshRendererComponent>(entity),
+			scene->GetComponent<MaterialComponent>(entity),
+			entity);
+		submitCallback(cmd);
+		
+		
 	}
 }
 

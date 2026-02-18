@@ -6,6 +6,12 @@ namespace rv {
 class Scene;
 class ICamera;
 
+enum class RenderProfile
+{
+	RUNTIME,
+	EDITOR
+};
+
 struct RenderContext
 {
 public:
