@@ -21,8 +21,9 @@ Engine::Engine()
 	m_Renderer.Init(m_Window.GetGLFWWindow());
 	m_AssetRegistry.Init(m_ProjectManager.GetProjectPath()); //TODO: Make this works with assets path
 	m_SceneManager.SetActiveScene(m_SceneManager.CreateScene("EmptyScene"));
-	PushLayer(new RenderLayer(this));
-
+	m_RenderLayer = new RenderLayer(this);
+	PushLayer(m_RenderLayer);
+	Selection = SelectionManager(m_RenderLayer);
 	if (s_Instance == nullptr)
 	{
 		s_Instance = this;

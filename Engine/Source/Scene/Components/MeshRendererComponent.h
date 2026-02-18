@@ -20,7 +20,6 @@ public:
     unsigned int indexCount = 0;
 
     MeshRendererComponent() = default;
-    ~MeshRendererComponent() { Destroy(); }
     MeshRendererComponent(const MeshRendererComponent&) = delete;
     MeshRendererComponent& operator=(const MeshRendererComponent&) = delete;
     MeshRendererComponent(MeshRendererComponent&&) = default;

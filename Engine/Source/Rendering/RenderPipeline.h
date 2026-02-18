@@ -35,6 +35,7 @@ public:
 	void SetRenderContext(const RenderContext& context);
 	void SubmitRenderCommand(const RenderCommand& cmd);
 	[[nodiscard]] inline GLuint GetFinalTexture() noexcept { return compositePass.GetFinalTexture(); }
+	[[nodiscard]] inline GLuint GetEntityBuffer() noexcept { return entityBufferPass.GetEntityBuffer(); }
 	void Execute();
 
 private:

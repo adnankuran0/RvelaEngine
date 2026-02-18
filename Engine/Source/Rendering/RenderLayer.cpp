@@ -55,16 +55,17 @@ void RenderLayer::OnRender()
 	Scene& scene = m_Engine->GetActiveScene();
 	ICamera* camera = m_Engine->GetCamera();
 
-	RenderContext context;
 	
-	context.camera = camera;
-	context.pointLights = CollectPointLights(scene);
-	context.directionalLight = CollectDirectionalLight(scene);
-	context.viewportWidth = 1920;
-	context.viewportHeight = 1080;
-	context.scene = &scene;
+	m_Context.Clear();
+
+	m_Context.camera = camera;
+	m_Context.pointLights = CollectPointLights(scene);
+	m_Context.directionalLight = CollectDirectionalLight(scene);
+	m_Context.viewportWidth = 1920;
+	m_Context.viewportHeight = 1080;
+	m_Context.scene = &scene;
 	
-	m_RenderPipeline->SetRenderContext(context);
+	m_RenderPipeline->SetRenderContext(m_Context);
 	m_RenderPipeline->EnsureInitialized();
 
 	
@@ -78,10 +79,10 @@ void RenderLayer::OnRender()
 
 void RenderLayer::CollectRenderCommands(Scene* scene, const std::function<void(const RenderCommand&)>& submitCallback)
 {
+
 	auto view = scene->GetRegistry().view<TransformComponent, MeshComponent ,MeshRendererComponent, MaterialComponent>();
 	for (auto entity : view)
 	{
-		
 
 		MeshComponent& meshComp = scene->GetComponent<MeshComponent>(entity);
 		
@@ -98,8 +99,9 @@ void RenderLayer::CollectRenderCommands(Scene* scene, const std::function<void(c
 			entity);
 		submitCallback(cmd);
 		
-		
 	}
+
+
 }
 
 }

@@ -23,6 +23,16 @@ public:
 	unsigned int viewportHeight;
 	Scene* scene;
 
+	void Clear()
+	{
+		camera = nullptr;
+		pointLights.clear();
+		directionalLight.reset();
+		viewportWidth = 1920;
+		viewportHeight = 1080;
+		scene = nullptr;
+	}
+
 	bool IsValid()
 	{
 		if (!camera)

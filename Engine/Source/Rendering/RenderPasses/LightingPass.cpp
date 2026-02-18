@@ -123,15 +123,8 @@ void LightingPass::Execute()
     size_t drawCallCounter = 0;
     for (auto& command : commands) {
         //if (!ctx.camera->Intersects(command.mesh.worldAABB)) continue; //TODO: dont know why but its broken
-        if (command.isSelected) {
-            glEnable(GL_STENCIL_TEST);
-            glStencilFunc(GL_ALWAYS, 1, 0xFF); 
-            glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-            glStencilMask(0xFF);
-        }
-        else {
-            glDisable(GL_STENCIL_TEST);
-        }
+        
+         glDisable(GL_STENCIL_TEST);
 
         if (!command.mesh.IsDoubleSided())
         {

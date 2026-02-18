@@ -82,9 +82,8 @@ void GeometryPass::Execute()
     geometryShader.setMat4("view", view);
     geometryShader.setMat4("projection", projection);
 
-
     for (auto& command : commands) {
-        if (!ctx.camera->Intersects(command.mesh.worldAABB)) continue;
+        //if (!ctx.camera->Intersects(command.mesh.worldAABB)) continue;
 
         auto& material = command.material;
         glm::mat4 model = command.transform.GetWorldMatrix();
@@ -121,10 +120,9 @@ void GeometryPass::Execute()
         }
 
 
-
-
         command.mesh.VAO.Bind();
         glDrawElements(GL_TRIANGLES, command.mesh.indexCount, GL_UNSIGNED_INT, 0);
+        
     }
 
     commands.clear();

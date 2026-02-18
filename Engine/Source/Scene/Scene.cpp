@@ -91,6 +91,7 @@ void Scene::DestroyEntity(entt::entity entity) {
     for (auto child : childrenCopy) 
         DestroyEntity(child);
 
+    if (HasComponent<MeshRendererComponent>(entity)) GetComponent<MeshRendererComponent>(entity).Destroy();
     m_EntityMap.erase(GetComponent<UUIDComponent>(entity).uuid);
     m_Registry.destroy(entity);
 }

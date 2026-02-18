@@ -32,8 +32,6 @@ void RenderPipeline::EnsureInitialized()
 			pass->Init();
 
 		isInitialized = true;
-
-		engine->SetFinalTexture(compositePass.GetFinalTexture());
 	}
 }
 
@@ -54,11 +52,11 @@ void RenderPipeline::SubmitRenderCommand(const RenderCommand& cmd)
 
 void RenderPipeline::Execute()
 {
-
-	
 	geometryPass.Execute();
 	shadowPass.Execute();
 
+
+	//TODO: execute only in editor mode
 	entityBufferPass.Execute();
 
 	skyboxPass.SetScreenFBO(lightingPass.GetScreenFBO());

@@ -18,7 +18,7 @@ public:
         assert(m_CurrentScene);
         return *m_CurrentScene;
     }
-    void SetActiveScene(std::unique_ptr<Scene> newScene)
+    void SetActiveScene(std::unique_ptr<Scene>&& newScene)
     {
         m_CurrentScene = std::move(newScene);
     }

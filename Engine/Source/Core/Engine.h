@@ -4,6 +4,7 @@
 #include "Scene/SceneManager.h"
 #include "Assets/AssetRegistry.h"
 #include "Utils/ProjectManager.h"
+#include "Scene/SelectionManager.h"
 #include "LayerStack.h"
 
 namespace rv {
@@ -39,15 +40,16 @@ public:
 	Camera* GetSceneCamera() noexcept { return GetCameraSystem().GetActiveCamera(); }
 	ICamera* GetCamera() noexcept;
 
+	RenderLayer& GetRenderLayer() noexcept { return *m_RenderLayer; }
+
 	inline void SetEditorCamera(EditorCamera* editorCam) { m_EditorCamera = editorCam; }
 
-	[[nodiscard]] inline void SetFinalTexture(GLuint textureID) { finalTexture = textureID; } //TODO: what the fuck are these doing here?
-	[[nodiscard]] inline GLuint GetFinalTexture() { return finalTexture; }
-
+	SelectionManager Selection;
 private:
-	GLuint finalTexture;
 
 	LayerStack m_LayerStack;
+
+	RenderLayer* m_RenderLayer;
 
 	void HandleEvents() noexcept;
 

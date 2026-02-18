@@ -36,8 +36,33 @@ void EntityBufferPass::Init()
         0
     );
 
+    glGenRenderbuffers(1, &m_Renderbuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, m_Renderbuffer);
+    glRenderbufferStorage(
+        GL_RENDERBUFFER,
+        GL_DEPTH_COMPONENT24,
+        ctx.viewportWidth,
+        ctx.viewportHeight
+    );
+
+    glFramebufferRenderbuffer(
+        GL_FRAMEBUFFER,
+        GL_DEPTH_ATTACHMENT,
+        GL_RENDERBUFFER,
+        m_Renderbuffer
+    );
+
+    GLenum buffers[1] = { GL_COLOR_ATTACHMENT0 };
+    glDrawBuffers(1, buffers);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    {
+        LOG_ERROR("EntityBuffer FBO not complete");
+    }
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
+
 void EntityBufferPass::Execute()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer);
@@ -45,9 +70,11 @@ void EntityBufferPass::Execute()
 
     GLuint clearValue = 0;
     glClearBufferuiv(GL_COLOR, 0, &clearValue);
+    glClear(GL_DEPTH_BUFFER_BIT);
 
     glEnable(GL_DEPTH_TEST);
-    glDepthMask(GL_FALSE); // don't rewrite depth
+    glDepthFunc(GL_LESS);
+    glDepthMask(GL_TRUE);
 
     Shader& shader = Renderer::GetEntityBufferShader();
     shader.use();
@@ -60,8 +87,8 @@ void EntityBufferPass::Execute()
 
     for (auto& command : commands)
     {
-        if (!ctx.camera->Intersects(command.mesh.worldAABB))
-            continue;
+        //if (!ctx.camera->Intersects(command.mesh.worldAABB))
+            //continue;
 
         glm::mat4 model = command.transform.GetWorldMatrix();
         shader.setMat4("model", model);
@@ -71,10 +98,14 @@ void EntityBufferPass::Execute()
 
         command.mesh.VAO.Bind();
         glDrawElements(GL_TRIANGLES, command.mesh.indexCount, GL_UNSIGNED_INT, 0);
+
     }
+
 
     glDepthMask(GL_TRUE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    commands.clear();
 }
 
 

@@ -4,6 +4,7 @@
 #include "ImGui/ImGuizmo.h"
 #include "Core/Engine.h"
 #include <glm/gtx/matrix_decompose.hpp>
+#include "Rendering/RenderLayer.h"
 
 namespace rv {
 
@@ -34,7 +35,7 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
 
 
 
-        ImTextureID textureID = (ImTextureID)(intptr_t)engine->GetFinalTexture(); //TODO: make this dynamic
+        ImTextureID textureID = (ImTextureID)(intptr_t)engine->GetRenderLayer().GetFinalTexture(); 
 
         ImGui::GetWindowDrawList()->AddImage(
             textureID,
@@ -162,60 +163,27 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
 
         if (isMouseInViewport && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGuizmo::IsUsing())
         {
-
             glm::vec2 mouseViewportPos = {
                 mousePos.x - displayPos.x,
                 mousePos.y - displayPos.y
             };
 
-            glm::vec2 viewportSizeF = { displaySize.x, displaySize.y };
-            glm::mat4 view = engine->GetCamera()->GetViewMatrix();
-            glm::mat4 projection = engine->GetCamera()->GetProjectionMatrix();
-
-            glm::vec3 rayOrigin = engine->GetCamera()->GetPosition();
-            glm::vec3 rayDirection = math::ScreenPosToWorldRay(mouseViewportPos, viewportSizeF, projection, view);
-
-            entt::entity closest = entt::null;
-            float closestDist = std::numeric_limits<float>::max();
-
-            auto& registry = engine->GetActiveScene().GetRegistry();
-            registry.view<TransformComponent,
-                MeshRendererComponent,
-                MeshComponent>().each([&](entt::entity entity,
-                    TransformComponent& tc,
-                    MeshRendererComponent& mrc,
-                    MeshComponent& mc) {
-
-                        AABB& box = mrc.worldAABB;
-                        //Frustum culling
-                        if (!engine->GetCamera()->Intersects(box)) return;
-
-                        Ref<MeshAsset> mesh = mc.GetMesh();
-                        glm::mat4 modelMatrix = tc.GetWorldMatrix();
-
-                        for (size_t i = 0; i < mesh->GetTriangleCount(); ++i)
-                        {
-                            glm::vec3 v0, v1, v2;
-                            mesh->GetTriangle(i, v0, v1, v2);
-
-                            v0 = modelMatrix * glm::vec4(v0, 1.0f);
-                            v1 = modelMatrix * glm::vec4(v1, 1.0f);
-                            v2 = modelMatrix * glm::vec4(v2, 1.0f);
-
-                            float t;
-                            if (math::RayIntersectsTriangle(rayOrigin, rayDirection, v0, v1, v2, t))
-                            {
-                                if (t < closestDist)
-                                {
-                                    closestDist = t;
-                                    selectedEntity = entity;
-                                    engine->GetActiveScene().SetSelectedEntity(selectedEntity);
-                                }
-                            }
-                        }
-                    });
+            auto& context = engine->GetRenderLayer().GetRenderContext(); // viewportWidth / viewportHeight
+            float fboWidth = context.viewportWidth;
+            float fboHeight = context.viewportHeight;
 
 
+            uint32_t fboX = (uint32_t)(mouseViewportPos.x * fboWidth / displaySize.x);
+            uint32_t fboY = (uint32_t)(fboHeight - ((displaySize.y - mouseViewportPos.y) * fboHeight / displaySize.y));
+
+            uint32_t pickedID = engine->Selection.Pick(fboX, fboY);
+
+            if (pickedID != 0)
+            {
+                entt::entity entity = (entt::entity)pickedID;
+                selectedEntity = entity;
+                engine->GetActiveScene().SetSelectedEntity(entity);
+            }
         }
         
     }
