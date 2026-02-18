@@ -7,14 +7,10 @@ class OutlinePass : public RenderPass
 {
 public:
     ~OutlinePass() {}
-    void Execute() override;
-    void Init() override {}
+    void Init(const RenderContext& ctx, RenderFrame& frame) override {}
+    void Execute(const RenderContext& ctx, RenderFrame& frame) override;
 
-    void SetScreenFBO(GLuint screenFBO) { i_ScreenFBO = screenFBO; }
-    void SetIntermediateFBO(GLuint intermediateFBO) { i_IntermiedateFBO = intermediateFBO; }
-private:
-    GLuint i_ScreenFBO;
-    GLuint i_IntermiedateFBO;
+    
 };
 
 }

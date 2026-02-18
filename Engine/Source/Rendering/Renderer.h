@@ -30,6 +30,7 @@ struct PointLightData {
 struct DirectionalLightData {
     glm::vec3 direction;
     glm::vec3 color;
+    glm::mat4 lightSpace;
     float intensity;
     bool castShadows;
     bool reverseCullFace;

@@ -27,7 +27,7 @@ static std::vector<PointLightData> CollectPointLights(Scene& scene) noexcept {
 	return lights;
 }
 
-static std::optional<DirectionalLightData> CollectDirectionalLight(Scene& scene) noexcept {
+static std::optional<DirectionalLightData> CollectDirectionalLight(Scene& scene,glm::vec3 cameraPos) noexcept {
 	auto view = scene.GetRegistry().view<DirectionalLightComponent, TransformComponent>();
 	for (auto e : view) {
 		auto& light = scene.GetComponent<DirectionalLightComponent>(e);
@@ -41,6 +41,13 @@ static std::optional<DirectionalLightData> CollectDirectionalLight(Scene& scene)
 		data.reverseCullFace = light.reverseCullFace;
 		data.blurRadius = light.blurRadius;
 
+		glm::vec3 lightDir = data.direction;
+		glm::vec3 sceneCenter = cameraPos;
+		glm::mat4 lightView = glm::lookAt(sceneCenter - lightDir * 50.0f, sceneCenter, glm::vec3(0, 1, 0));
+		float orthoSize = 35.0f;
+		glm::mat4 lightProjection = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, 0.1f, 120.0f);
+		data.lightSpace = lightProjection * lightView;
+
 		return data;
 	}
 	return std::nullopt;
@@ -49,8 +56,6 @@ static std::optional<DirectionalLightData> CollectDirectionalLight(Scene& scene)
 
 void RenderLayer::OnRender()
 {
-	
-	
 
 	Scene& scene = m_Engine->GetActiveScene();
 	ICamera* camera = m_Engine->GetCamera();
@@ -60,25 +65,21 @@ void RenderLayer::OnRender()
 
 	m_Context.camera = camera;
 	m_Context.pointLights = CollectPointLights(scene);
-	m_Context.directionalLight = CollectDirectionalLight(scene);
+	m_Context.directionalLight = CollectDirectionalLight(scene,camera->GetPosition());
 	m_Context.viewportWidth = 1920;
 	m_Context.viewportHeight = 1080;
 	m_Context.scene = &scene;
 	
-	m_RenderPipeline->SetRenderContext(m_Context);
-	m_RenderPipeline->EnsureInitialized();
-
+	m_RenderPipeline->EnsureInitialized(m_Context);
 	
-	// Collect commands and submit them to render passes via render pipeline
-	CollectRenderCommands(&scene, [&](const RenderCommand& cmd) {
-		m_RenderPipeline->SubmitRenderCommand(cmd);
-		});
+	CollectRenderCommands(&scene);
 	
-	m_RenderPipeline->Execute();
+	m_RenderPipeline->Execute(m_Context);
 }
 
-void RenderLayer::CollectRenderCommands(Scene* scene, const std::function<void(const RenderCommand&)>& submitCallback)
+void RenderLayer::CollectRenderCommands(Scene* scene)
 {
+	m_RenderPipeline->m_RenderFrame.commands.clear();
 
 	auto view = scene->GetRegistry().view<TransformComponent, MeshComponent ,MeshRendererComponent, MaterialComponent>();
 	for (auto entity : view)
@@ -91,13 +92,13 @@ void RenderLayer::CollectRenderCommands(Scene* scene, const std::function<void(c
 			scene->GetComponent<MeshRendererComponent>(entity).RecreateFromMesh(meshComp.GetMesh());
 			meshComp.SetDirty(false);
 		}
-
 		
 		RenderCommand cmd(scene->GetComponent<TransformComponent>(entity),
 			scene->GetComponent<MeshRendererComponent>(entity),
 			scene->GetComponent<MaterialComponent>(entity),
 			entity);
-		submitCallback(cmd);
+
+		m_RenderPipeline->m_RenderFrame.commands.push_back(cmd);
 		
 	}
 

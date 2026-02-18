@@ -25,7 +25,7 @@ private:
 	Engine* m_Engine;
 	std::unique_ptr<RenderPipeline> m_RenderPipeline;
 	RenderContext m_Context;
-	void CollectRenderCommands(Scene* scene, const std::function<void(const RenderCommand&)>& submitCallback);
+	void CollectRenderCommands(Scene* scene);
 
 };
 

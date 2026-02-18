@@ -4,10 +4,12 @@
 #include "Scene/Camera.h"
 #include <array>
 #include <algorithm>
+#include "Rendering/Renderer.h"
+#include "Rendering/RenderContext.h"
 
 namespace rv {
 
-void BloomPass::Init()
+void BloomPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
 
     downsampleFBOs.resize(mipLevels);
@@ -78,10 +80,14 @@ void BloomPass::Init()
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    frame.registry.Register("BloomTexture", { RenderResourceType::Texture,o_BlurredTexture });
 }
 
-void BloomPass::Downsample()
+void BloomPass::Downsample(const RenderContext& ctx, RenderFrame& frame)
 {
+    auto i_BrightTexture = frame.registry.Get("BrightTexture")->id;
+
     Shader& downsampleShader = Renderer::GetDownsampleShader();
     for (int i = 0; i < mipLevels; ++i)
     {
@@ -104,7 +110,7 @@ void BloomPass::Downsample()
     }
 }
 
-void BloomPass::Upsample()
+void BloomPass::Upsample(const RenderContext& ctx, RenderFrame& frame)
 {
     Shader& upsampleShader = Renderer::GetUpsampleShader();
     upsampleShader.use();
@@ -134,14 +140,15 @@ BloomPass::~BloomPass()
     //TODO: Fill this function
 }
 
-void BloomPass::Execute()
+void BloomPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
+    Downsample(ctx, frame);
 
-    Downsample();
-
-    Upsample();
+    Upsample(ctx, frame);
 
     o_BlurredTexture = downsampleTextures[0];
+
+    frame.registry.Register("BloomTexture", { RenderResourceType::Texture,o_BlurredTexture });
 
 }
 

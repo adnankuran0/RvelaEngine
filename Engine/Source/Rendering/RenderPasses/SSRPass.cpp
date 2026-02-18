@@ -2,10 +2,12 @@
 #include "SSRPass.h"
 #include "Core/Time.h"
 #include "Scene/ICamera.h" 
+#include "Rendering/RenderContext.h"
+
 
 namespace rv {
 
-void SSRPass::Init()
+void SSRPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
     glGenFramebuffers(1, &ssrFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, ssrFBO);
@@ -25,6 +27,8 @@ void SSRPass::Init()
         LOG_WARN("SSR framebuffer not complete!");
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    frame.registry.Register("SSRTexture", { RenderResourceType::Texture,o_SsrTexture });
 }
 
 SSRPass::~SSRPass()
@@ -32,8 +36,15 @@ SSRPass::~SSRPass()
     //TODO: Fill this function
 }
 
-void SSRPass::Execute()
+void SSRPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
+    auto i_Depth = frame.registry.Get("DepthTexture")->id;
+    auto i_Normal = frame.registry.Get("NormalTexture")->id;
+    auto i_Roughness = frame.registry.Get("RoughnessTexture")->id;
+    auto i_Metallic = frame.registry.Get("MetallicTexture")->id;
+    auto i_Screen = frame.registry.Get("ScreenTexture")->id;
+    auto i_Skybox = frame.registry.Get("SkyboxTexture")->id;
+
     Shader& ssrShader = Renderer::GetSSRShader();
     glDisable(GL_DEPTH_TEST);
     glBindFramebuffer(GL_FRAMEBUFFER, ssrFBO);
@@ -83,6 +94,9 @@ void SSRPass::Execute()
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
+
+    frame.registry.Register("SSRTexture", { RenderResourceType::Texture,o_SsrTexture });
+
 }
 
 }

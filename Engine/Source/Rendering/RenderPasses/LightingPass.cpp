@@ -4,6 +4,7 @@
 #include "Assets/AssetUUID.h"
 #include "Assets/AssetRegistry.h"
 #include "Scene/Components.h"
+#include "Rendering/RenderContext.h"
 
 namespace rv {
 
@@ -15,7 +16,7 @@ struct MapInfo {
     Ref<TextureAsset> texture;
 };
 
-void LightingPass::Init()
+void LightingPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
     // MSAA framebuffer
     glGenFramebuffers(1, &o_ScreenFBO);
@@ -49,17 +50,28 @@ void LightingPass::Init()
         LOG_ERROR("Intermediate Framebuffer not complete");
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    frame.registry.Register("ScreenTexture", { RenderResourceType::Texture,o_IntermediateColorTex });
+    frame.registry.Register("ScreenBuffer", { RenderResourceType::Framebuffer,o_ScreenFBO });
+    frame.registry.Register("IntermediateBuffer", { RenderResourceType::Framebuffer,intermediateFBO });
 }
+
 
 LightingPass::~LightingPass()
 {
     //TODO: Fill this function
 }
 
-void LightingPass::Execute()
+void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
-    if (commands.empty() || !ctx.IsValid()) return;
+    auto& commands = frame.commands;
+    auto& resourceRegistry = frame.registry;
 
+    if (commands.empty() ) return;
+
+
+    auto i_DirectionalShadowMap = resourceRegistry.Get("DirectionalShadowMap")->id;
+    auto i_PointShadowMap = resourceRegistry.Get("PointShadowMap")->id;
 
     glBindFramebuffer(GL_FRAMEBUFFER, o_ScreenFBO);
 
@@ -80,7 +92,7 @@ void LightingPass::Execute()
         shader.setFloat("directionalLight.shadowBias", dirLight.shadowBias);
         shader.setFloat("directionalLight.blurRadius", dirLight.blurRadius);
 
-        shader.setMat4("lightSpaceMatrix", i_LightSpaceMatrix);
+        shader.setMat4("lightSpaceMatrix", ctx.directionalLight->lightSpace);
 
         shader.setInt("shadowMap", 6);
         glBindTextureUnit(6, i_DirectionalShadowMap);
@@ -183,7 +195,9 @@ void LightingPass::Execute()
         GL_COLOR_BUFFER_BIT, GL_NEAREST
     );
 
-    commands.clear();
+    resourceRegistry.Register("ScreenTexture", { RenderResourceType::Texture,o_IntermediateColorTex });
+    resourceRegistry.Register("ScreenBuffer", { RenderResourceType::Framebuffer,o_ScreenFBO });
+    resourceRegistry.Register("IntermediateBuffer", { RenderResourceType::Framebuffer,intermediateFBO });
 }
 
 }

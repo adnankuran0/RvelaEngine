@@ -2,6 +2,7 @@
 #include "Scene/Components/TransformComponent.h"
 #include "Scene/Components/MeshRendererComponent.h"
 #include "Scene/Components/MaterialComponent.h"
+#include "entt/entt.h"
 
 namespace rv { 
 

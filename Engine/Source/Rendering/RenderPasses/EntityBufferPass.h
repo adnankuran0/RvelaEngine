@@ -8,10 +8,9 @@ class EntityBufferPass : public RenderPass
 public:
 
     ~EntityBufferPass() {}
-    void Execute() override;
-    void Init() override;
+    void Init(const RenderContext& ctx, RenderFrame& frame) override;
+    void Execute(const RenderContext& ctx, RenderFrame& frame) override;
 
-    GLuint GetEntityBuffer() { return m_Framebuffer; }
 private:
     GLuint m_Framebuffer = 0;
     GLuint m_Renderbuffer = 0;

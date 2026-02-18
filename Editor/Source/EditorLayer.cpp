@@ -12,6 +12,7 @@ EditorLayer::~EditorLayer()
 {
 }
 
+
 void EditorLayer::OnAttach()
 {
     IMGUI_CHECKVERSION();
@@ -69,11 +70,6 @@ void EditorLayer::OnLateUpdate()
 
 void EditorLayer::Render()
 {
-    
-
-
-    static entt::entity selectedEntity = entt::null; // TODO: this is not belong here
-
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -86,13 +82,13 @@ void EditorLayer::Render()
 
     m_Dockspace.Draw();
 
-    m_SceneHierarchyPanel.Draw(m_Engine, selectedEntity);
+    m_SceneHierarchyPanel.Draw(m_Engine, m_SelectedEntity);
 
-    m_InspectorPanel.Draw(m_Engine, selectedEntity);
+    m_InspectorPanel.Draw(m_Engine, m_SelectedEntity);
 
     m_AssetBrowserPanel.Draw(m_Engine, m_Engine->GetProjectManager().GetProjectPath() / "Assets");
 
-    m_Viewport.Draw(m_Engine, selectedEntity);
+    m_Viewport.Draw(m_Engine, m_SelectedEntity);
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

@@ -1,10 +1,11 @@
 ﻿#include "rvelapch.h"
 #include "CompositePass.h"
-#include "../Renderer.h"
+#include "Rendering/RenderContext.h"
+
 
 namespace rv {
 
-void CompositePass::Init()
+void CompositePass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
 	glGenFramebuffers(1, &m_Framebuffer);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer);
@@ -22,10 +23,15 @@ void CompositePass::Init()
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+	frame.registry.Register("FinalTexture", { RenderResourceType::Texture,o_FinalTexture });
 }
 
-void CompositePass::Execute()
+void CompositePass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
+	auto i_ScreenTexture = frame.registry.Get("ScreenTexture")->id;
+	auto i_BloomBlurTexture = frame.registry.Get("BloomTexture")->id;
+	auto i_AoTexture = frame.registry.Get("SSAOTexture")->id;
+	auto i_SsrTexture = frame.registry.Get("SSRTexture")->id;
 
 	glDisable(GL_DEPTH_TEST);
 	Shader& compositeShader = Renderer::GetCompositeShader();
@@ -34,8 +40,6 @@ void CompositePass::Execute()
 
 
 	compositeShader.use();
-	/*UpdateExposure(Time::GetDeltaTime());
-	compositeShader.setFloat("exposure", glm::clamp(exposure, 0.5f, 1.5f));*/
 	compositeShader.setFloat("exposure", 1.0f);
 	compositeShader.setInt("screenTexture", 0);
 	compositeShader.setInt("bloomTexture", 1);
@@ -51,26 +55,9 @@ void CompositePass::Execute()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glEnable(GL_DEPTH_TEST);
 
+	frame.registry.Register("FinalTexture", { RenderResourceType::Texture,o_FinalTexture });
 
 }
 
-void CompositePass::UpdateExposure(float deltaTime)
-{
-	glBindTexture(GL_TEXTURE_2D, i_ScreenTexture); // screenTexture
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	int mipLevel = (int)std::log2(std::max(ctx.viewportWidth, ctx.viewportHeight));
-	float avgColor[3];
-	glGetTexImage(GL_TEXTURE_2D, mipLevel, GL_RGB, GL_FLOAT, avgColor);
-
-	float luminance = 0.2126f * avgColor[0] + 0.7152f * avgColor[1] + 0.0722f * avgColor[2];
-
-	float targetLuminance = 0.3f;
-	float key = 0.1f;
-	float targetExposure = key * (targetLuminance / (luminance + 0.001f));
-
-	float speed = 1.5f;
-	exposure += (targetExposure - exposure) * deltaTime * speed;
-}
 
 }

@@ -1,10 +1,10 @@
 ﻿#include "rvelapch.h"
 #include "BrightPass.h"
-#include "../Renderer.h"
+#include "Rendering/RenderContext.h"
 
 namespace rv {
 
-void BrightPass::Init()
+void BrightPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
 	glGenFramebuffers(1, &brightFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, brightFBO);
@@ -34,6 +34,8 @@ void BrightPass::Init()
 		LOG_ERROR("Bright FBO not complete!");
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    frame.registry.Register("BrightTexture", { RenderResourceType::Texture,o_BrightColorTex });
 }
 
 BrightPass::~BrightPass()
@@ -41,8 +43,9 @@ BrightPass::~BrightPass()
 	//TODO: Fill this funciton
 }
 
-void BrightPass::Execute()
+void BrightPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
+    auto i_ScreenTexture = frame.registry.Get("ScreenTexture")->id;
 
     glDisable(GL_DEPTH_TEST);
 
@@ -63,6 +66,9 @@ void BrightPass::Execute()
 
     glEnable(GL_DEPTH_TEST);
 	glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
+
+    frame.registry.Register("BrightTexture", { RenderResourceType::Texture,o_BrightColorTex });
+
 }
 
 }

@@ -1,22 +1,15 @@
 #pragma once
-#include <vector>
 #include <memory>
 #include "RenderPass.h"
-#include "Rendering/RenderPasses/LightingPass.h"
-#include "Rendering/RenderPasses/SkyboxPass.h"
-#include "Rendering/RenderPasses/ShadowPass.h"
-#include "Rendering/RenderPasses/CompositePass.h"
-#include "Rendering/RenderPasses/BrightPass.h"
-#include "Rendering/RenderPasses/BloomPass.h"
-#include "Rendering/RenderPasses/GeometryPass.h"
-#include "Rendering/RenderPasses/SSAOPass.h"
-#include "Rendering/RenderPasses/SSRPass.h"
-#include "Rendering/RenderPasses/OutlinePass.h"
-#include "Rendering/RenderPasses/EntityBufferPass.h"
+#include "RenderCommand.h"
+#include "RenderFrame.h"
+
 
 namespace rv {
 
 class Engine;
+struct RenderContext;
+class RenderLayer;
 
 struct RenderFeatures
 {
@@ -31,32 +24,23 @@ class RenderPipeline
 public:
 
 	RenderPipeline(Engine* engine);
-	void EnsureInitialized();
-	void SetRenderContext(const RenderContext& context);
-	void SubmitRenderCommand(const RenderCommand& cmd);
-	[[nodiscard]] inline GLuint GetFinalTexture() noexcept { return compositePass.GetFinalTexture(); }
-	[[nodiscard]] inline GLuint GetEntityBuffer() noexcept { return entityBufferPass.GetEntityBuffer(); }
-	void Execute();
+	void EnsureInitialized(const RenderContext& ctx);
+	[[nodiscard]] inline GLuint GetFinalTexture() noexcept { return m_RenderFrame.registry.Get("FinalTexture")->id; }
+	[[nodiscard]] inline GLuint GetEntityBuffer() noexcept { return m_RenderFrame.registry.Get("EntityBuffer")->id; }
+	void Execute(const RenderContext& ctx);
 
 private:
+	friend class RenderLayer;
+
 	Engine* engine;
-
+	RenderFrame m_RenderFrame;
 	RenderFeatures m_RenderFeatures;
-	bool isPipelineDirty = true;
 
+	bool isPipelineDirty = true;
 	bool isInitialized = false;
 	//Render Passes
-	std::vector<RenderPass*> renderPasses;
-	GeometryPass geometryPass;
-	ShadowPass shadowPass;
-	SkyboxPass skyboxPass;
-	LightingPass lightingPass;
-	BrightPass brightPass;
-	BloomPass bloomPass;
-	SSAOPass ssaoPass;
-	SSRPass ssrPass;
-	CompositePass compositePass;
-	EntityBufferPass entityBufferPass;
+	std::vector<RenderPass*> m_RenderPasses;
+
 
 };
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "../RenderPass.h"
-#include "../Renderer.h"
-#include "Scene/Camera.h"
+#include "Rendering/Skybox.h"
+#include <Rendering/RenderFrame.h>
 
 namespace rv {
 
@@ -9,13 +9,9 @@ class SkyboxPass : public RenderPass
 {
 public:
 	~SkyboxPass();
-	void Execute() override;
-	void Init() override;
-	void SetScreenFBO(GLuint screenFBO) { i_ScreenFBO = screenFBO; }
-	GLuint GetSkyboxTexture() { return m_Skybox.GetTextureID(); }
+	void Execute(const RenderContext& ctx, RenderFrame& frame) override;
+	void Init(const RenderContext& ctx, RenderFrame& frame) override;
 private:
-	GLuint i_ScreenFBO = 0;
-
 	Skybox m_Skybox;
 };
 

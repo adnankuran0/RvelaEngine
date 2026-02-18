@@ -1,13 +1,18 @@
 ﻿#include "rvelapch.h"
 #include "ShadowPass.h"
+#include "Rendering/RenderContext.h"
+#include <Rendering/RenderFrame.h>
 
 namespace rv {
 
-void ShadowPass::Init()
+void ShadowPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
     
     InitDirectionalShadowMap();
     InitPointShadowMap();
+
+    frame.registry.Register("DirectionalShadowMap", { RenderResourceType::Texture, o_DirectionalShadowMap });
+    frame.registry.Register("PointShadowMap", { RenderResourceType::Texture, o_PointShadowMap });
 }
 
 void ShadowPass::InitDirectionalShadowMap()
@@ -49,7 +54,6 @@ void ShadowPass::InitDirectionalShadowMap()
 
 void ShadowPass::InitPointShadowMap()
 {
-    // POINT LIGHT SHADOWMAP SETUP
     glGenFramebuffers(1, &pointFBO);
 
     glGenTextures(1, &o_PointShadowMap);
@@ -86,21 +90,19 @@ void ShadowPass::InitPointShadowMap()
 
 }
 
-void ShadowPass::RenderDirectionalShadowMap()
+void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFrame& 
+frame)
 {
+    auto& commands = frame.commands;
+
     if (ctx.directionalLight && ctx.directionalLight->castShadows)
     {
         Shader& shadowShader = Renderer::GetDirectionalShadowShader();
         shadowShader.use();
 
-        glm::vec3 lightDir = ctx.directionalLight->direction;
-        glm::vec3 sceneCenter = ctx.camera->GetPosition();
-        glm::mat4 lightView = glm::lookAt(sceneCenter - lightDir * 50.0f, sceneCenter, glm::vec3(0, 1, 0));
-        float orthoSize = 35.0f;
-        glm::mat4 lightProjection = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, 0.1f, 120.0f);
-        o_LightSpaceMatrix = lightProjection * lightView;
+        
 
-        shadowShader.setMat4("lightSpaceMatrix", o_LightSpaceMatrix);
+        shadowShader.setMat4("lightSpaceMatrix", ctx.directionalLight->lightSpace);
 
         glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
         glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -120,7 +122,7 @@ void ShadowPass::RenderDirectionalShadowMap()
         }
 
         for (auto& command : commands) {
-            if (!ctx.camera->Intersects(lightProjection * lightView,command.mesh.worldAABB)) continue;
+            //if (!ctx.camera->Intersects(lightProjection * lightView,command.mesh.worldAABB)) continue;
             if (!command.mesh.IsCastShadow()) continue;
 
             shadowShader.setMat4("model", command.transform.GetWorldMatrix());
@@ -134,9 +136,9 @@ void ShadowPass::RenderDirectionalShadowMap()
 
 }
 
-void ShadowPass::RenderPointShadowMap()
+void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& frame)
 {
-
+    auto& commands = frame.commands;
 
     Shader& pointShadowShader = Renderer::GetPointShadowShader();
     pointShadowShader.use();
@@ -197,22 +199,25 @@ void ShadowPass::RenderPointShadowMap()
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
 }
 
+
+
 ShadowPass::~ShadowPass()
 {
     //TODO: Fill this function
 }
 
-void ShadowPass::Execute()
+void ShadowPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
+    if (frame.commands.empty()) return;
 
-    if (commands.empty() || !ctx.IsValid()) return;
+    auto& resourceRegistry = frame.registry;
 
+    RenderDirectionalShadowMap(ctx,frame);
+    RenderPointShadowMap(ctx, frame);
 
+    resourceRegistry.Register("DirectionalShadowMap", { RenderResourceType::Texture, o_DirectionalShadowMap });
+    resourceRegistry.Register("PointShadowMap", { RenderResourceType::Texture, o_PointShadowMap });
 
-    RenderDirectionalShadowMap();
-    RenderPointShadowMap();
-
-    commands.clear();
 }
 
 }

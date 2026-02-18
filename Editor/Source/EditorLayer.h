@@ -35,6 +35,7 @@ public:
 
     EditorCamera& GetEditorCamera() { return m_EditorCamera; }
 
+
 private:
     MenuBar m_MenuBar;
     ToolBar m_ToolBar;
@@ -44,6 +45,9 @@ private:
     AssetBrowserPanel m_AssetBrowserPanel;
     Viewport m_Viewport;
 
+    std::vector<entt::entity> m_SelectedEntities;
+
+    entt::entity m_SelectedEntity = entt::null;
     AssetImporterRegistry m_AssetImporterRegistry;
     EditorCamera m_EditorCamera;
     rv::Engine* m_Engine;

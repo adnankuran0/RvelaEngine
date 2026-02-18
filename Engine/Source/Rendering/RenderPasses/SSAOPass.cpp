@@ -1,6 +1,8 @@
 #include "rvelapch.h"
 #include "SSAOPass.h"
 #include "Scene/ICamera.h"
+#include "Rendering/RenderContext.h"
+
 
 namespace rv {
 
@@ -11,7 +13,7 @@ constexpr float NEAR_PLANE = 0.1f;
 constexpr float FAR_PLANE = 100.0f;
 
 
-void SSAOPass::Init()
+void SSAOPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
     glCreateFramebuffers(1, &ssaoFBO);
 
@@ -30,6 +32,8 @@ void SSAOPass::Init()
 
     GenerateSampleKernel();
     GenerateNoiseTexture();
+
+    frame.registry.Register("SSAOTexture", { RenderResourceType::Texture,o_SsaoTexture });
 }
 
 SSAOPass::~SSAOPass()
@@ -39,8 +43,10 @@ SSAOPass::~SSAOPass()
     glDeleteFramebuffers(1, &ssaoFBO);
 }
 
-void SSAOPass::Execute()
+void SSAOPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
+    auto i_Normal = frame.registry.Get("NormalTexture")->id;
+    auto i_Depth = frame.registry.Get("DepthTexture")->id;
 
     Shader& ssaoShader = Renderer::GetSSAOShader();
 
@@ -72,6 +78,9 @@ void SSAOPass::Execute()
     Renderer::DrawFullScreenQuad();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
+
+    frame.registry.Register("SSAOTexture", { RenderResourceType::Texture,o_SsaoTexture });
+
 }
 
 void SSAOPass::GenerateSampleKernel()

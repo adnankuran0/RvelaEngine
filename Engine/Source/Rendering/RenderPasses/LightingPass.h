@@ -1,7 +1,7 @@
 #pragma once
 #include "../RenderPass.h"
-#include "../Renderer.h"
 #include "Scene/Camera.h"
+#include <Rendering/RenderFrame.h>
 
 namespace rv {
 
@@ -10,21 +10,12 @@ class LightingPass : public RenderPass
 public:
 
     ~LightingPass();
-	void Execute() override;
-    void Init() override;
+    void Init(const RenderContext& ctx, RenderFrame& frame) override;
+	void Execute(const RenderContext& ctx, RenderFrame& frame) override;
 
-	GLuint GetScreenTexture() { return o_IntermediateColorTex; }
-    GLuint GetScreenFBO() { return o_ScreenFBO; }
-    GLuint GetIntermediateFBO() { return intermediateFBO; }
-
-	void SetDirectionalShadowMap(GLuint directionalShadowMap) { i_DirectionalShadowMap = directionalShadowMap; }
-	void SetPointShadowMap(GLuint pointShadowMap) { i_PointShadowMap = pointShadowMap; }
-	void SetLightSpaceMatrix(glm::mat4 lightSpaceMatrix) { i_LightSpaceMatrix = lightSpaceMatrix; }
 
 private:
-	GLuint i_DirectionalShadowMap = 0;
-	GLuint i_PointShadowMap = 0;
-	glm::mat4 i_LightSpaceMatrix;
+	
 	GLuint o_ScreenFBO = 0;
 	GLuint o_IntermediateColorTex = 0;
 

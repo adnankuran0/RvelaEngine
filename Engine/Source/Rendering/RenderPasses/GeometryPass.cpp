@@ -1,10 +1,12 @@
 #include "rvelapch.h"
 #include "GeometryPass.h"
 #include "Scene/ICamera.h"
+#include "Rendering/RenderContext.h"
+#include <Rendering/RenderFrame.h>
 
 namespace rv {
 
-void GeometryPass::Init()
+void GeometryPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
     glGenFramebuffers(1, &gBuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
@@ -53,7 +55,13 @@ void GeometryPass::Init()
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    frame.registry.Register("DepthTexture", { RenderResourceType::Texture, o_Depth });
+    frame.registry.Register("NormalTexture", { RenderResourceType::Texture, o_Normal });
+    frame.registry.Register("RoughnessTexture", { RenderResourceType::Texture, o_Roughness });
+    frame.registry.Register("MetallicTexture", { RenderResourceType::Texture, o_Metallic });
 }
+
+
 
 GeometryPass::~GeometryPass()
 {
@@ -64,8 +72,10 @@ GeometryPass::~GeometryPass()
     glDeleteTextures(1, &o_Metallic);
 }
 
-void GeometryPass::Execute()
+void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
+    auto& commands = frame.commands;
+    auto& resourceRegisty = frame.registry;
 
     Shader& geometryShader = Renderer::GetGeometryShader();
 
@@ -125,7 +135,10 @@ void GeometryPass::Execute()
         
     }
 
-    commands.clear();
+    resourceRegisty.Register("DepthTexture",{ RenderResourceType::Texture, o_Depth });
+    resourceRegisty.Register("NormalTexture",{ RenderResourceType::Texture, o_Normal });
+    resourceRegisty.Register("RoughnessTexture",{ RenderResourceType::Texture, o_Roughness });
+    resourceRegisty.Register("MetallicTexture",{ RenderResourceType::Texture, o_Metallic });
 
 }
 

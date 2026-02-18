@@ -1,11 +1,12 @@
 #include "rvelapch.h"
 #include "EntityBufferPass.h"
-#include "../Renderer.h"
+#include "Rendering/RenderContext.h"
 #include "Scene/ICamera.h"
+#include <Rendering/RenderFrame.h>
 
 namespace rv {
 
-void EntityBufferPass::Init()
+void EntityBufferPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
     glGenFramebuffers(1, &m_Framebuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer);
@@ -61,10 +62,16 @@ void EntityBufferPass::Init()
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    frame.registry.Register("EntityBuffer", { RenderResourceType::Framebuffer,m_Framebuffer });
 }
 
-void EntityBufferPass::Execute()
+
+void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
+    auto& commands = frame.commands;
+    auto& resourceRegistry = frame.registry;
+
     glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer);
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
 
@@ -105,7 +112,8 @@ void EntityBufferPass::Execute()
     glDepthMask(GL_TRUE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    commands.clear();
+    resourceRegistry.Register("EntityBuffer", { RenderResourceType::Framebuffer,m_Framebuffer });
+
 }
 
 

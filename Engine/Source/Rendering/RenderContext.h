@@ -22,6 +22,7 @@ public:
 	unsigned int viewportWidth;
 	unsigned int viewportHeight;
 	Scene* scene;
+	RenderProfile profile = RenderProfile::EDITOR;
 
 	void Clear()
 	{
@@ -33,14 +34,7 @@ public:
 		scene = nullptr;
 	}
 
-	bool IsValid()
-	{
-		if (!camera)
-		{
-			return false;
-		}
-		return true;
-	}
+	
 };
 
 }

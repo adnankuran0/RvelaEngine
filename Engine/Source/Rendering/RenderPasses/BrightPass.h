@@ -1,9 +1,6 @@
 #pragma once
 #include "../RenderPass.h"
-#include "Scene/Components.h"
-#include "../Renderer.h"
-#include "Scene/Camera.h"
-#include <array>
+#include <Rendering/RenderFrame.h>
 
 namespace rv {
 
@@ -11,13 +8,10 @@ class BrightPass : public RenderPass
 {
 public:
     ~BrightPass();
-    void Execute() override;
-    void Init() override;
-    GLuint GetBrightTexture() { return o_BrightColorTex; }
-    void SetScreenTexture(GLuint screenTexture) { i_ScreenTexture = screenTexture; }
+    void Init(const RenderContext& ctx, RenderFrame& frame) override;
+    void Execute(const RenderContext& ctx, RenderFrame& frame) override;
 
 private:
-    GLuint i_ScreenTexture = 0;
     GLuint o_BrightColorTex = 0;
     GLuint brightFBO = 0;
 };

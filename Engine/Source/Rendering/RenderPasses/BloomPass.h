@@ -1,5 +1,6 @@
 #pragma once
 #include "../RenderPass.h"
+#include <Rendering/RenderFrame.h>
 
 namespace rv {
 
@@ -7,18 +8,14 @@ class BloomPass : public RenderPass
 {
 public:
     ~BloomPass();
-    void Execute() override;
-    void Init() override;
-    GLuint GetBloomBlurTexture() { return o_BlurredTexture; }
-
-    void SetBrightTexture(GLuint brightTexture) { i_BrightTexture = brightTexture; }
+    void Init(const RenderContext& ctx, RenderFrame& frame) override;
+    void Execute(const RenderContext& ctx, RenderFrame& frame) override;
     
 
 private:
-    void Downsample();
-    void Upsample();
+    void Downsample(const RenderContext& ctx, RenderFrame& frame);
+    void Upsample(const RenderContext& ctx, RenderFrame& frame);
 
-    GLuint i_BrightTexture = 0;
     GLuint o_BlurredTexture = 0;
     std::vector<GLuint> downsampleFBOs;
     std::vector<GLuint> downsampleTextures;
