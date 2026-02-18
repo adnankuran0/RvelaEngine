@@ -24,6 +24,8 @@ void CompositePass::Init(const RenderContext& ctx, RenderFrame& frame)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	frame.registry.Register("FinalTexture", { RenderResourceType::Texture,o_FinalTexture });
+	frame.registry.Register("FinalFramebuffer",
+		{ RenderResourceType::Framebuffer, m_Framebuffer });
 }
 
 void CompositePass::Execute(const RenderContext& ctx, RenderFrame& frame)
@@ -56,7 +58,8 @@ void CompositePass::Execute(const RenderContext& ctx, RenderFrame& frame)
 	glEnable(GL_DEPTH_TEST);
 
 	frame.registry.Register("FinalTexture", { RenderResourceType::Texture,o_FinalTexture });
-
+	frame.registry.Register("FinalFramebuffer",
+		{ RenderResourceType::Framebuffer, m_Framebuffer });
 }
 
 

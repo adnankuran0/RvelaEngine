@@ -68,6 +68,7 @@ public:
     static Shader& GetOutlineShader() { return m_OutlineShader; }
     static Shader& GetEquirectangularToCubemapShader() { return m_EquirectangularToCubemap; }
     static Shader& GetEntityBufferShader() { return m_EntityBuffer; }
+    static Shader& GetMaskShader() { return m_MaskShader; }
 
 private:
     inline static GLFWwindow* activeWindow = nullptr;
@@ -87,6 +88,7 @@ private:
     inline static Shader m_OutlineShader;
     inline static Shader m_EquirectangularToCubemap;
     inline static Shader m_EntityBuffer;
+    inline static Shader m_MaskShader;
 
     static ScreenQuad m_ScreenQuad;
 };

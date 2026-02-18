@@ -38,6 +38,8 @@ SSRPass::~SSRPass()
 
 void SSRPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
+    if (!ctx.renderFeatures.ssr) return;
+
     auto i_Depth = frame.registry.Get("DepthTexture")->id;
     auto i_Normal = frame.registry.Get("NormalTexture")->id;
     auto i_Roughness = frame.registry.Get("RoughnessTexture")->id;

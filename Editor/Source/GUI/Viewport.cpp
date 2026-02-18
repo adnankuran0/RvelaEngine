@@ -184,6 +184,10 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
                 selectedEntity = entity;
                 engine->GetActiveScene().SetSelectedEntity(entity);
             }
+            else
+            {
+                selectedEntity = entt::null;
+            }
         }
         
     }

@@ -1,6 +1,7 @@
 ﻿#include "InspectorPanel.h"
 #include "ImGui/imgui.h"
 #include "Core/Engine.h"
+#include "Rendering/RenderLayer.h"
 
 namespace rv {
 
@@ -663,7 +664,12 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 
     if (ImGui::BeginTabItem("Environment"))
     {
-        ImGui::Text("Environment settings go here.");
+        auto& featureSettings = engine->GetRenderLayer().GetRenderContext().renderFeatures;
+
+        ImGui::Checkbox("SSAO", &featureSettings.ssao);
+        ImGui::Checkbox("SSR", &featureSettings.ssr);
+        ImGui::Checkbox("Bloom", &featureSettings.bloom);
+
         ImGui::EndTabItem();
     }
 

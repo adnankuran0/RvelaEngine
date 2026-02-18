@@ -11,35 +11,35 @@ class Engine;
 struct RenderContext;
 class RenderLayer;
 
-struct RenderFeatures
-{
-	bool ssao = true;
-	bool ssr = true;
-	bool bloom = true;
-};
+using RenderPassHandle = uint32_t;
 
+struct PassEntry
+{
+	RenderPassHandle id;
+	std::unique_ptr<RenderPass> pass;
+};
 
 class RenderPipeline
 {
 public:
-
-	RenderPipeline(Engine* engine);
+	RenderPipeline();
 	void EnsureInitialized(const RenderContext& ctx);
+	RenderPassHandle PushRenderPass(std::unique_ptr<RenderPass> pass);
+	RenderPass* GetRenderPass(RenderPassHandle id);
+	void Execute(const RenderContext& ctx);
+
 	[[nodiscard]] inline GLuint GetFinalTexture() noexcept { return m_RenderFrame.registry.Get("FinalTexture")->id; }
 	[[nodiscard]] inline GLuint GetEntityBuffer() noexcept { return m_RenderFrame.registry.Get("EntityBuffer")->id; }
-	void Execute(const RenderContext& ctx);
 
 private:
 	friend class RenderLayer;
 
-	Engine* engine;
 	RenderFrame m_RenderFrame;
-	RenderFeatures m_RenderFeatures;
 
 	bool isPipelineDirty = true;
 	bool isInitialized = false;
-	//Render Passes
-	std::vector<RenderPass*> m_RenderPasses;
+	std::vector<PassEntry> m_RenderPasses;
+	RenderPassHandle m_NextID = 1;
 
 
 };

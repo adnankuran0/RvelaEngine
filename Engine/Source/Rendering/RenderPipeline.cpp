@@ -11,43 +11,56 @@
 #include "Rendering/RenderPasses/GeometryPass.h"
 #include "Rendering/RenderPasses/SSAOPass.h"
 #include "Rendering/RenderPasses/SSRPass.h"
-#include "Rendering/RenderPasses/OutlinePass.h"
 #include "Rendering/RenderPasses/EntityBufferPass.h"
 
 namespace rv {
 
-RenderPipeline::RenderPipeline(Engine* engine)
+RenderPipeline::RenderPipeline()
 {
-	m_RenderPasses.push_back(new GeometryPass());
-	m_RenderPasses.push_back(new ShadowPass());
-	m_RenderPasses.push_back(new EntityBufferPass());
-	m_RenderPasses.push_back(new SkyboxPass());
-	m_RenderPasses.push_back(new LightingPass());
-	m_RenderPasses.push_back(new SSAOPass());
-	m_RenderPasses.push_back(new SSRPass());
-	m_RenderPasses.push_back(new SSRPass());
-	m_RenderPasses.push_back(new BrightPass());
-	m_RenderPasses.push_back(new BloomPass());
-	m_RenderPasses.push_back(new CompositePass());
-
-	this->engine = engine;
+	PushRenderPass(std::make_unique<GeometryPass>());
+	PushRenderPass(std::make_unique<ShadowPass>());
+	PushRenderPass(std::make_unique<EntityBufferPass>());
+	PushRenderPass(std::make_unique<SkyboxPass>());
+	PushRenderPass(std::make_unique<LightingPass>());
+	PushRenderPass(std::make_unique<SSAOPass>());
+	PushRenderPass(std::make_unique<SSRPass>());
+	PushRenderPass(std::make_unique<SSRPass>());
+	PushRenderPass(std::make_unique<BrightPass>());
+	PushRenderPass(std::make_unique<BloomPass>());
+	PushRenderPass(std::make_unique<CompositePass>());
 }
 
 void RenderPipeline::EnsureInitialized(const RenderContext& ctx)
 {
 	if (!isInitialized)
 	{
-		for (auto* pass : m_RenderPasses)
+		for (auto& [id, pass] : m_RenderPasses)
 			pass->Init(ctx,m_RenderFrame);
 
 		isInitialized = true;
 	}
 }
 
+RenderPassHandle RenderPipeline::PushRenderPass(std::unique_ptr<RenderPass> pass)
+{
+	RenderPassHandle id = m_NextID++;
+	m_RenderPasses.push_back({ id, std::move(pass) });
+	return id;
+}
+
+RenderPass* RenderPipeline::GetRenderPass(RenderPassHandle id)
+{
+	for (auto& entry : m_RenderPasses)
+	{
+		if (entry.id == id)
+			return entry.pass.get();
+	}
+	return nullptr;
+}
+
 void RenderPipeline::Execute(const RenderContext& ctx)
 {
-
-	for (auto* pass : m_RenderPasses)
+	for (auto& [id, pass] : m_RenderPasses)
 		pass->Execute(ctx, m_RenderFrame);
 	
 	m_RenderFrame.Reset();

@@ -12,7 +12,7 @@ class RenderLayer : public Layer
 public:
 	RenderLayer(Engine* engine) : Layer("RenderLayer"), m_Engine(engine) 
 	{
-		m_RenderPipeline = std::make_unique<RenderPipeline>(engine);
+		m_RenderPipeline = std::make_unique<RenderPipeline>();
 	}
 
 	void OnRender() override;
@@ -20,6 +20,8 @@ public:
 	GLuint GetEntityBuffer() { return m_RenderPipeline->GetEntityBuffer(); }
 	[[nodiscard]] inline GLuint GetFinalTexture() noexcept { return m_RenderPipeline->GetFinalTexture(); }
 	RenderContext& GetRenderContext() { return m_Context; }
+	RenderPassHandle PushRenderPass(std::unique_ptr<RenderPass> pass) { return m_RenderPipeline->PushRenderPass(std::move(pass)); }
+	RenderPass* GetRenderPass(RenderPassHandle id) { return m_RenderPipeline->GetRenderPass(id); };
 
 private:
 	Engine* m_Engine;

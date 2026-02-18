@@ -38,6 +38,7 @@ void Renderer::Init(GLFWwindow* window)
     m_OutlineShader.Init(VRT_PATH("Assets\\Shaders\\outline.glsl"));
     m_EquirectangularToCubemap.Init(VRT_PATH("Assets\\Shaders\\equirectangularToCubemap.glsl"));
     m_EntityBuffer.Init(VRT_PATH("Assets\\Shaders\\entityBuffer.glsl"));
+    m_MaskShader.Init(VRT_PATH("Assets\\Shaders\\mask.glsl"));
 
 
 

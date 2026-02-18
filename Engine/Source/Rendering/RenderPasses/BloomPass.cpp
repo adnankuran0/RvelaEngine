@@ -142,6 +142,8 @@ BloomPass::~BloomPass()
 
 void BloomPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
+    if (!ctx.renderFeatures.bloom) return;
+
     Downsample(ctx, frame);
 
     Upsample(ctx, frame);

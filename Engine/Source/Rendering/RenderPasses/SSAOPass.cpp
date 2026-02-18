@@ -45,6 +45,8 @@ SSAOPass::~SSAOPass()
 
 void SSAOPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
+    if (!ctx.renderFeatures.ssao) return;
+
     auto i_Normal = frame.registry.Get("NormalTexture")->id;
     auto i_Depth = frame.registry.Get("DepthTexture")->id;
 

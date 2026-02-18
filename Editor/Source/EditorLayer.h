@@ -12,6 +12,7 @@
 #include "GUI/Viewport.h"
 #include "GUI/InspectorPanel.h"
 #include "GUI/AssetBrowserPanel.h"
+#include <Rendering/RenderPipeline.h>
 
 namespace rv {
 
@@ -44,6 +45,9 @@ private:
     InspectorPanel m_InspectorPanel;
     AssetBrowserPanel m_AssetBrowserPanel;
     Viewport m_Viewport;
+
+    RenderPassHandle m_OutlinePass;
+    RenderPassHandle m_SelectedEntityMaskPass;
 
     std::vector<entt::entity> m_SelectedEntities;
 

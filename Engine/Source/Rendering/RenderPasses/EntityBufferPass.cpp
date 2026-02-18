@@ -64,6 +64,7 @@ void EntityBufferPass::Init(const RenderContext& ctx, RenderFrame& frame)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     frame.registry.Register("EntityBuffer", { RenderResourceType::Framebuffer,m_Framebuffer });
+    frame.registry.Register("EntityTexture", { RenderResourceType::Framebuffer,o_EntityTexture });
 }
 
 
@@ -113,6 +114,7 @@ void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     resourceRegistry.Register("EntityBuffer", { RenderResourceType::Framebuffer,m_Framebuffer });
+    frame.registry.Register("EntityTexture", { RenderResourceType::Framebuffer,o_EntityTexture });
 
 }
 

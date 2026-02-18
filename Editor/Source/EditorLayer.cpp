@@ -5,6 +5,9 @@
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_impl_glfw.h"
 #include "ImGui/imgui_impl_opengl3.h"
+#include "Rendering/RenderLayer.h"
+#include <Render/OutlinePass.h>
+#include <Render/SelectedEntityMaskPass.h>
 
 namespace rv { 
 
@@ -39,6 +42,10 @@ void EditorLayer::OnAttach()
     ImGui_ImplOpenGL3_Init("#version 460");
 
     SetStyle();
+
+    m_SelectedEntityMaskPass = m_Engine->GetRenderLayer().PushRenderPass(std::make_unique<SelectedEntityMaskPass>());
+    m_OutlinePass = m_Engine->GetRenderLayer().PushRenderPass(std::make_unique<OutlinePass>());
+
 }
 
 void EditorLayer::OnDetach()
@@ -52,6 +59,9 @@ void EditorLayer::OnUpdate()
 {
     if(m_Engine->GetActiveScene().GetState() == SceneState::EDIT)
         m_EditorCamera.Update();
+
+    static_cast<SelectedEntityMaskPass*>(m_Engine->GetRenderLayer().GetRenderPass(m_SelectedEntityMaskPass))->SetSelectedEntity(m_SelectedEntity);
+    static_cast<OutlinePass*>(m_Engine->GetRenderLayer().GetRenderPass(m_OutlinePass))->SetSelectedEntity(m_SelectedEntity);
    
 }
 

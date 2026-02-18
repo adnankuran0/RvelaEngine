@@ -12,6 +12,13 @@ enum class RenderProfile
 	EDITOR
 };
 
+struct RenderFeatures
+{
+	bool ssao = true;
+	bool ssr = true;
+	bool bloom = true;
+};
+
 struct RenderContext
 {
 public:
@@ -23,14 +30,13 @@ public:
 	unsigned int viewportHeight;
 	Scene* scene;
 	RenderProfile profile = RenderProfile::EDITOR;
+	RenderFeatures renderFeatures;
 
 	void Clear()
 	{
 		camera = nullptr;
 		pointLights.clear();
 		directionalLight.reset();
-		viewportWidth = 1920;
-		viewportHeight = 1080;
 		scene = nullptr;
 	}
 
