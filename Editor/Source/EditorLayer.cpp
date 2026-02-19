@@ -87,7 +87,7 @@ void EditorLayer::Render()
     ImGuiViewport* viewport = ImGui::GetMainViewport();
 
     m_MenuBar.Draw(m_Engine,m_AssetImporterRegistry);
-
+     
     m_ToolBar.Draw(m_Engine->GetActiveScene());
 
     m_Dockspace.Draw();

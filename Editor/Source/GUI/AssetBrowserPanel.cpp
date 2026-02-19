@@ -9,6 +9,7 @@
 #include "Core/Engine.h"
 #include "Scene/Entity.h"
 
+
 namespace rv {
 
 static std::filesystem::path s_CurrentDirectory;
@@ -90,8 +91,29 @@ void CollectSearchResults(const std::vector<std::filesystem::directory_entry>& f
     }
 }
 
+AssetBrowserPanel::AssetBrowserPanel()
+{
+    folderIcon.Init();
+    folderIcon.GenerateFromImage("C:\\RvelaEngine\\Resources\\Editor\\Icons\\folder.png");
+    materialIcon.Init();
+    materialIcon.GenerateFromImage("C:\\RvelaEngine\\Resources\\Editor\\Icons\\material.png");
+    sceneIcon.Init();
+    sceneIcon.GenerateFromImage("C:\\RvelaEngine\\Resources\\Editor\\Icons\\scene.png");
+    scriptIcon.Init();
+    scriptIcon.GenerateFromImage("C:\\RvelaEngine\\Resources\\Editor\\Icons\\script.png");
+    textureIcon.Init();
+    textureIcon.GenerateFromImage("C:\\RvelaEngine\\Resources\\Editor\\Icons\\texture.png");
+    prefabIcon.Init();
+    prefabIcon.GenerateFromImage("C:\\RvelaEngine\\Resources\\Editor\\Icons\\prefab.png");
+    meshIcon.Init();
+    meshIcon.GenerateFromImage("C:\\RvelaEngine\\Resources\\Editor\\Icons\\mesh.png");
+
+}
+
 void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDirectory)
 {
+   
+
     if (s_CurrentDirectory.empty())
     {
         s_CurrentDirectory = rootDirectory;
@@ -128,8 +150,25 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
 
     ImGui::BeginChild("Files", ImVec2(0, 0), true);
 
-    // Search input and refresh button on the same line
-    ImGui::PushItemWidth(-80.0f); // Leave space for refresh button
+    bool isAtRoot = s_CurrentDirectory == rootDirectory;
+
+    if (isAtRoot) {
+        ImGui::BeginDisabled(); 
+    }
+
+    if (ImGui::Button(" ^ ")) 
+    {
+        s_CurrentDirectory = s_CurrentDirectory.parent_path();
+        s_NeedsRefresh = true;
+    }
+
+    if (isAtRoot) {
+        ImGui::EndDisabled();
+    }
+
+    ImGui::SameLine(); 
+
+    ImGui::PushItemWidth(-110.0f);
     bool searchChanged = ImGui::InputTextWithHint("##Search", "Search assets...", s_SearchBuffer, sizeof(s_SearchBuffer));
     ImGui::PopItemWidth();
 
@@ -162,15 +201,31 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
     if (columnCount < 1) columnCount = 1;
 
     ImGui::Columns(columnCount, 0, false);
-
     // Use search results or cached files
     const auto& filesToShow = (s_SearchBuffer[0] != '\0') ? s_SearchResults : s_CachedFiles;
 
     for (const auto& entry : filesToShow)
     {
+        ImTextureID icon;
+        const auto& extension = entry.path().extension();
+        if (extension == ".rscene")
+            icon = sceneIcon.GetID();
+        else if (extension == ".rprefab")
+            icon = prefabIcon.GetID();
+        else if (entry.is_directory())
+            icon = folderIcon.GetID(); 
+        else if (extension == ".rtex" || extension == ".png" || extension == ".jpeg" || extension == ".jpg" || extension == ".tga")
+            icon = textureIcon.GetID();
+        else if (extension == ".rmat" )
+            icon = materialIcon.GetID();
+        else if (extension == ".rmesh" )
+            icon = meshIcon.GetID();
+        else 
+            icon = scriptIcon.GetID();
+
         const auto& filename = entry.path().filename().string();
 
-        ImGui::Button(filename.c_str(), ImVec2(thumbnailSize, thumbnailSize));
+        ImGui::ImageButton(filename.c_str(), icon,ImVec2(thumbnailSize, thumbnailSize));
 
         if (ImGui::BeginDragDropSource())
         {
@@ -189,15 +244,15 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
             }
             else
             {
-                // Use string_view to avoid copying extension
-                const auto& extension = entry.path().extension();
 
                 if (extension == ".rscene")
                 {
+                    
                     engine->GetSceneManager().LoadScene(entry.path().string());
                 }
                 else if (extension == ".rprefab")
                 {
+
                     const std::string& pathStr = entry.path().string();
                     std::ifstream inFile(pathStr, std::ios::binary);
                     if (!inFile.is_open()) {
@@ -215,13 +270,15 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
                 }
                 else if (extension == ".png" || extension == ".jpeg" || extension == ".jpg" || extension == ".tga")
                 {
+
                     std::string command = "\"" + entry.path().string() + "\"";
                     std::system(command.c_str());
                 }
             }
         }
 
-        ImGui::TextWrapped(filename.c_str());
+
+        ImGui::TextWrapped(entry.path().filename().string().c_str());
         ImGui::NextColumn();
     }
 

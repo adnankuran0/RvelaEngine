@@ -4,6 +4,7 @@
 #include "Rendering/Renderer.h"
 #include "Rendering/RenderFrame.h"
 #include "Scene/ICamera.h"
+#include "Scene/Scene.h"
 
 namespace rv {
 
@@ -34,7 +35,7 @@ void SelectedEntityMaskPass::Init(const RenderContext& ctx, RenderFrame& frame) 
 
 
 void SelectedEntityMaskPass::Execute(const RenderContext& ctx, RenderFrame& frame) {
-    if (m_SelectedEntity == entt::null)
+    if (m_SelectedEntity == entt::null || ctx.scene->GetState() != SceneState::EDIT)
         return;
 
     auto& commands = frame.commands;

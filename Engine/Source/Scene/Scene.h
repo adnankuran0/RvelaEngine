@@ -23,13 +23,12 @@ class Scene
 {
 public:
     Scene(const std::string& sceneName = "Untitled");
-
     void SetState(SceneState newState);
     SceneState GetState() const { return m_State; };
 
     void OnStart();
     void OnUpdate(float dt);
-    void OnStop();;
+    void OnStop();
 
     bool isLoading = false;
 

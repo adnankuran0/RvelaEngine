@@ -209,13 +209,16 @@ void main() {
         }
         
         FragColor = vec4(reflectionColor, reflectionStrength);
-    } else {
-        float fresnel = pow(1.0 - max(dot(-viewDir, worldNormal), 0.0), 5.0);
-        float fresnelFactor = mix(0.04, 1.0, fresnel);
-
+    } 
+    else {
         vec3 envColor = texture(uSkybox, reflectionDir).rgb;
-        //FragColor = vec4(envColor * fresnelFactor, fresnelFactor);
-        FragColor = vec4(0.0);
+        
+        float fresnel = pow(1.0 - max(dot(-viewDir, worldNormal), 0.0), 5.0);
+        float reflectionStrength = mix(0.04, 1.0, fresnel);
 
+        reflectionStrength *= 1.0 - roughness; 
+        reflectionStrength *= metallic;          
+
+        FragColor = vec4(envColor * reflectionStrength, reflectionStrength);
     }
 }

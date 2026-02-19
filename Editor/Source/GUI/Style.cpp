@@ -82,7 +82,7 @@ void SetStyle()
     style.ScrollbarRounding = 6.0f;
     style.GrabRounding = 6.0f;
 
-    style.FramePadding = ImVec2(8, 4);
+    style.FramePadding = ImVec2(4, 4);
     style.ItemSpacing = ImVec2(10, 6);
     style.WindowPadding = ImVec2(12, 8);
 }
