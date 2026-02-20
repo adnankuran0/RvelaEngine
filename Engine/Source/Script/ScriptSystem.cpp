@@ -21,6 +21,8 @@ ScriptSystem::ScriptSystem(Scene& scene) : m_Scene(scene)
         "Translate", &TransformComponent::Translate,
         "GetRotation", &TransformComponent::GetRotation,
         "SetRotation", &TransformComponent::SetRotation,
+        "GetEulerRotation", &TransformComponent::GetEulerRotation,
+        "SetEulerRotation", &TransformComponent::SetEulerRotation,
         "GetScale", &TransformComponent::GetScale,
         "SetScale", &TransformComponent::SetScale
     );

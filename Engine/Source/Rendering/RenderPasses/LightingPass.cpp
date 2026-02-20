@@ -67,7 +67,6 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     auto& commands = frame.commands;
     auto& resourceRegistry = frame.registry;
 
-    if (commands.empty() ) return;
 
 
     auto i_DirectionalShadowMap = resourceRegistry.Get("DirectionalShadowMap")->id;

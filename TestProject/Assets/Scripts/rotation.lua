@@ -10,12 +10,13 @@ function Player:OnUpdate(dt)
     time = time + dt
     local transform = self.entity:GetComponent("TransformComponent")
 
-    local pos = transform:GetPosition()
-    print(pos.y)
+    local rot = transform:GetEulerRotation()
     
-    pos.y = math.sin(time * 2.0) * 2.0  
-
-    transform:SetPosition(pos)
+    rot.x = time * 100
+    rot.y = time * 100 + 180
+    rot.z = time * 100 + 180
+    
+    transform:SetEulerRotation(rot)
 end
 
 return Player

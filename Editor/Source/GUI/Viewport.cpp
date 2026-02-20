@@ -39,6 +39,12 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
         if (ImGui::IsKeyPressed(ImGuiKey_R)) currentGizmoOperation = ImGuizmo::SCALE;
     }
 
+    ImGuizmo::GetStyle().RotationLineThickness = 4.0f;
+    ImGuizmo::GetStyle().ScaleLineCircleSize = 6.0f;
+    ImGuizmo::GetStyle().ScaleLineThickness = 4.0f;
+    ImGuizmo::GetStyle().TranslationLineArrowSize = 6.0f;
+    ImGuizmo::GetStyle().TranslationLineThickness = 4.0f;
+
     bool useSnap = ImGui::IsKeyDown(ImGuiKey_LeftCtrl);
 
 
@@ -65,6 +71,7 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
             useSnap ? snapScale : nullptr);
     }
 
+
     if (ImGuizmo::IsUsing()) {
         glm::vec3 translation, rotation, scale;
         ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(transform),
@@ -72,8 +79,9 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
             glm::value_ptr(rotation),
             glm::value_ptr(scale));
 
+
+
         if (currentGizmoMode == ImGuizmo::LOCAL) {
-            // Local mode için de parent transform'unu hesaba kat
             glm::mat4 parentWorld(1.0f);
             auto& scene = engine->GetActiveScene();
             auto& reg = scene.GetRegistry();
@@ -189,6 +197,8 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
             ImVec2(1, 0),
             IM_COL32_WHITE
         );
+
+        
 
         ImGui::TextColored(ImVec4(1, 1, 0, 1), "Viewport: %.0fx%.0f | Texture: 1920x1080 | Display: %.0fx%.0f | FPS: %.1f",
             viewportSize.x, viewportSize.y, displaySize.x, displaySize.y, ImGui::GetIO().Framerate);
