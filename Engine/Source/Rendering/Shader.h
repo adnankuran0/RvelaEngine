@@ -12,21 +12,25 @@ class Shader
 {
 public:
     unsigned int ID;
-    Shader(const Path& vertexPath, const Path& fragmentPath);
-    Shader(const Path& vertexPath, const Path& fragmentPath, const Path& geometryPath);
-    Shader(const Path& computePath);
+    Shader(const std::string& name, const Path& shaderPath);
     Shader() = default;
+    Shader(const Shader&) = delete;
+    Shader& operator=(const Shader&) = delete;
 
-    bool Init(const Path& vertexPath, const Path& fragmentPath);
-    bool Init(const Path& vertexPath, const Path& fragmentPath, const Path& geometryPath);
-    bool Init(const Path& computePath);
+    Shader(Shader&& other) noexcept;
+    Shader& operator=(Shader&& other) noexcept;
+    ~Shader() { Destroy(); }
 
+    bool Init(const std::string& name, const Path& shaderPath);
+    bool Recompile();
     void Destroy();
-
 
     void use();
     void dispatch(unsigned int x, unsigned int y = 1, unsigned int z = 1) const;
     void wait() const;
+
+    inline const std::string& GetName() { return m_Name; }
+    inline const Path& GetPath() { return m_Path; }
 
     inline void setBool(const std::string& name, bool value) const {
         glUniform1i(GetUniformLocation(name), (int)value);
@@ -59,7 +63,10 @@ public:
     GLint GetUniformLocation(const std::string& name) const; 
 
 private:
+    std::string m_Name;
+    Path m_Path;
     bool checkCompileErrors(unsigned int shader, std::string type);
+    bool CompileInternal(const Path& path, GLuint& outProgram);
     mutable std::unordered_map<std::string, GLint> uniformLocationCache;
 };
 

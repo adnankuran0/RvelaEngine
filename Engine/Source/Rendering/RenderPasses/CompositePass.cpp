@@ -36,7 +36,7 @@ void CompositePass::Execute(const RenderContext& ctx, RenderFrame& frame)
 	auto i_SsrTexture = frame.registry.Get("SSRTexture")->id;
 
 	glDisable(GL_DEPTH_TEST);
-	Shader& compositeShader = Renderer::GetCompositeShader();
+	Shader& compositeShader = ShaderManager::Get("Composite");
 	glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer);
 	glClear(GL_COLOR_BUFFER_BIT);
 

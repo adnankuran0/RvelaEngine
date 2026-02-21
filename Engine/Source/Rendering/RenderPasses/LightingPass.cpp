@@ -77,7 +77,7 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     glClear(GL_STENCIL_BUFFER_BIT);
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
 
-    Shader& shader = Renderer::GetPBRShader();
+    Shader& shader = ShaderManager::Get("PBR");
     shader.use();
 
     bool hasDirLight = ctx.directionalLight.has_value();

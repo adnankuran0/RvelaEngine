@@ -50,7 +50,7 @@ void SSAOPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     auto i_Normal = frame.registry.Get("NormalTexture")->id;
     auto i_Depth = frame.registry.Get("DepthTexture")->id;
 
-    Shader& ssaoShader = Renderer::GetSSAOShader();
+    Shader& ssaoShader = ShaderManager::Get("SSAO");
 
     const glm::mat4& projection = ctx.camera->GetProjectionMatrix();
     const glm::mat4 invProjection = glm::inverse(projection);

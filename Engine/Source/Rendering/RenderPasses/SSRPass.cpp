@@ -47,7 +47,7 @@ void SSRPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     auto i_Screen = frame.registry.Get("ScreenTexture")->id;
     auto i_Skybox = frame.registry.Get("SkyboxTexture")->id;
 
-    Shader& ssrShader = Renderer::GetSSRShader();
+    Shader& ssrShader = ShaderManager::Get("SSR");
     glDisable(GL_DEPTH_TEST);
     glBindFramebuffer(GL_FRAMEBUFFER, ssrFBO);
     glViewport(0, 0, ctx.viewportWidth / 2, ctx.viewportHeight / 2);

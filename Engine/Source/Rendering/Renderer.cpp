@@ -4,6 +4,7 @@
 #include "Core/Time.h"
 #include "Input/Input.h"
 #include "Utils/FileUtils.h"
+#include "ShaderManager.h"
 
 namespace rv {
 
@@ -22,29 +23,24 @@ Renderer::~Renderer()
 void Renderer::Init(GLFWwindow* window)
 {
     Renderer::activeWindow = window;
-    m_GeometryShader.Init(VRT_PATH("Assets\\Shaders\\geometry.glsl"));
-    m_PointShadowShader.Init(VRT_PATH("Assets\\Shaders\\pointShadow.glsl"));
-    m_DirectionalShadowShader.Init(VRT_PATH("Assets\\Shaders\\directionalShadow.glsl"));
-    m_SkyboxShader.Init(VRT_PATH("Assets\\Shaders\\skybox.glsl"));
-    m_PBRShader.Init(VRT_PATH("Assets\\Shaders\\pbr.glsl"));
-    m_BrightShader.Init(VRT_PATH("Assets\\Shaders\\brightPass.glsl"));
-    m_DownsampleShader.Init(VRT_PATH("Assets\\Shaders\\downsample.glsl"));
-    m_UpsampleShader.Init(VRT_PATH("Assets\\Shaders\\upsample.glsl"));
-    m_SSAOShader.Init(VRT_PATH("Assets\\Shaders\\ssao.glsl"));
-    m_SSRShader.Init(VRT_PATH("Assets\\Shaders\\ssr.glsl"));
-    m_CompositeShader.Init(VRT_PATH("Assets\\Shaders\\composite.glsl"));
-    m_LuminanceShader.Init(VRT_PATH("Assets\\Shaders\\luminance.glsl"));
-    m_ProceduralSkyShader.Init(VRT_PATH("Assets\\Shaders\\proceduralSky.glsl"));
-    m_OutlineShader.Init(VRT_PATH("Assets\\Shaders\\outline.glsl"));
-    m_EquirectangularToCubemap.Init(VRT_PATH("Assets\\Shaders\\equirectangularToCubemap.glsl"));
-    m_EntityBuffer.Init(VRT_PATH("Assets\\Shaders\\entityBuffer.glsl"));
-    m_MaskShader.Init(VRT_PATH("Assets\\Shaders\\mask.glsl"));
-
-
+    ShaderManager::Add(Shader("Geometry",VRT_PATH("Assets\\Shaders\\geometry.glsl")));
+    ShaderManager::Add(Shader("PointShadow",VRT_PATH("Assets\\Shaders\\pointShadow.glsl")));
+    ShaderManager::Add(Shader("DirectionalShadow",VRT_PATH("Assets\\Shaders\\directionalShadow.glsl")));
+    ShaderManager::Add(Shader("Skybox",VRT_PATH("Assets\\Shaders\\skybox.glsl")));
+    ShaderManager::Add(Shader("PBR",VRT_PATH("Assets\\Shaders\\pbr.glsl")));
+    ShaderManager::Add(Shader("Bright",VRT_PATH("Assets\\Shaders\\brightPass.glsl")));
+    ShaderManager::Add(Shader("Downsample",VRT_PATH("Assets\\Shaders\\downsample.glsl")));
+    ShaderManager::Add(Shader("Upsample",VRT_PATH("Assets\\Shaders\\upsample.glsl")));
+    ShaderManager::Add(Shader("SSAO",VRT_PATH("Assets\\Shaders\\ssao.glsl")));
+    ShaderManager::Add(Shader("SSR",VRT_PATH("Assets\\Shaders\\ssr.glsl")));
+    ShaderManager::Add(Shader("Composite",VRT_PATH("Assets\\Shaders\\composite.glsl")));
+    ShaderManager::Add(Shader("ProceduralSky",VRT_PATH("Assets\\Shaders\\proceduralSky.glsl")));
+    ShaderManager::Add(Shader("Outline",VRT_PATH("Assets\\Shaders\\outline.glsl")));
+    ShaderManager::Add(Shader("ToCubemap",VRT_PATH("Assets\\Shaders\\equirectangularToCubemap.glsl")));
+    ShaderManager::Add(Shader("EntityBuffer",VRT_PATH("Assets\\Shaders\\entityBuffer.glsl")));
+    ShaderManager::Add(Shader("Mask",VRT_PATH("Assets\\Shaders\\mask.glsl")));
 
     m_ScreenQuad.Init();
-
-
 
 }
 
@@ -68,17 +64,7 @@ void Renderer::EndFrame()
 
 void Renderer::Shutdown()
 {
-    m_GeometryShader.Destroy();
-    m_DirectionalShadowShader.Destroy();
-    m_PointShadowShader.Destroy();
-    m_SkyboxShader.Destroy();
-    m_PBRShader.Destroy();
-    m_BrightShader.Destroy();
-    m_DownsampleShader.Destroy();
-    m_UpsampleShader.Destroy();
-    m_SSAOShader.Destroy();
-    m_SSRShader.Destroy();
-    m_CompositeShader.Destroy();
+   
 }
 
 void Renderer::DrawFullScreenQuad()

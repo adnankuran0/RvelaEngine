@@ -8,7 +8,7 @@ namespace rv {
 void SkyboxPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
     Path path = VRT_PATH("Assets\\Textures\\skybox\\environment.hdr");
-    m_Skybox.InitHDR(path, Renderer::GetEquirectangularToCubemapShader());
+    m_Skybox.InitHDR(path, ShaderManager::Get("ToCubemap"));
 
     frame.registry.Register("SkyboxTexture", { RenderResourceType::Texture,m_Skybox.GetTextureID() });
 }
@@ -19,7 +19,7 @@ SkyboxPass::~SkyboxPass()
 void SkyboxPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
     auto screenFBO = frame.registry.Get("ScreenBuffer")->id;
-	m_Skybox.Render(Renderer::GetSkyboxShader(), ctx.camera->GetProjectionMatrix(), ctx.camera->GetViewMatrix(), screenFBO);
+	m_Skybox.Render(ShaderManager::Get("Skybox"), ctx.camera->GetProjectionMatrix(), ctx.camera->GetViewMatrix(), screenFBO);
     frame.registry.Register("SkyboxTexture", { RenderResourceType::Texture,m_Skybox.GetTextureID() });
 
 }

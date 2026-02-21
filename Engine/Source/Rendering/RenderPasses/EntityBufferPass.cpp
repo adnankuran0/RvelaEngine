@@ -84,7 +84,7 @@ void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     glDepthFunc(GL_LESS);
     glDepthMask(GL_TRUE);
 
-    Shader& shader = Renderer::GetEntityBufferShader();
+    Shader& shader = ShaderManager::Get("EntityBuffer");
     shader.use();
 
     glm::mat4 projection = ctx.camera->GetProjectionMatrix();

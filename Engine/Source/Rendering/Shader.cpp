@@ -2,96 +2,59 @@
 #include "Shader.h"
 #include "Core/Log.h"
 
-namespace rv { 
+using namespace rv;
 
-Shader::Shader(const Path& shaderPath)
+Shader::Shader(const std::string& name, const Path& shaderPath)
 {
-    Init(shaderPath);
+    Init(name,shaderPath);
 }
 
-bool Shader::Init(const Path& shaderPath)
+Shader::Shader(Shader&& other) noexcept
 {
-    std::ifstream shaderFile(shaderPath.GetAbsolute());
-    if (!shaderFile.is_open()) {
-        LOG_ERROR("ERROR::SHADER::FILE_NOT_OPENED");
+    ID = other.ID;
+    m_Name = std::move(other.m_Name);
+    m_Path = std::move(other.m_Path);
+    uniformLocationCache = std::move(other.uniformLocationCache);
+
+    other.ID = 0;
+}
+
+Shader& Shader::operator=(Shader&& other) noexcept
+{
+    if (this != &other)
+    {
+        Destroy();
+
+        ID = other.ID;
+        m_Name = std::move(other.m_Name);
+        m_Path = std::move(other.m_Path);
+        uniformLocationCache = std::move(other.uniformLocationCache);
+
+        other.ID = 0;
+    }
+    return *this;
+}
+
+bool Shader::Init(const std::string& name, const Path& shaderPath)
+{
+    m_Path = shaderPath;
+    m_Name = name;
+
+    GLuint program = 0;
+    if (!CompileInternal(shaderPath, program))
         return false;
-    }
 
-    std::stringstream buffer;
-    buffer << shaderFile.rdbuf();
-    std::string source = buffer.str();
-
-    std::unordered_map<std::string, std::string> shaderSources;
-    std::string currentType;
-    std::stringstream currentSource;
-
-    std::istringstream stream(source);
-    std::string line;
-    while (std::getline(stream, line)) {
-        if (line.find("#shader") != std::string::npos) {
-            if (!currentType.empty()) {
-                shaderSources[currentType] = currentSource.str();
-                currentSource.str("");
-                currentSource.clear();
-            }
-            currentType = line.substr(line.find("#shader") + 7);
-            currentType.erase(0, currentType.find_first_not_of(" \t"));
-        }
-        else {
-            currentSource << line << '\n';
-        }
-    }
-    if (!currentType.empty()) {
-        shaderSources[currentType] = currentSource.str();
-    }
-
-    std::vector<unsigned int> compiledShaders;
-
-    for (const auto& [type, src] : shaderSources) {
-        GLenum shaderType;
-        if (type == "vertex") shaderType = GL_VERTEX_SHADER;
-        else if (type == "fragment") shaderType = GL_FRAGMENT_SHADER;
-        else if (type == "geometry") shaderType = GL_GEOMETRY_SHADER;
-        else if (type == "compute") shaderType = GL_COMPUTE_SHADER;
-        else {
-            LOG_ERROR("ERROR::SHADER::UNKNOWN_SHADER_TYPE: {}", type);
-            continue;
-        }
-
-        const char* code = src.c_str();
-        unsigned int shader = glCreateShader(shaderType);
-        glShaderSource(shader, 1, &code, nullptr);
-        glCompileShader(shader);
-
-        if (!checkCompileErrors(shader, type)) {
-            for (auto id : compiledShaders)
-                glDeleteShader(id);
-            return false;
-        }
-
-        compiledShaders.push_back(shader);
-    }
-
-    ID = glCreateProgram();
-    for (auto shader : compiledShaders)
-        glAttachShader(ID, shader);
-    glLinkProgram(ID);
-
-    if (!checkCompileErrors(ID, "PROGRAM")) {
-        for (auto shader : compiledShaders)
-            glDeleteShader(shader);
-        return false;
-    }
-
-    for (auto shader : compiledShaders)
-        glDeleteShader(shader);
-
+    ID = program;
     return true;
 }
 
 void Shader::Destroy()
 {
-    glDeleteProgram(ID);
+    if (ID != 0)
+    {
+        glDeleteProgram(ID);
+        ID = 0;
+    }
 }
 
 void Shader::use()
@@ -138,6 +101,18 @@ bool Shader::checkCompileErrors(unsigned int shader, const std::string type)
     return true;
 }
 
+bool Shader::Recompile()
+{
+    GLuint newProgram = 0;
+
+    if (!CompileInternal(m_Path, newProgram))
+        return false;
+
+    glDeleteProgram(ID);
+    ID = newProgram;
+    uniformLocationCache.clear();
+    return true;
+}
 
 GLint Shader::GetUniformLocation(const std::string& name) const {
     auto it = uniformLocationCache.find(name);
@@ -149,4 +124,100 @@ GLint Shader::GetUniformLocation(const std::string& name) const {
     return location;
 }
 
+bool Shader::CompileInternal(const Path& path, GLuint& outProgram)
+{
+    std::ifstream shaderFile(path.GetAbsolute());
+    if (!shaderFile.is_open())
+    {
+        LOG_ERROR("ERROR::SHADER::FILE_NOT_OPENED");
+        return false;
+    }
+
+    std::stringstream buffer;
+    buffer << shaderFile.rdbuf();
+    std::string source = buffer.str();
+
+    std::unordered_map<std::string, std::string> shaderSources;
+    std::string currentType;
+    std::stringstream currentSource;
+
+    std::istringstream stream(source);
+    std::string line;
+
+    while (std::getline(stream, line))
+    {
+        if (line.find("#shader") != std::string::npos)
+        {
+            if (!currentType.empty())
+            {
+                shaderSources[currentType] = currentSource.str();
+                currentSource.str("");
+                currentSource.clear();
+            }
+
+            currentType = line.substr(line.find("#shader") + 7);
+            currentType.erase(0, currentType.find_first_not_of(" \t"));
+        }
+        else
+        {
+            currentSource << line << '\n';
+        }
+    }
+
+    if (!currentType.empty())
+        shaderSources[currentType] = currentSource.str();
+
+    std::vector<GLuint> compiledShaders;
+
+    for (const auto& [type, src] : shaderSources)
+    {
+        GLenum shaderType = 0;
+
+        if (type == "vertex") shaderType = GL_VERTEX_SHADER;
+        else if (type == "fragment") shaderType = GL_FRAGMENT_SHADER;
+        else if (type == "geometry") shaderType = GL_GEOMETRY_SHADER;
+        else if (type == "compute") shaderType = GL_COMPUTE_SHADER;
+        else
+        {
+            LOG_ERROR("ERROR::SHADER::UNKNOWN_SHADER_TYPE: {}", type);
+            continue;
+        }
+
+        GLuint shader = glCreateShader(shaderType);
+        const char* code = src.c_str();
+        glShaderSource(shader, 1, &code, nullptr);
+        glCompileShader(shader);
+
+        if (!checkCompileErrors(shader, type))
+        {
+            glDeleteShader(shader);
+            for (auto s : compiledShaders)
+                glDeleteShader(s);
+            return false;
+        }
+
+        compiledShaders.push_back(shader);
+    }
+
+    GLuint program = glCreateProgram();
+
+    for (auto shader : compiledShaders)
+        glAttachShader(program, shader);
+
+    glLinkProgram(program);
+
+    if (!checkCompileErrors(program, "PROGRAM"))
+    {
+        glDeleteProgram(program);
+        for (auto s : compiledShaders)
+            glDeleteShader(s);
+        return false;
+    }
+
+    for (auto s : compiledShaders)
+        glDeleteShader(s);
+
+    outProgram = program;
+    return true;
 }
+

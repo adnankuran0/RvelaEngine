@@ -28,7 +28,7 @@ void OutlinePass::Execute(const RenderContext& ctx, RenderFrame& frame) {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    Shader& shader = Renderer::GetOutlineShader();
+    Shader& shader = ShaderManager::Get("Outline");
     shader.use();
     glBindTextureUnit(0, maskRes->id);
 

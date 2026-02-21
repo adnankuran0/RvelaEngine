@@ -18,9 +18,9 @@ Engine::Engine()
 
 	m_Window.Init();
 	m_ProjectManager.LoadProject("C:\\RvelaEngine\\TestProject\\TestProject.rproj");
-	m_Renderer.Init(m_Window.GetGLFWWindow());
 	m_AssetRegistry.Init(m_ProjectManager.GetProjectPath()); //TODO: Make this works with assets path
 	m_SceneManager.SetActiveScene(m_SceneManager.CreateScene("EmptyScene"));
+	m_Renderer.Init(m_Window.GetGLFWWindow());
 	m_RenderLayer = new RenderLayer(this);
 	PushLayer(m_RenderLayer);
 	Selection = SelectionManager(m_RenderLayer);
@@ -142,6 +142,15 @@ void Engine::HandleEvents() noexcept
 					m_EditorCamera->SprintSpeed += scrollEvent->GetYOffset();
 					m_EditorCamera->SprintSpeed = std::clamp(m_EditorCamera->SprintSpeed, 2.5f, 30.0f);
 				}
+			}
+			break;
+		}
+		case EventType::KeyPressed:
+		{
+			if (Input::IsKeyJustPressed(KeyCode::End))
+			{
+				LOG_DEBUG("Shaders reloaded.");
+				ShaderManager::ReloadAll();
 			}
 			break;
 		}

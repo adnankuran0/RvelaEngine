@@ -15,12 +15,12 @@ void BrightPass::Init(const RenderContext& ctx, RenderFrame& frame)
     glTexImage2D(
         GL_TEXTURE_2D,
         0,
-        GL_R11F_G11F_B10F,           
+        GL_RGB16F,           
         ctx.viewportWidth / 2,
         ctx.viewportHeight / 2,
         0,
         GL_RGB,                       
-        GL_UNSIGNED_INT_10F_11F_11F_REV,
+        GL_FLOAT,
         nullptr
     );
 
@@ -49,11 +49,11 @@ void BrightPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     glDisable(GL_DEPTH_TEST);
 
-    Shader& brightShader = Renderer::GetBrightShader();
+    Shader& brightShader = ShaderManager::Get("Bright");
     brightShader.use();
 
     brightShader.setInt("hdrTexture", 0);
-    brightShader.setFloat("threshold", 1.0f);
+    brightShader.setFloat("threshold", 0.9f);
     brightShader.setFloat("knee", 0.5f);
 
     glBindTextureUnit(0, i_ScreenTexture); 

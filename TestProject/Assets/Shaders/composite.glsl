@@ -47,7 +47,8 @@ void main()
     float ao = blurredAO / 9.0;
     
     vec3 ambient = hdrColor * 0.03;
-    hdrColor -= ambient * (1.0 - ao) * 50.0;
+    hdrColor -= ambient * (1.0 - ao) * 2.0;
+    hdrColor = max(hdrColor, vec3(0.0));
     
     hdrColor = mix(hdrColor, hdrColor + ssrSample.rgb, ssrSample.a);
     
@@ -58,6 +59,5 @@ void main()
 
     // Gamma correction
     mapped = pow(mapped, vec3(1.0 / 2.2));
-
     FragColor = vec4(mapped, 1.0);
 }

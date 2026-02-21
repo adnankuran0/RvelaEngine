@@ -97,7 +97,7 @@ frame)
 
     if (ctx.directionalLight && ctx.directionalLight->castShadows)
     {
-        Shader& shadowShader = Renderer::GetDirectionalShadowShader();
+        Shader& shadowShader = ShaderManager::Get("DirectionalShadow");
         shadowShader.use();
 
         
@@ -140,7 +140,7 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
 {
     auto& commands = frame.commands;
 
-    Shader& pointShadowShader = Renderer::GetPointShadowShader();
+    Shader& pointShadowShader = ShaderManager::Get("PointShadow");
     pointShadowShader.use();
     glBindFramebuffer(GL_FRAMEBUFFER, pointFBO);
     glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, o_PointShadowMap, 0);

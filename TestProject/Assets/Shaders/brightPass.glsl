@@ -21,9 +21,8 @@ layout(binding = 0) uniform sampler2D hdrTexture;
 uniform float threshold;
 uniform float knee;
 
-float brightness(vec3 c)
-{
-    return max(c.r, max(c.g, c.b));
+float brightness(vec3 c) {
+    return dot(c, vec3(0.2126, 0.7152, 0.0722)); 
 }
 
 void main()
@@ -34,5 +33,10 @@ void main()
     float soft = clamp((br - threshold + knee) / (2.0 * knee), 0.0, 1.0);
     float contrib = max(br - threshold, 0.0) + soft * knee;
 
-    FragColor = vec4(color * (contrib / max(br, 1e-5)), 1.0);
+    vec4 finalColor = vec4(color * (contrib / max(br, 1e-5)), 1.0);
+
+    
+    
+
+    FragColor = finalColor;
 }

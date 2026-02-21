@@ -77,7 +77,7 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     auto& commands = frame.commands;
     auto& resourceRegisty = frame.registry;
 
-    Shader& geometryShader = Renderer::GetGeometryShader();
+    Shader& geometryShader = ShaderManager::Get("Geometry");
 
     glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);

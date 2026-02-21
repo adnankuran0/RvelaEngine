@@ -11,6 +11,7 @@
 #include "Scene/Components.h"
 #include "Skybox.h"
 #include "ScreenQuad.h"
+#include "ShaderManager.h"
 
 namespace rv {
 
@@ -52,43 +53,11 @@ public:
 
     static void DrawFullScreenQuad();
 
-    static Shader& GetPBRShader() { return m_PBRShader; }
-    static Shader& GetSkyboxShader() { return m_SkyboxShader; }
-    static Shader& GetDirectionalShadowShader() { return m_DirectionalShadowShader; }
-    static Shader& GetPointShadowShader() { return m_PointShadowShader; }
-    static Shader& GetBrightShader() { return m_BrightShader; }
-    static Shader& GetDownsampleShader() { return m_DownsampleShader; }
-    static Shader& GetUpsampleShader() { return m_UpsampleShader; }
-    static Shader& GetGeometryShader() { return m_GeometryShader; }
-    static Shader& GetSSAOShader() { return m_SSAOShader; }
-    static Shader& GetSSRShader() { return m_SSRShader; }
-    static Shader& GetCompositeShader() { return m_CompositeShader; }
-    static Shader& GetLuminanceShader() { return m_LuminanceShader; }
-    static Shader& GetProceduralSkyShader() { return m_ProceduralSkyShader; }
-    static Shader& GetOutlineShader() { return m_OutlineShader; }
-    static Shader& GetEquirectangularToCubemapShader() { return m_EquirectangularToCubemap; }
-    static Shader& GetEntityBufferShader() { return m_EntityBuffer; }
-    static Shader& GetMaskShader() { return m_MaskShader; }
+    
 
 private:
     inline static GLFWwindow* activeWindow = nullptr;
-    inline static Shader m_PBRShader;
-    inline static Shader m_SkyboxShader;
-    inline static Shader m_DirectionalShadowShader;
-    inline static Shader m_PointShadowShader;
-    inline static Shader m_BrightShader;
-    inline static Shader m_DownsampleShader;
-    inline static Shader m_UpsampleShader;
-    inline static Shader m_GeometryShader;
-    inline static Shader m_SSAOShader;
-    inline static Shader m_SSRShader;
-    inline static Shader m_CompositeShader;
-    inline static Shader m_LuminanceShader;
-    inline static Shader m_ProceduralSkyShader;
-    inline static Shader m_OutlineShader;
-    inline static Shader m_EquirectangularToCubemap;
-    inline static Shader m_EntityBuffer;
-    inline static Shader m_MaskShader;
+   
 
     static ScreenQuad m_ScreenQuad;
 };

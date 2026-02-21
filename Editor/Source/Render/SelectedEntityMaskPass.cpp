@@ -49,7 +49,7 @@ void SelectedEntityMaskPass::Execute(const RenderContext& ctx, RenderFrame& fram
     glDisable(GL_DEPTH_TEST);
     glDepthMask(GL_FALSE);
 
-    Shader& shader = Renderer::GetMaskShader();
+    Shader& shader = ShaderManager::Get("Mask");
     shader.use();
 
     glm::mat4 projection = ctx.camera->GetProjectionMatrix();

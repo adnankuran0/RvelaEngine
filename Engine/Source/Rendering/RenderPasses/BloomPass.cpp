@@ -88,7 +88,7 @@ void BloomPass::Downsample(const RenderContext& ctx, RenderFrame& frame)
 {
     auto i_BrightTexture = frame.registry.Get("BrightTexture")->id;
 
-    Shader& downsampleShader = Renderer::GetDownsampleShader();
+    Shader& downsampleShader = ShaderManager::Get("Downsample");
     for (int i = 0; i < mipLevels; ++i)
     {
         glBindFramebuffer(GL_FRAMEBUFFER, downsampleFBOs[i]);
@@ -112,7 +112,7 @@ void BloomPass::Downsample(const RenderContext& ctx, RenderFrame& frame)
 
 void BloomPass::Upsample(const RenderContext& ctx, RenderFrame& frame)
 {
-    Shader& upsampleShader = Renderer::GetUpsampleShader();
+    Shader& upsampleShader = ShaderManager::Get("Upsample");
     upsampleShader.use();
 
     glEnable(GL_BLEND);

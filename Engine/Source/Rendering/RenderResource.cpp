@@ -1,5 +1,6 @@
 #include "rvelapch.h"
 #include "RenderResource.h"
+#include "ShaderManager.h"
 
 namespace rv {
 
@@ -7,6 +8,8 @@ void RenderResourceRegistry::Register(const std::string& name, RenderResource re
 {
     m_Resources[name] = resource;
 }
+
+
 
 RenderResource* RenderResourceRegistry::Get(const std::string& name)
 {
@@ -16,5 +19,6 @@ RenderResource* RenderResourceRegistry::Get(const std::string& name)
 
     return &it->second;
 }
+
 
 }
