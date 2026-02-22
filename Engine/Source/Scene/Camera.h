@@ -1,31 +1,77 @@
 #pragma once
-#include "Scene/Components/CameraComponent.h"
-#include "Scene/Components/TransformComponent.h"
 #include <glm/gtc/matrix_transform.hpp>
-#include "Scene/ICamera.h"
+#include "AABB.h"
+#include <Rendering/Frustum.h>
 
 namespace rv {
 
-class Entity; // forward declaration
 
-class Camera : public ICamera
+
+class Camera
 {
 public:
-    Camera(Entity* entity);
-        
-    glm::mat4 GetProjectionMatrix() override;
-    glm::mat4 GetViewMatrix() override;
-    glm::vec3 GetPosition() override;
-    
-    void SetActive(bool active) { m_Component->isActive = active; }
-    bool IsActive() const { return m_Component->isActive; }
 
-    Entity* GetEntity() const { return m_Entity; }
+    enum class Projection
+    {
+        Perspective,
+        Orthographic
+    };
 
-private:
-    Entity* m_Entity;
-    CameraComponent* m_Component;
-    TransformComponent* m_Transform;
+    virtual ~Camera() = default;
+
+    glm::mat4 GetProjectionMatrix()
+    {
+        float aspect = static_cast<float>(width) / static_cast<float>(height);
+        if (ProjectionType == Projection::Perspective)
+        {
+            return glm::perspective(glm::radians(FOV), aspect, NearClip, FarClip);
+        }
+        else
+        {
+            float halfHeight = OrthoSize;
+            float halfWidth = OrthoSize * aspect;
+
+            return glm::ortho(
+                -halfWidth, halfWidth,
+                -halfHeight, halfHeight,
+                NearClip, FarClip
+            );
+        }
+    }
+
+    glm::mat4 GetViewMatrix()
+    {
+        return glm::lookAt(Position, Position + Front, Up);
+    }
+
+    bool Intersects(const AABB& AABB)
+    {
+        return frustum.Intersects(AABB);
+    }
+
+    bool Intersects(const glm::mat4& projView, const AABB& AABB)
+    {
+        return frustum.Intersects(projView, AABB);
+    }
+
+    void UpdateFrustum()
+    {
+        frustum.Update(GetProjectionMatrix() * GetViewMatrix());
+    }
+
+    Frustum frustum;
+    glm::vec3 Position{};
+    glm::vec3 Front{ 0.0f, 0.0f, -1.0f };
+    glm::vec3 Up{ 0.0f, 1.0f, 0.0f };
+    glm::vec3 Right{1.0f,0.0f,0.0f};
+    glm::vec3 WorldUp{ 0.0f, 1.0f, 0.0f};
+    float FOV{ 90.0f };
+    float OrthoSize{ 10.0f };
+    float NearClip{ 0.1f };
+    float FarClip{ 1000.0f };
+    int width{ 1920 };
+    int height{ 1080 };
+    Projection ProjectionType = Projection::Perspective;
 };
 
 }

@@ -32,8 +32,6 @@ Engine::Engine()
 	{
 		LOG_WARN("Another instance of Engine already exists!");
 	}
-
-
 	
 }
 
@@ -82,16 +80,12 @@ void Engine::Run()
 {
 	LOG_INFO("Engine has started!");
 
-	
-
 	while (!glfwWindowShouldClose(GetWindow().GetGLFWWindow()))
 	{
 		glfwPollEvents();
 		HandleEvents();
 
 		Time::Update();
-
-		
 
 		while (Time::ShouldRunFixedUpdate())
 		{
@@ -160,13 +154,14 @@ void Engine::HandleEvents() noexcept
 		});
 }
 
-ICamera* Engine::GetCamera() noexcept
+Camera* Engine::GetCamera() noexcept
 {
-	Camera* camera = GetSceneCamera();
-	if (m_SceneManager.GetActiveScene().GetState() == SceneState::EDIT || !camera)
-		return m_EditorCamera;
-	else
-		return camera;
+	Scene& scene = m_SceneManager.GetActiveScene();
+	Camera* sceneCamera = scene.GetCameraSystem().GetActiveCamera();
+
+	bool useEditorCamera = scene.GetState() == SceneState::EDIT || !sceneCamera;
+
+	return useEditorCamera ? m_EditorCamera : sceneCamera;
 }
 
 void Engine::Render()

@@ -11,7 +11,7 @@
 
 namespace rv {
 
-Scene::Scene(const std::string& sceneName) : m_Registry() , m_ScriptSystem(*this)
+Scene::Scene(const std::string& sceneName) : m_Registry() , m_ScriptSystem(*this), m_CameraSystem(*this)
 {
     m_SceneName = sceneName;
     m_RootEntity = m_Registry.create();
@@ -103,6 +103,7 @@ void Scene::Update()
     if (m_State == SceneState::PLAY)
         OnUpdate(Time::GetDeltaTime());
     UpdateHierarchy(); 
+    m_CameraSystem.Update();
 }
 
 entt::registry& Scene::GetRegistry() { return m_Registry; }
@@ -321,7 +322,6 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
             {
                 auto& comp = AddComponent<CameraComponent>(e);
                 DeserializeBin_CameraComp(ptr, comp);
-                GetCameraSystem().RegisterCamera(e);
                 break;
             }
             case ComponentType::SceneTree:

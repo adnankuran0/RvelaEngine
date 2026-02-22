@@ -312,7 +312,7 @@ void main()
     }
 
     // Ambient lighting
-    vec3 ambient = vec3(0.03) * albedo * ao;
+    vec3 ambient = vec3(0.1) * albedo * ao;
     vec3 color = ambient + Lo;
 
     FragColor = vec4(color, albedoTex.a);

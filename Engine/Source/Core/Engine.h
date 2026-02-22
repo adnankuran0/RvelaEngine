@@ -35,16 +35,15 @@ public:
 	SceneManager& GetSceneManager() noexcept { return m_SceneManager; }
 	AssetRegistry& GetAssetRegistry() noexcept { return m_AssetRegistry; }
 
-	CameraSystem& GetCameraSystem() noexcept { return m_SceneManager.GetActiveScene().GetCameraSystem(); }
 	EditorCamera* GetEditorCamera() const noexcept { return m_EditorCamera; }
-	Camera* GetSceneCamera() noexcept { return GetCameraSystem().GetActiveCamera(); }
-	ICamera* GetCamera() noexcept;
+	Camera* GetCamera() noexcept;
 
 	RenderLayer& GetRenderLayer() noexcept { return *m_RenderLayer; }
 
 	inline void SetEditorCamera(EditorCamera* editorCam) { m_EditorCamera = editorCam; }
 
 	SelectionManager Selection;
+
 private:
 
 	LayerStack m_LayerStack;

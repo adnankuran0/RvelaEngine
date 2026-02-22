@@ -128,7 +128,6 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             }
         }
 
-
         if (registry.any_of<CameraComponent>(selectedEntity))
         {
             bool open = ImGui::CollapsingHeader("Camera");
@@ -142,11 +141,30 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 
             if (open)
             {
-                auto& cameraComponent = registry.get<CameraComponent>(selectedEntity);
+                auto& camComp = registry.get<CameraComponent>(selectedEntity);
+                auto& camera = camComp.camera;
 
-                ImGui::SliderFloat("Fov", &cameraComponent.fov, 0.0f, 120.0f);
-                ImGui::SliderFloat("Near clip", &cameraComponent.nearClip, 0.001f, 1.0f);
-                ImGui::SliderFloat("Far clip", &cameraComponent.farClip, 1.0f, 1000.0f);
+                ImGui::Checkbox("Is Active", &camComp.isActive);
+
+                const char* projectionTypes[] = { "Perspective", "Orthographic" };
+                int current = static_cast<int>(camera.ProjectionType);
+
+                if (ImGui::Combo("Projection", &current, projectionTypes, 2))
+                {
+                    camera.ProjectionType = static_cast<Camera::Projection>(current);
+                }
+
+                if (camera.ProjectionType == Camera::Projection::Perspective)
+                {
+                    ImGui::SliderFloat("Fov", &camera.FOV, 1.0f, 120.0f);
+                }
+                else
+                {
+                    ImGui::SliderFloat("Ortho Size", &camera.OrthoSize, 0.1f, 100.0f);
+                }
+
+                ImGui::SliderFloat("Near clip", &camera.NearClip, 0.001f, 10.0f);
+                ImGui::SliderFloat("Far clip", &camera.FarClip, 1.0f, 5000.0f);
             }
         }
 

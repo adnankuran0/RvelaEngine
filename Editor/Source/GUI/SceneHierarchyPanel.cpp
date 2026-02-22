@@ -149,7 +149,8 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
         }
         
         if (ImGui::MenuItem("Camera")) {
-            selectedEntity = engine->GetCameraSystem().CreateCamera(scene).GetEntity()->GetHandle();
+            selectedEntity = scene.CreateEntity("Camera");
+            scene.AddComponent<CameraComponent>(selectedEntity);
         }
 
         if (ImGui::BeginMenu("Primitives")) {

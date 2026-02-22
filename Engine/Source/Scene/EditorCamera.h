@@ -1,13 +1,13 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include "Scene/ICamera.h"
+#include "Scene/Camera.h"
 
 struct GLFWwindow;
 
 namespace rv {
 
-class EditorCamera : public ICamera
+class EditorCamera : public Camera
 {
 public:
     EditorCamera(glm::vec3 position = { 0.0f, 2.0f, 5.0f },
@@ -19,9 +19,7 @@ public:
         float yaw, float pitch,
         int width, int height);
 
-    glm::mat4 GetViewMatrix() override;
-    glm::mat4 GetProjectionMatrix() override;
-    glm::vec3 GetPosition() override;
+
 
     void Update();
     void OnMouseMoved(double xPosIn, double yPosIn, GLFWwindow* window);
@@ -33,19 +31,12 @@ private:
     void UpdateCameraVectors();
 
 public:
-    glm::vec3 Position{};
-    glm::vec3 Front{ 0.0f, 0.0f, -1.0f };
-    glm::vec3 Up{};
-    glm::vec3 Right{};
-    glm::vec3 WorldUp{};
-
     float Yaw{ -90.0f };
     float Pitch{ 0.0f };
 
     float MovementSpeed{ 5.0f };
     float SprintSpeed{ 10.0f };
     float MouseSensitivity{ 0.075f };
-    float Zoom{ 90.0f };
 
     float lastX{ 0.0f };
     float lastY{ 0.0f };
@@ -54,8 +45,7 @@ public:
     float positionSmoothness{ 20.0f };
     glm::vec3 targetPosition{};
 
-    int width{ 1920 };
-    int height{ 1080 };
+
 };
 
 }

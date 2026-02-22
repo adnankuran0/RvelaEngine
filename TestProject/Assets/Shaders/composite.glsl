@@ -46,8 +46,8 @@ void main()
     }
     float ao = blurredAO / 9.0;
     
-    vec3 ambient = hdrColor * 0.03;
-    hdrColor -= ambient * (1.0 - ao) * 2.0;
+    vec3 ambient = hdrColor * 0.1;
+    hdrColor -= ambient * (1.0 - ao) * 10.0;
     hdrColor = max(hdrColor, vec3(0.0));
     
     hdrColor = mix(hdrColor, hdrColor + ssrSample.rgb, ssrSample.a);

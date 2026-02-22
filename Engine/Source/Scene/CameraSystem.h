@@ -9,25 +9,19 @@ class Scene; // forward declaration
 class CameraSystem
 {
 public:
-    CameraSystem() = default;
+    CameraSystem(Scene& scene) : m_Scene(scene) {}
 
-    Camera& CreateCamera(Scene& scene, const glm::vec3& position = { 0,0,0 });
-    Camera& RegisterCamera(Entity& cameraEntity);
-
-    void SetActiveCamera(Camera& cam);
-    Camera* GetActiveCamera() { return m_ActiveCamera; }
+    Camera* GetActiveCamera();
 
     void Update()
     {
-        if (m_ActiveCamera)
-            m_ActiveCamera->UpdateFrustum();
+        if (GetActiveCamera())
+            GetActiveCamera()->UpdateFrustum();
     }
 
-    const std::vector<std::unique_ptr<Camera>>& GetAllCameras() const { return m_Cameras; }
-
 private:
-    std::vector<std::unique_ptr<Camera>> m_Cameras;
-    Camera* m_ActiveCamera = nullptr;
+    Scene& m_Scene;
+
 };
 
 }

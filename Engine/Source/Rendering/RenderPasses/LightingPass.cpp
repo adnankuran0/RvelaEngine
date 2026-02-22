@@ -127,7 +127,7 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     glBindTextureUnit(POINT_SHADOW_MAP_SLOT, i_PointShadowMap);
 
     shader.setInt("pointLightCount", pointLightCount);
-    shader.setVec3("camPos", ctx.camera->GetPosition());
+    shader.setVec3("camPos", ctx.camera->Position);
     shader.setMat4("view", ctx.camera->GetViewMatrix());
     shader.setMat4("projection", ctx.camera->GetProjectionMatrix());
 

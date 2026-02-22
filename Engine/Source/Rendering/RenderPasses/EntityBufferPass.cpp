@@ -1,7 +1,7 @@
 #include "rvelapch.h"
 #include "EntityBufferPass.h"
 #include "Rendering/RenderContext.h"
-#include "Scene/ICamera.h"
+#include "Scene/Camera.h"
 #include <Rendering/RenderFrame.h>
 
 namespace rv {

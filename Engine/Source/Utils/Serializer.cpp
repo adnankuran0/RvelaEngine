@@ -82,9 +82,9 @@ void SerializeBin_CameraComp(const CameraComponent& comp, std::vector<std::byte>
 {
 	std::vector<std::byte> tempOut;
 
-	WriteToBuffer(tempOut, comp.fov);
-	WriteToBuffer(tempOut, comp.nearClip);
-	WriteToBuffer(tempOut, comp.farClip);
+	WriteToBuffer(tempOut, comp.camera.FOV);
+	WriteToBuffer(tempOut, comp.camera.NearClip);
+	WriteToBuffer(tempOut, comp.camera.FarClip);
 
 	uint8_t isActive = comp.isActive ? 1 : 0;
 	WriteToBuffer(tempOut, isActive);
@@ -99,9 +99,9 @@ void SerializeBin_CameraComp(const CameraComponent& comp, std::vector<std::byte>
 }
 void DeserializeBin_CameraComp(const std::byte*& cursor, CameraComponent& comp)
 {
-	ReadFromBuffer(cursor, comp.fov);
-	ReadFromBuffer(cursor, comp.nearClip);
-	ReadFromBuffer(cursor, comp.farClip);
+	ReadFromBuffer(cursor, comp.camera.FOV);
+	ReadFromBuffer(cursor, comp.camera.NearClip);
+	ReadFromBuffer(cursor, comp.camera.FarClip);
 
 	uint8_t isActive;
 	ReadFromBuffer(cursor, isActive);

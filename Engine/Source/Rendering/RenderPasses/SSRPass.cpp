@@ -1,7 +1,7 @@
 #include "rvelapch.h"
 #include "SSRPass.h"
 #include "Core/Time.h"
-#include "Scene/ICamera.h" 
+#include "Scene/Camera.h" 
 #include "Rendering/RenderContext.h"
 
 
@@ -66,7 +66,7 @@ void SSRPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     ssrShader.setFloat("near", 0.1f);
     ssrShader.setFloat("far", 100.0f);
     ssrShader.setFloat("uTime", (float)Time::GetCurrentTime());
-    ssrShader.setVec3("uCameraPos", ctx.camera->GetPosition());
+    ssrShader.setVec3("uCameraPos", ctx.camera->Position);
     ssrShader.setFloat("uMaxRayDistance", 100.0f);
     ssrShader.setVec2("uFullResolution",
         glm::vec2(ctx.viewportWidth, ctx.viewportHeight));

@@ -25,7 +25,7 @@ uniform mat4 invProjection;
 uniform vec2 windowSize;
 uniform vec3 samples[32];
 
-const float radius = 0.5;      
+const float radius = 1.0;      
 const float bias = 0.025;
 const float intensity = 1.0;
 const float invSamples = 1.0 / 32.0;

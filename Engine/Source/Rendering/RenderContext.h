@@ -4,7 +4,7 @@
 namespace rv {
 
 class Scene;
-class ICamera;
+class Camera;
 
 enum class RenderProfile
 {
@@ -23,7 +23,7 @@ struct RenderContext
 {
 public:
 	RenderContext() = default;
-	ICamera* camera;
+	Camera* camera;
 	std::vector<PointLightData> pointLights;
 	std::optional<DirectionalLightData> directionalLight;
 	unsigned int viewportWidth;

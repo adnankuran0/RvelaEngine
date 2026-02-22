@@ -88,8 +88,6 @@ void SceneSerializer::LoadScene(Scene& scene, const std::string& path)
         if (entityJson.contains("CameraComponent"))
         {
             scene.AddComponent<CameraComponent>(handle).Deserialize(entityJson["CameraComponent"]);
-            Entity camEntity(handle, &scene);
-            scene.GetCameraSystem().RegisterCamera(camEntity);
         }
 
         if (entityJson.contains("ScriptComponent"))
