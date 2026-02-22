@@ -95,8 +95,7 @@ void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     for (auto& command : commands)
     {
-        //if (!ctx.camera->Intersects(command.mesh.worldAABB))
-            //continue;
+        if (!ctx.camera->Intersects(command.mesh.worldAABB)) continue;
 
         glm::mat4 model = command.transform.GetWorldMatrix();
         shader.setMat4("model", model);

@@ -5,70 +5,90 @@
 #include <vector>
 #include <algorithm>
 #include <cstdlib>
+#include <fstream>
 #include <Assets/PrefabAsset.h>
 #include "Core/Engine.h"
 #include "Scene/Entity.h"
 
+using namespace rv;
 
-namespace rv {
+struct DirNode
+{
+    std::string name;
+    std::filesystem::path path;
+    std::vector<DirNode> children;
+};
 
 static std::filesystem::path s_CurrentDirectory;
 static char s_SearchBuffer[256] = "";
 static std::vector<std::filesystem::directory_entry> s_SearchResults;
-static std::vector<std::filesystem::directory_entry> s_CachedFiles; // Cached file list
-static bool s_NeedsRefresh = true; // Flag to indicate when refresh is needed
+static std::vector<std::filesystem::directory_entry> s_CachedFiles;
+static std::vector<DirNode> s_DirectoryTree;
 
-void RenderDirectoryRecursive(const std::filesystem::path& path, const std::filesystem::path& root, std::filesystem::path& selected)
+static bool s_NeedsRefresh = true;
+static bool s_DirectoryTreeDirty = true;
+
+static void BuildDirectoryTreeRecursive(const std::filesystem::path& path, std::vector<DirNode>& out)
 {
     for (const auto& entry : std::filesystem::directory_iterator(path))
     {
         if (!entry.is_directory())
             continue;
 
-        // Avoid string copy - use c_str() directly
-        const auto& filename = entry.path().filename().string();
-        bool opened = ImGui::TreeNode(filename.c_str());
+        DirNode node;
+        node.name = entry.path().filename().string();
+        node.path = entry.path();
+
+        BuildDirectoryTreeRecursive(entry.path(), node.children);
+        out.emplace_back(std::move(node));
+    }
+}
+
+static void RenderDirectoryRecursiveCached(const std::vector<DirNode>& nodes, std::filesystem::path& selected)
+{
+    for (const auto& node : nodes)
+    {
+        bool opened = ImGui::TreeNode(node.name.c_str());
 
         if (ImGui::IsItemClicked())
         {
-            selected = entry.path();
-            s_NeedsRefresh = true; // Mark for refresh when directory changes
+            selected = node.path;
+            s_NeedsRefresh = true;
         }
 
         if (opened)
         {
-            RenderDirectoryRecursive(entry.path(), root, selected);
+            RenderDirectoryRecursiveCached(node.children, selected);
             ImGui::TreePop();
         }
     }
 }
 
-void RefreshAssets(const std::filesystem::path& directory)
+static void RefreshAssets(const std::filesystem::path& directory)
 {
     s_CachedFiles.clear();
-    s_CachedFiles.reserve(256); // Reserve space to avoid reallocations
+    s_CachedFiles.reserve(256);
 
-    try {
+    try
+    {
         for (const auto& entry : std::filesystem::directory_iterator(directory))
         {
             if (entry.is_regular_file() || entry.is_directory())
-                s_CachedFiles.push_back(entry);
+                s_CachedFiles.emplace_back(entry);
         }
     }
-    catch (const std::filesystem::filesystem_error& ex)
+    catch (...)
     {
-        // Handle directory access errors gracefully
     }
 
     s_NeedsRefresh = false;
 }
 
-void CollectSearchResults(const std::vector<std::filesystem::directory_entry>& files, std::string_view query)
+static void CollectSearchResults(const std::vector<std::filesystem::directory_entry>& files, std::string_view query)
 {
     s_SearchResults.clear();
-    s_SearchResults.reserve(files.size()); // Reserve space
+    s_SearchResults.reserve(files.size());
 
-    // Convert query to lowercase once
     std::string queryLower;
     queryLower.reserve(query.size());
     std::transform(query.begin(), query.end(), std::back_inserter(queryLower), ::tolower);
@@ -78,16 +98,14 @@ void CollectSearchResults(const std::vector<std::filesystem::directory_entry>& f
         if (!entry.is_regular_file())
             continue;
 
-        const auto& filename = entry.path().filename();
+        auto filename = entry.path().filename().string();
 
-        // Use string_view and avoid temporary string creation
         std::string filenameLower;
-        filenameLower.reserve(filename.string().size());
-        const std::string& filenameStr = filename.string();
-        std::transform(filenameStr.begin(), filenameStr.end(), std::back_inserter(filenameLower), ::tolower);
+        filenameLower.reserve(filename.size());
+        std::transform(filename.begin(), filename.end(), std::back_inserter(filenameLower), ::tolower);
 
         if (filenameLower.find(queryLower) != std::string::npos)
-            s_SearchResults.push_back(entry);
+            s_SearchResults.emplace_back(entry);
     }
 }
 
@@ -107,17 +125,22 @@ AssetBrowserPanel::AssetBrowserPanel()
     prefabIcon.GenerateFromImage("C:\\RvelaEngine\\Resources\\Editor\\Icons\\prefab.png");
     meshIcon.Init();
     meshIcon.GenerateFromImage("C:\\RvelaEngine\\Resources\\Editor\\Icons\\mesh.png");
-
 }
 
 void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDirectory)
 {
-   
-
     if (s_CurrentDirectory.empty())
     {
         s_CurrentDirectory = rootDirectory;
         s_NeedsRefresh = true;
+        s_DirectoryTreeDirty = true;
+    }
+
+    if (s_DirectoryTreeDirty)
+    {
+        s_DirectoryTree.clear();
+        BuildDirectoryTreeRecursive(rootDirectory, s_DirectoryTree);
+        s_DirectoryTreeDirty = false;
     }
 
     ImGui::Begin("Asset Browser", nullptr,
@@ -131,19 +154,14 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
 
     ImGui::BeginChild("Folders", ImVec2(0, 0), true);
 
-    const auto& rootFilename = rootDirectory.filename().string();
-    if (ImGui::Selectable(rootFilename.c_str(), s_CurrentDirectory == rootDirectory))
+    auto rootName = rootDirectory.filename().string();
+    if (ImGui::Selectable(rootName.c_str(), s_CurrentDirectory == rootDirectory))
     {
         s_CurrentDirectory = rootDirectory;
         s_NeedsRefresh = true;
     }
 
-    std::filesystem::path previousDirectory = s_CurrentDirectory;
-    RenderDirectoryRecursive(rootDirectory, rootDirectory, s_CurrentDirectory);
-
-    // Check if directory changed
-    if (s_CurrentDirectory != previousDirectory)
-        s_NeedsRefresh = true;
+    RenderDirectoryRecursiveCached(s_DirectoryTree, s_CurrentDirectory);
 
     ImGui::EndChild();
     ImGui::NextColumn();
@@ -152,21 +170,19 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
 
     bool isAtRoot = s_CurrentDirectory == rootDirectory;
 
-    if (isAtRoot) {
-        ImGui::BeginDisabled(); 
-    }
+    if (isAtRoot)
+        ImGui::BeginDisabled();
 
-    if (ImGui::Button(" ^ ")) 
+    if (ImGui::Button(" ^ "))
     {
         s_CurrentDirectory = s_CurrentDirectory.parent_path();
         s_NeedsRefresh = true;
     }
 
-    if (isAtRoot) {
+    if (isAtRoot)
         ImGui::EndDisabled();
-    }
 
-    ImGui::SameLine(); 
+    ImGui::SameLine();
 
     ImGui::PushItemWidth(-110.0f);
     bool searchChanged = ImGui::InputTextWithHint("##Search", "Search assets...", s_SearchBuffer, sizeof(s_SearchBuffer));
@@ -176,19 +192,14 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
     if (ImGui::Button("Refresh", ImVec2(70.0f, 0)))
     {
         s_NeedsRefresh = true;
+        s_DirectoryTreeDirty = true;
     }
 
-    // Refresh assets if needed
     if (s_NeedsRefresh)
-    {
         RefreshAssets(s_CurrentDirectory);
-    }
 
-    // Update search results if search text changed
     if (searchChanged && s_SearchBuffer[0] != '\0')
-    {
         CollectSearchResults(s_CachedFiles, s_SearchBuffer);
-    }
 
     ImGui::Separator();
 
@@ -201,35 +212,29 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
     if (columnCount < 1) columnCount = 1;
 
     ImGui::Columns(columnCount, 0, false);
-    // Use search results or cached files
+
     const auto& filesToShow = (s_SearchBuffer[0] != '\0') ? s_SearchResults : s_CachedFiles;
 
     for (const auto& entry : filesToShow)
     {
         ImTextureID icon;
-        const auto& extension = entry.path().extension();
-        if (extension == ".rscene")
-            icon = sceneIcon.GetID();
-        else if (extension == ".rprefab")
-            icon = prefabIcon.GetID();
-        else if (entry.is_directory())
-            icon = folderIcon.GetID(); 
-        else if (extension == ".rtex" || extension == ".png" || extension == ".jpeg" || extension == ".jpg" || extension == ".tga")
-            icon = textureIcon.GetID();
-        else if (extension == ".rmat" )
-            icon = materialIcon.GetID();
-        else if (extension == ".rmesh" )
-            icon = meshIcon.GetID();
-        else 
-            icon = scriptIcon.GetID();
+        auto extension = entry.path().extension();
 
-        const auto& filename = entry.path().filename().string();
+        if (extension == ".rscene") icon = sceneIcon.GetID();
+        else if (extension == ".rprefab") icon = prefabIcon.GetID();
+        else if (entry.is_directory()) icon = folderIcon.GetID();
+        else if (extension == ".rtex" || extension == ".png" || extension == ".jpeg" || extension == ".jpg" || extension == ".tga") icon = textureIcon.GetID();
+        else if (extension == ".rmat") icon = materialIcon.GetID();
+        else if (extension == ".rmesh") icon = meshIcon.GetID();
+        else icon = scriptIcon.GetID();
 
-        ImGui::ImageButton(filename.c_str(), icon,ImVec2(thumbnailSize, thumbnailSize));
+        auto filename = entry.path().filename().string();
+
+        ImGui::ImageButton(filename.c_str(), icon, ImVec2(thumbnailSize, thumbnailSize));
 
         if (ImGui::BeginDragDropSource())
         {
-            const std::string& pathStr = entry.path().string();
+            auto pathStr = entry.path().string();
             ImGui::SetDragDropPayload("ASSET_PATH", pathStr.c_str(), pathStr.size() + 1);
             ImGui::Text("Dragging %s", filename.c_str());
             ImGui::EndDragDropSource();
@@ -242,50 +247,39 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
                 s_CurrentDirectory = entry.path();
                 s_NeedsRefresh = true;
             }
-            else
+            else if (extension == ".rscene")
             {
+                engine->GetSceneManager().LoadScene(entry.path().string());
+            }
+            else if (extension == ".rprefab")
+            {
+                auto pathStr = entry.path().string();
+                std::ifstream inFile(pathStr, std::ios::binary);
+                if (!inFile.is_open())
+                    return;
 
-                if (extension == ".rscene")
-                {
-                    
-                    engine->GetSceneManager().LoadScene(entry.path().string());
-                }
-                else if (extension == ".rprefab")
-                {
-
-                    const std::string& pathStr = entry.path().string();
-                    std::ifstream inFile(pathStr, std::ios::binary);
-                    if (!inFile.is_open()) {
-                        LOG_ERROR("file not opened");
-                        return;
-                    }
-                    AssetHeader header = AssetLoader::ReadHeader(inFile, MAGIC_PREFAB);
-                    std::unique_ptr<PrefabMeta> meta = AssetLoader::ReadMeta<PrefabMeta>(inFile, header);
-                    engine->GetActiveScene().Instantiate(meta->uuid);
-                }
-                else if (extension == ".glsl")
-                {
-                    std::string command = "code \"" + entry.path().string() + "\"";
-                    std::system(command.c_str());
-                }
-                else if (extension == ".png" || extension == ".jpeg" || extension == ".jpg" || extension == ".tga")
-                {
-
-                    std::string command = "\"" + entry.path().string() + "\"";
-                    std::system(command.c_str());
-                }
+                AssetHeader header = AssetLoader::ReadHeader(inFile, MAGIC_PREFAB);
+                auto meta = AssetLoader::ReadMeta<PrefabMeta>(inFile, header);
+                engine->GetActiveScene().Instantiate(meta->uuid);
+            }
+            else if (extension == ".glsl")
+            {
+                std::string command = "code \"" + entry.path().string() + "\"";
+                std::system(command.c_str());
+            }
+            else if (extension == ".png" || extension == ".jpeg" || extension == ".jpg" || extension == ".tga")
+            {
+                std::string command = "\"" + entry.path().string() + "\"";
+                std::system(command.c_str());
             }
         }
 
-
-        ImGui::TextWrapped(entry.path().filename().string().c_str());
+        ImGui::TextWrapped(filename.c_str());
         ImGui::NextColumn();
     }
 
     ImGui::Columns(1);
     ImGui::EndChild();
-
     ImGui::End();
 }
 
-}

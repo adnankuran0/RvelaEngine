@@ -133,7 +133,7 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     size_t drawCallCounter = 0;
     for (auto& command : commands) {
-        //if (!ctx.camera->Intersects(command.mesh.worldAABB)) continue; //TODO: dont know why but its broken
+        if (!ctx.camera->Intersects(command.mesh.worldAABB)) continue;
         
          glDisable(GL_STENCIL_TEST);
 

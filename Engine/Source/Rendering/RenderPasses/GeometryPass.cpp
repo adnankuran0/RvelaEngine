@@ -93,7 +93,7 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     geometryShader.setMat4("projection", projection);
 
     for (auto& command : commands) {
-        //if (!ctx.camera->Intersects(command.mesh.worldAABB)) continue;
+        if (!ctx.camera->Intersects(command.mesh.worldAABB)) continue;
 
         auto& material = command.material;
         glm::mat4 model = command.transform.GetWorldMatrix();

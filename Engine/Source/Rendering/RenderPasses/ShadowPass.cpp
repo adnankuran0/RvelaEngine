@@ -122,7 +122,7 @@ frame)
         }
 
         for (auto& command : commands) {
-            //if (!ctx.camera->Intersects(lightProjection * lightView,command.mesh.worldAABB)) continue;
+            if (!ctx.camera->Intersects(ctx.directionalLight->lightSpace,command.mesh.worldAABB)) continue;
             if (!command.mesh.IsCastShadow()) continue;
 
             shadowShader.setMat4("model", command.transform.GetWorldMatrix());

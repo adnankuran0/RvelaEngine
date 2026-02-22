@@ -35,6 +35,7 @@ void EditorCamera::Update()
     if (Input::IsMouseButtonPressed(MouseCode::Button1))
         ProcessKeyboard();
 
+    UpdateFrustum();
     float dt = Time::GetDeltaTime();
     Position = glm::mix(Position, targetPosition, positionSmoothness * dt);
 }
