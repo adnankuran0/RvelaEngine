@@ -1,6 +1,6 @@
 #include "rvelapch.h"
 #include "SSAOPass.h"
-#include "Scene/Camera.h"
+#include "Rendering/Camera.h"
 #include "Rendering/RenderContext.h"
 
 using namespace rv;

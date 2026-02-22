@@ -5,7 +5,7 @@
 #include "Input/Input.h"
 #include "Event/EventManager.h"
 #include "Time.h"
-#include <Scene/EditorCamera.h>
+#include <Rendering/EditorCamera.h>
 #include <Event/MouseEvents.h>
 
 using namespace rv;
@@ -133,8 +133,8 @@ void Engine::HandleEvents() noexcept
 				if (auto* scrollEvent = dynamic_cast<MouseScrolledEvent*>(&event))
 				{
 					// Adjust sprint speed based on scroll input
-					m_EditorCamera->SprintSpeed += scrollEvent->GetYOffset();
-					m_EditorCamera->SprintSpeed = std::clamp(m_EditorCamera->SprintSpeed, 2.5f, 30.0f);
+					m_EditorCamera->MovementSpeed += scrollEvent->GetYOffset();
+					m_EditorCamera->MovementSpeed = std::clamp(m_EditorCamera->MovementSpeed, 1.0f, 100.0f);
 				}
 			}
 			break;

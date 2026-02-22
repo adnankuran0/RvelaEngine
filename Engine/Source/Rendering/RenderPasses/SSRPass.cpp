@@ -1,7 +1,7 @@
 #include "rvelapch.h"
 #include "SSRPass.h"
 #include "Core/Time.h"
-#include "Scene/Camera.h" 
+#include "Rendering/Camera.h" 
 #include "Rendering/RenderContext.h"
 
 using namespace rv;

@@ -1,7 +1,7 @@
 ﻿#include "rvelapch.h"
 #include "SkyboxPass.h"
 #include "Rendering/RenderContext.h"
-#include "Scene/Camera.h"
+#include "Rendering/Camera.h"
 
 using namespace rv;
 

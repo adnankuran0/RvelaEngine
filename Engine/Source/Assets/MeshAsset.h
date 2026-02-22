@@ -5,7 +5,7 @@
 
 #include "Assets/Asset.h"
 #include "Assets/AssetMeta.h"
-#include "Scene/AABB.h"
+#include "Rendering/AABB.h"
 #include <span>
 #include <glm/glm.hpp>
 

@@ -149,7 +149,7 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         auto& material = command.material;
 
         shader.setVec2("UVScale", material.GetUVScale());
-        shader.setVec2("UVOffset", material.GetUVScale());
+        shader.setVec2("UVOffset", material.GetUVOffset());
         shader.setVec3("albedoColor", material.GetAlbedoColor());
         shader.setFloat("metallicValue", material.GetMetallic());
         shader.setFloat("roughnessValue", material.GetRoughness());

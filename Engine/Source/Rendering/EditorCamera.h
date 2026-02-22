@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include "Scene/Camera.h"
+#include "Rendering/Camera.h"
 
 struct GLFWwindow;
 
@@ -34,15 +34,15 @@ public:
     float Yaw{ -90.0f };
     float Pitch{ 0.0f };
 
-    float MovementSpeed{ 5.0f };
-    float SprintSpeed{ 10.0f };
+    float MovementSpeed{ 3.0f };
+    float SprintSpeed{ 5.0f };
     float MouseSensitivity{ 0.075f };
 
     float lastX{ 0.0f };
     float lastY{ 0.0f };
     bool firstMouse{ true };
 
-    float positionSmoothness{ 20.0f };
+    float positionSmoothness{ 25.0f };
     glm::vec3 targetPosition{};
 
 

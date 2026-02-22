@@ -10,6 +10,8 @@ out vec3 FragPos;
 out vec3 Normal;
 out vec2 TexCoords;
 out vec4 FragPosLightSpace;
+out vec3 Tangent;
+out vec3 Bitangent;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -33,6 +35,9 @@ void main()
     TexCoords = aTexCoords * UVScale + UVOffset;
 
     FragPosLightSpace = lightSpaceMatrix * worldPos;
+
+    Tangent = normalize(mat3(model) * aTangent);
+    Bitangent = normalize(mat3(model) * aBitangent);
 }
 
 #shader fragment
@@ -42,6 +47,8 @@ in vec2 TexCoords;
 in vec3 FragPos;
 in vec3 Normal;
 in vec4 FragPosLightSpace;
+in vec3 Tangent;
+in vec3 Bitangent;
 
 // Material parameters
 layout(binding = 0) uniform sampler2D albedoMap;
@@ -125,22 +132,27 @@ vec2 parallaxMapping(vec2 texCoords, vec3 viewDir) {
 vec3 getNormalFromMap() {
     if (!useNormalMap) return normalize(Normal);
     vec3 tangentNormal = texture(normalMap, TexCoords).xyz * 2.0 - 1.0;
-    
     tangentNormal.xy *= -1;
-    tangentNormal.xy *= normalScale; 
-    tangentNormal = normalize(tangentNormal);
-
-    // Precompute derivatives
-    vec3 dPosX = dFdx(FragPos);
-    vec3 dPosY = dFdy(FragPos);
-    vec2 dUVX = dFdx(TexCoords);
-    vec2 dUVY = dFdy(TexCoords);
+    tangentNormal.xy *= normalScale;
+    
+    float tnLen = length(tangentNormal);
+    if (tnLen < 0.001) return normalize(Normal);
+    tangentNormal /= tnLen;
     
     vec3 N = normalize(Normal);
-    vec3 T = normalize(dPosX * dUVY.t - dPosY * dUVX.t);
-    vec3 B = normalize(cross(N, T));
+    vec3 T = normalize(Tangent);
+    vec3 B = normalize(Bitangent);
+    
+    T = normalize(T - dot(T, N) * N);
+    B = cross(N, T); // B'yi yeniden hesapla (daha güvenli)
+    
     mat3 TBN = mat3(T, B, N);
-    return normalize(TBN * tangentNormal);
+    vec3 result = TBN * tangentNormal;
+    
+    float rLen = length(result);
+    if (rLen < 0.001) return N;
+    
+    return result / rLen;
 }
 
 // PBR functions
@@ -167,11 +179,13 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
 }
 
 vec3 fresnelSchlick(float cosTheta, vec3 F0) {
+    cosTheta = clamp(cosTheta, 0.0, 1.0);
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
 // Shadow calculations
 float calculateDirectionalShadow(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir, float shadowBias, float blurRadius) {
+    
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
     projCoords = projCoords * 0.5 + 0.5;
 
@@ -228,6 +242,8 @@ float calculatePointLightShadow(int index, vec3 fragPos, vec3 lightPos, float fa
 
 void main()
 {
+
+
     // Early alpha test
     vec4 albedoTex = useAlbedoMap ? texture(albedoMap, TexCoords) : vec4(albedoColor, 1.0);
     albedoTex *= vec4(albedoColor, 1.0);
@@ -273,6 +289,8 @@ void main()
               directionalLight.color * directionalLight.intensity * NdotL;
     }
 
+   
+
     // Point lights
     for(int i = 0; i < pointLightCount; ++i) 
     {
@@ -301,6 +319,7 @@ void main()
 
         vec3 numerator = NDF * G * F;
         float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
+       
         vec3 specular = numerator / denominator;
         
         float NdotL = max(dot(N, L), 0.0);
@@ -309,11 +328,16 @@ void main()
 
         vec3 radiance = light.color * light.intensity * attenuation;
         Lo += (1.0 - shadow) * (kD * albedo / PI + specular) * radiance * NdotL;
+       
     }
+
+    
 
     // Ambient lighting
     vec3 ambient = vec3(0.1) * albedo * ao;
     vec3 color = ambient + Lo;
 
     FragColor = vec4(color, albedoTex.a);
+
+   
 }

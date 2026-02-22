@@ -2,7 +2,7 @@
 
 #include "MeshImporter.h"
 
-#include "Scene/AABB.h"
+#include "Rendering/AABB.h"
 
 #include "Assimp/Importer.hpp"
 #include "Assimp/scene.h"

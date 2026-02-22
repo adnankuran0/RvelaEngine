@@ -1,6 +1,6 @@
 #include "rvelapch.h"
 #include "GeometryPass.h"
-#include "Scene/Camera.h"
+#include "Rendering/Camera.h"
 #include "Rendering/RenderContext.h"
 #include <Rendering/RenderFrame.h>
 

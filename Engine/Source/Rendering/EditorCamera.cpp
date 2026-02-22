@@ -43,7 +43,7 @@ void EditorCamera::Update()
 void EditorCamera::ProcessKeyboard()
 {
     float dt = Time::GetDeltaTime();
-    float velocity = (Input::IsKeyPressed(KeyCode::LeftShift) ? SprintSpeed : MovementSpeed) * dt;
+    float velocity = (Input::IsKeyPressed(KeyCode::LeftShift) ? MovementSpeed * 2.0f : MovementSpeed) * dt;
 
     if (Input::IsKeyPressed(KeyCode::W))
         targetPosition += Front * velocity;
@@ -94,16 +94,7 @@ void EditorCamera::OnMouseMoved(double xPosIn, double yPosIn, GLFWwindow* window
     ProcessMouseMovement(xoffset, yoffset);
 }
 
-void EditorCamera::ProcessMouseScroll(float yoffset)
-{
-    FOV -= yoffset;
 
-    if (FOV < 1.0f)
-        FOV = 1.0f;
-
-    if (FOV > 90.0f)
-        FOV = 90.0f;
-}
 
 void EditorCamera::ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch)
 {

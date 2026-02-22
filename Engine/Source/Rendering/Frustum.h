@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "glm/glm.hpp"
 #include <array>
-#include "Scene/AABB.h"
+#include "AABB.h"
 
 namespace rv {
 

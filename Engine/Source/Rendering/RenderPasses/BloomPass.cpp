@@ -1,7 +1,7 @@
 #include "rvelapch.h"
 #include "BloomPass.h"
 #include "Scene/Components.h"
-#include "Scene/Camera.h"
+#include "Rendering/Camera.h"
 #include <array>
 #include <algorithm>
 #include "Rendering/Renderer.h"

@@ -1,6 +1,6 @@
 #pragma once
 #include "../RenderPass.h"
-#include "Scene/Camera.h"
+#include "Rendering/Camera.h"
 
 namespace rv {
 

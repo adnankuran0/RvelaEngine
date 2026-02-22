@@ -2,7 +2,7 @@
 #include "Rendering/VertexArray.h"
 #include "Rendering/VertexBuffer.h"
 #include "Rendering/ElementBuffer.h"
-#include <Scene/AABB.h>
+#include <Rendering/AABB.h>
 #include "Assets/MeshAsset.h"
 #include "Core/Ref.h"
 
