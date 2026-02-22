@@ -6,7 +6,7 @@
 #include <glm/gtx/matrix_decompose.hpp>
 #include "Rendering/RenderLayer.h"
 
-namespace rv {
+using namespace rv;
 
 void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySize,entt::entity selectedEntity)
 {
@@ -212,8 +212,4 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
     }
     ImGui::End();
     ImGui::PopStyleVar();
-}
-
-
-
 }

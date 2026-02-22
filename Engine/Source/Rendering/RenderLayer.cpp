@@ -2,8 +2,8 @@
 #include "RenderLayer.h"
 #include "Core/Engine.h"
 
-namespace rv {
 
+using namespace rv;
 
 static std::vector<PointLightData> CollectPointLights(Scene& scene) noexcept {
 	std::vector<PointLightData> lights;
@@ -105,4 +105,3 @@ void RenderLayer::CollectRenderCommands(Scene* scene)
 
 }
 
-}

@@ -2,7 +2,7 @@
 #include "VertexArray.h"
 #include "GLAD/gl.h"
 
-namespace rv {
+using namespace rv;
 
 void VertexArray::Init()
 {
@@ -62,6 +62,4 @@ void VertexArray::SetBufferLayout(const BufferLayout& layout)
 unsigned int VertexArray::getID()
 {
 	return ID;
-}
-
 }

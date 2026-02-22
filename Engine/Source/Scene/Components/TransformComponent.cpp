@@ -1,7 +1,7 @@
 #include "rvelapch.h"
 #include "TransformComponent.h"
 
-namespace rv {
+using namespace rv;
 
 void TransformComponent::LookAt(const glm::vec3& target, const glm::vec3& up) noexcept
 {
@@ -37,6 +37,4 @@ void TransformComponent::Deserialize(const json& j) noexcept
     scaleRatio = glm::vec3(sr[0], sr[1], sr[2]);
 
     dirty = true;
-}
-
 }

@@ -8,7 +8,7 @@
 #include <glm/glm.hpp>
 #include "Core/Log.h"
 
-namespace rv {
+using namespace rv;
 
 std::unique_ptr<AssetMeta> MaterialMeta::Clone() const
 {
@@ -152,6 +152,4 @@ void MaterialAsset::Serialize()
     out.write(reinterpret_cast<const char*>(&header), sizeof(header));
     out.write(metaBuffer.data(), metaBuffer.size());
     out.write(dataBuffer.data(), dataBuffer.size());
-}
-
 }

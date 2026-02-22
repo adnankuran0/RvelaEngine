@@ -2,7 +2,7 @@
 #include "ElementBuffer.h"
 #include "GLAD/gl.h"
 
-namespace rv {
+using namespace rv;
 
 ElementBuffer::ElementBuffer(const void* data, size_t size)
 {
@@ -37,7 +37,5 @@ void ElementBuffer::Init(const void* data, size_t size)
 	glGenBuffers(1, &ID);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ID);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
-
-}
 
 }

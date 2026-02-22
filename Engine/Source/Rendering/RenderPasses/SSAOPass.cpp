@@ -3,8 +3,8 @@
 #include "Scene/Camera.h"
 #include "Rendering/RenderContext.h"
 
+using namespace rv;
 
-namespace rv {
 
 constexpr int KERNEL_SIZE = 32;
 constexpr int NOISE_SIZE = 16;
@@ -127,6 +127,4 @@ void SSAOPass::GenerateNoiseTexture()
     glTextureParameteri(noiseTexture, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTextureParameteri(noiseTexture, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTextureParameteri(noiseTexture, GL_TEXTURE_WRAP_T, GL_REPEAT);
-}
-
 }

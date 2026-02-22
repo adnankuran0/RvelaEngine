@@ -2,7 +2,7 @@
 #include "ImGui/imgui.h"
 #include "Scene/Scene.h"
 
-namespace rv {
+using namespace rv;
 
 void ToolBar::Draw(Scene& scene)
 {
@@ -70,4 +70,3 @@ void ToolBar::Draw(Scene& scene)
     ImGui::SetNextWindowViewport(viewport->ID);
 }
 
-}

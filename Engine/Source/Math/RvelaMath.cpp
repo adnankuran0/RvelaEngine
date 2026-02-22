@@ -5,10 +5,8 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/matrix_decompose.hpp>
 
-namespace rv::math {
 
-
-bool RayIntersectsTriangle(const glm::vec3& rayOrigin, const glm::vec3& rayDir,
+bool rv::math::RayIntersectsTriangle(const glm::vec3& rayOrigin, const glm::vec3& rayDir,
         const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2,
         float& t)
 {
@@ -36,7 +34,7 @@ bool RayIntersectsTriangle(const glm::vec3& rayOrigin, const glm::vec3& rayDir,
     return t > EPSILON;
 }
 
-glm::vec3 ScreenPosToWorldRay(const glm::vec2& mousePos, const glm::vec2& viewportSize,
+glm::vec3 rv::math::ScreenPosToWorldRay(const glm::vec2& mousePos, const glm::vec2& viewportSize,
     const glm::mat4& projectionMatrix, const glm::mat4& viewMatrix)
 {
     float x = (2.0f * mousePos.x) / viewportSize.x - 1.0f;
@@ -50,7 +48,7 @@ glm::vec3 ScreenPosToWorldRay(const glm::vec2& mousePos, const glm::vec2& viewpo
     return glm::normalize(glm::vec3(rayWorld));
 }
 
-void DecomposeToEulerAngles(const glm::mat4& worldMatrix, glm::vec3& scale, glm::vec3& rotationDegrees, glm::vec3& translation)
+void rv::math::DecomposeToEulerAngles(const glm::mat4& worldMatrix, glm::vec3& scale, glm::vec3& rotationDegrees, glm::vec3& translation)
 {
     glm::vec3 skew;
     glm::vec4 perspective;
@@ -59,16 +57,16 @@ void DecomposeToEulerAngles(const glm::mat4& worldMatrix, glm::vec3& scale, glm:
     rotationDegrees = glm::degrees(glm::eulerAngles(orientation));
 }
 
-glm::quat EulerToQuat(const glm::vec3& eulerDegrees) {
+glm::quat rv::math::EulerToQuat(const glm::vec3& eulerDegrees) {
     glm::vec3 radians = glm::radians(eulerDegrees);
     return glm::quat(radians);
 }
 
-glm::vec3 QuatToEuler(const glm::quat& q) {
+glm::vec3 rv::math::QuatToEuler(const glm::quat& q) {
     return glm::degrees(glm::eulerAngles(q));
 }
 
-glm::mat4 ConvertToGlmMatrix(const aiMatrix4x4& from)
+glm::mat4 rv::math::ConvertToGlmMatrix(const aiMatrix4x4& from)
 {
     glm::mat4 to;
     to[0][0] = from.a1; to[1][0] = from.a2; to[2][0] = from.a3; to[3][0] = from.a4;
@@ -76,6 +74,4 @@ glm::mat4 ConvertToGlmMatrix(const aiMatrix4x4& from)
     to[0][2] = from.c1; to[1][2] = from.c2; to[2][2] = from.c3; to[3][2] = from.c4;
     to[0][3] = from.d1; to[1][3] = from.d2; to[2][3] = from.d3; to[3][3] = from.d4;
     return to;
-}
-
 }

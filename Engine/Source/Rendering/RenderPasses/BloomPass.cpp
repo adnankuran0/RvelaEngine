@@ -7,7 +7,7 @@
 #include "Rendering/Renderer.h"
 #include "Rendering/RenderContext.h"
 
-namespace rv {
+using namespace rv;
 
 void BloomPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
@@ -151,7 +151,5 @@ void BloomPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     o_BlurredTexture = downsampleTextures[0];
 
     frame.registry.Register("BloomTexture", { RenderResourceType::Texture,o_BlurredTexture });
-
-}
 
 }

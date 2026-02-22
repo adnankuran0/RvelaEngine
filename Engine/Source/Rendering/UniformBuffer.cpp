@@ -1,7 +1,7 @@
 #include "rvelapch.h"
 #include "UniformBuffer.h"
 
-namespace rv { 
+using namespace rv;
 
 UniformBuffer::UniformBuffer(GLsizeiptr size, unsigned int bindingPoint)
 {
@@ -29,6 +29,4 @@ void UniformBuffer::SetData(GLintptr offset, GLsizeiptr size, const void* data)
 UniformBuffer::~UniformBuffer()
 {
 	glDeleteBuffers(1, &m_ID);
-}
-
 }

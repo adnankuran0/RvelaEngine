@@ -2,7 +2,8 @@
 #include "SceneSerializer.h"
 #include "Entity.h"
 
-namespace rv {
+using namespace rv;
+
 
 void SceneSerializer::SaveScene(Scene& scene, const std::string& path)
 {
@@ -183,6 +184,4 @@ json SceneSerializer::SerializeEntity(Scene& scene, entt::entity e)
     }
 
     return j;
-}
-
 }

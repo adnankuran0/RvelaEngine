@@ -5,7 +5,7 @@
 #include "stb_image.h"
 #include <Core/Log.h>
 
-namespace rv { 
+using namespace rv;
 
 Texture::Texture()
 {
@@ -184,7 +184,4 @@ int Texture::GetNrChannels() const
 const std::string& Texture::GetPath() 
 {
     return m_Path;
-}
-
-
 }

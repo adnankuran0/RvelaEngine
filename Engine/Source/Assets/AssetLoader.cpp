@@ -10,7 +10,7 @@
 #include "MaterialAsset.h"
 #include "Assets/AssetMagic.h"
 
-namespace rv { 
+using namespace rv;
 
 Ref<Asset> AssetLoader::Load(const std::filesystem::path& path)
 {
@@ -92,4 +92,3 @@ AssetHeader AssetLoader::ReadHeader(std::ifstream& inFile, uint32_t expectedMagi
     return header;
 }
 
-}

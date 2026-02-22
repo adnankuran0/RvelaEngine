@@ -1,9 +1,7 @@
 #include "rvelapch.h"
 #include "CameraComponent.h"
 
-namespace rv {
-
-
+using namespace rv;
 
 json CameraComponent::Serialize() const
 {
@@ -23,6 +21,4 @@ void CameraComponent::Deserialize(const json& j)
     camera.FarClip = j["farClip"];
     //camera.ProjectionType = static_cast<Camera::Projection>(j["projectionType"]);
     isActive = j["isActive"];
-}
-
 }

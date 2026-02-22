@@ -1,7 +1,7 @@
 #include "rvelapch.h"
 #include "ScriptComponent.h"
 
-namespace rv {
+using namespace rv;
 
 json ScriptComponent::Serialize() const
 {
@@ -12,6 +12,4 @@ json ScriptComponent::Serialize() const
 void ScriptComponent::Deserialize(const json& j)
 {
     luaFile = j.at("luaFile").get<std::string>();
-}
-
 }

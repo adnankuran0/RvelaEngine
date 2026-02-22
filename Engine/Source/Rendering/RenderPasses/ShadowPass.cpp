@@ -3,7 +3,7 @@
 #include "Rendering/RenderContext.h"
 #include <Rendering/RenderFrame.h>
 
-namespace rv {
+using namespace rv;
 
 void ShadowPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
@@ -217,7 +217,5 @@ void ShadowPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     resourceRegistry.Register("DirectionalShadowMap", { RenderResourceType::Texture, o_DirectionalShadowMap });
     resourceRegistry.Register("PointShadowMap", { RenderResourceType::Texture, o_PointShadowMap });
-
-}
 
 }

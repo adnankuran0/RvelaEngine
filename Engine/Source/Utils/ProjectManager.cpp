@@ -2,7 +2,7 @@
 #include "ProjectManager.h"
 #include "Utils/Serializer.h"
 
-namespace rv {
+using namespace rv;
 
 std::shared_ptr<Project> ProjectManager::m_ActiveProject;
 std::filesystem::path ProjectManager::m_ProjectFolderPath;
@@ -56,6 +56,4 @@ void ProjectManager::SaveActiveProject()
 std::shared_ptr<Project> ProjectManager::GetActiveProject()
 {
 	return m_ActiveProject;
-}
-
 }

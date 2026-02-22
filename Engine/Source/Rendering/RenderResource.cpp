@@ -2,7 +2,7 @@
 #include "RenderResource.h"
 #include "ShaderManager.h"
 
-namespace rv {
+using namespace rv;
 
 void RenderResourceRegistry::Register(const std::string& name, RenderResource resource)
 {
@@ -18,7 +18,4 @@ RenderResource* RenderResourceRegistry::Get(const std::string& name)
         return nullptr;
 
     return &it->second;
-}
-
-
 }

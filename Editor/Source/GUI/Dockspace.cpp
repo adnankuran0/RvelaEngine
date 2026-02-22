@@ -1,7 +1,7 @@
 ﻿#include "Dockspace.h"
 #include "ImGui/imgui.h"
 
-namespace rv {
+using namespace rv;
 
 void Dockspace::Draw()
 {
@@ -27,5 +27,4 @@ void Dockspace::Draw()
     ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
     ImGui::End();
-}
 }

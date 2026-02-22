@@ -2,8 +2,8 @@
 #include "CompositePass.h"
 #include "Rendering/RenderContext.h"
 
+using namespace rv;
 
-namespace rv {
 
 void CompositePass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
@@ -62,5 +62,3 @@ void CompositePass::Execute(const RenderContext& ctx, RenderFrame& frame)
 		{ RenderResourceType::Framebuffer, m_Framebuffer });
 }
 
-
-}

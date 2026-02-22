@@ -4,8 +4,8 @@
 #include "Scene/Camera.h" 
 #include "Rendering/RenderContext.h"
 
+using namespace rv;
 
-namespace rv {
 
 void SSRPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
@@ -98,7 +98,5 @@ void SSRPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
 
     frame.registry.Register("SSRTexture", { RenderResourceType::Texture,o_SsrTexture });
-
-}
 
 }

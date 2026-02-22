@@ -2,7 +2,7 @@
 #include "Time.h"
 #include "GLFW/glfw3.h"
 
-namespace rv { 
+using namespace rv;
 
 // Static member definitions (all in seconds)
 float Time::deltaTime = 0.0f;
@@ -12,7 +12,7 @@ float Time::timeScale = 1.0f;
 float Time::fixedDeltaTime = 1.0f / 60.0f; // 20ms default fixed timestep
 float Time::fixedTimeAccumulator = 0.0f;
 float Time::lastFpsUpdateTime = 0.0f; 
-int Time::maxFPS = 0;
+int Time::maxFPS = 240;
 int Time::fpsUpdateTime = 10; // as miliseconds
 int Time::frameCount = 0;
 
@@ -50,7 +50,6 @@ void Time::Update() noexcept
     fixedTimeAccumulator += deltaTime;
 }
 
-}
 
 
 

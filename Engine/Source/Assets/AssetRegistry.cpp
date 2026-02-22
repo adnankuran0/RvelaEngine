@@ -10,7 +10,7 @@
 #include "TextureAsset.h"
 #include "MaterialAsset.h"
 
-namespace rv { 
+using namespace rv;
 
 void AssetRegistry::Init(const std::filesystem::path& assetDir)
 {
@@ -101,4 +101,3 @@ void AssetRegistry::ScanAssets(const std::filesystem::path& dir)
 }
 
 
-}

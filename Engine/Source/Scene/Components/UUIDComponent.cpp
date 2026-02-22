@@ -2,7 +2,7 @@
 #include "UUIDComponent.h"
 #include <iostream>
 
-namespace rv {
+using namespace rv;
 
 json UUIDComponent::Serialize() const
 {
@@ -11,6 +11,4 @@ json UUIDComponent::Serialize() const
 void UUIDComponent::Deserialize(const json& j)
 {
     uuid = j.get<EntityUUID>();
-}
-
 }

@@ -2,7 +2,7 @@
 #include "Core/Engine.h"
 #include "Input.h"
 
-namespace rv { 
+using namespace rv;
 
 // Cache for the last known mouse position to avoid redundant GLFW calls
 glm::vec2 Input::s_LastMousePosition = { 0.0f, 0.0f };
@@ -79,7 +79,4 @@ glm::vec2 Input::GetMousePosition() noexcept {
     glfwGetCursorPos(window, &xPos, &yPos);
     s_LastMousePosition = { static_cast<float>(xPos), static_cast<float>(yPos) };
     return s_LastMousePosition;
-}
-
-
 }

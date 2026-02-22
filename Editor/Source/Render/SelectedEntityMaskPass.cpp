@@ -6,7 +6,7 @@
 #include "Scene/Camera.h"
 #include "Scene/Scene.h"
 
-namespace rv {
+using namespace rv;
 
 void SelectedEntityMaskPass::Init(const RenderContext& ctx, RenderFrame& frame) {
     glGenFramebuffers(1, &m_Framebuffer);
@@ -76,7 +76,5 @@ void SelectedEntityMaskPass::Execute(const RenderContext& ctx, RenderFrame& fram
 
     frame.registry.Register("SelectedEntityMask", { RenderResourceType::Texture, o_MaskTexture });
     frame.registry.Register("SelectedEntityMaskFBO", { RenderResourceType::Framebuffer, m_Framebuffer });
-
-}
 
 }

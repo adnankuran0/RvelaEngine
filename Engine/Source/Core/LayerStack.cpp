@@ -1,7 +1,7 @@
 #include "rvelapch.h"
 #include "LayerStack.h"
 
-namespace rv { 
+using namespace rv;
 
 LayerStack::~LayerStack()
 {
@@ -26,6 +26,4 @@ void LayerStack::PopLayer(Layer* layer)
         (*it)->OnDetach();
         m_Layers.erase(it);
     }
-}
-
 }

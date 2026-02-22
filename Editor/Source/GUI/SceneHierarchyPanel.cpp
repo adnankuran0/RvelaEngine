@@ -5,7 +5,7 @@
 #include "Core/Engine.h"
 #include "Scene/Entity.h"
 
-namespace rv {
+using namespace rv;
 
 struct PrimitiveConfig { std::string name; AssetUUID uuid; };
 static Entity LoadPrimitive(Scene& scene, const std::string& primitiveMeshName)
@@ -240,6 +240,4 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
     }
 
     ImGui::End();
-}
-
 }

@@ -3,7 +3,7 @@
 #include "Core/Engine.h"
 #include "Rendering/RenderLayer.h"
 
-namespace rv {
+using namespace rv;
 
 void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 {
@@ -696,4 +696,3 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
     ImGui::End();
 }
 
-}

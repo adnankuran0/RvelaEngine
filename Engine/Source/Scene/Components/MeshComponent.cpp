@@ -1,7 +1,7 @@
 #include "rvelapch.h"
 #include "MeshComponent.h"
 
-namespace rv {
+using namespace rv;
 
 void MeshComponent::Load(const AssetUUID& uuid)
 {
@@ -26,6 +26,4 @@ void MeshComponent::Deserialize(const json& j)
 {
     meshUUID = AssetUUID::FromString(j.at("mesh").get<std::string>());
     Load(meshUUID);
-}
-
 }

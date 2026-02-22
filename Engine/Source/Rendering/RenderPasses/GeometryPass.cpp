@@ -4,7 +4,7 @@
 #include "Rendering/RenderContext.h"
 #include <Rendering/RenderFrame.h>
 
-namespace rv {
+using namespace rv;
 
 void GeometryPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
@@ -142,4 +142,3 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
 }
 
-}

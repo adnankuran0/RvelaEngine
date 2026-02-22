@@ -3,7 +3,7 @@
 #include "Rendering/RenderContext.h"
 #include "Scene/Camera.h"
 
-namespace rv {
+using namespace rv;
 
 void SkyboxPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
@@ -36,4 +36,3 @@ void SkyboxPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
 }
 
-}

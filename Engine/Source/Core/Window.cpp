@@ -9,7 +9,7 @@
 #include "Event/MouseEvents.h"
 #include "Event/WindowEvents.h"
 
-namespace rv { 
+using namespace rv;
 
 Window::Window() noexcept
 {
@@ -139,5 +139,3 @@ void Window::Shutdown() const
         glfwDestroyWindow(m_Window);
 }
 
-
-}

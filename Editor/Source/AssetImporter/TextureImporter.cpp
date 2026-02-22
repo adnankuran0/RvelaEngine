@@ -4,7 +4,7 @@
 #include "stb_image/stb_image.h"
 #include <Core/Log.h>
 
-namespace rv {
+using namespace rv;
 
 AssetUUID TextureImporter::Import(const std::filesystem::path& path)
 {
@@ -135,6 +135,4 @@ AssetUUID TextureImporter::Import(const std::filesystem::path& path)
         path.filename().string(), width, height, usedChannels, meta.uuid.ToString());
 
     return meta.uuid;
-}
-
 }

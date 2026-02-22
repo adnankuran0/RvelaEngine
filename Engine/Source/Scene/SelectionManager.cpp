@@ -2,7 +2,7 @@
 #include "SelectionManager.h"
 #include "Rendering/RenderLayer.h"
 
-namespace rv {
+using namespace rv;
 
 uint32_t SelectionManager::Pick(uint32_t x, uint32_t y)
 {
@@ -25,5 +25,4 @@ void SelectionManager::PickRect(uint32_t x, uint32_t y, uint32_t w, uint32_t h, 
 {
 }
 
-}
 

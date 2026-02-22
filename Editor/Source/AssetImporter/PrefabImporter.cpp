@@ -5,7 +5,7 @@
 #include "Scene/Scene.h"
 #include "Utils/Serializer.h"
 
-namespace rv {
+using namespace rv;
 
 Ref<PrefabAsset> PrefabImporter::CreatePrefabAsset(const std::string& path, Scene& scene, entt::entity& rootEntity)
 {
@@ -135,5 +135,3 @@ unsigned int PrefabImporter::CountEntitiesRecursively(Scene& scene, entt::entity
     return count;
 }
 
-
-}

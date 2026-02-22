@@ -1,7 +1,7 @@
 #include "rvelapch.h"
 #include "MaterialComponent.h"
 
-namespace rv {
+using namespace rv;
 
 void MaterialComponent::Load(const AssetUUID& uuid)
 {
@@ -54,7 +54,5 @@ void MaterialComponent::Deserialize(const json& j)
 	std::string materialUUIDstr = j.at("material").get<std::string>();
 	materialUUID = AssetUUID::FromString(materialUUIDstr);
 	Load(materialUUID);
-
-}
 
 }

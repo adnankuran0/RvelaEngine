@@ -1,7 +1,7 @@
 #include "MaterialImporter.h"
 #include "Assets/MaterialAsset.h"
 
-namespace rv {
+using namespace rv;
 
 Ref<MaterialAsset> MaterialImporter::CreateMaterialAsset(const std::string& path)
 {
@@ -10,6 +10,4 @@ Ref<MaterialAsset> MaterialImporter::CreateMaterialAsset(const std::string& path
     //path = s_UUIDToPath[meta->uuid];
     asset->Serialize();
     return asset;
-}
-
 }

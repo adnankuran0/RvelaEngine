@@ -4,7 +4,7 @@
 #include "Scene/Components.h"
 #include "Rendering/RenderContext.h"
 
-namespace rv {
+using namespace rv;
 
 void OutlinePass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
@@ -37,6 +37,4 @@ void OutlinePass::Execute(const RenderContext& ctx, RenderFrame& frame) {
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
 }

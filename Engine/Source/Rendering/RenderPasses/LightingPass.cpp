@@ -6,7 +6,7 @@
 #include "Scene/Components.h"
 #include "Rendering/RenderContext.h"
 
-namespace rv {
+using namespace rv;
 
 struct MapInfo {
     bool isUsing;
@@ -199,4 +199,3 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     resourceRegistry.Register("IntermediateBuffer", { RenderResourceType::Framebuffer,intermediateFBO });
 }
 
-}

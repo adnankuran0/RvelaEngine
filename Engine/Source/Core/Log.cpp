@@ -1,7 +1,7 @@
 #include "rvelapch.h"
 #include "Log.h"
 
-namespace rv { 
+using namespace rv;
 
 std::shared_ptr<spdlog::logger> RvelaLog::s_Logger;
 
@@ -23,6 +23,4 @@ void RvelaLog::Init(const std::string&)
 std::shared_ptr<spdlog::logger>& RvelaLog::GetLogger()
 {
     return s_Logger;
-}
-
 }

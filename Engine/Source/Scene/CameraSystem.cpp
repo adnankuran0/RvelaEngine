@@ -2,7 +2,7 @@
 #include "CameraSystem.h"
 #include "Entity.h"
 
-namespace rv {
+using namespace rv;
 
 Camera* CameraSystem::GetActiveCamera()
 {
@@ -21,6 +21,4 @@ Camera* CameraSystem::GetActiveCamera()
     }
 
     return nullptr;
-}
-
 }

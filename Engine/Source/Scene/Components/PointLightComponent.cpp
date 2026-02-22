@@ -1,7 +1,7 @@
 #include "rvelapch.h"
 #include "PointLightComponent.h"
 
-namespace rv {
+using namespace rv;
 
 json PointLightComponent::Serialize() const
 {
@@ -22,6 +22,4 @@ void PointLightComponent::Deserialize(const json& j)
     radius = j.at("radius").get<float>();
     falloff = j.at("falloff").get<float>();
     castShadows = j.at("castShadows").get<float>();
-}
-
 }

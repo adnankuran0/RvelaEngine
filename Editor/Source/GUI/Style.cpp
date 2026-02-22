@@ -1,9 +1,8 @@
 #include "Style.h"
 #include <imgui.h>
 
-namespace rv {
 
-void SetStyle()
+void rv::SetStyle()
 {
     ImGuiIO& io = ImGui::GetIO();
     io.Fonts->AddFontFromFileTTF(
@@ -87,4 +86,3 @@ void SetStyle()
     style.WindowPadding = ImVec2(12, 8);
 }
 
-}

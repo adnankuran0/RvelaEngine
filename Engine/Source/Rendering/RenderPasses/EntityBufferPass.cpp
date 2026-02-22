@@ -4,7 +4,7 @@
 #include "Scene/Camera.h"
 #include <Rendering/RenderFrame.h>
 
-namespace rv {
+using namespace rv;
 
 void EntityBufferPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
@@ -117,5 +117,3 @@ void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
 }
 
-
-}

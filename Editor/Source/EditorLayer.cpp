@@ -9,7 +9,7 @@
 #include <Render/OutlinePass.h>
 #include <Render/SelectedEntityMaskPass.h>
 
-namespace rv { 
+using namespace rv;
 
 EditorLayer::~EditorLayer()
 {
@@ -110,6 +110,4 @@ void EditorLayer::Render()
         ImGui::RenderPlatformWindowsDefault();
         glfwMakeContextCurrent(backup_current_context);
     }
-}
-
 }

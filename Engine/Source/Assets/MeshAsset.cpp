@@ -7,9 +7,9 @@
 #include <cstring>
 #include <glm/gtc/type_ptr.hpp>
 
-namespace rv {
+using namespace rv;
 
-void PackVertices(std::span<const Vertex> verts, std::vector<float>& out) 
+void rv::PackVertices(std::span<const Vertex> verts, std::vector<float>& out) 
 { 
     out.clear();
     out.reserve(verts.size() * 14); 
@@ -133,6 +133,4 @@ void MeshAsset::GetTriangle(int triangleIndex,
     v0 = vertices[i0].position;
     v1 = vertices[i1].position;
     v2 = vertices[i2].position;
-}
-
 }

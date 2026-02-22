@@ -3,7 +3,7 @@
 #include <stb_image.h>
 #include "Core/Log.h"
 
-namespace rv {
+using namespace rv;
 
 Skybox::Skybox() : skyboxVAO(0), skyboxVBO(0), skyboxTexture(0)
 {
@@ -226,4 +226,3 @@ void Skybox::setupSkybox()
     glBindVertexArray(0);
 }
 
-}

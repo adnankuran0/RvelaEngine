@@ -2,7 +2,7 @@
 #include "BrightPass.h"
 #include "Rendering/RenderContext.h"
 
-namespace rv {
+using namespace rv;
 
 void BrightPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
@@ -71,4 +71,3 @@ void BrightPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
 }
 
-}

@@ -4,7 +4,7 @@
 #include <fstream>
 #include <cstring>
 
-namespace rv {
+using namespace rv;
 
 std::unique_ptr<AssetMeta> SceneMeta::Clone() const
 {
@@ -199,5 +199,3 @@ std::vector<uint8_t> SceneAsset::ReadSceneData(const std::filesystem::path& file
     return data;
 }
 
-
-}

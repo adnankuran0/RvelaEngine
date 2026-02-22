@@ -1,7 +1,7 @@
 #include "rvelapch.h"
 #include "PrefabComponent.h"
 
-namespace rv {
+using namespace rv;
 
 json PrefabComponent::Serialize() const
 {
@@ -10,6 +10,4 @@ json PrefabComponent::Serialize() const
 void PrefabComponent::Deserialize(const json& j)
 {
     prefabUUID = AssetUUID::FromString(j.get<std::string>());
-}
-
 }

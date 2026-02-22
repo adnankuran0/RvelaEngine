@@ -7,7 +7,7 @@
 #include "WindowEvents.h"
 #include "KeyEvents.h"
 
-namespace rv { 
+using namespace rv;
 
 std::vector<std::unique_ptr<Event>> EventManager::m_EventQueue;
 
@@ -32,6 +32,4 @@ void EventManager::DispatchEvents(const std::function<void(Event&)>& handler) no
 
     EventDispatcher::Dispatch(m_EventQueue, handler);
     ClearEvents();
-}
-
 }

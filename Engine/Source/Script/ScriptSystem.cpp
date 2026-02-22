@@ -3,7 +3,7 @@
 #include "Scene/Components/ScriptComponent.h"
 #include "Scene/Entity.h"
 
-namespace rv {
+using namespace rv;
 
 ScriptSystem::ScriptSystem(Scene& scene) : m_Scene(scene)
 {
@@ -115,6 +115,4 @@ void ScriptSystem::BindLuaScript(ScriptComponent& sc, entt::entity& e)
 
     if (sc.OnCreate.valid())
         sc.OnCreate(sc.luaInstance);
-}
-
 }

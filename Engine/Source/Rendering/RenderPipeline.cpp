@@ -13,7 +13,7 @@
 #include "Rendering/RenderPasses/SSRPass.h"
 #include "Rendering/RenderPasses/EntityBufferPass.h"
 
-namespace rv {
+using namespace rv;
 
 RenderPipeline::RenderPipeline()
 {
@@ -63,7 +63,5 @@ void RenderPipeline::Execute(const RenderContext& ctx)
 		pass->Execute(ctx, m_RenderFrame);
 	
 	m_RenderFrame.Reset();
-
-}
 
 }

@@ -1,7 +1,7 @@
 #include "rvelapch.h"
 #include "MeshRendererComponent.h"
 
-namespace rv {
+using namespace rv;
 
 void MeshRendererComponent::RecreateFromMesh(Ref<MeshAsset> mesh)
 {
@@ -33,6 +33,4 @@ void MeshRendererComponent::RecreateFromMesh(Ref<MeshAsset> mesh)
     localAABB = mesh->localAABB;
 
     //worldAABB = localAABB;
-}
-
 }

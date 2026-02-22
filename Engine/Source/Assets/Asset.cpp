@@ -2,7 +2,7 @@
 #include "Asset.h"
 #include "AssetUUID.h"
 
-namespace rv { 
+using namespace rv;
 
 Asset::Asset(std::unique_ptr<AssetMeta> assetMeta)
 {
@@ -24,4 +24,3 @@ AssetType Asset::GetAssetType() const
 	return m_Meta.get()->type; 
 }
 
-}

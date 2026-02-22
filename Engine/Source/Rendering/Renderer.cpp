@@ -6,7 +6,7 @@
 #include "Utils/FileUtils.h"
 #include "ShaderManager.h"
 
-namespace rv {
+using namespace rv;
 
 
 ScreenQuad Renderer::m_ScreenQuad;
@@ -72,4 +72,3 @@ void Renderer::DrawFullScreenQuad()
     m_ScreenQuad.Draw();
 }
 
-}

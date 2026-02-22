@@ -7,7 +7,7 @@
 #include <cstring>
 #include "GLAD/gl.h"
 
-namespace rv { 
+using namespace rv;
 
 static std::vector<uint8_t> ReadTextureData(const std::filesystem::path& filePath)
 {
@@ -167,7 +167,4 @@ bool TextureAsset::IsLoaded() const
 Texture& TextureAsset::GetTexture()
 {
     return m_Texture;
-}
-
-
 }

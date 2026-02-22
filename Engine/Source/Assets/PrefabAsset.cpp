@@ -5,7 +5,7 @@
 #include <fstream>
 #include <cstring>
 
-namespace rv {
+using namespace rv;
 
 std::unique_ptr<AssetMeta> PrefabMeta::Clone() const
 {
@@ -153,5 +153,3 @@ bool PrefabAsset::IsLoaded() const
     return m_Loaded;
 }
 
-
-}
