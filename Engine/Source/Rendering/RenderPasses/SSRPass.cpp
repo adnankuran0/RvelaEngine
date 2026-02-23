@@ -3,6 +3,7 @@
 #include "Core/Time.h"
 #include "Rendering/Camera.h" 
 #include "Rendering/RenderContext.h"
+#include "Scene/Environment.h"
 
 using namespace rv;
 
@@ -38,7 +39,7 @@ SSRPass::~SSRPass()
 
 void SSRPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
-    if (!ctx.renderFeatures.ssr) return;
+    if (!ctx.environment->SSR) return;
 
     auto i_Depth = frame.registry.Get("DepthTexture")->id;
     auto i_Normal = frame.registry.Get("NormalTexture")->id;

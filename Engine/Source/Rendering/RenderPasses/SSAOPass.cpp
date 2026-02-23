@@ -2,6 +2,7 @@
 #include "SSAOPass.h"
 #include "Rendering/Camera.h"
 #include "Rendering/RenderContext.h"
+#include "Scene/Environment.h"
 
 using namespace rv;
 
@@ -43,12 +44,12 @@ SSAOPass::~SSAOPass()
     glDeleteFramebuffers(1, &ssaoFBO);
 }
 
-void SSAOPass::Execute(const RenderContext& ctx, RenderFrame& frame)
-{
-    if (!ctx.renderFeatures.ssao) return;
+void SSAOPass::Execute(const RenderContext& ctx, RenderFrame& frame){
+    if (!ctx.environment->SSAO) return;
 
     auto i_Normal = frame.registry.Get("NormalTexture")->id;
     auto i_Depth = frame.registry.Get("DepthTexture")->id;
+    auto& env = *ctx.environment;
 
     Shader& ssaoShader = ShaderManager::Get("SSAO");
 
@@ -65,6 +66,9 @@ void SSAOPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     ssaoShader.setVec2("windowSize", glm::vec2(ctx.viewportWidth / 2, ctx.viewportHeight / 2));
     ssaoShader.setFloat("near", NEAR_PLANE);
     ssaoShader.setFloat("far", FAR_PLANE);
+    ssaoShader.setFloat("radius", env.SSAO_Radius);
+    ssaoShader.setFloat("bias", env.SSAO_Bias);
+    ssaoShader.setFloat("intensity", env.SSAO_Intensity);
 
     glBindTextureUnit(0, i_Normal);
     glBindTextureUnit(1, i_Depth);

@@ -7,6 +7,7 @@
 #include "Rendering/Renderer.h"
 #include "CameraSystem.h"
 #include "Script/ScriptSystem.h"
+#include "Environment.h"
 
 namespace rv {
 
@@ -113,6 +114,7 @@ public:
 
     inline CameraSystem& GetCameraSystem() noexcept { return m_CameraSystem; }
     inline ScriptSystem& GetScriptSystem() noexcept { return m_ScriptSystem; }
+    inline Environment& GetEnvironment() noexcept { return m_Environment; }
 
 private:
     unsigned int CountEntitiesRecursively(entt::entity& rootEntity);
@@ -125,6 +127,7 @@ private:
     entt::entity m_RootEntity;
     CameraSystem m_CameraSystem;
     ScriptSystem m_ScriptSystem;
+    Environment m_Environment;
 };
 
 }

@@ -1,6 +1,7 @@
 ﻿#include "rvelapch.h"
 #include "CompositePass.h"
 #include "Rendering/RenderContext.h"
+#include "Scene/Environment.h"
 
 using namespace rv;
 
@@ -30,6 +31,8 @@ void CompositePass::Init(const RenderContext& ctx, RenderFrame& frame)
 
 void CompositePass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
+	auto& env = *ctx.environment;
+
 	auto i_ScreenTexture = frame.registry.Get("ScreenTexture")->id;
 	auto i_BloomBlurTexture = frame.registry.Get("BloomTexture")->id;
 	auto i_AoTexture = frame.registry.Get("SSAOTexture")->id;
@@ -42,7 +45,11 @@ void CompositePass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
 
 	compositeShader.use();
-	compositeShader.setFloat("exposure", 1.0f);
+	compositeShader.setFloat("exposure", env.PostProcess_Exposure);
+	compositeShader.setFloat("vignetteIntensity", env.PostProcess_VignetteIntensity);
+	compositeShader.setFloat("vignetteSmoothness", env.PostProcess_VignetteSmoothness);
+	compositeShader.setFloat("chromaticStrength", env.PostProcess_ChromaticStrength);
+
 	compositeShader.setInt("screenTexture", 0);
 	compositeShader.setInt("bloomTexture", 1);
 	compositeShader.setInt("aoTexture", 2);

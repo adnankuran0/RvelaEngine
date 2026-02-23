@@ -5,6 +5,7 @@ namespace rv {
 
 class Scene;
 class Camera;
+class Environment;
 
 enum class RenderProfile
 {
@@ -12,12 +13,6 @@ enum class RenderProfile
 	EDITOR
 };
 
-struct RenderFeatures
-{
-	bool ssao = true;
-	bool ssr = true;
-	bool bloom = true;
-};
 
 struct RenderContext
 {
@@ -30,7 +25,7 @@ public:
 	unsigned int viewportHeight;
 	Scene* scene;
 	RenderProfile profile = RenderProfile::EDITOR;
-	RenderFeatures renderFeatures;
+	Environment* environment;
 
 	void Clear()
 	{
@@ -38,6 +33,7 @@ public:
 		pointLights.clear();
 		directionalLight.reset();
 		scene = nullptr;
+		environment = nullptr;
 	}
 
 	

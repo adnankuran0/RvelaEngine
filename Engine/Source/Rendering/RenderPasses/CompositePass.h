@@ -13,7 +13,6 @@ public:
 	void Execute(const RenderContext& ctx, RenderFrame& frame) override;
 
 private:
-    GLuint m_LuminanceBuffer = 0;
     GLuint m_Framebuffer = 0;       
     GLuint o_FinalTexture = 0;      
 };

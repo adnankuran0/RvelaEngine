@@ -1,6 +1,7 @@
 ﻿#include "rvelapch.h"
 #include "BrightPass.h"
 #include "Rendering/RenderContext.h"
+#include "Scene/Environment.h"
 
 using namespace rv;
 
@@ -45,7 +46,10 @@ BrightPass::~BrightPass()
 
 void BrightPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
+    if (!ctx.environment->Bloom) return;
+
     auto i_ScreenTexture = frame.registry.Get("ScreenTexture")->id;
+    auto& env = *ctx.environment;
 
     glDisable(GL_DEPTH_TEST);
 
@@ -53,8 +57,8 @@ void BrightPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     brightShader.use();
 
     brightShader.setInt("hdrTexture", 0);
-    brightShader.setFloat("threshold", 0.9f);
-    brightShader.setFloat("knee", 0.5f);
+    brightShader.setFloat("threshold",env.Bloom_Treshold);
+    brightShader.setFloat("knee", env.Bloom_Knee);
 
     glBindTextureUnit(0, i_ScreenTexture); 
 

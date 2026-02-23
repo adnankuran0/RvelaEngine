@@ -6,6 +6,7 @@
 #include <algorithm>
 #include "Rendering/Renderer.h"
 #include "Rendering/RenderContext.h"
+#include "Scene/Environment.h"
 
 using namespace rv;
 
@@ -142,7 +143,7 @@ BloomPass::~BloomPass()
 
 void BloomPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
-    if (!ctx.renderFeatures.bloom) return;
+    if (!ctx.environment->Bloom) return;
 
     Downsample(ctx, frame);
 

@@ -25,13 +25,14 @@ uniform mat4 invProjection;
 uniform vec2 windowSize;
 uniform vec3 samples[32];
 
-const float radius = 1.0;      
-const float bias = 0.025;
-const float intensity = 1.0;
+
 const float invSamples = 1.0 / 32.0;
 
 uniform float near;
 uniform float far;
+uniform float radius = 1.0;      
+uniform float bias = 0.025;
+uniform float intensity = 1.0;
 
 vec3 getViewPos(vec2 uv)
 {

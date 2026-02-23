@@ -682,11 +682,34 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 
     if (ImGui::BeginTabItem("Environment"))
     {
-        auto& featureSettings = engine->GetRenderLayer().GetRenderContext().renderFeatures;
+        auto& env = engine->GetActiveScene().GetEnvironment();
 
-        ImGui::Checkbox("SSAO", &featureSettings.ssao);
-        ImGui::Checkbox("SSR", &featureSettings.ssr);
-        ImGui::Checkbox("Bloom", &featureSettings.bloom);
+        if (ImGui::CollapsingHeader("SSAO"))
+        {
+            ImGui::Checkbox("SSAO", &env.SSAO);
+            ImGui::SliderFloat("Intensity", &env.SSAO_Intensity, 0.0f, 10.0f);
+            ImGui::SliderFloat("Radius", &env.SSAO_Radius, 0.0f, 10.0f);
+            ImGui::SliderFloat("Bias", &env.SSAO_Bias, 0.0f, 0.1f);
+
+        }
+
+        ImGui::Checkbox("SSR", &env.SSR);
+
+        if (ImGui::CollapsingHeader("Bloom"))
+        {
+            ImGui::Checkbox("Use Bloom", &env.Bloom);
+            ImGui::SliderFloat("Treshold", &env.Bloom_Treshold,0.0f,1.0f);
+            ImGui::SliderFloat("Knee", &env.Bloom_Knee,0.0f,1.0f);
+        }
+       
+        if (ImGui::CollapsingHeader("Post Process"))
+        {
+            ImGui::SliderFloat("Exposure", &env.PostProcess_Exposure, 0.0f, 10.0f);
+            ImGui::SliderFloat("Chromatic Aberration", &env.PostProcess_ChromaticStrength, 0.001f, 0.1f);
+            ImGui::SliderFloat("Vignette Intensity", &env.PostProcess_VignetteIntensity, 0.0f, 1.0f);
+            ImGui::SliderFloat("Vignette Smoothness", &env.PostProcess_VignetteSmoothness, 0.1f, 1.0f);
+
+        }
 
         ImGui::EndTabItem();
     }
