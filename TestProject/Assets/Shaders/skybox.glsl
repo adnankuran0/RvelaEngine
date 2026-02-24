@@ -8,9 +8,9 @@ uniform mat4 view;
 
 void main()
 {
-    TexCoords = aPosition; // Vertex pozisyonlarını doku koordinatları olarak kullan
+    TexCoords = aPosition; 
     vec4 pos = projection * view * vec4(aPosition, 1.0);
-    gl_Position = pos.xyww; // Derinlik testinde her zaman en uzakta kalmasını sağlar
+    gl_Position = pos.xyww;
 }
 
 #shader fragment

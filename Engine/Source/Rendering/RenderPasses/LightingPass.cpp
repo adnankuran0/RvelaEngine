@@ -5,6 +5,7 @@
 #include "Assets/AssetRegistry.h"
 #include "Scene/Components.h"
 #include "Rendering/RenderContext.h"
+#include "Scene/Environment.h"
 
 using namespace rv;
 
@@ -67,7 +68,7 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     auto& commands = frame.commands;
     auto& resourceRegistry = frame.registry;
 
-
+  
 
     auto i_DirectionalShadowMap = resourceRegistry.Get("DirectionalShadowMap")->id;
     auto i_PointShadowMap = resourceRegistry.Get("PointShadowMap")->id;
@@ -131,6 +132,25 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     shader.setMat4("view", ctx.camera->GetViewMatrix());
     shader.setMat4("projection", ctx.camera->GetProjectionMatrix());
 
+
+
+    auto& skybox = ctx.environment->GetSkybox();
+  
+
+
+    glBindTextureUnit(6, i_DirectionalShadowMap);
+    glBindTextureUnit(7, i_PointShadowMap);
+
+    shader.setInt("irradianceMap", 8);
+    shader.setInt("prefilterMap", 9);
+    shader.setInt("brdfLUT", 10);
+    shader.setFloat("iblIntensity", ctx.environment->IBL_Intensity);
+    shader.setBool("useIBL", true);
+        
+    glBindTextureUnit(8, skybox.GetIrradianceMap());
+    glBindTextureUnit(9, skybox.GetPrefilterMap());
+    glBindTextureUnit(10, skybox.GetBRDFLUTTexture());
+
     size_t drawCallCounter = 0;
     for (auto& command : commands) {
         if (!ctx.camera->Intersects(command.mesh.worldAABB)) continue;
@@ -193,7 +213,7 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         0, 0, ctx.viewportWidth, ctx.viewportHeight,
         GL_COLOR_BUFFER_BIT, GL_NEAREST
     );
-
+   
     resourceRegistry.Register("ScreenTexture", { RenderResourceType::Texture,o_IntermediateColorTex });
     resourceRegistry.Register("ScreenBuffer", { RenderResourceType::Framebuffer,o_ScreenFBO });
     resourceRegistry.Register("IntermediateBuffer", { RenderResourceType::Framebuffer,intermediateFBO });

@@ -2,15 +2,16 @@
 #include "SkyboxPass.h"
 #include "Rendering/RenderContext.h"
 #include "Rendering/Camera.h"
+#include "Scene/Environment.h"
 
 using namespace rv;
 
 void SkyboxPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
     Path path = VRT_PATH("Assets\\Textures\\skybox\\environment.hdr");
-    m_Skybox.InitHDR(path, ShaderManager::Get("ToCubemap"));
+    auto& skybox = ctx.environment->GetSkybox();
 
-    frame.registry.Register("SkyboxTexture", { RenderResourceType::Texture,m_Skybox.GetTextureID() });
+    frame.registry.Register("SkyboxTexture", { RenderResourceType::Texture,skybox.GetEnvironmentMap() });
 }
 
 SkyboxPass::~SkyboxPass()
@@ -18,7 +19,17 @@ SkyboxPass::~SkyboxPass()
 }
 void SkyboxPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
+  
+
     auto screenFBO = frame.registry.Get("ScreenBuffer")->id;
+    auto& skybox = ctx.environment->GetSkybox();
+
+    if (!ctx.environment->IsInitialized())
+    {
+        Path path = VRT_PATH("Assets\\Textures\\skybox\\environment.hdr");
+        skybox.InitHDR(path);
+        ctx.environment->SetInitialized(true);
+    }
     glm::mat4 proj;
 
     auto& camera = ctx.camera;
@@ -31,8 +42,10 @@ void SkyboxPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     {
         proj = camera->GetProjectionMatrix();
     }
-	m_Skybox.Render(ShaderManager::Get("Skybox"), ctx.camera->GetProjectionMatrix(), ctx.camera->GetViewMatrix(), screenFBO);
-    frame.registry.Register("SkyboxTexture", { RenderResourceType::Texture,m_Skybox.GetTextureID() });
-
+   
+    skybox.Render(ctx.camera->GetProjectionMatrix(), ctx.camera->GetViewMatrix(), screenFBO);
+    
+    frame.registry.Register("SkyboxTexture", { RenderResourceType::Texture,skybox.GetEnvironmentMap() });
+   
 }
 

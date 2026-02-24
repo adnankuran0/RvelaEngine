@@ -39,6 +39,9 @@ void Renderer::Init(GLFWwindow* window)
     ShaderManager::Add(Shader("ToCubemap",VRT_PATH("Assets\\Shaders\\equirectangularToCubemap.glsl")));
     ShaderManager::Add(Shader("EntityBuffer",VRT_PATH("Assets\\Shaders\\entityBuffer.glsl")));
     ShaderManager::Add(Shader("Mask",VRT_PATH("Assets\\Shaders\\mask.glsl")));
+    ShaderManager::Add(Shader("Irradiance",VRT_PATH("Assets\\Shaders\\irradiance.glsl")));
+    ShaderManager::Add(Shader("Prefilter",VRT_PATH("Assets\\Shaders\\prefilter.glsl")));
+    ShaderManager::Add(Shader("BRDF",VRT_PATH("Assets\\Shaders\\brdf.glsl")));
 
     m_ScreenQuad.Init();
 

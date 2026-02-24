@@ -52,7 +52,6 @@ public:
     void Shutdown();
 
     static void DrawFullScreenQuad();
-
     
 
 private:

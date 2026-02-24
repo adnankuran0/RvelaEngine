@@ -58,6 +58,7 @@ layout(binding = 3) uniform sampler2D roughnessMap;
 layout(binding = 4) uniform sampler2D aoMap;
 layout(binding = 5) uniform sampler2D heightMap;
 
+
 uniform bool useAlbedoMap;
 uniform bool useNormalMap;
 uniform bool useMetallicMap;
@@ -76,6 +77,14 @@ uniform float normalScale;
 layout(binding = 6) uniform sampler2D shadowMap;
 layout(binding = 7) uniform samplerCubeArray pointShadowMap;
 uniform mat4 lightSpaceMatrix;
+
+// IBL
+layout(binding = 8) uniform samplerCube irradianceMap;
+layout(binding = 9) uniform samplerCube prefilterMap;
+layout(binding = 10) uniform sampler2D brdfLUT;
+
+uniform bool useIBL;
+uniform float iblIntensity;
 
 // Lights
 #define MAX_POINT_LIGHTS 20
@@ -333,8 +342,33 @@ void main()
 
     
 
-    // Ambient lighting
-    vec3 ambient = vec3(0.3) * albedo * ao;
+    vec3 ambient = vec3(0.0);
+
+    if(useIBL)
+    {
+        vec3 R = reflect(-V, N);
+        
+        float NdotV = max(dot(N, V), 0.0);
+        vec3 F = fresnelSchlick(NdotV, F0);
+        
+        vec3 kS = F;
+        vec3 kD = vec3(1.0) - kS;
+        kD *= 1.0 - metallic; 
+
+        vec3 irradiance = texture(irradianceMap, N).rgb;
+        vec3 diffuse = irradiance * albedo;
+
+        const float MAX_REFLECTION_LOD = 4.0;
+        float lod = roughness * MAX_REFLECTION_LOD;
+        vec3 prefilteredColor = textureLod(prefilterMap, R, lod).rgb;
+        
+        vec2 brdf = texture(brdfLUT, vec2(NdotV, roughness)).rg;
+        
+        vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
+
+        ambient = (kD * diffuse + specular) * ao * iblIntensity;
+    }
+
     vec3 color = ambient + Lo;
 
     FragColor = vec4(color, albedoTex.a);

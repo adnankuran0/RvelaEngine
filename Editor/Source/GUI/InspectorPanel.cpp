@@ -684,9 +684,15 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
     {
         auto& env = engine->GetActiveScene().GetEnvironment();
 
+        if (ImGui::CollapsingHeader("Skybox"))
+        {
+            ImGui::SliderFloat("IBL Intensity", &env.IBL_Intensity, 0.0f, 10.0f,"%.1f");
+
+        }
+
         if (ImGui::CollapsingHeader("SSAO"))
         {
-            ImGui::Checkbox("SSAO", &env.SSAO);
+            ImGui::Checkbox("Use SSAO", &env.SSAO);
             ImGui::SliderFloat("Intensity", &env.SSAO_Intensity, 0.0f, 10.0f);
             ImGui::SliderFloat("Radius", &env.SSAO_Radius, 0.0f, 10.0f);
             ImGui::SliderFloat("Bias", &env.SSAO_Bias, 0.0f, 0.1f);

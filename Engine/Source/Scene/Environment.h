@@ -1,4 +1,5 @@
 #pragma once
+#include "Rendering/Skybox.h"
 
 namespace rv {
 
@@ -20,6 +21,16 @@ public:
 	float PostProcess_VignetteIntensity = 0.25f;
 	float PostProcess_VignetteSmoothness = 0.5f;
 	float PostProcess_ChromaticStrength = 0.01f;
+
+	float IBL_Intensity = 1.0f;
+
+	Skybox& GetSkybox() { return m_Skybox; }
+	bool IsInitialized() { return m_IsInitialized; }
+	void SetInitialized(bool isInitialized) { m_IsInitialized = isInitialized; }
+private:
+	bool m_IsInitialized = false;
+	Skybox m_Skybox;
+
 };
 
 }
