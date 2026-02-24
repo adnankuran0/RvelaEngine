@@ -73,6 +73,9 @@ uniform float aoValue;
 uniform float heightScale;
 uniform float normalScale;
 
+uniform vec3 ambientColor;
+uniform float ambientIntensity;
+
 // Shadows
 layout(binding = 6) uniform sampler2D shadowMap;
 layout(binding = 7) uniform samplerCubeArray pointShadowMap;
@@ -368,7 +371,11 @@ void main()
 
         ambient = (kD * diffuse + specular) * ao * iblIntensity;
     }
-
+    else
+    {
+        ambient = ambientColor * ambientIntensity * albedo * ao;
+    }
+    
     vec3 color = ambient + Lo;
 
     FragColor = vec4(color, albedoTex.a);

@@ -134,9 +134,8 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
 
 
-    auto& skybox = ctx.environment->GetSkybox();
-  
-
+    auto& env = *ctx.environment;
+    auto& skybox = env.GetSkybox();
 
     glBindTextureUnit(6, i_DirectionalShadowMap);
     glBindTextureUnit(7, i_PointShadowMap);
@@ -144,8 +143,10 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     shader.setInt("irradianceMap", 8);
     shader.setInt("prefilterMap", 9);
     shader.setInt("brdfLUT", 10);
-    shader.setFloat("iblIntensity", ctx.environment->IBL_Intensity);
-    shader.setBool("useIBL", true);
+    shader.setFloat("iblIntensity", env.Lighting_IBLIntensity);
+    shader.setBool("useIBL", env.Lighting_IBL);
+    shader.setVec3("ambientColor", env.Lighting_AmbientColor);
+    shader.setFloat("ambientIntensity", env.Lighting_AmbientIntensity);
         
     glBindTextureUnit(8, skybox.GetIrradianceMap());
     glBindTextureUnit(9, skybox.GetPrefilterMap());

@@ -10,6 +10,7 @@ void SkyboxPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
     Path path = VRT_PATH("Assets\\Textures\\skybox\\environment.hdr");
     auto& skybox = ctx.environment->GetSkybox();
+    skybox.InitHDR(path);
 
     frame.registry.Register("SkyboxTexture", { RenderResourceType::Texture,skybox.GetEnvironmentMap() });
 }
@@ -24,12 +25,7 @@ void SkyboxPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     auto screenFBO = frame.registry.Get("ScreenBuffer")->id;
     auto& skybox = ctx.environment->GetSkybox();
 
-    if (!ctx.environment->IsInitialized())
-    {
-        Path path = VRT_PATH("Assets\\Textures\\skybox\\environment.hdr");
-        skybox.InitHDR(path);
-        ctx.environment->SetInitialized(true);
-    }
+ 
     glm::mat4 proj;
 
     auto& camera = ctx.camera;

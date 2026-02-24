@@ -8,6 +8,7 @@ using namespace rv;
 void SceneSerializer::SaveScene(Scene& scene, const std::string& path)
 {
     json sceneJson;
+    sceneJson["Environment"] = scene.GetEnvironment().Serialize();
     sceneJson["Entities"] = json::array();
 
     auto view = scene.GetRegistry().view<UUIDComponent, SceneTreeComponent>();
@@ -32,7 +33,8 @@ void SceneSerializer::LoadScene(Scene& scene, const std::string& path)
     std::ifstream(path) >> j;
 
     std::unordered_map<EntityUUID, entt::entity> uuidToEntity;
-
+    if (j.contains("Environment"))
+        scene.GetEnvironment().Deserialize(j["Environment"]);
     for (auto& entityJson : j["Entities"])
     {
         bool isPrefab = entityJson.contains("Prefab");

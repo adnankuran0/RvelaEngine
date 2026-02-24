@@ -55,6 +55,7 @@ void Skybox::Init(const std::vector<Path>& faces)
 void Skybox::InitHDR(const Path& hdrFilePath)
 {
     GLuint hdrTexture = LoadHDRTexture(hdrFilePath);
+    m_Path = hdrFilePath;
     setupSkybox();  
     SetupQuad();
 

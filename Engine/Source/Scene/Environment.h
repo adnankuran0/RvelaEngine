@@ -1,11 +1,17 @@
 #pragma once
 #include "Rendering/Skybox.h"
+#include "nlohmann/json.hpp"
 
 namespace rv {
 
 class Environment
 {
 public:
+	bool Lighting_IBL = true;
+	float Lighting_IBLIntensity = 0.5f;
+	glm::vec3 Lighting_AmbientColor = glm::vec3(1.0f, 1.0f, 1.0f);
+	float Lighting_AmbientIntensity = 0.5f;
+
 	bool SSAO = true;
 	float SSAO_Radius = 1.0f;
 	float SSAO_Bias = 0.025f;
@@ -22,13 +28,11 @@ public:
 	float PostProcess_VignetteSmoothness = 0.5f;
 	float PostProcess_ChromaticStrength = 0.01f;
 
-	float IBL_Intensity = 1.0f;
-
 	Skybox& GetSkybox() { return m_Skybox; }
-	bool IsInitialized() { return m_IsInitialized; }
-	void SetInitialized(bool isInitialized) { m_IsInitialized = isInitialized; }
+
+	nlohmann::json Serialize();
+	void Deserialize(const nlohmann::json& j);
 private:
-	bool m_IsInitialized = false;
 	Skybox m_Skybox;
 
 };

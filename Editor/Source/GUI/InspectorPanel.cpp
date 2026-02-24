@@ -684,9 +684,40 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
     {
         auto& env = engine->GetActiveScene().GetEnvironment();
 
-        if (ImGui::CollapsingHeader("Skybox"))
+        if (ImGui::CollapsingHeader("Lighting"))
         {
-            ImGui::SliderFloat("IBL Intensity", &env.IBL_Intensity, 0.0f, 10.0f,"%.1f");
+            ImGui::Button("Skybox HDR", ImVec2(200, 20));
+            if (ImGui::BeginDragDropTarget())
+            {
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
+                {
+                    const char* path = (const char*)payload->Data;
+                    std::string pathStr(path);
+
+                    if (pathStr.ends_with(".hdr"))
+                    {
+                        Path path = Path::FromAbsolute(pathStr);
+                        env.GetSkybox().InitHDR(path);
+                    }
+                }
+                ImGui::EndDragDropTarget();
+            }
+            bool* useIBL = &env.Lighting_IBL;
+            ImGui::Checkbox("Use IBL", useIBL);
+            
+            if (*useIBL)
+            {
+                ImGui::SliderFloat("IBL Intensity", &env.Lighting_IBLIntensity, 0.0f, 5.0f, "%.1f");
+            }
+            else
+            {
+                ImGui::ColorEdit3("Ambient Color", glm::value_ptr(env.Lighting_AmbientColor));
+                ImGui::SliderFloat("Ambient Intensity", &env.Lighting_AmbientIntensity, 0.0f, 5.0f, "%.1f");
+            }
+            
+            
+            
+            
 
         }
 
