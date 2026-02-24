@@ -101,7 +101,8 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         geometryShader.setMat4("model", model);
         glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(view * model)));
         geometryShader.setMat3("normalMatrix", normalMatrix);
-
+        geometryShader.setVec2("UVScale", material.GetUVScale());
+        geometryShader.setVec2("UVOffset", material.GetUVOffset());
 
         if (material.IsUsingRoughnessMap())
         {

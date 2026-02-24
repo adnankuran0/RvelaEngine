@@ -10,6 +10,8 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 uniform mat3 normalMatrix;
+uniform vec2 UVScale;
+uniform vec2 UVOffset;
 
 out vec3 FragPos;
 out vec3 Normal;
@@ -20,7 +22,7 @@ void main()
     vec4 worldPos = model * vec4(aPos, 1.0);
     FragPos = vec3(view * worldPos);
     Normal = normalMatrix * aNormal;
-    TexCoords = aTexCoords;
+    TexCoords = aTexCoords * UVScale + UVOffset;
     gl_Position = projection * view * worldPos;
 }
 
