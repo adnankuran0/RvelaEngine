@@ -11,7 +11,7 @@
 
 using namespace rv;
 
-Scene::Scene(const std::string& sceneName) : m_Registry() , m_ScriptSystem(*this), m_CameraSystem(*this)
+Scene::Scene(const std::string& sceneName) : m_Registry() , m_ScriptSystem(*this), m_CameraSystem(*this), m_LightSystem(*this)
 {
     m_SceneName = sceneName;
     m_RootEntity = m_Registry.create();

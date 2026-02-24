@@ -7,6 +7,7 @@
 #include "Rendering/Renderer.h"
 #include "CameraSystem.h"
 #include "Script/ScriptSystem.h"
+#include "LightSystem.h"
 #include "Environment.h"
 
 namespace rv {
@@ -114,6 +115,7 @@ public:
 
     inline CameraSystem& GetCameraSystem() noexcept { return m_CameraSystem; }
     inline ScriptSystem& GetScriptSystem() noexcept { return m_ScriptSystem; }
+    inline LightSystem& GetLightSystem() noexcept { return m_LightSystem; }
     inline Environment& GetEnvironment() noexcept { return m_Environment; }
 
 private:
@@ -127,6 +129,7 @@ private:
     entt::entity m_RootEntity;
     CameraSystem m_CameraSystem;
     ScriptSystem m_ScriptSystem;
+    LightSystem m_LightSystem;
     Environment m_Environment;
 };
 

@@ -2,6 +2,8 @@
 #include "BrightPass.h"
 #include "Rendering/RenderContext.h"
 #include "Scene/Environment.h"
+#include "Rendering/Renderer.h"
+
 
 using namespace rv;
 

@@ -34,7 +34,6 @@ void Renderer::Init(GLFWwindow* window)
     ShaderManager::Add(Shader("SSAO",VRT_PATH("Assets\\Shaders\\ssao.glsl")));
     ShaderManager::Add(Shader("SSR",VRT_PATH("Assets\\Shaders\\ssr.glsl")));
     ShaderManager::Add(Shader("Composite",VRT_PATH("Assets\\Shaders\\composite.glsl")));
-    ShaderManager::Add(Shader("ProceduralSky",VRT_PATH("Assets\\Shaders\\proceduralSky.glsl")));
     ShaderManager::Add(Shader("Outline",VRT_PATH("Assets\\Shaders\\outline.glsl")));
     ShaderManager::Add(Shader("ToCubemap",VRT_PATH("Assets\\Shaders\\equirectangularToCubemap.glsl")));
     ShaderManager::Add(Shader("EntityBuffer",VRT_PATH("Assets\\Shaders\\entityBuffer.glsl")));

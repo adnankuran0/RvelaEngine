@@ -6,6 +6,7 @@
 #include "Scene/Components.h"
 #include "Rendering/RenderContext.h"
 #include "Scene/Environment.h"
+#include "Rendering/ShaderManager.h"
 
 using namespace rv;
 

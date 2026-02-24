@@ -1,5 +1,5 @@
 #pragma once
-#include "Rendering/Renderer.h"
+#include "Light.h"
 
 namespace rv {
 
@@ -19,8 +19,8 @@ struct RenderContext
 public:
 	RenderContext() = default;
 	Camera* camera;
-	std::vector<PointLightData> pointLights;
-	std::optional<DirectionalLightData> directionalLight;
+	std::vector<PointLight> pointLights;
+	std::optional<DirectionalLight> directionalLight;
 	unsigned int viewportWidth;
 	unsigned int viewportHeight;
 	Scene* scene;

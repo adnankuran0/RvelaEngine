@@ -3,6 +3,7 @@
 #include "Rendering/Camera.h"
 #include "Rendering/RenderContext.h"
 #include <Rendering/RenderFrame.h>
+#include "Rendering/ShaderManager.h"
 
 using namespace rv;
 
