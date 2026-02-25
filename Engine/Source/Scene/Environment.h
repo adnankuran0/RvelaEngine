@@ -20,7 +20,8 @@ public:
 	bool SSR = true;
 
 	bool Bloom = true;
-	float Bloom_Treshold = 1.0;
+	float Bloom_Intensity = 1.0f;
+	float Bloom_Treshold = 1.0f;
 	float Bloom_Knee = 0.5f;
 
 	float PostProcess_Exposure = 1.0f;

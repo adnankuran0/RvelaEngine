@@ -1,420 +1,18 @@
 {
     "Entities": [
         {
-            "Material": {
-                "material": "6febaed5-8da7-4794-9f90-de32e70208d2"
-            },
-            "Mesh": {
-                "mesh": "67ca389a-7b6d-415e-9a02-fb6dce14910b"
-            },
-            "ParentUUID": 0,
-            "Tag": {
-                "tag": "utility_box_02"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    -0.3246814012527466,
-                    0.4893058240413666,
-                    -2.9519529342651367
-                ],
-                "rotation": [
-                    -89.99061584472656,
-                    29.295886993408203,
-                    7.636051304871216e-05
-                ],
-                "scale": [
-                    0.9999986886978149,
-                    0.9997269511222839,
-                    0.999714195728302
-                ],
-                "scaleRatio": [
-                    1.0,
-                    1.0,
-                    1.0
-                ]
-            },
-            "UUID": 24
-        },
-        {
-            "Material": {
-                "material": "99427148-c3b6-47ca-82b7-a71bb37e22fc"
-            },
-            "Mesh": {
-                "mesh": "d7a4a76b-2e35-4788-a599-23dadc39bee2"
-            },
-            "ParentUUID": 0,
-            "Tag": {
-                "tag": "Chair"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    1.600956678390503,
-                    0.5906838178634644,
-                    -3.1681480407714844
-                ],
-                "rotation": [
-                    0.0,
-                    -32.48604965209961,
-                    0.0
-                ],
-                "scale": [
-                    0.9999997615814209,
-                    1.0,
-                    0.9999997615814209
-                ],
-                "scaleRatio": [
-                    1.0,
-                    1.0,
-                    1.0
-                ]
-            },
-            "UUID": 22
-        },
-        {
-            "Material": {
-                "material": "034b121e-dc18-48bb-800d-9ff54a5d7d83"
-            },
-            "Mesh": {
-                "mesh": "135e1d8e-5e85-445f-a1e5-75b4e0701f7b"
-            },
-            "ParentUUID": 16,
-            "Tag": {
-                "tag": "covered_car"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    0.037599992007017136,
-                    0.0,
-                    0.037599992007017136
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scale": [
-                    1.0,
-                    1.0,
-                    1.0
-                ],
-                "scaleRatio": [
-                    1.0,
-                    1.0,
-                    1.0
-                ]
-            },
-            "UUID": 21
-        },
-        {
-            "Material": {
-                "material": "034b121e-dc18-48bb-800d-9ff54a5d7d83"
-            },
-            "Mesh": {
-                "mesh": "c340b05c-5527-47cc-8d44-a59094941efa"
-            },
-            "ParentUUID": 16,
-            "Tag": {
-                "tag": "covered_car_wheel_04"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    0.7475999593734741,
-                    0.30000001192092896,
-                    -1.2993998527526855
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scale": [
-                    1.0,
-                    1.0,
-                    1.0
-                ],
-                "scaleRatio": [
-                    1.0,
-                    1.0,
-                    1.0
-                ]
-            },
-            "UUID": 20
-        },
-        {
-            "Material": {
-                "material": "034b121e-dc18-48bb-800d-9ff54a5d7d83"
-            },
-            "Mesh": {
-                "mesh": "f1eadfe1-9561-43af-9dd5-6afce861d5a1"
-            },
-            "ParentUUID": 16,
-            "Tag": {
-                "tag": "covered_car_wheel_03"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    -0.6724001169204712,
-                    0.30000001192092896,
-                    -1.299399971961975
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scale": [
-                    1.0,
-                    1.0,
-                    1.0
-                ],
-                "scaleRatio": [
-                    1.0,
-                    1.0,
-                    1.0
-                ]
-            },
-            "UUID": 19
-        },
-        {
-            "Material": {
-                "material": "034b121e-dc18-48bb-800d-9ff54a5d7d83"
-            },
-            "Mesh": {
-                "mesh": "7dee8ba5-1319-4e06-9e0a-725fe7b291dc"
-            },
-            "ParentUUID": 16,
-            "Tag": {
-                "tag": "covered_car_wheel_02"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    -0.6823999881744385,
-                    0.30000001192092896,
-                    1.2806000709533691
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scale": [
-                    1.0,
-                    1.0,
-                    1.0
-                ],
-                "scaleRatio": [
-                    1.0,
-                    1.0,
-                    1.0
-                ]
-            },
-            "UUID": 18
-        },
-        {
-            "Material": {
-                "material": "034b121e-dc18-48bb-800d-9ff54a5d7d83"
-            },
-            "Mesh": {
-                "mesh": "0bd2c01b-696a-4980-bcef-f25beb1b9c0d"
-            },
-            "ParentUUID": 16,
-            "Tag": {
-                "tag": "covered_car_wheel_01"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    0.7576000690460205,
-                    0.30000001192092896,
-                    1.2806000709533691
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scale": [
-                    1.0,
-                    1.0,
-                    1.0
-                ],
-                "scaleRatio": [
-                    1.0,
-                    1.0,
-                    1.0
-                ]
-            },
-            "UUID": 17
-        },
-        {
-            "ParentUUID": 0,
-            "Tag": {
-                "tag": "Car"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    -6.0,
-                    0.46623384952545166,
-                    -6.0
-                ],
-                "rotation": [
-                    0.0,
-                    17.404903411865234,
-                    0.0
-                ],
-                "scale": [
-                    0.9999918341636658,
-                    1.0,
-                    0.9999918341636658
-                ],
-                "scaleRatio": [
-                    1.0,
-                    1.0,
-                    1.0
-                ]
-            },
-            "UUID": 16
-        },
-        {
-            "ParentUUID": 0,
-            "PointLight": {
+            "DirectionalLight": {
                 "castShadows": true,
                 "color": [
                     1.0,
                     1.0,
                     1.0
                 ],
-                "falloff": 2.0,
-                "intensity": 100.0,
-                "radius": 13.40999984741211
-            },
-            "Tag": {
-                "tag": "PointLight"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    0.0,
-                    5.054037570953369,
-                    0.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scale": [
-                    1.0,
-                    1.0,
-                    1.0
-                ],
-                "scaleRatio": [
-                    1.0,
-                    1.0,
-                    1.0
-                ]
-            },
-            "UUID": 15
-        },
-        {
-            "ParentUUID": 0,
-            "PointLight": {
-                "castShadows": true,
-                "color": [
-                    0.19746558368206024,
-                    0.442502498626709,
-                    0.678787887096405
-                ],
-                "falloff": 3.2019999027252197,
-                "intensity": 20.0,
-                "radius": 50.0
-            },
-            "Tag": {
-                "tag": "PointLight"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    5.390352249145508,
-                    2.139963388442993,
-                    -6.013968467712402
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scale": [
-                    1.0,
-                    1.0,
-                    1.0
-                ],
-                "scaleRatio": [
-                    1.0,
-                    1.0,
-                    1.0
-                ]
-            },
-            "UUID": 13
-        },
-        {
-            "ParentUUID": 0,
-            "PointLight": {
-                "castShadows": true,
-                "color": [
-                    1.0,
-                    0.030303001403808594,
-                    0.030303001403808594
-                ],
-                "falloff": 5.673999786376953,
-                "intensity": 20.0,
-                "radius": 9.071000099182129
-            },
-            "Tag": {
-                "tag": "PointLight"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    -4.572669506072998,
-                    2.011259078979492,
-                    -4.437511444091797
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scale": [
-                    1.0,
-                    1.0,
-                    1.0
-                ],
-                "scaleRatio": [
-                    1.0,
-                    1.0,
-                    1.0
-                ]
-            },
-            "UUID": 14
-        },
-        {
-            "Material": {
-                "material": "5fbc428b-1fbc-4f88-a55d-8ee35575f903"
-            },
-            "Mesh": {
-                "mesh": "36468d32-bba5-4eb4-82db-0d4da5cd6c65"
+                "intensity": 2.6740000247955322
             },
             "ParentUUID": 0,
             "Tag": {
-                "tag": "Cube"
+                "tag": "DirectionalLight"
             },
             "Transform": {
                 "lockScaleRatio": false,
@@ -424,14 +22,14 @@
                     0.0
                 ],
                 "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
+                    26.726232528686523,
+                    49.13761901855469,
+                    77.51712799072266
                 ],
                 "scale": [
-                    20.0,
-                    1.0,
-                    20.0
+                    1.000005841255188,
+                    0.9999982714653015,
+                    0.9999983906745911
                 ],
                 "scaleRatio": [
                     1.0,
@@ -439,24 +37,18 @@
                     1.0
                 ]
             },
-            "UUID": 2
+            "UUID": 23
         },
         {
-            "Material": {
-                "material": "afd0df4c-0757-4f9b-b211-7370b5f0613f"
-            },
-            "Mesh": {
-                "mesh": "36468d32-bba5-4eb4-82db-0d4da5cd6c65"
-            },
             "ParentUUID": 0,
             "Tag": {
-                "tag": "Cube"
+                "tag": "Player"
             },
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
-                    10.0,
-                    3.0,
+                    0.0,
+                    0.5,
                     0.0
                 ],
                 "rotation": [
@@ -466,43 +58,7 @@
                 ],
                 "scale": [
                     1.0,
-                    6.0,
-                    20.0
-                ],
-                "scaleRatio": [
                     1.0,
-                    1.0,
-                    1.0
-                ]
-            },
-            "UUID": 10
-        },
-        {
-            "Material": {
-                "material": "afd0df4c-0757-4f9b-b211-7370b5f0613f"
-            },
-            "Mesh": {
-                "mesh": "36468d32-bba5-4eb4-82db-0d4da5cd6c65"
-            },
-            "ParentUUID": 0,
-            "Tag": {
-                "tag": "Cube"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    0.0,
-                    3.0,
-                    10.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scale": [
-                    20.0,
-                    6.0,
                     1.0
                 ],
                 "scaleRatio": [
@@ -511,7 +67,7 @@
                     1.0
                 ]
             },
-            "UUID": 9
+            "UUID": 7
         },
         {
             "CameraComponent": {
@@ -551,15 +107,57 @@
             "UUID": 8
         },
         {
+            "Material": {
+                "material": "afd0df4c-0757-4f9b-b211-7370b5f0613f"
+            },
+            "Mesh": {
+                "mesh": "36468d32-bba5-4eb4-82db-0d4da5cd6c65"
+            },
             "ParentUUID": 0,
             "Tag": {
-                "tag": "Player"
+                "tag": "Cube"
             },
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
                     0.0,
-                    0.5,
+                    3.0,
+                    10.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    20.0,
+                    6.0,
+                    1.0
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 9
+        },
+        {
+            "Material": {
+                "material": "afd0df4c-0757-4f9b-b211-7370b5f0613f"
+            },
+            "Mesh": {
+                "mesh": "36468d32-bba5-4eb4-82db-0d4da5cd6c65"
+            },
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": "Cube"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    10.0,
+                    3.0,
                     0.0
                 ],
                 "rotation": [
@@ -569,8 +167,8 @@
                 ],
                 "scale": [
                     1.0,
-                    1.0,
-                    1.0
+                    6.0,
+                    20.0
                 ],
                 "scaleRatio": [
                     1.0,
@@ -578,7 +176,43 @@
                     1.0
                 ]
             },
-            "UUID": 7
+            "UUID": 10
+        },
+        {
+            "Material": {
+                "material": "5fbc428b-1fbc-4f88-a55d-8ee35575f903"
+            },
+            "Mesh": {
+                "mesh": "36468d32-bba5-4eb4-82db-0d4da5cd6c65"
+            },
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": "Cube"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    20.0,
+                    1.0,
+                    20.0
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 2
         },
         {
             "Material": {
@@ -630,42 +264,6 @@
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
-                    0.0,
-                    3.0,
-                    -10.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scale": [
-                    20.0,
-                    6.0,
-                    1.0
-                ],
-                "scaleRatio": [
-                    1.0,
-                    1.0,
-                    1.0
-                ]
-            },
-            "UUID": 5
-        },
-        {
-            "Material": {
-                "material": "afd0df4c-0757-4f9b-b211-7370b5f0613f"
-            },
-            "Mesh": {
-                "mesh": "36468d32-bba5-4eb4-82db-0d4da5cd6c65"
-            },
-            "ParentUUID": 0,
-            "Tag": {
-                "tag": "Cube"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
                     -10.0,
                     3.0,
                     0.0
@@ -689,29 +287,92 @@
             "UUID": 4
         },
         {
-            "DirectionalLight": {
-                "castShadows": true,
-                "color": [
-                    1.0,
-                    1.0,
-                    1.0
-                ],
-                "intensity": 3.0
+            "Material": {
+                "material": "afd0df4c-0757-4f9b-b211-7370b5f0613f"
+            },
+            "Mesh": {
+                "mesh": "36468d32-bba5-4eb4-82db-0d4da5cd6c65"
             },
             "ParentUUID": 0,
             "Tag": {
-                "tag": "DirectionalLight"
+                "tag": "Cube"
             },
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
                     0.0,
-                    0.0,
-                    0.0
+                    3.0,
+                    -10.0
                 ],
                 "rotation": [
-                    -60.0,
-                    -90.0,
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    20.0,
+                    6.0,
+                    1.0
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 5
+        },
+        {
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": "Car"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    -6.0,
+                    0.46623384952545166,
+                    -6.0
+                ],
+                "rotation": [
+                    0.0,
+                    17.404903411865234,
+                    0.0
+                ],
+                "scale": [
+                    0.9999918341636658,
+                    1.0,
+                    0.9999918341636658
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 16
+        },
+        {
+            "Material": {
+                "material": "034b121e-dc18-48bb-800d-9ff54a5d7d83"
+            },
+            "Mesh": {
+                "mesh": "0bd2c01b-696a-4980-bcef-f25beb1b9c0d"
+            },
+            "ParentUUID": 16,
+            "Tag": {
+                "tag": "covered_car_wheel_01"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.7576000690460205,
+                    0.30000001192092896,
+                    1.2806000709533691
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
                     0.0
                 ],
                 "scale": [
@@ -725,22 +386,239 @@
                     1.0
                 ]
             },
-            "UUID": 3
+            "UUID": 17
+        },
+        {
+            "Material": {
+                "material": "034b121e-dc18-48bb-800d-9ff54a5d7d83"
+            },
+            "Mesh": {
+                "mesh": "7dee8ba5-1319-4e06-9e0a-725fe7b291dc"
+            },
+            "ParentUUID": 16,
+            "Tag": {
+                "tag": "covered_car_wheel_02"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    -0.6823999881744385,
+                    0.30000001192092896,
+                    1.2806000709533691
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 18
+        },
+        {
+            "Material": {
+                "material": "034b121e-dc18-48bb-800d-9ff54a5d7d83"
+            },
+            "Mesh": {
+                "mesh": "f1eadfe1-9561-43af-9dd5-6afce861d5a1"
+            },
+            "ParentUUID": 16,
+            "Tag": {
+                "tag": "covered_car_wheel_03"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    -0.6724001169204712,
+                    0.30000001192092896,
+                    -1.299399971961975
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 19
+        },
+        {
+            "Material": {
+                "material": "034b121e-dc18-48bb-800d-9ff54a5d7d83"
+            },
+            "Mesh": {
+                "mesh": "c340b05c-5527-47cc-8d44-a59094941efa"
+            },
+            "ParentUUID": 16,
+            "Tag": {
+                "tag": "covered_car_wheel_04"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.7475999593734741,
+                    0.30000001192092896,
+                    -1.2993998527526855
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 20
+        },
+        {
+            "Material": {
+                "material": "034b121e-dc18-48bb-800d-9ff54a5d7d83"
+            },
+            "Mesh": {
+                "mesh": "135e1d8e-5e85-445f-a1e5-75b4e0701f7b"
+            },
+            "ParentUUID": 16,
+            "Tag": {
+                "tag": "covered_car"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.037599992007017136,
+                    0.0,
+                    0.037599992007017136
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 21
+        },
+        {
+            "Material": {
+                "material": "99427148-c3b6-47ca-82b7-a71bb37e22fc"
+            },
+            "Mesh": {
+                "mesh": "d7a4a76b-2e35-4788-a599-23dadc39bee2"
+            },
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": "Chair"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    1.600956678390503,
+                    0.5906838178634644,
+                    -3.1681480407714844
+                ],
+                "rotation": [
+                    0.0,
+                    -32.48604965209961,
+                    0.0
+                ],
+                "scale": [
+                    0.9999997615814209,
+                    1.0,
+                    0.9999997615814209
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 22
+        },
+        {
+            "Material": {
+                "material": "6febaed5-8da7-4794-9f90-de32e70208d2"
+            },
+            "Mesh": {
+                "mesh": "67ca389a-7b6d-415e-9a02-fb6dce14910b"
+            },
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": "utility_box_02"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    -0.3246814012527466,
+                    0.4893058240413666,
+                    -2.9519529342651367
+                ],
+                "rotation": [
+                    -89.99061584472656,
+                    29.295886993408203,
+                    7.636051304871216e-05
+                ],
+                "scale": [
+                    0.9999986886978149,
+                    0.9997269511222839,
+                    0.999714195728302
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 24
         }
     ],
     "Environment": {
         "Bloom": true,
-        "Bloom_Knee": 0.5,
+        "Bloom_Intensity": 1.0,
+        "Bloom_Knee": 0.0,
         "Bloom_Treshold": 1.0,
-        "HDRPath": "Assets\\Textures\\skybox\\environment3.hdr",
+        "HDRPath": "Assets\\Textures\\skybox\\environment.hdr",
         "Lighting_AmbientColor": [
             1.0,
             1.0,
             1.0
         ],
         "Lighting_AmbientIntensity": 0.5,
-        "Lighting_IBL": true,
-        "Lighting_IBLIntensity": 0.5,
+        "Lighting_IBL": false,
+        "Lighting_IBLIntensity": 1.0,
         "PostProcess_ChromaticStrength": 0.009999999776482582,
         "PostProcess_Exposure": 1.0,
         "PostProcess_VignetteIntensity": 0.25,

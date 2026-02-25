@@ -25,6 +25,7 @@ json Environment::Serialize()
     j["SSR"] = SSR;
 
     j["Bloom"] = Bloom;
+    j["Bloom_Intensity"] = Bloom_Intensity;
     j["Bloom_Treshold"] = Bloom_Treshold;
     j["Bloom_Knee"] = Bloom_Knee;
 
@@ -72,6 +73,9 @@ void Environment::Deserialize(const json& j)
 
     if (j.contains("Bloom"))
         Bloom = j["Bloom"];
+
+    if (j.contains("Bloom_Intensity "))
+        Bloom_Intensity = j["Bloom_Intensity "];
 
     if (j.contains("Bloom_Treshold"))
         Bloom_Treshold = j["Bloom_Treshold"];

@@ -93,11 +93,9 @@ void BloomPass::Downsample(const RenderContext& ctx, RenderFrame& frame)
     for (int i = 0; i < mipLevels; ++i)
     {
         glBindFramebuffer(GL_FRAMEBUFFER, downsampleFBOs[i]);
-        int w = std::max(1, (int)ctx.viewportWidth >> i);
+        int w = std::max(1, (int)ctx.viewportWidth  >> i);
         int h = std::max(1, (int)ctx.viewportHeight >> i);
         glViewport(0, 0, w, h);
-        glClear(GL_COLOR_BUFFER_BIT);
-
         downsampleShader.use();
         downsampleShader.setInt("u_Texture", 0);
         downsampleShader.setVec2("u_TexelSize", glm::vec2(1.0f / w, 1.0f / h));
@@ -116,8 +114,7 @@ void BloomPass::Upsample(const RenderContext& ctx, RenderFrame& frame)
     Shader& upsampleShader = ShaderManager::Get("Upsample");
     upsampleShader.use();
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ONE);
+    glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
 
     for (int i = mipLevels - 2; i >= 0; --i)
@@ -128,12 +125,14 @@ void BloomPass::Upsample(const RenderContext& ctx, RenderFrame& frame)
         int h = std::max(1, (int)ctx.viewportHeight >> i);
         glViewport(0, 0, w, h);
 
-        glBindTextureUnit(0, (i == mipLevels - 2) ? downsampleTextures[i + 1] : downsampleTextures[i + 1]);
+        upsampleShader.setInt("u_LowMip", 0);
+        upsampleShader.setInt("u_BaseMip", 1);
+
+        glBindTextureUnit(0, downsampleTextures[i + 1]); 
+        glBindTextureUnit(1, downsampleTextures[i]);     
 
         Renderer::DrawFullScreenQuad();
     }
-
-    glDisable(GL_BLEND);
 }
 
 BloomPass::~BloomPass()

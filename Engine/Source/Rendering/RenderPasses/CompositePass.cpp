@@ -47,6 +47,7 @@ void CompositePass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
 	compositeShader.use();
 	compositeShader.setFloat("exposure", env.PostProcess_Exposure);
+	compositeShader.setFloat("bloomIntensity", env.Bloom_Intensity);
 	compositeShader.setFloat("vignetteIntensity", env.PostProcess_VignetteIntensity);
 	compositeShader.setFloat("vignetteSmoothness", env.PostProcess_VignetteSmoothness);
 	compositeShader.setFloat("chromaticStrength", env.PostProcess_ChromaticStrength);

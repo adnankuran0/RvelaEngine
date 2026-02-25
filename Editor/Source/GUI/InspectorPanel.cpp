@@ -735,6 +735,7 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
         if (ImGui::CollapsingHeader("Bloom"))
         {
             ImGui::Checkbox("Use Bloom", &env.Bloom);
+            ImGui::SliderFloat("Intensity", &env.Bloom_Intensity,0.0f,1.0f);
             ImGui::SliderFloat("Treshold", &env.Bloom_Treshold,0.0f,1.0f);
             ImGui::SliderFloat("Knee", &env.Bloom_Knee,0.0f,1.0f);
         }

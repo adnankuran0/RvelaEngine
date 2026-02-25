@@ -22,7 +22,7 @@ private:
 
     std::vector<GLuint> upsampleFBOs;
     std::vector<GLuint> upsampleTextures;
-    const int mipLevels = 6;
+    const int mipLevels = 8;
 };
 
 }

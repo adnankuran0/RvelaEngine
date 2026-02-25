@@ -21,12 +21,14 @@ layout(binding = 1) uniform sampler2D bloomTexture;
 layout(binding = 2) uniform sampler2D aoTexture;
 layout(binding = 3) uniform sampler2D ssrTexture;
 
+uniform float bloomIntensity;
+
 uniform float exposure;
 
-uniform float chromaticStrength;   // 0.0 – 1.0
+uniform float chromaticStrength; 
 
-uniform float vignetteIntensity;   // 0.0 – 1.0
-uniform float vignetteSmoothness;  // 0.0 – 1.0
+uniform float vignetteIntensity;   
+uniform float vignetteSmoothness;  
 
 vec3 ACESFilm(vec3 x)
 {
@@ -89,7 +91,7 @@ void main()
 
     hdrColor = mix(hdrColor, hdrColor + ssrSample.rgb, ssrSample.a);
 
-    vec3 combined = hdrColor + bloomColor;
+    vec3 combined = hdrColor + bloomColor * bloomIntensity;
 
     combined    = vec3(1.0) - exp(-combined * exposure);
     vec3 mapped = ACESFilm(combined);
