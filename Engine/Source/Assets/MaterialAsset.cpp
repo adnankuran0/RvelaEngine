@@ -72,6 +72,8 @@ bool MaterialAsset::Load()
         };
 
     read(&albedoColor, sizeof(glm::vec3));
+    read(&emmisiveColor, sizeof(glm::vec3));
+    read(&emmisiveIntensity, sizeof(float));
     read(&metallic, sizeof(float));
     read(&roughness, sizeof(float));
     read(&ao, sizeof(float));
@@ -114,6 +116,8 @@ void MaterialAsset::Serialize()
         };
 
     write(&albedoColor, sizeof(glm::vec3));
+    write(&emmisiveColor, sizeof(glm::vec3));
+    write(&emmisiveIntensity, sizeof(float));
     write(&metallic, sizeof(float));
     write(&roughness, sizeof(float));
     write(&ao, sizeof(float));

@@ -21,6 +21,10 @@ public:
 
 	inline glm::vec3 GetAlbedoColor() const noexcept { return material->albedoColor; }
 	inline void SetAlbedoColor(const glm::vec3& albedoColor) noexcept { material->albedoColor = albedoColor; }
+	inline glm::vec3 GetEmmisiveColor() const noexcept { return material->emmisiveColor; }
+	inline void SetEmmisiveColor(const glm::vec3& emmisiveColor) noexcept { material->emmisiveColor = emmisiveColor; }
+	inline float GetEmmisiveIntensity() const noexcept { return material->emmisiveIntensity; }
+	inline void SetEmmisiveIntensity(float emmisiveIntensity) const noexcept { material->emmisiveIntensity = emmisiveIntensity; }
 	inline float GetMetallic() const noexcept { return material->metallic; }
 	inline void SetMetallic(float metallic) noexcept { material->metallic = metallic; }
 	inline float GetRoughness() const noexcept { return material->roughness; }

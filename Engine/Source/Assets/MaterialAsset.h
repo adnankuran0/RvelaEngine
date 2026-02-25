@@ -33,6 +33,8 @@ public:
     bool useHeightMap = false;
 
     glm::vec3 albedoColor;
+    glm::vec3 emmisiveColor = glm::vec3(0.0f);
+    float emmisiveIntensity = 0.0f;
     float metallic;
     float roughness;
     float ao;

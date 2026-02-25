@@ -507,6 +507,26 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                     ImGui::Unindent();
                 }
 
+                if (ImGui::CollapsingHeader("Emmisive"))
+                {
+                    ImGui::Indent();
+                    glm::vec3 emmisiveColor = material.GetEmmisiveColor();
+                    float intensity = material.GetEmmisiveIntensity();
+                    float color[3] = { emmisiveColor.r, emmisiveColor.g, emmisiveColor.b };
+
+                    if (ImGui::ColorEdit3("Emmisive Color", color))
+                    {
+                        material.SetEmmisiveColor(glm::vec3(color[0], color[1], color[2]));
+                        //Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath().GetAbsoluteStr());
+                    }
+                    if (ImGui::SliderFloat("Intensity", &intensity, 0.0f, 20.0f, "%.1f"))
+                    {
+                        material.SetEmmisiveIntensity(intensity);
+                    }
+
+                    ImGui::Unindent();
+                }
+
 
                 glm::vec2 uvOffset = material.GetUVOffset();
                 glm::vec2 uvScale = material.GetUVScale();

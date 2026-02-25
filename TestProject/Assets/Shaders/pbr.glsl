@@ -67,6 +67,8 @@ uniform bool useAOMap;
 uniform bool useHeightMap;
 
 uniform vec3 albedoColor;
+uniform vec3 emmisiveColor;
+uniform float emmisiveIntensity;
 uniform float metallicValue;
 uniform float roughnessValue;
 uniform float aoValue;
@@ -376,7 +378,7 @@ void main()
         ambient = ambientColor * ambientIntensity * albedo * ao;
     }
     
-    vec3 color = ambient + Lo;
+    vec3 color = ambient + Lo + emmisiveColor * emmisiveIntensity;
 
     FragColor = vec4(color, albedoTex.a);
 

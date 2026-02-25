@@ -19,6 +19,6 @@ void CameraComponent::Deserialize(const json& j)
     camera.FOV = j["fov"];
     camera.NearClip = j["nearClip"];
     camera.FarClip = j["farClip"];
-    //camera.ProjectionType = static_cast<Camera::Projection>(j["projectionType"]);
+    camera.ProjectionType = static_cast<Camera::Projection>(j["projectionType"]);
     isActive = j["isActive"];
 }
