@@ -74,6 +74,7 @@ uniform float roughnessValue;
 uniform float aoValue;
 uniform float heightScale;
 uniform float normalScale;
+uniform float specularIntensity;
 
 uniform vec3 ambientColor;
 uniform float ambientIntensity;
@@ -273,7 +274,10 @@ void main()
     // View direction and normal
     vec3 V = normalize(camPos - FragPos);
     vec3 N = getNormalFromMap();
-    vec3 F0 = mix(vec3(0.04), albedo, metallic);
+    vec3 baseF0 = vec3(0.04); 
+    baseF0 = mix(baseF0, albedo, metallic);
+    baseF0 = mix(baseF0, vec3(0.0), 1.0 - metallic); 
+    vec3 F0 = baseF0;
 
     // Reflectance equation
     vec3 Lo = vec3(0.0);
@@ -294,7 +298,7 @@ void main()
         vec3 numerator = NDF * G * F;
         float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
         vec3 specular = numerator / denominator;
-        
+        specular *= specularIntensity;
         float NdotL = max(dot(N, L), 0.0);
         float shadow = directionalLight.castShadows ? 
             calculateDirectionalShadow(FragPosLightSpace, N, L, directionalLight.shadowBias, directionalLight.blurRadius) : 0.0;
@@ -335,7 +339,7 @@ void main()
         float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
        
         vec3 specular = numerator / denominator;
-        
+        specular *= specularIntensity;
         float NdotL = max(dot(N, L), 0.0);
         float shadow = light.castShadows ? 
             calculatePointLightShadow(light.shadowIndex, FragPos, light.position, light.radius, N, light.shadowBias, light.blurRadius) : 0.0;
@@ -370,7 +374,7 @@ void main()
         vec2 brdf = texture(brdfLUT, vec2(NdotV, roughness)).rg;
         
         vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
-
+        specular *= specularIntensity;
         ambient = (kD * diffuse + specular) * ao * iblIntensity;
     }
     else

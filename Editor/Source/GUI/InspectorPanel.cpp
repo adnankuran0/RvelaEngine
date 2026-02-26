@@ -463,7 +463,11 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                     if (ImGui::SliderFloat("Metallic##34", &metallic, 0.0f, 1.0f))
                     {
                         material.SetMetallic(metallic);
-                        //Serializer::SaveToFile(*materialSerializable, materialComponent.GetMaterialPath().GetAbsoluteStr());
+                    }
+                    float specular = material.GetSpecular();
+                    if (ImGui::SliderFloat("Specular##34", &specular, 0.0f, 1.0f))
+                    {
+                        material.SetSpecular(specular);
                     }
                     ImGui::Unindent();
                 }

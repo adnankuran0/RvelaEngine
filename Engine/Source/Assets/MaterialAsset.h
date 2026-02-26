@@ -37,6 +37,7 @@ public:
     glm::vec3 emmisiveColor = glm::vec3(0.0f);
     float emmisiveIntensity = 0.0f;
     float metallic;
+    float specular = 1.0f;
     float roughness;
     float ao;
     float normalScale;

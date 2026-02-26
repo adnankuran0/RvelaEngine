@@ -14620,7 +14620,7 @@
         "Bloom_Intensity": 1.0,
         "Bloom_Knee": 0.5,
         "Bloom_Treshold": 1.0,
-        "HDRPath": "Assets\\Textures\\skybox\\environment3.hdr",
+        "HDRPath": "Assets\\Textures\\skybox\\environment2.hdr",
         "Lighting_AmbientColor": [
             1.0,
             1.0,

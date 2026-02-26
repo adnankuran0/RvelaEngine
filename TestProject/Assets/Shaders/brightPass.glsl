@@ -35,8 +35,5 @@ void main()
 
     vec4 finalColor = vec4(color * (contrib / max(br, 1e-5)), 1.0);
 
-    
-    
-
     FragColor = finalColor;
 }

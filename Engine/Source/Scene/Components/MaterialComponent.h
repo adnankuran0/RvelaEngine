@@ -27,6 +27,8 @@ public:
 	inline void SetEmmisiveIntensity(float emmisiveIntensity) const noexcept { material->emmisiveIntensity = emmisiveIntensity; }
 	inline float GetMetallic() const noexcept { return material->metallic; }
 	inline void SetMetallic(float metallic) noexcept { material->metallic = metallic; }
+	inline float GetSpecular() const noexcept { return material->specular; }
+	inline void SetSpecular(float specular) noexcept { material->specular = specular; }
 	inline float GetRoughness() const noexcept { return material->roughness; }
 	inline void SetRoughness(float roughness) noexcept { material->roughness = roughness; }
 	inline float GetAO() const noexcept { return material->ao; }

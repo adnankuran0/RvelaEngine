@@ -179,6 +179,7 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         shader.setFloat("roughnessValue", material.GetRoughness());
         shader.setFloat("aoValue", material.GetAO());
         shader.setFloat("normalScale", material.GetNormalScale());
+        shader.setFloat("specularIntensity", material.GetSpecular());
 
         std::vector<MapInfo> maps = 
         {
