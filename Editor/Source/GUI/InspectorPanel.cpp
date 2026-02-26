@@ -528,6 +528,55 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                 }
 
 
+                if (ImGui::CollapsingHeader("Sampler"))
+                {
+                    ImGui::Indent();
+                    const char* minFilterTypes[] = { "Nearest", "Linear", "Nearest Mipmap", "Linear Mipmap"};
+                    const char* magFilterTypes[] = { "Nearest", "Linear" };
+                    const char* wrapTypes[] = { "Repeat", "Mirror Repeat", "Clamp to edge","Clamp to border", "Mirror clamp to edge"};
+                    const char* anisoLevels[] = { "1x", "2x", "4x", "8x", "16x" };
+
+                    SamplerDesc desc = material.GetSampler().GetDesc();
+                    int currentMinFilter = static_cast<uint8_t>(desc.minFilter);
+                    int currentMagFilter = static_cast<uint8_t>(desc.magFilter);
+                    int currentWrap = static_cast<uint8_t>(desc.wrap);
+                    int currentAniso = static_cast<uint8_t>(desc.anisotropy);
+
+                    int currentAnisoIdx = 0;
+                    if (desc.anisotropy > 8.0f) currentAnisoIdx = 4;      // 16x
+                    else if (desc.anisotropy > 4.0f) currentAnisoIdx = 3; // 8x
+                    else if (desc.anisotropy > 2.0f) currentAnisoIdx = 2; // 4x
+                    else if (desc.anisotropy > 1.0f) currentAnisoIdx = 1; // 2x
+
+                    bool isDirty = false;
+
+                    if (ImGui::Combo("Min Filter", &currentMinFilter, minFilterTypes, 4))
+                    {
+                        desc.minFilter = static_cast<MinFilter>(currentMinFilter);
+                        isDirty = true;
+                    }
+                    if (ImGui::Combo("Mag Filter", &currentMagFilter, magFilterTypes, 2))
+                    {
+                        desc.magFilter = static_cast<MagFilter>(currentMagFilter);
+                        isDirty = true;
+
+                    }
+                    if (ImGui::Combo("Wrap", &currentWrap, wrapTypes, 5))
+                    {
+                        desc.wrap = static_cast<Wrap>(currentWrap);
+                        isDirty = true;
+                    }
+                    if (ImGui::Combo("Anisotropy", &currentAnisoIdx, anisoLevels, 5)) {
+                        float values[] = { 1.0f, 2.0f, 4.0f, 8.0f, 16.0f };
+                        desc.anisotropy = values[currentAnisoIdx];
+                        isDirty = true;
+                    }
+                    if (isDirty)
+                        material.GetSampler().Init(desc);
+                  
+                    ImGui::Unindent();
+                }
+
                 glm::vec2 uvOffset = material.GetUVOffset();
                 glm::vec2 uvScale = material.GetUVScale();
 

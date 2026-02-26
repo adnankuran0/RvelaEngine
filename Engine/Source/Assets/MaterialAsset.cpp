@@ -80,6 +80,12 @@ bool MaterialAsset::Load()
     read(&normalScale, sizeof(float));
     read(&UVScale, sizeof(glm::vec2));
     read(&UVOffset, sizeof(glm::vec2));
+    SamplerDesc desc;
+    read(&desc.wrap, sizeof(Wrap));
+    read(&desc.minFilter, sizeof(MinFilter));
+    read(&desc.magFilter, sizeof(MagFilter));
+    read(&desc.anisotropy, sizeof(float));
+    sampler.Init(desc);
 
     read(&albedoTextureUUID, sizeof(AssetUUID));
     read(&normalTextureUUID, sizeof(AssetUUID));
@@ -124,6 +130,10 @@ void MaterialAsset::Serialize()
     write(&normalScale, sizeof(float));
     write(&UVScale, sizeof(glm::vec2));
     write(&UVOffset, sizeof(glm::vec2));
+    write(&sampler.GetDesc().wrap, sizeof(Wrap));
+    write(&sampler.GetDesc().minFilter, sizeof(MinFilter));
+    write(&sampler.GetDesc().magFilter, sizeof(MagFilter));
+    write(&sampler.GetDesc().anisotropy, sizeof(float));
 
     write(&albedoTextureUUID, sizeof(AssetUUID));
     write(&normalTextureUUID, sizeof(AssetUUID));

@@ -39,7 +39,6 @@ void MaterialComponent::Load(const AssetUUID& uuid)
 		aoTexture = AssetRegistry::GetAsset<TextureAsset>(material->aoTextureUUID);
 	if (material->useHeightMap)
 		heightTexture = AssetRegistry::GetAsset<TextureAsset>(material->heightTextureUUID);
-
 }
 
 json MaterialComponent::Serialize() const

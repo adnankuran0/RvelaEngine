@@ -100,6 +100,9 @@ public:
 		Load(newMaterialUUID);
 	}
 
+	Sampler& GetSampler() { return material->sampler; }
+	void SetSampler(const SamplerDesc& samplerDescc) { material->sampler.Init(samplerDescc); }
+
 	inline const AssetUUID& GetMaterialID() const noexcept{ return materialUUID; }
 
 	json Serialize() const;
@@ -115,7 +118,6 @@ private:
 	Ref<TextureAsset> roughnessTexture;
 	Ref<TextureAsset> aoTexture;
 	Ref<TextureAsset> heightTexture;
-
 	Ref<MaterialAsset> material;
 	AssetUUID materialUUID;
 

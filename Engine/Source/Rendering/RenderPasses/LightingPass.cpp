@@ -197,6 +197,7 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             {
                 shader.setInt(map.uniformName, map.slot);
                 map.texture->GetTexture().Bind(map.slot);
+                material.GetSampler().Bind(map.slot);
             }
         }
 
@@ -207,9 +208,13 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         command.mesh.VAO.Bind();
         glDrawElements(GL_TRIANGLES, command.mesh.indexCount, GL_UNSIGNED_INT, 0);
         drawCallCounter++;
+        for (const auto& map : maps)
+        {
+            glBindSampler(map.slot, 0); // TODO: Material sorting
+        }
     }
     //LOG_DEBUG("Draw calls: {}", drawCallCounter);
-
+    
     glBindFramebuffer(GL_READ_FRAMEBUFFER, o_ScreenFBO);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, intermediateFBO);
     glBlitFramebuffer(

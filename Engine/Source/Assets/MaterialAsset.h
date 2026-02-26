@@ -5,6 +5,7 @@
 
 #include "Assets/Asset.h"
 #include "Assets/AssetUUID.h"
+#include "Rendering/Sampler.h"
 
 namespace rv { 
 
@@ -41,6 +42,8 @@ public:
     float normalScale;
     glm::vec2 UVScale;
     glm::vec2 UVOffset;
+
+    Sampler sampler;
 
     AssetUUID albedoTextureUUID;
     AssetUUID normalTextureUUID;

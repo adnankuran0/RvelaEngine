@@ -111,6 +111,8 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             geometryShader.setBool("useRoughnessMap", true);
             geometryShader.setInt("roughnessMap", 0);
             roughnessTexture->GetTexture().Bind(0);
+            material.GetSampler().Bind(0);
+
         }
         else
         {
@@ -124,6 +126,8 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             geometryShader.setBool("useMetallicMap", true);
             geometryShader.setInt("metallicMap", 1);
             metallicTexture->GetTexture().Bind(1);
+            material.GetSampler().Bind(1);
+
         }
         else
         {
@@ -135,7 +139,11 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         command.mesh.VAO.Bind();
         glDrawElements(GL_TRIANGLES, command.mesh.indexCount, GL_UNSIGNED_INT, 0);
         
+        material.GetSampler().Unbind(0);
+        material.GetSampler().Unbind(1);
     }
+
+    
 
     resourceRegisty.Register("DepthTexture",{ RenderResourceType::Texture, o_Depth });
     resourceRegisty.Register("NormalTexture",{ RenderResourceType::Texture, o_Normal });
