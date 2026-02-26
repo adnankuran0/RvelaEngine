@@ -35,6 +35,8 @@ public:
 	inline void SetAO(float ao) noexcept { material->ao = ao; }
 	inline float GetNormalScale() const noexcept { return material->normalScale; }
 	inline void SetNormalScale(float normalScale) noexcept { material->normalScale = normalScale; }
+	inline float GetHeightScale() const noexcept { return material->heightScale; }
+	inline void SetHeightScale(float heightScale) noexcept { material->heightScale = heightScale; }
 	inline glm::vec2 GetUVScale() const noexcept { return material->UVScale; }
 	inline void SetUVScale(const glm::vec2& UVScale) noexcept { material->UVScale = UVScale; }
 	inline glm::vec2 GetUVOffset() const noexcept { return material->UVOffset; }

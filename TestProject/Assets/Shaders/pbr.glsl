@@ -79,6 +79,8 @@ uniform float specularIntensity;
 uniform vec3 ambientColor;
 uniform float ambientIntensity;
 
+
+
 // Shadows
 layout(binding = 6) uniform sampler2D shadowMap;
 layout(binding = 7) uniform samplerCubeArray pointShadowMap;
@@ -136,18 +138,39 @@ const vec2 poissonDisk[16] = vec2[](
     vec2(0.19984126, 0.78641367), vec2(0.14383161, -0.14100790)
 );
 
-// Helper functions
-vec2 parallaxMapping(vec2 texCoords, vec3 viewDir) {
-    if (!useHeightMap) return texCoords;
-    float height = texture(heightMap, texCoords).r; 
-    vec2 p = viewDir.xy * (height * heightScale) / (viewDir.z + 0.001); // Avoid division by zero
-    return texCoords - p;
+vec2 parallaxOcclusionMapping(vec2 texCoords, vec3 viewDirTS)
+{
+    if(!useHeightMap) return texCoords;
+
+    const float minLayers = 8.0;
+    const float maxLayers = 32.0;
+    float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0,0.0,1.0), viewDirTS)));
+
+    float layerDepth = 1.0 / numLayers;
+    float currentLayerDepth = 0.0;
+    vec2 P = normalize(viewDirTS).xy * -heightScale; 
+    vec2 deltaTexCoords = P / numLayers;
+
+    vec2 currentTexCoords = texCoords;
+    float currentDepthMapValue = texture(heightMap, currentTexCoords).r;
+
+    while(currentLayerDepth < currentDepthMapValue)
+    {
+        currentTexCoords -= deltaTexCoords;
+        currentLayerDepth += layerDepth;
+        currentDepthMapValue = texture(heightMap, currentTexCoords).r;
+    }
+
+    vec2 prevTexCoords = currentTexCoords + deltaTexCoords;
+    float afterDepth = currentDepthMapValue - currentLayerDepth;
+    float beforeDepth = texture(heightMap, prevTexCoords).r - (currentLayerDepth - layerDepth);
+    float weight = afterDepth / (afterDepth - beforeDepth + 0.0001);
+    return mix(currentTexCoords, prevTexCoords, weight);
 }
 
 vec3 getNormalFromMap() {
     if (!useNormalMap) return normalize(Normal);
     vec3 tangentNormal = texture(normalMap, TexCoords).xyz * 2.0 - 1.0;
-    tangentNormal.xy *= -1;
     tangentNormal.xy *= normalScale;
     
     float tnLen = length(tangentNormal);
@@ -159,7 +182,7 @@ vec3 getNormalFromMap() {
     vec3 B = normalize(Bitangent);
     
     T = normalize(T - dot(T, N) * N);
-    B = cross(N, T); // B'yi yeniden hesapla (daha güvenli)
+    B = cross(N, T);
     
     mat3 TBN = mat3(T, B, N);
     vec3 result = TBN * tangentNormal;
@@ -257,29 +280,37 @@ float calculatePointLightShadow(int index, vec3 fragPos, vec3 lightPos, float fa
 
 void main()
 {
+    vec3 viewDir = normalize(camPos - FragPos);
 
+    // Tangent space viewDir
+    vec3 T = normalize(Tangent);
+    vec3 B = normalize(Bitangent);
+    vec3 N = normalize(Normal);
+    mat3 TBN = mat3(T, B, N);
+    vec3 viewDirTS = transpose(TBN) * viewDir;
+
+    vec2 mappedTexCoords = parallaxOcclusionMapping(TexCoords, viewDirTS);
 
     // Early alpha test
-    vec4 albedoTex = useAlbedoMap ? texture(albedoMap, TexCoords) : vec4(albedoColor, 1.0);
+    vec4 albedoTex = useAlbedoMap ? texture(albedoMap, mappedTexCoords) : vec4(albedoColor, 1.0);
     albedoTex *= vec4(albedoColor, 1.0);
     if(albedoTex.a < 0.2) discard;
 
     // Material properties
     vec3 albedo = pow(albedoTex.rgb, vec3(2.2));
-    float metallic = useMetallicMap ? texture(metallicMap, TexCoords).r : metallicValue;
-    float roughnessMapValue = useRoughnessMap ? texture(roughnessMap, TexCoords).r : 1.0;
+    float metallic = useMetallicMap ? texture(metallicMap, mappedTexCoords).r : metallicValue;
+    float roughnessMapValue = useRoughnessMap ? texture(roughnessMap, mappedTexCoords).r : 1.0;
     float roughness = clamp(roughnessValue * roughnessMapValue, 0.0, 1.0);
-    float ao = useAOMap ? texture(aoMap, TexCoords).r : aoValue;
+    float ao = useAOMap ? texture(aoMap, mappedTexCoords).r : aoValue;
 
     // View direction and normal
     vec3 V = normalize(camPos - FragPos);
-    vec3 N = getNormalFromMap();
+    vec3 Nmap = getNormalFromMap();
     vec3 baseF0 = vec3(0.04); 
     baseF0 = mix(baseF0, albedo, metallic);
     baseF0 = mix(baseF0, vec3(0.0), 1.0 - metallic); 
     vec3 F0 = baseF0;
 
-    // Reflectance equation
     vec3 Lo = vec3(0.0);
 
     // Directional light
@@ -288,20 +319,20 @@ void main()
         vec3 H = normalize(V + L);
         
         // Cook-Torrance BRDF
-        float NDF = DistributionGGX(N, H, roughness);
-        float G = GeometrySmith(N, V, L, roughness);
+        float NDF = DistributionGGX(Nmap, H, roughness);
+        float G = GeometrySmith(Nmap, V, L, roughness);
         vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
         
         vec3 kS = F;
         vec3 kD = (vec3(1.0) - kS) * (1.0 - metallic);
 
         vec3 numerator = NDF * G * F;
-        float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
+        float denominator = 4.0 * max(dot(Nmap, V), 0.0) * max(dot(Nmap, L), 0.0) + 0.0001;
         vec3 specular = numerator / denominator;
         specular *= specularIntensity;
-        float NdotL = max(dot(N, L), 0.0);
+        float NdotL = max(dot(Nmap, L), 0.0);
         float shadow = directionalLight.castShadows ? 
-            calculateDirectionalShadow(FragPosLightSpace, N, L, directionalLight.shadowBias, directionalLight.blurRadius) : 0.0;
+            calculateDirectionalShadow(FragPosLightSpace, Nmap, L, directionalLight.shadowBias, directionalLight.blurRadius) : 0.0;
 
         Lo += (1.0 - shadow) * (kD * albedo / PI + specular) * 
               directionalLight.color * directionalLight.intensity * NdotL;
@@ -328,21 +359,21 @@ void main()
         attenuation *= 1.0 - smoothstep(light.radius * 0.75, light.radius, distance);
         
         // Cook-Torrance BRDF
-        float NDF = DistributionGGX(N, H, roughness);
-        float G = GeometrySmith(N, V, L, roughness);
+        float NDF = DistributionGGX(Nmap, H, roughness);
+        float G = GeometrySmith(Nmap, V, L, roughness);
         vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
         
         vec3 kS = F;
         vec3 kD = (vec3(1.0) - kS) * (1.0 - metallic);
 
         vec3 numerator = NDF * G * F;
-        float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
+        float denominator = 4.0 * max(dot(Nmap, V), 0.0) * max(dot(Nmap, L), 0.0) + 0.0001;
        
         vec3 specular = numerator / denominator;
         specular *= specularIntensity;
-        float NdotL = max(dot(N, L), 0.0);
+        float NdotL = max(dot(Nmap, L), 0.0);
         float shadow = light.castShadows ? 
-            calculatePointLightShadow(light.shadowIndex, FragPos, light.position, light.radius, N, light.shadowBias, light.blurRadius) : 0.0;
+            calculatePointLightShadow(light.shadowIndex, FragPos, light.position, light.radius, Nmap, light.shadowBias, light.blurRadius) : 0.0;
 
         vec3 radiance = light.color * light.intensity * attenuation;
         Lo += (1.0 - shadow) * (kD * albedo / PI + specular) * radiance * NdotL;
@@ -355,16 +386,16 @@ void main()
 
     if(useIBL)
     {
-        vec3 R = reflect(-V, N);
+        vec3 R = reflect(-V, Nmap);
         
-        float NdotV = max(dot(N, V), 0.0);
+        float NdotV = max(dot(Nmap, V), 0.0);
         vec3 F = fresnelSchlick(NdotV, F0);
         
         vec3 kS = F;
         vec3 kD = vec3(1.0) - kS;
         kD *= 1.0 - metallic; 
 
-        vec3 irradiance = texture(irradianceMap, N).rgb;
+        vec3 irradiance = texture(irradianceMap, Nmap).rgb;
         vec3 diffuse = irradiance * albedo;
 
         const float MAX_REFLECTION_LOD = 4.0;

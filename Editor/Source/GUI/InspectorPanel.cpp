@@ -471,7 +471,45 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                     }
                     ImGui::Unindent();
                 }
+                if (ImGui::CollapsingHeader("Height"))
+                {
+                    ImGui::Indent();
+                    ImGui::Button("Height Slot", ImVec2(200, 20));
+                    if (ImGui::BeginDragDropTarget())
+                    {
+                        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
+                        {
+                            const char* path = (const char*)payload->Data;
+                            std::string pathStr(path);
+                            if (pathStr.ends_with(".rtex"))
+                            {
+                                std::ifstream inFile(pathStr, std::ios::binary);
+                                if (!inFile.is_open()) {
+                                    LOG_ERROR("file not opened");
+                                    return;
+                                }
+                                AssetHeader header = AssetLoader::ReadHeader(inFile, MAGIC_TEXTURE);
+                                std::unique_ptr<TextureMeta> meta = AssetLoader::ReadMeta<TextureMeta>(inFile, header);
+                                material.SetHeightTexture(meta->uuid);
+                                material.SetUseHeightMap(true);
+                            }
+                        }
+                        ImGui::EndDragDropTarget();
 
+
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button("X##hgt", ImVec2(20, 20)))
+                    {
+                        material.SetUseHeightMap(!material.IsUsingHeightMap());
+                    }
+                    float heightScale = material.GetHeightScale();
+                    if (ImGui::SliderFloat("Height Scale", &heightScale, 0.0f, 1.0f))
+                    {
+                        material.SetHeightScale(heightScale);
+                    }
+                    ImGui::Unindent();
+                }
                 if (ImGui::CollapsingHeader("AO##35"))
                 {
                     ImGui::Indent();

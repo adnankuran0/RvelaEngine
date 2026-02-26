@@ -10,7 +10,6 @@ layout(std430, binding = 0) buffer LuminanceBuffer {
 };
 
 void main() {
-    // Fetch average color from the smallest mip level
     vec3 color = texelFetch(u_ScreenTexture, ivec2(0, 0), u_MipLevel).rgb;
     luminance = 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b;
 }

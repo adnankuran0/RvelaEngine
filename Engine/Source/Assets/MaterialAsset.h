@@ -41,6 +41,7 @@ public:
     float roughness;
     float ao;
     float normalScale;
+    float heightScale = 0.1f;
     glm::vec2 UVScale;
     glm::vec2 UVOffset;
 

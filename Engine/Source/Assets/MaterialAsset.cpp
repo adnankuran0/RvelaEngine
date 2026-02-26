@@ -79,6 +79,7 @@ bool MaterialAsset::Load()
     read(&roughness, sizeof(float));
     read(&ao, sizeof(float));
     read(&normalScale, sizeof(float));
+    read(&heightScale, sizeof(float));
     read(&UVScale, sizeof(glm::vec2));
     read(&UVOffset, sizeof(glm::vec2));
     SamplerDesc desc;
@@ -130,6 +131,7 @@ void MaterialAsset::Serialize()
     write(&roughness, sizeof(float));
     write(&ao, sizeof(float));
     write(&normalScale, sizeof(float));
+    write(&heightScale, sizeof(float));
     write(&UVScale, sizeof(glm::vec2));
     write(&UVOffset, sizeof(glm::vec2));
     write(&sampler.GetDesc().wrap, sizeof(Wrap));

@@ -143,8 +143,6 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         material.GetSampler().Unbind(1);
     }
 
-    
-
     resourceRegisty.Register("DepthTexture",{ RenderResourceType::Texture, o_Depth });
     resourceRegisty.Register("NormalTexture",{ RenderResourceType::Texture, o_Normal });
     resourceRegisty.Register("RoughnessTexture",{ RenderResourceType::Texture, o_Roughness });

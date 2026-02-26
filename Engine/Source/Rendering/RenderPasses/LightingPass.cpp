@@ -101,7 +101,6 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
        
     }
 
-    shader.setFloat("heightScale", 0.0f);
 
     GLint maxTextureUnits = 0;
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextureUnits);
@@ -180,6 +179,7 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         shader.setFloat("aoValue", material.GetAO());
         shader.setFloat("normalScale", material.GetNormalScale());
         shader.setFloat("specularIntensity", material.GetSpecular());
+        shader.setFloat("heightScale", material.GetHeightScale());
 
         std::vector<MapInfo> maps = 
         {
