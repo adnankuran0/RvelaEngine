@@ -5,13 +5,13 @@
 
 using namespace rv;
 
-void rv::EditorUtils::CreateScene(Engine& engine)
+void EditorUtils::CreateScene(Engine& engine)
 {
     auto& sm = engine.GetSceneManager();
     sm.SetActiveScene(sm.CreateScene("NewScene"));
 }
 
-void rv::EditorUtils::OpenScene(Engine& engine)
+void EditorUtils::OpenScene(Engine& engine)
 {
     std::string file = Dialogs::OpenSceneDialog();
     if (!file.empty())
@@ -20,27 +20,32 @@ void rv::EditorUtils::OpenScene(Engine& engine)
     }
 }
 
-void rv::EditorUtils::SaveScene(Engine& engine)
+bool EditorUtils::SaveScene(Engine& engine)
 {
     Scene& activeScene = engine.GetActiveScene();
     if (activeScene.GetState() != SceneState::EDIT)
     {
         LOG_WARN("Scene can only be saved in EDIT mode.");
-        return;
+        return false;
     }
     if (!activeScene.GetPath().empty())
+    {
         engine.GetSceneManager().SaveScene(activeScene.GetPath());
+        return true;
+    }
     else
-        SaveSceneAs(engine);
+    {
+        return SaveSceneAs(engine);
+    }
 }
 
-void rv::EditorUtils::SaveSceneAs(Engine& engine)
+bool EditorUtils::SaveSceneAs(Engine& engine)
 {
     Scene& activeScene = engine.GetActiveScene();
     if (activeScene.GetState() != SceneState::EDIT)
     {
         LOG_WARN("Scene can only be saved in EDIT mode.");
-        return;
+        return false;
     }
     std::string file = Dialogs::OpenSceneDialog();
     if (!file.empty())
@@ -50,7 +55,9 @@ void rv::EditorUtils::SaveSceneAs(Engine& engine)
         {
             ofs.close();
             engine.GetSceneManager().SaveScene(file);
+            return true;
         }
     }
+    return false;
 }
 

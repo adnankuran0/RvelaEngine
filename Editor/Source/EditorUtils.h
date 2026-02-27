@@ -9,8 +9,8 @@ class EditorUtils
 public:
 	static void CreateScene(Engine& engine);
 	static void OpenScene(Engine& engine);
-	static void SaveScene(Engine& engine);
-	static void SaveSceneAs(Engine& engine);
+	static bool SaveScene(Engine& engine);
+	static bool SaveSceneAs(Engine& engine);
 
 
 };

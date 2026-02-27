@@ -10,7 +10,7 @@ bool rv::math::RayIntersectsTriangle(const glm::vec3& rayOrigin, const glm::vec3
         const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2,
         float& t)
 {
-    const float EPSILON = 1e-8;
+    const float EPSILON = 1e-8f;
     glm::vec3 edge1 = v1 - v0;
     glm::vec3 edge2 = v2 - v0;
 

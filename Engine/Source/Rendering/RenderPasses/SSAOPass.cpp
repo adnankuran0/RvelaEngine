@@ -19,8 +19,8 @@ void SSAOPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
     glCreateFramebuffers(1, &ssaoFBO);
 
-    int w = ctx.viewportWidth / 2.0f;
-    int h = ctx.viewportHeight / 2.0f;
+    int w = (int)(ctx.viewportWidth / 2.0f);
+    int h = (int)(ctx.viewportHeight / 2.0f);
 
     glCreateTextures(GL_TEXTURE_2D, 1, &o_SsaoTexture);
     glTextureStorage2D(o_SsaoTexture, 1, SSAO_TEXTURE_FORMAT,w ,h);

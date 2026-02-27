@@ -14623,7 +14623,7 @@
             },
             "ParentUUID": 0,
             "ScriptComponent": {
-                "luaFile": "C:\\RvelaEngine\\TestProject\\Assets\\Scripts\\Test.lua"
+                "luaFile": "C:\\RvelaEngine\\TestProject\\Assets\\Scripts\\rotation.lua"
             },
             "Tag": {
                 "tag": "Capsule"
@@ -14631,9 +14631,9 @@
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
-                    -11.629457473754883,
-                    1.0,
-                    0.0
+                    -11.629396438598633,
+                    0.999969482421875,
+                    -6.102956831455231e-05
                 ],
                 "rotation": [
                     0.0,

@@ -43,8 +43,8 @@ void ToolBar::Draw(Engine& engine)
 
         if (ImGui::Button("Play", button_size)) 
         {
-            EditorUtils::SaveScene(engine);
-            scene.SetState(SceneState::PLAY);
+            if(EditorUtils::SaveScene(engine))
+                scene.SetState(SceneState::PLAY);
         }
         ImGui::SameLine();
 
@@ -57,8 +57,13 @@ void ToolBar::Draw(Engine& engine)
 
         if (ImGui::Button("Stop", button_size)) 
         {
-            engine.GetSceneManager().LoadScene(scene.GetPath());
-            scene.SetState(SceneState::EDIT);
+            if (scene.GetState() == SceneState::PLAY || scene.GetState() == SceneState::PAUSE)
+            {
+                const std::string& scenePath = scene.GetPath();
+
+                engine.GetSceneManager().LoadScene(scenePath);
+                scene.SetState(SceneState::EDIT);
+            }
         }
 
         ImGui::PopStyleColor();

@@ -50,7 +50,7 @@ public:
 	void Shutdown() const;
 	
 private:
-	GLFWwindow* m_Window;
+	GLFWwindow* m_Window{};
 	WindowData m_WindowData;
 
 	void SetCallbacks() noexcept;

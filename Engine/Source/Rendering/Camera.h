@@ -23,7 +23,7 @@ public:
     bool Intersects(const glm::mat4& projView, const AABB& AABB);
     void UpdateFrustum();
    
-    Frustum frustum;
+    Frustum frustum{};
     glm::vec3 Position{};
     glm::vec3 Front{ 0.0f, 0.0f, -1.0f };
     glm::vec3 Up{ 0.0f, 1.0f, 0.0f };

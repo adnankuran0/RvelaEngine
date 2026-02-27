@@ -8,6 +8,8 @@ class SceneManager
 {
 public:
 
+    void Init();
+
     std::unique_ptr<Scene> CreateScene(const std::string& sceneName)
     {
         return std::make_unique<Scene>(sceneName);
@@ -25,7 +27,11 @@ public:
 
     void SaveScene(const std::string& path);
     void LoadScene(const std::string& path);
+
+    void Update();
 private:
+    std::string m_PendingScenePath = "";
+    bool m_HasPendingScene = false; 
     std::unique_ptr<Scene> m_CurrentScene = nullptr;
     SceneSerializer m_SceneSerializer;
     

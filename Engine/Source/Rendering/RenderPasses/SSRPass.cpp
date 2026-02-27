@@ -17,8 +17,8 @@ void SSRPass::Init(const RenderContext& ctx, RenderFrame& frame)
     glGenTextures(1, &o_SsrTexture);
     glBindTexture(GL_TEXTURE_2D, o_SsrTexture);
 
-    int w = ctx.viewportWidth / 2.0f;
-    int h = ctx.viewportHeight / 2.0f;
+    int w = (int)(ctx.viewportWidth / 2.0f);
+    int h = (int)(ctx.viewportHeight / 2.0f);
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, w,h, 0, GL_RGBA, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

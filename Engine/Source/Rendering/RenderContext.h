@@ -18,14 +18,14 @@ struct RenderContext
 {
 public:
 	RenderContext() = default;
-	Camera* camera;
-	std::vector<PointLight> pointLights;
-	std::optional<DirectionalLight> directionalLight;
-	unsigned int viewportWidth;
-	unsigned int viewportHeight;
-	Scene* scene;
+	Camera* camera{};
+	std::vector<PointLight> pointLights{};
+	std::optional<DirectionalLight> directionalLight{};
+	unsigned int viewportWidth{};
+	unsigned int viewportHeight{};
+	Scene* scene{};
 	RenderProfile profile = RenderProfile::EDITOR;
-	Environment* environment;
+	Environment* environment{};
 
 	void Clear()
 	{

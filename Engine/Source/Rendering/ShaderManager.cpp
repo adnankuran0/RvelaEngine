@@ -15,6 +15,9 @@ Shader& ShaderManager::Get(const std::string& shaderName)
 		if (shader.GetName() == shaderName)
 			return shader;
 	}
+    //TODO: return default shader
+    LOG_ERROR("Shader {} not found.", shaderName);
+    assert(false);
 }
 
 void ShaderManager::Reload(const std::string& name)

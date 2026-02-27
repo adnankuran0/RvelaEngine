@@ -32,14 +32,12 @@ namespace rv {
         inline int GetPrefilterMaxMipLevels() const { return prefilterMaxMipLevels; }
         Path& GetPath() { return m_Path; }
     private:
-        GLuint skyboxVAO, skyboxVBO, quadVAO, quadVBO;
-        GLuint skyboxTexture;
+        GLuint skyboxVAO, skyboxVBO, quadVAO, quadVBO = 0;
+        GLuint skyboxTexture = 0;
 
-        GLuint irradianceMap;
-        GLuint prefilterMap;
-        GLuint brdfLUTTexture;
+        GLuint irradianceMap, prefilterMap, brdfLUTTexture = 0;
 
-        int prefilterMaxMipLevels;
+        int prefilterMaxMipLevels = 0;
         static constexpr int IRRADIANCE_SIZE = 32;
         static constexpr int PREFILTER_SIZE = 128;
         static constexpr int BRDF_LUT_SIZE = 512;

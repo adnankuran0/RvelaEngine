@@ -15,8 +15,8 @@ public:
     AABB localAABB;
     AABB worldAABB;
     VertexArray VAO;
-    VertexBuffer VBO;
-    ElementBuffer EBO;
+    VertexBuffer VBO{};
+    ElementBuffer EBO{};
     unsigned int indexCount = 0;
 
     MeshRendererComponent() = default;

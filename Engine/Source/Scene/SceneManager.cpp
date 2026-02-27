@@ -9,6 +9,11 @@ using namespace rv;
 
 using json = nlohmann::json;
 
+void SceneManager::Init()
+{
+    SetActiveScene(CreateScene("EmptyScene"));
+}
+
 void SceneManager::SaveScene(const std::string& path)
 {
     
@@ -17,7 +22,17 @@ void SceneManager::SaveScene(const std::string& path)
 
 void SceneManager::LoadScene(const std::string& path)
 {
-    std::unique_ptr<Scene> scenePtr = CreateScene("NewScene");
-    m_SceneSerializer.LoadScene(*scenePtr, path);
-    SetActiveScene(std::move(scenePtr));
+    m_PendingScenePath = path;
+    m_HasPendingScene = true;
+}
+
+void SceneManager::Update()
+{
+    if (m_HasPendingScene)
+    {
+        std::unique_ptr<Scene> scenePtr = CreateScene("NewScene");
+        m_SceneSerializer.LoadScene(*scenePtr, m_PendingScenePath);
+        SetActiveScene(std::move(scenePtr));
+        m_HasPendingScene = false;
+    }
 }
