@@ -8,6 +8,8 @@
 #include "Rendering/RenderLayer.h"
 #include <Render/OutlinePass.h>
 #include <Render/SelectedEntityMaskPass.h>
+#include "Input/Input.h"
+#include "EditorUtils.h"
 
 using namespace rv;
 
@@ -63,6 +65,7 @@ void EditorLayer::OnUpdate()
     static_cast<SelectedEntityMaskPass*>(m_Engine->GetRenderLayer().GetRenderPass(m_SelectedEntityMaskPass))->SetSelectedEntity(m_SelectedEntity);
     static_cast<OutlinePass*>(m_Engine->GetRenderLayer().GetRenderPass(m_OutlinePass))->SetSelectedEntity(m_SelectedEntity);
    
+    HandleShortcuts();
 }
 
 void EditorLayer::OnRender()
@@ -88,7 +91,7 @@ void EditorLayer::Render()
 
     m_MenuBar.Draw(m_Engine,m_AssetImporterRegistry);
      
-    m_ToolBar.Draw(m_Engine->GetActiveScene());
+    m_ToolBar.Draw(*m_Engine);
 
     m_Dockspace.Draw();
 
@@ -109,5 +112,34 @@ void EditorLayer::Render()
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();
         glfwMakeContextCurrent(backup_current_context);
+    }
+}
+
+void EditorLayer::HandleShortcuts()
+{
+    if (Input::IsKeyPressed(KeyCode::LeftControl) || Input::IsKeyPressed(KeyCode::RightControl))
+    {
+        if (Input::IsKeyJustPressed(KeyCode::S))
+        {
+            EditorUtils::SaveScene(*m_Engine);
+        }
+        if (Input::IsKeyJustPressed(KeyCode::O))
+        {
+            EditorUtils::OpenScene(*m_Engine);
+        }
+        if (Input::IsKeyJustPressed(KeyCode::N))
+        {
+            EditorUtils::CreateScene(*m_Engine);
+        }
+
+        // Ctrl + Shift 
+        if (Input::IsKeyPressed(KeyCode::LeftShift) || Input::IsKeyPressed(KeyCode::RightShift))
+        {
+            if (Input::IsKeyJustPressed(KeyCode::S))
+            {
+                EditorUtils::SaveSceneAs(*m_Engine);
+            }
+        }
+
     }
 }

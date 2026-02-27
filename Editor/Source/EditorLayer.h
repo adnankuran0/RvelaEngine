@@ -38,6 +38,8 @@ public:
 
 
 private:
+    void HandleShortcuts();
+
     MenuBar m_MenuBar;
     ToolBar m_ToolBar;
     Dockspace m_Dockspace;

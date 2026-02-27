@@ -11,6 +11,7 @@ using json = nlohmann::json;
 
 void SceneManager::SaveScene(const std::string& path)
 {
+    
     m_SceneSerializer.SaveScene(GetActiveScene(), path);
 }
 

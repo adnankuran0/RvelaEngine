@@ -114,7 +114,7 @@ void Engine::HandleEvents() noexcept
 		{
 			if (auto* mouseEvent = dynamic_cast<MouseMovedEvent*>(&event) )
 			{
-				if (GetActiveScene().GetState() == SceneState::EDIT)
+				if (GetActiveScene().GetState() == SceneState::EDIT && m_EditorCamera)
 				{
 					m_EditorCamera->OnMouseMoved(
 						mouseEvent->GetX(),

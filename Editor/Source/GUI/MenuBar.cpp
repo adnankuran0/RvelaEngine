@@ -1,10 +1,12 @@
 ﻿#include "MenuBar.h"
-#include <ImGui/tinyfiledialogs.h>
-#include <fstream>
+
 #include <AssetImporter/MaterialImporter.h>
 #include "Core/Engine.h"
 #include "AssetImporter/AssetImporterRegistry.h"
 #include <imgui.h>
+#include "Dialogs.h"
+#include "EditorUtils.h"
+#include "tinyfiledialogs.h"
 
 using namespace rv;
 
@@ -14,38 +16,22 @@ void MenuBar::Draw(Engine* engine, AssetImporterRegistry& assetImporter)
     {
         if (ImGui::BeginMenu("File"))
         {
-            if (ImGui::MenuItem("New scene"))
+            if (ImGui::MenuItem("New scene (Ctrl + N)"))
             {
-                auto& sm = engine->GetSceneManager();
-                sm.SetActiveScene(sm.CreateScene("NewScene"));
+                EditorUtils::CreateScene(*engine);
             }
-            if (ImGui::MenuItem("Open scene"))
+            if (ImGui::MenuItem("Open scene (Ctrl + O)"))
             {
-                const char* filterPatterns[] = { "*.rscene" };
-                const char* filePath = tinyfd_openFileDialog("Select a scene", "", 1, filterPatterns, NULL, 0);
-
-                std::string file = filePath ? std::string(filePath) : "";
-                if (!file.empty())
-                {
-                    engine->GetSceneManager().LoadScene(file);
-                }
-
+                EditorUtils::OpenScene(*engine);
             }
-            if (ImGui::MenuItem("Save scene"))
+            if (ImGui::MenuItem("Save scene (Ctrl + S)"))
             {
-                const char* filterPatterns[] = { "*.rscene" };
-                const char* filePath = tinyfd_saveFileDialog("Save Scene As", "scene.rscene", 1, filterPatterns, NULL);
-
-                std::string file = filePath ? std::string(filePath) : "";
-                if (!file.empty())
-                {
-                    std::ofstream ofs(file);
-                    if (ofs.is_open())
-                    {
-                        ofs.close();
-                        engine->GetSceneManager().SaveScene(file);
-                    }
-                }
+                EditorUtils::SaveScene(*engine);
+            }
+            if (ImGui::MenuItem("Save scene as (Ctrl + Shift + S)"))
+            {
+                EditorUtils::SaveSceneAs(*engine);
+               
             }
             if (ImGui::MenuItem("Import assets"))
             {
@@ -56,11 +42,11 @@ void MenuBar::Draw(Engine* engine, AssetImporterRegistry& assetImporter)
                     8,
                     filterPatterns,
                     NULL,
-                    1); //multi-select
+                    1); 
 
                 if (lTheOpenFileName)
                 {
-                    // tinyfd returns paths separated by '|'
+                    // tinyfd returns paths separated by |
                     std::string pathsStr(lTheOpenFileName);
                     size_t start = 0;
                     size_t end = pathsStr.find('|');
@@ -71,7 +57,7 @@ void MenuBar::Draw(Engine* engine, AssetImporterRegistry& assetImporter)
                         start = end + 1;
                         end = pathsStr.find('|', start);
                     }
-                    // Last file (or only file if no '|')
+                    // Last file (or only file if no |)
                     std::string lastFile = pathsStr.substr(start);
                     if (!lastFile.empty())
                     {

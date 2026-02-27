@@ -1,9 +1,5 @@
 #pragma once 
-
-namespace rv
-{
-	class Engine;
-}
+#include "Core/Engine.h"
 
 class Editor
 {
@@ -11,8 +7,7 @@ public:
 	Editor();
 	void Run();
 
-	rv::Engine* GetEngine();
 private:
-	rv::Engine* m_Engine;
+	rv::Engine m_Engine;
 
 };

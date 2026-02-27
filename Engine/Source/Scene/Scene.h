@@ -1,7 +1,6 @@
 #pragma once
 
 #include <entt/entt.h>
-
 #include "Math/RvelaMath.h"
 #include "Utils/ISerializable.h"
 #include "Rendering/Renderer.h"
@@ -15,7 +14,7 @@ namespace rv {
 class Entity; // Forward Declaration
 
 enum class SceneState
-{
+{ 
     EDIT,
     PLAY,
     PAUSE
@@ -27,6 +26,11 @@ public:
     Scene(const std::string& sceneName = "Untitled");
     void SetState(SceneState newState);
     SceneState GetState() const { return m_State; };
+    Scene(const Scene&) = delete;
+    Scene& operator=(const Scene&) = delete;
+
+    inline const std::string& GetPath() noexcept { return m_ScenePath; }
+    inline void SetPath(const std::string& path) noexcept { m_ScenePath = path; }
 
     void OnStart();
     void OnUpdate(float dt);
@@ -89,11 +93,11 @@ public:
     Entity Instantiate(const AssetUUID& prefabUUID);
 
     entt::registry& GetRegistry();
-    std::unordered_map<EntityUUID, entt::entity> GetUUIDEntityMap() { return m_EntityMap; }
+    std::unordered_map<EntityUUID, entt::entity>& GetUUIDEntityMap() { return m_EntityMap; }
 
     [[nodiscard]] inline const entt::entity& GetRootEntity() const noexcept { return m_RootEntity; }
 
-    entt::entity& GetEntityByUUID(EntityUUID& uuid) { return m_EntityMap.at(uuid); }
+    entt::entity GetEntityByUUID(EntityUUID& uuid) { return m_EntityMap.at(uuid); }
 
     
 
@@ -118,11 +122,13 @@ public:
     inline LightSystem& GetLightSystem() noexcept { return m_LightSystem; }
     inline Environment& GetEnvironment() noexcept { return m_Environment; }
 
+
 private:
     unsigned int CountEntitiesRecursively(entt::entity& rootEntity);
     friend class Entity;
     SceneState m_State = SceneState::EDIT;
     std::string m_SceneName;
+    std::string m_ScenePath;
     entt::registry m_Registry;
     std::unordered_map<EntityUUID, entt::entity> m_EntityMap;
     entt::entity selectedEntity;

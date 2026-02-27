@@ -1,11 +1,13 @@
 ﻿#include "ToolBar.h"
 #include "ImGui/imgui.h"
-#include "Scene/Scene.h"
+#include "Core/Engine.h"
+#include "EditorUtils.h"
 
 using namespace rv;
 
-void ToolBar::Draw(Scene& scene)
+void ToolBar::Draw(Engine& engine)
 {
+    Scene& scene = engine.GetActiveScene();
     ImGuiViewport* viewport = ImGui::GetMainViewport();
 
     ImGuiWindowFlags toolbar_flags = ImGuiWindowFlags_NoMove |
@@ -41,6 +43,7 @@ void ToolBar::Draw(Scene& scene)
 
         if (ImGui::Button("Play", button_size)) 
         {
+            EditorUtils::SaveScene(engine);
             scene.SetState(SceneState::PLAY);
         }
         ImGui::SameLine();
@@ -54,6 +57,7 @@ void ToolBar::Draw(Scene& scene)
 
         if (ImGui::Button("Stop", button_size)) 
         {
+            engine.GetSceneManager().LoadScene(scene.GetPath());
             scene.SetState(SceneState::EDIT);
         }
 

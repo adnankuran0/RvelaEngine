@@ -2,12 +2,12 @@
 
 namespace rv {
 
-class Scene;
+class Engine;
 
 class ToolBar
 {
 public:
-	void Draw(Scene& scene);
+	void Draw(Engine& engine);
 };
 
 }

@@ -29,6 +29,8 @@ void SceneSerializer::SaveScene(Scene& scene, const std::string& path)
 
 void SceneSerializer::LoadScene(Scene& scene, const std::string& path)
 {
+    scene.SetPath(path);
+
     json j;
     std::ifstream(path) >> j;
 
