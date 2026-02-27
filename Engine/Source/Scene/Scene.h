@@ -99,8 +99,6 @@ public:
 
     entt::entity GetEntityByUUID(EntityUUID& uuid) { return m_EntityMap.at(uuid); }
 
-    
-
     void SetSelectedEntity(entt::entity selectedEntity) { this->selectedEntity = selectedEntity; }
     entt::entity GetSelectedEntity() { return selectedEntity; }
 
@@ -129,7 +127,6 @@ private:
     SceneState m_State = SceneState::EDIT;
     std::string m_SceneName;
     std::string m_ScenePath;
-    entt::registry m_Registry;
     std::unordered_map<EntityUUID, entt::entity> m_EntityMap;
     entt::entity selectedEntity;
     entt::entity m_RootEntity;
@@ -137,6 +134,7 @@ private:
     ScriptSystem m_ScriptSystem;
     LightSystem m_LightSystem;
     Environment m_Environment;
+    entt::registry m_Registry;
 };
 
 }

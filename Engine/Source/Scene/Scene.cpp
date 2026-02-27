@@ -248,9 +248,6 @@ void Scene::RemoveParent(entt::entity child)
     SetParent(child, m_RootEntity);
 }
 
-
-
-
 Entity Scene::Instantiate(const AssetUUID& prefabUUID)
 {
     Ref<PrefabAsset> prefab = AssetRegistry::GetAsset<PrefabAsset>(prefabUUID);
@@ -420,7 +417,7 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
     }
 
     UpdateHierarchy();
-
+        
     return rootEntity;
 }
 
