@@ -9,6 +9,14 @@ namespace rv {
 class Input
 {
 public:
+
+	enum class MouseMode
+	{
+		VISIBLE,
+		HIDDEN,
+		CAPTURED
+	};
+
 	static void Update() noexcept;
 
 	static bool IsKeyPressed(KeyCode key) noexcept;
@@ -22,6 +30,8 @@ public:
 	static bool IsMouseButtonJustPressed(MouseCode button) noexcept;
 
 	static bool IsMouseButtonJustReleased(MouseCode button) noexcept;
+
+	static void SetMouseMode(MouseMode mode) noexcept;
 
 	static glm::vec2 GetMousePosition() noexcept;
 

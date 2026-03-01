@@ -11,13 +11,16 @@ ScriptSystem::ScriptSystem(Scene& scene) : m_Scene(scene)
     m_State.open_libraries(sol::lib::base, sol::lib::math, sol::lib::table, sol::lib::string, sol::lib::os);
 
     m_State.new_usertype<glm::vec3>("vec3",
-        sol::constructors<
-        glm::vec3(),
-        glm::vec3(float, float, float)
-        >(),
+        sol::constructors<glm::vec3(), glm::vec3(float, float, float)>(),
         "x", &glm::vec3::x,
         "y", &glm::vec3::y,
-        "z", &glm::vec3::z
+        "z", &glm::vec3::z,
+        "Normalized", [](const glm::vec3& v) { return glm::normalize(v); },
+        "Cross", [](const glm::vec3& a, const glm::vec3& b) { return glm::cross(a, b); },
+        "__add", [](const glm::vec3& a, const glm::vec3& b) { return a + b; },
+        "__sub", [](const glm::vec3& a, const glm::vec3& b) { return a - b; },
+        "__mul", [](const glm::vec3& a, float b) { return a * b; },
+        "__div", [](const glm::vec3& a, float b) { return a / b; }
     );
 
     m_State.new_usertype<TransformComponent>("TransformComponent",
@@ -29,7 +32,8 @@ ScriptSystem::ScriptSystem(Scene& scene) : m_Scene(scene)
         "GetEulerRotation", &TransformComponent::GetEulerRotation,
         "SetEulerRotation", &TransformComponent::SetEulerRotation,
         "GetScale", &TransformComponent::GetScale,
-        "SetScale", &TransformComponent::SetScale
+        "SetScale", &TransformComponent::SetScale,
+        "GetForward", &TransformComponent::GetForward
     );
 
     m_State.new_usertype<Entity>("Entity",
@@ -53,6 +57,7 @@ ScriptSystem::ScriptSystem(Scene& scene) : m_Scene(scene)
     BIND_KEY(S)
     BIND_KEY(D)
     BIND_KEY(Space)
+    BIND_KEY(Escape)
     BIND_KEY(LeftShift)
 
     BIND_MOUSE(ButtonLeft)
@@ -60,6 +65,13 @@ ScriptSystem::ScriptSystem(Scene& scene) : m_Scene(scene)
 
     #undef BIND_KEY
     #undef BIND_MOUSE
+
+    m_State["MouseMode"] = m_State.create_table();
+
+    m_State["MouseMode"]["VISIBLE"] = static_cast<int>(Input::MouseMode::VISIBLE);
+    m_State["MouseMode"]["HIDDEN"] = static_cast<int>(Input::MouseMode::HIDDEN);
+    m_State["MouseMode"]["CAPTURED"] = static_cast<int>(Input::MouseMode::CAPTURED);
+
 
     m_State["Input"] = m_State.create_table();
 
@@ -82,6 +94,27 @@ ScriptSystem::ScriptSystem(Scene& scene) : m_Scene(scene)
         {
             glm::vec2 pos = Input::GetMousePosition();
             return glm::vec3(pos.x, pos.y, 0.0f);
+        };
+
+    m_State["Input"]["SetMouseMode"] = [](int mode)
+        {
+            Input::SetMouseMode(static_cast<Input::MouseMode>(mode));
+        };
+
+    m_State["Scene"] = m_State.create_table();
+
+    m_State["Scene"]["FindEntityByName"] = [this](const std::string& name) -> Entity
+        {
+            auto& registry = m_Scene.GetRegistry();
+            auto view = registry.view<TagComponent>();
+
+            for (auto entityHandle : view) {
+                Entity e(entityHandle, &m_Scene);
+                if (e.GetName() == name)
+                    return e;
+            }
+
+            return Entity{};
         };
 }
 
@@ -150,6 +183,8 @@ void ScriptSystem::OnStop(entt::registry& registry)
 
 void ScriptSystem::BindLuaScript(ScriptComponent& sc, entt::entity& e)
 {
+    Input::SetMouseMode(Input::MouseMode::CAPTURED);
+
     sc.luaState = &m_State;
 
     sol::load_result script = sc.luaState->load_file(sc.luaFile);

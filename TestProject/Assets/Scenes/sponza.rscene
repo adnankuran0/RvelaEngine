@@ -14694,6 +14694,9 @@
         },
         {
             "ParentUUID": 411,
+            "ScriptComponent": {
+                "luaFile": "C:\\RvelaEngine\\TestProject\\Assets\\Scripts\\camera.lua"
+            },
             "Tag": {
                 "tag": "CameraHolder"
             },

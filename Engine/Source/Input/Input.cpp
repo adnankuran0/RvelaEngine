@@ -69,6 +69,29 @@ bool Input::IsMouseButtonJustReleased(MouseCode button) noexcept
     return !isPressed && wasPressed;
 }
 
+void rv::Input::SetMouseMode(MouseMode mode) noexcept
+{
+    int glfwMode;
+    switch (mode)
+    {
+    case rv::Input::MouseMode::VISIBLE:
+        glfwMode = GLFW_CURSOR_NORMAL;
+        break;
+    case rv::Input::MouseMode::HIDDEN:
+        glfwMode = GLFW_CURSOR_HIDDEN;
+        break;
+    case rv::Input::MouseMode::CAPTURED:
+        glfwMode = GLFW_CURSOR_DISABLED;
+        break;
+    default:
+        glfwMode = GLFW_CURSOR_NORMAL;
+        break;
+    }
+
+    GLFWwindow* window = Engine::Get()->GetWindow().GetGLFWWindow();
+    glfwSetInputMode(window, GLFW_CURSOR, glfwMode);
+}
+
 glm::vec2 Input::GetMousePosition() noexcept {
     auto* window = Engine::Get()->GetWindow().GetGLFWWindow();
     if (!window) {
