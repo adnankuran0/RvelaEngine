@@ -101,8 +101,6 @@ frame)
         Shader& shadowShader = ShaderManager::Get("DirectionalShadow");
         shadowShader.use();
 
-        
-
         shadowShader.setMat4("lightSpaceMatrix", ctx.directionalLight->lightSpace);
 
         glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
@@ -199,8 +197,6 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
     glEnable(GL_CULL_FACE);
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
 }
-
-
 
 ShadowPass::~ShadowPass()
 {

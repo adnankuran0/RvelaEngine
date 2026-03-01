@@ -7,6 +7,7 @@
 #include "CameraSystem.h"
 #include "Script/ScriptSystem.h"
 #include "LightSystem.h"
+#include "TransformSystem.h"
 #include "Environment.h"
 
 namespace rv {
@@ -83,10 +84,6 @@ public:
         return entt::null;
     }
 
-    void UpdateHierarchy();
-
-    void UpdateNodeRecursive(entt::entity entity,
-        const glm::mat4& parentWorld);
 
     void Update();
 
@@ -115,6 +112,7 @@ public:
 
     [[nodiscard]] unsigned int GetComponentCount(entt::entity entity) noexcept;
 
+    inline TransformSystem& GetTransformSystem() noexcept { return m_TransformSystem; }
     inline CameraSystem& GetCameraSystem() noexcept { return m_CameraSystem; }
     inline ScriptSystem& GetScriptSystem() noexcept { return m_ScriptSystem; }
     inline LightSystem& GetLightSystem() noexcept { return m_LightSystem; }
@@ -130,6 +128,7 @@ private:
     std::unordered_map<EntityUUID, entt::entity> m_EntityMap;
     entt::entity selectedEntity;
     entt::entity m_RootEntity;
+    TransformSystem m_TransformSystem;
     CameraSystem m_CameraSystem;
     ScriptSystem m_ScriptSystem;
     LightSystem m_LightSystem;

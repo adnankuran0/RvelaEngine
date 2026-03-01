@@ -121,7 +121,7 @@ void SceneSerializer::LoadScene(Scene& scene, const std::string& path)
         }
     }
 
-    scene.UpdateHierarchy();
+    scene.GetTransformSystem().Update();
 }
 
 json SceneSerializer::SerializeEntity(Scene& scene, entt::entity e)

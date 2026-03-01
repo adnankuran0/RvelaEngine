@@ -11,7 +11,11 @@
 
 using namespace rv;
 
-Scene::Scene(const std::string& sceneName) : m_Registry() , m_ScriptSystem(*this), m_CameraSystem(*this), m_LightSystem(*this)
+Scene::Scene(const std::string& sceneName) : m_Registry() , 
+m_ScriptSystem(*this), 
+m_CameraSystem(*this), 
+m_LightSystem(*this),
+m_TransformSystem(*this)
 {
     m_ScenePath = "";
     m_SceneName = sceneName;
@@ -103,53 +107,13 @@ void Scene::Update()
 {                
     if (m_State == SceneState::PLAY)
         OnUpdate(Time::GetDeltaTime());
-    UpdateHierarchy(); 
+    m_TransformSystem.Update();
     m_CameraSystem.Update();
 }
 
 entt::registry& Scene::GetRegistry() { return m_Registry; }
 
-void Scene::UpdateHierarchy() {
-    auto view = m_Registry.view<SceneTreeComponent, TransformComponent>();
 
-    UpdateNodeRecursive(m_RootEntity, glm::mat4(1.0f));
-    //if(GetComponent<TransformComponent>(root).IsDirty()) // child may be dirty
-}
-
-void Scene::UpdateNodeRecursive(entt::entity e, const glm::mat4& parentWorld)
-{
-    auto& transform = GetComponent<TransformComponent>(e);
-
-    glm::mat4 localMatrix = transform.GetLocalMatrix();
-    glm::mat4 worldMatrix = parentWorld * localMatrix;
-
-    glm::vec3 scale, skew, translation;
-    glm::quat rotation;
-    glm::vec4 perspective;
-    glm::decompose(worldMatrix, scale, rotation, translation, skew, perspective);
-
-    transform.SetWorldTransform(translation, rotation, scale);
-
-    if (HasComponent<MeshRendererComponent>(e))
-    {
-        auto& meshRenderer = GetComponent<MeshRendererComponent>(e);
-        meshRenderer.worldAABB = meshRenderer.localAABB.CalculateWorldAABB(worldMatrix);
-    }
-
-    //transform.ClearDirty();
-
-    if (HasComponent<SceneTreeComponent>(e))
-    {
-        auto& sceneTree = GetComponent<SceneTreeComponent>(e);
-        for (auto child : sceneTree.children)
-        {
-            if (m_Registry.valid(child))
-            {
-                UpdateNodeRecursive(child, worldMatrix);
-            }
-        }
-    }
-}
 
 void Scene::SetParent(entt::entity child, entt::entity parent)
 {
@@ -416,7 +380,7 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
         AddComponent<PrefabComponent>(rootEntity, prefabUUID);
     }
 
-    UpdateHierarchy();
+    m_TransformSystem.Update(); // TODO: is this necessary?
         
     return rootEntity;
 }

@@ -173,7 +173,7 @@ AssetUUID ModelImporter::ConstructPrefab(const aiScene* scene, const std::filesy
 {
     Scene prefabScene;
     entt::entity rootEntity = ProcessNode(scene->mRootNode, scene, entt::null, prefabScene);
-    prefabScene.UpdateHierarchy();
+    prefabScene.GetTransformSystem().Update();
 
     std::filesystem::path prefabPath = modelPath;
     prefabPath.replace_extension(".rprefab");
@@ -248,7 +248,7 @@ void ModelImporter::SetTransformForEntity(aiNode* node, Scene& scene, entt::enti
     tc.SetPosition(pos);
     tc.SetScale(scale);
     tc.SetEulerRotation(rotDeg);
-    scene.UpdateHierarchy();
+    scene.GetTransformSystem().Update();
 }
 
 AssetUUID ModelImporter::Import(const std::filesystem::path& path)
