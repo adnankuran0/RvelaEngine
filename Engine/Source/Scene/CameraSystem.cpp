@@ -13,7 +13,7 @@ Camera* CameraSystem::GetActiveCamera()
         {
             auto& camera = camComp.camera;
             auto& transformComp = m_Scene.GetComponent<TransformComponent>(e);
-            camera.Position = transformComp.GetPosition();
+            camera.Position = transformComp.GetWorldPosition();
             camera.Front = transformComp.GetForward();
             camera.Right = transformComp.GetRight();
             return &camera;

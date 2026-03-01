@@ -2,6 +2,7 @@
 #include "ScriptSystem.h"
 #include "Scene/Components/ScriptComponent.h"
 #include "Scene/Entity.h"
+#include "Input/Input.h"
 
 using namespace rv;
 
@@ -10,6 +11,10 @@ ScriptSystem::ScriptSystem(Scene& scene) : m_Scene(scene)
     m_State.open_libraries(sol::lib::base, sol::lib::math, sol::lib::table, sol::lib::string, sol::lib::os);
 
     m_State.new_usertype<glm::vec3>("vec3",
+        sol::constructors<
+        glm::vec3(),
+        glm::vec3(float, float, float)
+        >(),
         "x", &glm::vec3::x,
         "y", &glm::vec3::y,
         "z", &glm::vec3::z
@@ -36,6 +41,48 @@ ScriptSystem::ScriptSystem(Scene& scene) : m_Scene(scene)
         },
         "GetName", &Entity::GetName
     );
+
+    m_State["KeyCode"] = m_State.create_table();
+    m_State["MouseCode"] = m_State.create_table();
+
+    #define BIND_KEY(k) m_State["KeyCode"][#k] = static_cast<int>(KeyCode::k);
+    #define BIND_MOUSE(m) m_State["MouseCode"][#m] = static_cast<int>(MouseCode::m);
+
+    BIND_KEY(W)
+    BIND_KEY(A)
+    BIND_KEY(S)
+    BIND_KEY(D)
+    BIND_KEY(Space)
+    BIND_KEY(LeftShift)
+
+    BIND_MOUSE(ButtonLeft)
+    BIND_MOUSE(ButtonRight)
+
+    #undef BIND_KEY
+    #undef BIND_MOUSE
+
+    m_State["Input"] = m_State.create_table();
+
+    m_State["Input"]["IsKeyPressed"] = [](int key)
+        {
+            return Input::IsKeyPressed(static_cast<KeyCode>(key));
+        };
+
+    m_State["Input"]["IsKeyJustPressed"] = [](int key)
+        {
+            return Input::IsKeyJustPressed(static_cast<KeyCode>(key));
+        };
+
+    m_State["Input"]["IsMouseButtonPressed"] = [](int button)
+        {
+            return Input::IsMouseButtonPressed(static_cast<MouseCode>(button));
+        };
+
+    m_State["Input"]["GetMousePosition"] = []()
+        {
+            glm::vec2 pos = Input::GetMousePosition();
+            return glm::vec3(pos.x, pos.y, 0.0f);
+        };
 }
 
 void ScriptSystem::OnStart(entt::registry& registry)
@@ -44,7 +91,7 @@ void ScriptSystem::OnStart(entt::registry& registry)
     for (auto entity : view)
     {
         auto& sc = view.get<ScriptComponent>(entity);
-
+        BindLuaScript(sc, entity);
         if (sc.OnCreate.valid())
         {
             sol::protected_function_result result = sc.OnCreate(sc.luaInstance);
@@ -67,9 +114,16 @@ void ScriptSystem::OnUpdate(entt::registry& registry, float dt)
 
         if (sc.luaInstance.valid())
         {
-            sol::function onUpdate = sc.luaInstance["OnUpdate"];
+            sol::protected_function onUpdate = sc.luaInstance["OnUpdate"];
             if (onUpdate.valid())
-                onUpdate(sc.luaInstance, dt);
+            {
+                sol::protected_function_result result = onUpdate(sc.luaInstance, dt);
+                if (!result.valid())
+                {
+                    sol::error err = result;
+                    LOG_ERROR("Lua OnUpdate error: {}", err.what());
+                }
+            }
         }
     }
 
