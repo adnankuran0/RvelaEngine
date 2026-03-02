@@ -1,6 +1,5 @@
 #include "rvelapch.h"
 #include "ScriptEngine.h"
-#include "Scene/Entity.h"
 #include "ScriptBindings.h"
 
 using namespace rv;
@@ -13,11 +12,7 @@ void ScriptEngine::Init()
     LuaBindings::RegisterCoreTypes(m_State);
     LuaBindings::RegisterComponents(m_State);
     LuaBindings::RegisterInputAPI(m_State);
+    LuaBindings::RegisterSceneAPI(m_State);
+
     
-
-    m_State["Scene"] = m_State.create_table();
-
-    m_State.new_usertype<Scene>("Scene",
-        "FindEntityByName", &Scene::GetEntityByName
-    );
 }

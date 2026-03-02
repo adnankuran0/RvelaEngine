@@ -41,6 +41,16 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
                 return sol::make_object(lua, std::ref(e.GetComponent<MaterialComponent>()));
             }
             return sol::make_object(lua, sol::nil);
+        },
+        "AddComponent", [&](Entity& e, const std::string& typeName) -> sol::object {
+            if (typeName == "PointLightComponent")
+                return sol::make_object(lua, &e.AddComponent<PointLightComponent>());
+            else if (typeName == "DirectionalLightComponent")
+                return sol::make_object(lua, &e.AddComponent<DirectionalLightComponent>());
+            else if (typeName == "CameraComponent")
+                return sol::make_object(lua, &e.AddComponent<CameraComponent>());
+
+            return sol::nil;
         }
     );
 

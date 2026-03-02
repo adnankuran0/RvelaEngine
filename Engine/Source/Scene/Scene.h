@@ -43,6 +43,7 @@ public:
     Entity CreateEntityRaw();
     Entity CreateEntityWithUUID(const std::string& name, EntityUUID uuid);
     void DestroyEntity(entt::entity entity);
+    void DestroyEntity(Entity& entity);
 
     template<typename Component, typename... Args>
     Component& AddComponent(entt::entity entity, Args&&... args) {
@@ -83,7 +84,6 @@ public:
             return GetComponent<SceneTreeComponent>(entity).parent;
         return entt::null;
     }
-
 
     void Update();
 

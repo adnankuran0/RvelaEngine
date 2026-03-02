@@ -101,6 +101,10 @@ void Scene::DestroyEntity(entt::entity entity) {
     m_Registry.destroy(entity);
 }
 
+void Scene::DestroyEntity(Entity& entity) {
+    DestroyEntity(entity.GetHandle());
+}
+
 
 
 void Scene::Update() 
