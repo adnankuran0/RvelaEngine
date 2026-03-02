@@ -1,6 +1,7 @@
 #include "rvelapch.h"
 #include "ScriptSystem.h"
 #include "Scene/Components/ScriptComponent.h"
+#include "Scene/Components/MaterialComponent.h"
 #include "Scene/Entity.h"
 
 using namespace rv;
@@ -56,10 +57,10 @@ void ScriptSystem::OnUpdate(float dt)
 
 void ScriptSystem::OnStop()
 {
-    auto view = m_Scene.GetRegistry().view<ScriptComponent>();
-    for (auto entity : view)
+    auto scView = m_Scene.GetRegistry().view<ScriptComponent>();
+    for (auto entity : scView)
     {
-        auto& sc = view.get<ScriptComponent>(entity);
+        auto& sc = scView.get<ScriptComponent>(entity);
 
         if (sc.OnDestroy.valid())
         {
@@ -71,6 +72,16 @@ void ScriptSystem::OnStop()
             }
         }
     }
+
+    //TODO: Runtime material instances
+    auto mcView = m_Scene.GetRegistry().view<MaterialComponent>();
+    for (auto entity : mcView)
+    {
+        auto& mc = mcView.get<MaterialComponent>(entity);
+        mc.Reload();
+
+    }
+
 }
 
 void ScriptSystem::BindLuaScript(ScriptComponent& sc, entt::entity& e)

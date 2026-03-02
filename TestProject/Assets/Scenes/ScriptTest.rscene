@@ -41,7 +41,7 @@
         },
         {
             "Material": {
-                "material": "ee3dde12-6263-4f11-bb1d-812b3e196ab7"
+                "material": "5fbc428b-1fbc-4f88-a55d-8ee35575f903"
             },
             "Mesh": {
                 "mesh": "36468d32-bba5-4eb4-82db-0d4da5cd6c65"
@@ -66,9 +66,9 @@
                     0.0
                 ],
                 "scale": [
+                    20.0,
                     1.0,
-                    1.0,
-                    1.0
+                    20.0
                 ],
                 "scaleRatio": [
                     1.0,

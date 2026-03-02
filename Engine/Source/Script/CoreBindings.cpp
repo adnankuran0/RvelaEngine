@@ -1,7 +1,7 @@
 ﻿#include "rvelapch.h"
 #include "CoreBindings.h"
 #include "sol/sol.hpp"
-#include <Scene/Entity.h>
+#include "Scene/Entity.h"
 
 using namespace rv;
 
@@ -15,6 +15,10 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             // TODO: RTTR
             if (type == "TransformComponent") return e.HasComponent<TransformComponent>();
             else if (type == "CameraComponent") return e.HasComponent<CameraComponent>();
+            else if (type == "DirectionalLightComponent") return e.HasComponent<DirectionalLightComponent>();
+            else if (type == "PointLightComponent") return e.HasComponent<PointLightComponent>();
+            else if (type == "MeshRendererComponent") return e.HasComponent<MeshRendererComponent>();
+            else if (type == "MaterialComponent") return e.HasComponent<MaterialComponent>();
             return false;
         },
         "GetComponent", [&](Entity& e, const std::string& type) -> sol::object {
@@ -24,31 +28,21 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             else if (type == "CameraComponent") {
                 return sol::make_object(lua, std::ref(e.GetComponent<CameraComponent>()));
             }
+            else if (type == "DirectionalLightComponent") {
+                return sol::make_object(lua, std::ref(e.GetComponent<DirectionalLightComponent>()));
+            }
+            else if (type == "PointLightComponent") {
+                return sol::make_object(lua, std::ref(e.GetComponent<PointLightComponent>()));
+            }
+            else if (type == "MeshRendererComponent") {
+                return sol::make_object(lua, std::ref(e.GetComponent<MeshRendererComponent>()));
+            }
+            else if (type == "MaterialComponent") {
+                return sol::make_object(lua, std::ref(e.GetComponent<MaterialComponent>()));
+            }
             return sol::make_object(lua, sol::nil);
         }
     );
 
-    lua.new_usertype<TransformComponent>("TransformComponent",
-        "GetPosition", &TransformComponent::GetPosition,
-        "SetPosition", &TransformComponent::SetPosition,
-        "GetWorldPosition", &TransformComponent::GetWorldPosition,
-        "Translate", &TransformComponent::Translate,
-        "GetRotation", &TransformComponent::GetRotation,
-        "GetWorldRotation", &TransformComponent::GetWorldRotation,
-        "SetRotation", &TransformComponent::SetRotation,
-        "GetEulerRotation", &TransformComponent::GetEulerRotation,
-        "SetEulerRotation", &TransformComponent::SetEulerRotation,
-        "GetScale", &TransformComponent::GetScale,
-        "GetWorldScale", &TransformComponent::GetWorldScale,
-        "SetScale", &TransformComponent::SetScale,
-        "GetForward", &TransformComponent::GetForward,
-        "GetUp", &TransformComponent::GetUp,
-        "GetRight", &TransformComponent::GetRight,
-        "LookAt", &TransformComponent::LookAt
-    );
-
-    lua.new_usertype<CameraComponent>("CameraComponent",
-        "GetFOV", [](CameraComponent& c) { return (double)c.GetFOV(); },
-        "SetFOV", &CameraComponent::SetFOV
-    );
+   
 }

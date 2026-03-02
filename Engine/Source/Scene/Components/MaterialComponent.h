@@ -103,6 +103,7 @@ public:
 	{
 		Load(newMaterialUUID);
 	}
+	void Reload() { Load(materialUUID); }
 
 	Sampler& GetSampler() { return material->sampler; }
 	void SetSampler(const SamplerDesc& samplerDescc) { material->sampler.Init(samplerDescc); }

@@ -1,14 +1,20 @@
 local Test = {}
 
+Test.toggle = false
+Test.timer = 0
+Test.comp = nil
+
 function Test:OnCreate()
-    local name = self.entity:GetName()
-    print("Entity name: ", name)
-    if  self.entity:HasComponent("TransformComponent") then
-        local transform = self.entity:GetComponent("TransformComponent")
-        local pos = transform:GetPosition()
-        pos.x = pos.x + 5
-        transform:SetPosition(pos)
-    end
+   self.comp = self.entity:GetComponent("MaterialComponent")
+end
+
+function Test:OnUpdate(dt) 
+    self.timer = self.timer + dt
+
+    local uvOffset = self.comp:GetUVOffset()
+    uvOffset.x = uvOffset.x + 1 * dt
+    self.comp:SetUVOffset(uvOffset)
+    self.comp:SetNormalScale(self.timer)
 end
 
 return Test

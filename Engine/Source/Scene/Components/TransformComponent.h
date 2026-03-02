@@ -13,20 +13,7 @@ using json = nlohmann::json;
 
 struct alignas(16) TransformComponent
 {
-private:
-    glm::quat localRotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
-    glm::quat worldRotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
 
-    glm::vec3 localPosition = glm::vec3(0.0f);
-    glm::vec3 worldPosition = glm::vec3(0.0f);
-    glm::vec3 localScale = glm::vec3(1.0f);
-    glm::vec3 worldScale = glm::vec3(1.0f);
-    glm::vec3 scaleRatio = glm::vec3(1.0f);
-    glm::vec3 localEuler = glm::vec3(0.0f);
-    glm::vec3 worldEuler = glm::vec3(0.0f);
-
-    bool lockScaleRatio = false;
-    bool dirty = true;
 
 public:
     TransformComponent() = default;
@@ -123,7 +110,21 @@ public:
 
     json Serialize() const noexcept;
     void Deserialize(const json& j) noexcept;
-   
+
+private:
+    glm::quat localRotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+    glm::quat worldRotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+
+    glm::vec3 localPosition = glm::vec3(0.0f);
+    glm::vec3 worldPosition = glm::vec3(0.0f);
+    glm::vec3 localScale = glm::vec3(1.0f);
+    glm::vec3 worldScale = glm::vec3(1.0f);
+    glm::vec3 scaleRatio = glm::vec3(1.0f);
+    glm::vec3 localEuler = glm::vec3(0.0f);
+    glm::vec3 worldEuler = glm::vec3(0.0f);
+
+    bool lockScaleRatio = false;
+    bool dirty = true;
 };
 
 

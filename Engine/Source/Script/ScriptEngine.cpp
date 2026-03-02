@@ -12,7 +12,7 @@ void ScriptEngine::Init()
 
     LuaBindings::RegisterMath(m_State);
     LuaBindings::RegisterCoreTypes(m_State);
-
+    LuaBindings::RegisterComponents(m_State);
 
     m_State["KeyCode"] = m_State.create_table();
     m_State["MouseCode"] = m_State.create_table();
