@@ -11,6 +11,7 @@ class AssetImporterRegistry;
 class Dialogs {
 public:
 	static std::string OpenSceneDialog();
+	static std::string SaveSceneDialog();
 };
 
 

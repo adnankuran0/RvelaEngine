@@ -4,23 +4,33 @@ Player.velocity = Vec3.new(0,0,0)
 Player.velocityY = 0
 
 Player.isGrounded = true
-Player.jumpStrength = 5.0
+Player.jumpStrength = 4.0
 Player.gravity = -9.8
 
-Player.acceleration = 20.0
-Player.deceleration = 25.0
+Player.acceleration = 10.0
+Player.deceleration = 15.0
 Player.maxWalkSpeed = 3.0
 Player.maxSprintSpeed = 5.0
 
 function Player:OnCreate()
-    self.cam = self.scene:FindEntityByName("CameraHolder")
-    if not self.cam then
-        print("Warning: CameraHolder not found on start")
+    self.camHolder = self.scene:FindEntityByName("CameraHolder")
+    self.cam = self.scene:FindEntityByName("Camera")
+    if not self.camHolder or not self.cam then
+        print("Camera not found")
+    end
+
+    self.headBobTime = 0.0
+
+    if self.camHolder then
+        local camTransform = self.camHolder:GetComponent("TransformComponent")
+        if camTransform then
+            self.camStartY = camTransform:GetPosition().y
+        end
     end
 end
 
 function Player:OnUpdate(dt)
-    local transform = self.entity:GetComponent("Transform")
+    local transform = self.entity:GetComponent("TransformComponent")
 
     local targetSpeed = self.maxWalkSpeed
     if Input.IsKeyPressed(KeyCode.LeftShift) then
@@ -31,8 +41,7 @@ function Player:OnUpdate(dt)
     local camRight   = Vec3.new(1,0,0)
 
     if self.cam then
-        local camTransform = self.cam:GetComponent("Transform")
-
+        local camTransform = self.camHolder:GetComponent("TransformComponent")
         camForward = camTransform:GetForward()
         camForward.y = 0
         camForward = camForward:Normalized()
@@ -55,10 +64,27 @@ function Player:OnUpdate(dt)
         inputDir = inputDir - camRight
     end
 
+    if self.cam then
+        local cameraComp = self.cam:GetComponent("CameraComponent")
+        if cameraComp then
+            local baseFOV = 75.0
+            local sprintFOV = 90.0
+            local fovSpeed = 10.0
+
+            local targetFOV = baseFOV
+            if Input.IsKeyPressed(KeyCode.LeftShift) then
+                targetFOV = sprintFOV
+            end
+
+            local currentFOV = cameraComp:GetFOV()
+            local newFOV = currentFOV + (targetFOV - currentFOV) * math.min(1, fovSpeed * dt)
+            cameraComp:SetFOV(newFOV)
+        end
+    end
+
     if inputDir:LengthSq() > 0 then
         inputDir = inputDir:Normalized()
         local targetVelocity = inputDir * targetSpeed
-
         local diff = targetVelocity - Vec3.new(self.velocity.x,0,self.velocity.z)
         local accel = diff * math.min(1, self.acceleration * dt)
 
@@ -67,7 +93,6 @@ function Player:OnUpdate(dt)
     else
         local horizontal = Vec3.new(self.velocity.x,0,self.velocity.z)
         local decay = math.min(1, self.deceleration * dt)
-
         horizontal = horizontal * (1 - decay)
 
         self.velocity.x = horizontal.x
@@ -93,6 +118,31 @@ function Player:OnUpdate(dt)
         self.velocity.y = 0
         self.isGrounded = true
     end
+
+    if self.cam then
+    local camTransform = self.camHolder:GetComponent("TransformComponent")
+    if camTransform then
+        local isMoving = inputDir:LengthSq() > 0
+        local bobFrequency = 8.0
+        local bobAmplitude = 0.05
+
+        if Input.IsKeyPressed(KeyCode.LeftShift) then
+            bobFrequency = 14.0
+            bobAmplitude = 0.04
+        end
+
+        if isMoving then
+            self.headBobTime = self.headBobTime + dt * bobFrequency
+        else
+            self.headBobTime = self.headBobTime * 0.8
+        end
+
+        local headBobOffset = math.sin(self.headBobTime) * bobAmplitude
+        local pos = camTransform:GetPosition()
+        pos.y = self.camStartY + headBobOffset
+        camTransform:SetPosition(pos)
+    end
+end
 end
 
 return Player

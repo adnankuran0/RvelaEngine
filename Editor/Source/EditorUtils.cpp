@@ -47,7 +47,7 @@ bool EditorUtils::SaveSceneAs(Engine& engine)
         LOG_WARN("Scene can only be saved in EDIT mode.");
         return false;
     }
-    std::string file = Dialogs::OpenSceneDialog();
+    std::string file = Dialogs::SaveSceneDialog();
     if (!file.empty())
     {
         std::ofstream ofs(file);

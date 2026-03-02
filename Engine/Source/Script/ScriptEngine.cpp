@@ -2,7 +2,7 @@
 #include "ScriptEngine.h"
 #include "Scene/Entity.h"
 #include "Input/Input.h"
-#include "MathBindings.h"
+#include "ScriptBindings.h"
 
 using namespace rv;
 
@@ -11,29 +11,8 @@ void ScriptEngine::Init()
     m_State.open_libraries(sol::lib::base, sol::lib::math, sol::lib::table, sol::lib::string, sol::lib::os);
 
     LuaBindings::RegisterMath(m_State);
+    LuaBindings::RegisterCoreTypes(m_State);
 
-    m_State.new_usertype<TransformComponent>("TransformComponent",
-        "GetPosition", &TransformComponent::GetPosition,
-        "SetPosition", &TransformComponent::SetPosition,
-        "Translate", &TransformComponent::Translate,
-        "GetRotation", &TransformComponent::GetRotation,
-        "SetRotation", &TransformComponent::SetRotation,
-        "GetEulerRotation", &TransformComponent::GetEulerRotation,
-        "SetEulerRotation", &TransformComponent::SetEulerRotation,
-        "GetScale", &TransformComponent::GetScale,
-        "SetScale", &TransformComponent::SetScale,
-        "GetForward", &TransformComponent::GetForward
-    );
-
-    m_State.new_usertype<Entity>("Entity",
-        "GetComponent", [](Entity& e) -> TransformComponent& {
-            return e.GetComponent<TransformComponent>();
-        },
-        "HasComponent", [](Entity& e) -> bool {
-            return e.HasComponent<TransformComponent>();
-        },
-        "GetName", &Entity::GetName
-    );
 
     m_State["KeyCode"] = m_State.create_table();
     m_State["MouseCode"] = m_State.create_table();

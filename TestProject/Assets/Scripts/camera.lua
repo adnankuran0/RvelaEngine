@@ -29,7 +29,7 @@ function Camera:OnUpdate(dt)
         return
     end
 
-    local transform = self.entity:GetComponent("Transform")
+    local transform = self.entity:GetComponent("TransformComponent")
 
     local mouse = Input.GetMousePosition()
     local mouseX = mouse.x

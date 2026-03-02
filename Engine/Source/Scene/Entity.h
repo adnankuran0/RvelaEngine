@@ -54,6 +54,7 @@ public:
 	operator uint32_t() const { return (uint32_t)m_EntityHandle; }
 
 	const std::string& GetName() { return GetComponent<TagComponent>().tag; }
+	void SetName(const std::string& name) { GetComponent<TagComponent>().tag = name; }
 	const entt::entity GetHandle() { return m_EntityHandle; }
 
 

@@ -1,21 +1,14 @@
-local Player = {}
+local Test = {}
 
-local time = 0.0
-
-function Player:OnCreate()
-    print("Player created")
+function Test:OnCreate()
+    local name = self.entity:GetName()
+    print("Entity name: ", name)
+    if  self.entity:HasComponent("TransformComponent") then
+        local transform = self.entity:GetComponent("TransformComponent")
+        local pos = transform:GetPosition()
+        pos.x = pos.x + 5
+        transform:SetPosition(pos)
+    end
 end
 
-function Player:OnUpdate(dt)
-    time = time + dt
-    local transform = self.entity:GetComponent("TransformComponent")
-
-    local pos = transform:GetPosition()
-    print(pos.y)
-    
-    pos.y = math.sin(time * 2.0) * 2.0  
-
-    transform:SetPosition(pos)
-end
-
-return Player
+return Test

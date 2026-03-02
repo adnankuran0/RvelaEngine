@@ -86,13 +86,12 @@ void ScriptSystem::BindLuaScript(ScriptComponent& sc, entt::entity& e)
 
     sc.luaInstance = result;
 
-    sc.luaInstance["scene"] = &m_Scene;
     sc.luaInstance["entity"] = Entity(e, &m_Scene);
+    sc.luaInstance["scene"] = &m_Scene;
 
     sc.OnCreate = sc.luaInstance["OnCreate"];
     sc.OnUpdate = sc.luaInstance["OnUpdate"];
     sc.OnDestroy = sc.luaInstance["OnDestroy"];
 
-    if (sc.OnCreate.valid())
-        sc.OnCreate(sc.luaInstance);
+    
 }

@@ -7,6 +7,8 @@ using namespace rv;
 
 void SceneSerializer::SaveScene(Scene& scene, const std::string& path)
 {
+    scene.SetPath(path);
+
     json sceneJson;
     sceneJson["Environment"] = scene.GetEnvironment().Serialize();
     sceneJson["Entities"] = json::array();

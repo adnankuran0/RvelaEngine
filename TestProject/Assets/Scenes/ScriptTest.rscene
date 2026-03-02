@@ -1,0 +1,106 @@
+{
+    "Entities": [
+        {
+            "DirectionalLight": {
+                "castShadows": true,
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "intensity": 1.0
+            },
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": "DirectionalLight"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    4.4461669921875,
+                    0.0
+                ],
+                "rotation": [
+                    -60.000003814697266,
+                    -90.0,
+                    -13.240519523620605
+                ],
+                "scale": [
+                    0.9999998807907104,
+                    1.0,
+                    0.9999998807907104
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 3
+        },
+        {
+            "Material": {
+                "material": "ee3dde12-6263-4f11-bb1d-812b3e196ab7"
+            },
+            "Mesh": {
+                "mesh": "36468d32-bba5-4eb4-82db-0d4da5cd6c65"
+            },
+            "ParentUUID": 0,
+            "ScriptComponent": {
+                "luaFile": "C:\\RvelaEngine\\TestProject\\Assets\\Scripts\\Test.lua"
+            },
+            "Tag": {
+                "tag": "Cube"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.7132339477539063,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 2
+        }
+    ],
+    "Environment": {
+        "Bloom": true,
+        "Bloom_Intensity": 1.0,
+        "Bloom_Knee": 0.5,
+        "Bloom_Treshold": 1.0,
+        "HDRPath": "Assets\\Textures\\skybox\\environment.hdr",
+        "Lighting_AmbientColor": [
+            1.0,
+            1.0,
+            1.0
+        ],
+        "Lighting_AmbientIntensity": 0.20000000298023224,
+        "Lighting_IBL": true,
+        "Lighting_IBLIntensity": 0.30000001192092896,
+        "PostProcess_ChromaticStrength": 0.009999999776482582,
+        "PostProcess_Exposure": 1.0,
+        "PostProcess_VignetteIntensity": 0.25,
+        "PostProcess_VignetteSmoothness": 0.5,
+        "SSAO": true,
+        "SSAO_Bias": 0.02500000037252903,
+        "SSAO_Intensity": 1.0,
+        "SSAO_Radius": 1.0,
+        "SSR": true
+    }
+}
