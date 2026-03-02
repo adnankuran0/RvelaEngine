@@ -95,6 +95,7 @@ public:
     [[nodiscard]] inline const entt::entity& GetRootEntity() const noexcept { return m_RootEntity; }
 
     entt::entity GetEntityByUUID(EntityUUID& uuid) { return m_EntityMap.at(uuid); }
+    Entity GetEntityByName(const std::string& name);
 
     void SetSelectedEntity(entt::entity selectedEntity) { this->selectedEntity = selectedEntity; }
     entt::entity GetSelectedEntity() { return selectedEntity; }

@@ -2,125 +2,17 @@
 #include "ScriptSystem.h"
 #include "Scene/Components/ScriptComponent.h"
 #include "Scene/Entity.h"
-#include "Input/Input.h"
 
 using namespace rv;
 
 ScriptSystem::ScriptSystem(Scene& scene) : m_Scene(scene)
 {
-    m_State.open_libraries(sol::lib::base, sol::lib::math, sol::lib::table, sol::lib::string, sol::lib::os);
-
-    m_State.new_usertype<glm::vec3>("vec3",
-        sol::constructors<glm::vec3(), glm::vec3(float, float, float)>(),
-        "x", &glm::vec3::x,
-        "y", &glm::vec3::y,
-        "z", &glm::vec3::z,
-        "Normalized", [](const glm::vec3& v) { return glm::normalize(v); },
-        "Cross", [](const glm::vec3& a, const glm::vec3& b) { return glm::cross(a, b); },
-        "__add", [](const glm::vec3& a, const glm::vec3& b) { return a + b; },
-        "__sub", [](const glm::vec3& a, const glm::vec3& b) { return a - b; },
-        "__mul", [](const glm::vec3& a, float b) { return a * b; },
-        "__div", [](const glm::vec3& a, float b) { return a / b; }
-    );
-
-    m_State.new_usertype<TransformComponent>("TransformComponent",
-        "GetPosition", &TransformComponent::GetPosition,
-        "SetPosition", &TransformComponent::SetPosition,
-        "Translate", &TransformComponent::Translate,
-        "GetRotation", &TransformComponent::GetRotation,
-        "SetRotation", &TransformComponent::SetRotation,
-        "GetEulerRotation", &TransformComponent::GetEulerRotation,
-        "SetEulerRotation", &TransformComponent::SetEulerRotation,
-        "GetScale", &TransformComponent::GetScale,
-        "SetScale", &TransformComponent::SetScale,
-        "GetForward", &TransformComponent::GetForward
-    );
-
-    m_State.new_usertype<Entity>("Entity",
-        "GetComponent", [](Entity& e) -> TransformComponent& {
-            return e.GetComponent<TransformComponent>();
-        },
-        "HasComponent", [](Entity& e) -> bool {
-            return e.HasComponent<TransformComponent>();
-        },
-        "GetName", &Entity::GetName
-    );
-
-    m_State["KeyCode"] = m_State.create_table();
-    m_State["MouseCode"] = m_State.create_table();
-
-    #define BIND_KEY(k) m_State["KeyCode"][#k] = static_cast<int>(KeyCode::k);
-    #define BIND_MOUSE(m) m_State["MouseCode"][#m] = static_cast<int>(MouseCode::m);
-
-    BIND_KEY(W)
-    BIND_KEY(A)
-    BIND_KEY(S)
-    BIND_KEY(D)
-    BIND_KEY(Space)
-    BIND_KEY(Escape)
-    BIND_KEY(LeftShift)
-
-    BIND_MOUSE(ButtonLeft)
-    BIND_MOUSE(ButtonRight)
-
-    #undef BIND_KEY
-    #undef BIND_MOUSE
-
-    m_State["MouseMode"] = m_State.create_table();
-
-    m_State["MouseMode"]["VISIBLE"] = static_cast<int>(Input::MouseMode::VISIBLE);
-    m_State["MouseMode"]["HIDDEN"] = static_cast<int>(Input::MouseMode::HIDDEN);
-    m_State["MouseMode"]["CAPTURED"] = static_cast<int>(Input::MouseMode::CAPTURED);
-
-
-    m_State["Input"] = m_State.create_table();
-
-    m_State["Input"]["IsKeyPressed"] = [](int key)
-        {
-            return Input::IsKeyPressed(static_cast<KeyCode>(key));
-        };
-
-    m_State["Input"]["IsKeyJustPressed"] = [](int key)
-        {
-            return Input::IsKeyJustPressed(static_cast<KeyCode>(key));
-        };
-
-    m_State["Input"]["IsMouseButtonPressed"] = [](int button)
-        {
-            return Input::IsMouseButtonPressed(static_cast<MouseCode>(button));
-        };
-
-    m_State["Input"]["GetMousePosition"] = []()
-        {
-            glm::vec2 pos = Input::GetMousePosition();
-            return glm::vec3(pos.x, pos.y, 0.0f);
-        };
-
-    m_State["Input"]["SetMouseMode"] = [](int mode)
-        {
-            Input::SetMouseMode(static_cast<Input::MouseMode>(mode));
-        };
-
-    m_State["Scene"] = m_State.create_table();
-
-    m_State["Scene"]["FindEntityByName"] = [this](const std::string& name) -> Entity
-        {
-            auto& registry = m_Scene.GetRegistry();
-            auto view = registry.view<TagComponent>();
-
-            for (auto entityHandle : view) {
-                Entity e(entityHandle, &m_Scene);
-                if (e.GetName() == name)
-                    return e;
-            }
-
-            return Entity{};
-        };
+    m_ScriptEngine.Init();
 }
 
-void ScriptSystem::OnStart(entt::registry& registry)
+void ScriptSystem::OnStart()
 {
-    auto view = registry.view<ScriptComponent>();
+    auto view = m_Scene.GetRegistry().view<ScriptComponent>();
     for (auto entity : view)
     {
         auto& sc = view.get<ScriptComponent>(entity);
@@ -137,9 +29,9 @@ void ScriptSystem::OnStart(entt::registry& registry)
     }
 }
 
-void ScriptSystem::OnUpdate(entt::registry& registry, float dt)
+void ScriptSystem::OnUpdate(float dt)
 {
-    auto view = registry.view<ScriptComponent>();
+    auto view = m_Scene.GetRegistry().view<ScriptComponent>();
 
     for (auto entity : view)
     {
@@ -162,9 +54,9 @@ void ScriptSystem::OnUpdate(entt::registry& registry, float dt)
 
 }
 
-void ScriptSystem::OnStop(entt::registry& registry)
+void ScriptSystem::OnStop()
 {
-    auto view = registry.view<ScriptComponent>();
+    auto view = m_Scene.GetRegistry().view<ScriptComponent>();
     for (auto entity : view)
     {
         auto& sc = view.get<ScriptComponent>(entity);
@@ -183,9 +75,7 @@ void ScriptSystem::OnStop(entt::registry& registry)
 
 void ScriptSystem::BindLuaScript(ScriptComponent& sc, entt::entity& e)
 {
-    Input::SetMouseMode(Input::MouseMode::CAPTURED);
-
-    sc.luaState = &m_State;
+    sc.luaState = &m_ScriptEngine.GetState();
 
     sol::load_result script = sc.luaState->load_file(sc.luaFile);
     if (!script.valid()) { LOG_ERROR(script); return; }
@@ -196,6 +86,7 @@ void ScriptSystem::BindLuaScript(ScriptComponent& sc, entt::entity& e)
 
     sc.luaInstance = result;
 
+    sc.luaInstance["scene"] = &m_Scene;
     sc.luaInstance["entity"] = Entity(e, &m_Scene);
 
     sc.OnCreate = sc.luaInstance["OnCreate"];

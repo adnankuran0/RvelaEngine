@@ -40,17 +40,17 @@ void Scene::SetState(SceneState newState)
 
 void Scene::OnStart()
 {
-    m_ScriptSystem.OnStart(m_Registry);
+    m_ScriptSystem.OnStart();
 }
 
 void Scene::OnUpdate(float dt)
 {
-    m_ScriptSystem.OnUpdate(m_Registry, dt);
+    m_ScriptSystem.OnUpdate(dt);
 }
 
 void Scene::OnStop()
 {
-    m_ScriptSystem.OnStop(m_Registry);
+    m_ScriptSystem.OnStop();
 }
 
 Entity Scene::CreateEntityRaw()
@@ -112,6 +112,19 @@ void Scene::Update()
 }
 
 entt::registry& Scene::GetRegistry() { return m_Registry; }
+
+Entity rv::Scene::GetEntityByName(const std::string& name)
+{
+    auto view = m_Registry.view<TagComponent>();
+
+    for (auto entityHandle : view) {
+        Entity e(entityHandle, this);
+        if (e.GetName() == name)
+            return e;
+    }
+
+    return Entity{};
+}
 
 
 

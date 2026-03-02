@@ -1,6 +1,7 @@
 #pragma once
 #include "sol/sol.hpp"
 #include "entt/entt.h"
+#include "ScriptEngine.h"
 
 namespace rv {
 // forward declaration
@@ -12,16 +13,14 @@ class ScriptSystem
 public:
 	ScriptSystem(Scene& scene);
 
-	void OnStart(entt::registry& registry);
-	void OnUpdate(entt::registry& registry,float dt);
-	void OnStop(entt::registry& registry);
+	void OnStart();
+	void OnUpdate(float dt);
+	void OnStop();
 
-
-	sol::state& GetState() { return m_State; }
 	void BindLuaScript(ScriptComponent& sc, entt::entity& e);
 
 private:
-	sol::state m_State; // TODO: make state per scene
+	ScriptEngine m_ScriptEngine;
 	Scene& m_Scene;
 };
 
