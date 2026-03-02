@@ -22,20 +22,23 @@ project "RvelaEditor"
       "../Vendor/ImGui",
       "../Vendor/nlohmann",
       "../Vendor/robin_map/include",
-      "../Vendor/lua/include"
+      "../Vendor/lua/include",
+      "../Vendor/Jolt/include"
    }
 
    libdirs
    {
       "../Vendor/GLFW/lib",
-      "../Vendor/lua/lib"
+      "../Vendor/lua/lib",
+      "../Vendor/Jolt/lib"
    }
 
    links
    {
       "RvelaEngine",
         "glfw3",
-        "lua54"
+        "lua54",
+         "Jolt"
    }
 
    targetdir ("../Binaries/" .. OutputDir .. "/%{prj.name}")

@@ -13,6 +13,8 @@ struct ScriptComponent {
 
     sol::function OnCreate;
     sol::function OnUpdate;
+    sol::function OnFixedUpdate;
+    sol::function OnLateUpdate;
     sol::function OnDestroy;
 
     json Serialize() const;

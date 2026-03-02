@@ -15,9 +15,11 @@ public:
 
 	void OnStart();
 	void OnUpdate(float dt);
+	void OnFixedUpdate(float dt);
+	void OnLateUpdate(float dt);
 	void OnStop();
 
-	void BindLuaScript(ScriptComponent& sc, entt::entity& e);
+	void BindLuaScript(ScriptComponent& sc, entt::entity e);
 
 private:
 	ScriptEngine m_ScriptEngine;

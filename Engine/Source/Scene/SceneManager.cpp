@@ -28,6 +28,8 @@ void SceneManager::LoadScene(const std::string& path)
 
 void SceneManager::Update()
 {
+    GetActiveScene().Update();
+
     if (m_HasPendingScene)
     {
         std::unique_ptr<Scene> scenePtr = CreateScene("NewScene");
@@ -35,4 +37,15 @@ void SceneManager::Update()
         SetActiveScene(std::move(scenePtr));
         m_HasPendingScene = false;
     }
+}
+
+void SceneManager::FixedUpdate()
+{
+    GetActiveScene().FixedUpdate();
+}
+
+
+void SceneManager::LateUpdate()
+{
+    GetActiveScene().LateUpdate();
 }

@@ -35,6 +35,8 @@ public:
 
     void OnStart();
     void OnUpdate(float dt);
+    void OnFixedUpdate(float dt);
+    void OnLateUpdate(float dt);
     void OnStop();
 
     bool isLoading = false;
@@ -86,6 +88,8 @@ public:
     }
 
     void Update();
+    void FixedUpdate();
+    void LateUpdate();
 
     Entity Instantiate(const AssetUUID& prefabUUID);
 

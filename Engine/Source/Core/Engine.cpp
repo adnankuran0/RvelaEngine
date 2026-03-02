@@ -52,7 +52,6 @@ void Engine::PopLayer(Layer* layer)
 
 void Engine::Update()
 {
-	GetActiveScene().Update();
 	m_SceneManager.Update();
 
 	for (Layer* layer : m_LayerStack)
@@ -64,15 +63,16 @@ void Engine::Update()
 
 void Engine::FixedUpdate()
 {
-	static double lastTime = glfwGetTime();
-	double currentTime = glfwGetTime();
-	lastTime = currentTime;
+	m_SceneManager.FixedUpdate();
+
 	for (Layer* layer : m_LayerStack)
 		layer->OnFixedUpdate();
 }
 
 void Engine::LateUpdate()
 {
+	m_SceneManager.LateUpdate();
+
 	for (Layer* layer : m_LayerStack)
 		layer->OnLateUpdate();
 }

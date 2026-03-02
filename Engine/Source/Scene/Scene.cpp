@@ -48,6 +48,16 @@ void Scene::OnUpdate(float dt)
     m_ScriptSystem.OnUpdate(dt);
 }
 
+void rv::Scene::OnFixedUpdate(float dt)
+{
+    m_ScriptSystem.OnFixedUpdate(dt);
+}
+
+void rv::Scene::OnLateUpdate(float dt)
+{
+    m_ScriptSystem.OnLateUpdate(dt);
+}
+
 void Scene::OnStop()
 {
     m_ScriptSystem.OnStop();
@@ -113,6 +123,16 @@ void Scene::Update()
         OnUpdate(Time::GetDeltaTime());
     m_TransformSystem.Update();
     m_CameraSystem.Update();
+}
+void Scene::FixedUpdate() 
+{                
+    if (m_State == SceneState::PLAY)
+        OnFixedUpdate(Time::GetFixedDeltaTime());
+}
+void Scene::LateUpdate() 
+{              
+    if (m_State == SceneState::PLAY)
+        OnLateUpdate(Time::GetDeltaTime());
 }
 
 entt::registry& Scene::GetRegistry() { return m_Registry; }

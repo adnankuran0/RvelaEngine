@@ -26,7 +26,8 @@ project "RvelaEngine"
       "../Vendor/uuid_v4",
       "../Vendor/robin_map/include",
       "../Vendor/sol",
-      "../Vendor/lua/include"
+      "../Vendor/lua/include",
+      "../Vendor/Jolt/include"
       
    }
 
@@ -34,7 +35,8 @@ project "RvelaEngine"
    {
       "../Vendor/GLFW/lib",
       "../Vendor/Assimp/lib",
-      "../Vendor/lua/lib"
+      "../Vendor/lua/lib",
+      "../Vendor/Jolt/lib"
 
    }
 
@@ -43,7 +45,8 @@ project "RvelaEngine"
       "glfw3",
       "opengl32",
       "assimp-vc143-mt",
-      "lua54"
+      "lua54",
+      "Jolt"
    }
 
    targetdir ("../Binaries/" .. OutputDir .. "/%{prj.name}")

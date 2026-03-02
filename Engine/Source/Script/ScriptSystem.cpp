@@ -40,14 +40,58 @@ void ScriptSystem::OnUpdate(float dt)
 
         if (sc.luaInstance.valid())
         {
-            sol::protected_function onUpdate = sc.luaInstance["OnUpdate"];
-            if (onUpdate.valid())
+            if (sc.OnUpdate.valid())
             {
-                sol::protected_function_result result = onUpdate(sc.luaInstance, dt);
+                sol::protected_function_result result = sc.OnUpdate(sc.luaInstance, dt);
                 if (!result.valid())
                 {
                     sol::error err = result;
                     LOG_ERROR("Lua OnUpdate error: {}", err.what());
+                }
+            }
+        }
+    }
+}
+void ScriptSystem::OnFixedUpdate(float dt)
+{
+    auto view = m_Scene.GetRegistry().view<ScriptComponent>();
+
+    for (auto entity : view)
+    {
+        auto& sc = view.get<ScriptComponent>(entity);
+
+        if (sc.luaInstance.valid())
+        {
+            if (sc.OnFixedUpdate.valid())
+            {
+                sol::protected_function_result result = sc.OnFixedUpdate(sc.luaInstance, dt);
+                if (!result.valid())
+                {
+                    sol::error err = result;
+                    LOG_ERROR("Lua OnFixedUpdate error: {}", err.what());
+                }
+            }
+        }
+    }
+
+}
+void ScriptSystem::OnLateUpdate(float dt)
+{
+    auto view = m_Scene.GetRegistry().view<ScriptComponent>();
+
+    for (auto entity : view)
+    {
+        auto& sc = view.get<ScriptComponent>(entity);
+
+        if (sc.luaInstance.valid())
+        {
+            if (sc.OnLateUpdate.valid())
+            {
+                sol::protected_function_result result = sc.OnLateUpdate(sc.luaInstance, dt);
+                if (!result.valid())
+                {
+                    sol::error err = result;
+                    LOG_ERROR("Lua OnLateUpdate error: {}", err.what());
                 }
             }
         }
@@ -71,7 +115,7 @@ void ScriptSystem::OnStop()
                 LOG_ERROR("Lua OnDestroy error: {}", err.what());
             }
         }
-    }
+    } 
 
     //TODO: Runtime material instances
     auto mcView = m_Scene.GetRegistry().view<MaterialComponent>();
@@ -84,7 +128,7 @@ void ScriptSystem::OnStop()
 
 }
 
-void ScriptSystem::BindLuaScript(ScriptComponent& sc, entt::entity& e)
+void ScriptSystem::BindLuaScript(ScriptComponent& sc, entt::entity e)
 {
     sc.luaState = &m_ScriptEngine.GetState();
 
@@ -102,6 +146,8 @@ void ScriptSystem::BindLuaScript(ScriptComponent& sc, entt::entity& e)
 
     sc.OnCreate = sc.luaInstance["OnCreate"];
     sc.OnUpdate = sc.luaInstance["OnUpdate"];
+    sc.OnFixedUpdate = sc.luaInstance["OnFixedUpdate"];
+    sc.OnLateUpdate = sc.luaInstance["OnLateUpdate"];
     sc.OnDestroy = sc.luaInstance["OnDestroy"];
 
     

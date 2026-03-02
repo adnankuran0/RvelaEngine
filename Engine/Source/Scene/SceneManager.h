@@ -29,6 +29,8 @@ public:
     void LoadScene(const std::string& path);
 
     void Update();
+    void FixedUpdate();
+    void LateUpdate();
 private:
     std::string m_PendingScenePath = "";
     bool m_HasPendingScene = false; 
