@@ -2,3 +2,5 @@
 #include "MathBindings.h"
 #include "CoreBindings.h"
 #include "ComponentBindings.h"
+#include "InputBindings.h"
+#include "SceneBindings.h"
