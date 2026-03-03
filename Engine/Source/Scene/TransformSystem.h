@@ -11,8 +11,7 @@ public:
     TransformSystem(Scene& scene) : m_Scene(scene) {}
     void Update();
 private:
-    void UpdateNodeRecursive(entt::entity entity,
-        const glm::mat4& parentWorld);
+    void UpdateNodeRecursive(entt::entity e, const glm::mat4& parentWorldMatrix, bool parentDirty);
     Scene& m_Scene;
 };
 

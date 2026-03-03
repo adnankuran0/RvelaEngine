@@ -421,7 +421,6 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
         AddComponent<PrefabComponent>(rootEntity, prefabUUID);
     }
 
-    m_TransformSystem.Update(); // TODO: is this necessary?
         
     return rootEntity;
 }

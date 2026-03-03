@@ -89,13 +89,13 @@ void Engine::Run()
 		Time::Update();
 
 		
-
 		Update();
 		while (Time::ShouldRunFixedUpdate())
 		{
 			FixedUpdate();
 			Time::ConsumeFixedDeltaTime();
 		}
+		
 		LateUpdate();
 
 

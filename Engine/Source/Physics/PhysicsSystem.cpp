@@ -104,39 +104,41 @@ void PhysicsSystem::InitBodies()
 	}
 }
 
-void rv::PhysicsSystem::SyncTransforms()
+void PhysicsSystem::SyncTransforms()
 {
 	JPH::BodyInterface& bodyInterface = m_PhysicsSystem.GetBodyInterface();
 	auto view = m_Scene.GetRegistry().view<RigidbodyComponent, TransformComponent, SceneTreeComponent>();
 
-	for (auto& e : view)
+	for (auto e : view)
 	{
 		auto& rb = view.get<RigidbodyComponent>(e);
 		if (rb.bodyType == Physics::BodyType::STATIC) continue;
 
+		auto& transform = view.get<TransformComponent>(e);
+		auto& node = view.get<SceneTreeComponent>(e);
+
 		glm::vec3 worldPos = math::FromJoltRVec3(bodyInterface.GetPosition(rb.RuntimeBodyID));
 		glm::quat worldRot = math::FromJoltQuat(bodyInterface.GetRotation(rb.RuntimeBodyID));
 
-		TransformComponent& transform = view.get<TransformComponent>(e);
-		SceneTreeComponent& node = view.get<SceneTreeComponent>(e);
-
-		if (node.parent != entt::null && node.parent != m_Scene.GetRootEntity())
-		{
-			auto& parentTransform = m_Scene.GetComponent<TransformComponent>(node.parent);
-			glm::mat4 invParentWorld = glm::inverse(parentTransform.GetWorldMatrix());
-
-			glm::vec4 localPos = invParentWorld * glm::vec4(worldPos, 1.0f);
-			glm::quat localRot = glm::inverse(parentTransform.GetWorldRotation()) * worldRot;
-
-			transform.SetPosition(glm::vec3(localPos));
-			transform.SetRotation(localRot);
-		}
-		else
+		if (node.parent == entt::null || node.parent == m_Scene.GetRootEntity())
 		{
 			transform.SetPosition(worldPos);
 			transform.SetRotation(worldRot);
 		}
+		else
+		{
+			auto& parentTransform = m_Scene.GetComponent<TransformComponent>(node.parent);
+			glm::mat4 invParentWorld = glm::inverse(parentTransform.GetWorldMatrix());
 
-		transform.SetWorldTransform(worldPos, worldRot, transform.GetWorldScale());
+			glm::vec3 localPos = glm::vec3(invParentWorld * glm::vec4(worldPos, 1.0f));
+			glm::quat localRot = glm::inverse(parentTransform.GetWorldRotation()) * worldRot;
+
+			transform.SetPosition(localPos);
+			transform.SetRotation(localRot);
+		}
+
+		glm::mat4 newWorld = glm::translate(glm::mat4(1.0f), worldPos) * glm::mat4_cast(worldRot) * glm::scale(glm::mat4(1.0f), transform.GetScale());
+
+		transform.SetWorldMatrix(newWorld);
 	}
 }
