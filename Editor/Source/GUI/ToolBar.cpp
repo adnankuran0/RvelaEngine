@@ -43,8 +43,9 @@ void ToolBar::Draw(Engine& engine)
 
         if (ImGui::Button("Play", button_size)) 
         {
-            if(scene.GetState() == SceneState::EDIT && EditorUtils::SaveScene(engine))
+            if((scene.GetState() == SceneState::EDIT && EditorUtils::SaveScene(engine)) || scene.GetState() == SceneState::PAUSE)
                 scene.SetState(SceneState::PLAY);
+
         }
         ImGui::SameLine();
 

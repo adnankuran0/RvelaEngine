@@ -22,6 +22,7 @@ public:
 
 private:
 	void InitBodies();
+	void SyncTransforms();
 
 private:
 	const unsigned int cMaxBodies = 1024;

@@ -9,7 +9,6 @@ using namespace rv;
 void TransformSystem::Update() 
 {
     auto view = m_Scene.GetRegistry().view<SceneTreeComponent, TransformComponent>();
-
     UpdateNodeRecursive(m_Scene.GetRootEntity(), glm::mat4(1.0f));
     //if(GetComponent<TransformComponent>(root).IsDirty()) // child may be dirty
 }

@@ -1,7 +1,9 @@
 ﻿#pragma once
 #include <glm/glm.hpp>
 #include "assimp/matrix4x4.h"
-
+#include "Jolt/Jolt.h"
+#include "Jolt/Math/MathTypes.h"
+#include <glm/gtc/quaternion.hpp>
 namespace rv::math {
 
 static inline JPH::Vec3 ToJoltVec3(const glm::vec3& v) 

@@ -38,6 +38,7 @@ PhysicsSystem::PhysicsSystem(Scene& scene) :
 void PhysicsSystem::Step(float dt)
 {
 	m_PhysicsSystem.Update(dt, cCollisionSteps, &m_TempAllocator, &m_JobSystem);
+	SyncTransforms();
 }
 
 void PhysicsSystem::OnStart()
@@ -100,5 +101,42 @@ void PhysicsSystem::InitBodies()
 		rb.RuntimeBodyID = bodyInterface.CreateAndAddBody(settings, JPH::EActivation::Activate);
 
 		
+	}
+}
+
+void rv::PhysicsSystem::SyncTransforms()
+{
+	JPH::BodyInterface& bodyInterface = m_PhysicsSystem.GetBodyInterface();
+	auto view = m_Scene.GetRegistry().view<RigidbodyComponent, TransformComponent, SceneTreeComponent>();
+
+	for (auto& e : view)
+	{
+		auto& rb = view.get<RigidbodyComponent>(e);
+		if (rb.bodyType == Physics::BodyType::STATIC) continue;
+
+		glm::vec3 worldPos = math::FromJoltRVec3(bodyInterface.GetPosition(rb.RuntimeBodyID));
+		glm::quat worldRot = math::FromJoltQuat(bodyInterface.GetRotation(rb.RuntimeBodyID));
+
+		TransformComponent& transform = view.get<TransformComponent>(e);
+		SceneTreeComponent& node = view.get<SceneTreeComponent>(e);
+
+		if (node.parent != entt::null && node.parent != m_Scene.GetRootEntity())
+		{
+			auto& parentTransform = m_Scene.GetComponent<TransformComponent>(node.parent);
+			glm::mat4 invParentWorld = glm::inverse(parentTransform.GetWorldMatrix());
+
+			glm::vec4 localPos = invParentWorld * glm::vec4(worldPos, 1.0f);
+			glm::quat localRot = glm::inverse(parentTransform.GetWorldRotation()) * worldRot;
+
+			transform.SetPosition(glm::vec3(localPos));
+			transform.SetRotation(localRot);
+		}
+		else
+		{
+			transform.SetPosition(worldPos);
+			transform.SetRotation(worldRot);
+		}
+
+		transform.SetWorldTransform(worldPos, worldRot, transform.GetWorldScale());
 	}
 }
