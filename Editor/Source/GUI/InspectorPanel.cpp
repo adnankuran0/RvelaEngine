@@ -262,6 +262,51 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             }
         }
 
+        if (registry.any_of<RigidbodyComponent>(selectedEntity))
+        {
+            bool open = ImGui::CollapsingHeader("Rigidbody");
+
+            if (ImGui::BeginPopupContextItem("RigidbodyComponentContext")) {
+                if (ImGui::MenuItem("Remove Component")) {
+                    registry.remove<RigidbodyComponent>(selectedEntity);
+                }
+
+                ImGui::EndPopup();
+            }
+
+            if (open)
+            {
+                auto& rb = registry.get<RigidbodyComponent>(selectedEntity);
+
+                const char* bodyTypes[] = { "Static", "Kinematic","Dynamic" };
+                int current = static_cast<int>(rb.bodyType);
+
+                if (ImGui::Combo("Body type", &current, bodyTypes, 3))
+                {
+                    rb.bodyType= static_cast<Physics::BodyType>(current);
+                }
+                ImGui::SliderFloat("Mass", &rb.mass, 0.001f, 1000.0f);
+                ImGui::SliderFloat("Friction", &rb.friction, 0.0f, 1.0f);
+                ImGui::SliderFloat("Restitution", &rb.restitution, 0.0f, 1.0f);
+                ImGui::SliderFloat("Linear Damping", &rb.linearDamping, 0.0f, 1.0f);
+                ImGui::SliderFloat("Angular Damping", &rb.angularDamping, 0.0f, 1.0f);
+
+                ImGui::Checkbox("Lock Rotation X", &rb.lockRotationX);
+                ImGui::Checkbox("Lock Rotation Y", &rb.lockRotationY);
+                ImGui::Checkbox("Lock Rotation Z", &rb.lockRotationZ);
+                ImGui::Checkbox("Lock Translation X", &rb.lockTranslationX);
+                ImGui::Checkbox("Lock Translation Y", &rb.lockTranslationY);
+                ImGui::Checkbox("Lock Translation Z", &rb.lockTranslationZ);
+               
+                ImGui::SliderFloat("Gravity factor", &rb.gravityFactor, 0.0f, 10.0f);
+
+                ImGui::Checkbox("Is sensor", &rb.isSensor);
+                ImGui::Checkbox("Use CCD", &rb.useCCD);
+
+
+            }
+        }
+
         if (registry.any_of<MaterialComponent>(selectedEntity)) {
             bool open = ImGui::CollapsingHeader("Material");
 
@@ -777,7 +822,14 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                     ImGui::CloseCurrentPopup();
                 }
             }
-
+            if (!registry.any_of<RigidbodyComponent>(selectedEntity))
+            {
+                if (ImGui::MenuItem("Rigidbody"))
+                {
+                    RigidbodyComponent& comp = registry.emplace<RigidbodyComponent>(selectedEntity);
+                    ImGui::CloseCurrentPopup();
+                }
+            }
             ImGui::EndPopup();
         }
 

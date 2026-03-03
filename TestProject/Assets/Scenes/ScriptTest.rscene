@@ -1,45 +1,6 @@
 {
     "Entities": [
         {
-            "DirectionalLight": {
-                "castShadows": true,
-                "color": [
-                    1.0,
-                    1.0,
-                    1.0
-                ],
-                "intensity": 1.0
-            },
-            "ParentUUID": 0,
-            "Tag": {
-                "tag": "DirectionalLight"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    0.0,
-                    4.4461669921875,
-                    0.0
-                ],
-                "rotation": [
-                    -60.000003814697266,
-                    -90.0,
-                    -13.240519523620605
-                ],
-                "scale": [
-                    0.9999998807907104,
-                    1.0,
-                    0.9999998807907104
-                ],
-                "scaleRatio": [
-                    1.0,
-                    1.0,
-                    1.0
-                ]
-            },
-            "UUID": 3
-        },
-        {
             "Material": {
                 "material": "5fbc428b-1fbc-4f88-a55d-8ee35575f903"
             },
@@ -77,6 +38,45 @@
                 ]
             },
             "UUID": 2
+        },
+        {
+            "DirectionalLight": {
+                "castShadows": true,
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "intensity": 1.0
+            },
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": "DirectionalLight"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    4.4461669921875,
+                    0.0
+                ],
+                "rotation": [
+                    -60.000003814697266,
+                    -90.0,
+                    -13.240519523620605
+                ],
+                "scale": [
+                    0.9999998807907104,
+                    1.0,
+                    0.9999998807907104
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 3
         }
     ],
     "Environment": {

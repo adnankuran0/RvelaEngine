@@ -13,6 +13,8 @@
 #include "Scene/Components/PrefabComponent.h"
 #include "Scene/Components/ScriptComponent.h"
 #include "Scene/Components/CameraComponent.h"
+#include "Scene/Components/RigidbodyComponent.h"
+#include "Scene/Components/ColliderComponents.h"
 
 namespace rv {
 
@@ -30,7 +32,11 @@ enum class ComponentType
 	SpotLight,
 	Prefab,
 	Script,
-	Camera
+	Camera,
+	Rigidbody,
+	BoxColliderComponent,
+	SphereColliderComponent,
+	CapsuleColliderComponent
 };
 
 }

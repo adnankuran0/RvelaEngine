@@ -21,6 +21,9 @@ public:
 	void Step(float dt);
 
 private:
+	void InitBodies();
+
+private:
 	const unsigned int cMaxBodies = 1024;
 	const unsigned int cNumBodyMutexes = 0;
 	const unsigned int cMaxBodyPairs = 1024;

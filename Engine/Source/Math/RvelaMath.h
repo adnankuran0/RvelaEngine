@@ -1,8 +1,39 @@
-#pragma once
+﻿#pragma once
 #include <glm/glm.hpp>
 #include "assimp/matrix4x4.h"
 
 namespace rv::math {
+
+static inline JPH::Vec3 ToJoltVec3(const glm::vec3& v) 
+{
+    return JPH::Vec3(v.x, v.y, v.z);
+}
+
+static inline JPH::RVec3 ToJoltRVec3(const glm::vec3& v) 
+{
+    return JPH::RVec3((JPH::Real)v.x, (JPH::Real)v.y, (JPH::Real)v.z);
+}
+
+static inline JPH::Quat ToJoltQuat(const glm::quat& q) 
+{
+    return JPH::Quat(q.x, q.y, q.z, q.w);
+}
+
+static inline glm::vec3 FromJoltVec3(const JPH::Vec3& v) 
+{
+    return glm::vec3(v.GetX(), v.GetY(), v.GetZ());
+}
+
+static inline glm::vec3 FromJoltRVec3(const JPH::RVec3& v) 
+{
+    return glm::vec3((float)v.GetX(), (float)v.GetY(), (float)v.GetZ());
+}
+
+static inline glm::quat FromJoltQuat(const JPH::Quat& q) 
+{
+    return glm::quat(q.GetW(), q.GetX(), q.GetY(), q.GetZ());
+}
+
 
 bool RayIntersectsTriangle(const glm::vec3& rayOrigin, const glm::vec3& rayDir,
     const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2,
