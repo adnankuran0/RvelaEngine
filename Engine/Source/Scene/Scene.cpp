@@ -15,7 +15,8 @@ Scene::Scene(const std::string& sceneName) : m_Registry() ,
 m_ScriptSystem(*this), 
 m_CameraSystem(*this), 
 m_LightSystem(*this),
-m_TransformSystem(*this)
+m_TransformSystem(*this),
+m_PhysicsSystem(*this)
 {
     m_ScenePath = "";
     m_SceneName = sceneName;
@@ -26,6 +27,7 @@ m_TransformSystem(*this)
     entity.AddComponent<TagComponent>(sceneName);
     entity.AddComponent<UUIDComponent>(EntityUUIDGenerator::Generate());
     m_EntityMap[entity.GetUUID()] = (entt::entity)m_RootEntity;
+
 }
 
 void Scene::SetState(SceneState newState)
@@ -40,6 +42,7 @@ void Scene::SetState(SceneState newState)
 
 void Scene::OnStart()
 {
+    m_PhysicsSystem.OnStart();
     m_ScriptSystem.OnStart();
 }
 
@@ -51,6 +54,7 @@ void Scene::OnUpdate(float dt)
 void rv::Scene::OnFixedUpdate(float dt)
 {
     m_ScriptSystem.OnFixedUpdate(dt);
+    m_PhysicsSystem.Step(dt);
 }
 
 void rv::Scene::OnLateUpdate(float dt)

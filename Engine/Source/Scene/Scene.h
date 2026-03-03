@@ -9,6 +9,7 @@
 #include "LightSystem.h"
 #include "TransformSystem.h"
 #include "Environment.h"
+#include "Physics/PhysicsSystem.h"
 
 namespace rv {
 
@@ -138,6 +139,7 @@ private:
     ScriptSystem m_ScriptSystem;
     LightSystem m_LightSystem;
     Environment m_Environment;
+    PhysicsSystem m_PhysicsSystem;
     entt::registry m_Registry;
 };
 

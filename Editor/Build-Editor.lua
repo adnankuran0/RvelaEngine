@@ -7,6 +7,15 @@ project "RvelaEditor"
 
    files { "Source/**.h", "Source/**.cpp","../Vendor/ImGui/*.cpp","../Vendor/ImGui/*.c", "../Vendor/GLAD/src/**.c", }
 
+   defines
+   {
+        "_CONSOLE",
+       "JPH_DEBUG_RENDERER",
+       "JPH_OBJECT_STREAM",
+       "JPH_USE_SSE4_1",
+       "JPH_USE_SSE4_2"
+   }
+
    includedirs
    {
       "Source",
@@ -38,7 +47,6 @@ project "RvelaEditor"
       "RvelaEngine",
         "glfw3",
         "lua54",
-         "Jolt"
    }
 
    targetdir ("../Binaries/" .. OutputDir .. "/%{prj.name}")
@@ -47,23 +55,24 @@ project "RvelaEditor"
    filter "system:windows"
        systemversion "latest"
        defines { "WINDOWS","GLFW_INCLUDE_NONE" }
-       buildoptions { "/utf-8" }
+       buildoptions { "/utf-8","/MP"  }
 
    filter "configurations:Debug"
-       defines { "DEBUG" }
+       defines { "DEBUG"}
+       links { "JoltDebug" }
        runtime "Debug"
        symbols "On"
        --postbuildcommands 
        --{ "{COPY} ../Vendor/Assimp/lib/assimp-vc143-mt.dll ../Binaries/" .. OutputDir .. "/Editor/" }
 
    filter "configurations:Release"
-       defines { "RELEASE" }
+       defines { "RELEASE","NDEBUG"  }
        runtime "Release"
+       links { "Jolt" }
        optimize "On"
        symbols "On"
-       postbuildcommands {
-      "{COPY} ../Vendor/Assimp/lib/assimp-vc143-mt.dll ../Binaries/" .. OutputDir .. "/%{prj.name}/"
-}
+       --postbuildcommands {
+      --"{COPY} ../Vendor/Assimp/lib/assimp-vc143-mt.dll ../Binaries/" .. OutputDir .. "/%{prj.name}/"}
 
    filter "configurations:Dist"
        defines { "DIST" }

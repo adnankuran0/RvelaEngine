@@ -5,6 +5,7 @@
 #include "Assets/AssetRegistry.h"
 #include "Utils/ProjectManager.h"
 #include "Scene/SelectionManager.h"
+#include "Physics/PhysicsEngine.h"
 #include "LayerStack.h"
 
 namespace rv {
@@ -59,6 +60,7 @@ private:
 	ProjectManager m_ProjectManager;
 	SceneManager m_SceneManager;
 	AssetRegistry m_AssetRegistry;
+	PhysicsEngine m_PhysicsEngine;
 
 };
 

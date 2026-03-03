@@ -1,45 +1,6 @@
 {
     "Entities": [
         {
-            "Material": {
-                "material": "5fbc428b-1fbc-4f88-a55d-8ee35575f903"
-            },
-            "Mesh": {
-                "mesh": "36468d32-bba5-4eb4-82db-0d4da5cd6c65"
-            },
-            "ParentUUID": 0,
-            "ScriptComponent": {
-                "luaFile": "C:\\RvelaEngine\\TestProject\\Assets\\Scripts\\Test.lua"
-            },
-            "Tag": {
-                "tag": "Cube"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    0.0,
-                    -0.01512908935546875,
-                    0.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scale": [
-                    20.0,
-                    1.0,
-                    20.0
-                ],
-                "scaleRatio": [
-                    1.0,
-                    1.0,
-                    1.0
-                ]
-            },
-            "UUID": 2
-        },
-        {
             "DirectionalLight": {
                 "castShadows": true,
                 "color": [
@@ -77,6 +38,45 @@
                 ]
             },
             "UUID": 3
+        },
+        {
+            "Material": {
+                "material": "5fbc428b-1fbc-4f88-a55d-8ee35575f903"
+            },
+            "Mesh": {
+                "mesh": "36468d32-bba5-4eb4-82db-0d4da5cd6c65"
+            },
+            "ParentUUID": 0,
+            "ScriptComponent": {
+                "luaFile": "C:\\RvelaEngine\\TestProject\\Assets\\Scripts\\Test.lua"
+            },
+            "Tag": {
+                "tag": "Cube"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    -0.01512908935546875,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    20.0,
+                    1.0,
+                    20.0
+                ],
+                "scaleRatio": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 2
         }
     ],
     "Environment": {

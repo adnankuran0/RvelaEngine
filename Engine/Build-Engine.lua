@@ -5,6 +5,15 @@ project "RvelaEngine"
    targetdir "Binaries/%{cfg.buildcfg}"
    staticruntime "off"
 
+   defines
+   {
+        "_CONSOLE",
+       "JPH_DEBUG_RENDERER",
+       "JPH_OBJECT_STREAM",
+       "JPH_USE_SSE4_1",
+       "JPH_USE_SSE4_2"
+   }
+
    files { "Source/**.h", "Source/**.cpp", "../Vendor/GLAD/src/**.c" }
 
    pchheader "rvelapch.h"
@@ -46,7 +55,7 @@ project "RvelaEngine"
       "opengl32",
       "assimp-vc143-mt",
       "lua54",
-      "Jolt"
+      
    }
 
    targetdir ("../Binaries/" .. OutputDir .. "/%{prj.name}")
@@ -55,15 +64,17 @@ project "RvelaEngine"
    filter "system:windows"
        systemversion "latest"
        defines { "GLFW_INCLUDE_NONE" }
-       buildoptions { "/utf-8" }
+       buildoptions { "/utf-8", "/MP" }
 
    filter "configurations:Debug"
        defines { "DEBUG" }
+       links { "JoltDebug" }
        runtime "Debug"
        symbols "On"
 
    filter "configurations:Release"
-       defines { "RELEASE" }
+       defines { "RELEASE", "NDEBUG"}
+       links { "Jolt" }
        runtime "Release"
        optimize "On"
        symbols "On"
