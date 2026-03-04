@@ -4,3 +4,4 @@
 #include "ComponentBindings.h"
 #include "InputBindings.h"
 #include "SceneBindings.h"
+#include "PhysicsBindings.h"

@@ -13,6 +13,7 @@ void ScriptEngine::Init()
     LuaBindings::RegisterComponents(m_State);
     LuaBindings::RegisterInputAPI(m_State);
     LuaBindings::RegisterSceneAPI(m_State);
+    LuaBindings::RegisterPhysicsAPI(m_State);
 
     
 }

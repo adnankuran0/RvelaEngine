@@ -306,6 +306,67 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 
             }
         }
+        if (registry.any_of<BoxColliderComponent>(selectedEntity))
+        {
+            bool open = ImGui::CollapsingHeader("BoxCollider");
+
+            if (ImGui::BeginPopupContextItem("BoxColliderComponentContext")) {
+                if (ImGui::MenuItem("Remove Component")) {
+                    registry.remove<BoxColliderComponent>(selectedEntity);
+                }
+
+                ImGui::EndPopup();
+            }
+
+            if (open)
+            {
+                auto& bc = registry.get<BoxColliderComponent>(selectedEntity);
+              
+                ImGui::DragFloat3("Size", &bc.size[0], 0.001f, 1000.0f);
+                ImGui::DragFloat3("Offset", &bc.offset[0], 0.001f, 1000.0f);
+            }
+        }
+        if (registry.any_of<SphereColliderComponent>(selectedEntity))
+        {
+            bool open = ImGui::CollapsingHeader("SphereCollider");
+
+            if (ImGui::BeginPopupContextItem("SphereColliderComponentContext")) {
+                if (ImGui::MenuItem("Remove Component")) {
+                    registry.remove<SphereColliderComponent>(selectedEntity);
+                }
+
+                ImGui::EndPopup();
+            }
+
+            if (open)
+            {
+                auto& sc = registry.get<SphereColliderComponent>(selectedEntity);
+
+                ImGui::DragFloat("Radius", &sc.radius, 0.001f, 1000.0f);
+                ImGui::DragFloat3("Offset", &sc.offset[0], 0.001f, 1000.0f);
+            }
+        }
+        if (registry.any_of<CapsuleColliderComponent>(selectedEntity))
+        {
+            bool open = ImGui::CollapsingHeader("CapsuleCollider");
+
+            if (ImGui::BeginPopupContextItem("CapsuleColliderComponentContext")) {
+                if (ImGui::MenuItem("Remove Component")) {
+                    registry.remove<CapsuleColliderComponent>(selectedEntity);
+                }
+
+                ImGui::EndPopup();
+            }
+
+            if (open)
+            {
+                auto& cc = registry.get<CapsuleColliderComponent>(selectedEntity);
+
+                ImGui::SliderFloat("Half height", &cc.halfHeight, 0.001f, 100.0f);
+                ImGui::SliderFloat("Radius", &cc.radius , 0.001f, 100.0f);
+                ImGui::DragFloat3("Offset", &cc.offset[0], 0.001f, 1000.0f);
+            }
+        }
 
         if (registry.any_of<MaterialComponent>(selectedEntity)) {
             bool open = ImGui::CollapsingHeader("Material");
@@ -827,6 +888,30 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                 if (ImGui::MenuItem("Rigidbody"))
                 {
                     RigidbodyComponent& comp = registry.emplace<RigidbodyComponent>(selectedEntity);
+                    ImGui::CloseCurrentPopup();
+                }
+            }
+            if (!registry.any_of<BoxColliderComponent>(selectedEntity))
+            {
+                if (ImGui::MenuItem("BoxCollider"))
+                {
+                    BoxColliderComponent& comp = registry.emplace<BoxColliderComponent>(selectedEntity);
+                    ImGui::CloseCurrentPopup();
+                }
+            }
+            if (!registry.any_of<SphereColliderComponent>(selectedEntity))
+            {
+                if (ImGui::MenuItem("SphereCollider"))
+                {
+                    SphereColliderComponent& comp = registry.emplace<SphereColliderComponent>(selectedEntity);
+                    ImGui::CloseCurrentPopup();
+                }
+            }
+            if (!registry.any_of<CapsuleColliderComponent>(selectedEntity))
+            {
+                if (ImGui::MenuItem("CapsuleCollider"))
+                {
+                    CapsuleColliderComponent& comp = registry.emplace<CapsuleColliderComponent>(selectedEntity);
                     ImGui::CloseCurrentPopup();
                 }
             }

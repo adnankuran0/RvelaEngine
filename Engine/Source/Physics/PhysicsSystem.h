@@ -8,10 +8,13 @@
 #include <memory>
 #include "ContactListener.h"
 #include "BodyActivationListener.h"
+#include "entt/entt.h"
 
 namespace rv {
 
 class Scene;
+struct RigidbodyComponent;
+struct TransformComponent;
 
 class PhysicsSystem
 {
@@ -19,10 +22,20 @@ public:
 	PhysicsSystem(Scene& scene);
 	void OnStart();
 	void Step(float dt);
+	void AddForce(RigidbodyComponent* comp, const glm::vec3& force);
+	void AddImpulse(RigidbodyComponent* comp, const glm::vec3& impulse);
+	void SetVelocity(RigidbodyComponent* comp, const glm::vec3& velocity);
+	glm::vec3 GetVelocity(RigidbodyComponent* comp);
 
 private:
-	void InitBodies();
+	void InitialiseBodies();
 	void SyncTransforms();
+	JPH::BodyCreationSettings BuildBodyCreationSettings(RigidbodyComponent& rbComp, TransformComponent& tComp);
+	JPH::ShapeRefC BuildShape(entt::entity e);
+	JPH::BodyInterface& BodyInterface()
+	{
+		return m_PhysicsSystem.GetBodyInterface();
+	}
 
 private:
 	const unsigned int cMaxBodies = 1024;

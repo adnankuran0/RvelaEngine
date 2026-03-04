@@ -143,6 +143,7 @@ void ScriptSystem::BindLuaScript(ScriptComponent& sc, entt::entity e)
 
     sc.luaInstance["entity"] = Entity(e, &m_Scene);
     sc.luaInstance["scene"] = &m_Scene;
+    sc.luaInstance["physics"] = &m_Scene.GetPhysicsSystem();
 
     sc.OnCreate = sc.luaInstance["OnCreate"];
     sc.OnUpdate = sc.luaInstance["OnUpdate"];

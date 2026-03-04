@@ -122,6 +122,7 @@ public:
     inline CameraSystem& GetCameraSystem() noexcept { return m_CameraSystem; }
     inline ScriptSystem& GetScriptSystem() noexcept { return m_ScriptSystem; }
     inline LightSystem& GetLightSystem() noexcept { return m_LightSystem; }
+    inline PhysicsSystem& GetPhysicsSystem() noexcept { return m_PhysicsSystem; }
     inline Environment& GetEnvironment() noexcept { return m_Environment; }
 
 
@@ -138,8 +139,8 @@ private:
     CameraSystem m_CameraSystem;
     ScriptSystem m_ScriptSystem;
     LightSystem m_LightSystem;
-    Environment m_Environment;
     PhysicsSystem m_PhysicsSystem;
+    Environment m_Environment;
     entt::registry m_Registry;
 };
 

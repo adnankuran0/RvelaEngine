@@ -19,6 +19,7 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             else if (type == "PointLightComponent") return e.HasComponent<PointLightComponent>();
             else if (type == "MeshRendererComponent") return e.HasComponent<MeshRendererComponent>();
             else if (type == "MaterialComponent") return e.HasComponent<MaterialComponent>();
+            else if (type == "RigidbodyComponent") return e.HasComponent<RigidbodyComponent>();
             return false;
         },
         "GetComponent", [&](Entity& e, const std::string& type) -> sol::object {
@@ -39,6 +40,9 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             }
             else if (type == "MaterialComponent") {
                 return sol::make_object(lua, std::ref(e.GetComponent<MaterialComponent>()));
+            }
+            else if (type == "RigidbodyComponent") {
+                return sol::make_object(lua, std::ref(e.GetComponent<RigidbodyComponent>()));
             }
             return sol::make_object(lua, sol::nil);
         },

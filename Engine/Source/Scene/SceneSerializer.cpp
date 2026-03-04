@@ -102,6 +102,25 @@ void SceneSerializer::LoadScene(Scene& scene, const std::string& path)
             scene.AddComponent<ScriptComponent>(handle).Deserialize(entityJson["ScriptComponent"]);
 
         }
+        if (entityJson.contains("RigidbodyComponent"))
+        {
+            scene.AddComponent<RigidbodyComponent>(handle).Deserialize(entityJson["RigidbodyComponent"]);
+        }
+        if (entityJson.contains("BoxColliderComponent"))
+        {
+            scene.AddComponent<BoxColliderComponent>(handle).Deserialize(entityJson["BoxColliderComponent"]);
+
+        }
+        if (entityJson.contains("SphereColliderComponent"))
+        {
+            scene.AddComponent<SphereColliderComponent>(handle).Deserialize(entityJson["SphereColliderComponent"]);
+
+        }
+        if (entityJson.contains("CapsuleColliderComponent"))
+        {
+            scene.AddComponent<CapsuleColliderComponent>(handle).Deserialize(entityJson["CapsuleColliderComponent"]);
+
+        }
 
         if (entityJson.contains("ParentUUID"))
         {
@@ -171,6 +190,18 @@ json SceneSerializer::SerializeEntity(Scene& scene, entt::entity e)
 
     if (scene.HasComponent<ScriptComponent>(e))
         j["ScriptComponent"] = scene.GetComponent<ScriptComponent>(e).Serialize();
+
+    if (scene.HasComponent<RigidbodyComponent>(e))
+        j["RigidbodyComponent"] = scene.GetComponent<RigidbodyComponent>(e).Serialize();
+
+    if (scene.HasComponent<BoxColliderComponent>(e))
+        j["BoxColliderComponent"] = scene.GetComponent<BoxColliderComponent>(e).Serialize();
+
+    if (scene.HasComponent<SphereColliderComponent>(e))
+        j["SphereColliderComponent"] = scene.GetComponent<SphereColliderComponent>(e).Serialize();
+
+    if (scene.HasComponent<CapsuleColliderComponent>(e))
+        j["CapsuleColliderComponent"] = scene.GetComponent<CapsuleColliderComponent>(e).Serialize();
 
     if (scene.HasComponent<SceneTreeComponent>(e))
     {

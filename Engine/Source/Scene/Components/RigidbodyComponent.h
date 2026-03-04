@@ -3,10 +3,14 @@
 #include <Jolt/Physics/Body/BodyID.h>
 #include <Jolt/Physics/Body/MotionType.h>
 #include "Physics/BodyType.h"
+#include "../nlohmann/json.hpp"
 
 namespace rv {
 
-struct RigidbodyComponent {
+using json = nlohmann::json;
+
+struct RigidbodyComponent 
+{
     JPH::BodyID RuntimeBodyID{};
 
     Physics::BodyType bodyType = Physics::BodyType::DYNAMIC;
@@ -30,6 +34,9 @@ struct RigidbodyComponent {
     bool isSensor = false;
 
     bool useCCD = false;
+
+    json Serialize() const;
+    void Deserialize(const json& j);
 };
 
 }

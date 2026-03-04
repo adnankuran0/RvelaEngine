@@ -8,12 +8,18 @@
 #include <Jolt/Physics/Body/BodyActivationListener.h>
 #include <Jolt/Physics/Collision/Shape/BoxShape.h>
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
+#include <Jolt/Physics/Collision/Shape/CapsuleShape.h>
+#include <Jolt/Physics/Collision/Shape/StaticCompoundShape.h>
+#include <Jolt/Physics/Collision/Shape/ConvexHullShape.h>
+#include <Jolt/Physics/Collision/Shape/EmptyShape.h>
+
 #include "Layers.h"
 #include <iostream>
 #include <cstdarg>
 #include <thread>
 #include "Scene/Scene.h"
 #include <Scene/Components/RigidbodyComponent.h>
+#include <Scene/Components/TransformComponent.h>
 #include "Math/RvelaMath.h"
 
 JPH_SUPPRESS_WARNINGS
@@ -37,76 +43,64 @@ PhysicsSystem::PhysicsSystem(Scene& scene) :
 
 void PhysicsSystem::Step(float dt)
 {
+	InitialiseBodies();
 	m_PhysicsSystem.Update(dt, cCollisionSteps, &m_TempAllocator, &m_JobSystem);
 	SyncTransforms();
+}
+
+void PhysicsSystem::AddForce(RigidbodyComponent* comp, const glm::vec3& force)
+{
+	if (comp && comp->RuntimeBodyID.IsInvalid()) return;
+
+	BodyInterface().AddForce(comp->RuntimeBodyID, math::ToJoltVec3(force));
+}
+
+void PhysicsSystem::AddImpulse(RigidbodyComponent* comp, const glm::vec3& impulse)
+{
+	if (comp->RuntimeBodyID.IsInvalid()) return;
+
+	BodyInterface().AddImpulse(comp->RuntimeBodyID, math::ToJoltVec3(impulse));
+}
+
+void PhysicsSystem::SetVelocity(RigidbodyComponent* comp, const glm::vec3& velocity)
+{
+	if (comp->RuntimeBodyID.IsInvalid()) return;
+
+	BodyInterface().SetLinearVelocity(comp->RuntimeBodyID, math::ToJoltVec3(velocity));
+}
+
+glm::vec3 PhysicsSystem::GetVelocity(RigidbodyComponent* comp)
+{
+	return math::FromJoltVec3(BodyInterface().GetLinearVelocity(comp->RuntimeBodyID));
 }
 
 void PhysicsSystem::OnStart()
 {
 	m_PhysicsSystem.OptimizeBroadPhase();
-	InitBodies();
+	InitialiseBodies();
 }
 
-void PhysicsSystem::InitBodies()
+void PhysicsSystem::InitialiseBodies()
 {
 	auto view = m_Scene.GetRegistry().view<RigidbodyComponent>();
 	for (auto& e : view)
 	{
 		auto& rb = m_Scene.GetComponent<RigidbodyComponent>(e);
+		if (!rb.RuntimeBodyID.IsInvalid()) continue;
+
 		auto& transform = m_Scene.GetComponent<TransformComponent>(e);
-		
-		JPH::BoxShapeSettings shapeSettings(JPH::Vec3(0.5f, 0.5f, 0.5f));
-		JPH::ShapeRefC shape = shapeSettings.Create().Get();
+		JPH::BodyCreationSettings settings = BuildBodyCreationSettings(rb, transform);
 
-		JPH::EMotionType motionType = JPH::EMotionType::Dynamic;
-		JPH::ObjectLayer layer = Physics::Layers::MOVING;
-
-		if (rb.bodyType == Physics::BodyType::STATIC) {
-			motionType = JPH::EMotionType::Static;
-			layer = Physics::Layers::NON_MOVING;
-		}
-		else if (rb.bodyType == Physics::BodyType::KINEMATIC) {
-			motionType = JPH::EMotionType::Kinematic;
-		}
-
-		JPH::BodyCreationSettings settings;
+		JPH::ShapeRefC shape = BuildShape(e);
 		settings.SetShape(shape);
-		settings.mPosition = math::ToJoltRVec3(transform.GetWorldPosition());
-		settings.mRotation = math::ToJoltQuat(transform.GetWorldRotation());
-		settings.mMotionType = motionType;
-		settings.mObjectLayer = layer;
 
-		settings.mFriction = rb.friction;
-		settings.mRestitution = rb.restitution;
-		settings.mLinearDamping = rb.linearDamping;
-		settings.mAngularDamping = rb.angularDamping;
-		settings.mGravityFactor = rb.gravityFactor;
-		settings.mIsSensor = rb.isSensor;
-
-		JPH::EAllowedDOFs dofs = JPH::EAllowedDOFs::All;
-
-		if (!rb.lockRotationX) dofs = dofs | JPH::EAllowedDOFs::RotationX;
-		if (!rb.lockRotationY) dofs = dofs | JPH::EAllowedDOFs::RotationY;
-		if (!rb.lockRotationZ) dofs = dofs | JPH::EAllowedDOFs::RotationZ;
-		if (!rb.lockTranslationX) dofs = dofs | JPH::EAllowedDOFs::TranslationX;
-		if (!rb.lockTranslationY) dofs = dofs | JPH::EAllowedDOFs::TranslationY;
-		if (!rb.lockRotationZ) dofs = dofs | JPH::EAllowedDOFs::TranslationZ;
-		settings.mAllowedDOFs = dofs;
-
-		if (rb.useCCD) {
-			settings.mMotionQuality = JPH::EMotionQuality::LinearCast;
-		}
-
-		JPH::BodyInterface& bodyInterface = m_PhysicsSystem.GetBodyInterface();
-		rb.RuntimeBodyID = bodyInterface.CreateAndAddBody(settings, JPH::EActivation::Activate);
-
+		rb.RuntimeBodyID = BodyInterface().CreateAndAddBody(settings, JPH::EActivation::Activate);
 		
 	}
 }
 
 void PhysicsSystem::SyncTransforms()
 {
-	JPH::BodyInterface& bodyInterface = m_PhysicsSystem.GetBodyInterface();
 	auto view = m_Scene.GetRegistry().view<RigidbodyComponent, TransformComponent, SceneTreeComponent>();
 
 	for (auto e : view)
@@ -117,8 +111,8 @@ void PhysicsSystem::SyncTransforms()
 		auto& transform = view.get<TransformComponent>(e);
 		auto& node = view.get<SceneTreeComponent>(e);
 
-		glm::vec3 worldPos = math::FromJoltRVec3(bodyInterface.GetPosition(rb.RuntimeBodyID));
-		glm::quat worldRot = math::FromJoltQuat(bodyInterface.GetRotation(rb.RuntimeBodyID));
+		glm::vec3 worldPos = math::FromJoltRVec3(BodyInterface().GetPosition(rb.RuntimeBodyID));
+		glm::quat worldRot = math::FromJoltQuat(BodyInterface().GetRotation(rb.RuntimeBodyID));
 
 		if (node.parent == entt::null || node.parent == m_Scene.GetRootEntity())
 		{
@@ -141,4 +135,90 @@ void PhysicsSystem::SyncTransforms()
 
 		transform.SetWorldMatrix(newWorld);
 	}
+}
+
+JPH::BodyCreationSettings PhysicsSystem::BuildBodyCreationSettings(RigidbodyComponent& rbComp, TransformComponent& tComp)
+{
+	JPH::BodyCreationSettings settings;
+	JPH::EMotionType motionType = JPH::EMotionType::Dynamic;
+	JPH::ObjectLayer layer = Physics::Layers::MOVING;
+
+	if (rbComp.bodyType == Physics::BodyType::STATIC) {
+		motionType = JPH::EMotionType::Static;
+		layer = Physics::Layers::NON_MOVING;
+	}
+	else if (rbComp.bodyType == Physics::BodyType::KINEMATIC) {
+		motionType = JPH::EMotionType::Kinematic;
+	}
+
+	settings.mPosition = math::ToJoltRVec3(tComp.GetWorldPosition());
+	settings.mRotation = math::ToJoltQuat(tComp.GetWorldRotation());
+	settings.mMotionType = motionType;
+	settings.mObjectLayer = layer;
+
+	settings.mFriction = rbComp.friction;
+	settings.mRestitution = rbComp.restitution;
+	settings.mLinearDamping = rbComp.linearDamping;
+	settings.mAngularDamping = rbComp.angularDamping;
+	settings.mGravityFactor = rbComp.gravityFactor;
+	settings.mIsSensor = rbComp.isSensor;
+
+	JPH::EAllowedDOFs dofs = JPH::EAllowedDOFs::None;
+
+	if (!rbComp.lockRotationX) dofs = dofs | JPH::EAllowedDOFs::RotationX;
+	if (!rbComp.lockRotationY) dofs = dofs | JPH::EAllowedDOFs::RotationY;
+	if (!rbComp.lockRotationZ) dofs = dofs | JPH::EAllowedDOFs::RotationZ;
+	if (!rbComp.lockTranslationX) dofs = dofs | JPH::EAllowedDOFs::TranslationX;
+	if (!rbComp.lockTranslationY) dofs = dofs | JPH::EAllowedDOFs::TranslationY;
+	if (!rbComp.lockTranslationZ) dofs = dofs | JPH::EAllowedDOFs::TranslationZ;
+	settings.mAllowedDOFs = dofs;
+
+	if (rbComp.useCCD) {
+		settings.mMotionQuality = JPH::EMotionQuality::LinearCast;
+	}
+	return settings;
+}
+
+JPH::ShapeRefC PhysicsSystem::BuildShape(entt::entity e)
+{
+	auto& registry = m_Scene.GetRegistry();
+	JPH::StaticCompoundShapeSettings compound;
+
+	bool hasCollider = false;
+
+	if (auto* box = registry.try_get<BoxColliderComponent>(e))
+	{
+		JPH::BoxShapeSettings boxSettings(math::ToJoltVec3(box->size));
+		JPH::ShapeRefC shape = boxSettings.Create().Get();
+		compound.AddShape(math::ToJoltVec3(box->offset), JPH::Quat::sIdentity(), shape);
+		hasCollider = true;
+	}
+
+	if (auto* sphere = registry.try_get<SphereColliderComponent>(e))
+	{
+		JPH::SphereShapeSettings sphereSettings(sphere->radius);
+		JPH::ShapeRefC shape = sphereSettings.Create().Get();
+		compound.AddShape(math::ToJoltVec3(sphere->offset), JPH::Quat::sIdentity(), shape);
+		hasCollider = true;
+	}
+
+	if (auto* capsule = registry.try_get<CapsuleColliderComponent>(e))
+	{
+		JPH::CapsuleShapeSettings capsuleSettings(capsule->halfHeight, capsule->radius);
+		JPH::ShapeRefC shape = capsuleSettings.Create().Get();
+		compound.AddShape(math::ToJoltVec3(capsule->offset), JPH::Quat::sIdentity(), shape);
+		hasCollider = true;
+	}
+
+	// ConvexHullCollider
+	// MeshCollider
+
+	if (!hasCollider)
+	{
+		LOG_WARN("Entity with rigidbody has no colliders.");
+		JPH::EmptyShapeSettings settings;
+		return settings.Create().Get();
+	}
+
+	return compound.Create().Get();
 }

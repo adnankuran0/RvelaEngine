@@ -180,7 +180,7 @@ void Engine::Render()
 	
 	GLenum err;
 	while ((err = glGetError()) != GL_NO_ERROR) {
-		LOG_ERROR("OpenGL hatası: {}", err);
+		LOG_ERROR("OpenGL error: {}", err);
 	}
 }
 
