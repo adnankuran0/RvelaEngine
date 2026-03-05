@@ -9,8 +9,10 @@
 #include <Jolt/Physics/Collision/Shape/BoxShape.h>
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
 #include <Jolt/Physics/Collision/Shape/CapsuleShape.h>
+#include <Jolt/Physics/Collision/Shape/CylinderShape.h>
 #include <Jolt/Physics/Collision/Shape/StaticCompoundShape.h>
 #include <Jolt/Physics/Collision/Shape/ConvexHullShape.h>
+#include <Jolt/Physics/Collision/Shape/MeshShape.h>
 #include <Jolt/Physics/Collision/Shape/EmptyShape.h>
 
 #include "Layers.h"
@@ -21,6 +23,7 @@
 #include <Scene/Components/RigidbodyComponent.h>
 #include <Scene/Components/TransformComponent.h>
 #include "Math/RvelaMath.h"
+#include <glm/gtx/component_wise.hpp>
 
 JPH_SUPPRESS_WARNINGS
 
@@ -36,9 +39,7 @@ PhysicsSystem::PhysicsSystem(Scene& scene) :
 	m_PhysicsSystem.SetBodyActivationListener(&m_BodyActivationListener);
 	m_PhysicsSystem.SetContactListener(&m_ContactListener);
 
-
 	JPH::BodyCreationSettings settings;
-	
 }
 
 void PhysicsSystem::Step(float dt)
@@ -182,21 +183,28 @@ JPH::BodyCreationSettings PhysicsSystem::BuildBodyCreationSettings(RigidbodyComp
 JPH::ShapeRefC PhysicsSystem::BuildShape(entt::entity e)
 {
 	auto& registry = m_Scene.GetRegistry();
+	auto& tc = registry.get<TransformComponent>(e);
+	glm::vec3 worldScale = tc.GetWorldScale();
+
 	JPH::StaticCompoundShapeSettings compound;
 
 	bool hasCollider = false;
 
 	if (auto* box = registry.try_get<BoxColliderComponent>(e))
 	{
-		JPH::BoxShapeSettings boxSettings(math::ToJoltVec3(box->size));
+		JPH::BoxShapeSettings boxSettings(math::ToJoltVec3(box->size * tc.GetWorldScale()) );
 		JPH::ShapeRefC shape = boxSettings.Create().Get();
-		compound.AddShape(math::ToJoltVec3(box->offset), JPH::Quat::sIdentity(), shape);
+		compound.AddShape(math::ToJoltVec3(box->offset * tc.GetWorldScale()), JPH::Quat::sIdentity(), shape);
 		hasCollider = true;
 	}
 
+	bool isScaleUniform = glm::epsilonEqual(worldScale.x, worldScale.y, 0.0001f) &&
+		glm::epsilonEqual(worldScale.y, worldScale.z, 0.0001f);
+
 	if (auto* sphere = registry.try_get<SphereColliderComponent>(e))
 	{
-		JPH::SphereShapeSettings sphereSettings(sphere->radius);
+		float scaledRadius = isScaleUniform ? sphere->radius * worldScale.x : sphere->radius;
+		JPH::SphereShapeSettings sphereSettings(scaledRadius);
 		JPH::ShapeRefC shape = sphereSettings.Create().Get();
 		compound.AddShape(math::ToJoltVec3(sphere->offset), JPH::Quat::sIdentity(), shape);
 		hasCollider = true;
@@ -204,14 +212,84 @@ JPH::ShapeRefC PhysicsSystem::BuildShape(entt::entity e)
 
 	if (auto* capsule = registry.try_get<CapsuleColliderComponent>(e))
 	{
-		JPH::CapsuleShapeSettings capsuleSettings(capsule->halfHeight, capsule->radius);
+		float scaledRadius = isScaleUniform ? capsule->radius * worldScale.x : capsule->radius;
+		float scaledHeight = isScaleUniform ? capsule->halfHeight * worldScale.y : capsule->halfHeight;
+
+		JPH::CapsuleShapeSettings capsuleSettings(scaledHeight, scaledRadius);
 		JPH::ShapeRefC shape = capsuleSettings.Create().Get();
-		compound.AddShape(math::ToJoltVec3(capsule->offset), JPH::Quat::sIdentity(), shape);
+		compound.AddShape(math::ToJoltVec3(capsule->offset * tc.GetWorldScale()), JPH::Quat::sIdentity(), shape);
 		hasCollider = true;
 	}
 
-	// ConvexHullCollider
-	// MeshCollider
+	if (auto* cylinder = registry.try_get<CylinderColliderComponent>(e))
+	{
+		float scaledRadius = isScaleUniform ? cylinder->radius * worldScale.x : cylinder->radius;
+		float scaledHeight = isScaleUniform ? cylinder->halfHeight * worldScale.y : cylinder->halfHeight;
+
+		JPH::CylinderShapeSettings cylinderSettings(scaledHeight, scaledRadius);
+		JPH::ShapeRefC shape = cylinderSettings.Create().Get();
+		compound.AddShape(math::ToJoltVec3(cylinder->offset * tc.GetWorldScale()), JPH::Quat::sIdentity(), shape);
+		hasCollider = true;
+	}
+
+	auto* meshCollider = registry.try_get<MeshColliderComponent>(e);
+	auto* meshComp = registry.try_get<MeshComponent>(e);
+	if (meshCollider && meshComp)
+	{
+
+		Ref<MeshAsset> mesh = meshComp->GetMesh();
+			
+		JPH::Array<JPH::Float3> joltVertices;
+		joltVertices.reserve(mesh->vertices.size());
+
+		for (const auto& v : mesh->vertices)
+		{
+			joltVertices.push_back(JPH::Float3(v.position.x, v.position.y, v.position.z));
+		}
+
+		JPH::Array<JPH::IndexedTriangle> joltTriangles;
+		joltTriangles.reserve(mesh->indices.size() / 3);
+
+		for (size_t i = 0; i < mesh->indices.size(); i += 3)
+		{
+			joltTriangles.push_back(JPH::IndexedTriangle(
+				mesh->indices[i],
+				mesh->indices[i + 1],
+				mesh->indices[i + 2]
+			));
+		}
+
+		JPH::MeshShapeSettings meshSettings;
+		meshSettings.mTriangleVertices = joltVertices;
+		meshSettings.mIndexedTriangles = joltTriangles;
+		meshSettings.mActiveEdgeCosThresholdAngle = meshCollider->activeEdgeTresholdAngle;
+		meshSettings.mMaxTrianglesPerLeaf = meshCollider->maxTrianglesPerLeaf;
+
+		JPH::ShapeRefC shape = meshSettings.Create().Get();
+		compound.AddShape(math::ToJoltVec3(meshCollider->offset * tc.GetWorldScale()), JPH::Quat::sIdentity(), shape);
+		hasCollider = true;
+	}
+
+	auto* convexHullCollider = registry.try_get<ConvexHullColliderComponent>(e);
+	if (meshComp && convexHullCollider)
+	{
+		Ref<MeshAsset> mesh = meshComp->GetMesh();
+
+		JPH::Array<JPH::Vec3> points;
+		points.reserve(mesh->vertices.size());
+
+		for (const auto& v : mesh->vertices)
+		{
+			points.push_back(math::ToJoltVec3(v.position * worldScale));
+		}
+
+		JPH::ConvexHullShapeSettings convexHullSettings(points);
+		convexHullSettings.mMaxConvexRadius = convexHullCollider->maxConvexRadius;
+		JPH::ShapeRefC shape = convexHullSettings.Create().Get();
+		compound.AddShape(math::ToJoltVec3(convexHullCollider->offset * tc.GetWorldScale()), JPH::Quat::sIdentity(), shape);
+		hasCollider = true;
+	}
+
 
 	if (!hasCollider)
 	{

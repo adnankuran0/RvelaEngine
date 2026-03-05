@@ -367,6 +367,68 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                 ImGui::DragFloat3("Offset", &cc.offset[0], 0.001f, 1000.0f);
             }
         }
+        if (registry.any_of<CylinderColliderComponent>(selectedEntity))
+        {
+            bool open = ImGui::CollapsingHeader("CylinderCollider");
+
+            if (ImGui::BeginPopupContextItem("CylinderColliderComponentContext")) {
+                if (ImGui::MenuItem("Remove Component")) {
+                    registry.remove<CylinderColliderComponent>(selectedEntity);
+                }
+
+                ImGui::EndPopup();
+            }
+
+            if (open)
+            {
+                auto& cc = registry.get<CylinderColliderComponent>(selectedEntity);
+
+                ImGui::SliderFloat("Half height", &cc.halfHeight, 0.001f, 100.0f);
+                ImGui::SliderFloat("Radius", &cc.radius , 0.001f, 100.0f);
+                ImGui::DragFloat3("Offset", &cc.offset[0], 0.001f, 1000.0f);
+            }
+        }
+        if (registry.any_of<MeshColliderComponent>(selectedEntity))
+        {
+            bool open = ImGui::CollapsingHeader("MeshCollider");
+
+            if (ImGui::BeginPopupContextItem("MeshColliderComponentContext")) {
+                if (ImGui::MenuItem("Remove Component")) {
+                    registry.remove<MeshColliderComponent>(selectedEntity);
+                }
+
+                ImGui::EndPopup();
+            }
+
+            if (open)
+            {
+                auto& mc = registry.get<MeshColliderComponent>(selectedEntity);
+
+                ImGui::SliderInt("Max triangles per leaf", &mc.maxTrianglesPerLeaf, 1,16);
+                ImGui::SliderFloat("Active edge treshold angle", &mc.activeEdgeTresholdAngle , 0.001f, 2.0f);
+                ImGui::DragFloat3("Offset", &mc.offset[0], 0.001f, 1000.0f);
+            }
+        }
+        if (registry.any_of<ConvexHullColliderComponent>(selectedEntity))
+        {
+            bool open = ImGui::CollapsingHeader("ConvexHullCollider");
+
+            if (ImGui::BeginPopupContextItem("ConvexHullColliderComponentContext")) {
+                if (ImGui::MenuItem("Remove Component")) {
+                    registry.remove<ConvexHullColliderComponent>(selectedEntity);
+                }
+
+                ImGui::EndPopup();
+            }
+
+            if (open)
+            {
+                auto& mc = registry.get<ConvexHullColliderComponent>(selectedEntity);
+
+                ImGui::SliderFloat("maxConvexRadius", &mc.maxConvexRadius , 0.0f, 0.1f);
+                ImGui::DragFloat3("Offset", &mc.offset[0], 0.001f, 1000.0f);
+            }
+        }
 
         if (registry.any_of<MaterialComponent>(selectedEntity)) {
             bool open = ImGui::CollapsingHeader("Material");
@@ -912,6 +974,30 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                 if (ImGui::MenuItem("CapsuleCollider"))
                 {
                     CapsuleColliderComponent& comp = registry.emplace<CapsuleColliderComponent>(selectedEntity);
+                    ImGui::CloseCurrentPopup();
+                }
+            }
+            if (!registry.any_of<CylinderColliderComponent>(selectedEntity))
+            {
+                if (ImGui::MenuItem("CylinderCollider"))
+                {
+                    CylinderColliderComponent& comp = registry.emplace<CylinderColliderComponent>(selectedEntity);
+                    ImGui::CloseCurrentPopup();
+                }
+            }
+            if (!registry.any_of<MeshColliderComponent>(selectedEntity))
+            {
+                if (ImGui::MenuItem("MeshCollider"))
+                {
+                    MeshColliderComponent& comp = registry.emplace<MeshColliderComponent>(selectedEntity);
+                    ImGui::CloseCurrentPopup();
+                }
+            }
+            if (!registry.any_of<ConvexHullColliderComponent>(selectedEntity))
+            {
+                if (ImGui::MenuItem("ConvexHullCollider"))
+                {
+                    ConvexHullColliderComponent& comp = registry.emplace<ConvexHullColliderComponent>(selectedEntity);
                     ImGui::CloseCurrentPopup();
                 }
             }

@@ -1,121 +1,38 @@
 {
     "Entities": [
         {
-            "CapsuleColliderComponent": {
-                "halfHeight": 1.0,
-                "offset": [
-                    0.0,
-                    0.0,
-                    0.0
+            "DirectionalLight": {
+                "castShadows": true,
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0
                 ],
-                "radius": 0.5
-            },
-            "Material": {
-                "material": "ee3dde12-6263-4f11-bb1d-812b3e196ab7"
-            },
-            "Mesh": {
-                "mesh": "395a97e7-2cbe-4d65-95af-dea85f856252"
+                "intensity": 1.0
             },
             "ParentUUID": 0,
-            "RigidbodyComponent": {
-                "angularDamping": 0.05000000074505806,
-                "bodyType": 2,
-                "friction": 0.5,
-                "gravityFactor": 1.0,
-                "isSensor": false,
-                "linearDamping": 0.05000000074505806,
-                "lockRotationX": false,
-                "lockRotationY": false,
-                "lockRotationZ": false,
-                "lockTranslationX": false,
-                "lockTranslationY": false,
-                "lockTranslationZ": false,
-                "mass": 1.0,
-                "restitution": 0.0,
-                "useCCD": false
-            },
             "Tag": {
-                "tag": "Capsule"
+                "tag": "DirectionalLight"
             },
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
-                    -2.078932523727417,
-                    3.702568531036377,
-                    -6.103589839767665e-05
+                    0.0,
+                    4.4461669921875,
+                    0.0
                 ],
                 "rotation": [
-                    19.266475677490234,
-                    12.514863967895508,
-                    -36.67416000366211
+                    -60.000003814697266,
+                    -90.0,
+                    -13.240519523620605
                 ],
                 "scale": [
-                    0.9999995827674866,
                     0.9999998807907104,
-                    0.9999995827674866
+                    1.0,
+                    0.9999998807907104
                 ]
             },
-            "UUID": 89
-        },
-        {
-            "BoxColliderComponent": {
-                "offset": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "size": [
-                    0.5,
-                    0.5,
-                    0.5
-                ]
-            },
-            "Material": {
-                "material": "ee3dde12-6263-4f11-bb1d-812b3e196ab7"
-            },
-            "Mesh": {
-                "mesh": "36468d32-bba5-4eb4-82db-0d4da5cd6c65"
-            },
-            "ParentUUID": 0,
-            "RigidbodyComponent": {
-                "angularDamping": 0.05000000074505806,
-                "bodyType": 2,
-                "friction": 0.5,
-                "gravityFactor": 1.0,
-                "isSensor": false,
-                "linearDamping": 0.05000000074505806,
-                "lockRotationX": false,
-                "lockRotationY": false,
-                "lockRotationZ": false,
-                "lockTranslationX": false,
-                "lockTranslationY": false,
-                "lockTranslationZ": false,
-                "mass": 1.0,
-                "restitution": 0.0,
-                "useCCD": false
-            },
-            "Tag": {
-                "tag": "Cube"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    3.100038528442383,
-                    3.387598991394043,
-                    0.0
-                ],
-                "rotation": [
-                    26.789804458618164,
-                    1.1083407402038574,
-                    -55.517860412597656
-                ],
-                "scale": [
-                    0.9999988675117493,
-                    0.9999996423721313,
-                    0.9999992251396179
-                ]
-            },
-            "UUID": 81
+            "UUID": 3
         },
         {
             "BoxColliderComponent": {
@@ -181,38 +98,121 @@
             "UUID": 2
         },
         {
-            "DirectionalLight": {
-                "castShadows": true,
-                "color": [
-                    1.0,
-                    1.0,
-                    1.0
+            "BoxColliderComponent": {
+                "offset": [
+                    0.0,
+                    0.0,
+                    0.0
                 ],
-                "intensity": 1.0
+                "size": [
+                    0.5,
+                    0.5,
+                    0.5
+                ]
+            },
+            "Material": {
+                "material": "ee3dde12-6263-4f11-bb1d-812b3e196ab7"
+            },
+            "Mesh": {
+                "mesh": "36468d32-bba5-4eb4-82db-0d4da5cd6c65"
             },
             "ParentUUID": 0,
+            "RigidbodyComponent": {
+                "angularDamping": 0.05000000074505806,
+                "bodyType": 2,
+                "friction": 0.5,
+                "gravityFactor": 1.0,
+                "isSensor": false,
+                "linearDamping": 0.05000000074505806,
+                "lockRotationX": false,
+                "lockRotationY": false,
+                "lockRotationZ": false,
+                "lockTranslationX": false,
+                "lockTranslationY": false,
+                "lockTranslationZ": false,
+                "mass": 1.0,
+                "restitution": 0.0,
+                "useCCD": false
+            },
             "Tag": {
-                "tag": "DirectionalLight"
+                "tag": "Cube"
             },
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
-                    0.0,
-                    4.4461669921875,
+                    3.100038528442383,
+                    3.387598991394043,
                     0.0
                 ],
                 "rotation": [
-                    -60.000003814697266,
-                    -90.0,
-                    -13.240519523620605
+                    26.789804458618164,
+                    1.1083407402038574,
+                    -55.517860412597656
                 ],
                 "scale": [
-                    0.9999998807907104,
-                    1.0,
-                    0.9999998807907104
+                    0.9999988675117493,
+                    0.9999996423721313,
+                    0.9999992251396179
                 ]
             },
-            "UUID": 3
+            "UUID": 81
+        },
+        {
+            "CapsuleColliderComponent": {
+                "halfHeight": 1.0,
+                "offset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "radius": 0.5
+            },
+            "Material": {
+                "material": "ee3dde12-6263-4f11-bb1d-812b3e196ab7"
+            },
+            "Mesh": {
+                "mesh": "395a97e7-2cbe-4d65-95af-dea85f856252"
+            },
+            "ParentUUID": 0,
+            "RigidbodyComponent": {
+                "angularDamping": 0.05000000074505806,
+                "bodyType": 2,
+                "friction": 0.5,
+                "gravityFactor": 1.0,
+                "isSensor": false,
+                "linearDamping": 0.05000000074505806,
+                "lockRotationX": false,
+                "lockRotationY": false,
+                "lockRotationZ": false,
+                "lockTranslationX": false,
+                "lockTranslationY": false,
+                "lockTranslationZ": false,
+                "mass": 1.0,
+                "restitution": 0.0,
+                "useCCD": false
+            },
+            "Tag": {
+                "tag": "Capsule"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    -2.078932523727417,
+                    3.702568531036377,
+                    -6.103589839767665e-05
+                ],
+                "rotation": [
+                    19.266475677490234,
+                    12.514863967895508,
+                    -36.67416000366211
+                ],
+                "scale": [
+                    0.9999995827674866,
+                    0.9999998807907104,
+                    0.9999995827674866
+                ]
+            },
+            "UUID": 89
         }
     ],
     "Environment": {

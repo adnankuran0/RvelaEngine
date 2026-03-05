@@ -109,17 +109,26 @@ void SceneSerializer::LoadScene(Scene& scene, const std::string& path)
         if (entityJson.contains("BoxColliderComponent"))
         {
             scene.AddComponent<BoxColliderComponent>(handle).Deserialize(entityJson["BoxColliderComponent"]);
-
         }
         if (entityJson.contains("SphereColliderComponent"))
         {
             scene.AddComponent<SphereColliderComponent>(handle).Deserialize(entityJson["SphereColliderComponent"]);
-
         }
         if (entityJson.contains("CapsuleColliderComponent"))
         {
             scene.AddComponent<CapsuleColliderComponent>(handle).Deserialize(entityJson["CapsuleColliderComponent"]);
-
+        }
+        if (entityJson.contains("CylinderColliderComponent"))
+        {
+            scene.AddComponent<CylinderColliderComponent>(handle).Deserialize(entityJson["CylinderColliderComponent"]);
+        }
+        if (entityJson.contains("MeshColliderComponent"))
+        {
+            scene.AddComponent<MeshColliderComponent>(handle).Deserialize(entityJson["MeshColliderComponent"]);
+        }
+        if (entityJson.contains("ConvexHullColliderComponent"))
+        {
+            scene.AddComponent<ConvexHullColliderComponent>(handle).Deserialize(entityJson["ConvexHullColliderComponent"]);
         }
 
         if (entityJson.contains("ParentUUID"))
@@ -202,6 +211,15 @@ json SceneSerializer::SerializeEntity(Scene& scene, entt::entity e)
 
     if (scene.HasComponent<CapsuleColliderComponent>(e))
         j["CapsuleColliderComponent"] = scene.GetComponent<CapsuleColliderComponent>(e).Serialize();
+
+    if (scene.HasComponent<CylinderColliderComponent>(e))
+        j["CylinderColliderComponent"] = scene.GetComponent<CylinderColliderComponent>(e).Serialize();
+
+    if (scene.HasComponent<MeshColliderComponent>(e))
+        j["MeshColliderComponent"] = scene.GetComponent<MeshColliderComponent>(e).Serialize();
+
+    if (scene.HasComponent<ConvexHullColliderComponent>(e))
+        j["ConvexHullColliderComponent"] = scene.GetComponent<ConvexHullColliderComponent>(e).Serialize();
 
     if (scene.HasComponent<SceneTreeComponent>(e))
     {

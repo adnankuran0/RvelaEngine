@@ -17,7 +17,7 @@ struct RigidbodyComponent
 
     float mass = 1.0f;
     float friction = 0.5f;
-    float restitution = 0.2f;
+    float restitution = 0.0f;
     float linearDamping = 0.05f; 
     float angularDamping = 0.05f;
 

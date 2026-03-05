@@ -6,10 +6,8 @@ using namespace rv::Physics;
 
 void BodyActivationListener::OnBodyActivated(const JPH::BodyID& inBodyID, JPH::uint64 inBodyUserData)
 {
-	LOG_DEBUG("A body got activated");
 }
 
 void BodyActivationListener::OnBodyDeactivated(const JPH::BodyID& inBodyID, JPH::uint64 inBodyUserData)
 {
-	LOG_DEBUG("A body went to sleep");
 }

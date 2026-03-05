@@ -31,6 +31,18 @@ static Entity LoadPrimitive(Scene& scene, const std::string& primitiveMeshName)
     root.GetComponent<TagComponent>().tag = cfg.name;
     AssetUUID defaultMaterialId = AssetUUID::FromString("ee3dde12-6263-4f11-bb1d-812b3e196ab7");
     root.AddComponent<MaterialComponent>(defaultMaterialId);
+    root.AddComponent<RigidbodyComponent>();
+    if (primitiveMeshName == "Cube")
+        root.AddComponent<BoxColliderComponent>();
+    else if (primitiveMeshName == "Sphere")
+        root.AddComponent<SphereColliderComponent>();
+    else if (primitiveMeshName == "Capsule")
+        root.AddComponent<CapsuleColliderComponent>();
+    else if (primitiveMeshName == "Cylinder")
+        root.AddComponent<CylinderColliderComponent>();
+    else 
+        root.AddComponent<ConvexHullColliderComponent>(); 
+
     scene.SetParent(root.GetHandle(), scene.GetRootEntity());
     return root;
 }

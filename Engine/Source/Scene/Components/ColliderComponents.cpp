@@ -50,3 +50,52 @@ void CapsuleColliderComponent::Deserialize(const json& j)
     auto offsetData = j.at("offset");
     offset = glm::vec3(offsetData[0], offsetData[1], offsetData[2]);
 }
+
+json CylinderColliderComponent::Serialize() const
+{
+    json j;
+    j["radius"] = radius;
+    j["halfHeight"] = halfHeight;
+    j["offset"] = { offset.x, offset.y, offset.z };
+    return j;
+}
+
+void CylinderColliderComponent::Deserialize(const json& j)
+{
+    radius = j.at("radius").get<float>();
+    halfHeight = j.at("halfHeight").get<float>();
+    auto offsetData = j.at("offset");
+    offset = glm::vec3(offsetData[0], offsetData[1], offsetData[2]);
+}
+
+json MeshColliderComponent::Serialize() const
+{
+    json j;
+    j["maxTrianglesPerLeaf"] = maxTrianglesPerLeaf;
+    j["activeEdgeTresholdAngle"] = activeEdgeTresholdAngle;
+    j["offset"] = { offset.x, offset.y, offset.z };
+    return j;
+}
+
+void MeshColliderComponent::Deserialize(const json& j)
+{
+    maxTrianglesPerLeaf = j.at("maxTrianglesPerLeaf").get<int>();
+    activeEdgeTresholdAngle = j.at("activeEdgeTresholdAngle").get<float>();
+    auto offsetData = j.at("offset");
+    offset = glm::vec3(offsetData[0], offsetData[1], offsetData[2]);
+}
+
+json ConvexHullColliderComponent::Serialize() const
+{
+    json j;
+    j["maxConvexRadius"] = maxConvexRadius;
+    j["offset"] = { offset.x, offset.y, offset.z };
+    return j;
+}
+
+void ConvexHullColliderComponent::Deserialize(const json& j)
+{
+    maxConvexRadius = j.at("maxConvexRadius").get<float>();
+    auto offsetData = j.at("offset");
+    offset = glm::vec3(offsetData[0], offsetData[1], offsetData[2]);
+}
