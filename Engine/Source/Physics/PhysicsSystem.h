@@ -9,16 +9,18 @@
 #include "ContactListener.h"
 #include "BodyActivationListener.h"
 #include "entt/entt.h"
+#include "ShapeBuilder.h"
 
 namespace rv {
 
 class Scene;
 struct RigidbodyComponent;
-struct TransformComponent;
 
 class PhysicsSystem
 {
 public:
+	
+
 	PhysicsSystem(Scene& scene);
 	void OnStart();
 	void Step(float dt);
@@ -28,10 +30,13 @@ public:
 	glm::vec3 GetVelocity(RigidbodyComponent* comp);
 
 private:
+	
+
 	void InitialiseBodies();
 	void SyncTransforms();
 	JPH::BodyCreationSettings BuildBodyCreationSettings(RigidbodyComponent& rbComp, TransformComponent& tComp);
-	JPH::ShapeRefC BuildShape(entt::entity e);
+	
+
 	JPH::BodyInterface& BodyInterface()
 	{
 		return m_PhysicsSystem.GetBodyInterface();
@@ -56,6 +61,7 @@ private:
 	Physics::BodyActivationListener m_BodyActivationListener;
 	Physics::ContactListener m_ContactListener;
 
+	Physics::ShapeBuilder m_ShapeBuilder;
 
 	Scene& m_Scene;
 };

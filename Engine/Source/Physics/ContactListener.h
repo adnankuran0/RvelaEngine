@@ -1,6 +1,7 @@
 #pragma once
 #include "Jolt/Jolt.h"
 #include <Jolt/Physics/PhysicsSystem.h>
+#include <Jolt/Physics/Character/CharacterVirtual.h>
 
 namespace rv::Physics {
 
