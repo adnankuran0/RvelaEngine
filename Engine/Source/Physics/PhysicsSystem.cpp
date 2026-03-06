@@ -40,6 +40,7 @@ PhysicsSystem::PhysicsSystem(Scene& scene) :
 void PhysicsSystem::Step(float dt)
 {
 	InitialiseBodies();
+	UpdateCharacters(dt);
 	m_PhysicsSystem.Update(dt, cCollisionSteps, &m_TempAllocator, &m_JobSystem);
 	SyncTransforms();
 }
@@ -80,8 +81,8 @@ void PhysicsSystem::OnStart()
 
 void PhysicsSystem::InitialiseBodies()
 {
-	auto view = m_Scene.GetRegistry().view<RigidbodyComponent>();
-	for (auto& e : view)
+	auto rbView = m_Scene.GetRegistry().view<RigidbodyComponent>();
+	for (auto& e : rbView)
 	{
 		auto& rb = m_Scene.GetComponent<RigidbodyComponent>(e);
 		if (!rb.RuntimeBodyID.IsInvalid()) continue;
@@ -93,14 +94,42 @@ void PhysicsSystem::InitialiseBodies()
 		settings.SetShape(shape);
 
 		rb.RuntimeBodyID = BodyInterface().CreateAndAddBody(settings, JPH::EActivation::Activate);
-		
 	}
+
+	auto cbView = m_Scene.GetRegistry().view<CharacterBodyComponent>();
+	for (auto& e : cbView)
+	{
+		auto& cb = m_Scene.GetComponent<CharacterBodyComponent>(e);
+		if (cb.character) continue; 
+
+		auto& transform = m_Scene.GetComponent<TransformComponent>(e);
+
+		auto settings = BuildCharacterBodyCreationSettings(cb, transform);
+		settings->mShape = m_ShapeBuilder.BuildShape(m_Scene.GetRegistry(), e);
+
+		cb.character = new JPH::CharacterVirtual(
+			settings,
+			math::ToJoltVec3(transform.GetWorldPosition()),
+			math::ToJoltQuat(transform.GetWorldRotation()),
+			(int)e,
+			&m_PhysicsSystem 
+		);
+		cb.character->SetCharacterVsCharacterCollision(&m_CharacterVsCharacterCollision);
+		m_CharacterVsCharacterCollision.Add(cb.character);
+		cb.character->SetListener(&m_CharacterContactListener);
+	}
+
 }
 
 void PhysicsSystem::SyncTransforms()
 {
-	auto view = m_Scene.GetRegistry().view<RigidbodyComponent, TransformComponent, SceneTreeComponent>();
+	SyncBodyTransforms();
+	SyncCharacterTransforms();
+}
 
+void rv::PhysicsSystem::SyncBodyTransforms()
+{
+	auto view = m_Scene.GetRegistry().view<RigidbodyComponent, TransformComponent, SceneTreeComponent>();
 	for (auto e : view)
 	{
 		auto& rb = view.get<RigidbodyComponent>(e);
@@ -130,7 +159,29 @@ void PhysicsSystem::SyncTransforms()
 		}
 
 		glm::mat4 newWorld = glm::translate(glm::mat4(1.0f), worldPos) * glm::mat4_cast(worldRot) * glm::scale(glm::mat4(1.0f), transform.GetScale());
+		transform.SetWorldMatrix(newWorld);
+	}
+}
 
+void rv::PhysicsSystem::SyncCharacterTransforms()
+{
+	auto view = m_Scene.GetRegistry().view<CharacterBodyComponent, TransformComponent>();
+	for (auto& e : view)
+	{
+		auto& cb = view.get<CharacterBodyComponent>(e);
+		if (!cb.character) continue;
+
+		auto& transform = view.get<TransformComponent>(e);
+
+		glm::vec3 pos = math::FromJoltRVec3(cb.character->GetPosition());
+		glm::quat rot = math::FromJoltQuat(cb.character->GetRotation());
+
+		transform.SetPosition(pos);
+		transform.SetRotation(rot);
+
+		glm::mat4 newWorld = glm::translate(glm::mat4(1.0f), pos)
+			* glm::mat4_cast(rot)
+			* glm::scale(glm::mat4(1.0f), transform.GetScale());
 		transform.SetWorldMatrix(newWorld);
 	}
 }
@@ -166,6 +217,8 @@ JPH::BodyCreationSettings PhysicsSystem::BuildBodyCreationSettings(RigidbodyComp
 		settings.mOverrideMassProperties = JPH::EOverrideMassProperties::CalculateInertia;
 		settings.mMassPropertiesOverride.mMass = rbComp.mass;
 	}
+	//TODO: override mass and innertia for bodies with mesh colliders
+
 
 	settings.mMaxLinearVelocity = rbComp.maxLinearVelocity;
 	settings.mMaxAngularVelocity = rbComp.maxAngularVelocity;
@@ -190,6 +243,45 @@ JPH::BodyCreationSettings PhysicsSystem::BuildBodyCreationSettings(RigidbodyComp
 		settings.mMotionQuality = JPH::EMotionQuality::LinearCast;
 	}
 	return settings;
+}
+
+JPH::Ref<JPH::CharacterVirtualSettings> rv::PhysicsSystem::BuildCharacterBodyCreationSettings(CharacterBodyComponent& cbComp, TransformComponent& tComp)
+{
+	JPH::Ref<JPH::CharacterVirtualSettings> settings = new JPH::CharacterVirtualSettings();
+	settings->mSupportingVolume = JPH::Plane(JPH::Vec3::sAxisY(), -0.5f);
+	settings->mMass = cbComp.mass;
+	settings->mMaxStrength = cbComp.maxStrength;
+	settings->mShapeOffset = math::ToJoltVec3(cbComp.shapeOffset);
+	settings->mPredictiveContactDistance = cbComp.predictiveContactDistance;
+	settings->mMaxSlopeAngle = JPH::DegreesToRadians(cbComp.maxSlopeAngle);
+	return settings;
+}
+
+void rv::PhysicsSystem::UpdateCharacters(float dt)
+{
+	auto cbView = m_Scene.GetRegistry().view<CharacterBodyComponent>();
+	for (auto& e : cbView)
+	{
+		auto& cb = m_Scene.GetComponent<CharacterBodyComponent>(e);
+		if (!cb.character) continue;
+
+		cb.character->UpdateGroundVelocity();
+
+		JPH::CharacterVirtual::ExtendedUpdateSettings updateSettings;
+		//updateSettings.mStickToFloorStepDown = -cb.character->GetUp() * 0.5f; 
+		//updateSettings.mWalkStairsStepUp = cb.character->GetUp() * 0.4f;
+
+		cb.character->ExtendedUpdate(
+			dt,
+			-cb.character->GetUp() * m_PhysicsSystem.GetGravity().Length(),
+			updateSettings,
+			m_PhysicsSystem.GetDefaultBroadPhaseLayerFilter(Physics::Layers::MOVING),
+			m_PhysicsSystem.GetDefaultLayerFilter(Physics::Layers::MOVING),
+			{},
+			{},
+			m_TempAllocator
+		);
+	}
 }
 
 

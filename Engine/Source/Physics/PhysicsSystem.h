@@ -7,6 +7,7 @@
 #include "ObjectVsBroadPhaseLayerFilter.h"
 #include <memory>
 #include "ContactListener.h"
+#include "CharacterContactListener.h"
 #include "BodyActivationListener.h"
 #include "entt/entt.h"
 #include "ShapeBuilder.h"
@@ -31,7 +32,11 @@ public:
 private:
 	void InitialiseBodies();
 	void SyncTransforms();
+	void SyncBodyTransforms();
+	void SyncCharacterTransforms();
 	JPH::BodyCreationSettings BuildBodyCreationSettings(RigidbodyComponent& rbComp, TransformComponent& tComp);
+	JPH::Ref<JPH::CharacterVirtualSettings> BuildCharacterBodyCreationSettings(CharacterBodyComponent& cbComp, TransformComponent& tComp);
+	void UpdateCharacters(float dt);
 	inline JPH::BodyInterface& BodyInterface() { return m_PhysicsSystem.GetBodyInterface(); }
 
 private:
@@ -47,11 +52,13 @@ private:
 	Physics::BPLayerInterfaceImpl m_BroadPhaseLayerInterface;
 	Physics::ObjectVsBroadPhaseLayerFilterImpl m_ObjectVsBroadPhaseLayerFilter;
 	Physics::ObjectLayerPairFilterImpl m_ObjectVsObjectLayerFilter;
+	JPH::CharacterVsCharacterCollisionSimple m_CharacterVsCharacterCollision;
 
 	JPH::PhysicsSystem m_PhysicsSystem;
 
 	Physics::BodyActivationListener m_BodyActivationListener;
 	Physics::ContactListener m_ContactListener;
+	Physics::CharacterContactListener m_CharacterContactListener;
 
 	Physics::ShapeBuilder m_ShapeBuilder;
 

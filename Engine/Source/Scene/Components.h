@@ -14,6 +14,7 @@
 #include "Scene/Components/ScriptComponent.h"
 #include "Scene/Components/CameraComponent.h"
 #include "Scene/Components/RigidbodyComponent.h"
+#include "Scene/Components/CharacterBodyComponent.h"
 #include "Scene/Components/ColliderComponents.h"
 
 namespace rv {
@@ -34,9 +35,13 @@ enum class ComponentType
 	Script,
 	Camera,
 	Rigidbody,
-	BoxColliderComponent,
-	SphereColliderComponent,
-	CapsuleColliderComponent
+	CharacterBody,
+	BoxCollider,
+	SphereCollider,
+	CapsuleCollider,
+	CylinderCollider,
+	MeshCollider,
+	ConvexHullCollider
 };
 
 }
