@@ -15,11 +15,15 @@ struct RigidbodyComponent
 
     Physics::BodyType bodyType = Physics::BodyType::DYNAMIC;
 
+    bool autoCalculateMass = true;
     float mass = 1.0f;
     float friction = 0.5f;
     float restitution = 0.0f;
     float linearDamping = 0.05f; 
     float angularDamping = 0.05f;
+    float maxLinearVelocity = 500.0f;
+    float maxAngularVelocity = 50.0f;
+    bool allowSleep = true;
 
     bool lockRotationX = false;
     bool lockRotationY = false;

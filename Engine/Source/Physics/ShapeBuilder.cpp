@@ -38,16 +38,20 @@ JPH::ShapeRefC ShapeBuilder::BuildShape(entt::registry& registry, entt::entity e
 		return settings.Create().Get();
 	}
 
-	return compound.Create().Get();
+	JPH::ShapeRefC compoundShape = compound.Create().Get();
+	JPH::Shape::ShapeResult shapeResult = compoundShape->ScaleShape(math::ToJoltVec3(worldScale));
+	
+	return shapeResult.IsValid() ? shapeResult.Get() : compoundShape;
+	
 }
 
 int ShapeBuilder::TryAddBoxShape(ShapeBuildParams& params)
 {
 	if (auto* box = params.reg.try_get<BoxColliderComponent>(params.e))
 	{
-		JPH::BoxShapeSettings boxSettings(math::ToJoltVec3(box->size * params.tc.GetWorldScale()));
+		JPH::BoxShapeSettings boxSettings(math::ToJoltVec3(box->size));
 		JPH::ShapeRefC shape = boxSettings.Create().Get();
-		params.compound.AddShape(math::ToJoltVec3(box->offset * params.tc.GetWorldScale()), JPH::Quat::sIdentity(), shape);
+		params.compound.AddShape(math::ToJoltVec3(box->offset), JPH::Quat::sIdentity(), shape);
 		return 1;
 	}
 	return 0;
@@ -57,8 +61,7 @@ int ShapeBuilder::TryAddSphereShape(ShapeBuildParams& params)
 {
 	if (auto* sphere = params.reg.try_get<SphereColliderComponent>(params.e))
 	{
-		float scaledRadius = params.isScaleUniform ? sphere->radius * params.worldScale.x : sphere->radius;
-		JPH::SphereShapeSettings sphereSettings(scaledRadius);
+		JPH::SphereShapeSettings sphereSettings(sphere->radius);
 		JPH::ShapeRefC shape = sphereSettings.Create().Get();
 		params.compound.AddShape(math::ToJoltVec3(sphere->offset), JPH::Quat::sIdentity(), shape);
 		return 1;
@@ -70,12 +73,9 @@ int ShapeBuilder::TryAddCapsuleShape(ShapeBuildParams& params)
 {
 	if (auto* capsule = params.reg.try_get<CapsuleColliderComponent>(params.e))
 	{
-		float scaledRadius = params.isScaleUniform ? capsule->radius * params.worldScale.x : capsule->radius;
-		float scaledHeight = params.isScaleUniform ? capsule->halfHeight * params.worldScale.y : capsule->halfHeight;
-
-		JPH::CapsuleShapeSettings capsuleSettings(scaledHeight, scaledRadius);
+		JPH::CapsuleShapeSettings capsuleSettings(capsule->halfHeight, capsule->radius);
 		JPH::ShapeRefC shape = capsuleSettings.Create().Get();
-		params.compound.AddShape(math::ToJoltVec3(capsule->offset * params.tc.GetWorldScale()), JPH::Quat::sIdentity(), shape);
+		params.compound.AddShape(math::ToJoltVec3(capsule->offset), JPH::Quat::sIdentity(), shape);
 		return 1;
 	}
 	return 0;
@@ -85,12 +85,9 @@ int ShapeBuilder::TryAddCylinderShape(ShapeBuildParams& params)
 {
 	if (auto* cylinder = params.reg.try_get<CylinderColliderComponent>(params.e))
 	{
-		float scaledRadius = params.isScaleUniform ? cylinder->radius * params.worldScale.x : cylinder->radius;
-		float scaledHeight = params.isScaleUniform ? cylinder->halfHeight * params.worldScale.y : cylinder->halfHeight;
-
-		JPH::CylinderShapeSettings cylinderSettings(scaledHeight, scaledRadius);
+		JPH::CylinderShapeSettings cylinderSettings(cylinder->halfHeight, cylinder->radius);
 		JPH::ShapeRefC shape = cylinderSettings.Create().Get();
-		params.compound.AddShape(math::ToJoltVec3(cylinder->offset * params.tc.GetWorldScale()), JPH::Quat::sIdentity(), shape);
+		params.compound.AddShape(math::ToJoltVec3(cylinder->offset), JPH::Quat::sIdentity(), shape);
 		return 1;
 	}
 	return 0;
@@ -131,7 +128,7 @@ int ShapeBuilder::TryAddMeshShape(ShapeBuildParams& params)
 		meshSettings.mMaxTrianglesPerLeaf = meshCollider->maxTrianglesPerLeaf;
 
 		JPH::ShapeRefC shape = meshSettings.Create().Get();
-		params.compound.AddShape(math::ToJoltVec3(meshCollider->offset * params.tc.GetWorldScale()), JPH::Quat::sIdentity(), shape);
+		params.compound.AddShape(math::ToJoltVec3(meshCollider->offset), JPH::Quat::sIdentity(), shape);
 		return 1;
 	}
 	return 0;
@@ -150,13 +147,13 @@ int ShapeBuilder::TryAddConvexHullShape(ShapeBuildParams& params)
 
 		for (const auto& v : mesh->vertices)
 		{
-			points.push_back(math::ToJoltVec3(v.position * params.worldScale));
+			points.push_back(math::ToJoltVec3(v.position));
 		}
 
 		JPH::ConvexHullShapeSettings convexHullSettings(points);
 		convexHullSettings.mMaxConvexRadius = convexHullCollider->maxConvexRadius;
 		JPH::ShapeRefC shape = convexHullSettings.Create().Get();
-		params.compound.AddShape(math::ToJoltVec3(convexHullCollider->offset * params.tc.GetWorldScale()), JPH::Quat::sIdentity(), shape);
+		params.compound.AddShape(math::ToJoltVec3(convexHullCollider->offset), JPH::Quat::sIdentity(), shape);
 		return 1;
 	}
 	return 0;

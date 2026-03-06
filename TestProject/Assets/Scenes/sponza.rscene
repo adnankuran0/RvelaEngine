@@ -17,7 +17,9 @@
             },
             "ParentUUID": 0,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 2,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
@@ -30,6 +32,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },
@@ -73,7 +77,9 @@
             },
             "ParentUUID": 0,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 2,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
@@ -86,6 +92,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },
@@ -129,7 +137,9 @@
             },
             "ParentUUID": 0,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 2,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
@@ -142,6 +152,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },
@@ -213,7 +225,9 @@
             },
             "ParentUUID": 0,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 2,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
@@ -226,6 +240,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },
@@ -255,7 +271,7 @@
                 "scale": [
                     0.2200000286102295,
                     0.2200000286102295,
-                    0.2200000286102295
+                    0.2199999988079071
                 ]
             },
             "UUID": 1260
@@ -314,7 +330,9 @@
             },
             "ParentUUID": 8854,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 0,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
@@ -327,6 +345,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },
@@ -371,7 +391,9 @@
             },
             "ParentUUID": 8854,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 0,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
@@ -384,6 +406,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },
@@ -428,7 +452,9 @@
             },
             "ParentUUID": 8854,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 0,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
@@ -441,6 +467,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },
@@ -485,9 +513,11 @@
             },
             "ParentUUID": 8854,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 0,
-                "friction": 0.5,
+                "friction": 1.0,
                 "gravityFactor": 1.0,
                 "isSensor": false,
                 "linearDamping": 0.05000000074505806,
@@ -498,6 +528,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },
@@ -545,9 +577,11 @@
             },
             "ParentUUID": 0,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 2,
-                "friction": 0.5,
+                "friction": 1.0,
                 "gravityFactor": 1.0,
                 "isSensor": false,
                 "linearDamping": 0.05000000074505806,
@@ -557,7 +591,9 @@
                 "lockTranslationX": false,
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
-                "mass": 1.0,
+                "mass": 10000.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },
@@ -593,7 +629,9 @@
             },
             "ParentUUID": 0,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 2,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
@@ -606,6 +644,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.20000000298023224,
                 "useCCD": false
             },
@@ -658,7 +698,9 @@
             },
             "ParentUUID": 0,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 2,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
@@ -671,6 +713,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.20000000298023224,
                 "useCCD": false
             },
@@ -748,7 +792,9 @@
             },
             "ParentUUID": 4,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 0,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
@@ -761,6 +807,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },
@@ -1036,7 +1084,9 @@
             },
             "ParentUUID": 0,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.0,
+                "autoCalculateMass": 1,
                 "bodyType": 2,
                 "friction": 0.10999999940395355,
                 "gravityFactor": 1.0,
@@ -1049,6 +1099,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 534.2470092773438,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },
@@ -1250,7 +1302,9 @@
             },
             "ParentUUID": 401,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 0,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
@@ -1263,6 +1317,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },
@@ -1362,7 +1418,9 @@
             },
             "ParentUUID": 398,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 0,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
@@ -1375,6 +1433,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },
@@ -1443,7 +1503,9 @@
             },
             "ParentUUID": 2,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 0,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
@@ -1456,6 +1518,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },
@@ -1499,7 +1563,9 @@
             },
             "ParentUUID": 2,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 0,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
@@ -1512,6 +1578,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },
@@ -1555,7 +1623,9 @@
             },
             "ParentUUID": 2,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 0,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
@@ -1568,6 +1638,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },
@@ -1611,7 +1683,9 @@
             },
             "ParentUUID": 2,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 0,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
@@ -1624,6 +1698,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },
@@ -1667,7 +1743,9 @@
             },
             "ParentUUID": 391,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 0,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
@@ -1680,6 +1758,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },
@@ -1779,7 +1859,9 @@
             },
             "ParentUUID": 388,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 0,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
@@ -1792,6 +1874,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },
@@ -1891,7 +1975,9 @@
             },
             "ParentUUID": 385,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 0,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
@@ -1904,6 +1990,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },
@@ -2003,7 +2091,9 @@
             },
             "ParentUUID": 382,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 0,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
@@ -2016,6 +2106,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },
@@ -2115,7 +2207,9 @@
             },
             "ParentUUID": 379,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 0,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
@@ -2128,6 +2222,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },
@@ -2227,7 +2323,9 @@
             },
             "ParentUUID": 376,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 0,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
@@ -2240,6 +2338,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },
@@ -2339,7 +2439,9 @@
             },
             "ParentUUID": 373,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 0,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
@@ -2352,6 +2454,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },
@@ -13658,19 +13762,19 @@
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
-                    0.0,
+                    1.862645149230957e-09,
                     0.0,
                     0.0
                 ],
                 "rotation": [
-                    90.00000762939453,
+                    89.99998474121094,
                     -0.0,
                     0.0
                 ],
                 "scale": [
                     0.009999999776482582,
-                    0.009999998845160007,
-                    0.009999998845160007
+                    0.009999984875321388,
+                    0.009999984875321388
                 ]
             },
             "UUID": 10
@@ -13786,7 +13890,9 @@
             },
             "ParentUUID": 8854,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 0,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
@@ -13799,6 +13905,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },
@@ -13843,7 +13951,9 @@
             },
             "ParentUUID": 8854,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 0,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
@@ -13856,6 +13966,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },
@@ -13900,7 +14012,9 @@
             },
             "ParentUUID": 8854,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 0,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
@@ -13913,6 +14027,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },
@@ -13956,7 +14072,9 @@
             },
             "ParentUUID": 0,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 2,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
@@ -13969,6 +14087,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },
@@ -14013,7 +14133,9 @@
             },
             "ParentUUID": 0,
             "RigidbodyComponent": {
+                "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
                 "bodyType": 2,
                 "friction": 1.0,
                 "gravityFactor": 1.0,
@@ -14026,6 +14148,8 @@
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
                 "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },

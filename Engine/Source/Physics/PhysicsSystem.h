@@ -19,7 +19,6 @@ struct RigidbodyComponent;
 class PhysicsSystem
 {
 public:
-	
 
 	PhysicsSystem(Scene& scene);
 	void OnStart();
@@ -30,17 +29,10 @@ public:
 	glm::vec3 GetVelocity(RigidbodyComponent* comp);
 
 private:
-	
-
 	void InitialiseBodies();
 	void SyncTransforms();
 	JPH::BodyCreationSettings BuildBodyCreationSettings(RigidbodyComponent& rbComp, TransformComponent& tComp);
-	
-
-	JPH::BodyInterface& BodyInterface()
-	{
-		return m_PhysicsSystem.GetBodyInterface();
-	}
+	inline JPH::BodyInterface& BodyInterface() { return m_PhysicsSystem.GetBodyInterface(); }
 
 private:
 	const unsigned int cMaxBodies = 1024;

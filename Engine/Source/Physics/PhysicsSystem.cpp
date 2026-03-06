@@ -28,7 +28,8 @@ PhysicsSystem::PhysicsSystem(Scene& scene) :
 	m_TempAllocator(10 * 1024 * 1024),
 	m_JobSystem(JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers, std::thread::hardware_concurrency() - 1)
 {
-	m_PhysicsSystem.Init(cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, m_BroadPhaseLayerInterface, m_ObjectVsBroadPhaseLayerFilter, m_ObjectVsObjectLayerFilter);
+	m_PhysicsSystem.Init(cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, 
+		m_BroadPhaseLayerInterface, m_ObjectVsBroadPhaseLayerFilter, m_ObjectVsObjectLayerFilter);
 
 	m_PhysicsSystem.SetBodyActivationListener(&m_BodyActivationListener);
 	m_PhysicsSystem.SetContactListener(&m_ContactListener);
@@ -159,6 +160,21 @@ JPH::BodyCreationSettings PhysicsSystem::BuildBodyCreationSettings(RigidbodyComp
 	settings.mAngularDamping = rbComp.angularDamping;
 	settings.mGravityFactor = rbComp.gravityFactor;
 	settings.mIsSensor = rbComp.isSensor;
+
+	if (!rbComp.autoCalculateMass)
+	{
+		settings.mOverrideMassProperties = JPH::EOverrideMassProperties::CalculateInertia;
+		settings.mMassPropertiesOverride.mMass = rbComp.mass;
+	}
+
+	settings.mMaxLinearVelocity = rbComp.maxLinearVelocity;
+	settings.mMaxAngularVelocity = rbComp.maxAngularVelocity;
+	
+	settings.mAllowSleeping = rbComp.allowSleep;
+
+	// ensure sensors detect static bodies
+	settings.mCollideKinematicVsNonDynamic = true;
+	
 
 	JPH::EAllowedDOFs dofs = JPH::EAllowedDOFs::None;
 

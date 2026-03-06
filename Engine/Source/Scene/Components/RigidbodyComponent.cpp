@@ -7,11 +7,15 @@ json RigidbodyComponent::Serialize() const
 {
     json j;
     j["bodyType"] = static_cast<int>(bodyType);
+    j["autoCalculateMass"] = static_cast<int>(autoCalculateMass);
     j["mass"] = mass;
     j["friction"] = friction;
     j["restitution"] = restitution;
     j["linearDamping"] = linearDamping;
     j["angularDamping"] = angularDamping;
+    j["maxLinearVelocity"] = maxLinearVelocity;
+    j["maxAngularVelocity"] = maxAngularVelocity;
+    j["allowSleep"] = static_cast<int>(allowSleep);
 
     j["lockRotationX"] = lockRotationX;
     j["lockRotationY"] = lockRotationY;
@@ -32,11 +36,15 @@ void RigidbodyComponent::Deserialize(const json& j)
 {
     bodyType = static_cast<Physics::BodyType>(j.value("bodyType", static_cast<int>(Physics::BodyType::DYNAMIC)));
 
+    autoCalculateMass = static_cast<bool>(j.value("autoCalculateMass", 1.0));
     mass = j.value("mass", 1.0f);
     friction = j.value("friction", 0.5f);
-    restitution = j.value("restitution", 0.2f);
+    restitution = j.value("restitution", 0.0f);
     linearDamping = j.value("linearDamping", 0.05f);
     angularDamping = j.value("angularDamping", 0.05f);
+    maxLinearVelocity = j.value("maxLinearVelocity", 500.0f);
+    maxAngularVelocity = j.value("maxAngularVelocity", 50.0f);
+    allowSleep = static_cast<bool>(j.value("allowSleep", 1.0));
 
     lockRotationX = j.value("lockRotationX", false);
     lockRotationY = j.value("lockRotationY", false);

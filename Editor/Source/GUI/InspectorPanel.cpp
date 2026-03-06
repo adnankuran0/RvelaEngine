@@ -285,18 +285,29 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                 {
                     rb.bodyType= static_cast<Physics::BodyType>(current);
                 }
-                ImGui::SliderFloat("Mass", &rb.mass, 0.001f, 1000.0f);
+
+                ImGui::Checkbox("Auto mass", &rb.autoCalculateMass);
+                bool autoMass = rb.autoCalculateMass;
+                if(!autoMass)
+                    ImGui::SliderFloat("Mass", &rb.mass, 0.001f, 1000.0f);
                 ImGui::SliderFloat("Friction", &rb.friction, 0.0f, 1.0f);
                 ImGui::SliderFloat("Restitution", &rb.restitution, 0.0f, 1.0f);
                 ImGui::SliderFloat("Linear Damping", &rb.linearDamping, 0.0f, 1.0f);
                 ImGui::SliderFloat("Angular Damping", &rb.angularDamping, 0.0f, 1.0f);
+                ImGui::SliderFloat("Max linear velocity", &rb.maxLinearVelocity, 0.0f, 1000.0f);
+                ImGui::SliderFloat("Max angular velocity", &rb.maxAngularVelocity, 0.0f, 100.0f);
+                ImGui::Checkbox("Allow sleeping", &rb.allowSleep);
 
-                ImGui::Checkbox("Lock Rotation X", &rb.lockRotationX);
-                ImGui::Checkbox("Lock Rotation Y", &rb.lockRotationY);
-                ImGui::Checkbox("Lock Rotation Z", &rb.lockRotationZ);
-                ImGui::Checkbox("Lock Translation X", &rb.lockTranslationX);
-                ImGui::Checkbox("Lock Translation Y", &rb.lockTranslationY);
-                ImGui::Checkbox("Lock Translation Z", &rb.lockTranslationZ);
+                if (ImGui::CollapsingHeader("Constraints"))
+                {
+                    ImGui::Checkbox("Lock Rotation X", &rb.lockRotationX);
+                    ImGui::Checkbox("Lock Rotation Y", &rb.lockRotationY);
+                    ImGui::Checkbox("Lock Rotation Z", &rb.lockRotationZ);
+                    ImGui::Checkbox("Lock Translation X", &rb.lockTranslationX);
+                    ImGui::Checkbox("Lock Translation Y", &rb.lockTranslationY);
+                    ImGui::Checkbox("Lock Translation Z", &rb.lockTranslationZ);
+                }
+                
                
                 ImGui::SliderFloat("Gravity factor", &rb.gravityFactor, 0.0f, 10.0f);
 
