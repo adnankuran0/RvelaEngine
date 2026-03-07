@@ -108,11 +108,20 @@ public:
     [[nodiscard]] inline std::vector<entt::entity> GetRootEntities() noexcept
     {
         std::vector<entt::entity> roots;
-        m_Registry.view<SceneTreeComponent>().each([&](entt::entity e, SceneTreeComponent& stc) {
-            if (stc.parent == entt::null) {
+
+        if (!m_Registry.valid(entt::null)) 
+        { 
+            return roots;
+        }
+
+        auto view = m_Registry.view<SceneTreeComponent>();
+        for (auto e : view) {
+            const auto& stc = view.get<SceneTreeComponent>(e);
+            if (stc.parent == entt::null) 
+            {
                 roots.push_back(e);
             }
-            });
+        }
         return roots;
     }
 

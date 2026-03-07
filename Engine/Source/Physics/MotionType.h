@@ -2,7 +2,7 @@
 
 namespace rv::Physics {
 
-enum class BodyType
+enum class MotionType
 {
 	STATIC,
 	KINEMATIC,

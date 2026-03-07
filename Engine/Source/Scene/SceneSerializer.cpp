@@ -106,6 +106,10 @@ void SceneSerializer::LoadScene(Scene& scene, const std::string& path)
         {
             scene.AddComponent<RigidbodyComponent>(handle).Deserialize(entityJson["RigidbodyComponent"]);
         }
+        if (entityJson.contains("CharacterBodyComponent"))
+        {
+            scene.AddComponent<CharacterBodyComponent>(handle).Deserialize(entityJson["CharacterBodyComponent"]);
+        }
         if (entityJson.contains("BoxColliderComponent"))
         {
             scene.AddComponent<BoxColliderComponent>(handle).Deserialize(entityJson["BoxColliderComponent"]);
@@ -202,6 +206,9 @@ json SceneSerializer::SerializeEntity(Scene& scene, entt::entity e)
 
     if (scene.HasComponent<RigidbodyComponent>(e))
         j["RigidbodyComponent"] = scene.GetComponent<RigidbodyComponent>(e).Serialize();
+
+    if (scene.HasComponent<CharacterBodyComponent>(e))
+        j["CharacterBodyComponent"] = scene.GetComponent<CharacterBodyComponent>(e).Serialize();
 
     if (scene.HasComponent<BoxColliderComponent>(e))
         j["BoxColliderComponent"] = scene.GetComponent<BoxColliderComponent>(e).Serialize();

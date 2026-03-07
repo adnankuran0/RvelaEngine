@@ -1,20 +1,19 @@
 #include "rvelapch.h"
 #include "sol/sol.hpp"
 #include "PhysicsBindings.h"
-#include "Physics/PhysicsSystem.h"
+#include "Physics/PhysicsWorld.h"
 #include "Scene/Components/RigidbodyComponent.h"
-#include "Physics/PhysicsSystem.h"
 
-using namespace rv;
+using namespace rv::Physics;
 
-void LuaBindings::RegisterPhysicsAPI(sol::state& lua)
+void rv::LuaBindings::RegisterPhysicsAPI(sol::state& lua)
 {
 
-    lua.new_usertype<rv::PhysicsSystem>("Physics",
-        "AddForce", &rv::PhysicsSystem::AddForce,
-        "AddImpulse", &rv::PhysicsSystem::AddImpulse,
-        "SetVelocity", &rv::PhysicsSystem::SetVelocity,
-        "GetVelocity", &rv::PhysicsSystem::GetVelocity
+    lua.new_usertype<PhysicsWorld>("Physics",
+        "AddForce", &PhysicsWorld::AddForce,
+        "AddImpulse", &PhysicsWorld::AddImpulse,
+        "SetVelocity", &PhysicsWorld::SetVelocity,
+        "GetVelocity", &PhysicsWorld::GetVelocity
     );
 
 }

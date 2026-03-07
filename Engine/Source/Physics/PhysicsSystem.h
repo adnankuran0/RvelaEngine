@@ -11,11 +11,13 @@
 #include "BodyActivationListener.h"
 #include "entt/entt.h"
 #include "ShapeBuilder.h"
+#include "PhysicsWorld.h"
 
 namespace rv {
 
 class Scene;
 struct RigidbodyComponent;
+struct CharacterBodyComponent;
 
 class PhysicsSystem
 {
@@ -24,10 +26,7 @@ public:
 	PhysicsSystem(Scene& scene);
 	void OnStart();
 	void Step(float dt);
-	void AddForce(RigidbodyComponent* comp, const glm::vec3& force);
-	void AddImpulse(RigidbodyComponent* comp, const glm::vec3& impulse);
-	void SetVelocity(RigidbodyComponent* comp, const glm::vec3& velocity);
-	glm::vec3 GetVelocity(RigidbodyComponent* comp);
+	inline Physics::PhysicsWorld& GetPhysicsWorld() { return m_PhysicsWorld; }
 
 private:
 	void InitialiseBodies();
@@ -36,8 +35,7 @@ private:
 	void SyncCharacterTransforms();
 	JPH::BodyCreationSettings BuildBodyCreationSettings(RigidbodyComponent& rbComp, TransformComponent& tComp);
 	JPH::Ref<JPH::CharacterVirtualSettings> BuildCharacterBodyCreationSettings(CharacterBodyComponent& cbComp, TransformComponent& tComp);
-	void UpdateCharacters(float dt);
-	inline JPH::BodyInterface& BodyInterface() { return m_PhysicsSystem.GetBodyInterface(); }
+	void UpdateCharacters(float dt); // TODO: think about seperate MoveAndSlide function
 
 private:
 	const unsigned int cMaxBodies = 1024;
@@ -61,6 +59,8 @@ private:
 	Physics::CharacterContactListener m_CharacterContactListener;
 
 	Physics::ShapeBuilder m_ShapeBuilder;
+
+	Physics::PhysicsWorld m_PhysicsWorld;
 
 	Scene& m_Scene;
 };

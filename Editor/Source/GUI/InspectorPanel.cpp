@@ -317,6 +317,31 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 
             }
         }
+        if (registry.any_of<CharacterBodyComponent>(selectedEntity))
+        {
+            bool open = ImGui::CollapsingHeader("CharacterBody");
+
+            if (ImGui::BeginPopupContextItem("CharacterBodyComponentContext")) {
+                if (ImGui::MenuItem("Remove Component")) {
+                    registry.remove<CharacterBodyComponent>(selectedEntity);
+                }
+
+                ImGui::EndPopup();
+            }
+
+            if (open)
+            {
+                auto& cb = registry.get<CharacterBodyComponent>(selectedEntity);
+
+                ImGui::SliderFloat("Mass", &cb.mass, 0.001f, 1000.0f);
+                ImGui::SliderFloat("Max Strength", &cb.maxStrength, 0.0f, 200.0f);
+                ImGui::DragFloat3("Shape offset", &cb.shapeOffset[0], 0.001f, 1000.0f);
+                ImGui::SliderFloat("Predictive contact  distance", &cb.predictiveContactDistance, 0.0f, 0.2f);
+                ImGui::SliderFloat("Max slope angle", &cb.maxSlopeAngle, 0.0f, 89.0f);
+
+
+            }
+        }
         if (registry.any_of<BoxColliderComponent>(selectedEntity))
         {
             bool open = ImGui::CollapsingHeader("BoxCollider");
@@ -961,6 +986,14 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                 if (ImGui::MenuItem("Rigidbody"))
                 {
                     RigidbodyComponent& comp = registry.emplace<RigidbodyComponent>(selectedEntity);
+                    ImGui::CloseCurrentPopup();
+                }
+            }
+            if (!registry.any_of<CharacterBodyComponent>(selectedEntity))
+            {
+                if (ImGui::MenuItem("CharacterBody"))
+                {
+                    CharacterBodyComponent& comp = registry.emplace<CharacterBodyComponent>(selectedEntity);
                     ImGui::CloseCurrentPopup();
                 }
             }

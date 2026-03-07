@@ -16,6 +16,9 @@ struct CharacterBodyComponent
 	glm::vec3 shapeOffset{ 0.0,0.0,0.0 };
 	float predictiveContactDistance = 0.1f;
 	float maxSlopeAngle = 50.0f; // degrees
+
+	json Serialize() const;
+	void Deserialize(const json& j);
 };
 
 }

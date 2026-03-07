@@ -34,7 +34,7 @@ PhysicsSystem::PhysicsSystem(Scene& scene) :
 	m_PhysicsSystem.SetBodyActivationListener(&m_BodyActivationListener);
 	m_PhysicsSystem.SetContactListener(&m_ContactListener);
 
-	JPH::BodyCreationSettings settings;
+	m_PhysicsWorld.Init(m_PhysicsSystem);
 }
 
 void PhysicsSystem::Step(float dt)
@@ -45,33 +45,6 @@ void PhysicsSystem::Step(float dt)
 	SyncTransforms();
 }
 
-void PhysicsSystem::AddForce(RigidbodyComponent* comp, const glm::vec3& force)
-{
-	if (!comp || comp->RuntimeBodyID.IsInvalid()) return;
-
-	BodyInterface().AddForce(comp->RuntimeBodyID, math::ToJoltVec3(force));
-}
-
-void PhysicsSystem::AddImpulse(RigidbodyComponent* comp, const glm::vec3& impulse)
-{
-	if (!comp || comp->RuntimeBodyID.IsInvalid()) return;
-
-	BodyInterface().AddImpulse(comp->RuntimeBodyID, math::ToJoltVec3(impulse));
-}
-
-void PhysicsSystem::SetVelocity(RigidbodyComponent* comp, const glm::vec3& velocity)
-{
-	if (!comp || comp->RuntimeBodyID.IsInvalid()) return;
-
-	BodyInterface().SetLinearVelocity(comp->RuntimeBodyID, math::ToJoltVec3(velocity));
-}
-
-glm::vec3 PhysicsSystem::GetVelocity(RigidbodyComponent* comp)
-{
-	if (!comp || comp->RuntimeBodyID.IsInvalid()) return glm::vec3(0.0);
-
-	return math::FromJoltVec3(BodyInterface().GetLinearVelocity(comp->RuntimeBodyID));
-}
 
 void PhysicsSystem::OnStart()
 {
@@ -265,6 +238,8 @@ void rv::PhysicsSystem::UpdateCharacters(float dt)
 		auto& cb = m_Scene.GetComponent<CharacterBodyComponent>(e);
 		if (!cb.character) continue;
 
+		
+
 		cb.character->UpdateGroundVelocity();
 
 		JPH::CharacterVirtual::ExtendedUpdateSettings updateSettings;
@@ -281,6 +256,7 @@ void rv::PhysicsSystem::UpdateCharacters(float dt)
 			{},
 			m_TempAllocator
 		);
+
 	}
 }
 
