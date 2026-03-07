@@ -2,7 +2,7 @@
 #include <Jolt/Jolt.h>
 #include <Jolt/Physics/Body/BodyID.h>
 #include <Jolt/Physics/Body/MotionType.h>
-#include "Physics/BodyType.h"
+#include "Physics/MotionType.h"
 #include "../nlohmann/json.hpp"
 
 namespace rv {
@@ -13,7 +13,7 @@ struct RigidbodyComponent
 {
     JPH::BodyID RuntimeBodyID{};
 
-    Physics::BodyType bodyType = Physics::BodyType::DYNAMIC;
+    Physics::MotionType bodyType = Physics::MotionType::DYNAMIC;
 
     bool autoCalculateMass = true;
     float mass = 1.0f;

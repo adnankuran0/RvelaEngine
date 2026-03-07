@@ -36,6 +36,7 @@ private:
 	JPH::BodyCreationSettings BuildBodyCreationSettings(RigidbodyComponent& rbComp, TransformComponent& tComp);
 	JPH::Ref<JPH::CharacterVirtualSettings> BuildCharacterBodyCreationSettings(CharacterBodyComponent& cbComp, TransformComponent& tComp);
 	void UpdateCharacters(float dt); // TODO: think about seperate MoveAndSlide function
+	inline JPH::BodyInterface& BodyInterface() { return m_PhysicsSystem.GetBodyInterface(); }
 
 private:
 	const unsigned int cMaxBodies = 1024;

@@ -34,7 +34,7 @@ json RigidbodyComponent::Serialize() const
 
 void RigidbodyComponent::Deserialize(const json& j)
 {
-    bodyType = static_cast<Physics::BodyType>(j.value("bodyType", static_cast<int>(Physics::BodyType::DYNAMIC)));
+    bodyType = static_cast<Physics::MotionType>(j.value("bodyType", static_cast<int>(Physics::MotionType::DYNAMIC)));
 
     autoCalculateMass = static_cast<bool>(j.value("autoCalculateMass", 1.0));
     mass = j.value("mass", 1.0f);

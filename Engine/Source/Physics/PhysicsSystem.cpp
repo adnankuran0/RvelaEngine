@@ -106,7 +106,7 @@ void rv::PhysicsSystem::SyncBodyTransforms()
 	for (auto e : view)
 	{
 		auto& rb = view.get<RigidbodyComponent>(e);
-		if (rb.bodyType == Physics::BodyType::STATIC) continue;
+		if (rb.bodyType == Physics::MotionType::STATIC) continue;
 
 		auto& transform = view.get<TransformComponent>(e);
 		auto& node = view.get<SceneTreeComponent>(e);
@@ -165,11 +165,11 @@ JPH::BodyCreationSettings PhysicsSystem::BuildBodyCreationSettings(RigidbodyComp
 	JPH::EMotionType motionType = JPH::EMotionType::Dynamic;
 	JPH::ObjectLayer layer = Physics::Layers::MOVING;
 
-	if (rbComp.bodyType == Physics::BodyType::STATIC) {
+	if (rbComp.bodyType == Physics::MotionType::STATIC) {
 		motionType = JPH::EMotionType::Static;
 		layer = Physics::Layers::NON_MOVING;
 	}
-	else if (rbComp.bodyType == Physics::BodyType::KINEMATIC) {
+	else if (rbComp.bodyType == Physics::MotionType::KINEMATIC) {
 		motionType = JPH::EMotionType::Kinematic;
 	}
 

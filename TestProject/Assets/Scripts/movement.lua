@@ -48,7 +48,7 @@ function Player:OnUpdate(dt)
     if Input.IsKeyPressed(KeyCode.A) then inputDir = inputDir + camRight end
     if Input.IsKeyPressed(KeyCode.D) then inputDir = inputDir - camRight end
 
-    local velocity = self.physics:GetVelocity(self.rb)
+    local velocity = self.physics:GetLinearVelocity(self.rb)
     local horizontal = Vec3.new(velocity.x, 0, velocity.z)
 
     if inputDir:LengthSq() > 0 then
@@ -64,9 +64,9 @@ function Player:OnUpdate(dt)
     end
 
     if Input.IsKeyJustPressed(KeyCode.Space) and self.isGrounded then
-        local v = self.physics:GetVelocity(self.rb)
+        local v = self.physics:GetLinearVelocity(self.rb)
         v.y = self.jumpStrength
-        self.physics:SetVelocity(self.rb, v)
+        self.physics:SetLinearVelocity(self.rb, v)
         self.isGrounded = false
     end
 
@@ -88,7 +88,7 @@ function Player:OnUpdate(dt)
         end
     end
 
-    local velocity = self.physics:GetVelocity(self.rb)
+    local velocity = self.physics:GetLinearVelocity(self.rb)
 
     if math.abs(velocity.y) < 0.01 then
         self.isGrounded = true

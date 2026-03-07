@@ -81,8 +81,6 @@ public:
 	glm::vec3 GetCharacterGroundVelocity(CharacterBodyComponent* comp);
 	glm::vec3 GetCharacterGroundPosition(CharacterBodyComponent* comp);
 
-
-
 private:
 	inline JPH::BodyInterface& BodyInterface() { return m_PhysicsSystem->GetBodyInterface(); }
 	JPH::PhysicsSystem* m_PhysicsSystem = nullptr;
