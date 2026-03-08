@@ -173,14 +173,14 @@
                     -3.4661056995391846
                 ],
                 "rotation": [
-                    -16.88888168334961,
-                    -32.488773345947266,
-                    72.51538848876953
+                    -16.888751983642578,
+                    -32.488853454589844,
+                    72.51535034179688
                 ],
                 "scale": [
-                    1.0000004768371582,
-                    0.999998927116394,
-                    0.9999967217445374
+                    6.197600364685059,
+                    3.049910068511963,
+                    3.484441041946411
                 ]
             },
             "UUID": 16
@@ -290,7 +290,61 @@
                 "lockScaleRatio": false,
                 "position": [
                     0.0,
+                    -14.589408874511719,
+                    0.0
+                ],
+                "rotation": [
                     0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    10.0,
+                    10.0,
+                    10.0
+                ]
+            },
+            "UUID": 2
+        },
+        {
+            "CapsuleColliderComponent": {
+                "halfHeight": 0.5,
+                "offset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "radius": 0.5
+            },
+            "CharacterBodyComponent": {
+                "mass": 70.0,
+                "maxSlopeAngle": 50.0,
+                "maxStrength": 10000.0,
+                "predictiveContactDistance": 0.10000000149011612,
+                "shapeOffset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ]
+            },
+            "Material": {
+                "material": "ee3dde12-6263-4f11-bb1d-812b3e196ab7"
+            },
+            "Mesh": {
+                "mesh": "395a97e7-2cbe-4d65-95af-dea85f856252"
+            },
+            "ParentUUID": 0,
+            "ScriptComponent": {
+                "luaFile": "C:\\RvelaEngine\\TestProject\\Assets\\Scripts\\CharacterController.lua"
+            },
+            "Tag": {
+                "tag": "Character"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    4.0979461669921875,
                     0.0
                 ],
                 "rotation": [
@@ -304,7 +358,101 @@
                     1.0
                 ]
             },
-            "UUID": 2
+            "UUID": 8
+        },
+        {
+            "ParentUUID": 8,
+            "ScriptComponent": {
+                "luaFile": "C:\\RvelaEngine\\TestProject\\Assets\\Scripts\\camera.lua"
+            },
+            "Tag": {
+                "tag": "CameraHolder"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.5963134765625,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 23
+        },
+        {
+            "CameraComponent": {
+                "farClip": 1000.0,
+                "fov": 90.0,
+                "isActive": true,
+                "nearClip": 0.10000000149011612,
+                "projectionType": 0
+            },
+            "ParentUUID": 23,
+            "Tag": {
+                "tag": "Camera"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 24
+        },
+        {
+            "DirectionalLight": {
+                "castShadows": true,
+                "color": [
+                    1.0,
+                    0.9265874624252319,
+                    0.8084112405776978
+                ],
+                "intensity": 3.0
+            },
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": "DirectionalLight"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    -34.95356369018555,
+                    41.99502944946289,
+                    -1.0640610456466675
+                ],
+                "scale": [
+                    0.9999991655349731,
+                    0.9999980926513672,
+                    0.9999989867210388
+                ]
+            },
+            "UUID": 57
         }
     ],
     "Environment": {
@@ -320,7 +468,7 @@
         ],
         "Lighting_AmbientIntensity": 0.5,
         "Lighting_IBL": true,
-        "Lighting_IBLIntensity": 0.5,
+        "Lighting_IBLIntensity": 0.20000000298023224,
         "PostProcess_ChromaticStrength": 0.009999999776482582,
         "PostProcess_Exposure": 1.0,
         "PostProcess_VignetteIntensity": 0.25,

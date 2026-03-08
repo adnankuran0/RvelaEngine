@@ -39,7 +39,6 @@ void LuaBindings::RegisterComponents(sol::state& lua)
         "reverseCullFace", &rv::DirectionalLightComponent::reverseCullFace
     );
 
-    // TODO:
     lua.new_usertype<rv::RigidbodyComponent>("RigidbodyComponent",
         "mass", &rv::RigidbodyComponent::mass
     );

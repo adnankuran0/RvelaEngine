@@ -7,7 +7,6 @@
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Body/BodyActivationListener.h>
 
-
 #include "Layers.h"
 #include <iostream>
 #include <cstdarg>
@@ -39,7 +38,7 @@ PhysicsSystem::PhysicsSystem(Scene& scene) :
 
 void PhysicsSystem::Step(float dt)
 {
-	InitialiseBodies();
+	BuildBodies();
 	UpdateCharacters(dt);
 	m_PhysicsSystem.Update(dt, cCollisionSteps, &m_TempAllocator, &m_JobSystem);
 	SyncTransforms();
@@ -49,10 +48,16 @@ void PhysicsSystem::Step(float dt)
 void PhysicsSystem::OnStart()
 {
 	m_PhysicsSystem.OptimizeBroadPhase();
-	InitialiseBodies();
+	BuildBodies();
 }
 
-void PhysicsSystem::InitialiseBodies()
+void PhysicsSystem::BuildBodies()
+{
+	BuildRigidbodies();
+	BuildCharacterBodies();
+}
+
+void PhysicsSystem::BuildRigidbodies()
 {
 	auto rbView = m_Scene.GetRegistry().view<RigidbodyComponent>();
 	for (auto& e : rbView)
@@ -63,35 +68,38 @@ void PhysicsSystem::InitialiseBodies()
 		auto& transform = m_Scene.GetComponent<TransformComponent>(e);
 		JPH::BodyCreationSettings settings = BuildBodyCreationSettings(rb, transform);
 
-		JPH::ShapeRefC shape = m_ShapeBuilder.BuildShape(m_Scene.GetRegistry(),e);
+		JPH::ShapeRefC shape = m_ShapeBuilder.BuildShape(m_Scene.GetRegistry(), e);
 		settings.SetShape(shape);
 
 		rb.RuntimeBodyID = BodyInterface().CreateAndAddBody(settings, JPH::EActivation::Activate);
 	}
+}
 
+void PhysicsSystem::BuildCharacterBodies()
+{
 	auto cbView = m_Scene.GetRegistry().view<CharacterBodyComponent>();
 	for (auto& e : cbView)
 	{
 		auto& cb = m_Scene.GetComponent<CharacterBodyComponent>(e);
-		if (cb.character) continue; 
+		if (cb.character) continue;
 
 		auto& transform = m_Scene.GetComponent<TransformComponent>(e);
 
 		auto settings = BuildCharacterBodyCreationSettings(cb, transform);
-		settings->mShape = m_ShapeBuilder.BuildShape(m_Scene.GetRegistry(), e);
-
+		auto shape = m_ShapeBuilder.BuildShape(m_Scene.GetRegistry(), e);
+		settings->mShape = shape;
+		//settings->mInnerBodyShape = shape;
 		cb.character = new JPH::CharacterVirtual(
 			settings,
 			math::ToJoltVec3(transform.GetWorldPosition()),
 			math::ToJoltQuat(transform.GetWorldRotation()),
 			(int)e,
-			&m_PhysicsSystem 
+			&m_PhysicsSystem
 		);
 		cb.character->SetCharacterVsCharacterCollision(&m_CharacterVsCharacterCollision);
 		m_CharacterVsCharacterCollision.Add(cb.character);
 		cb.character->SetListener(&m_CharacterContactListener);
 	}
-
 }
 
 void PhysicsSystem::SyncTransforms()
@@ -200,7 +208,6 @@ JPH::BodyCreationSettings PhysicsSystem::BuildBodyCreationSettings(RigidbodyComp
 
 	// ensure sensors detect static bodies
 	settings.mCollideKinematicVsNonDynamic = true;
-	
 
 	JPH::EAllowedDOFs dofs = JPH::EAllowedDOFs::None;
 

@@ -1,35 +1,68 @@
 {
     "Entities": [
         {
+            "BoxColliderComponent": {
+                "offset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    0.5,
+                    0.5,
+                    0.5
+                ]
+            },
             "Material": {
-                "material": "d81a3b00-28f7-4b98-923e-b7344e7594f9"
+                "material": "ee3dde12-6263-4f11-bb1d-812b3e196ab7"
             },
             "Mesh": {
-                "mesh": "e5f740be-1e0a-43ed-9fe3-2877cab3078e"
+                "mesh": "36468d32-bba5-4eb4-82db-0d4da5cd6c65"
             },
-            "ParentUUID": 413,
+            "ParentUUID": 0,
+            "RigidbodyComponent": {
+                "allowSleep": 1,
+                "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
+                "bodyType": 2,
+                "friction": 0.5,
+                "gravityFactor": 1.0,
+                "isSensor": false,
+                "linearDamping": 0.05000000074505806,
+                "lockRotationX": false,
+                "lockRotationY": false,
+                "lockRotationZ": false,
+                "lockTranslationX": false,
+                "lockTranslationY": false,
+                "lockTranslationZ": false,
+                "mass": 40.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
+                "restitution": 0.0,
+                "useCCD": false
+            },
             "Tag": {
-                "tag": "wooden_axe"
+                "tag": "Cube"
             },
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
-                    0.31223011016845703,
-                    -0.4569528102874756,
-                    -0.11408272385597229
+                    -5.640468120574951,
+                    1.0377193689346313,
+                    -0.8102413415908813
                 ],
                 "rotation": [
-                    -161.4398651123047,
-                    11.384799003601074,
-                    -176.97247314453125
+                    0.0,
+                    -0.0,
+                    0.0
                 ],
                 "scale": [
-                    1.000307321548462,
-                    1.0001155138015747,
-                    1.0006197690963745
+                    1.0,
+                    1.0,
+                    1.0
                 ]
             },
-            "UUID": 432
+            "UUID": 2666
         },
         {
             "Material": {
@@ -13118,6 +13151,17 @@
                 ],
                 "radius": 0.5
             },
+            "CharacterBodyComponent": {
+                "mass": 70.0,
+                "maxSlopeAngle": 50.0,
+                "maxStrength": 100.0,
+                "predictiveContactDistance": 0.10000000149011612,
+                "shapeOffset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ]
+            },
             "Material": {
                 "material": "ee3dde12-6263-4f11-bb1d-812b3e196ab7"
             },
@@ -13125,29 +13169,8 @@
                 "mesh": "395a97e7-2cbe-4d65-95af-dea85f856252"
             },
             "ParentUUID": 0,
-            "RigidbodyComponent": {
-                "allowSleep": 1,
-                "angularDamping": 0.0,
-                "autoCalculateMass": 1,
-                "bodyType": 2,
-                "friction": 0.10999999940395355,
-                "gravityFactor": 1.0,
-                "isSensor": false,
-                "linearDamping": 0.05000000074505806,
-                "lockRotationX": true,
-                "lockRotationY": true,
-                "lockRotationZ": true,
-                "lockTranslationX": false,
-                "lockTranslationY": false,
-                "lockTranslationZ": false,
-                "mass": 534.2470092773438,
-                "maxAngularVelocity": 50.0,
-                "maxLinearVelocity": 500.0,
-                "restitution": 0.0,
-                "useCCD": false
-            },
             "ScriptComponent": {
-                "luaFile": "C:\\RvelaEngine\\TestProject\\Assets\\Scripts\\movement.lua"
+                "luaFile": "C:\\RvelaEngine\\TestProject\\Assets\\Scripts\\CharacterController.lua"
             },
             "Tag": {
                 "tag": "Character"
@@ -13156,7 +13179,7 @@
                 "lockScaleRatio": false,
                 "position": [
                     -8.447417259216309,
-                    3.1447434425354004,
+                    1.123093605041504,
                     0.0
                 ],
                 "rotation": [
@@ -13560,7 +13583,7 @@
         },
         {
             "Material": {
-                "material": "ee3dde12-6263-4f11-bb1d-812b3e196ab7"
+                "material": "afd0df4c-0757-4f9b-b211-7370b5f0613f"
             },
             "Mesh": {
                 "mesh": "7f8ebf7d-a783-4a96-93e5-effcc76f557d"
@@ -14077,7 +14100,7 @@
             "RigidbodyComponent": {
                 "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
-                "autoCalculateMass": 1,
+                "autoCalculateMass": 0,
                 "bodyType": 2,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
@@ -14089,7 +14112,7 @@
                 "lockTranslationX": false,
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
-                "mass": 1.0,
+                "mass": 40.0,
                 "maxAngularVelocity": 50.0,
                 "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
@@ -14239,55 +14262,35 @@
             "UUID": 866
         },
         {
-            "CapsuleColliderComponent": {
-                "halfHeight": 0.5,
-                "offset": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "radius": 0.5
-            },
-            "CharacterBodyComponent": {
-                "mass": 70.0,
-                "maxSlopeAngle": 50.0,
-                "maxStrength": 100.0,
-                "predictiveContactDistance": 0.10000000149011612,
-                "shapeOffset": [
-                    0.0,
-                    0.0,
-                    0.0
-                ]
-            },
             "Material": {
-                "material": "ee3dde12-6263-4f11-bb1d-812b3e196ab7"
+                "material": "d81a3b00-28f7-4b98-923e-b7344e7594f9"
             },
             "Mesh": {
-                "mesh": "395a97e7-2cbe-4d65-95af-dea85f856252"
+                "mesh": "e5f740be-1e0a-43ed-9fe3-2877cab3078e"
             },
-            "ParentUUID": 0,
+            "ParentUUID": 413,
             "Tag": {
-                "tag": "Capsule"
+                "tag": "wooden_axe"
             },
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
-                    -4.548254013061523,
-                    5.557475566864014,
-                    0.0
+                    0.31223011016845703,
+                    -0.4569528102874756,
+                    -0.11408272385597229
                 ],
                 "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
+                    -161.4398651123047,
+                    11.38479995727539,
+                    -176.97247314453125
                 ],
                 "scale": [
-                    1.0,
-                    1.0,
-                    1.0
+                    1.000307321548462,
+                    1.0001155138015747,
+                    1.0006197690963745
                 ]
             },
-            "UUID": 868
+            "UUID": 432
         }
     ],
     "Environment": {

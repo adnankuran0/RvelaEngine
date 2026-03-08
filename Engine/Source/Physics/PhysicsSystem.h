@@ -22,14 +22,16 @@ struct CharacterBodyComponent;
 class PhysicsSystem
 {
 public:
-
 	PhysicsSystem(Scene& scene);
 	void OnStart();
 	void Step(float dt);
 	inline Physics::PhysicsWorld& GetPhysicsWorld() { return m_PhysicsWorld; }
 
 private:
-	void InitialiseBodies();
+	void BuildBodies();
+	void BuildRigidbodies();
+	void BuildCharacterBodies();
+
 	void SyncTransforms();
 	void SyncBodyTransforms();
 	void SyncCharacterTransforms();
