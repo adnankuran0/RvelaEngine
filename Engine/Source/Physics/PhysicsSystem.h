@@ -26,6 +26,7 @@ public:
 	void OnStart();
 	void Step(float dt);
 	inline Physics::PhysicsWorld& GetPhysicsWorld() { return m_PhysicsWorld; }
+	std::vector<Physics::CollisionEvent> FlushEvents() { return std::move(m_CollisionEventQueue); }
 
 private:
 	void BuildBodies();
@@ -47,6 +48,8 @@ private:
 	const unsigned int cMaxContactConstraints = 1024;
 	const int cCollisionSteps = 1;
 
+	Scene& m_Scene;
+
 	JPH::TempAllocatorImpl m_TempAllocator;
 	JPH::JobSystemThreadPool m_JobSystem;
 
@@ -65,7 +68,8 @@ private:
 
 	Physics::PhysicsWorld m_PhysicsWorld;
 
-	Scene& m_Scene;
+	std::vector<Physics::CollisionEvent> m_CollisionEventQueue;
+
 };
 
 }

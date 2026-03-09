@@ -34,6 +34,9 @@ PhysicsSystem::PhysicsSystem(Scene& scene) :
 	m_PhysicsSystem.SetContactListener(&m_ContactListener);
 
 	m_PhysicsWorld.Init(m_PhysicsSystem);
+
+	m_CollisionEventQueue.reserve(50);
+	m_ContactListener.Init(&BodyInterface(),&m_CollisionEventQueue);
 }
 
 void PhysicsSystem::Step(float dt)
@@ -67,6 +70,7 @@ void PhysicsSystem::BuildRigidbodies()
 
 		auto& transform = m_Scene.GetComponent<TransformComponent>(e);
 		JPH::BodyCreationSettings settings = BuildBodyCreationSettings(rb, transform);
+		settings.mUserData = static_cast<uint64_t>(e);
 
 		JPH::ShapeRefC shape = m_ShapeBuilder.BuildShape(m_Scene.GetRegistry(), e);
 		settings.SetShape(shape);

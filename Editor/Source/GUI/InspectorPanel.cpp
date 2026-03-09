@@ -283,7 +283,7 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 
                 if (ImGui::Combo("Body type", &current, bodyTypes, 3))
                 {
-                    rb.bodyType= static_cast<Physics::BodyType>(current);
+                    rb.bodyType= static_cast<Physics::MotionType>(current);
                 }
 
                 ImGui::Checkbox("Auto mass", &rb.autoCalculateMass);
