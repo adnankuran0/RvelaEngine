@@ -17,6 +17,12 @@ struct CharacterBodyComponent
 	float predictiveContactDistance = 0.1f;
 	float maxSlopeAngle = 50.0f; // degrees
 
+	bool interpolationReady = false;
+	glm::vec3 previousPosition{};
+	glm::quat previousRotation{ 1,0,0,0 };
+	glm::vec3 currentPosition{};
+	glm::quat currentRotation{ 1,0,0,0 };
+
 	json Serialize() const;
 	void Deserialize(const json& j);
 };

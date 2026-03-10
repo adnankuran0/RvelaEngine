@@ -64,6 +64,11 @@ public:
         fpsUpdateTime = fpsUpdateTimeAsMiliseconds;
     }
 
+    inline static float GetInterpolationAlpha() noexcept
+    {
+        return fixedTimeAccumulator / fixedDeltaTime;
+    }
+
 private:
     static float lastFrameTime;  ///< The time of the last frame (in seconds).
     static float deltaTime;      ///< The time difference between the current and last frame (in seconds).

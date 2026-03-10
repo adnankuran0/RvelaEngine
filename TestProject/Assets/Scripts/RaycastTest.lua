@@ -8,7 +8,8 @@ end
 function RaycastTest:OnFixedUpdate(dt)
     local raycastResult = self.physics:Raycast(self.transform:GetWorldPosition(),self.transform:GetForward(),5.0,false)
     if raycastResult.hit then
-        print("Found hit",raycastResult.entity:GetName(),raycastResult.normal)
+        print("Found hit",raycastResult.entity:GetName(),raycastResult.point)
+        
     end
 
 end

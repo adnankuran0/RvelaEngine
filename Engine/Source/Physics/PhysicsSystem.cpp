@@ -42,8 +42,8 @@ PhysicsSystem::PhysicsSystem(Scene& scene) :
 void PhysicsSystem::Step(float dt)
 {
 	BuildBodies();
-	UpdateCharacters(dt);
 	m_PhysicsSystem.Update(dt, cCollisionSteps, &m_TempAllocator, &m_JobSystem);
+	UpdateCharacters(dt);
 	SyncTransforms();
 }
 
@@ -82,6 +82,12 @@ void PhysicsSystem::BuildRigidbodies()
 		settings.SetShape(shape);
 
 		rb.RuntimeBodyID = BodyInterface().CreateAndAddBody(settings, JPH::EActivation::Activate);
+		rb.currentPosition = math::FromJoltRVec3(BodyInterface().GetPosition(rb.RuntimeBodyID));
+		rb.currentRotation = math::FromJoltQuat(BodyInterface().GetRotation(rb.RuntimeBodyID));
+		rb.previousPosition = rb.currentPosition;
+		rb.previousRotation = rb.currentRotation;
+		rb.interpolationReady = true;
+
 	}
 }
 
@@ -109,6 +115,12 @@ void PhysicsSystem::BuildCharacterBodies()
 		cb.character->SetCharacterVsCharacterCollision(&m_CharacterVsCharacterCollision);
 		m_CharacterVsCharacterCollision.Add(cb.character);
 		cb.character->SetListener(&m_CharacterContactListener);
+
+		cb.currentPosition = math::FromJoltRVec3(cb.character->GetPosition());
+		cb.currentRotation = math::FromJoltQuat(cb.character->GetRotation());
+		cb.previousPosition = cb.currentPosition;
+		cb.previousRotation = cb.currentRotation;
+		cb.interpolationReady = true;
 	}
 }
 
@@ -126,31 +138,12 @@ void rv::PhysicsSystem::SyncBodyTransforms()
 		auto& rb = view.get<RigidbodyComponent>(e);
 		if (rb.bodyType == Physics::MotionType::STATIC) continue;
 
-		auto& transform = view.get<TransformComponent>(e);
-		auto& node = view.get<SceneTreeComponent>(e);
+		rb.previousPosition = rb.currentPosition;
+		rb.previousRotation = rb.currentRotation;
 
-		glm::vec3 worldPos = math::FromJoltRVec3(BodyInterface().GetPosition(rb.RuntimeBodyID));
-		glm::quat worldRot = math::FromJoltQuat(BodyInterface().GetRotation(rb.RuntimeBodyID));
-
-		if (node.parent == entt::null || node.parent == m_Scene.GetRootEntity())
-		{
-			transform.SetPosition(worldPos);
-			transform.SetRotation(worldRot);
-		}
-		else
-		{
-			auto& parentTransform = m_Scene.GetComponent<TransformComponent>(node.parent);
-			glm::mat4 invParentWorld = glm::inverse(parentTransform.GetWorldMatrix());
-
-			glm::vec3 localPos = glm::vec3(invParentWorld * glm::vec4(worldPos, 1.0f));
-			glm::quat localRot = glm::inverse(parentTransform.GetWorldRotation()) * worldRot;
-
-			transform.SetPosition(localPos);
-			transform.SetRotation(localRot);
-		}
-
-		glm::mat4 newWorld = glm::translate(glm::mat4(1.0f), worldPos) * glm::mat4_cast(worldRot) * glm::scale(glm::mat4(1.0f), transform.GetScale());
-		transform.SetWorldMatrix(newWorld);
+		// Jolt'tan oku → current'a kaydet
+		rb.currentPosition = math::FromJoltRVec3(BodyInterface().GetPosition(rb.RuntimeBodyID));
+		rb.currentRotation = math::FromJoltQuat(BodyInterface().GetRotation(rb.RuntimeBodyID));
 	}
 }
 
@@ -162,18 +155,11 @@ void rv::PhysicsSystem::SyncCharacterTransforms()
 		auto& cb = view.get<CharacterBodyComponent>(e);
 		if (!cb.character) continue;
 
-		auto& transform = view.get<TransformComponent>(e);
+		cb.previousPosition = cb.currentPosition;
+		cb.previousRotation = cb.currentRotation;
 
-		glm::vec3 pos = math::FromJoltRVec3(cb.character->GetPosition());
-		glm::quat rot = math::FromJoltQuat(cb.character->GetRotation());
-
-		transform.SetPosition(pos);
-		transform.SetRotation(rot);
-
-		glm::mat4 newWorld = glm::translate(glm::mat4(1.0f), pos)
-			* glm::mat4_cast(rot)
-			* glm::scale(glm::mat4(1.0f), transform.GetScale());
-		transform.SetWorldMatrix(newWorld);
+		cb.currentPosition = math::FromJoltRVec3(cb.character->GetPosition());
+		cb.currentRotation = math::FromJoltQuat(cb.character->GetRotation());
 	}
 }
 
@@ -244,6 +230,7 @@ JPH::Ref<JPH::CharacterVirtualSettings> rv::PhysicsSystem::BuildCharacterBodyCre
 	settings->mShapeOffset = math::ToJoltVec3(cbComp.shapeOffset);
 	settings->mPredictiveContactDistance = cbComp.predictiveContactDistance;
 	settings->mMaxSlopeAngle = JPH::DegreesToRadians(cbComp.maxSlopeAngle);
+	settings->mPenetrationRecoverySpeed = 0.5f; 
 	return settings;
 }
 
@@ -260,8 +247,8 @@ void rv::PhysicsSystem::UpdateCharacters(float dt)
 		cb.character->UpdateGroundVelocity();
 
 		JPH::CharacterVirtual::ExtendedUpdateSettings updateSettings;
-		//updateSettings.mStickToFloorStepDown = -cb.character->GetUp() * 0.5f; 
-		//updateSettings.mWalkStairsStepUp = cb.character->GetUp() * 0.4f;
+		updateSettings.mStickToFloorStepDown = JPH::Vec3::sZero();
+		updateSettings.mWalkStairsStepUp = JPH::Vec3::sZero();
 
 		cb.character->ExtendedUpdate(
 			dt,

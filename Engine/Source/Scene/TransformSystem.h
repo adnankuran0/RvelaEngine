@@ -11,6 +11,9 @@ public:
     TransformSystem(Scene& scene) : m_Scene(scene) {}
     void Update();
 private:
+    void InterpolatePhysicsBodies();
+    void InterpolateRigidbodies(float alpha);
+    void InterpolateCharacterBodies(float alpha);
     void UpdateNodeRecursive(entt::entity e, const glm::mat4& parentWorldMatrix, bool parentDirty);
     Scene& m_Scene;
 };
