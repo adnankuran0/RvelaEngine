@@ -17,6 +17,7 @@
 #include "Math/RvelaMath.h"
 #include <glm/gtx/component_wise.hpp>
 #include "ShapeBuilder.h"
+#include "UserData.h"
 
 JPH_SUPPRESS_WARNINGS
 
@@ -36,7 +37,8 @@ PhysicsSystem::PhysicsSystem(Scene& scene) :
 	m_PhysicsWorld.Init(m_PhysicsSystem);
 
 	m_CollisionEventQueue.reserve(50);
-	m_ContactListener.Init(&m_PhysicsSystem,&m_CollisionEventQueue);
+	m_ContactListener.Init(&m_Scene,&m_PhysicsSystem,&m_CollisionEventQueue);
+	m_CharacterContactListener.Init(&m_PhysicsSystem);
 }
 
 void PhysicsSystem::Step(float dt)
@@ -76,7 +78,11 @@ void PhysicsSystem::BuildRigidbodies()
 
 		auto& transform = m_Scene.GetComponent<TransformComponent>(e);
 		JPH::BodyCreationSettings settings = BuildBodyCreationSettings(rb, transform);
-		settings.mUserData = static_cast<uint64_t>(e);
+
+		Physics::UserData* data = new Physics::UserData{};
+		data->filter = rb.collisionFilter;
+		data->entity = e;
+		settings.mUserData =(JPH::uint64)data;
 
 		JPH::ShapeRefC shape = m_ShapeBuilder.BuildShape(m_Scene.GetRegistry(), e);
 		settings.SetShape(shape);
@@ -114,13 +120,20 @@ void PhysicsSystem::BuildCharacterBodies()
 		);
 		cb.character->SetCharacterVsCharacterCollision(&m_CharacterVsCharacterCollision);
 		m_CharacterVsCharacterCollision.Add(cb.character);
-		cb.character->SetListener(&m_CharacterContactListener);
 
+		Physics::UserData* data = new Physics::UserData{};
+		data->filter = cb.collisionFilter;
+		data->entity = e;
+		cb.character->SetUserData((JPH::uint64)data);
+
+		cb.character->SetListener(&m_CharacterContactListener);
 		cb.currentPosition = math::FromJoltRVec3(cb.character->GetPosition());
 		cb.currentRotation = math::FromJoltQuat(cb.character->GetRotation());
 		cb.previousPosition = cb.currentPosition;
 		cb.previousRotation = cb.currentRotation;
 		cb.interpolationReady = true;
+
+		
 	}
 }
 

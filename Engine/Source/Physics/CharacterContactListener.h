@@ -7,6 +7,14 @@ namespace rv::Physics {
 class CharacterContactListener : public JPH::CharacterContactListener
 {
 public:
+    void Init(JPH::PhysicsSystem* physicsSystem) { m_PhysicsSystem = physicsSystem;  }
+
+    bool OnContactValidate(const JPH::CharacterVirtual* inCharacter, const JPH::BodyID& inBodyID2, 
+        const JPH::SubShapeID& inSubShapeID2) override;
+
+    bool OnCharacterContactValidate(const JPH::CharacterVirtual* inCharacter, 
+        const JPH::CharacterVirtual* inOtherCharacter, const JPH::SubShapeID& inSubShapeID2);
+
     void OnContactAdded(
         const JPH::CharacterVirtual* inCharacter,
         const JPH::BodyID& inBodyID2,
@@ -38,6 +46,8 @@ public:
         const JPH::PhysicsMaterial* inContactMaterial,
         JPH::Vec3Arg inCharacterVelocity,
         JPH::Vec3& ioNewCharacterVelocity) override;
+private:
+    JPH::PhysicsSystem* m_PhysicsSystem;
 };
 
 } 

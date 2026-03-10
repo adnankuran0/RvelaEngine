@@ -6,6 +6,7 @@
 #include "Jolt/Physics/Collision/RayCast.h"
 #include <Jolt/Physics/Collision/CastResult.h>
 #include "Jolt/Physics/Collision/CollisionCollectorImpl.h"
+#include "UserData.h"
 
 using namespace rv::Physics;
 
@@ -386,7 +387,7 @@ RaycastResult PhysicsWorld::Raycast(const glm::vec3& rayOrigin,
 		result.distance = distance;
 		result.point = math::FromJoltRVec3(hitPoint);
 		result.normal = math::FromJoltVec3(normal);
-		result.entity = (entt::entity)body.GetUserData();
+		result.entity = reinterpret_cast<UserData*>(body.GetUserData())->entity;
 	}
 
 	return result;

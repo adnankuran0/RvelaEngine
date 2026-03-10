@@ -307,7 +307,68 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                     ImGui::Checkbox("Lock Translation Y", &rb.lockTranslationY);
                     ImGui::Checkbox("Lock Translation Z", &rb.lockTranslationZ);
                 }
-                
+                if (ImGui::CollapsingHeader("Collision Filter"))
+                {
+                    auto& filter = rb.collisionFilter;
+
+                    if (ImGui::TreeNode("Layer"))
+                    {
+                        for (int i = 0; i < 32; i++)
+                        {
+                            bool enabled = (filter.layer & (1u << i)) != 0;
+
+                            if (enabled)
+                                ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
+
+                            std::string label = std::to_string(i + 1);
+
+                            if (ImGui::Button(label.c_str(), ImVec2(22, 22)))
+                            {
+                                if (enabled)
+                                    filter.layer &= ~(1u << i);
+                                else
+                                    filter.layer |= (1u << i);
+                            }
+
+                            if (enabled)
+                                ImGui::PopStyleColor();
+
+                            if ((i % 8) != 7)
+                                ImGui::SameLine();
+                        }
+
+                        ImGui::TreePop();
+                    }
+
+                    if (ImGui::TreeNode("Mask"))
+                    {
+                        for (int i = 0; i < 32; i++)
+                        {
+                            bool enabled = (filter.mask & (1u << i)) != 0;
+
+                            if (enabled)
+                                ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
+
+                            std::string label = std::to_string(i + 1);
+
+                            if (ImGui::Button(label.c_str(), ImVec2(22, 22)))
+                            {
+                                if (enabled)
+                                    filter.mask &= ~(1u << i);
+                                else
+                                    filter.mask |= (1u << i);
+                            }
+
+                            if (enabled)
+                                ImGui::PopStyleColor();
+
+                            if ((i % 8) != 7)
+                                ImGui::SameLine();
+                        }
+
+                        ImGui::TreePop();
+                    }
+                }
                
                 ImGui::SliderFloat("Gravity factor", &rb.gravityFactor, 0.0f, 10.0f);
 
@@ -339,7 +400,68 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                 ImGui::SliderFloat("Predictive contact  distance", &cb.predictiveContactDistance, 0.0f, 0.2f);
                 ImGui::SliderFloat("Max slope angle", &cb.maxSlopeAngle, 0.0f, 89.0f);
 
+                if (ImGui::CollapsingHeader("Collision Filter"))
+                {
+                    auto& filter = cb.collisionFilter;
 
+                    if (ImGui::TreeNode("Layer"))
+                    {
+                        for (int i = 0; i < 32; i++)
+                        {
+                            bool enabled = (filter.layer & (1u << i)) != 0;
+
+                            if (enabled)
+                                ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
+
+                            std::string label = std::to_string(i + 1);
+
+                            if (ImGui::Button(label.c_str(), ImVec2(22, 22)))
+                            {
+                                if (enabled)
+                                    filter.layer &= ~(1u << i);
+                                else
+                                    filter.layer |= (1u << i);
+                            }
+
+                            if (enabled)
+                                ImGui::PopStyleColor();
+
+                            if ((i % 8) != 7)
+                                ImGui::SameLine();
+                        }
+
+                        ImGui::TreePop();
+                    }
+
+                    if (ImGui::TreeNode("Mask"))
+                    {
+                        for (int i = 0; i < 32; i++)
+                        {
+                            bool enabled = (filter.mask & (1u << i)) != 0;
+
+                            if (enabled)
+                                ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
+
+                            std::string label = std::to_string(i + 1);
+
+                            if (ImGui::Button(label.c_str(), ImVec2(22, 22)))
+                            {
+                                if (enabled)
+                                    filter.mask &= ~(1u << i);
+                                else
+                                    filter.mask |= (1u << i);
+                            }
+
+                            if (enabled)
+                                ImGui::PopStyleColor();
+
+                            if ((i % 8) != 7)
+                                ImGui::SameLine();
+                        }
+
+                        ImGui::TreePop();
+                    }
+                }
             }
         }
         if (registry.any_of<BoxColliderComponent>(selectedEntity))

@@ -29,6 +29,9 @@ json RigidbodyComponent::Serialize() const
     j["isSensor"] = isSensor;
     j["useCCD"] = useCCD;
 
+    j["collisionLayer"] = collisionFilter.layer;
+    j["collisionMask"] = collisionFilter.mask;
+
     return j;
 }
 
@@ -57,4 +60,7 @@ void RigidbodyComponent::Deserialize(const json& j)
     gravityFactor = j.value("gravityFactor", 1.0f);
     isSensor = j.value("isSensor", false);
     useCCD = j.value("useCCD", false);
+
+    collisionFilter.layer = j.value("collisionLayer", 1u);
+    collisionFilter.mask = j.value("collisionMask", 0xFFFFFFFFu);
 }

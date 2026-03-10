@@ -4,6 +4,7 @@
 #include <Jolt/Physics/Body/MotionType.h>
 #include "Physics/MotionType.h"
 #include "../nlohmann/json.hpp"
+#include "Physics/CollisionFilter.h"
 
 namespace rv {
 
@@ -38,6 +39,8 @@ struct RigidbodyComponent
     bool isSensor = false;
 
     bool useCCD = false;
+
+    Physics::CollisionFilter collisionFilter;
 
     bool interpolationReady = false;
     glm::vec3 previousPosition{};

@@ -3,19 +3,35 @@
 #include "Core/Log.h"
 #include "Math/RvelaMath.h"
 #include <Jolt/Physics/Body/BodyLockMulti.h>
+#include "Scene/Scene.h"
+#include "UserData.h"
 
 using namespace rv::Physics;
 
 static entt::entity BodyToEntity(const JPH::Body& body)
 {
-	return static_cast<entt::entity>(body.GetUserData());
+	return reinterpret_cast<UserData*>(body.GetUserData())->entity;
 }
 
 JPH::ValidateResult ContactListener::OnContactValidate(const JPH::Body& inBody1, const JPH::Body& inBody2, 
 	JPH::RVec3Arg inBaseOffset, const JPH::CollideShapeResult& inCollisionResult)
 {
+
+	CollisionFilter a = reinterpret_cast<UserData*>(inBody1.GetUserData())->filter;
+	CollisionFilter b = reinterpret_cast<UserData*>(inBody2.GetUserData())->filter;
+
+	uint32_t layerA = a.layer;
+	uint32_t maskA = a.mask;
+
+	uint32_t layerB = b.layer;
+	uint32_t maskB = b.mask;
+
+	if ((maskA & layerB) == 0 || (maskB & layerA) == 0)
+		return JPH::ValidateResult::RejectContact;
+
 	return JPH::ValidateResult::AcceptAllContactsForThisBodyPair;
 }
+
 void ContactListener::OnContactAdded(const JPH::Body& inBody1, const JPH::Body& inBody2,
 	const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings)
 {
