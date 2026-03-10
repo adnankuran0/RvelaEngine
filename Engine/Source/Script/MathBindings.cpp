@@ -24,7 +24,11 @@ void LuaBindings::RegisterMath(sol::state& lua)
             [](const glm::vec2& a, float s) { return a * s; },
             [](float s, const glm::vec2& a) { return a * s; }
         ),
-        "__div", [](const glm::vec2& a, float s) { return a / s; }
+        "__div", [](const glm::vec2& a, float s) { return a / s; },
+        sol::meta_function::to_string, [](const glm::vec2& v)
+        {
+            return std::format("Vec2({}, {})", v.x, v.y);
+        }
         );
     lua["Vec2"]["ZERO"] = []() { return glm::vec2(0.0f); };
     lua["Vec2"]["UP"] = []() { return glm::vec2(0.0f, 1.0f); };
@@ -53,7 +57,11 @@ void LuaBindings::RegisterMath(sol::state& lua)
             [](const glm::vec3& a, float s) { return a * s; },
             [](float s, const glm::vec3& a) { return a * s; }
         ),
-        "__div", [](const glm::vec3& a, float s) { return a / s; }
+        "__div", [](const glm::vec3& a, float s) { return a / s; },
+        sol::meta_function::to_string, [](const glm::vec3& v)
+        {
+            return std::format("Vec3({}, {}, {})", v.x, v.y, v.z);
+        }
     );
     lua["Vec3"]["ZERO"] = []() { return glm::vec3(0.0f); };
     lua["Vec3"]["UP"] = []() { return glm::vec3(0.0f, 1.0f, 0.0f); };

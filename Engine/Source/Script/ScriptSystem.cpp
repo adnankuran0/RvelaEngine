@@ -3,8 +3,11 @@
 #include "Scene/Components/ScriptComponent.h"
 #include "Scene/Components/MaterialComponent.h"
 #include "Scene/Entity.h"
+#include "Physics/CollisionInfo.h"
 
 using namespace rv;
+
+
 
 ScriptSystem::ScriptSystem(Scene& scene) : m_Scene(scene)
 {
@@ -32,6 +35,8 @@ void ScriptSystem::OnStart()
 
 void ScriptSystem::OnUpdate(float dt)
 {
+    DispatchCollisionEvents();
+
     auto view = m_Scene.GetRegistry().view<ScriptComponent>();
 
     for (auto entity : view)
@@ -151,5 +156,62 @@ void ScriptSystem::BindLuaScript(ScriptComponent& sc, entt::entity e)
     sc.OnLateUpdate = sc.luaInstance["OnLateUpdate"];
     sc.OnDestroy = sc.luaInstance["OnDestroy"];
 
+    sc.OnCollisionEnter = sc.luaInstance["OnCollisionEnter"];
+    sc.OnCollisionStay = sc.luaInstance["OnCollisionStay"];
+    sc.OnCollisionExit = sc.luaInstance["OnCollisionExit"];
+
     
+}
+
+void ScriptSystem::DispatchCollisionEvents()
+{
+    auto events = m_Scene.GetPhysicsSystem().FlushEvents();
+    auto& reg = m_Scene.GetRegistry();
+
+    auto dispatchEvent = [](ScriptComponent& sc, Physics::CollisionEventType type, Physics::CollisionInfo& info)
+        {
+            sol::function* fn = nullptr;
+            const char* name = "";
+
+            switch (type)
+            {
+            case Physics::CollisionEventType::ENTER: fn = &sc.OnCollisionEnter; name = "OnCollisionEnter"; break;
+            case Physics::CollisionEventType::STAY:  fn = &sc.OnCollisionStay;  name = "OnCollisionStay";  break;
+            case Physics::CollisionEventType::EXIT:  fn = &sc.OnCollisionExit;  name = "OnCollisionExit";  break;
+            }
+
+            if (fn && fn->valid())
+            {
+                sol::protected_function_result result = (*fn)(sc.luaInstance, info);
+                if (!result.valid())
+                {
+                    sol::error err = result;
+                    LOG_ERROR("Lua {} error: {}", name, err.what());
+                }
+            }
+        };
+
+    for (auto& event : events)
+    {
+
+        if (reg.try_get<ScriptComponent>(event.entityA))
+        {
+            ScriptComponent& sc = reg.get<ScriptComponent>(event.entityA);
+            Physics::CollisionInfo info = BuildCollisionInfo(event.collision,event.entityB);
+            dispatchEvent(sc, event.eventType, info);
+        }
+
+        if (reg.try_get<ScriptComponent>(event.entityB))
+        {
+            ScriptComponent& sc = reg.get<ScriptComponent>(event.entityB);
+            Physics::CollisionInfo info = BuildCollisionInfo(event.collision, event.entityA);
+            info.normal *= -1.0f;
+            dispatchEvent(sc, event.eventType, info);
+        }
+    }
+}
+
+Physics::CollisionInfo rv::ScriptSystem::BuildCollisionInfo(const Physics::Collision& collision, entt::entity otherEntity)
+{
+    return { Entity(otherEntity, &m_Scene), collision.point, collision.normal };
 }

@@ -1,5 +1,5 @@
 #pragma once
-#include "CollisionInfo.h"
+#include "Collision.h"
 #include "entt/entt.h"
 
 namespace rv::Physics {
@@ -15,7 +15,7 @@ struct  CollisionEvent
 {
 	entt::entity entityA;
 	entt::entity entityB;
-	CollisionInfo collisionInfo;
+	Collision collision;
 	CollisionEventType eventType;
 };
 

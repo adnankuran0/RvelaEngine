@@ -17,6 +17,10 @@ struct ScriptComponent {
     sol::function OnLateUpdate;
     sol::function OnDestroy;
 
+    sol::function OnCollisionEnter;
+    sol::function OnCollisionStay;
+    sol::function OnCollisionExit;
+
     json Serialize() const;
     void Deserialize(const json& j);
 };

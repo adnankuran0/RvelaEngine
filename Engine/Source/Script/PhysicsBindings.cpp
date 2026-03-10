@@ -4,6 +4,8 @@
 #include "Physics/PhysicsWorld.h"
 #include "Scene/Components/RigidbodyComponent.h"
 #include "Scene/Components/CharacterBodyComponent.h"
+#include "Physics/CollisionInfo.h"
+#include "Scene/Entity.h"
 
 using namespace rv::Physics;
 
@@ -14,6 +16,14 @@ void rv::LuaBindings::RegisterPhysicsAPI(sol::state& lua)
     { "Kinematic", MotionType::KINEMATIC },
     { "Dynamic",   MotionType::DYNAMIC   }
         });
+
+    lua.new_usertype<CollisionInfo>("CollisionInfo",
+        "point", &CollisionInfo::point,
+        "normal", &CollisionInfo::normal,
+        "other", sol::property(
+            [](CollisionInfo& ci) -> Entity& { return ci.other; }
+        )
+    );
 
     lua.new_usertype<PhysicsWorld>("Physics",
         "SetPosition", &PhysicsWorld::SetPosition,

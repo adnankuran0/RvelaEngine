@@ -3,6 +3,11 @@
 #include "entt/entt.h"
 #include "ScriptEngine.h"
 
+namespace rv::Physics {
+struct CollisionInfo;
+struct Collision;
+}
+
 namespace rv {
 // forward declaration
 struct ScriptComponent;
@@ -22,6 +27,9 @@ public:
 	void BindLuaScript(ScriptComponent& sc, entt::entity e);
 
 private:
+	void DispatchCollisionEvents();
+	Physics::CollisionInfo BuildCollisionInfo(const Physics::Collision& collision, entt::entity otherEntity);
+	
 	ScriptEngine m_ScriptEngine;
 	Scene& m_Scene;
 };

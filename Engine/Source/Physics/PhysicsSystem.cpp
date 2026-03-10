@@ -36,7 +36,7 @@ PhysicsSystem::PhysicsSystem(Scene& scene) :
 	m_PhysicsWorld.Init(m_PhysicsSystem);
 
 	m_CollisionEventQueue.reserve(50);
-	m_ContactListener.Init(&BodyInterface(),&m_CollisionEventQueue);
+	m_ContactListener.Init(&m_PhysicsSystem,&m_CollisionEventQueue);
 }
 
 void PhysicsSystem::Step(float dt)
@@ -50,6 +50,12 @@ void PhysicsSystem::Step(float dt)
 
 void PhysicsSystem::OnStart()
 {
+	m_Scene.GetRegistry().on_destroy<RigidbodyComponent>()
+		.connect<&PhysicsSystem::OnRigidbodyDestroyed>(this);
+
+	m_Scene.GetRegistry().on_destroy<CharacterBodyComponent>()
+		.connect<&PhysicsSystem::OnCharacterBodyDestroyed>(this);
+
 	m_PhysicsSystem.OptimizeBroadPhase();
 	BuildBodies();
 }
@@ -271,5 +277,20 @@ void rv::PhysicsSystem::UpdateCharacters(float dt)
 	}
 }
 
+void PhysicsSystem::OnRigidbodyDestroyed(entt::registry& reg, entt::entity e)
+{
+    auto& rb = reg.get<RigidbodyComponent>(e);
+    if (rb.RuntimeBodyID.IsInvalid()) return;
+    
+    BodyInterface().RemoveBody(rb.RuntimeBodyID);
+    BodyInterface().DestroyBody(rb.RuntimeBodyID);
+}
 
+void PhysicsSystem::OnCharacterBodyDestroyed(entt::registry& reg, entt::entity e)
+{
+    auto& cb = reg.get<CharacterBodyComponent>(e);
+    if (!cb.character) return;
+    
+    cb.character = nullptr;
+}
 

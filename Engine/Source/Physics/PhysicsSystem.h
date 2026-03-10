@@ -41,6 +41,9 @@ private:
 	void UpdateCharacters(float dt); // TODO: think about seperate MoveAndSlide function
 	inline JPH::BodyInterface& BodyInterface() { return m_PhysicsSystem.GetBodyInterface(); }
 
+	void OnRigidbodyDestroyed(entt::registry& reg, entt::entity e);
+	void OnCharacterBodyDestroyed(entt::registry& reg, entt::entity e);
+
 private:
 	const unsigned int cMaxBodies = 1024;
 	const unsigned int cNumBodyMutexes = 0;

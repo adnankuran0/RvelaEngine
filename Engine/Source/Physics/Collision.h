@@ -1,14 +1,12 @@
 #pragma once
-#include "Scene/Entity.h"
+#include "glm/glm.hpp"
 
 namespace rv::Physics {
 
-struct CollisionInfo
+struct Collision
 {
-	Entity other;
 	glm::vec3 point;
 	glm::vec3 normal;
 };
-
 
 }
