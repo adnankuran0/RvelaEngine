@@ -6,6 +6,7 @@
 #include "Scene/Components/CharacterBodyComponent.h"
 #include "Physics/CollisionInfo.h"
 #include "Scene/Entity.h"
+#include "Core/Engine.h" // ...
 
 using namespace rv::Physics;
 
@@ -22,6 +23,16 @@ void rv::LuaBindings::RegisterPhysicsAPI(sol::state& lua)
         "normal", &CollisionInfo::normal,
         "other", sol::property(
             [](CollisionInfo& ci) -> Entity& { return ci.other; }
+        )
+    );
+
+    lua.new_usertype<RaycastResult>("RaycastResult",
+        "hit", &RaycastResult::hit,
+        "distance", &RaycastResult::distance,
+        "point", &RaycastResult::point,
+        "normal", &RaycastResult::normal,
+        "entity", sol::property(
+            [](RaycastResult& r) -> Entity { return Entity(r.entity,&Engine::Get()->GetActiveScene()); } // TODO: this is bad
         )
     );
 
@@ -82,6 +93,8 @@ void rv::LuaBindings::RegisterPhysicsAPI(sol::state& lua)
 
         "GetCharacterGroundNormal", &PhysicsWorld::GetCharacterGroundNormal,
         "GetCharacterGroundVelocity", &PhysicsWorld::GetCharacterGroundVelocity,
-        "GetCharacterGroundPosition", &PhysicsWorld::GetCharacterGroundPosition
+        "GetCharacterGroundPosition", &PhysicsWorld::GetCharacterGroundPosition,
+
+        "Raycast", & PhysicsWorld::Raycast
     );
 }

@@ -24,6 +24,7 @@ void ContactListener::OnContactAdded(const JPH::Body& inBody1, const JPH::Body& 
 	ContactKey key(inBody1.GetID(), inBody2.GetID());
 	m_ActiveContacts[key] = e;
 
+	std::lock_guard lock(m_EventMutex);
 	m_EventQueue->push_back(e);
 }
 
@@ -35,6 +36,7 @@ void ContactListener::OnContactPersisted(const JPH::Body& inBody1, const JPH::Bo
 	ContactKey key(inBody1.GetID(), inBody2.GetID());
 	m_ActiveContacts[key] = e;
 
+	std::lock_guard lock(m_EventMutex);
 	m_EventQueue->push_back(e);
 }
 
@@ -50,6 +52,7 @@ void ContactListener::OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair
 	CollisionEvent e = it->second;
 	e.eventType = CollisionEventType::EXIT;
 
+	std::lock_guard lock(m_EventMutex);
 	m_EventQueue->push_back(e);
 
 	m_ActiveContacts.erase(it);

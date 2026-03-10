@@ -1,52 +1,30 @@
 {
     "Entities": [
         {
-            "DirectionalLight": {
-                "castShadows": true,
-                "color": [
-                    1.0,
-                    1.0,
-                    1.0
-                ],
-                "intensity": 2.075000047683716
-            },
-            "ParentUUID": 0,
-            "Tag": {
-                "tag": "DirectionalLight"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
+            "BoxColliderComponent": {
+                "offset": [
                     0.0,
                     0.0,
                     0.0
                 ],
-                "rotation": [
-                    -34.95356369018555,
-                    41.99502944946289,
-                    -1.0640610456466675
-                ],
-                "scale": [
-                    0.9999991655349731,
-                    0.9999980926513672,
-                    0.9999989867210388
+                "size": [
+                    0.5,
+                    0.5,
+                    0.5
                 ]
             },
-            "UUID": 57
-        },
-        {
             "Material": {
                 "material": "ee3dde12-6263-4f11-bb1d-812b3e196ab7"
             },
             "Mesh": {
-                "mesh": "7f8ebf7d-a783-4a96-93e5-effcc76f557d"
+                "mesh": "36468d32-bba5-4eb4-82db-0d4da5cd6c65"
             },
             "ParentUUID": 0,
             "RigidbodyComponent": {
                 "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
                 "autoCalculateMass": 1,
-                "bodyType": 2,
+                "bodyType": 0,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
                 "isSensor": false,
@@ -60,29 +38,18 @@
                 "mass": 1.0,
                 "maxAngularVelocity": 50.0,
                 "maxLinearVelocity": 500.0,
-                "restitution": 0.4580000042915344,
+                "restitution": 0.0,
                 "useCCD": false
             },
-            "ScriptComponent": {
-                "luaFile": "C:\\RvelaEngine\\TestProject\\Assets\\Scripts\\CallbackTest.lua"
-            },
-            "SphereColliderComponent": {
-                "offset": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "radius": 0.5
-            },
             "Tag": {
-                "tag": "Sphere"
+                "tag": "Cube"
             },
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
-                    -4.831772327423096,
-                    28.440502166748047,
-                    6.1034410464344546e-05
+                    -4.938564300537109,
+                    10.98337459564209,
+                    6.103515625e-05
                 ],
                 "rotation": [
                     0.0,
@@ -90,126 +57,12 @@
                     0.0
                 ],
                 "scale": [
-                    4.039999961853027,
-                    4.039999961853027,
-                    4.039999961853027
+                    16.366397857666016,
+                    16.366397857666016,
+                    16.366397857666016
                 ]
             },
-            "UUID": 9
-        },
-        {
-            "CameraComponent": {
-                "farClip": 1000.0,
-                "fov": 90.0,
-                "isActive": true,
-                "nearClip": 0.10000000149011612,
-                "projectionType": 0
-            },
-            "ParentUUID": 23,
-            "Tag": {
-                "tag": "Camera"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "rotation": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "scale": [
-                    1.0,
-                    1.0,
-                    1.0
-                ]
-            },
-            "UUID": 24
-        },
-        {
-            "ParentUUID": 8,
-            "ScriptComponent": {
-                "luaFile": "C:\\RvelaEngine\\TestProject\\Assets\\Scripts\\camera.lua"
-            },
-            "Tag": {
-                "tag": "CameraHolder"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    0.0,
-                    0.5963134765625,
-                    0.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scale": [
-                    1.0,
-                    1.0,
-                    1.0
-                ]
-            },
-            "UUID": 23
-        },
-        {
-            "CapsuleColliderComponent": {
-                "halfHeight": 0.5,
-                "offset": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "radius": 0.5
-            },
-            "CharacterBodyComponent": {
-                "mass": 70.0,
-                "maxSlopeAngle": 50.0,
-                "maxStrength": 100.0,
-                "predictiveContactDistance": 0.10000000149011612,
-                "shapeOffset": [
-                    0.0,
-                    0.0,
-                    0.0
-                ]
-            },
-            "Material": {
-                "material": "ee3dde12-6263-4f11-bb1d-812b3e196ab7"
-            },
-            "Mesh": {
-                "mesh": "395a97e7-2cbe-4d65-95af-dea85f856252"
-            },
-            "ParentUUID": 0,
-            "ScriptComponent": {
-                "luaFile": "C:\\RvelaEngine\\TestProject\\Assets\\Scripts\\CharacterController.lua"
-            },
-            "Tag": {
-                "tag": "Character"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    0.0,
-                    4.0979461669921875,
-                    0.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scale": [
-                    1.0,
-                    1.0,
-                    1.0
-                ]
-            },
-            "UUID": 8
+            "UUID": 10
         },
         {
             "Material": {
@@ -273,30 +126,135 @@
             "UUID": 2
         },
         {
-            "BoxColliderComponent": {
+            "CapsuleColliderComponent": {
+                "halfHeight": 0.5,
                 "offset": [
                     0.0,
                     0.0,
                     0.0
                 ],
-                "size": [
-                    0.5,
-                    0.5,
-                    0.5
+                "radius": 0.5
+            },
+            "CharacterBodyComponent": {
+                "mass": 70.0,
+                "maxSlopeAngle": 50.0,
+                "maxStrength": 100.0,
+                "predictiveContactDistance": 0.10000000149011612,
+                "shapeOffset": [
+                    0.0,
+                    0.0,
+                    0.0
                 ]
             },
             "Material": {
                 "material": "ee3dde12-6263-4f11-bb1d-812b3e196ab7"
             },
             "Mesh": {
-                "mesh": "36468d32-bba5-4eb4-82db-0d4da5cd6c65"
+                "mesh": "395a97e7-2cbe-4d65-95af-dea85f856252"
+            },
+            "ParentUUID": 0,
+            "ScriptComponent": {
+                "luaFile": "C:\\RvelaEngine\\TestProject\\Assets\\Scripts\\CharacterController.lua"
+            },
+            "Tag": {
+                "tag": "Character"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    4.0979461669921875,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 8
+        },
+        {
+            "ParentUUID": 8,
+            "ScriptComponent": {
+                "luaFile": "C:\\RvelaEngine\\TestProject\\Assets\\Scripts\\camera.lua"
+            },
+            "Tag": {
+                "tag": "CameraHolder"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.5963134765625,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 23
+        },
+        {
+            "CameraComponent": {
+                "farClip": 1000.0,
+                "fov": 90.0,
+                "isActive": true,
+                "nearClip": 0.10000000149011612,
+                "projectionType": 0
+            },
+            "ParentUUID": 23,
+            "ScriptComponent": {
+                "luaFile": "C:\\RvelaEngine\\TestProject\\Assets\\Scripts\\RaycastTest.lua"
+            },
+            "Tag": {
+                "tag": "Camera"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 24
+        },
+        {
+            "Material": {
+                "material": "ee3dde12-6263-4f11-bb1d-812b3e196ab7"
+            },
+            "Mesh": {
+                "mesh": "7f8ebf7d-a783-4a96-93e5-effcc76f557d"
             },
             "ParentUUID": 0,
             "RigidbodyComponent": {
                 "allowSleep": 1,
                 "angularDamping": 0.05000000074505806,
                 "autoCalculateMass": 1,
-                "bodyType": 0,
+                "bodyType": 2,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
                 "isSensor": false,
@@ -310,18 +268,26 @@
                 "mass": 1.0,
                 "maxAngularVelocity": 50.0,
                 "maxLinearVelocity": 500.0,
-                "restitution": 0.0,
+                "restitution": 0.4580000042915344,
                 "useCCD": false
             },
+            "SphereColliderComponent": {
+                "offset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "radius": 0.5
+            },
             "Tag": {
-                "tag": "Cube"
+                "tag": "Sphere"
             },
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
-                    -4.938564300537109,
-                    10.98337459564209,
-                    6.103515625e-05
+                    -4.831772327423096,
+                    28.440502166748047,
+                    6.1034410464344546e-05
                 ],
                 "rotation": [
                     0.0,
@@ -329,12 +295,46 @@
                     0.0
                 ],
                 "scale": [
-                    16.366397857666016,
-                    16.366397857666016,
-                    16.366397857666016
+                    4.039999961853027,
+                    4.039999961853027,
+                    4.039999961853027
                 ]
             },
-            "UUID": 10
+            "UUID": 9
+        },
+        {
+            "DirectionalLight": {
+                "castShadows": true,
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "intensity": 2.075000047683716
+            },
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": "DirectionalLight"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    -34.95356369018555,
+                    41.99502944946289,
+                    -1.0640610456466675
+                ],
+                "scale": [
+                    0.9999991655349731,
+                    0.9999980926513672,
+                    0.9999989867210388
+                ]
+            },
+            "UUID": 57
         }
     ],
     "Environment": {

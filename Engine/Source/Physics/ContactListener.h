@@ -3,6 +3,7 @@
 #include <Jolt/Physics/PhysicsSystem.h>
 #include "CollisionEvent.h"
 #include "ContactKey.h"
+#include <mutex>
 
 namespace rv::Physics {
 
@@ -20,6 +21,7 @@ private:
 	CollisionEvent BuildEvent(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, const CollisionEventType& eventType);
 
 	JPH::PhysicsSystem* m_PhysicsSystem = nullptr;
+	std::mutex m_EventMutex;
 	std::vector<CollisionEvent>* m_EventQueue;
 	std::unordered_map<ContactKey, CollisionEvent, ContactKeyHash> m_ActiveContacts;
 };

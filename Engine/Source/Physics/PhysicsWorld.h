@@ -3,6 +3,7 @@
 #include "Jolt/Physics/Body/BodyInterface.h"
 #include "Jolt/Physics/PhysicsSystem.h"
 #include "MotionType.h"
+#include "RaycastResult.h"
 
 namespace rv {
 struct RigidbodyComponent;
@@ -80,6 +81,11 @@ public:
 	glm::vec3 GetCharacterGroundNormal(CharacterBodyComponent* comp);
 	glm::vec3 GetCharacterGroundVelocity(CharacterBodyComponent* comp);
 	glm::vec3 GetCharacterGroundPosition(CharacterBodyComponent* comp);
+
+	RaycastResult Raycast(const glm::vec3& rayOrigin,
+		const glm::vec3& rayDirection,
+		float maxDistance,
+		bool hitInside = false);
 
 private:
 	inline JPH::BodyInterface& BodyInterface() { return m_PhysicsSystem->GetBodyInterface(); }

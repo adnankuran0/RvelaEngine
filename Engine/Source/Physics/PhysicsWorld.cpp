@@ -3,6 +3,9 @@
 #include "Scene/Components/RigidbodyComponent.h"
 #include "Scene/Components/CharacterBodyComponent.h"
 #include "Math/RvelaMath.h"
+#include "Jolt/Physics/Collision/RayCast.h"
+#include <Jolt/Physics/Collision/CastResult.h>
+#include "Jolt/Physics/Collision/CollisionCollectorImpl.h"
 
 using namespace rv::Physics;
 
@@ -333,4 +336,59 @@ glm::vec3 PhysicsWorld::GetCharacterGroundPosition(CharacterBodyComponent* comp)
 	return math::FromJoltVec3(comp->character->GetGroundPosition());
 }
 
+RaycastResult PhysicsWorld::Raycast(const glm::vec3& rayOrigin,
+	const glm::vec3& rayDirection,
+	float maxDistance,
+	bool hitInside)
+{
+	RaycastResult result;
+	glm::vec3 dir = glm::normalize(rayDirection);
+	JPH::RRayCast ray(
+		math::ToJoltRVec3(rayOrigin),
+		math::ToJoltVec3(dir * maxDistance)
+	);
+
+	JPH::AllHitCollisionCollector<JPH::CastRayCollector> collector;
+	JPH::RayCastSettings settings;
+	settings.mTreatConvexAsSolid = false;
+
+	m_PhysicsSystem->GetNarrowPhaseQuery().CastRay(ray, settings, collector);
+
+	if (!collector.HadHit())
+		return result;
+
+	const JPH::RayCastResult* bestHit = nullptr;
+	float bestFraction = FLT_MAX;
+
+	for (const auto& hit : collector.mHits)
+	{
+		if (!hitInside && hit.mFraction <= 0.0001f) continue; // skip if inside
+		if (hit.mFraction < bestFraction)
+		{
+			bestFraction = hit.mFraction;
+			bestHit = &hit;
+		}
+
+	}
+
+	if (!bestHit)
+		return result;
+
+	float distance = bestHit->mFraction * maxDistance;
+	JPH::RVec3 hitPoint = ray.mOrigin + ray.mDirection * bestHit->mFraction;
+
+	const JPH::BodyLockRead lock(m_PhysicsSystem->GetBodyLockInterface(), bestHit->mBodyID);
+	if (lock.Succeeded())
+	{
+		const JPH::Body& body = lock.GetBody();
+		JPH::Vec3 normal = body.GetWorldSpaceSurfaceNormal(bestHit->mSubShapeID2, hitPoint);
+		result.hit = true;
+		result.distance = distance;
+		result.point = math::FromJoltRVec3(hitPoint);
+		result.normal = math::FromJoltVec3(normal);
+		result.entity = (entt::entity)body.GetUserData();
+	}
+
+	return result;
+}
 
