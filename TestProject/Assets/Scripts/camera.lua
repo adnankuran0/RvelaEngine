@@ -56,8 +56,8 @@ function Camera:OnUpdate(dt)
     if self.pitch > 89.0 then
         self.pitch = 89.0
     end
-    if self.pitch < -45.0 then
-        self.pitch = -45.0
+    if self.pitch < -89.0 then
+        self.pitch = -89.0
     end
 
     transform:SetEulerRotation(Vec3.new(self.pitch, self.yaw, 0.0))

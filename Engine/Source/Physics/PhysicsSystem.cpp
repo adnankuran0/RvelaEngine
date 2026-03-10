@@ -42,8 +42,8 @@ PhysicsSystem::PhysicsSystem(Scene& scene) :
 void PhysicsSystem::Step(float dt)
 {
 	BuildBodies();
-	m_PhysicsSystem.Update(dt, cCollisionSteps, &m_TempAllocator, &m_JobSystem);
 	UpdateCharacters(dt);
+	m_PhysicsSystem.Update(dt, cCollisionSteps, &m_TempAllocator, &m_JobSystem);
 	SyncTransforms();
 }
 
@@ -230,7 +230,6 @@ JPH::Ref<JPH::CharacterVirtualSettings> rv::PhysicsSystem::BuildCharacterBodyCre
 	settings->mShapeOffset = math::ToJoltVec3(cbComp.shapeOffset);
 	settings->mPredictiveContactDistance = cbComp.predictiveContactDistance;
 	settings->mMaxSlopeAngle = JPH::DegreesToRadians(cbComp.maxSlopeAngle);
-	settings->mPenetrationRecoverySpeed = 0.5f; 
 	return settings;
 }
 
@@ -247,8 +246,8 @@ void rv::PhysicsSystem::UpdateCharacters(float dt)
 		cb.character->UpdateGroundVelocity();
 
 		JPH::CharacterVirtual::ExtendedUpdateSettings updateSettings;
-		updateSettings.mStickToFloorStepDown = JPH::Vec3::sZero();
-		updateSettings.mWalkStairsStepUp = JPH::Vec3::sZero();
+		updateSettings.mStickToFloorStepDown = { 0.0f,-0.3,0.0 };
+		updateSettings.mWalkStairsStepUp = { 0.0f,0.2,0.0 };
 
 		cb.character->ExtendedUpdate(
 			dt,

@@ -13,7 +13,7 @@ struct RigidbodyComponent
 {
     JPH::BodyID RuntimeBodyID{};
 
-    Physics::MotionType bodyType = Physics::MotionType::DYNAMIC;
+    Physics::MotionType bodyType = Physics::MotionType::STATIC;
 
     bool autoCalculateMass = true;
     float mass = 1.0f;

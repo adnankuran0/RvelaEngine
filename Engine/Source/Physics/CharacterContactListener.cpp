@@ -10,8 +10,8 @@ void CharacterContactListener::OnContactAdded(
     JPH::Vec3Arg inContactNormal,
     JPH::CharacterContactSettings& ioSettings)
 {
-    //ioSettings.mCanPushCharacter = true; 
-    //ioSettings.mCanReceiveImpulses = true; 
+    ioSettings.mCanPushCharacter = true; 
+    ioSettings.mCanReceiveImpulses = true; 
 }
 
 void CharacterContactListener::OnContactPersisted(
