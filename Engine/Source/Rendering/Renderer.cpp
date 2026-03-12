@@ -41,6 +41,7 @@ void Renderer::Init(GLFWwindow* window)
     ShaderManager::Add(Shader("Irradiance",VRT_PATH("Assets\\Shaders\\irradiance.glsl")));
     ShaderManager::Add(Shader("Prefilter",VRT_PATH("Assets\\Shaders\\prefilter.glsl")));
     ShaderManager::Add(Shader("BRDF",VRT_PATH("Assets\\Shaders\\brdf.glsl")));
+    ShaderManager::Add(Shader("Line",VRT_PATH("Assets\\Shaders\\line.glsl")));
 
     m_ScreenQuad.Init();
 

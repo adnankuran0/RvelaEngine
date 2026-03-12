@@ -2,8 +2,10 @@
 #include <glm/glm.hpp>
 #include "assimp/matrix4x4.h"
 #include "Jolt/Jolt.h"
+#include "Jolt/Core/Color.h"
 #include "Jolt/Math/MathTypes.h"
 #include <glm/gtc/quaternion.hpp>
+
 namespace rv::math {
 
 static inline JPH::Vec3 ToJoltVec3(const glm::vec3& v) 
@@ -36,6 +38,10 @@ static inline glm::quat FromJoltQuat(const JPH::Quat& q)
     return glm::quat(q.GetW(), q.GetX(), q.GetY(), q.GetZ());
 }
 
+static inline glm::vec4 FromJoltColor(const JPH::Color& c)
+{
+    return glm::vec4(c.r,c.g,c.b,c.a);
+}
 
 bool RayIntersectsTriangle(const glm::vec3& rayOrigin, const glm::vec3& rayDir,
     const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2,

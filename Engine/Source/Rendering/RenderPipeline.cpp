@@ -12,6 +12,7 @@
 #include "Rendering/RenderPasses/SSAOPass.h"
 #include "Rendering/RenderPasses/SSRPass.h"
 #include "Rendering/RenderPasses/EntityBufferPass.h"
+#include "Rendering/RenderPasses/DebugPass.h"
 
 using namespace rv;
 
@@ -27,6 +28,7 @@ RenderPipeline::RenderPipeline()
 	PushRenderPass(std::make_unique<BrightPass>());
 	PushRenderPass(std::make_unique<BloomPass>());
 	PushRenderPass(std::make_unique<CompositePass>());
+	PushRenderPass(std::make_unique<DebugPass>());
 }
 
 void RenderPipeline::EnsureInitialized(const RenderContext& ctx)

@@ -34,14 +34,24 @@ void VertexBuffer::Init(const void* data, size_t size)
 	glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 }
 
+void VertexBuffer::Init()
+{
+	ID = 0;
+	glGenBuffers(1, &ID);
+}
+
 void VertexBuffer::Unbind() const
 {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void VertexBuffer::Data(const void* data, unsigned int size) const
+void VertexBuffer::Data(const void* data, unsigned int size, bool dynamicDraw) const
 {
 	glBindBuffer(GL_ARRAY_BUFFER, ID);
-	glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+	if (dynamicDraw)
+		glBufferData(GL_ARRAY_BUFFER, size, data, GL_DYNAMIC_DRAW);
+	else
+		glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+
 }
 

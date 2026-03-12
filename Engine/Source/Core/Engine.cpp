@@ -7,6 +7,7 @@
 #include "Time.h"
 #include <Rendering/EditorCamera.h>
 #include <Event/MouseEvents.h>
+#include "Rendering/DebugRenderer/DebugRenderer.h"
 
 using namespace rv;
 
@@ -169,6 +170,7 @@ Camera* Engine::GetCamera() noexcept
 
 void Engine::Render()
 {
+	DebugRenderer::Get().BeginFrame();
 	m_Renderer.StartFrame();
 
 	for (Layer* layer : m_LayerStack)
