@@ -12,6 +12,7 @@
 #include "entt/entt.h"
 #include "ShapeBuilder.h"
 #include "PhysicsWorld.h"
+#include "Rendering/JoltDebugRenderer.h"
 
 namespace rv {
 
@@ -25,6 +26,7 @@ public:
 	PhysicsSystem(Scene& scene);
 	void OnStart();
 	void Step(float dt);
+	void Update();
 	inline Physics::PhysicsWorld& GetPhysicsWorld() { return m_PhysicsWorld; }
 	std::vector<Physics::CollisionEvent> FlushEvents() { return std::move(m_CollisionEventQueue); }
 
@@ -44,6 +46,7 @@ private:
 	void OnRigidbodyDestroyed(entt::registry& reg, entt::entity e);
 	void OnCharacterBodyDestroyed(entt::registry& reg, entt::entity e);
 
+	void DebugDraw();
 private:
 	const unsigned int cMaxBodies = 1024;
 	const unsigned int cNumBodyMutexes = 0;
@@ -72,6 +75,9 @@ private:
 	Physics::PhysicsWorld m_PhysicsWorld;
 
 	std::vector<Physics::CollisionEvent> m_CollisionEventQueue;
+
+	JoltDebugRenderer m_DebugRenderer;
+	
 
 };
 

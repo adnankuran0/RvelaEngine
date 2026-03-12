@@ -43,6 +43,20 @@ static inline glm::vec4 FromJoltColor(const JPH::Color& c)
     return glm::vec4(c.r,c.g,c.b,c.a);
 }
 
+static inline glm::vec3 FromJoltFloat3(const JPH::Float3& v)
+{
+    return glm::vec3(v.x, v.y, v.z);
+}
+
+static inline glm::mat4 FromJoltMat44(const JPH::RMat44& m)
+{
+    glm::mat4 result;
+    for (int col = 0; col < 4; col++)
+        for (int row = 0; row < 4; row++)
+            result[col][row] = m.GetColumn4(col)[row];
+    return result;
+}
+
 bool RayIntersectsTriangle(const glm::vec3& rayOrigin, const glm::vec3& rayDir,
     const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2,
     float& t);

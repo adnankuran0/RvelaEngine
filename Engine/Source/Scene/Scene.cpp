@@ -49,6 +49,9 @@ void Scene::OnStart()
 void Scene::OnUpdate(float dt)
 {
     m_ScriptSystem.OnUpdate(dt);
+    JPH::BodyManager::DrawSettings settings;
+    settings.mDrawBoundingBox = true;
+    settings.mDrawShapeWireframe = true;
 }
 
 void rv::Scene::OnFixedUpdate(float dt)
@@ -119,14 +122,13 @@ void Scene::DestroyEntity(Entity& entity) {
     DestroyEntity(entity.GetHandle());
 }
 
-
-
 void Scene::Update() 
 {                
     if (m_State == SceneState::PLAY)
         OnUpdate(Time::GetDeltaTime());
     m_TransformSystem.Update();
     m_CameraSystem.Update();
+    m_PhysicsSystem.Update();
 }
 void Scene::FixedUpdate() 
 {                

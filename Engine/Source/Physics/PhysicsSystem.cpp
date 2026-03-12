@@ -19,6 +19,8 @@
 #include "ShapeBuilder.h"
 #include "UserData.h"
 
+#include "Rendering/DebugRenderer.h"
+
 JPH_SUPPRESS_WARNINGS
 
 using namespace rv;
@@ -39,6 +41,7 @@ PhysicsSystem::PhysicsSystem(Scene& scene) :
 	m_CollisionEventQueue.reserve(50);
 	m_ContactListener.Init(&m_Scene,&m_PhysicsSystem,&m_CollisionEventQueue);
 	m_CharacterContactListener.Init(&m_PhysicsSystem);
+
 }
 
 void PhysicsSystem::Step(float dt)
@@ -46,11 +49,34 @@ void PhysicsSystem::Step(float dt)
 	BuildBodies();
 	UpdateCharacters(dt);
 	m_PhysicsSystem.Update(dt, cCollisionSteps, &m_TempAllocator, &m_JobSystem);
+
 	SyncTransforms();
 }
 
+void PhysicsSystem::DebugDraw()
+{
+	JPH::BodyManager::DrawSettings settings;
+	settings.mDrawShapeWireframe = true;
+	settings.mDrawShape = true;
+	settings.mDrawVelocity = true;
+
+	m_PhysicsSystem.DrawBodies(settings, &m_DebugRenderer);
+}
+
+
+void PhysicsSystem::Update()
+{
+	BuildBodies();
+	DebugDraw();
+}
 
 void PhysicsSystem::OnStart()
+{
+	BuildBodies();
+	m_PhysicsSystem.OptimizeBroadPhase();
+}
+
+void PhysicsSystem::BuildBodies()
 {
 	m_Scene.GetRegistry().on_destroy<RigidbodyComponent>()
 		.connect<&PhysicsSystem::OnRigidbodyDestroyed>(this);
@@ -58,12 +84,7 @@ void PhysicsSystem::OnStart()
 	m_Scene.GetRegistry().on_destroy<CharacterBodyComponent>()
 		.connect<&PhysicsSystem::OnCharacterBodyDestroyed>(this);
 
-	m_PhysicsSystem.OptimizeBroadPhase();
-	BuildBodies();
-}
 
-void PhysicsSystem::BuildBodies()
-{
 	BuildRigidbodies();
 	BuildCharacterBodies();
 }

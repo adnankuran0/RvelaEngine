@@ -7,7 +7,7 @@
 #include "Time.h"
 #include <Rendering/EditorCamera.h>
 #include <Event/MouseEvents.h>
-#include "Rendering/DebugRenderer/DebugRenderer.h"
+#include "Rendering/DebugRenderer.h"
 
 using namespace rv;
 
@@ -89,6 +89,7 @@ void Engine::Run()
 
 		Time::Update();
 
+		DebugRenderer::Get().BeginFrame();
 		
 		Update();
 		while (Time::ShouldRunFixedUpdate())
@@ -170,12 +171,12 @@ Camera* Engine::GetCamera() noexcept
 
 void Engine::Render()
 {
-	DebugRenderer::Get().BeginFrame();
 	m_Renderer.StartFrame();
 
 	for (Layer* layer : m_LayerStack)
 		layer->OnRender();
 	
+
 	m_Renderer.EndFrame();
 	
 	glfwSwapBuffers(GetWindow().GetGLFWWindow());
