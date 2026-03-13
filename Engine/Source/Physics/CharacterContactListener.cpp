@@ -2,9 +2,22 @@
 #include "CharacterContactListener.h"
 #include "UserData.h"
 #include "CollisionFilter.h"
+#include "Math/RvelaMath.h"
 #include "Jolt/Physics/PhysicsSystem.h"
 
 using namespace rv::Physics;
+
+static entt::entity CharacterToEntity(const JPH::CharacterVirtual* character)
+{
+    return reinterpret_cast<UserData*>(character->GetUserData())->entity;
+}
+
+static entt::entity BodyToEntity(JPH::PhysicsSystem* physicsSystem, const JPH::BodyID& bodyID)
+{
+    return reinterpret_cast<UserData*>(
+        physicsSystem->GetBodyInterface().GetUserData(bodyID)
+        )->entity;
+}
 
 bool CharacterContactListener::OnContactValidate(const JPH::CharacterVirtual* inCharacter, const JPH::BodyID& inBodyID2,
     const JPH::SubShapeID& inSubShapeID2)
@@ -12,15 +25,8 @@ bool CharacterContactListener::OnContactValidate(const JPH::CharacterVirtual* in
     CollisionFilter a = reinterpret_cast<UserData*>(inCharacter->GetUserData())->filter;
     CollisionFilter b = reinterpret_cast<UserData*>(m_PhysicsSystem->GetBodyInterface().GetUserData(inBodyID2))->filter;
 
-    uint32_t layerA = a.layer;
-    uint32_t maskA = a.mask;
-
-    uint32_t layerB = b.layer;
-    uint32_t maskB = b.mask;
-
-    if ((maskA & layerB) == 0 || (maskB & layerA) == 0)
+    if ((a.mask & b.layer) == 0 || (b.mask & a.layer) == 0)
         return false;
-
     return true;
 }
 
@@ -30,18 +36,10 @@ bool CharacterContactListener::OnCharacterContactValidate(const JPH::CharacterVi
     CollisionFilter a = reinterpret_cast<UserData*>(inCharacter->GetUserData())->filter;
     CollisionFilter b = reinterpret_cast<UserData*>(inOtherCharacter->GetUserData())->filter;
 
-    uint32_t layerA = a.layer;
-    uint32_t maskA = a.mask;
-
-    uint32_t layerB = b.layer;
-    uint32_t maskB = b.mask;
-
-    if ((maskA & layerB) == 0 || (maskB & layerA) == 0)
+    if ((a.mask & b.layer) == 0 || (b.mask & a.layer) == 0)
         return false;
-
     return true;
 }
-
 
 void CharacterContactListener::OnContactAdded(
     const JPH::CharacterVirtual* inCharacter,
@@ -51,8 +49,16 @@ void CharacterContactListener::OnContactAdded(
     JPH::Vec3Arg inContactNormal,
     JPH::CharacterContactSettings& ioSettings)
 {
-    ioSettings.mCanPushCharacter = true; 
-    ioSettings.mCanReceiveImpulses = true; 
+    ioSettings.mCanPushCharacter = true;
+    ioSettings.mCanReceiveImpulses = true;
+
+    CollisionEvent e = BuildEvent(inCharacter, inBodyID2, inContactPosition, inContactNormal, CollisionEventType::ENTER);
+
+    CharacterContactKey key{ inCharacter, inBodyID2 };
+    m_ActiveContacts[key] = e;
+
+    std::lock_guard lock(m_EventMutex);
+    m_EventQueue->push_back(e);
 }
 
 void CharacterContactListener::OnContactPersisted(
@@ -63,6 +69,13 @@ void CharacterContactListener::OnContactPersisted(
     JPH::Vec3Arg inContactNormal,
     JPH::CharacterContactSettings& ioSettings)
 {
+    CollisionEvent e = BuildEvent(inCharacter, inBodyID2, inContactPosition, inContactNormal, CollisionEventType::STAY);
+
+    CharacterContactKey key{ inCharacter, inBodyID2 };
+    m_ActiveContacts[key] = e;
+
+    std::lock_guard lock(m_EventMutex);
+    m_EventQueue->push_back(e);
 }
 
 void CharacterContactListener::OnContactRemoved(
@@ -70,8 +83,34 @@ void CharacterContactListener::OnContactRemoved(
     const JPH::BodyID& inBodyID2,
     const JPH::SubShapeID& inSubShapeID2)
 {
+    CharacterContactKey key{ inCharacter, inBodyID2 };
+    auto it = m_ActiveContacts.find(key);
+    if (it == m_ActiveContacts.end())
+        return;
+
+    CollisionEvent e = it->second;
+    e.eventType = CollisionEventType::EXIT;
+
+    std::lock_guard lock(m_EventMutex);
+    m_EventQueue->push_back(e);
+    m_ActiveContacts.erase(it);
 }
 
+CollisionEvent CharacterContactListener::BuildEvent(
+    const JPH::CharacterVirtual* inCharacter,
+    const JPH::BodyID& inBodyID2,
+    JPH::RVec3Arg inContactPosition,
+    JPH::Vec3Arg inContactNormal,
+    CollisionEventType eventType)
+{
+    CollisionEvent event;
+    event.entityA = CharacterToEntity(inCharacter);
+    event.entityB = BodyToEntity(m_PhysicsSystem, inBodyID2);
+    event.eventType = eventType;
+    event.collision.point = math::FromJoltRVec3(inContactPosition);
+    event.collision.normal = math::FromJoltVec3(inContactNormal);
+    return event;
+}
 void CharacterContactListener::OnContactSolve(
     const JPH::CharacterVirtual* inCharacter,
     const JPH::BodyID& inBodyID2,

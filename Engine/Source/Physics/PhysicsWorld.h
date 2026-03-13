@@ -24,7 +24,7 @@ public:
 	void MoveKinematic(RigidbodyComponent* comp, const glm::vec3& targetPosition, 
 		const glm::quat& targetRotation, float dt);
 
-	void SetMotionType(RigidbodyComponent* comp, MotionType motionType); // TODO: MotionType usertype for script api
+	void SetMotionType(RigidbodyComponent* comp, MotionType motionType);
 	MotionType GetMotionType(RigidbodyComponent* comp);
 
 	void AddForce(RigidbodyComponent* comp, const glm::vec3& force);

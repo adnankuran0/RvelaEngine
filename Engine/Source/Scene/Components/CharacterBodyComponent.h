@@ -10,6 +10,7 @@ using json = nlohmann::json;
 
 struct CharacterBodyComponent
 {
+public:
 	JPH::Ref<JPH::CharacterVirtual> character;
 
 	float mass = 70.0f;
@@ -26,8 +27,17 @@ struct CharacterBodyComponent
 	glm::vec3 currentPosition{};
 	glm::quat currentRotation{ 1,0,0,0 };
 
+	glm::vec3 worldScaleCache = glm::vec3(1.0f);
+
+	void SetShapeDirty() { shapeDirty = true; }
+	void ClearShapeDirty() { shapeDirty = false; }
+	bool IsShapeDirty() { return shapeDirty; }
+
 	json Serialize() const;
 	void Deserialize(const json& j);
+private:
+	bool shapeDirty = false;
+
 };
 
 }

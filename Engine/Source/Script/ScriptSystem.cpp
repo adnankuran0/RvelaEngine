@@ -193,20 +193,20 @@ void ScriptSystem::DispatchCollisionEvents()
 
     for (auto& event : events)
     {
+        ScriptComponent* scA = reg.try_get<ScriptComponent>(event.entityA);
+        ScriptComponent* scB = reg.try_get<ScriptComponent>(event.entityB);
 
-        if (reg.try_get<ScriptComponent>(event.entityA))
+        if (scA)
         {
-            ScriptComponent& sc = reg.get<ScriptComponent>(event.entityA);
-            Physics::CollisionInfo info = BuildCollisionInfo(event.collision,event.entityB);
-            dispatchEvent(sc, event.eventType, info);
+            Physics::CollisionInfo info = BuildCollisionInfo(event.collision, event.entityB);
+            dispatchEvent(*scA, event.eventType, info);
         }
 
-        if (reg.try_get<ScriptComponent>(event.entityB))
+        if (scB && reg.try_get<ScriptComponent>(event.entityB))
         {
-            ScriptComponent& sc = reg.get<ScriptComponent>(event.entityB);
             Physics::CollisionInfo info = BuildCollisionInfo(event.collision, event.entityA);
             info.normal *= -1.0f;
-            dispatchEvent(sc, event.eventType, info);
+            dispatchEvent(*scB, event.eventType, info);
         }
     }
 }

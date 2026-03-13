@@ -1,13 +1,15 @@
 #pragma once
 #include "Jolt/Jolt.h"
 #include <Jolt/Physics/Character/CharacterVirtual.h>
+#include "CollisionEvent.h"
+#include "CharacterContactKey.h"
 
 namespace rv::Physics {
 
 class CharacterContactListener : public JPH::CharacterContactListener
 {
 public:
-    void Init(JPH::PhysicsSystem* physicsSystem) { m_PhysicsSystem = physicsSystem;  }
+    void Init(JPH::PhysicsSystem* physicsSystem, std::vector<CollisionEvent>* eventQueue) { m_PhysicsSystem = physicsSystem; m_EventQueue = eventQueue; }
 
     bool OnContactValidate(const JPH::CharacterVirtual* inCharacter, const JPH::BodyID& inBodyID2, 
         const JPH::SubShapeID& inSubShapeID2) override;
@@ -47,7 +49,17 @@ public:
         JPH::Vec3Arg inCharacterVelocity,
         JPH::Vec3& ioNewCharacterVelocity) override;
 private:
-    JPH::PhysicsSystem* m_PhysicsSystem;
+    CollisionEvent BuildEvent(
+        const JPH::CharacterVirtual* inCharacter,
+        const JPH::BodyID& inBodyID2,
+        JPH::RVec3Arg inContactPosition,
+        JPH::Vec3Arg inContactNormal,
+        CollisionEventType eventType);
+
+    JPH::PhysicsSystem* m_PhysicsSystem = nullptr;
+    std::mutex m_EventMutex;
+    std::vector<CollisionEvent>* m_EventQueue = nullptr;
+    std::unordered_map<CharacterContactKey, CollisionEvent, CharacterContactKeyHash> m_ActiveContacts;
 };
 
 } 

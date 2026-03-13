@@ -39,8 +39,8 @@ PhysicsSystem::PhysicsSystem(Scene& scene) :
 	m_PhysicsWorld.Init(m_PhysicsSystem);
 
 	m_CollisionEventQueue.reserve(50);
-	m_ContactListener.Init(&m_Scene,&m_PhysicsSystem,&m_CollisionEventQueue);
-	m_CharacterContactListener.Init(&m_PhysicsSystem);
+	m_ContactListener.Init(&m_PhysicsSystem,&m_CollisionEventQueue);
+	m_CharacterContactListener.Init(&m_PhysicsSystem, &m_CollisionEventQueue);
 
 	BindCallbacks();
 }
@@ -60,6 +60,28 @@ void PhysicsSystem::DebugDraw()
 	settings.mDrawShapeWireframe = true;
 
 	m_PhysicsSystem.DrawBodies(settings, &m_DebugRenderer);
+
+	auto view = m_Scene.GetRegistry().view<CharacterBodyComponent>();
+	for (auto e : view)
+	{
+		auto& cb = view.get<CharacterBodyComponent>(e);
+		if (!cb.character) continue;
+
+		JPH::RVec3 pos = cb.character->GetPosition();
+		JPH::Quat rot = cb.character->GetRotation();
+		JPH::ShapeRefC shape = cb.character->GetShape();
+
+		JPH::Mat44 transform = JPH::Mat44::sRotationTranslation(rot, pos);
+
+		shape->Draw(
+			&m_DebugRenderer,
+			transform,
+			JPH::Vec3::sReplicate(1.0f),
+			JPH::Color::sGreen,
+			false,
+			false
+		);
+	}
 }
 
 
@@ -108,6 +130,52 @@ void PhysicsSystem::BuildBodies()
 
 void PhysicsSystem::RebuildDirtyShapes()
 {
+	auto cbView = m_Scene.GetRegistry().view<CharacterBodyComponent>();
+	for (auto e : cbView)
+	{
+		auto& cb = m_Scene.GetRegistry().get<CharacterBodyComponent>(e);
+		if (!cb.character) continue;
+
+		auto& tc = m_Scene.GetRegistry().get<TransformComponent>(e);
+		glm::vec3 worldScale = tc.GetWorldScale();
+
+		bool scaleDirty = !glm::all(glm::epsilonEqual(worldScale, cb.worldScaleCache, 0.0001f));
+		if (scaleDirty) {
+			cb.SetShapeDirty();
+			cb.worldScaleCache = worldScale;
+		}
+
+		bool dirty = cb.IsShapeDirty();
+
+		if (auto* c = m_Scene.GetRegistry().try_get<BoxColliderComponent>(e))          dirty |= c->IsDirty();
+		if (auto* c = m_Scene.GetRegistry().try_get<SphereColliderComponent>(e))       dirty |= c->IsDirty();
+		if (auto* c = m_Scene.GetRegistry().try_get<CapsuleColliderComponent>(e))      dirty |= c->IsDirty();
+		if (auto* c = m_Scene.GetRegistry().try_get<CylinderColliderComponent>(e))     dirty |= c->IsDirty();
+		if (auto* c = m_Scene.GetRegistry().try_get<MeshColliderComponent>(e))         dirty |= c->IsDirty();
+		if (auto* c = m_Scene.GetRegistry().try_get<ConvexHullColliderComponent>(e))   dirty |= c->IsDirty();
+
+		if (!dirty) continue;
+
+		JPH::ShapeRefC newShape = m_ShapeBuilder.BuildShape(m_Scene.GetRegistry(), e);
+		cb.character->SetShape(
+			newShape,
+			1.5f * m_PhysicsSystem.GetPhysicsSettings().mPenetrationSlop,
+			m_PhysicsSystem.GetDefaultBroadPhaseLayerFilter(Physics::Layers::MOVING),
+			m_PhysicsSystem.GetDefaultLayerFilter(Physics::Layers::MOVING),
+			{}, {},
+			m_TempAllocator
+		);
+
+		if (auto* c = m_Scene.GetRegistry().try_get<BoxColliderComponent>(e))          c->ClearDirty();
+		if (auto* c = m_Scene.GetRegistry().try_get<SphereColliderComponent>(e))       c->ClearDirty();
+		if (auto* c = m_Scene.GetRegistry().try_get<CapsuleColliderComponent>(e))      c->ClearDirty();
+		if (auto* c = m_Scene.GetRegistry().try_get<CylinderColliderComponent>(e))     c->ClearDirty();
+		if (auto* c = m_Scene.GetRegistry().try_get<MeshColliderComponent>(e))         c->ClearDirty();
+		if (auto* c = m_Scene.GetRegistry().try_get<ConvexHullColliderComponent>(e))   c->ClearDirty();
+
+		cb.ClearShapeDirty();
+	}
+
 	auto rbView = m_Scene.GetRegistry().view<RigidbodyComponent>();
 	for (auto e : rbView)
 	{
@@ -185,7 +253,6 @@ void PhysicsSystem::BuildCharacterBodies()
 	{
 		auto& cb = m_Scene.GetComponent<CharacterBodyComponent>(e);
 		if (cb.character) continue;
-
 		auto& transform = m_Scene.GetComponent<TransformComponent>(e);
 
 		auto settings = BuildCharacterBodyCreationSettings(cb, transform);
@@ -213,13 +280,15 @@ void PhysicsSystem::BuildCharacterBodies()
 		cb.previousPosition = cb.currentPosition;
 		cb.previousRotation = cb.currentRotation;
 		cb.interpolationReady = true;
+
+		cb.worldScaleCache = transform.GetWorldScale();
 	}
 }
 
 void PhysicsSystem::SyncBodiesFromTransforms()
 {
-	auto view = m_Scene.GetRegistry().view<RigidbodyComponent, TransformComponent>();
-	for (auto e : view)
+	auto rbView = m_Scene.GetRegistry().view<RigidbodyComponent, TransformComponent>();
+	for (auto e : rbView)
 	{
 		auto& rb = m_Scene.GetComponent<RigidbodyComponent>(e);
 		if (rb.RuntimeBodyID.IsInvalid()) continue;
@@ -234,6 +303,20 @@ void PhysicsSystem::SyncBodiesFromTransforms()
 			math::ToJoltQuat(transform.GetWorldRotation()),
 			JPH::EActivation::DontActivate
 		);
+	}
+
+	auto cbView = m_Scene.GetRegistry().view<CharacterBodyComponent, TransformComponent>();
+	for (auto e : cbView)
+	{
+		auto& cb = m_Scene.GetComponent<CharacterBodyComponent>(e);
+		if (!cb.character) continue;
+
+		auto& transform = m_Scene.GetComponent<TransformComponent>(e);
+		// TODO: fix dirty check
+		// if (!transform.IsDirty()) continue;
+
+		cb.character->SetPosition(math::ToJoltRVec3(transform.GetWorldPosition()));
+		cb.character->SetRotation(math::ToJoltQuat(transform.GetWorldRotation()));
 	}
 }
 
@@ -308,14 +391,13 @@ JPH::BodyCreationSettings PhysicsSystem::BuildBodyCreationSettings(RigidbodyComp
 	}
 	//TODO: override mass and innertia for bodies with mesh colliders
 
-
 	settings.mMaxLinearVelocity = rbComp.maxLinearVelocity;
 	settings.mMaxAngularVelocity = rbComp.maxAngularVelocity;
-	
+
 	settings.mAllowSleeping = rbComp.allowSleep;
 
-	// ensure sensors detect static bodies
-	settings.mCollideKinematicVsNonDynamic = true;
+	if (!rbComp.isSensor)
+		settings.mCollideKinematicVsNonDynamic = true;
 
 	JPH::EAllowedDOFs dofs = JPH::EAllowedDOFs::None;
 
@@ -375,24 +457,26 @@ void rv::PhysicsSystem::UpdateCharacters(float dt)
 
 void PhysicsSystem::OnRigidbodyDestroyed(entt::registry& reg, entt::entity e)
 {
-    auto& rb = reg.get<RigidbodyComponent>(e);
-    if (rb.RuntimeBodyID.IsInvalid()) return;
-    
-    BodyInterface().RemoveBody(rb.RuntimeBodyID);
-    BodyInterface().DestroyBody(rb.RuntimeBodyID);
+	auto& rb = reg.get<RigidbodyComponent>(e);
+	if (rb.RuntimeBodyID.IsInvalid()) return;
+
+	BodyInterface().RemoveBody(rb.RuntimeBodyID);
+	BodyInterface().DestroyBody(rb.RuntimeBodyID);
 }
 
 void PhysicsSystem::OnCharacterBodyDestroyed(entt::registry& reg, entt::entity e)
 {
-    auto& cb = reg.get<CharacterBodyComponent>(e);
-    if (!cb.character) return;
-    
-    cb.character = nullptr;
+	auto& cb = reg.get<CharacterBodyComponent>(e);
+	if (!cb.character) return;
+
+	cb.character = nullptr;
 }
 
 void PhysicsSystem::OnShapeChanged(entt::registry& reg, entt::entity e)
 {
 	if (auto* rb = reg.try_get<RigidbodyComponent>(e))
-		rb->SetShapeDirty(); 
-}
+		rb->SetShapeDirty();
 
+	if (auto* cb = reg.try_get<CharacterBodyComponent>(e))
+		cb->SetShapeDirty();
+}
