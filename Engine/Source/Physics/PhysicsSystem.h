@@ -31,10 +31,14 @@ public:
 	std::vector<Physics::CollisionEvent> FlushEvents() { return std::move(m_CollisionEventQueue); }
 
 private:
+	void BindCallbacks();
+
 	void BuildBodies();
+	void RebuildDirtyShapes();
 	void BuildRigidbodies();
 	void BuildCharacterBodies();
 
+	void SyncBodiesFromTransforms();
 	void SyncTransforms();
 	void SyncBodyTransforms();
 	void SyncCharacterTransforms();
@@ -45,6 +49,7 @@ private:
 
 	void OnRigidbodyDestroyed(entt::registry& reg, entt::entity e);
 	void OnCharacterBodyDestroyed(entt::registry& reg, entt::entity e);
+	void OnShapeChanged(entt::registry& reg, entt::entity e);
 
 	void DebugDraw();
 private:

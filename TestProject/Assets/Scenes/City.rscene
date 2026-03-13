@@ -48688,13 +48688,14 @@
             "UUID": 1929
         },
         {
-            "ConvexHullColliderComponent": {
-                "maxConvexRadius": 0.0,
+            "CylinderColliderComponent": {
+                "halfHeight": 0.25,
                 "offset": [
-                    0.0,
-                    0.0,
-                    0.0
-                ]
+                    0.7369999885559082,
+                    0.3199999928474426,
+                    -7.906000137329102
+                ],
+                "radius": 0.20000000298023224
             },
             "Material": {
                 "material": "e3bc8772-a271-4a0c-b98f-d120149ef76f"
@@ -48710,7 +48711,7 @@
                 "bodyType": 2,
                 "collisionLayer": 1,
                 "collisionMask": 4294967295,
-                "friction": 0.5,
+                "friction": 0.0,
                 "gravityFactor": 1.0,
                 "isSensor": false,
                 "linearDamping": 0.05000000074505806,
@@ -48720,7 +48721,7 @@
                 "lockTranslationX": false,
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
-                "mass": 1.0,
+                "mass": 1000.0,
                 "maxAngularVelocity": 50.0,
                 "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
@@ -48734,7 +48735,7 @@
                 "position": [
                     0.0,
                     0.0,
-                    0.0
+                    -0.01515352725982666
                 ],
                 "rotation": [
                     0.0,

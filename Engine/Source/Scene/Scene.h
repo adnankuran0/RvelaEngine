@@ -148,9 +148,9 @@ private:
     CameraSystem m_CameraSystem;
     ScriptSystem m_ScriptSystem;
     LightSystem m_LightSystem;
+    entt::registry m_Registry;
     PhysicsSystem m_PhysicsSystem;
     Environment m_Environment;
-    entt::registry m_Registry;
 };
 
 }

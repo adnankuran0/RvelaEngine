@@ -49,9 +49,9 @@ int ShapeBuilder::TryAddBoxShape(ShapeBuildParams& params)
 {
 	if (auto* box = params.reg.try_get<BoxColliderComponent>(params.e))
 	{
-		JPH::BoxShapeSettings boxSettings(math::ToJoltVec3(box->size));
+		JPH::BoxShapeSettings boxSettings(math::ToJoltVec3(box->GetSize()));
 		JPH::ShapeRefC shape = boxSettings.Create().Get();
-		params.compound.AddShape(math::ToJoltVec3(box->offset), JPH::Quat::sIdentity(), shape);
+		params.compound.AddShape(math::ToJoltVec3(box->GetOffset()), JPH::Quat::sIdentity(), shape);
 		return 1;
 	}
 	return 0;
@@ -61,9 +61,9 @@ int ShapeBuilder::TryAddSphereShape(ShapeBuildParams& params)
 {
 	if (auto* sphere = params.reg.try_get<SphereColliderComponent>(params.e))
 	{
-		JPH::SphereShapeSettings sphereSettings(sphere->radius);
+		JPH::SphereShapeSettings sphereSettings(sphere->GetRadius());
 		JPH::ShapeRefC shape = sphereSettings.Create().Get();
-		params.compound.AddShape(math::ToJoltVec3(sphere->offset), JPH::Quat::sIdentity(), shape);
+		params.compound.AddShape(math::ToJoltVec3(sphere->GetOffset()), JPH::Quat::sIdentity(), shape);
 		return 1;
 	}
 	return 0;
@@ -73,9 +73,9 @@ int ShapeBuilder::TryAddCapsuleShape(ShapeBuildParams& params)
 {
 	if (auto* capsule = params.reg.try_get<CapsuleColliderComponent>(params.e))
 	{
-		JPH::CapsuleShapeSettings capsuleSettings(capsule->halfHeight, capsule->radius);
+		JPH::CapsuleShapeSettings capsuleSettings(capsule->GetHalfHeight(), capsule->GetRadius());
 		JPH::ShapeRefC shape = capsuleSettings.Create().Get();
-		params.compound.AddShape(math::ToJoltVec3(capsule->offset), JPH::Quat::sIdentity(), shape);
+		params.compound.AddShape(math::ToJoltVec3(capsule->GetOffset()), JPH::Quat::sIdentity(), shape);
 		return 1;
 	}
 	return 0;
@@ -85,9 +85,9 @@ int ShapeBuilder::TryAddCylinderShape(ShapeBuildParams& params)
 {
 	if (auto* cylinder = params.reg.try_get<CylinderColliderComponent>(params.e))
 	{
-		JPH::CylinderShapeSettings cylinderSettings(cylinder->halfHeight, cylinder->radius);
+		JPH::CylinderShapeSettings cylinderSettings(cylinder->GetHalfHeight(), cylinder->GetRadius());
 		JPH::ShapeRefC shape = cylinderSettings.Create().Get();
-		params.compound.AddShape(math::ToJoltVec3(cylinder->offset), JPH::Quat::sIdentity(), shape);
+		params.compound.AddShape(math::ToJoltVec3(cylinder->GetOffset()), JPH::Quat::sIdentity(), shape);
 		return 1;
 	}
 	return 0;
@@ -124,11 +124,11 @@ int ShapeBuilder::TryAddMeshShape(ShapeBuildParams& params)
 		JPH::MeshShapeSettings meshSettings;
 		meshSettings.mTriangleVertices = joltVertices;
 		meshSettings.mIndexedTriangles = joltTriangles;
-		meshSettings.mActiveEdgeCosThresholdAngle = meshCollider->activeEdgeTresholdAngle;
-		meshSettings.mMaxTrianglesPerLeaf = meshCollider->maxTrianglesPerLeaf;
+		meshSettings.mActiveEdgeCosThresholdAngle = meshCollider->GetActiveEdgeTresholdAngle();
+		meshSettings.mMaxTrianglesPerLeaf = meshCollider->GetMaxTrianglesPerLeaf();
 
 		JPH::ShapeRefC shape = meshSettings.Create().Get();
-		params.compound.AddShape(math::ToJoltVec3(meshCollider->offset), JPH::Quat::sIdentity(), shape);
+		params.compound.AddShape(math::ToJoltVec3(meshCollider->GetOffset()), JPH::Quat::sIdentity(), shape);
 		return 1;
 	}
 	return 0;
@@ -151,9 +151,9 @@ int ShapeBuilder::TryAddConvexHullShape(ShapeBuildParams& params)
 		}
 
 		JPH::ConvexHullShapeSettings convexHullSettings(points);
-		convexHullSettings.mMaxConvexRadius = convexHullCollider->maxConvexRadius;
+		convexHullSettings.mMaxConvexRadius = convexHullCollider->GetMaxConvexRadius();
 		JPH::ShapeRefC shape = convexHullSettings.Create().Get();
-		params.compound.AddShape(math::ToJoltVec3(convexHullCollider->offset), JPH::Quat::sIdentity(), shape);
+		params.compound.AddShape(math::ToJoltVec3(convexHullCollider->GetOffset()), JPH::Quat::sIdentity(), shape);
 		return 1;
 	}
 	return 0;

@@ -8,14 +8,14 @@ using namespace rv;
 void JoltDebugRenderer::DrawLine(JPH::RVec3Arg inFrom, JPH::RVec3Arg inTo, JPH::ColorArg inColor)
 {
 	auto& renderer = rv::DebugRenderer::Get();
-	renderer.DrawLine(math::FromJoltRVec3(inFrom), math::FromJoltRVec3(inTo), math::FromJoltColor(inColor));
+	renderer.DrawLine(math::FromJoltRVec3(inFrom), math::FromJoltRVec3(inTo), m_JoltLineColor);
 
 }
 
 void JoltDebugRenderer::DrawTriangle(JPH::RVec3Arg inV1, JPH::RVec3Arg inV2, JPH::RVec3Arg inV3, JPH::ColorArg inColor, ECastShadow inCastShadow)
 {
 	auto& renderer = rv::DebugRenderer::Get();
-	renderer.DrawTriangle(math::FromJoltRVec3(inV1), math::FromJoltRVec3(inV2), math::FromJoltRVec3(inV3), math::FromJoltColor(inColor));
+	renderer.DrawTriangle(math::FromJoltRVec3(inV1), math::FromJoltRVec3(inV2), math::FromJoltRVec3(inV3), m_JoltLineColor);
 }
 
 JPH::DebugRenderer::Batch JoltDebugRenderer::CreateTriangleBatch(const Triangle* inTriangles, int inTriangleCount)
@@ -94,6 +94,6 @@ void JoltDebugRenderer::DrawGeometry(
         glm::vec3 v0 = glm::vec3(model * glm::vec4(verts[indices[i + 0]], 1.0f));
         glm::vec3 v1 = glm::vec3(model * glm::vec4(verts[indices[i + 1]], 1.0f));
         glm::vec3 v2 = glm::vec3(model * glm::vec4(verts[indices[i + 2]], 1.0f));
-        renderer.DrawTriangle(v0, v1, v2, color);
+        renderer.DrawTriangle(v0, v1, v2, m_JoltLineColor);
     }
 }

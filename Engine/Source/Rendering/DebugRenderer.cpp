@@ -18,7 +18,6 @@ void DebugRenderer::Init()
 	
 	m_LineVAO.SetBufferLayout(layout);
 
-	glLineWidth(2.0f);
 }
 
 void DebugRenderer::DrawLine(const glm::vec3& from, const glm::vec3& to, const glm::vec4& color)
@@ -42,6 +41,8 @@ void DebugRenderer::BeginFrame()
 
 void DebugRenderer::EndFrame(const glm::mat4& mvp)
 {
+	glLineWidth(2.0f);
+
 	m_LineVAO.Bind();
 	m_LineVBO.Bind();
 

@@ -13194,7 +13194,7 @@
                 "collisionMask": 4294967295,
                 "mass": 70.0,
                 "maxSlopeAngle": 50.0,
-                "maxStrength": 100.0,
+                "maxStrength": 200.0,
                 "predictiveContactDistance": 0.10000000149011612,
                 "shapeOffset": [
                     0.0,
@@ -13564,7 +13564,7 @@
         },
         {
             "CapsuleColliderComponent": {
-                "halfHeight": 1.0,
+                "halfHeight": 0.5,
                 "offset": [
                     0.0,
                     0.0,
@@ -13586,7 +13586,7 @@
                 "bodyType": 2,
                 "collisionLayer": 1,
                 "collisionMask": 4294967295,
-                "friction": 0.5,
+                "friction": 1.0,
                 "gravityFactor": 1.0,
                 "isSensor": false,
                 "linearDamping": 0.05000000074505806,
@@ -13599,7 +13599,7 @@
                 "mass": 1.0,
                 "maxAngularVelocity": 50.0,
                 "maxLinearVelocity": 500.0,
-                "restitution": 0.20000000298023224,
+                "restitution": 0.0,
                 "useCCD": false
             },
             "Tag": {
@@ -13650,7 +13650,7 @@
                 "lockTranslationX": false,
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
-                "mass": 5.0,
+                "mass": 1.0,
                 "maxAngularVelocity": 50.0,
                 "maxLinearVelocity": 500.0,
                 "restitution": 0.20000000298023224,
@@ -14172,7 +14172,7 @@
                 "lockTranslationX": false,
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
-                "mass": 20.0,
+                "mass": 50.0,
                 "maxAngularVelocity": 50.0,
                 "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
@@ -14185,7 +14185,7 @@
                 "lockScaleRatio": false,
                 "position": [
                     2.483051300048828,
-                    0.0,
+                    0.5174778699874878,
                     0.0
                 ],
                 "rotation": [

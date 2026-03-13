@@ -469,19 +469,19 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             bool open = ImGui::CollapsingHeader("BoxCollider");
 
             if (ImGui::BeginPopupContextItem("BoxColliderComponentContext")) {
-                if (ImGui::MenuItem("Remove Component")) {
+                if (ImGui::MenuItem("Remove Component"))
                     registry.remove<BoxColliderComponent>(selectedEntity);
-                }
-
                 ImGui::EndPopup();
             }
 
             if (open)
             {
                 auto& bc = registry.get<BoxColliderComponent>(selectedEntity);
-              
-                ImGui::DragFloat3("Size", &bc.size[0], 0.001f, 1000.0f);
-                ImGui::DragFloat3("Offset", &bc.offset[0], 0.001f, 1000.0f);
+
+                glm::vec3 size = bc.GetSize();
+                glm::vec3 offset = bc.GetOffset();
+                if (ImGui::DragFloat3("Size", &size[0], 0.001f, 1000.0f)) bc.SetSize(size);
+                if (ImGui::DragFloat3("Offset", &offset[0], 0.001f, 1000.0f)) bc.SetOffset(offset);
             }
         }
         if (registry.any_of<SphereColliderComponent>(selectedEntity))
@@ -489,10 +489,8 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             bool open = ImGui::CollapsingHeader("SphereCollider");
 
             if (ImGui::BeginPopupContextItem("SphereColliderComponentContext")) {
-                if (ImGui::MenuItem("Remove Component")) {
+                if (ImGui::MenuItem("Remove Component"))
                     registry.remove<SphereColliderComponent>(selectedEntity);
-                }
-
                 ImGui::EndPopup();
             }
 
@@ -500,8 +498,10 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             {
                 auto& sc = registry.get<SphereColliderComponent>(selectedEntity);
 
-                ImGui::DragFloat("Radius", &sc.radius, 0.001f, 1000.0f);
-                ImGui::DragFloat3("Offset", &sc.offset[0], 0.001f, 1000.0f);
+                float radius = sc.GetRadius();
+                glm::vec3 offset = sc.GetOffset();
+                if (ImGui::DragFloat("Radius", &radius, 0.001f, 1000.0f)) sc.SetRadius(radius);
+                if (ImGui::DragFloat3("Offset", &offset[0], 0.001f, 1000.0f)) sc.SetOffset(offset);
             }
         }
         if (registry.any_of<CapsuleColliderComponent>(selectedEntity))
@@ -509,10 +509,8 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             bool open = ImGui::CollapsingHeader("CapsuleCollider");
 
             if (ImGui::BeginPopupContextItem("CapsuleColliderComponentContext")) {
-                if (ImGui::MenuItem("Remove Component")) {
+                if (ImGui::MenuItem("Remove Component"))
                     registry.remove<CapsuleColliderComponent>(selectedEntity);
-                }
-
                 ImGui::EndPopup();
             }
 
@@ -520,9 +518,12 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             {
                 auto& cc = registry.get<CapsuleColliderComponent>(selectedEntity);
 
-                ImGui::SliderFloat("Half height", &cc.halfHeight, 0.001f, 100.0f);
-                ImGui::SliderFloat("Radius", &cc.radius , 0.001f, 100.0f);
-                ImGui::DragFloat3("Offset", &cc.offset[0], 0.001f, 1000.0f);
+                float halfHeight = cc.GetHalfHeight();
+                float radius = cc.GetRadius();
+                glm::vec3 offset = cc.GetOffset();
+                if (ImGui::SliderFloat("Half height", &halfHeight, 0.001f, 100.0f)) cc.SetHalfHeight(halfHeight);
+                if (ImGui::SliderFloat("Radius", &radius, 0.001f, 100.0f)) cc.SetRadius(radius);
+                if (ImGui::DragFloat3("Offset", &offset[0], 0.001f, 1000.0f)) cc.SetOffset(offset);
             }
         }
         if (registry.any_of<CylinderColliderComponent>(selectedEntity))
@@ -530,10 +531,8 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             bool open = ImGui::CollapsingHeader("CylinderCollider");
 
             if (ImGui::BeginPopupContextItem("CylinderColliderComponentContext")) {
-                if (ImGui::MenuItem("Remove Component")) {
+                if (ImGui::MenuItem("Remove Component"))
                     registry.remove<CylinderColliderComponent>(selectedEntity);
-                }
-
                 ImGui::EndPopup();
             }
 
@@ -541,9 +540,12 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             {
                 auto& cc = registry.get<CylinderColliderComponent>(selectedEntity);
 
-                ImGui::SliderFloat("Half height", &cc.halfHeight, 0.001f, 100.0f);
-                ImGui::SliderFloat("Radius", &cc.radius , 0.001f, 100.0f);
-                ImGui::DragFloat3("Offset", &cc.offset[0], 0.001f, 1000.0f);
+                float halfHeight = cc.GetHalfHeight();
+                float radius = cc.GetRadius();
+                glm::vec3 offset = cc.GetOffset();
+                if (ImGui::SliderFloat("Half height", &halfHeight, 0.001f, 100.0f)) cc.SetHalfHeight(halfHeight);
+                if (ImGui::SliderFloat("Radius", &radius, 0.001f, 100.0f)) cc.SetRadius(radius);
+                if (ImGui::DragFloat3("Offset", &offset[0], 0.001f, 1000.0f)) cc.SetOffset(offset);
             }
         }
         if (registry.any_of<MeshColliderComponent>(selectedEntity))
@@ -551,10 +553,8 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             bool open = ImGui::CollapsingHeader("MeshCollider");
 
             if (ImGui::BeginPopupContextItem("MeshColliderComponentContext")) {
-                if (ImGui::MenuItem("Remove Component")) {
+                if (ImGui::MenuItem("Remove Component"))
                     registry.remove<MeshColliderComponent>(selectedEntity);
-                }
-
                 ImGui::EndPopup();
             }
 
@@ -562,9 +562,12 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             {
                 auto& mc = registry.get<MeshColliderComponent>(selectedEntity);
 
-                ImGui::SliderInt("Max triangles per leaf", &mc.maxTrianglesPerLeaf, 1,16);
-                ImGui::SliderFloat("Active edge treshold angle", &mc.activeEdgeTresholdAngle , 0.001f, 2.0f);
-                ImGui::DragFloat3("Offset", &mc.offset[0], 0.001f, 1000.0f);
+                int   maxTris = mc.GetMaxTrianglesPerLeaf();
+                float edgeAngle = mc.GetActiveEdgeTresholdAngle();
+                glm::vec3 offset = mc.GetOffset();
+                if (ImGui::SliderInt("Max triangles per leaf", &maxTris, 1, 16))       mc.SetMaxTrianglesPerLeaf(maxTris);
+                if (ImGui::SliderFloat("Active edge treshold angle", &edgeAngle, 0.001f, 2.0f)) mc.SetActiveEdgeTresholdAngle(edgeAngle);
+                if (ImGui::DragFloat3("Offset", &offset[0], 0.001f, 1000.0f)) mc.SetOffset(offset);
             }
         }
         if (registry.any_of<ConvexHullColliderComponent>(selectedEntity))
@@ -572,10 +575,8 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             bool open = ImGui::CollapsingHeader("ConvexHullCollider");
 
             if (ImGui::BeginPopupContextItem("ConvexHullColliderComponentContext")) {
-                if (ImGui::MenuItem("Remove Component")) {
+                if (ImGui::MenuItem("Remove Component"))
                     registry.remove<ConvexHullColliderComponent>(selectedEntity);
-                }
-
                 ImGui::EndPopup();
             }
 
@@ -583,8 +584,10 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             {
                 auto& mc = registry.get<ConvexHullColliderComponent>(selectedEntity);
 
-                ImGui::SliderFloat("maxConvexRadius", &mc.maxConvexRadius , 0.0f, 0.1f);
-                ImGui::DragFloat3("Offset", &mc.offset[0], 0.001f, 1000.0f);
+                float maxConvexRadius = mc.GetMaxConvexRadius();
+                glm::vec3 offset = mc.GetOffset();
+                if (ImGui::SliderFloat("maxConvexRadius", &maxConvexRadius, 0.0f, 0.1f))       mc.SetMaxConvexRadius(maxConvexRadius);
+                if (ImGui::DragFloat3("Offset", &offset[0], 0.001f, 1000.0f))  mc.SetOffset(offset);
             }
         }
 

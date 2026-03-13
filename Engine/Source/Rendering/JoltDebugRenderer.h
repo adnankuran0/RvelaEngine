@@ -26,6 +26,8 @@ public:
 	virtual void						DrawGeometry(JPH::RMat44Arg inModelMatrix, const JPH::AABox& inWorldSpaceBounds, float inLODScaleSq, JPH::ColorArg inModelColor, const GeometryRef& inGeometry, ECullMode inCullMode, ECastShadow inCastShadow, EDrawMode inDrawMode) override;
 	virtual void						DrawText3D(JPH::RVec3Arg inPosition, const std::string_view& inString, JPH::ColorArg inColor, float inHeight) override {}
 
+private:
+	glm::vec4 m_JoltLineColor = { 0.0,1.0,1.0,1.0 };
 };
 
 }

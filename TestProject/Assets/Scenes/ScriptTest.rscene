@@ -68,7 +68,7 @@
         },
         {
             "CapsuleColliderComponent": {
-                "halfHeight": 1.0,
+                "halfHeight": 0.5,
                 "offset": [
                     0.0,
                     0.0,

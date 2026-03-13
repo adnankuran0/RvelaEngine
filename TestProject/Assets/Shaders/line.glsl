@@ -10,7 +10,9 @@ out vec4 Color;
 
 void main()
 {
-    gl_Position =  uMVP * vec4(aPosition,1.0);
+    vec4 pos = uMVP * vec4(aPosition, 1.0);
+    pos.z -= 0.0001 * pos.w;  // z fighting fix
+    gl_Position = pos;
     Color = aColor;
 }
 

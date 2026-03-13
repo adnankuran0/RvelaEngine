@@ -48,8 +48,18 @@ struct RigidbodyComponent
     glm::vec3 currentPosition{};
     glm::quat currentRotation{ 1,0,0,0 };
 
+    glm::vec3 worldScaleCache = glm::vec3(1.0f);
+
+    void SetShapeDirty() { shapeDirty = true; }
+    void ClearShapeDirty() { shapeDirty = false; }
+    bool IsShapeDirty() { return shapeDirty; }
+
     json Serialize() const;
     void Deserialize(const json& j);
+
+
+private:
+    bool shapeDirty = false;
 };
 
 }

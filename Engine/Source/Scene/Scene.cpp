@@ -127,8 +127,8 @@ void Scene::Update()
     if (m_State == SceneState::PLAY)
         OnUpdate(Time::GetDeltaTime());
     m_TransformSystem.Update();
+    m_PhysicsSystem.Update(); 
     m_CameraSystem.Update();
-    m_PhysicsSystem.Update();
 }
 void Scene::FixedUpdate() 
 {                
