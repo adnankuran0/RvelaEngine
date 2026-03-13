@@ -47,6 +47,8 @@ public:
     Entity CreateEntityWithUUID(const std::string& name, EntityUUID uuid);
     void DestroyEntity(entt::entity entity);
     void DestroyEntity(Entity& entity);
+    void QueueDestroyEntity(Entity& entity);
+    void QueueDestroyEntity(entt::entity entity);
 
     template<typename Component, typename... Args>
     Component& AddComponent(entt::entity entity, Args&&... args) {
@@ -136,6 +138,17 @@ public:
 
 
 private:
+    void FlushDestroyQueue()
+    {
+        for (entt::entity e : m_pendingDestroys)
+            DestroyEntity(e);
+        m_pendingDestroys.clear();
+    }
+
+private:
+    bool m_isUpdating = false;
+    std::vector<entt::entity> m_pendingDestroys;
+
     unsigned int CountEntitiesRecursively(entt::entity& rootEntity);
     friend class Entity;
     SceneState m_State = SceneState::EDIT;

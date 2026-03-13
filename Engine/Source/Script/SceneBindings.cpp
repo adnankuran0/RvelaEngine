@@ -11,7 +11,7 @@ void LuaBindings::RegisterSceneAPI(sol::state& lua)
 
     lua.new_usertype<Scene>("Scene",
         "CreateEntity", &Scene::CreateEntity,
-        "DestroyEntity", [](Scene& scene, Entity& e) { scene.DestroyEntity(e); },
+        "DestroyEntity", [](Scene& scene, Entity& e) { scene.QueueDestroyEntity(e); },
         "FindEntityByName", &Scene::GetEntityByName
         
     );

@@ -122,10 +122,29 @@ void Scene::DestroyEntity(Entity& entity) {
     DestroyEntity(entity.GetHandle());
 }
 
+void Scene::QueueDestroyEntity(Entity& entity)
+{
+    QueueDestroyEntity(entity.GetHandle());
+}
+
+void Scene::QueueDestroyEntity(entt::entity entity)
+{
+    if (!m_isUpdating)
+        DestroyEntity(entity);
+    else
+        m_pendingDestroys.push_back(entity);
+}
+
 void Scene::Update() 
 {                
+
     if (m_State == SceneState::PLAY)
+    {
+        m_isUpdating = true;
         OnUpdate(Time::GetDeltaTime());
+        m_isUpdating = false;
+        FlushDestroyQueue();
+    }
     m_TransformSystem.Update();
     m_PhysicsSystem.Update(); 
     m_CameraSystem.Update();
@@ -133,12 +152,22 @@ void Scene::Update()
 void Scene::FixedUpdate() 
 {                
     if (m_State == SceneState::PLAY)
+    {
+        m_isUpdating = true;
         OnFixedUpdate(Time::GetFixedDeltaTime());
+        m_isUpdating = false;
+        FlushDestroyQueue(); 
+    }
 }
 void Scene::LateUpdate() 
 {              
     if (m_State == SceneState::PLAY)
+    {
+        m_isUpdating = true;
         OnLateUpdate(Time::GetDeltaTime());
+        m_isUpdating = false;
+        FlushDestroyQueue(); 
+    }
 }
 
 entt::registry& Scene::GetRegistry() { return m_Registry; }
