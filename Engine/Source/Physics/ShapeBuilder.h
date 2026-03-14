@@ -19,21 +19,21 @@ public:
 private:
 	struct ShapeBuildParams
 	{
-		entt::registry& reg;
-		entt::entity e;
-		TransformComponent& tc;
-		MeshComponent* mc;
-		glm::vec3 worldScale;
-		bool isScaleUniform;
-		JPH::StaticCompoundShapeSettings& compound;
+		entt::registry* registry;
+		entt::entity entity;
+		TransformComponent* transformComponent;
+		MeshComponent* meshComponent;
+		JPH::StaticCompoundShapeSettings* compoundSettings;
 	};
 
-	int TryAddBoxShape(ShapeBuildParams& params);
-	int TryAddSphereShape(ShapeBuildParams& params);
-	int TryAddCapsuleShape(ShapeBuildParams& params);
-	int TryAddCylinderShape(ShapeBuildParams& params);
-	int TryAddMeshShape(ShapeBuildParams& params);
-	int TryAddConvexHullShape(ShapeBuildParams& params);
+	bool TryAddBoxShape(ShapeBuildParams& params);
+	bool TryAddSphereShape(ShapeBuildParams& params);
+	bool TryAddCapsuleShape(ShapeBuildParams& params);
+	bool TryAddCylinderShape(ShapeBuildParams& params);
+	bool TryAddMeshShape(ShapeBuildParams& params);
+	bool TryAddConvexHullShape(ShapeBuildParams& params);
+
+	JPH::ShapeRefC TryApplyScale(JPH::ShapeRefC shape, const glm::vec3& scale);
 };
 
 }

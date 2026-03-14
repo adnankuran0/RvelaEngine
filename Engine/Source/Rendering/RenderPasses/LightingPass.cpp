@@ -181,15 +181,14 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         shader.setFloat("specularIntensity", material.GetSpecular());
         shader.setFloat("heightScale", material.GetHeightScale());
 
-        std::vector<MapInfo> maps = 
-        {
+        std::array<MapInfo, 6> maps = { {
         { material.IsUsingAlbedoMap(),    "albedoMap",    0, "useAlbedoMap",    material.GetAlbedoTexture() },
         { material.IsUsingNormalMap(),    "normalMap",    1, "useNormalMap",    material.GetNormalTexture() },
         { material.IsUsingMetallicMap(),  "metallicMap",  2, "useMetallicMap",  material.GetMetallicTexture() },
         { material.IsUsingRoughnessMap(), "roughnessMap", 3, "useRoughnessMap", material.GetRoughnessTexture() },
         { material.IsUsingAOMap(),        "aoMap",        4, "useAOMap",        material.GetAOTexture() },
         { material.IsUsingHeightMap(),    "heightMap",    5, "useHeightMap",    material.GetHeightTexture() }
-        };
+        } };
 
         for (const auto& map : maps) 
         {

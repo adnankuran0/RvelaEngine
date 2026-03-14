@@ -27,7 +27,7 @@ public:
 	virtual void						DrawText3D(JPH::RVec3Arg inPosition, const std::string_view& inString, JPH::ColorArg inColor, float inHeight) override {}
 
 private:
-	glm::vec4 m_JoltLineColor = { 0.0,1.0,1.0,1.0 };
+	glm::vec4 m_JoltLineColor = { 0.0,1.0,0.0,1.0 };
 };
 
 }

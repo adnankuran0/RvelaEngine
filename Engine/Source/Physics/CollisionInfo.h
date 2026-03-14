@@ -6,8 +6,7 @@ namespace rv::Physics {
 struct CollisionInfo
 {
 	Entity other;
-	glm::vec3 point;
-	glm::vec3 normal;
+	Collision collision;
 };
 
 

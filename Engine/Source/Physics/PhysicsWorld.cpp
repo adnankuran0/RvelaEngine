@@ -30,7 +30,9 @@ void rv::Physics::PhysicsWorld::MoveKinematic(RigidbodyComponent* comp,
 	const glm::vec3& targetPosition,const glm::quat& targetRotation, float dt)
 {
 	if (!comp || comp->RuntimeBodyID.IsInvalid()) return;
-	if (GetMotionType(comp) != MotionType::KINEMATIC) return;
+
+	JPH::EMotionType type = BodyInterface().GetMotionType(comp->RuntimeBodyID);
+	if (type != JPH::EMotionType::Kinematic) return;
 
 	BodyInterface().MoveKinematic(comp->RuntimeBodyID, 
 		math::ToJoltRVec3(targetPosition), 

@@ -3,6 +3,7 @@
 #include "Rendering/DebugRenderer.h"
 #include "Rendering/RenderContext.h"
 #include "Rendering/Camera.h"
+#include "Scene/Scene.h"
 
 using namespace rv;
 
@@ -13,6 +14,9 @@ void DebugPass::Init(const RenderContext& ctx, RenderFrame& frame)
 
 void DebugPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
+    if (DebugRenderer::Get().GetSettings().drawBoundingBoxes)
+        DrawAABBs(ctx);
+
     GLuint finalFramebuffer = frame.registry.Get("FinalFramebuffer")->id;
     GLuint depthTexture = frame.registry.Get("DepthTexture")->id;
 
@@ -31,4 +35,18 @@ void DebugPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     glDepthMask(GL_TRUE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void DebugPass::DrawAABBs(const RenderContext& ctx)
+{
+    auto& reg = ctx.scene->GetRegistry();
+       
+    auto view = reg.view<MeshRendererComponent>();
+    for (auto e : view)
+    {
+        auto& comp = reg.get<MeshRendererComponent>(e);
+        DebugRenderer::Get().DrawBox(comp.worldAABB.min, comp.worldAABB.max, { 0.0,1.0,1.0,1.0 });
+    }
+   
+
 }

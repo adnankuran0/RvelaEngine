@@ -77,7 +77,9 @@ void JoltDebugRenderer::DrawGeometry(
 {
     if (!inGeometry || inGeometry->mLODs.empty()) return;
 
-    const auto& batch = inGeometry->mLODs[0].mTriangleBatch;
+    size_t lodIndex = std::min((size_t)1, inGeometry->mLODs.size() - 1);
+    const auto& batch = inGeometry->mLODs[lodIndex].mTriangleBatch;
+
     auto* batchImpl = static_cast<TriangleBatchImpl*>(batch.GetPtr());
     if (!batchImpl) return;
 

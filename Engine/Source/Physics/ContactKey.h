@@ -34,7 +34,9 @@ struct ContactKeyHash
 {
     size_t operator()(const ContactKey& k) const
     {
-        return ((size_t)k.a.GetIndex() << 32) ^ (size_t)k.b.GetIndex(); 
+        size_t h1 = std::hash<uint32_t>{}(k.a.GetIndex());
+        size_t h2 = std::hash<uint32_t>{}(k.b.GetIndex());
+        return h1 ^ (h2 * 2654435761u); // Knuth multiplicative hash
     }
 };
 

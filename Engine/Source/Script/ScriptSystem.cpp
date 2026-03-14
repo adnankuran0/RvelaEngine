@@ -205,7 +205,7 @@ void ScriptSystem::DispatchCollisionEvents()
         if (scB && reg.try_get<ScriptComponent>(event.entityB))
         {
             Physics::CollisionInfo info = BuildCollisionInfo(event.collision, event.entityA);
-            info.normal *= -1.0f;
+            info.collision.normal *= -1.0f;
             dispatchEvent(*scB, event.eventType, info);
         }
     }
@@ -213,5 +213,5 @@ void ScriptSystem::DispatchCollisionEvents()
 
 Physics::CollisionInfo rv::ScriptSystem::BuildCollisionInfo(const Physics::Collision& collision, entt::entity otherEntity)
 {
-    return { Entity(otherEntity, &m_Scene), collision.point, collision.normal };
+    return { Entity(otherEntity, &m_Scene), collision };
 }

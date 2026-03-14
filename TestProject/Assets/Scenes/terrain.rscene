@@ -782,11 +782,11 @@
                 "rotation": [
                     0.0,
                     -0.0,
-                    46.263328552246094
+                    36.5582389831543
                 ],
                 "scale": [
-                    0.9999983310699463,
-                    0.9999983310699463,
+                    0.9999986886978149,
+                    0.9999986886978149,
                     1.0
                 ]
             },
@@ -853,6 +853,72 @@
                 ]
             },
             "UUID": 21
+        },
+        {
+            "BoxColliderComponent": {
+                "offset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    0.5,
+                    0.5,
+                    0.5
+                ]
+            },
+            "Material": {
+                "material": "ee3dde12-6263-4f11-bb1d-812b3e196ab7"
+            },
+            "Mesh": {
+                "mesh": "36468d32-bba5-4eb4-82db-0d4da5cd6c65"
+            },
+            "ParentUUID": 0,
+            "RigidbodyComponent": {
+                "allowSleep": 0,
+                "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 0,
+                "bodyType": 2,
+                "collisionLayer": 1,
+                "collisionMask": 4294967295,
+                "friction": 1.0,
+                "gravityFactor": 1.0,
+                "isSensor": false,
+                "linearDamping": 0.05000000074505806,
+                "lockRotationX": false,
+                "lockRotationY": false,
+                "lockRotationZ": false,
+                "lockTranslationX": false,
+                "lockTranslationY": false,
+                "lockTranslationZ": false,
+                "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
+                "restitution": 0.0,
+                "useCCD": false
+            },
+            "Tag": {
+                "tag": "Cube"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    0.7200000286102295,
+                    0.7200000286102295,
+                    0.7200000286102295
+                ]
+            },
+            "UUID": 478
         }
     ],
     "Environment": {
@@ -868,7 +934,7 @@
         ],
         "Lighting_AmbientIntensity": 0.5,
         "Lighting_IBL": true,
-        "Lighting_IBLIntensity": 0.20000000298023224,
+        "Lighting_IBLIntensity": 0.30000001192092896,
         "PostProcess_ChromaticStrength": 0.009999999776482582,
         "PostProcess_Exposure": 1.0,
         "PostProcess_VignetteIntensity": 0.25,

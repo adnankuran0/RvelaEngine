@@ -59,8 +59,10 @@ void PhysicsSystem::DebugDraw()
 	JPH::BodyManager::DrawSettings settings;
 	settings.mDrawShapeWireframe = true;
 
+	// draw rigidbodies
 	m_PhysicsSystem.DrawBodies(settings, &m_DebugRenderer);
 
+	// draw character bodies
 	auto view = m_Scene.GetRegistry().view<CharacterBodyComponent>();
 	for (auto e : view)
 	{
@@ -88,7 +90,8 @@ void PhysicsSystem::DebugDraw()
 void PhysicsSystem::Update()
 {
 	BuildBodies();
-	DebugDraw();
+	if (DebugRenderer::Get().GetSettings().drawColliders)
+		DebugDraw();
 
 	if (m_Scene.GetState() == SceneState::EDIT)
 		SyncBodiesFromTransforms();
@@ -130,30 +133,38 @@ void PhysicsSystem::BuildBodies()
 
 void PhysicsSystem::RebuildDirtyShapes()
 {
+	auto rbView = m_Scene.GetRegistry().view<RigidbodyComponent>();
+	for (auto e : rbView)
+	{
+		auto& rb = m_Scene.GetRegistry().get<RigidbodyComponent>(e);
+		if (rb.RuntimeBodyID.IsInvalid()) continue;
+
+		auto& tc = m_Scene.GetRegistry().get<TransformComponent>(e);
+		glm::vec3 worldScale = tc.GetWorldScale();
+
+		CheckAndUpdateScaleDirty(e, rb.worldScaleCache, false);
+
+		bool dirty = rb.IsShapeDirty() || IsAnyColliderDirty(e);
+		if (!dirty) continue;
+
+		JPH::ShapeRefC newShape = m_ShapeBuilder.BuildShape(m_Scene.GetRegistry(), e);
+		BodyInterface().SetShape(rb.RuntimeBodyID, newShape, false, JPH::EActivation::Activate);
+
+		ClearColliderDirtyFlags(e);
+
+		rb.ClearShapeDirty();
+
+	}
+
 	auto cbView = m_Scene.GetRegistry().view<CharacterBodyComponent>();
 	for (auto e : cbView)
 	{
 		auto& cb = m_Scene.GetRegistry().get<CharacterBodyComponent>(e);
 		if (!cb.character) continue;
 
-		auto& tc = m_Scene.GetRegistry().get<TransformComponent>(e);
-		glm::vec3 worldScale = tc.GetWorldScale();
+		CheckAndUpdateScaleDirty(e,cb.worldScaleCache,true);
 
-		bool scaleDirty = !glm::all(glm::epsilonEqual(worldScale, cb.worldScaleCache, 0.0001f));
-		if (scaleDirty) {
-			cb.SetShapeDirty();
-			cb.worldScaleCache = worldScale;
-		}
-
-		bool dirty = cb.IsShapeDirty();
-
-		if (auto* c = m_Scene.GetRegistry().try_get<BoxColliderComponent>(e))          dirty |= c->IsDirty();
-		if (auto* c = m_Scene.GetRegistry().try_get<SphereColliderComponent>(e))       dirty |= c->IsDirty();
-		if (auto* c = m_Scene.GetRegistry().try_get<CapsuleColliderComponent>(e))      dirty |= c->IsDirty();
-		if (auto* c = m_Scene.GetRegistry().try_get<CylinderColliderComponent>(e))     dirty |= c->IsDirty();
-		if (auto* c = m_Scene.GetRegistry().try_get<MeshColliderComponent>(e))         dirty |= c->IsDirty();
-		if (auto* c = m_Scene.GetRegistry().try_get<ConvexHullColliderComponent>(e))   dirty |= c->IsDirty();
-
+		bool dirty = cb.IsShapeDirty() || IsAnyColliderDirty(e);
 		if (!dirty) continue;
 
 		JPH::ShapeRefC newShape = m_ShapeBuilder.BuildShape(m_Scene.GetRegistry(), e);
@@ -166,55 +177,12 @@ void PhysicsSystem::RebuildDirtyShapes()
 			m_TempAllocator
 		);
 
-		if (auto* c = m_Scene.GetRegistry().try_get<BoxColliderComponent>(e))          c->ClearDirty();
-		if (auto* c = m_Scene.GetRegistry().try_get<SphereColliderComponent>(e))       c->ClearDirty();
-		if (auto* c = m_Scene.GetRegistry().try_get<CapsuleColliderComponent>(e))      c->ClearDirty();
-		if (auto* c = m_Scene.GetRegistry().try_get<CylinderColliderComponent>(e))     c->ClearDirty();
-		if (auto* c = m_Scene.GetRegistry().try_get<MeshColliderComponent>(e))         c->ClearDirty();
-		if (auto* c = m_Scene.GetRegistry().try_get<ConvexHullColliderComponent>(e))   c->ClearDirty();
+		ClearColliderDirtyFlags(e);
 
 		cb.ClearShapeDirty();
 	}
 
-	auto rbView = m_Scene.GetRegistry().view<RigidbodyComponent>();
-	for (auto e : rbView)
-	{
-		auto& rb = m_Scene.GetRegistry().get<RigidbodyComponent>(e);
-		if (rb.RuntimeBodyID.IsInvalid()) continue;
-
-		auto& tc = m_Scene.GetRegistry().get<TransformComponent>(e);
-		glm::vec3 worldScale = tc.GetWorldScale();
-
-		bool scaleDirty = !glm::all(glm::epsilonEqual(worldScale, rb.worldScaleCache, 0.0001f));
-		if (scaleDirty) {
-			rb.SetShapeDirty();
-			rb.worldScaleCache = worldScale;
-		}
-
-		bool dirty = rb.IsShapeDirty();
-
-		if (auto* c = m_Scene.GetRegistry().try_get<BoxColliderComponent>(e)) dirty |= c->IsDirty();
-		if (auto* c = m_Scene.GetRegistry().try_get<SphereColliderComponent>(e)) dirty |= c->IsDirty();
-		if (auto* c = m_Scene.GetRegistry().try_get<CapsuleColliderComponent>(e)) dirty |= c->IsDirty();
-		if (auto* c = m_Scene.GetRegistry().try_get<CylinderColliderComponent>(e)) dirty |= c->IsDirty();
-		if (auto* c = m_Scene.GetRegistry().try_get<MeshColliderComponent>(e)) dirty |= c->IsDirty();
-		if (auto* c = m_Scene.GetRegistry().try_get<ConvexHullColliderComponent>(e)) dirty |= c->IsDirty();
-
-		if (!dirty) continue;
-
-		JPH::ShapeRefC newShape = m_ShapeBuilder.BuildShape(m_Scene.GetRegistry(), e);
-		BodyInterface().SetShape(rb.RuntimeBodyID, newShape, false, JPH::EActivation::Activate);
-
-		if (auto* c = m_Scene.GetRegistry().try_get<BoxColliderComponent>(e)) c->ClearDirty();
-		if (auto* c = m_Scene.GetRegistry().try_get<SphereColliderComponent>(e))  c->ClearDirty();
-		if (auto* c = m_Scene.GetRegistry().try_get<CapsuleColliderComponent>(e)) c->ClearDirty();
-		if (auto* c = m_Scene.GetRegistry().try_get<CylinderColliderComponent>(e)) c->ClearDirty();
-		if (auto* c = m_Scene.GetRegistry().try_get<MeshColliderComponent>(e)) c->ClearDirty();
-		if (auto* c = m_Scene.GetRegistry().try_get<ConvexHullColliderComponent>(e)) c->ClearDirty();
-
-		rb.ClearShapeDirty();
-
-	}
+	
 }
 
 void PhysicsSystem::BuildRigidbodies()
@@ -389,7 +357,7 @@ JPH::BodyCreationSettings PhysicsSystem::BuildBodyCreationSettings(RigidbodyComp
 		settings.mOverrideMassProperties = JPH::EOverrideMassProperties::CalculateInertia;
 		settings.mMassPropertiesOverride.mMass = rbComp.mass;
 	}
-	//TODO: override mass and innertia for bodies with mesh colliders
+	//TODO: override both mass and innertia for bodies with mesh colliders
 
 	settings.mMaxLinearVelocity = rbComp.maxLinearVelocity;
 	settings.mMaxAngularVelocity = rbComp.maxAngularVelocity;
@@ -460,6 +428,9 @@ void PhysicsSystem::OnRigidbodyDestroyed(entt::registry& reg, entt::entity e)
 	auto& rb = reg.get<RigidbodyComponent>(e);
 	if (rb.RuntimeBodyID.IsInvalid()) return;
 
+	Physics::UserData* data = reinterpret_cast<Physics::UserData*>(BodyInterface().GetUserData(rb.RuntimeBodyID));
+	delete data;
+
 	BodyInterface().RemoveBody(rb.RuntimeBodyID);
 	BodyInterface().DestroyBody(rb.RuntimeBodyID);
 }
@@ -468,6 +439,9 @@ void PhysicsSystem::OnCharacterBodyDestroyed(entt::registry& reg, entt::entity e
 {
 	auto& cb = reg.get<CharacterBodyComponent>(e);
 	if (!cb.character) return;
+
+	Physics::UserData* data = reinterpret_cast<Physics::UserData*>(cb.character->GetUserData());
+	delete data;
 
 	cb.character = nullptr;
 }
@@ -479,4 +453,46 @@ void PhysicsSystem::OnShapeChanged(entt::registry& reg, entt::entity e)
 
 	if (auto* cb = reg.try_get<CharacterBodyComponent>(e))
 		cb->SetShapeDirty();
+}
+
+bool PhysicsSystem::IsAnyColliderDirty(entt::entity e)
+{
+	auto& reg = m_Scene.GetRegistry();
+	if (auto* c = reg.try_get<BoxColliderComponent>(e))        if (c->IsDirty()) return true;
+	if (auto* c = reg.try_get<SphereColliderComponent>(e))     if (c->IsDirty()) return true;
+	if (auto* c = reg.try_get<CapsuleColliderComponent>(e))    if (c->IsDirty()) return true;
+	if (auto* c = reg.try_get<CylinderColliderComponent>(e))   if (c->IsDirty()) return true;
+	if (auto* c = reg.try_get<MeshColliderComponent>(e))       if (c->IsDirty()) return true;
+	if (auto* c = reg.try_get<ConvexHullColliderComponent>(e)) if (c->IsDirty()) return true;
+	return false;
+}
+
+void PhysicsSystem::ClearColliderDirtyFlags(entt::entity e)
+{
+	auto& reg = m_Scene.GetRegistry();
+	if (auto* c = reg.try_get<BoxColliderComponent>(e))			 c->ClearDirty();
+	if (auto* c = reg.try_get<SphereColliderComponent>(e))		 c->ClearDirty();
+	if (auto* c = reg.try_get<CapsuleColliderComponent>(e))		 c->ClearDirty();
+	if (auto* c = reg.try_get<CylinderColliderComponent>(e))	 c->ClearDirty();
+	if (auto* c = reg.try_get<MeshColliderComponent>(e))		 c->ClearDirty();
+	if (auto* c = reg.try_get<ConvexHullColliderComponent>(e))	 c->ClearDirty();
+}
+
+void PhysicsSystem::CheckAndUpdateScaleDirty(entt::entity e, glm::vec3& scaleCache,bool isCharacter)
+{
+	const glm::vec3 worldScale = m_Scene.GetRegistry().get<TransformComponent>(e).GetWorldScale();
+	if (glm::all(glm::epsilonEqual(worldScale, scaleCache, 0.0001f))) return;
+
+	scaleCache = worldScale;
+
+	if (isCharacter)
+	{
+		auto& cb = m_Scene.GetRegistry().get<CharacterBodyComponent>(e);
+		cb.SetShapeDirty();
+	}
+	else
+	{
+		auto& rb = m_Scene.GetRegistry().get<RigidbodyComponent>(e);
+		rb.SetShapeDirty();
+	}
 }

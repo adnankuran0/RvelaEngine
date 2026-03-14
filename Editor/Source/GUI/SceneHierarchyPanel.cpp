@@ -108,7 +108,7 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             {
                 if (ImGui::MenuItem("Delete Entity"))
                 {
-                    scene.DestroyEntity(entity);
+                    scene.QueueDestroyEntity(entity);
                     if (selectedEntity == entity)
                         selectedEntity = entt::null;
                 }

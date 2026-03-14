@@ -58,7 +58,6 @@ void ContactListener::OnContactPersisted(const JPH::Body& inBody1, const JPH::Bo
 
 void ContactListener::OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair)
 {
-   
 	ContactKey key(inSubShapePair.GetBody1ID(), inSubShapePair.GetBody2ID());
 
 	auto it = m_ActiveContacts.find(key);

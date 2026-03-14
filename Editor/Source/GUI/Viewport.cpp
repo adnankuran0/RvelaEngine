@@ -5,6 +5,7 @@
 #include "Core/Engine.h"
 #include <glm/gtx/matrix_decompose.hpp>
 #include "Rendering/RenderLayer.h"
+#include "Rendering/DebugRenderer.h"
 
 using namespace rv;
 
@@ -119,6 +120,32 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
     }
 }
 
+void Viewport::DrawPopups(Engine* engine, ImVec2& displayPos, ImVec2& displaySize)
+{
+    auto& debugSettings = DebugRenderer::Get().GetSettings();
+
+    float buttonSize = 25.0f;
+
+    ImVec2 buttonPos = {
+        displayPos.x + 6.0f,
+        displayPos.y + 6.0f
+    };
+
+    ImGui::SetCursorScreenPos(buttonPos);
+
+    if (ImGui::Button("...", ImVec2(buttonSize, buttonSize)))
+    {
+        ImGui::OpenPopup("ViewportOptions");
+    }
+
+    if (ImGui::BeginPopup("ViewportOptions"))
+    {
+        ImGui::Checkbox("Draw Colliders", &debugSettings.drawColliders);
+        ImGui::Checkbox("Draw Bounding Boxes", &debugSettings.drawBoundingBoxes);
+        ImGui::EndPopup();
+    }
+}
+
 void Viewport::HandleSelection(Engine* engine, ImVec2& displayPos, ImVec2& displaySize, entt::entity& selectedEntity)
 {
     if (engine->GetActiveScene().GetState() != SceneState::EDIT) return;
@@ -187,7 +214,7 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
 
 
 
-        ImTextureID textureID = (ImTextureID)(intptr_t)engine->GetRenderLayer().GetFinalTexture(); 
+        ImTextureID textureID = (ImTextureID)(intptr_t)engine->GetRenderLayer().GetFinalTexture();
 
         ImGui::GetWindowDrawList()->AddImage(
             textureID,
@@ -198,17 +225,13 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
             IM_COL32_WHITE
         );
 
-        
-
         ImGui::TextColored(ImVec4(1, 1, 0, 1), "Viewport: %.0fx%.0f | Texture: 1920x1080 | Display: %.0fx%.0f | FPS: %.1f",
             viewportSize.x, viewportSize.y, displaySize.x, displaySize.y, ImGui::GetIO().Framerate);
 
-        
-
         DrawGizmos(engine, displayPos, displaySize, selectedEntity);
         HandleSelection(engine, displayPos, displaySize, selectedEntity);
-        
-        
+
+        DrawPopups(engine, displayPos, displaySize);
     }
     ImGui::End();
     ImGui::PopStyleVar();

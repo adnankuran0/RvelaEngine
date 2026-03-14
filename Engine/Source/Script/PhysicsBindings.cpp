@@ -6,7 +6,7 @@
 #include "Scene/Components/CharacterBodyComponent.h"
 #include "Physics/CollisionInfo.h"
 #include "Scene/Entity.h"
-#include "Core/Engine.h" // ...
+#include "Core/Engine.h"
 
 using namespace rv::Physics;
 
@@ -19,11 +19,9 @@ void rv::LuaBindings::RegisterPhysicsAPI(sol::state& lua)
         });
 
     lua.new_usertype<CollisionInfo>("CollisionInfo",
-        "point", &CollisionInfo::point,
-        "normal", &CollisionInfo::normal,
-        "other", sol::property(
-            [](CollisionInfo& ci) -> Entity& { return ci.other; }
-        )
+        "point", sol::property([](CollisionInfo& ci) { return ci.collision.point; }),
+        "normal", sol::property([](CollisionInfo& ci) { return ci.collision.normal; }),
+        "other", sol::property([](CollisionInfo& ci) -> Entity& { return ci.other; })
     );
 
     lua.new_usertype<RaycastResult>("RaycastResult",

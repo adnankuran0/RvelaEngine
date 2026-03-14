@@ -42,10 +42,15 @@ private:
 	void SyncTransforms();
 	void SyncBodyTransforms();
 	void SyncCharacterTransforms();
+
 	JPH::BodyCreationSettings BuildBodyCreationSettings(RigidbodyComponent& rbComp, TransformComponent& tComp);
 	JPH::Ref<JPH::CharacterVirtualSettings> BuildCharacterBodyCreationSettings(CharacterBodyComponent& cbComp, TransformComponent& tComp);
 	void UpdateCharacters(float dt); // TODO: think about seperate MoveAndSlide function
 	inline JPH::BodyInterface& BodyInterface() { return m_PhysicsSystem.GetBodyInterface(); }
+
+	bool IsAnyColliderDirty(entt::entity e);
+	void ClearColliderDirtyFlags(entt::entity e);
+	void CheckAndUpdateScaleDirty(entt::entity e, glm::vec3& scaleCache,bool isCharacter);
 
 	void OnRigidbodyDestroyed(entt::registry& reg, entt::entity e);
 	void OnCharacterBodyDestroyed(entt::registry& reg, entt::entity e);
