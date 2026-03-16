@@ -1,8 +1,9 @@
 #pragma once
 #include "Utils/FileUtils.h"
 #include "nlohmann/json.hpp"
-#include "Assets/MeshAsset.h"
-#include "Assets/AssetRegistry.h"
+#include "Asset/Types/MeshAsset.h"
+#include "Asset/AssetRegistry.h"
+#include "Core/Ref.h"
 
 namespace rv {
 

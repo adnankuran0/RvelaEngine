@@ -11,10 +11,11 @@ public:
     Ref(std::shared_ptr<T> ptr) : ptr(std::move(ptr)) {}
 
     template<typename U>
-        explicit Ref(const Ref<U>& other) {
-        static_assert(std::is_base_of<U, T>::value || std::is_base_of<T, U>::value,
-            "Incompatible Ref conversion");
-        ptr = std::dynamic_pointer_cast<T>(other.GetShared());
+    Ref(const Ref<U>& other) : ptr(other.GetShared()) {}
+
+    template<typename U, typename = std::enable_if_t<std::is_base_of_v<U, T>>>
+    explicit Ref(const Ref<U>& other)
+        : ptr(std::dynamic_pointer_cast<T>(other.GetShared())) {
     }
 
     Ref(const Ref& other) = default;

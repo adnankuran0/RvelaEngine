@@ -1,16 +1,7 @@
 #pragma once
+#include "Asset/Types/TextureAsset.h"
 
 namespace rv { 
-
-enum TextureFormat : uint8_t
-{
-    Unknown = 0,
-    RGBA8,
-    RGB8,
-    R8,
-    BC1, //DXT1
-    BC3  //DXT5
-};
 
 class Texture
 {
@@ -18,6 +9,35 @@ public:
     Texture();
     ~Texture();
     Texture(const std::string& path);
+    Texture(const Texture&) = delete;
+    Texture& operator=(const Texture&) = delete;
+
+    Texture(Texture&& other) noexcept
+        : m_Texture(other.m_Texture), m_Width(other.m_Width),
+        m_Height(other.m_Height), m_NrChannels(other.m_NrChannels),
+        m_Path(std::move(other.m_Path)), m_Data(other.m_Data)
+    {
+        other.m_Texture = 0;
+        other.m_Data = nullptr;
+    }
+
+    Texture& operator=(Texture&& other) noexcept
+    {
+        if (this != &other)
+        {
+            Destroy();
+            m_Texture = other.m_Texture;
+            m_Width = other.m_Width;
+            m_Height = other.m_Height;
+            m_NrChannels = other.m_NrChannels;
+            m_Path = std::move(other.m_Path);
+            m_Data = other.m_Data;
+            other.m_Texture = 0;
+            other.m_Data = nullptr;
+        }
+        return *this;
+    }
+
     void Init();
     void Destroy() const;
     void Bind(unsigned int activeTexture) const;

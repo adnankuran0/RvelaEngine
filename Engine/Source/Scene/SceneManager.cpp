@@ -4,6 +4,7 @@
 #include "EntityUUID.h"  
 #include "Core/Log.h"
 #include <Utils/Serializer.h>
+#include "Rendering/TextureCache.h"
 
 using namespace rv;
 
@@ -22,6 +23,7 @@ void SceneManager::SaveScene(const std::string& path)
 
 void SceneManager::LoadScene(const std::string& path)
 {
+    TextureCache::Get().Clear();
     m_PendingScenePath = path;
     m_HasPendingScene = true;
 }

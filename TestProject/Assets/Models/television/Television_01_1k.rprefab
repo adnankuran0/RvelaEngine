@@ -1,0 +1,35 @@
+{
+    "Entities": [
+        {
+            "Material": {
+                "material": "f63d0b25-975e-45dd-9de2-abc57e89172c"
+            },
+            "Mesh": {
+                "mesh": "59ba242e-5a39-40fc-996d-286e6f9de9e0"
+            },
+            "Tag": {
+                "tag": "Television_01"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 3
+        }
+    ]
+}

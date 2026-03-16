@@ -2,8 +2,7 @@
 
 #include "Core/Layer.h"
 #include "Rendering/EditorCamera.h"
-#include "AssetImporter/AssetImporterRegistry.h"
-
+#include "Asset/AssetImportPipeline.h"
 #include "GUI/SceneHierarchyPanel.h"
 #include "GUI/Style.h"
 #include "GUI/MenuBar.h"
@@ -54,7 +53,7 @@ private:
     std::vector<entt::entity> m_SelectedEntities;
 
     entt::entity m_SelectedEntity = entt::null;
-    AssetImporterRegistry m_AssetImporterRegistry;
+    AssetImportPipeline m_AssetImportPipeline;
     EditorCamera m_EditorCamera;
     rv::Engine* m_Engine;
     bool m_ShowUI = true;

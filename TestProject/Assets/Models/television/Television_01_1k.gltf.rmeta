@@ -1,0 +1,30 @@
+{
+    "dependencies": [],
+    "importerID": "ModelImporter",
+    "importerSettings": {},
+    "sourceHash": 6164396953737985738,
+    "subAssets": [
+        {
+            "index": 0,
+            "name": "Television_01_1k_Mat0",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "f63d0b25-975e-45dd-9de2-abc57e89172c"
+        },
+        {
+            "index": 1,
+            "name": "Television_01_1k_Mat1",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "c5263d55-f15a-4f39-bcad-edaf5699b5fe"
+        },
+        {
+            "index": 0,
+            "name": "Cube.021",
+            "sourceHash": 6164396953737985738,
+            "type": "Mesh",
+            "uuid": "59ba242e-5a39-40fc-996d-286e6f9de9e0"
+        }
+    ],
+    "uuid": "dc73c3b0-a3a4-449f-b24b-8eec60a67637"
+}

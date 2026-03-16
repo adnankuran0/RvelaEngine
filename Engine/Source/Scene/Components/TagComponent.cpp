@@ -9,7 +9,13 @@ json TagComponent::Serialize() const
     j["tag"] = tag;
     return j;
 }
+
 void TagComponent::Deserialize(const json& j)
 {
-    tag = j.at("tag").get<std::string>();
+    if (j.is_string())
+    {
+        tag = j.get<std::string>();
+        return;
+    }
+    tag = j.value("tag", "Entity");
 }

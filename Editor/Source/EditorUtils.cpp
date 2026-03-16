@@ -61,3 +61,18 @@ bool EditorUtils::SaveSceneAs(Engine& engine)
     return false;
 }
 
+AssetUUID EditorUtils::ReadUUIDFromMeta(const std::string& assetPath)
+{
+    auto metaPath = assetPath + ".rmeta";
+    if (!std::filesystem::exists(metaPath))
+    {
+        LOG_WARN("No .rmeta found for: {}", assetPath);
+        return AssetUUID::Invalid();
+    }
+
+    AssetMeta meta;
+    if (!meta.LoadFromFile(metaPath))
+        return AssetUUID::Invalid();
+
+    return meta.uuid;
+}

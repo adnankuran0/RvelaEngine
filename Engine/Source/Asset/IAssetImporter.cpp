@@ -1,12 +1,15 @@
+#include "rvelapch.h"
 #include "IAssetImporter.h"
 #include <fstream>
 
-uint64_t rv::IAssetImporter::HashFile(const std::filesystem::path& path)
+using namespace rv;
+
+uint64_t IAssetImporter::HashFile(const std::filesystem::path& path)
 {
     std::ifstream file(path, std::ios::binary);
     if (!file) return 0;
 
-    // FNV-1a 64bit
+    // FNV-1a
     uint64_t hash = 14695981039346656037ULL;
     constexpr uint64_t prime = 1099511628211ULL;
 

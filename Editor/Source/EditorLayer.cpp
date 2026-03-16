@@ -10,6 +10,11 @@
 #include <Render/SelectedEntityMaskPass.h>
 #include "Input/Input.h"
 #include "EditorUtils.h"
+#include "AssetImporters/PrefabImporter.h"
+#include "AssetImporters/ModelImporter.h"
+#include "AssetImporters/TextureImporter.h"
+#include "AssetImporters/MeshImporter.h"
+#include <memory>
 
 using namespace rv;
 
@@ -47,6 +52,9 @@ void EditorLayer::OnAttach()
 
     m_SelectedEntityMaskPass = m_Engine->GetRenderLayer().PushRenderPass(std::make_unique<SelectedEntityMaskPass>());
     m_OutlinePass = m_Engine->GetRenderLayer().PushRenderPass(std::make_unique<OutlinePass>());
+
+    m_AssetImportPipeline.RegisterImporter(std::make_unique<ModelImporter>());
+    m_AssetImportPipeline.RegisterImporter(std::make_unique<TextureImporter>());
 
 }
 
@@ -89,7 +97,7 @@ void EditorLayer::Render()
 
     ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-    m_MenuBar.Draw(m_Engine,m_AssetImporterRegistry);
+    m_MenuBar.Draw(m_Engine,m_AssetImportPipeline);
      
     m_ToolBar.Draw(*m_Engine);
 

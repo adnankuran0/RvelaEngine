@@ -1,0 +1,24 @@
+{
+    "UVOffset": [
+        0.0,
+        0.0
+    ],
+    "UVScale": [
+        1.0,
+        1.0
+    ],
+    "albedoTexture": "795c2714-bc58-4b82-bb78-89f632a500fa",
+    "ao": 1.0,
+    "emissiveColor": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "emissiveIntensity": 0.0,
+    "heightScale": 0.10000000149011612,
+    "metallic": 0.0,
+    "normalScale": 1.0,
+    "normalTexture": "80748d26-1196-4bfa-92c4-314d45ce32fd",
+    "roughness": 1.0,
+    "specular": 1.0
+}

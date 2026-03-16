@@ -1,0 +1,23 @@
+{
+    "dependencies": [],
+    "importerID": "ModelImporter",
+    "importerSettings": {},
+    "sourceHash": 11701999077847563597,
+    "subAssets": [
+        {
+            "index": 0,
+            "name": "Monkey_Mat0",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "ab90d890-0861-4c4c-809b-98515bf111db"
+        },
+        {
+            "index": 0,
+            "name": "Suzanne",
+            "sourceHash": 11701999077847563597,
+            "type": "Mesh",
+            "uuid": "d5b8e68a-8170-4b1a-b439-62ae98d391f8"
+        }
+    ],
+    "uuid": "b731d965-2d99-4a74-ae09-4243f445e178"
+}

@@ -11,6 +11,8 @@ public:
 
     void Init(AssetRegistry& db);
 
+    AssetRegistry& GetRegistry() { assert(m_Registry);  return *m_Registry; }
+
     void RegisterLoader(std::unique_ptr<IAssetLoader> loader);
 
     template<typename T>

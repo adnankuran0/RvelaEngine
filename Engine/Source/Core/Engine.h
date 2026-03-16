@@ -2,11 +2,11 @@
 #include "Window.h"
 #include "Rendering/Renderer.h"
 #include "Scene/SceneManager.h"
-#include "Assets/AssetRegistry.h"
 #include "Utils/ProjectManager.h"
 #include "Scene/SelectionManager.h"
 #include "Physics/PhysicsEngine.h"
 #include "LayerStack.h"
+#include "Asset/AssetRegistry.h"
 
 namespace rv {
 
@@ -34,7 +34,6 @@ public:
 	Scene& GetActiveScene() noexcept { return m_SceneManager.GetActiveScene(); }
 	ProjectManager& GetProjectManager() noexcept { return m_ProjectManager; }
 	SceneManager& GetSceneManager() noexcept { return m_SceneManager; }
-	AssetRegistry& GetAssetRegistry() noexcept { return m_AssetRegistry; }
 
 	EditorCamera* GetEditorCamera() const noexcept { return m_EditorCamera; }
 	Camera* GetCamera() noexcept;

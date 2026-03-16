@@ -1,4 +1,4 @@
-#include "rvelapch.h"
+﻿#include "rvelapch.h"
 #include "AssetRegistry.h"
 #include "Core/Log.h"
 #include <fstream>
@@ -8,29 +8,121 @@ using namespace rv;
 void AssetRegistry::Scan(const std::filesystem::path& assetDir)
 {
     m_AssetDir = assetDir;
+    auto cacheRoot = assetDir / ".cache";
 
     for (auto& entry : std::filesystem::recursive_directory_iterator(assetDir))
     {
         if (!entry.is_regular_file()) continue;
-
         auto path = entry.path();
-        auto ext = path.extension().string();
 
-        if (ext == ".rmeta") continue;
+        if (path.extension() == ".rmeta") continue;
+        if (path.string().find((assetDir / ".cache").string()) != std::string::npos)
+            continue;
 
         auto metaPath = AssetMeta::GetMetaPath(path);
-        if (!std::filesystem::exists(metaPath)) continue;
+        if (!std::filesystem::exists(metaPath))
+        {
+            continue;
+        }
 
         AssetMeta meta;
-        if (!meta.LoadFromFile(metaPath)) continue;
-        if (!meta.uuid.IsValid())         continue;
+        if (!meta.LoadFromFile(metaPath))
+        {
+            LOG_WARN("Meta load failed: {}", metaPath.filename().string());
+            continue;
+        }
+        if (!meta.uuid.IsValid())
+        {
+            LOG_WARN("Invalid UUID: {}", metaPath.filename().string());
+            continue;
+        }
 
         m_UUIDToPath[meta.uuid] = path;
         m_PathToUUID[path.string()] = meta.uuid;
-        m_Metas[meta.uuid] = std::move(meta);
+        m_Metas[meta.uuid] = meta;
+
+        for (auto& sub : meta.subAssets)
+        {
+            if (!sub.uuid.IsValid()) continue;
+
+            if (!m_Metas.contains(sub.uuid))
+            {
+                AssetMeta subMeta;
+                subMeta.uuid = sub.uuid;
+                subMeta.importerID = sub.type == "Mesh" ? "MeshImporter"
+                    : sub.type == "Material" ? "MaterialLoader"
+                    : "";
+                m_Metas[sub.uuid] = subMeta;
+            }
+        }
     }
 
-    LOG_INFO("[AssetRegistry] Scan complete. {} assets registered.", m_UUIDToPath.size());
+    if (std::filesystem::exists(cacheRoot))
+    {
+        for (auto& entry : std::filesystem::directory_iterator(cacheRoot))
+        {
+            if (!entry.is_regular_file()) continue;
+            auto cachePath = entry.path();
+            auto ext = cachePath.extension().string();
+
+
+            if (ext != ".rmesh" && ext != ".rtexture" && ext != ".rtex" && ext != ".rprefab" && ext != ".rmat")
+                continue;
+
+            auto uuid = AssetUUID::FromString(cachePath.stem().string());
+            if (!uuid.IsValid())
+            {
+                LOG_WARN("Invalid UUID in filename");
+                continue;
+            }
+
+            bool hasMeta = m_Metas.contains(uuid);
+            bool hasPath = m_UUIDToPath.contains(uuid);
+
+            if (!hasMeta)
+            {
+                LOG_WARN("Cache file with no meta. Consider deleting: {}",
+                    cachePath.filename().string());
+                continue;
+            }
+
+            bool alreadyHasCachePath = hasPath &&
+                m_UUIDToPath[uuid].string().find(".cache") != std::string::npos;
+
+            if (!alreadyHasCachePath)
+            {
+                m_UUIDToPath[uuid] = cachePath;
+                m_PathToUUID[cachePath.string()] = uuid;
+            }
+        }
+    }
+    else
+    {
+        LOG_WARN(".cache does not exist: {}", cacheRoot.string());
+    }
+
+}
+
+void AssetRegistry::RegisterSubAsset(const AssetUUID& uuid,
+    const std::filesystem::path& cachePath,
+    const std::string& importerID)
+{
+    m_UUIDToPath[uuid] = cachePath;
+    m_PathToUUID[cachePath.string()] = uuid;
+
+    auto it = m_Metas.find(uuid);
+    if (it == m_Metas.end())
+    {
+        AssetMeta meta;
+        meta.uuid = uuid;
+        meta.importerID = importerID;
+        m_Metas[uuid] = meta;
+    }
+    else
+    {
+        if (it.value().importerID.empty())
+            it.value().importerID = importerID;
+    }
 }
 
 AssetMeta AssetRegistry::GetMeta(const AssetUUID& uuid) const
@@ -67,10 +159,9 @@ AssetMeta AssetRegistry::GetOrCreateMeta(const std::filesystem::path& path)
         }
     }
 
-    // if meta doesnt exists
     AssetMeta meta;
-    meta.uuid = AssetUUID{};
-    meta.importerID = ""; // AssetImportPipeline
+    meta.uuid = AssetUUID{}; // generates a new UUID
+    meta.importerID = "";
     meta.sourceHash = 0;
 
     meta.SaveToFile(metaPath);
@@ -90,6 +181,20 @@ void AssetRegistry::SaveMeta(const std::filesystem::path& path, const AssetMeta&
     m_Metas[meta.uuid] = meta;
     m_UUIDToPath[meta.uuid] = path;
     m_PathToUUID[path.string()] = meta.uuid;
+
+    for (auto& sub : meta.subAssets)
+    {
+        if (!sub.uuid.IsValid()) continue;
+        if (!m_Metas.contains(sub.uuid))
+        {
+            AssetMeta subMeta;
+            subMeta.uuid = sub.uuid;
+            subMeta.importerID = sub.type == "Mesh" ? "MeshImporter"
+                : sub.type == "Material" ? "MaterialLoader"
+                : "";
+            m_Metas[sub.uuid] = subMeta;
+        }
+    }
 }
 
 bool AssetRegistry::Exists(const AssetUUID& uuid) const

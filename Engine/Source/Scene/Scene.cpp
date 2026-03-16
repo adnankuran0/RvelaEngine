@@ -6,7 +6,8 @@
 #include "Utils/Serializer.h"
 #include "Utils/ProjectManager.h"
 #include "EntityUUID.h"
-#include <Assets/PrefabAsset.h>
+#include "Asset/Types/PrefabAsset.h"
+#include "Asset/AssetManager.h"
 #include <glm/gtx/matrix_decompose.hpp>
 
 using namespace rv;
@@ -286,173 +287,113 @@ void Scene::RemoveParent(entt::entity child)
 
 Entity Scene::Instantiate(const AssetUUID& prefabUUID)
 {
-    Ref<PrefabAsset> prefab = AssetRegistry::GetAsset<PrefabAsset>(prefabUUID);
-    unsigned int entityCount = prefab->GetMetaAs<PrefabMeta>()->entityCount;
-
-    const std::vector<std::byte>& buffer = prefab->GetData();
-    const std::byte* ptr = buffer.data();
-    const std::byte* end = buffer.data() + buffer.size();
-
-    std::unordered_map<EntityUUID, Entity> uuidToEntity;
-    Entity rootEntity;
-
-    for (unsigned int i = 0; i < entityCount; i++)
+    Ref<PrefabAsset> prefab = AssetManager::Get().GetAsset<PrefabAsset>(prefabUUID);
+    if (!prefab || !prefab->IsValid())
     {
-        Entity e = CreateEntityRaw();
-
-        unsigned int componentCount;
-        memcpy(&componentCount, ptr, sizeof(unsigned int));
-        ptr += sizeof(unsigned int);
-
-        for (unsigned int j = 0; j < componentCount; j++)
-        {
-            ComponentHeader header;
-            memcpy(&header, ptr, (sizeof(ComponentHeader)));
-            ptr += sizeof(ComponentHeader);
-
-            ComponentType compType = static_cast<ComponentType>(header.type);
-            switch (compType)
-            {
-            case ComponentType::DirectionalLight:
-            {
-                DirectionalLightComponent dirComp;
-                DeserializeBin_DirectionalLightComp(ptr, dirComp);
-                AddComponent<DirectionalLightComponent>(e, std::move(dirComp));
-                break;
-            }
-            case ComponentType::Material:
-            {
-                MaterialComponent matComp;
-                DeserializeBin_MaterialComp(ptr, matComp);
-                AddComponent<MaterialComponent>(e, std::move(matComp));
-                break;
-            }
-            case ComponentType::Mesh:
-            {
-                auto& mshComp = AddComponent<MeshComponent>(e);
-                DeserializeBin_MeshComp(ptr, mshComp);
-                break;
-            }
-            case ComponentType::MeshRenderer:
-            {
-                AddComponent<MeshRendererComponent>(e);
-                auto& comp = GetComponent<MeshRendererComponent>(e);
-                DeserializeBin_MeshRendererComp(ptr, comp);
-                if (HasComponent<MeshComponent>(e))
-                {
-                    Ref<MeshAsset> mesh = GetComponent<MeshComponent>(e).GetMesh();
-                    comp.RecreateFromMesh(mesh);
-                }
-                break;
-            }
-            case ComponentType::PointLight:
-            {
-                PointLightComponent plgComp;
-                DeserializeBin_PointLightComp(ptr, plgComp);
-                AddComponent<PointLightComponent>(e, std::move(plgComp));
-                break;
-            }
-            case ComponentType::Camera:
-            {
-                auto& comp = AddComponent<CameraComponent>(e);
-                DeserializeBin_CameraComp(ptr, comp);
-                break;
-            }
-            case ComponentType::SceneTree:
-            {
-                auto& comp = GetComponent<SceneTreeComponent>(e);
-                DeserializeBin_SceneTreeComp(ptr, comp);
-                break;
-            }
-            case ComponentType::Tag:
-            {
-                auto& comp = AddComponent<TagComponent>(e);
-                DeserializeBin_TagComp(ptr, comp);
-                break;
-            }
-            case ComponentType::Transform:
-            {
-                auto& comp = GetComponent<TransformComponent>(e);
-                DeserializeBin_TransformComp(ptr, comp);
-                break;
-            }
-            case ComponentType::UUID:
-            {
-                auto& comp = GetComponent<UUIDComponent>(e);
-                EntityUUID oldUUID;
-                DeserializeBin_UUIDComp(ptr, comp);
-
-                oldUUID = comp.uuid;
-
-                comp.uuid = EntityUUIDGenerator::Generate();
-
-                uuidToEntity[oldUUID] = e;
-
-                m_EntityMap[comp.uuid] = (entt::entity)e;
-                break;
-            }
-            
-            default:
-            {
-                LOG_ERROR("Undefined component type id");
-                break;
-            }
-            }
-        }
+        LOG_ERROR("[Scene::Instantiate] Prefab not found: {}", prefabUUID.ToString());
+        return Entity{};
     }
 
-
-    for (auto& [oldUUID, entity] : uuidToEntity)
+    json prefabJson;
+    try { prefabJson = json::parse(prefab->GetJSON()); }
+    catch (const json::exception& e)
     {
-        if (!HasComponent<SceneTreeComponent>(entity)) continue;
+        LOG_ERROR("[Scene::Instantiate] JSON parse error: {}", e.what());
+        return Entity{};
+    }
 
-        auto& tree = GetComponent<SceneTreeComponent>(entity);
+    if (!prefabJson.contains("Entities"))
+    {
+        LOG_ERROR("[Scene::Instantiate] No Entities in prefab: {}", prefabUUID.ToString());
+        return Entity{};
+    }
 
-        if (tree.parentUUID != 0 && uuidToEntity.contains(tree.parentUUID))
+    std::unordered_map<EntityUUID, entt::entity> oldToNewEntity;
+    Entity rootEntity;
+
+    for (auto& entityJson : prefabJson["Entities"])
+    {
+        entt::entity handle = m_Registry.create();
+        Entity e(handle, this);
+
+        e.AddComponent<TransformComponent>();
+        e.AddComponent<SceneTreeComponent>();
+        e.AddComponent<TagComponent>();
+        e.AddComponent<UUIDComponent>();
+
+        EntityUUID oldUUID = entityJson.contains("UUID") ? entityJson["UUID"].get<EntityUUID>() : 0;
+
+        EntityUUID newUUID = EntityUUIDGenerator::Generate();
+        e.GetComponent<UUIDComponent>().uuid = newUUID;
+        m_EntityMap[newUUID] = handle;
+
+        if (oldUUID != 0)
+            oldToNewEntity[oldUUID] = handle;
+
+        if (entityJson.contains("Tag"))
+            e.GetComponent<TagComponent>().Deserialize(entityJson["Tag"]);
+        else
+            e.AddComponent<TagComponent>("Entity");
+
+        if (entityJson.contains("Transform"))
+            e.GetComponent<TransformComponent>().Deserialize(entityJson["Transform"]);
+
+        if (entityJson.contains("Material"))
+            e.AddComponent<MaterialComponent>().Deserialize(entityJson["Material"]);
+
+        if (entityJson.contains("Mesh"))
         {
-            entt::entity parent = uuidToEntity[tree.parentUUID].GetHandle();
+            auto& comp = e.AddComponent<MeshComponent>();
+            comp.Deserialize(entityJson["Mesh"]);
+            e.AddComponent<MeshRendererComponent>(comp.GetMesh());
+        }
 
-            tree.parent = parent;
+        if (entityJson.contains("PointLight"))
+            e.AddComponent<PointLightComponent>().Deserialize(entityJson["PointLight"]);
 
-            auto& pnode = GetComponent<SceneTreeComponent>(parent);
-            pnode.children.push_back(entity);
+        if (entityJson.contains("DirectionalLight"))
+            e.AddComponent<DirectionalLightComponent>().Deserialize(entityJson["DirectionalLight"]);
 
-            tree.parentUUID = GetComponent<UUIDComponent>(parent).uuid;
+        if (entityJson.contains("CameraComponent"))
+            e.AddComponent<CameraComponent>().Deserialize(entityJson["CameraComponent"]);
+
+        if (entityJson.contains("ScriptComponent"))
+            e.AddComponent<ScriptComponent>().Deserialize(entityJson["ScriptComponent"]);
+
+        if (entityJson.contains("ParentUUID"))
+            e.GetComponent<SceneTreeComponent>().parentUUID = entityJson["ParentUUID"];
+
+        if (entityJson.contains("_isRoot") && entityJson["_isRoot"] == true)
+            rootEntity = e;
+    }
+
+    for (auto& [oldUUID, handle] : oldToNewEntity)
+    {
+        auto& tree = GetComponent<SceneTreeComponent>(handle);
+
+        if (tree.parentUUID != 0 && oldToNewEntity.contains(tree.parentUUID))
+        {
+            entt::entity newParent = oldToNewEntity[tree.parentUUID];
+            SetParentKeepLocal(handle, newParent);
         }
         else
         {
-            tree.parent = m_RootEntity;
-            tree.parentUUID = GetComponent<UUIDComponent>(m_RootEntity).uuid;
+            SetParentKeepLocal(handle, m_RootEntity);
 
-            auto& rootNode = GetComponent<SceneTreeComponent>(m_RootEntity);
-            rootNode.children.push_back(entity);
-            rootNode.childrenUUIDs.push_back(GetComponent<UUIDComponent>(entity).uuid);
-
-            rootEntity = entity;
-        }
-    }
-
-    if (rootEntity.GetHandle() == entt::null)
-    {
-        for (auto& [oldUUID, entity] : uuidToEntity)
-        {
-            if (!HasComponent<SceneTreeComponent>(entity)) continue;
-
-            auto& tree = GetComponent<SceneTreeComponent>(entity);
-            if (tree.parent == m_RootEntity)
-            {
-                rootEntity = entity;
-                break;
-            }
+            if (rootEntity.GetHandle() == entt::null)
+                rootEntity = Entity(handle, this);
         }
     }
 
     if (rootEntity.GetHandle() != entt::null)
     {
-        AddComponent<PrefabComponent>(rootEntity, prefabUUID);
+        auto& tc = GetComponent<TransformComponent>(rootEntity.GetHandle());
+        tc.SetPosition(glm::vec3(0.0f));
+        tc.SetRotation(glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+
+        AddComponent<PrefabComponent>(rootEntity.GetHandle(), prefabUUID);
     }
 
-        
     return rootEntity;
 }
 

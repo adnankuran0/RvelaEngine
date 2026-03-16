@@ -6,7 +6,8 @@
 #include <algorithm>
 #include <cstdlib>
 #include <fstream>
-#include <Assets/PrefabAsset.h>
+#include "Asset/Types/PrefabAsset.h"
+#include "EditorUtils.h"
 #include "Core/Engine.h"
 #include "Scene/Entity.h"
 
@@ -254,13 +255,9 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
             else if (extension == ".rprefab")
             {
                 auto pathStr = entry.path().string();
-                std::ifstream inFile(pathStr, std::ios::binary);
-                if (!inFile.is_open())
-                    return;
-
-                AssetHeader header = AssetLoader::ReadHeader(inFile, MAGIC_PREFAB);
-                auto meta = AssetLoader::ReadMeta<PrefabMeta>(inFile, header);
-                engine->GetActiveScene().Instantiate(meta->uuid);
+                AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(entry.path().string());
+                if (uuid.IsValid())
+                    engine->GetActiveScene().Instantiate(uuid);
             }
             else if (extension == ".glsl")
             {

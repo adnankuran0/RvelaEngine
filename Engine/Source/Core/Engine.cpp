@@ -8,6 +8,7 @@
 #include <Rendering/EditorCamera.h>
 #include <Event/MouseEvents.h>
 #include "Rendering/DebugRenderer.h"
+#include "Asset/AssetManager.h"
 
 using namespace rv;
 
@@ -19,7 +20,11 @@ Engine::Engine()
 
 	m_Window.Init();
 	m_ProjectManager.LoadProject("C:\\RvelaEngine\\TestProject\\TestProject.rproj");
-	m_AssetRegistry.Init(m_ProjectManager.GetProjectPath()); //TODO: Make this works with assets path
+	m_AssetRegistry.Scan(ProjectManager::GetProjectPath() / "Assets");
+	AssetManager& assetManager = AssetManager::Get();
+
+	assetManager.Init(m_AssetRegistry);
+
 	m_Renderer.Init(m_Window.GetGLFWWindow());
 	m_SceneManager.Init();
 	m_RenderLayer = new RenderLayer(this);

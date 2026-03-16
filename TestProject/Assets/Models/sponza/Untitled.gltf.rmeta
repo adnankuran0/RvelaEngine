@@ -1,0 +1,2942 @@
+{
+    "dependencies": [],
+    "importerID": "ModelImporter",
+    "importerSettings": {},
+    "sourceHash": 17718746184086404244,
+    "subAssets": [
+        {
+            "index": 0,
+            "name": "Untitled_Mat0",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "8baf6b8e-f0f3-4e85-a1e7-8a5a2d425b79"
+        },
+        {
+            "index": 1,
+            "name": "Untitled_Mat1",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "ce815b93-c8fb-4ec6-92a1-3d0dbe15f3e2"
+        },
+        {
+            "index": 2,
+            "name": "Untitled_Mat2",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "c00015e6-d193-4e5a-9202-5029f1e0eb63"
+        },
+        {
+            "index": 3,
+            "name": "Untitled_Mat3",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "f2d4a869-4d90-4ae0-8987-a8d93b1fa7be"
+        },
+        {
+            "index": 4,
+            "name": "Untitled_Mat4",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "538298d9-3c49-433e-947c-900d6979c2a2"
+        },
+        {
+            "index": 5,
+            "name": "Untitled_Mat5",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "21e40887-3129-40ec-9483-afd9c27407d0"
+        },
+        {
+            "index": 6,
+            "name": "Untitled_Mat6",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "896a205d-ff56-420c-b42a-13f18dee3100"
+        },
+        {
+            "index": 7,
+            "name": "Untitled_Mat7",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "05918378-ec07-4402-b6a7-8147f89e934f"
+        },
+        {
+            "index": 8,
+            "name": "Untitled_Mat8",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "3e444c5a-e162-484b-878a-0684e369aa90"
+        },
+        {
+            "index": 9,
+            "name": "Untitled_Mat9",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "886f2ef1-07d1-47ee-8b94-7fa5fafea8e9"
+        },
+        {
+            "index": 10,
+            "name": "Untitled_Mat10",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "c2ee71ef-3c38-4cf4-b8ff-7e10879fbe63"
+        },
+        {
+            "index": 11,
+            "name": "Untitled_Mat11",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "dd40909d-991c-42ca-a971-ebe8181b9e47"
+        },
+        {
+            "index": 12,
+            "name": "Untitled_Mat12",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "0a7abe2f-1a88-423f-b579-5e0205c98c69"
+        },
+        {
+            "index": 13,
+            "name": "Untitled_Mat13",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "c6232e46-d8d2-47ad-9e35-5750022f1b9c"
+        },
+        {
+            "index": 14,
+            "name": "Untitled_Mat14",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "5155159a-2992-47e9-8e16-0ea13a1c1598"
+        },
+        {
+            "index": 15,
+            "name": "Untitled_Mat15",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "2fe2c5e1-f0d7-4292-83e0-eb7489a6834e"
+        },
+        {
+            "index": 16,
+            "name": "Untitled_Mat16",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "2344e918-2bf3-4e80-bf92-788f32005278"
+        },
+        {
+            "index": 17,
+            "name": "Untitled_Mat17",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "cda8b597-3a18-4eb2-a9bb-6de704945036"
+        },
+        {
+            "index": 18,
+            "name": "Untitled_Mat18",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "e0493954-9045-4d32-8e73-5d58f3e731d0"
+        },
+        {
+            "index": 19,
+            "name": "Untitled_Mat19",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "a527ef7b-2a53-4453-9a43-a6ca8e5abeb4"
+        },
+        {
+            "index": 20,
+            "name": "Untitled_Mat20",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "b96157be-8cfa-40e6-801c-e08ae4fe284c"
+        },
+        {
+            "index": 21,
+            "name": "Untitled_Mat21",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "c5b9305a-522f-4910-8bf3-93741c186569"
+        },
+        {
+            "index": 22,
+            "name": "Untitled_Mat22",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "26cdf2fc-13f5-4cf5-9c90-775ddfefff4e"
+        },
+        {
+            "index": 23,
+            "name": "Untitled_Mat23",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "de3ef312-c2c2-499b-98c6-120c5f4f78f8"
+        },
+        {
+            "index": 24,
+            "name": "Untitled_Mat24",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "dee6a726-5a02-4d85-944c-ba8157f9539f"
+        },
+        {
+            "index": 25,
+            "name": "Untitled_Mat25",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "5e6d0a9a-4bb6-461d-b2be-ceb72e9f7456"
+        },
+        {
+            "index": 0,
+            "name": "Mesh",
+            "sourceHash": 17718746184086404244,
+            "type": "Mesh",
+            "uuid": "66910740-c4eb-4c38-a610-d03c2717b80c"
+        },
+        {
+            "index": 1,
+            "name": "Mesh.001-0",
+            "sourceHash": 17718746182243599653,
+            "type": "Mesh",
+            "uuid": "f94db718-9d6a-480d-9f5e-a0b1008a856d"
+        },
+        {
+            "index": 2,
+            "name": "Mesh.001-1",
+            "sourceHash": 17718746189251858422,
+            "type": "Mesh",
+            "uuid": "12c87b83-c087-44e3-808d-df04d883706e"
+        },
+        {
+            "index": 3,
+            "name": "Mesh.002",
+            "sourceHash": 17718746185522565511,
+            "type": "Mesh",
+            "uuid": "449badf4-4028-4b02-841b-f8d1412ebd56"
+        },
+        {
+            "index": 387,
+            "name": "Mesh.376-0",
+            "sourceHash": 17718745510352505351,
+            "type": "Mesh",
+            "uuid": "31152b91-6713-4a93-884a-14825b1c5844"
+        },
+        {
+            "index": 4,
+            "name": "Mesh.003",
+            "sourceHash": 17718746175350954576,
+            "type": "Mesh",
+            "uuid": "e0ff4b32-cc2c-4c79-8fe9-9dc0fe521f25"
+        },
+        {
+            "index": 5,
+            "name": "Mesh.004",
+            "sourceHash": 17718746179943161057,
+            "type": "Mesh",
+            "uuid": "b002a7fa-7c74-4955-a4ab-74a7572cf458"
+        },
+        {
+            "index": 6,
+            "name": "Mesh.005",
+            "sourceHash": 17718746178361484978,
+            "type": "Mesh",
+            "uuid": "ceec3eb1-20e3-45ee-bc22-e9c511b5c456"
+        },
+        {
+            "index": 7,
+            "name": "Mesh.006",
+            "sourceHash": 17718746166042259267,
+            "type": "Mesh",
+            "uuid": "c770575e-ac8e-4f65-a8bb-6158ab20574f"
+        },
+        {
+            "index": 8,
+            "name": "Mesh.007",
+            "sourceHash": 17718746164468969756,
+            "type": "Mesh",
+            "uuid": "7fd3ea40-c66a-4c22-857e-b45533314b22"
+        },
+        {
+            "index": 9,
+            "name": "Mesh.008",
+            "sourceHash": 17718746169061178285,
+            "type": "Mesh",
+            "uuid": "10ca05c0-578c-44db-9d5a-455ff0308278"
+        },
+        {
+            "index": 10,
+            "name": "Mesh.009",
+            "sourceHash": 17718746158889565310,
+            "type": "Mesh",
+            "uuid": "c4436f9c-f9f5-4da9-accd-176fbf9acf00"
+        },
+        {
+            "index": 11,
+            "name": "Mesh.010",
+            "sourceHash": 17718746155160241679,
+            "type": "Mesh",
+            "uuid": "28d89870-6fdf-490e-ac43-0af1957d56bf"
+        },
+        {
+            "index": 12,
+            "name": "Mesh.011",
+            "sourceHash": 17718746162168498392,
+            "type": "Mesh",
+            "uuid": "a01931b5-bc76-4a7e-85d5-dd0409f393f8"
+        },
+        {
+            "index": 13,
+            "name": "Mesh.012",
+            "sourceHash": 17718746218568749417,
+            "type": "Mesh",
+            "uuid": "ba9b4e11-e4b7-44c4-9eaa-0196372727ee"
+        },
+        {
+            "index": 14,
+            "name": "Mesh.013",
+            "sourceHash": 17718746216718637882,
+            "type": "Mesh",
+            "uuid": "da8e0471-d9fa-483d-a0a7-597f0ae2efb5"
+        },
+        {
+            "index": 15,
+            "name": "Mesh.014",
+            "sourceHash": 17718746221579279819,
+            "type": "Mesh",
+            "uuid": "407e42dc-f31b-4ce0-914b-3558a44f37f6"
+        },
+        {
+            "index": 16,
+            "name": "Mesh.015",
+            "sourceHash": 17718746220004943748,
+            "type": "Mesh",
+            "uuid": "ca88ee2b-6508-4ad5-8528-dcf7f0e6688a"
+        },
+        {
+            "index": 17,
+            "name": "Mesh.016",
+            "sourceHash": 17718746207685716053,
+            "type": "Mesh",
+            "uuid": "d8c064bd-3dc2-4d3d-9ce2-676018318698"
+        },
+        {
+            "index": 18,
+            "name": "Mesh.017",
+            "sourceHash": 17718746214425539302,
+            "type": "Mesh",
+            "uuid": "46b5ff72-1b35-4625-8238-7b3a49b0d168"
+        },
+        {
+            "index": 19,
+            "name": "Mesh.018",
+            "sourceHash": 17718746212843730103,
+            "type": "Mesh",
+            "uuid": "23325ba6-2523-4039-9c04-35f3aa6d9c24"
+        },
+        {
+            "index": 20,
+            "name": "Mesh.019",
+            "sourceHash": 17718746200524635456,
+            "type": "Mesh",
+            "uuid": "a68eba7f-9977-4dfa-abfb-393b3312605b"
+        },
+        {
+            "index": 21,
+            "name": "Mesh.020",
+            "sourceHash": 17718746198942926609,
+            "type": "Mesh",
+            "uuid": "9f9d3525-427a-4e8b-9cda-5751110878e0"
+        },
+        {
+            "index": 22,
+            "name": "Mesh.021",
+            "sourceHash": 17718746203803568546,
+            "type": "Mesh",
+            "uuid": "7e321248-f812-4d4d-a7fd-700248d1c331"
+        },
+        {
+            "index": 23,
+            "name": "Mesh.022",
+            "sourceHash": 17718746193371910771,
+            "type": "Mesh",
+            "uuid": "8b215ed6-9ce6-41e1-95f4-b83a05d4943d"
+        },
+        {
+            "index": 24,
+            "name": "Mesh.023",
+            "sourceHash": 17718746189642617868,
+            "type": "Mesh",
+            "uuid": "466cf208-1c60-4a06-b464-8df672336eb6"
+        },
+        {
+            "index": 25,
+            "name": "Mesh.024",
+            "sourceHash": 17718746196650876637,
+            "type": "Mesh",
+            "uuid": "b8a6ff9c-0430-4525-9e1d-9d275b132907"
+        },
+        {
+            "index": 26,
+            "name": "Mesh.025",
+            "sourceHash": 17718746253051127662,
+            "type": "Mesh",
+            "uuid": "05420aa1-0725-46a6-bb89-14deff3b4197"
+        },
+        {
+            "index": 27,
+            "name": "Mesh.026",
+            "sourceHash": 17718746251201014079,
+            "type": "Mesh",
+            "uuid": "9ebb911c-c54f-4be5-962f-c5b466f6d58e"
+        },
+        {
+            "index": 28,
+            "name": "Mesh.027",
+            "sourceHash": 17718746256061658056,
+            "type": "Mesh",
+            "uuid": "266a7546-2289-40e7-96ff-0b5cb803f1dc"
+        },
+        {
+            "index": 29,
+            "name": "Mesh.028",
+            "sourceHash": 17718746254479979929,
+            "type": "Mesh",
+            "uuid": "f70a49cf-78ed-4de8-94e9-f940413e04af"
+        },
+        {
+            "index": 30,
+            "name": "Mesh.029",
+            "sourceHash": 17718746242160754218,
+            "type": "Mesh",
+            "uuid": "dfe8c99c-e909-4410-b035-08e75886a995"
+        },
+        {
+            "index": 31,
+            "name": "Mesh.030",
+            "sourceHash": 17718746249176318203,
+            "type": "Mesh",
+            "uuid": "914e8cfb-50a7-4cfd-9627-2e193f1e55eb"
+        },
+        {
+            "index": 32,
+            "name": "Mesh.031",
+            "sourceHash": 17718746245178591924,
+            "type": "Mesh",
+            "uuid": "b7ca8c0d-8956-46bc-91d6-e3ae434563d3"
+        },
+        {
+            "index": 33,
+            "name": "Mesh.032",
+            "sourceHash": 17718746235006980933,
+            "type": "Mesh",
+            "uuid": "ee24987b-9b95-452e-9aab-ad725455711c"
+        },
+        {
+            "index": 34,
+            "name": "Mesh.033",
+            "sourceHash": 17718746239867622678,
+            "type": "Mesh",
+            "uuid": "fadc5945-9763-4023-8d2b-8f76c0a8d08e"
+        },
+        {
+            "index": 35,
+            "name": "Mesh.034",
+            "sourceHash": 17718746238285946791,
+            "type": "Mesh",
+            "uuid": "b5c24366-5465-4a26-8a74-84b8d99ea7d9"
+        },
+        {
+            "index": 36,
+            "name": "Mesh.035",
+            "sourceHash": 17718746227845767280,
+            "type": "Mesh",
+            "uuid": "2d6309a5-90c1-4dcf-b013-4fdf3aa633c3"
+        },
+        {
+            "index": 37,
+            "name": "Mesh.036",
+            "sourceHash": 17718746224116607489,
+            "type": "Mesh",
+            "uuid": "e0c61531-5cfa-477a-ac08-220c956303af"
+        },
+        {
+            "index": 38,
+            "name": "Mesh.037",
+            "sourceHash": 17718746231133121746,
+            "type": "Mesh",
+            "uuid": "e744b1bd-0120-4cc2-be15-5dac73d9922b"
+        },
+        {
+            "index": 39,
+            "name": "Mesh.038",
+            "sourceHash": 17718746287533503843,
+            "type": "Mesh",
+            "uuid": "77f1d707-f513-4d7c-bd1f-80b0d772c2fc"
+        },
+        {
+            "index": 40,
+            "name": "Mesh.039",
+            "sourceHash": 17718746285951696700,
+            "type": "Mesh",
+            "uuid": "71827e8c-ed81-4ff5-9dfd-99f00d418dab"
+        },
+        {
+            "index": 41,
+            "name": "Mesh.040",
+            "sourceHash": 17718746290544001485,
+            "type": "Mesh",
+            "uuid": "ca098f44-41ad-4e34-83e4-e64509af1385"
+        },
+        {
+            "index": 42,
+            "name": "Mesh.041",
+            "sourceHash": 17718746288962325406,
+            "type": "Mesh",
+            "uuid": "4ee8a5be-e878-4b17-9f50-2b214a1f3c36"
+        },
+        {
+            "index": 43,
+            "name": "Mesh.042",
+            "sourceHash": 17718746276643097647,
+            "type": "Mesh",
+            "uuid": "47e6268f-5ff6-413f-981d-1635ac3f367f"
+        },
+        {
+            "index": 44,
+            "name": "Mesh.043",
+            "sourceHash": 17718746283651356408,
+            "type": "Mesh",
+            "uuid": "cb4cd9b1-c205-4ae9-924e-25eb2e6ae28b"
+        },
+        {
+            "index": 45,
+            "name": "Mesh.044",
+            "sourceHash": 17718746279653628041,
+            "type": "Mesh",
+            "uuid": "91da1f96-1354-4c25-a7fb-98b0c56746bd"
+        },
+        {
+            "index": 46,
+            "name": "Mesh.045",
+            "sourceHash": 17718746269489357146,
+            "type": "Mesh",
+            "uuid": "4a835e5e-1c06-42f6-a25b-df6a17ac27be"
+        },
+        {
+            "index": 47,
+            "name": "Mesh.046",
+            "sourceHash": 17718746274350001131,
+            "type": "Mesh",
+            "uuid": "a05bb6b7-ff9c-45c6-ab5d-ff057d6ef4ce"
+        },
+        {
+            "index": 48,
+            "name": "Mesh.047",
+            "sourceHash": 17718746272768322980,
+            "type": "Mesh",
+            "uuid": "f384e134-4061-4b70-8b1d-ccb4f130880f"
+        },
+        {
+            "index": 49,
+            "name": "Mesh.048",
+            "sourceHash": 17718746260449097333,
+            "type": "Mesh",
+            "uuid": "fa173d25-397c-4aa0-8b20-7df162f6eba6"
+        },
+        {
+            "index": 50,
+            "name": "Mesh.049",
+            "sourceHash": 17718746258598983686,
+            "type": "Mesh",
+            "uuid": "2a1f8193-5bc1-4e5b-8a03-07d949fdb292"
+        },
+        {
+            "index": 51,
+            "name": "Mesh.050",
+            "sourceHash": 17718746263459594967,
+            "type": "Mesh",
+            "uuid": "c5b384f9-7f95-4f70-8e5a-85a0cc3179e4"
+        },
+        {
+            "index": 52,
+            "name": "Mesh.051",
+            "sourceHash": 17718746322007460704,
+            "type": "Mesh",
+            "uuid": "9501fdc7-c8f8-4ae8-adca-33e2cb4323ef"
+        },
+        {
+            "index": 53,
+            "name": "Mesh.052",
+            "sourceHash": 17718746318286556465,
+            "type": "Mesh",
+            "uuid": "58f3c848-889d-4b4d-8a14-8172fd54df61"
+        },
+        {
+            "index": 54,
+            "name": "Mesh.053",
+            "sourceHash": 17718746325026379714,
+            "type": "Mesh",
+            "uuid": "8ed89f79-1afb-4b24-bb13-fff39e0fc8c3"
+        },
+        {
+            "index": 55,
+            "name": "Mesh.054",
+            "sourceHash": 17718746323444570515,
+            "type": "Mesh",
+            "uuid": "7cb613fd-7b4a-4f05-b8c8-85ade98ea998"
+        },
+        {
+            "index": 391,
+            "name": "Mesh.379",
+            "sourceHash": 17718745568189997507,
+            "type": "Mesh",
+            "uuid": "838e18ce-08a0-40d3-b753-27cb00060f40"
+        },
+        {
+            "index": 56,
+            "name": "Mesh.055",
+            "sourceHash": 17718746311125475884,
+            "type": "Mesh",
+            "uuid": "0ea60311-3ee3-4342-b230-484c22a15ffe"
+        },
+        {
+            "index": 57,
+            "name": "Mesh.056",
+            "sourceHash": 17718746318133601533,
+            "type": "Mesh",
+            "uuid": "850f7e77-6421-4d4a-b2ce-efa7499a6572"
+        },
+        {
+            "index": 385,
+            "name": "Mesh.375-0",
+            "sourceHash": 17718745515931811749,
+            "type": "Mesh",
+            "uuid": "ede2a8dd-bae8-48c7-b0ad-8ccc58491dc5"
+        },
+        {
+            "index": 58,
+            "name": "Mesh.057",
+            "sourceHash": 17718746314404441742,
+            "type": "Mesh",
+            "uuid": "23693236-7f35-4a22-95a8-dc67565be6df"
+        },
+        {
+            "index": 59,
+            "name": "Mesh.058",
+            "sourceHash": 17718746303964264287,
+            "type": "Mesh",
+            "uuid": "56fab1a2-4192-4c89-8903-739d8ef66168"
+        },
+        {
+            "index": 60,
+            "name": "Mesh.059",
+            "sourceHash": 17718746308825037288,
+            "type": "Mesh",
+            "uuid": "7ade6c4c-c00a-4d53-a0c4-6ca6bbbef3ae"
+        },
+        {
+            "index": 61,
+            "name": "Mesh.060",
+            "sourceHash": 17718746307250668473,
+            "type": "Mesh",
+            "uuid": "c6e99477-5617-4d88-ba00-6ed102388442"
+        },
+        {
+            "index": 389,
+            "name": "Mesh.377",
+            "sourceHash": 17718745565171078497,
+            "type": "Mesh",
+            "uuid": "6bcd2cbf-c3c7-4ba8-9168-8f8d4ae12240"
+        },
+        {
+            "index": 62,
+            "name": "Mesh.061",
+            "sourceHash": 17718746294931440714,
+            "type": "Mesh",
+            "uuid": "c1682710-f2bf-44f2-bf44-00ad4a9e0cef"
+        },
+        {
+            "index": 63,
+            "name": "Mesh.062",
+            "sourceHash": 17718746293081329179,
+            "type": "Mesh",
+            "uuid": "8aa4b72a-f63c-4284-9dfa-78651a401d4d"
+        },
+        {
+            "index": 64,
+            "name": "Mesh.063",
+            "sourceHash": 17718746297941971156,
+            "type": "Mesh",
+            "uuid": "0d41cb11-0a3b-4d9f-a5d5-171236dbb9fa"
+        },
+        {
+            "index": 65,
+            "name": "Mesh.064",
+            "sourceHash": 17718746356489836901,
+            "type": "Mesh",
+            "uuid": "7ec9e54d-4043-491e-92cb-0a25605d1bd9"
+        },
+        {
+            "index": 66,
+            "name": "Mesh.065",
+            "sourceHash": 17718746352760546102,
+            "type": "Mesh",
+            "uuid": "b4396da0-5da9-45eb-9df5-332dd077f666"
+        },
+        {
+            "index": 67,
+            "name": "Mesh.066",
+            "sourceHash": 17718746359768802759,
+            "type": "Mesh",
+            "uuid": "9e09b74c-15db-45e3-a647-ee5362d99c96"
+        },
+        {
+            "index": 68,
+            "name": "Mesh.067",
+            "sourceHash": 17718746347189530512,
+            "type": "Mesh",
+            "uuid": "b7463037-70ba-4a3e-b54b-d8c7c27bc636"
+        },
+        {
+            "index": 69,
+            "name": "Mesh.068",
+            "sourceHash": 17718746345607852065,
+            "type": "Mesh",
+            "uuid": "eeeca24b-3e63-4b82-b8c5-02295c99fa32"
+        },
+        {
+            "index": 70,
+            "name": "Mesh.069-0",
+            "sourceHash": 17718746350468496114,
+            "type": "Mesh",
+            "uuid": "e0969d2d-8af8-42cb-afaf-f23ee56f0db3"
+        },
+        {
+            "index": 71,
+            "name": "Mesh.069-1",
+            "sourceHash": 17718746348886817923,
+            "type": "Mesh",
+            "uuid": "c37cc03a-8cd3-42dd-9b8b-c08fe84a7183"
+        },
+        {
+            "index": 72,
+            "name": "Mesh.070-0",
+            "sourceHash": 17718746338446607708,
+            "type": "Mesh",
+            "uuid": "478e5ed0-1b7c-481d-8a09-809c861fec1e"
+        },
+        {
+            "index": 73,
+            "name": "Mesh.070-1",
+            "sourceHash": 17718746343307382765,
+            "type": "Mesh",
+            "uuid": "613543ad-5970-4d44-8ceb-c91a78dde1e6"
+        },
+        {
+            "index": 74,
+            "name": "Mesh.071",
+            "sourceHash": 17718746341725573566,
+            "type": "Mesh",
+            "uuid": "39e378fb-2ead-409d-8875-f7c25eacb807"
+        },
+        {
+            "index": 75,
+            "name": "Mesh.072",
+            "sourceHash": 17718746329406478927,
+            "type": "Mesh",
+            "uuid": "6d37beb4-f970-4e5a-88a7-71ba905d5806"
+        },
+        {
+            "index": 76,
+            "name": "Mesh.073",
+            "sourceHash": 17718746327833058328,
+            "type": "Mesh",
+            "uuid": "991cc05a-d7d8-4e91-80da-d0daa171eafb"
+        },
+        {
+            "index": 77,
+            "name": "Mesh.074",
+            "sourceHash": 17718746332424349353,
+            "type": "Mesh",
+            "uuid": "b1630790-f5f6-4f42-832c-8c5accc46fe4"
+        },
+        {
+            "index": 78,
+            "name": "Mesh.075",
+            "sourceHash": 17718746390972084090,
+            "type": "Mesh",
+            "uuid": "d31df59e-d0f1-4df3-a931-c9c72a4d8eb0"
+        },
+        {
+            "index": 79,
+            "name": "Mesh.076",
+            "sourceHash": 17718746387242922251,
+            "type": "Mesh",
+            "uuid": "06d123c8-8211-4e11-a7a7-7f5a4c1fba3e"
+        },
+        {
+            "index": 80,
+            "name": "Mesh.077",
+            "sourceHash": 17718746394251049924,
+            "type": "Mesh",
+            "uuid": "f1ad3ef1-cbbb-4fe8-afa7-1c754bace9d2"
+        },
+        {
+            "index": 81,
+            "name": "Mesh.078",
+            "sourceHash": 17718746381663518101,
+            "type": "Mesh",
+            "uuid": "efb74277-a1f7-477a-99e9-92c1e5e23f52"
+        },
+        {
+            "index": 82,
+            "name": "Mesh.079",
+            "sourceHash": 17718746380081808934,
+            "type": "Mesh",
+            "uuid": "15ea113f-c76c-4298-9eca-e53b23389042"
+        },
+        {
+            "index": 83,
+            "name": "Mesh.080",
+            "sourceHash": 17718746384950839543,
+            "type": "Mesh",
+            "uuid": "1aa854b1-1d45-46e9-a8b1-44038f4afac1"
+        },
+        {
+            "index": 84,
+            "name": "Mesh.081",
+            "sourceHash": 17718746383369163392,
+            "type": "Mesh",
+            "uuid": "cd56e6eb-5afb-43c9-a924-35474d9319ef"
+        },
+        {
+            "index": 85,
+            "name": "Mesh.082",
+            "sourceHash": 17718746371049937745,
+            "type": "Mesh",
+            "uuid": "06b799bb-e0e7-4673-b1eb-403372495a81"
+        },
+        {
+            "index": 86,
+            "name": "Mesh.083",
+            "sourceHash": 17718746377789758946,
+            "type": "Mesh",
+            "uuid": "cd6b3be8-d01e-4a5b-9a14-e6970ded6df9"
+        },
+        {
+            "index": 87,
+            "name": "Mesh.084",
+            "sourceHash": 17718746374060468147,
+            "type": "Mesh",
+            "uuid": "adcfd5f8-8943-4f64-9a29-fb9c6da8e046"
+        },
+        {
+            "index": 88,
+            "name": "Mesh.085",
+            "sourceHash": 17718746363888855116,
+            "type": "Mesh",
+            "uuid": "119deab2-4b6f-47ac-8953-e9548858bc93"
+        },
+        {
+            "index": 89,
+            "name": "Mesh.086",
+            "sourceHash": 17718746368749498909,
+            "type": "Mesh",
+            "uuid": "598e5ebb-d680-4982-b5d8-0fab90dbf162"
+        },
+        {
+            "index": 90,
+            "name": "Mesh.087",
+            "sourceHash": 17718746366899385518,
+            "type": "Mesh",
+            "uuid": "6226542f-8c9a-4aa6-b8c3-55c4b0c2307a"
+        },
+        {
+            "index": 91,
+            "name": "Mesh.088",
+            "sourceHash": 17718746425455508863,
+            "type": "Mesh",
+            "uuid": "19a4fa7c-c594-4774-8bc6-7d519c2e7757"
+        },
+        {
+            "index": 92,
+            "name": "Mesh.089",
+            "sourceHash": 17718746421725267720,
+            "type": "Mesh",
+            "uuid": "5e1cc0da-94b7-4b4c-a124-a6bf49d9cd98"
+        },
+        {
+            "index": 93,
+            "name": "Mesh.090",
+            "sourceHash": 17718746428733393369,
+            "type": "Mesh",
+            "uuid": "dae8fe92-409f-4526-b43c-459fe440bef0"
+        },
+        {
+            "index": 94,
+            "name": "Mesh.091",
+            "sourceHash": 17718746416414298730,
+            "type": "Mesh",
+            "uuid": "d84c6f1b-6712-47a7-bbd1-ce9054907ee5"
+        },
+        {
+            "index": 95,
+            "name": "Mesh.092",
+            "sourceHash": 17718746414564054075,
+            "type": "Mesh",
+            "uuid": "64876f64-d7bb-464b-8d87-5f7cbd875377"
+        },
+        {
+            "index": 96,
+            "name": "Mesh.093",
+            "sourceHash": 17718746419424829172,
+            "type": "Mesh",
+            "uuid": "129e52dc-f97b-4985-91cf-b7bd0bff709c"
+        },
+        {
+            "index": 97,
+            "name": "Mesh.094",
+            "sourceHash": 17718746417843019909,
+            "type": "Mesh",
+            "uuid": "a2efba5d-6136-4bd9-b984-264309cd86fa"
+        },
+        {
+            "index": 98,
+            "name": "Mesh.095",
+            "sourceHash": 17718746405532313942,
+            "type": "Mesh",
+            "uuid": "44aee2f0-7a9e-4ff4-916e-35dde3cb2751"
+        },
+        {
+            "index": 99,
+            "name": "Mesh.096",
+            "sourceHash": 17718746412272006119,
+            "type": "Mesh",
+            "uuid": "8b0eff4b-8b13-43f2-b58d-cbff3da526b1"
+        },
+        {
+            "index": 100,
+            "name": "Mesh.097",
+            "sourceHash": 17718746408542844336,
+            "type": "Mesh",
+            "uuid": "0bcbc2c0-7988-49be-a45e-cb7c035e6318"
+        },
+        {
+            "index": 101,
+            "name": "Mesh.098",
+            "sourceHash": 17718746398371102273,
+            "type": "Mesh",
+            "uuid": "d0441a27-6c69-4174-8781-5acd155b5f0a"
+        },
+        {
+            "index": 102,
+            "name": "Mesh.099",
+            "sourceHash": 17718746403231842322,
+            "type": "Mesh",
+            "uuid": "013dc84a-148f-4b35-b7cc-d937f8956090"
+        },
+        {
+            "index": 103,
+            "name": "Mesh.100",
+            "sourceHash": 17718746401650166435,
+            "type": "Mesh",
+            "uuid": "0a0cea77-999b-40dd-8788-801b731ae68a"
+        },
+        {
+            "index": 104,
+            "name": "Mesh.101",
+            "sourceHash": 17718745908026168188,
+            "type": "Mesh",
+            "uuid": "88ae4a13-c2b1-438c-9a0b-676b80fc1135"
+        },
+        {
+            "index": 105,
+            "name": "Mesh.102",
+            "sourceHash": 17718745906444489997,
+            "type": "Mesh",
+            "uuid": "274bd65a-895f-40b8-bce3-674316224584"
+        },
+        {
+            "index": 106,
+            "name": "Mesh.103",
+            "sourceHash": 17718745911313522654,
+            "type": "Mesh",
+            "uuid": "50a700da-3934-4971-940f-8a13904cd8b3"
+        },
+        {
+            "index": 107,
+            "name": "Mesh.104",
+            "sourceHash": 17718745901140861039,
+            "type": "Mesh",
+            "uuid": "2a321a2a-bede-4262-839f-9cb37490ca9a"
+        },
+        {
+            "index": 108,
+            "name": "Mesh.105",
+            "sourceHash": 17718745899290618424,
+            "type": "Mesh",
+            "uuid": "f888e996-d25c-460a-b9a5-49ff86d082bb"
+        },
+        {
+            "index": 109,
+            "name": "Mesh.106",
+            "sourceHash": 17718745904151391433,
+            "type": "Mesh",
+            "uuid": "25ac0501-698f-47e4-8545-2bdbdb2130c6"
+        },
+        {
+            "index": 110,
+            "name": "Mesh.107",
+            "sourceHash": 17718745902569584282,
+            "type": "Mesh",
+            "uuid": "2c58a11e-e35a-4dbf-9416-52bf85e75ed1"
+        },
+        {
+            "index": 111,
+            "name": "Mesh.108",
+            "sourceHash": 17718745890250489643,
+            "type": "Mesh",
+            "uuid": "ad803d74-a22d-4506-b464-5f7d72bc92ae"
+        },
+        {
+            "index": 112,
+            "name": "Mesh.109",
+            "sourceHash": 17718745897258582500,
+            "type": "Mesh",
+            "uuid": "c14209f1-4598-4041-a768-6c51dc06178d"
+        },
+        {
+            "index": 113,
+            "name": "Mesh.110",
+            "sourceHash": 17718745893269375925,
+            "type": "Mesh",
+            "uuid": "51a23e60-2677-415d-a07d-ecef2d6da8eb"
+        },
+        {
+            "index": 114,
+            "name": "Mesh.111",
+            "sourceHash": 17718745883097631814,
+            "type": "Mesh",
+            "uuid": "758be5d8-0b11-4c9e-8472-5a59d373c6a1"
+        },
+        {
+            "index": 115,
+            "name": "Mesh.112",
+            "sourceHash": 17718745887958406679,
+            "type": "Mesh",
+            "uuid": "a41358ff-7bf2-45fa-9ae9-e3b9f1570cc8"
+        },
+        {
+            "index": 116,
+            "name": "Mesh.113",
+            "sourceHash": 17718745886376597664,
+            "type": "Mesh",
+            "uuid": "9902a77e-2214-44da-94b2-9fc286790c55"
+        },
+        {
+            "index": 117,
+            "name": "Mesh.114",
+            "sourceHash": 17718745942508544369,
+            "type": "Mesh",
+            "uuid": "4a38682d-bc29-42e8-a895-1754f860bbd5"
+        },
+        {
+            "index": 118,
+            "name": "Mesh.115",
+            "sourceHash": 17718745940926737154,
+            "type": "Mesh",
+            "uuid": "88fbba7d-ec02-49de-a6f2-3a299a907443"
+        },
+        {
+            "index": 119,
+            "name": "Mesh.116",
+            "sourceHash": 17718745945787510227,
+            "type": "Mesh",
+            "uuid": "1c79c10c-193f-4f27-a019-4722ada2882a"
+        },
+        {
+            "index": 120,
+            "name": "Mesh.117",
+            "sourceHash": 17718745935615768172,
+            "type": "Mesh",
+            "uuid": "637526ce-7208-41c6-aa3d-2a2e10a3bb1f"
+        },
+        {
+            "index": 121,
+            "name": "Mesh.118",
+            "sourceHash": 17718745931894995005,
+            "type": "Mesh",
+            "uuid": "8a5cfb57-dfd2-40c9-a1d1-971101e80159"
+        },
+        {
+            "index": 122,
+            "name": "Mesh.119",
+            "sourceHash": 17718745938633736910,
+            "type": "Mesh",
+            "uuid": "10bb1008-e4b6-4a94-869b-56a9b31c53ea"
+        },
+        {
+            "index": 123,
+            "name": "Mesh.120",
+            "sourceHash": 17718745926314509471,
+            "type": "Mesh",
+            "uuid": "52eafaf1-352c-4056-ad8d-14218f903da9"
+        },
+        {
+            "index": 124,
+            "name": "Mesh.121",
+            "sourceHash": 17718745924732833064,
+            "type": "Mesh",
+            "uuid": "fc849589-7e08-4675-9735-7af918e1f5bd"
+        },
+        {
+            "index": 125,
+            "name": "Mesh.122",
+            "sourceHash": 17718745929593477113,
+            "type": "Mesh",
+            "uuid": "c9434d8e-cccf-4564-9833-565344510db2"
+        },
+        {
+            "index": 126,
+            "name": "Mesh.123",
+            "sourceHash": 17718745927743363466,
+            "type": "Mesh",
+            "uuid": "375741e2-139a-4922-92c8-0dddb5330ce8"
+        },
+        {
+            "index": 127,
+            "name": "Mesh.124",
+            "sourceHash": 17718745917571621467,
+            "type": "Mesh",
+            "uuid": "370497da-8750-4895-aa4e-91c27189a206"
+        },
+        {
+            "index": 128,
+            "name": "Mesh.125",
+            "sourceHash": 17718745922440782868,
+            "type": "Mesh",
+            "uuid": "cc0c8a12-ae64-4fe5-9de3-7dc1761d3edd"
+        },
+        {
+            "index": 314,
+            "name": "Mesh.311",
+            "sourceHash": 17718745351131529102,
+            "type": "Mesh",
+            "uuid": "a3b5cb3d-a18e-4f04-819d-3ee2d05333bd"
+        },
+        {
+            "index": 129,
+            "name": "Mesh.126",
+            "sourceHash": 17718745920858975909,
+            "type": "Mesh",
+            "uuid": "06d1760b-fcec-4049-84bf-47f8b301e742"
+        },
+        {
+            "index": 130,
+            "name": "Mesh.127",
+            "sourceHash": 17718745977259358070,
+            "type": "Mesh",
+            "uuid": "04dea7ce-08b7-4811-96d3-b2fd46f239ba"
+        },
+        {
+            "index": 260,
+            "name": "Mesh.257",
+            "sourceHash": 17718745770423790416,
+            "type": "Mesh",
+            "uuid": "2522142a-56bb-43ef-a0b8-7f7f9ed7bfb5"
+        },
+        {
+            "index": 131,
+            "name": "Mesh.128",
+            "sourceHash": 17718745975409113351,
+            "type": "Mesh",
+            "uuid": "40513df4-c122-48cb-8b09-f796be61b05a"
+        },
+        {
+            "index": 132,
+            "name": "Mesh.129",
+            "sourceHash": 17718745980269855696,
+            "type": "Mesh",
+            "uuid": "a97c2014-6a03-4e64-a1d5-36a0d1fac1fa"
+        },
+        {
+            "index": 318,
+            "name": "Mesh.315",
+            "sourceHash": 17718745340249511242,
+            "type": "Mesh",
+            "uuid": "38fc9979-963e-4cb9-aa39-0d95f0812232"
+        },
+        {
+            "index": 133,
+            "name": "Mesh.130",
+            "sourceHash": 17718745970098111585,
+            "type": "Mesh",
+            "uuid": "155bd2e2-9486-44db-af55-6e1fec8dd1c1"
+        },
+        {
+            "index": 134,
+            "name": "Mesh.131",
+            "sourceHash": 17718745966368951858,
+            "type": "Mesh",
+            "uuid": "4fcb6ec9-0ddf-4516-a51f-5ea27be66486"
+        },
+        {
+            "index": 312,
+            "name": "Mesh.309",
+            "sourceHash": 17718745356442497836,
+            "type": "Mesh",
+            "uuid": "6dc5c252-db3e-4b21-a546-639bc62ad630"
+        },
+        {
+            "index": 135,
+            "name": "Mesh.132",
+            "sourceHash": 17718745973108641987,
+            "type": "Mesh",
+            "uuid": "bf8b4dbd-d681-4f88-86dc-aaaaf32d7408"
+        },
+        {
+            "index": 136,
+            "name": "Mesh.133",
+            "sourceHash": 17718745960797936284,
+            "type": "Mesh",
+            "uuid": "cd095c7b-f4b6-4b06-8d0a-cc151659bd10"
+        },
+        {
+            "index": 258,
+            "name": "Mesh.255",
+            "sourceHash": 17718745715606264054,
+            "type": "Mesh",
+            "uuid": "469a66d3-7483-4ed8-b46a-9ef89fa52125"
+        },
+        {
+            "index": 137,
+            "name": "Mesh.134",
+            "sourceHash": 17718745959216128813,
+            "type": "Mesh",
+            "uuid": "d8434206-fc49-43df-aca8-affcdac9f163"
+        },
+        {
+            "index": 138,
+            "name": "Mesh.135",
+            "sourceHash": 17718745964075853310,
+            "type": "Mesh",
+            "uuid": "4e94fe42-5eb5-445d-a25d-900a796944bc"
+        },
+        {
+            "index": 268,
+            "name": "Mesh.265",
+            "sourceHash": 17718745757241334232,
+            "type": "Mesh",
+            "uuid": "a2d486b2-c095-4ee3-835e-9285962e74b6"
+        },
+        {
+            "index": 139,
+            "name": "Mesh.136",
+            "sourceHash": 17718745962494046095,
+            "type": "Mesh",
+            "uuid": "73eb5fd3-c7be-4f31-bd9e-562977b48a84"
+        },
+        {
+            "index": 140,
+            "name": "Mesh.137",
+            "sourceHash": 17718745949906514008,
+            "type": "Mesh",
+            "uuid": "72795250-7130-4b71-b71a-649a93bf32ee"
+        },
+        {
+            "index": 262,
+            "name": "Mesh.259",
+            "sourceHash": 17718745773434320818,
+            "type": "Mesh",
+            "uuid": "9757cb6c-f3bf-47a8-92aa-0ddc592f39c3"
+        },
+        {
+            "index": 141,
+            "name": "Mesh.138",
+            "sourceHash": 17718745956914641641,
+            "type": "Mesh",
+            "uuid": "734ff2b6-06fc-4c99-a015-ce8823021fff"
+        },
+        {
+            "index": 142,
+            "name": "Mesh.139",
+            "sourceHash": 17718745953185479866,
+            "type": "Mesh",
+            "uuid": "25795288-b56b-44d2-a7e1-359b89c39eee"
+        },
+        {
+            "index": 256,
+            "name": "Mesh.253",
+            "sourceHash": 17718745712327298452,
+            "type": "Mesh",
+            "uuid": "d72baa96-7ab5-477a-942a-dc7bfe51c391"
+        },
+        {
+            "index": 143,
+            "name": "Mesh.140",
+            "sourceHash": 17718746011741701451,
+            "type": "Mesh",
+            "uuid": "6a2f28ff-d966-45fe-bcbe-a103ab85940f"
+        },
+        {
+            "index": 144,
+            "name": "Mesh.141",
+            "sourceHash": 17718746009891458820,
+            "type": "Mesh",
+            "uuid": "4e72938b-c932-47e1-b762-a57ed2f3a148"
+        },
+        {
+            "index": 266,
+            "name": "Mesh.263",
+            "sourceHash": 17718745753962368382,
+            "type": "Mesh",
+            "uuid": "6f2bc992-4824-4889-beaf-c3f5c9765384"
+        },
+        {
+            "index": 145,
+            "name": "Mesh.142",
+            "sourceHash": 17718746014752231893,
+            "type": "Mesh",
+            "uuid": "493d812b-a433-4599-8b51-72dfd43e1b73"
+        },
+        {
+            "index": 146,
+            "name": "Mesh.143",
+            "sourceHash": 17718746004580489830,
+            "type": "Mesh",
+            "uuid": "3a6c99cb-9ab3-4a78-a622-f8db165e9197"
+        },
+        {
+            "index": 276,
+            "name": "Mesh.273",
+            "sourceHash": 17718745795597438528,
+            "type": "Mesh",
+            "uuid": "1a981151-b78d-4713-be9c-f5235555af61"
+        },
+        {
+            "index": 147,
+            "name": "Mesh.144",
+            "sourceHash": 17718746000851328055,
+            "type": "Mesh",
+            "uuid": "23d36f4a-4d74-488b-9a0d-5cf6caaadcf6"
+        },
+        {
+            "index": 148,
+            "name": "Mesh.145",
+            "sourceHash": 17718746007859455680,
+            "type": "Mesh",
+            "uuid": "2b6e6938-45eb-4aac-9eb9-364672770a4b"
+        },
+        {
+            "index": 270,
+            "name": "Mesh.267",
+            "sourceHash": 17718745743071994938,
+            "type": "Mesh",
+            "uuid": "8aa509ac-d077-41b4-a1d3-56490afcc61c"
+        },
+        {
+            "index": 149,
+            "name": "Mesh.146",
+            "sourceHash": 17718745995271923857,
+            "type": "Mesh",
+            "uuid": "937fc478-2788-4f43-b21d-7a52bfd9e662"
+        },
+        {
+            "index": 150,
+            "name": "Mesh.147",
+            "sourceHash": 17718745993690116386,
+            "type": "Mesh",
+            "uuid": "96f3d23c-aeeb-4c87-b6e7-21faf3c60d5d"
+        },
+        {
+            "index": 264,
+            "name": "Mesh.261",
+            "sourceHash": 17718745768131707420,
+            "type": "Mesh",
+            "uuid": "d5db19ae-4649-4829-b7a0-a598ec95160c"
+        },
+        {
+            "index": 151,
+            "name": "Mesh.148",
+            "sourceHash": 17718745998559280115,
+            "type": "Mesh",
+            "uuid": "873cf87f-dd37-4909-b5b7-da60ffec951c"
+        },
+        {
+            "index": 152,
+            "name": "Mesh.149",
+            "sourceHash": 17718745996977470860,
+            "type": "Mesh",
+            "uuid": "d12e13bd-d683-431a-9e96-429486f53af9"
+        },
+        {
+            "index": 274,
+            "name": "Mesh.271",
+            "sourceHash": 17718745809499390950,
+            "type": "Mesh",
+            "uuid": "66816e7e-9523-48ec-bd1c-d8f7563f4458"
+        },
+        {
+            "index": 153,
+            "name": "Mesh.150",
+            "sourceHash": 17718745984388859485,
+            "type": "Mesh",
+            "uuid": "f5224248-c65f-42f4-9ea9-07df95a616f3"
+        },
+        {
+            "index": 154,
+            "name": "Mesh.151",
+            "sourceHash": 17718745991396985070,
+            "type": "Mesh",
+            "uuid": "e24cbaa2-f527-4925-b778-eeee163ad807"
+        },
+        {
+            "index": 284,
+            "name": "Mesh.281",
+            "sourceHash": 17718745782415015112,
+            "type": "Mesh",
+            "uuid": "a407e462-f884-4a09-a77c-822edaa5f4a1"
+        },
+        {
+            "index": 155,
+            "name": "Mesh.152",
+            "sourceHash": 17718745987667825343,
+            "type": "Mesh",
+            "uuid": "a9be4c3e-baed-4d36-ace3-9c1b87afb544"
+        },
+        {
+            "index": 156,
+            "name": "Mesh.153",
+            "sourceHash": 17718746046215560008,
+            "type": "Mesh",
+            "uuid": "c36da3ed-f9c6-450c-82a5-1922cfa41260"
+        },
+        {
+            "index": 278,
+            "name": "Mesh.275",
+            "sourceHash": 17718745798884792994,
+            "type": "Mesh",
+            "uuid": "24a3623c-eb9b-45db-85f8-11bc615c8ca3"
+        },
+        {
+            "index": 157,
+            "name": "Mesh.154",
+            "sourceHash": 17718746051076332825,
+            "type": "Mesh",
+            "uuid": "432c5594-76dc-4691-b7dc-5e7d7a74f56c"
+        },
+        {
+            "index": 158,
+            "name": "Mesh.155",
+            "sourceHash": 17718746049234479018,
+            "type": "Mesh",
+            "uuid": "cb5f2792-0aab-4634-8454-f8e02d84a200"
+        },
+        {
+            "index": 272,
+            "name": "Mesh.269",
+            "sourceHash": 17718745806488891524,
+            "type": "Mesh",
+            "uuid": "115ae0df-2dcc-48b7-b2ac-4013bae01e4c"
+        },
+        {
+            "index": 159,
+            "name": "Mesh.156",
+            "sourceHash": 17718746036915382395,
+            "type": "Mesh",
+            "uuid": "157fb4d6-b557-4efc-bc36-e739c1912738"
+        },
+        {
+            "index": 160,
+            "name": "Mesh.157",
+            "sourceHash": 17718746035333575220,
+            "type": "Mesh",
+            "uuid": "941aaa3e-b858-4f9e-a3f2-0d9b81048dd4"
+        },
+        {
+            "index": 161,
+            "name": "Mesh.158",
+            "sourceHash": 17718746040194348229,
+            "type": "Mesh",
+            "uuid": "bea2d145-8043-4db2-91a2-bddfd19b273e"
+        },
+        {
+            "index": 162,
+            "name": "Mesh.159",
+            "sourceHash": 17718746029754171030,
+            "type": "Mesh",
+            "uuid": "f6970167-184b-4762-97b5-772860bfa1c9"
+        },
+        {
+            "index": 292,
+            "name": "Mesh.289",
+            "sourceHash": 17718745822918734192,
+            "type": "Mesh",
+            "uuid": "819795fc-0e77-4828-9a01-4e2f701d32f9"
+        },
+        {
+            "index": 163,
+            "name": "Mesh.160",
+            "sourceHash": 17718746028172461863,
+            "type": "Mesh",
+            "uuid": "29082936-2ef9-4f0e-af14-509a6d25e4e8"
+        },
+        {
+            "index": 164,
+            "name": "Mesh.161",
+            "sourceHash": 17718746033033234928,
+            "type": "Mesh",
+            "uuid": "2f0cb1dc-9d9d-4063-a2d9-61382ebe80f5"
+        },
+        {
+            "index": 165,
+            "name": "Mesh.162",
+            "sourceHash": 17718746031451427713,
+            "type": "Mesh",
+            "uuid": "4305d565-5e9d-4c1d-b2ed-42fa10c0c43a"
+        },
+        {
+            "index": 166,
+            "name": "Mesh.163",
+            "sourceHash": 17718746018872284242,
+            "type": "Mesh",
+            "uuid": "dc751e33-1335-43b8-a057-ff8c2caf64f8"
+        },
+        {
+            "index": 167,
+            "name": "Mesh.164",
+            "sourceHash": 17718746025880411875,
+            "type": "Mesh",
+            "uuid": "e9c1e80f-efbf-4795-9f05-2205db6ad1a0"
+        },
+        {
+            "index": 168,
+            "name": "Mesh.165",
+            "sourceHash": 17718746022150201532,
+            "type": "Mesh",
+            "uuid": "11b9f771-ea91-4862-9e1a-9d2dbfe0debf"
+        },
+        {
+            "index": 290,
+            "name": "Mesh.287",
+            "sourceHash": 17718745837088073238,
+            "type": "Mesh",
+            "uuid": "5294ea38-102b-4921-84a4-1591ee42c50d"
+        },
+        {
+            "index": 169,
+            "name": "Mesh.166",
+            "sourceHash": 17718746080697936205,
+            "type": "Mesh",
+            "uuid": "42a78018-09dc-4846-9e40-8bab8c63f2f0"
+        },
+        {
+            "index": 170,
+            "name": "Mesh.167",
+            "sourceHash": 17718746085558711070,
+            "type": "Mesh",
+            "uuid": "119aa0b9-abec-4046-8cf6-7747a2f83527"
+        },
+        {
+            "index": 300,
+            "name": "Mesh.297",
+            "sourceHash": 17718745878724192248,
+            "type": "Mesh",
+            "uuid": "a1a8d4c3-918d-4f09-bd05-d94c14d26bf9"
+        },
+        {
+            "index": 171,
+            "name": "Mesh.168",
+            "sourceHash": 17718746083708466607,
+            "type": "Mesh",
+            "uuid": "c40c18f2-b184-4dba-83e9-e68071c25ff9"
+        },
+        {
+            "index": 172,
+            "name": "Mesh.169",
+            "sourceHash": 17718746071389372024,
+            "type": "Mesh",
+            "uuid": "df8f3699-482b-4270-9e53-c3be97a5cdb1"
+        },
+        {
+            "index": 294,
+            "name": "Mesh.291",
+            "sourceHash": 17718745826206088658,
+            "type": "Mesh",
+            "uuid": "c1658ab2-9d96-44ea-9a09-791092da4a3d"
+        },
+        {
+            "index": 173,
+            "name": "Mesh.170",
+            "sourceHash": 17718746069815918601,
+            "type": "Mesh",
+            "uuid": "7c94c45c-24ed-449c-bf64-4e60bacf1e13"
+        },
+        {
+            "index": 174,
+            "name": "Mesh.171",
+            "sourceHash": 17718746074676693722,
+            "type": "Mesh",
+            "uuid": "c7785c08-4b2c-4820-83a3-fa222cad1450"
+        },
+        {
+            "index": 288,
+            "name": "Mesh.285",
+            "sourceHash": 17718745842400091060,
+            "type": "Mesh",
+            "uuid": "9fc9cd21-97b9-407d-b360-4bf2d49979fd"
+        },
+        {
+            "index": 175,
+            "name": "Mesh.172",
+            "sourceHash": 17718746064236516203,
+            "type": "Mesh",
+            "uuid": "70b7de54-c511-45a9-a90a-098461edc351"
+        },
+        {
+            "index": 176,
+            "name": "Mesh.173",
+            "sourceHash": 17718746060507354404,
+            "type": "Mesh",
+            "uuid": "b0794f30-2562-4ca9-955a-8059d784a3f8"
+        },
+        {
+            "index": 298,
+            "name": "Mesh.295",
+            "sourceHash": 17718745875445224606,
+            "type": "Mesh",
+            "uuid": "fb4d6fe2-a386-440f-9b04-9cf173e1ca31"
+        },
+        {
+            "index": 177,
+            "name": "Mesh.174",
+            "sourceHash": 17718746067515482101,
+            "type": "Mesh",
+            "uuid": "3a043884-17d3-413c-9b1b-db42a9a495bd"
+        },
+        {
+            "index": 178,
+            "name": "Mesh.175",
+            "sourceHash": 17718746055196385670,
+            "type": "Mesh",
+            "uuid": "e97053b2-ea4e-468f-8130-2942942b77ee"
+        },
+        {
+            "index": 308,
+            "name": "Mesh.305",
+            "sourceHash": 17718745848369206368,
+            "type": "Mesh",
+            "uuid": "d0a3fdc5-4977-4f26-a432-e87de574e4ca"
+        },
+        {
+            "index": 179,
+            "name": "Mesh.176",
+            "sourceHash": 17718746053614578263,
+            "type": "Mesh",
+            "uuid": "5b38e04c-0b03-4d79-afeb-1756acd4ea08"
+        },
+        {
+            "index": 180,
+            "name": "Mesh.177",
+            "sourceHash": 17718746060354399456,
+            "type": "Mesh",
+            "uuid": "cae8c01f-c128-4226-b3e1-d38a3f4a8743"
+        },
+        {
+            "index": 302,
+            "name": "Mesh.299",
+            "sourceHash": 17718745864563241562,
+            "type": "Mesh",
+            "uuid": "2c22f250-8ae2-4a8d-89ee-34f415c2f184"
+        },
+        {
+            "index": 181,
+            "name": "Mesh.178",
+            "sourceHash": 17718746056633497265,
+            "type": "Mesh",
+            "uuid": "1b3b0609-7ab7-4d3b-b60b-4d14e2e35794"
+        },
+        {
+            "index": 182,
+            "name": "Mesh.179",
+            "sourceHash": 17718746115181363010,
+            "type": "Mesh",
+            "uuid": "3d3b99c0-42b8-43e4-bfd1-9e4ea6a4e79a"
+        },
+        {
+            "index": 296,
+            "name": "Mesh.293",
+            "sourceHash": 17718745812305152060,
+            "type": "Mesh",
+            "uuid": "6fc16dbf-963b-42fc-aa98-b0119b17d446"
+        },
+        {
+            "index": 183,
+            "name": "Mesh.180",
+            "sourceHash": 17718746120041054483,
+            "type": "Mesh",
+            "uuid": "a8264694-1677-40d6-ac03-0614969ba564"
+        },
+        {
+            "index": 184,
+            "name": "Mesh.181",
+            "sourceHash": 17718746118190812076,
+            "type": "Mesh",
+            "uuid": "615f0abf-40c7-41d1-8c68-774295eb32fc"
+        },
+        {
+            "index": 306,
+            "name": "Mesh.303",
+            "sourceHash": 17718745862261721350,
+            "type": "Mesh",
+            "uuid": "75341287-b6f6-4170-a797-d7a59821183e"
+        },
+        {
+            "index": 185,
+            "name": "Mesh.182",
+            "sourceHash": 17718746105871715453,
+            "type": "Mesh",
+            "uuid": "a6aa840b-2e11-4239-b888-7aed97e7e153"
+        },
+        {
+            "index": 186,
+            "name": "Mesh.183",
+            "sourceHash": 17718746104289908238,
+            "type": "Mesh",
+            "uuid": "1e7d1fa1-71d8-4e9c-99d8-d51e2451c696"
+        },
+        {
+            "index": 316,
+            "name": "Mesh.313",
+            "sourceHash": 17718745354150415080,
+            "type": "Mesh",
+            "uuid": "8950492b-e078-432e-942d-8cd865a30fa1"
+        },
+        {
+            "index": 187,
+            "name": "Mesh.184",
+            "sourceHash": 17718746109150681311,
+            "type": "Mesh",
+            "uuid": "fbc047e4-0557-48ed-8844-e3556ebb0838"
+        },
+        {
+            "index": 188,
+            "name": "Mesh.185",
+            "sourceHash": 17718746098987327848,
+            "type": "Mesh",
+            "uuid": "036e0488-0ee9-4fef-a413-2816b9b75b42"
+        },
+        {
+            "index": 310,
+            "name": "Mesh.307",
+            "sourceHash": 17718745851379736770,
+            "type": "Mesh",
+            "uuid": "b645b3f7-00ff-4bfc-ba23-0432c898a245"
+        },
+        {
+            "index": 189,
+            "name": "Mesh.186",
+            "sourceHash": 17718746094989732665,
+            "type": "Mesh",
+            "uuid": "51115edb-46b6-4e7b-9f1d-2ddce7de4a1e"
+        },
+        {
+            "index": 190,
+            "name": "Mesh.187",
+            "sourceHash": 17718746101997858250,
+            "type": "Mesh",
+            "uuid": "6cf4b48e-c6b0-4302-87d9-ac0c3f472ec7"
+        },
+        {
+            "index": 304,
+            "name": "Mesh.301",
+            "sourceHash": 17718745867842207396,
+            "type": "Mesh",
+            "uuid": "9449394c-e827-469f-93f2-ff288c1cd10a"
+        },
+        {
+            "index": 191,
+            "name": "Mesh.188",
+            "sourceHash": 17718746089678763931,
+            "type": "Mesh",
+            "uuid": "b498f44b-479b-4b31-8acc-ae66151185a0"
+        },
+        {
+            "index": 192,
+            "name": "Mesh.189",
+            "sourceHash": 17718746088096954452,
+            "type": "Mesh",
+            "uuid": "ce5b9b4f-5d5d-400b-850e-652ed82c41e0"
+        },
+        {
+            "index": 378,
+            "name": "Mesh.369-1",
+            "sourceHash": 17718745533707621326,
+            "type": "Mesh",
+            "uuid": "ba5a2ba9-3003-461d-b416-196533170541"
+        },
+        {
+            "index": 193,
+            "name": "Mesh.190",
+            "sourceHash": 17718746092689261285,
+            "type": "Mesh",
+            "uuid": "466dab2a-346c-44ef-8e50-89088279ad3d"
+        },
+        {
+            "index": 194,
+            "name": "Mesh.191",
+            "sourceHash": 17718746091107452086,
+            "type": "Mesh",
+            "uuid": "38fb1b36-dc26-430b-a545-4f4d3876a7a6"
+        },
+        {
+            "index": 324,
+            "name": "Mesh.321",
+            "sourceHash": 17718745394654034064,
+            "type": "Mesh",
+            "uuid": "350ab496-a53f-4441-be36-342e69927dd8"
+        },
+        {
+            "index": 195,
+            "name": "Mesh.192",
+            "sourceHash": 17718746147507834183,
+            "type": "Mesh",
+            "uuid": "90d11a4d-012b-4569-9840-c64c65a4f0fe"
+        },
+        {
+            "index": 196,
+            "name": "Mesh.193",
+            "sourceHash": 17718746154524350224,
+            "type": "Mesh",
+            "uuid": "56104b0a-080b-4ebc-85c0-7e8235531d87"
+        },
+        {
+            "index": 382,
+            "name": "Mesh.372",
+            "sourceHash": 17718745514226264714,
+            "type": "Mesh",
+            "uuid": "381bac6a-7931-4518-912e-b04c403e1119"
+        },
+        {
+            "index": 197,
+            "name": "Mesh.194",
+            "sourceHash": 17718746150795188641,
+            "type": "Mesh",
+            "uuid": "d895dab2-4974-4a12-a02d-3fc9efcba628"
+        },
+        {
+            "index": 198,
+            "name": "Mesh.195",
+            "sourceHash": 17718746140355011186,
+            "type": "Mesh",
+            "uuid": "9fd2707b-ca50-4b27-b741-1d1ed1daf80d"
+        },
+        {
+            "index": 376,
+            "name": "Mesh.368-1",
+            "sourceHash": 17718745530697090924,
+            "type": "Mesh",
+            "uuid": "f86e015e-db94-4907-9c5e-d0e60d48585d"
+        },
+        {
+            "index": 199,
+            "name": "Mesh.196",
+            "sourceHash": 17718746138772284419,
+            "type": "Mesh",
+            "uuid": "72193650-1314-4156-8178-c70c7fe6e8f7"
+        },
+        {
+            "index": 200,
+            "name": "Mesh.197",
+            "sourceHash": 17718746143632928476,
+            "type": "Mesh",
+            "uuid": "9a20c15d-27c5-4261-a129-8217b8f40d83"
+        },
+        {
+            "index": 322,
+            "name": "Mesh.319",
+            "sourceHash": 17718745337948023862,
+            "type": "Mesh",
+            "uuid": "d651f16d-0693-4a35-bf07-094b6032c8a1"
+        },
+        {
+            "index": 201,
+            "name": "Mesh.198",
+            "sourceHash": 17718746133461317485,
+            "type": "Mesh",
+            "uuid": "45897aa1-39f4-41d1-854e-df1b78d59846"
+        },
+        {
+            "index": 202,
+            "name": "Mesh.199",
+            "sourceHash": 17718746129463589182,
+            "type": "Mesh",
+            "uuid": "27653eac-a82d-4876-b9f2-f5560f9ebe4e"
+        },
+        {
+            "index": 332,
+            "name": "Mesh.329",
+            "sourceHash": 17718745381471710488,
+            "type": "Mesh",
+            "uuid": "e51517b1-4a6d-451a-af02-d9ec5bedcce5"
+        },
+        {
+            "index": 203,
+            "name": "Mesh.200",
+            "sourceHash": 17718746136480203727,
+            "type": "Mesh",
+            "uuid": "00fbba15-3587-4abd-a40a-b29f0a34a46e"
+        },
+        {
+            "index": 204,
+            "name": "Mesh.201",
+            "sourceHash": 17718746124161107352,
+            "type": "Mesh",
+            "uuid": "2fad879f-3ee1-4a66-a42b-16ae15b1c145"
+        },
+        {
+            "index": 326,
+            "name": "Mesh.323",
+            "sourceHash": 17718745397933100018,
+            "type": "Mesh",
+            "uuid": "73ad0e29-c725-43f1-8ff5-212fe3d51712"
+        },
+        {
+            "index": 205,
+            "name": "Mesh.202",
+            "sourceHash": 17718746122579299881,
+            "type": "Mesh",
+            "uuid": "bf91d73b-1833-4e2a-8655-c070c8df3030"
+        },
+        {
+            "index": 206,
+            "name": "Mesh.203",
+            "sourceHash": 17718746127440072954,
+            "type": "Mesh",
+            "uuid": "2222c8ff-dd40-4fac-baa9-02314e294e3b"
+        },
+        {
+            "index": 320,
+            "name": "Mesh.317",
+            "sourceHash": 17718745343260041684,
+            "type": "Mesh",
+            "uuid": "5d9f4c99-60d5-4dcc-86f0-464dd47a282c"
+        },
+        {
+            "index": 207,
+            "name": "Mesh.204",
+            "sourceHash": 17718746125589830283,
+            "type": "Mesh",
+            "uuid": "29314782-0582-45ae-a9f4-e3979a8baf0e"
+        },
+        {
+            "index": 208,
+            "name": "Mesh.205",
+            "sourceHash": 17718745632234398532,
+            "type": "Mesh",
+            "uuid": "e92a2052-5640-49ec-b165-c4e536937602"
+        },
+        {
+            "index": 330,
+            "name": "Mesh.327",
+            "sourceHash": 17718745387042726590,
+            "type": "Mesh",
+            "uuid": "92463329-31ab-45d1-b73d-93a0a518c5f0"
+        },
+        {
+            "index": 209,
+            "name": "Mesh.206",
+            "sourceHash": 17718745639242523925,
+            "type": "Mesh",
+            "uuid": "59fe77a4-d6bf-420a-b06f-8cf3ce2e2266"
+        },
+        {
+            "index": 210,
+            "name": "Mesh.207",
+            "sourceHash": 17718745635513364390,
+            "type": "Mesh",
+            "uuid": "65510164-31a8-4a79-b77c-4ce4daa8ee70"
+        },
+        {
+            "index": 340,
+            "name": "Mesh.337",
+            "sourceHash": 17718745420096250752,
+            "type": "Mesh",
+            "uuid": "b6449a2b-865f-42d3-9f8f-80bdcf6ca8cf"
+        },
+        {
+            "index": 211,
+            "name": "Mesh.208",
+            "sourceHash": 17718745625081573495,
+            "type": "Mesh",
+            "uuid": "fce64ea4-1ea3-4aa2-be07-59d52c7dadb7"
+        },
+        {
+            "index": 212,
+            "name": "Mesh.209",
+            "sourceHash": 17718745629942348288,
+            "type": "Mesh",
+            "uuid": "1265c2e4-a82b-4bed-8989-6f8c061e67d6"
+        },
+        {
+            "index": 334,
+            "name": "Mesh.331",
+            "sourceHash": 17718745367570806906,
+            "type": "Mesh",
+            "uuid": "c44d902d-71c6-4075-a3d3-7d42f9433ff0"
+        },
+        {
+            "index": 213,
+            "name": "Mesh.210",
+            "sourceHash": 17718745628360539345,
+            "type": "Mesh",
+            "uuid": "e789b19d-293c-4c69-9af9-a2a87dba6d39"
+        },
+        {
+            "index": 214,
+            "name": "Mesh.211",
+            "sourceHash": 17718745616040363362,
+            "type": "Mesh",
+            "uuid": "eb253556-4a95-472e-81a2-362dd4081028"
+        },
+        {
+            "index": 328,
+            "name": "Mesh.325",
+            "sourceHash": 17718745383763760732,
+            "type": "Mesh",
+            "uuid": "19483e84-9599-443c-b515-a526d5f89365"
+        },
+        {
+            "index": 215,
+            "name": "Mesh.212",
+            "sourceHash": 17718745614458556211,
+            "type": "Mesh",
+            "uuid": "2143e489-4fc8-49aa-bb10-d6c19cefe4df"
+        },
+        {
+            "index": 216,
+            "name": "Mesh.213",
+            "sourceHash": 17718745621198377420,
+            "type": "Mesh",
+            "uuid": "90045d1f-a600-40d4-bd70-f8885cd3103c"
+        },
+        {
+            "index": 338,
+            "name": "Mesh.335",
+            "sourceHash": 17718745425407219494,
+            "type": "Mesh",
+            "uuid": "e5156f6c-97b7-469f-b386-6f03f969fde5"
+        },
+        {
+            "index": 217,
+            "name": "Mesh.214",
+            "sourceHash": 17718745608879152029,
+            "type": "Mesh",
+            "uuid": "feeda6e2-bd0b-46d9-89a8-832f74cb31ce"
+        },
+        {
+            "index": 218,
+            "name": "Mesh.215",
+            "sourceHash": 17718745607305862190,
+            "type": "Mesh",
+            "uuid": "8ceaaefa-5421-4c29-b659-1dcde3c31401"
+        },
+        {
+            "index": 348,
+            "name": "Mesh.345",
+            "sourceHash": 17718745406913794056,
+            "type": "Mesh",
+            "uuid": "9110bbc7-dff0-4e16-b354-25ef61c5f0cf"
+        },
+        {
+            "index": 219,
+            "name": "Mesh.216",
+            "sourceHash": 17718745612166506239,
+            "type": "Mesh",
+            "uuid": "7cdb532f-6ee1-4d19-8327-d67a6daf9c93"
+        },
+        {
+            "index": 220,
+            "name": "Mesh.217",
+            "sourceHash": 17718745610316392584,
+            "type": "Mesh",
+            "uuid": "3ba61cf9-3d56-4113-9771-bbb8e98b4945"
+        },
+        {
+            "index": 342,
+            "name": "Mesh.339",
+            "sourceHash": 17718745423106780898,
+            "type": "Mesh",
+            "uuid": "12db1734-2a87-4ea8-81b7-dacb9e14b224"
+        },
+        {
+            "index": 221,
+            "name": "Mesh.218",
+            "sourceHash": 17718745666716643673,
+            "type": "Mesh",
+            "uuid": "3f3739bb-907f-4d34-8ae9-6c977418880d"
+        },
+        {
+            "index": 222,
+            "name": "Mesh.219",
+            "sourceHash": 17718745673724902378,
+            "type": "Mesh",
+            "uuid": "16662159-e980-41d5-ab05-32c7c3efcda8"
+        },
+        {
+            "index": 336,
+            "name": "Mesh.333",
+            "sourceHash": 17718745370848691396,
+            "type": "Mesh",
+            "uuid": "68ed1910-b72d-427a-a222-5361b1670049"
+        },
+        {
+            "index": 223,
+            "name": "Mesh.220",
+            "sourceHash": 17718745669995609531,
+            "type": "Mesh",
+            "uuid": "640e1961-2862-4fcc-8170-b0e318f42370"
+        },
+        {
+            "index": 224,
+            "name": "Mesh.221",
+            "sourceHash": 17718745659823965812,
+            "type": "Mesh",
+            "uuid": "5b65c959-9ee5-4d94-a143-023a5f545844"
+        },
+        {
+            "index": 282,
+            "name": "Mesh.279",
+            "sourceHash": 17718745779404484718,
+            "type": "Mesh",
+            "uuid": "9ee75b55-be72-4ac3-90ee-b3fa5610e1a2"
+        },
+        {
+            "index": 225,
+            "name": "Mesh.222",
+            "sourceHash": 17718745664416303109,
+            "type": "Mesh",
+            "uuid": "fc490c05-0a04-4a61-8c4e-7394efb77a5d"
+        },
+        {
+            "index": 226,
+            "name": "Mesh.223",
+            "sourceHash": 17718745662842884822,
+            "type": "Mesh",
+            "uuid": "680f0f65-4d71-47d0-b3cb-876432c7e5cf"
+        },
+        {
+            "index": 356,
+            "name": "Mesh.353",
+            "sourceHash": 17718745445269898928,
+            "type": "Mesh",
+            "uuid": "e93a2443-b363-43cd-ba5f-712b536e42bc"
+        },
+        {
+            "index": 227,
+            "name": "Mesh.224",
+            "sourceHash": 17718745650523790183,
+            "type": "Mesh",
+            "uuid": "901dc3f2-04da-47b1-8e03-c261fe1672a0"
+        },
+        {
+            "index": 228,
+            "name": "Mesh.225",
+            "sourceHash": 17718745648941980976,
+            "type": "Mesh",
+            "uuid": "9f836a94-271e-4a59-ad6c-77c0891ef279"
+        },
+        {
+            "index": 286,
+            "name": "Mesh.283",
+            "sourceHash": 17718745837242076970,
+            "type": "Mesh",
+            "uuid": "4a67820c-80ab-4b04-8865-ba832f827042"
+        },
+        {
+            "index": 229,
+            "name": "Mesh.226",
+            "sourceHash": 17718745653533272001,
+            "type": "Mesh",
+            "uuid": "2278715f-ff97-427a-a4f1-223088ad7867"
+        },
+        {
+            "index": 230,
+            "name": "Mesh.227",
+            "sourceHash": 17718745643361528210,
+            "type": "Mesh",
+            "uuid": "2db3b536-5cd8-493a-9e36-bd8aefc27d1c"
+        },
+        {
+            "index": 280,
+            "name": "Mesh.277",
+            "sourceHash": 17718745793305388300,
+            "type": "Mesh",
+            "uuid": "d8f9860f-8c0c-4df2-8755-3c0226f6ded8"
+        },
+        {
+            "index": 231,
+            "name": "Mesh.228",
+            "sourceHash": 17718745639632368163,
+            "type": "Mesh",
+            "uuid": "af9f77d3-d20f-43c1-ad30-e6ab708eba24"
+        },
+        {
+            "index": 232,
+            "name": "Mesh.229",
+            "sourceHash": 17718745646640493820,
+            "type": "Mesh",
+            "uuid": "bd5b6f70-04cc-4505-aafb-c4030861d090"
+        },
+        {
+            "index": 354,
+            "name": "Mesh.351",
+            "sourceHash": 17718745450849335894,
+            "type": "Mesh",
+            "uuid": "57913dd3-023c-4f5f-84a4-78c5e2cb7e01"
+        },
+        {
+            "index": 233,
+            "name": "Mesh.230",
+            "sourceHash": 17718745703049264781,
+            "type": "Mesh",
+            "uuid": "f50b1d3b-aa2a-4163-82cc-38bb34ca0c29"
+        },
+        {
+            "index": 234,
+            "name": "Mesh.231",
+            "sourceHash": 17718745701198989150,
+            "type": "Mesh",
+            "uuid": "45bccff2-8336-4258-9c58-d400aa6212b1"
+        },
+        {
+            "index": 364,
+            "name": "Mesh.361",
+            "sourceHash": 17718745494364502840,
+            "type": "Mesh",
+            "uuid": "267b764f-7e2d-4345-8916-0ea8a5d33d0d"
+        },
+        {
+            "index": 235,
+            "name": "Mesh.232",
+            "sourceHash": 17718745708207245807,
+            "type": "Mesh",
+            "uuid": "c425d1bb-b172-41a6-a497-19e890d56e8c"
+        },
+        {
+            "index": 236,
+            "name": "Mesh.233",
+            "sourceHash": 17718745704477955000,
+            "type": "Mesh",
+            "uuid": "f7b7a1cc-1670-4700-8dea-eb3426be0686"
+        },
+        {
+            "index": 358,
+            "name": "Mesh.355",
+            "sourceHash": 17718745448548864274,
+            "type": "Mesh",
+            "uuid": "6a6542c0-111e-46ec-b975-7af073bda7e6"
+        },
+        {
+            "index": 237,
+            "name": "Mesh.234",
+            "sourceHash": 17718745694306341961,
+            "type": "Mesh",
+            "uuid": "3af4ad46-4ac2-4ca5-b311-77219a7b3760"
+        },
+        {
+            "index": 238,
+            "name": "Mesh.235",
+            "sourceHash": 17718745698898550298,
+            "type": "Mesh",
+            "uuid": "6752a277-9cba-4d12-b38b-0728fe31facc"
+        },
+        {
+            "index": 352,
+            "name": "Mesh.349",
+            "sourceHash": 17718745464741851124,
+            "type": "Mesh",
+            "uuid": "3b5c8d3e-3e70-4eed-9be8-65807e5a6e3a"
+        },
+        {
+            "index": 239,
+            "name": "Mesh.236",
+            "sourceHash": 17718745697316872363,
+            "type": "Mesh",
+            "uuid": "13f1cc95-b963-4ad5-96d9-605ebba2ae05"
+        },
+        {
+            "index": 240,
+            "name": "Mesh.237",
+            "sourceHash": 17718745684997646692,
+            "type": "Mesh",
+            "uuid": "994a3560-ad75-470f-b833-97c9adbb3828"
+        },
+        {
+            "index": 362,
+            "name": "Mesh.359",
+            "sourceHash": 17718745439814363358,
+            "type": "Mesh",
+            "uuid": "c7fc0746-1e1b-4b0e-8ba9-2a5b173be142"
+        },
+        {
+            "index": 241,
+            "name": "Mesh.238",
+            "sourceHash": 17718745683424359221,
+            "type": "Mesh",
+            "uuid": "f75676d9-a05f-4596-ba4e-12521253cc39"
+        },
+        {
+            "index": 242,
+            "name": "Mesh.239",
+            "sourceHash": 17718745688285001158,
+            "type": "Mesh",
+            "uuid": "ebf723f1-0c7e-45c2-b7a4-bc162b6163de"
+        },
+        {
+            "index": 372,
+            "name": "Mesh.366-1",
+            "sourceHash": 17718745481449564576,
+            "type": "Mesh",
+            "uuid": "4dffbec2-0a1a-4b5f-acaf-8037af6c12e9"
+        },
+        {
+            "index": 243,
+            "name": "Mesh.240",
+            "sourceHash": 17718745677844955031,
+            "type": "Mesh",
+            "uuid": "dc110e04-423d-4d07-a9b2-a3f13bf98b55"
+        },
+        {
+            "index": 244,
+            "name": "Mesh.241",
+            "sourceHash": 17718745674114711584,
+            "type": "Mesh",
+            "uuid": "97e380bb-4494-4b0c-9f14-f08f6ec39e71"
+        },
+        {
+            "index": 366,
+            "name": "Mesh.363",
+            "sourceHash": 17718745489052583834,
+            "type": "Mesh",
+            "uuid": "caef5e43-0f33-4240-8c12-8ca7e486a0fc"
+        },
+        {
+            "index": 245,
+            "name": "Mesh.242",
+            "sourceHash": 17718745681122839281,
+            "type": "Mesh",
+            "uuid": "3fe7cdae-1aea-408b-b0bb-2fc8de57b5e1"
+        },
+        {
+            "index": 246,
+            "name": "Mesh.243",
+            "sourceHash": 17718745737523219586,
+            "type": "Mesh",
+            "uuid": "cabc3871-3f9f-49e0-bda8-c4f40da4b40d"
+        },
+        {
+            "index": 360,
+            "name": "Mesh.357",
+            "sourceHash": 17718745436527008892,
+            "type": "Mesh",
+            "uuid": "2e571e6f-f9f7-4206-8aae-4167ff069de8"
+        },
+        {
+            "index": 247,
+            "name": "Mesh.244",
+            "sourceHash": 17718745735672976723,
+            "type": "Mesh",
+            "uuid": "3fdae2ff-3d2d-481a-a433-d7f4019efd49"
+        },
+        {
+            "index": 248,
+            "name": "Mesh.245",
+            "sourceHash": 17718745740542140396,
+            "type": "Mesh",
+            "uuid": "68e594d0-ffb4-4909-b296-de76b205ef47"
+        },
+        {
+            "index": 370,
+            "name": "Mesh.365-1",
+            "sourceHash": 17718745478170598726,
+            "type": "Mesh",
+            "uuid": "506df79c-a22b-4068-aaf9-299b1e7639f1"
+        },
+        {
+            "index": 249,
+            "name": "Mesh.246",
+            "sourceHash": 17718745738960331197,
+            "type": "Mesh",
+            "uuid": "c9662ff8-328f-413f-bb61-639588e58a82"
+        },
+        {
+            "index": 250,
+            "name": "Mesh.247",
+            "sourceHash": 17718745726641236558,
+            "type": "Mesh",
+            "uuid": "ee322065-4a7c-4335-9818-d9c1085bf6d2"
+        },
+        {
+            "index": 380,
+            "name": "Mesh.370-1",
+            "sourceHash": 17718745519806717480,
+            "type": "Mesh",
+            "uuid": "0acd70b0-a852-45d6-b01f-473cb11ac93d"
+        },
+        {
+            "index": 251,
+            "name": "Mesh.248",
+            "sourceHash": 17718745733649361951,
+            "type": "Mesh",
+            "uuid": "24f74546-8e03-4e12-8030-1ad446e30c71"
+        },
+        {
+            "index": 252,
+            "name": "Mesh.249",
+            "sourceHash": 17718745731799250600,
+            "type": "Mesh",
+            "uuid": "9fd39015-dfef-4d65-b8d6-ec15b6dbe69e"
+        },
+        {
+            "index": 374,
+            "name": "Mesh.367-1",
+            "sourceHash": 17718745475870159874,
+            "type": "Mesh",
+            "uuid": "2755e0df-266a-4638-a90d-00209ded6b11"
+        },
+        {
+            "index": 253,
+            "name": "Mesh.250",
+            "sourceHash": 17718745719480024953,
+            "type": "Mesh",
+            "uuid": "e645682b-ed02-4f84-98be-025804078717"
+        },
+        {
+            "index": 254,
+            "name": "Mesh.251",
+            "sourceHash": 17718745717898313994,
+            "type": "Mesh",
+            "uuid": "84732258-dfd1-4c28-a796-feb3ac5edf69"
+        },
+        {
+            "index": 368,
+            "name": "Mesh.364-1",
+            "sourceHash": 17718745492071502564,
+            "type": "Mesh",
+            "uuid": "242414a2-8bdc-45d1-a31e-7a6bd9b051a6"
+        },
+        {
+            "index": 255,
+            "name": "Mesh.252",
+            "sourceHash": 17718745722758958043,
+            "type": "Mesh",
+            "uuid": "e6d5ef60-6ea3-47d0-a16e-32d949250a1a"
+        },
+        {
+            "index": 257,
+            "name": "Mesh.254",
+            "sourceHash": 17718745708598007333,
+            "type": "Mesh",
+            "uuid": "ca0001d8-58db-4246-8505-334ba4497741"
+        },
+        {
+            "index": 259,
+            "name": "Mesh.256",
+            "sourceHash": 17718745772006515335,
+            "type": "Mesh",
+            "uuid": "c6525bec-e39a-4fb6-a0ff-eb0ab4062b41"
+        },
+        {
+            "index": 261,
+            "name": "Mesh.258",
+            "sourceHash": 17718745775015996897,
+            "type": "Mesh",
+            "uuid": "31408402-4a81-4624-8310-27233870fe2c"
+        },
+        {
+            "index": 263,
+            "name": "Mesh.260",
+            "sourceHash": 17718745761123481667,
+            "type": "Mesh",
+            "uuid": "38f6101a-4b67-4c4e-aeb3-264989415d5e"
+        },
+        {
+            "index": 265,
+            "name": "Mesh.262",
+            "sourceHash": 17718745764134110381,
+            "type": "Mesh",
+            "uuid": "b4d3df2c-4121-48a4-8c73-e5827905807c"
+        },
+        {
+            "index": 267,
+            "name": "Mesh.264",
+            "sourceHash": 17718745758823143183,
+            "type": "Mesh",
+            "uuid": "9909fe82-9032-48aa-96ab-3a7706ec80ac"
+        },
+        {
+            "index": 269,
+            "name": "Mesh.266",
+            "sourceHash": 17718745744922239593,
+            "type": "Mesh",
+            "uuid": "74c843ca-705c-4098-93f0-38aa8d85f1ea"
+        },
+        {
+            "index": 271,
+            "name": "Mesh.268",
+            "sourceHash": 17718745750088642251,
+            "type": "Mesh",
+            "uuid": "da1dceb7-5987-4eb1-ac43-a168cbe5c734"
+        },
+        {
+            "index": 273,
+            "name": "Mesh.270",
+            "sourceHash": 17718745804907215189,
+            "type": "Mesh",
+            "uuid": "341a71fb-0328-40ee-ab64-5e0f9687956d"
+        },
+        {
+            "index": 275,
+            "name": "Mesh.272",
+            "sourceHash": 17718745807916664247,
+            "type": "Mesh",
+            "uuid": "1d213f35-e7ce-425e-a209-364e819434cb"
+        },
+        {
+            "index": 277,
+            "name": "Mesh.274",
+            "sourceHash": 17718745802605694993,
+            "type": "Mesh",
+            "uuid": "59cd3759-92c7-4662-84a6-ac08d374ea71"
+        },
+        {
+            "index": 279,
+            "name": "Mesh.276",
+            "sourceHash": 17718745788444746611,
+            "type": "Mesh",
+            "uuid": "12cb4372-0bf0-4836-81a1-d75f10ae5c86"
+        },
+        {
+            "index": 281,
+            "name": "Mesh.278",
+            "sourceHash": 17718745791723712477,
+            "type": "Mesh",
+            "uuid": "0a8c454b-42cf-4d26-8723-99bcb95728fc"
+        },
+        {
+            "index": 283,
+            "name": "Mesh.280",
+            "sourceHash": 17718745777554373183,
+            "type": "Mesh",
+            "uuid": "eb1910d0-6a32-4f19-864b-1ea20630d7d2"
+        },
+        {
+            "index": 285,
+            "name": "Mesh.282",
+            "sourceHash": 17718745840962848409,
+            "type": "Mesh",
+            "uuid": "54379fbe-54ac-4a67-9ae1-55c2e9ebea89"
+        },
+        {
+            "index": 287,
+            "name": "Mesh.284",
+            "sourceHash": 17718745844250202619,
+            "type": "Mesh",
+            "uuid": "d149068a-470b-4466-908e-e9087d343517"
+        },
+        {
+            "index": 289,
+            "name": "Mesh.286",
+            "sourceHash": 17718745830080863301,
+            "type": "Mesh",
+            "uuid": "df614603-2bb4-4293-8fd1-a63f610e724f"
+        },
+        {
+            "index": 291,
+            "name": "Mesh.288",
+            "sourceHash": 17718745833358780583,
+            "type": "Mesh",
+            "uuid": "e74ae51a-3c0b-4c1c-af8d-0fff99db14d0"
+        },
+        {
+            "index": 293,
+            "name": "Mesh.290",
+            "sourceHash": 17718745827787766529,
+            "type": "Mesh",
+            "uuid": "72b9881c-94e5-4420-9d11-1113f5a3e2a9"
+        },
+        {
+            "index": 295,
+            "name": "Mesh.292",
+            "sourceHash": 17718745813886830179,
+            "type": "Mesh",
+            "uuid": "cb79f767-76b9-4d00-ab7b-00e6a27bb171"
+        },
+        {
+            "index": 297,
+            "name": "Mesh.294",
+            "sourceHash": 17718745816897360589,
+            "type": "Mesh",
+            "uuid": "2994afe3-f438-4069-a193-cd49a1dfd6dc"
+        },
+        {
+            "index": 299,
+            "name": "Mesh.296",
+            "sourceHash": 17718745871715933487,
+            "type": "Mesh",
+            "uuid": "425e4015-ac9e-4b42-82fc-faafb57d517f"
+        },
+        {
+            "index": 301,
+            "name": "Mesh.298",
+            "sourceHash": 17718745866144917897,
+            "type": "Mesh",
+            "uuid": "2169d1cb-ed24-402a-b787-982a1aa524a7"
+        },
+        {
+            "index": 303,
+            "name": "Mesh.300",
+            "sourceHash": 17718745869423883499,
+            "type": "Mesh",
+            "uuid": "a19a2fe8-52db-41ab-82d0-03e7bc8e74ff"
+        },
+        {
+            "index": 305,
+            "name": "Mesh.302",
+            "sourceHash": 17718745855522031477,
+            "type": "Mesh",
+            "uuid": "7552b19d-726d-4ebf-8ad5-7019b0dade86"
+        },
+        {
+            "index": 307,
+            "name": "Mesh.304",
+            "sourceHash": 17718745860680045527,
+            "type": "Mesh",
+            "uuid": "61fb193a-3f8c-4cc9-8ce0-7d199d03d9e4"
+        },
+        {
+            "index": 309,
+            "name": "Mesh.306",
+            "sourceHash": 17718745846787530289,
+            "type": "Mesh",
+            "uuid": "96ef5523-b562-48d3-a66c-5ddc11849ce7"
+        },
+        {
+            "index": 311,
+            "name": "Mesh.308",
+            "sourceHash": 17718745360171788947,
+            "type": "Mesh",
+            "uuid": "aede3afa-86f2-48db-b54c-e4287cefe3ee"
+        },
+        {
+            "index": 313,
+            "name": "Mesh.310",
+            "sourceHash": 17718745363450754557,
+            "type": "Mesh",
+            "uuid": "91f9dd5f-1d7e-416a-8f9c-4c93955384cd"
+        },
+        {
+            "index": 315,
+            "name": "Mesh.312",
+            "sourceHash": 17718745349281382495,
+            "type": "Mesh",
+            "uuid": "2225922d-b073-4a7c-9ebe-f56a2758ed13"
+        },
+        {
+            "index": 317,
+            "name": "Mesh.314",
+            "sourceHash": 17718745352568736953,
+            "type": "Mesh",
+            "uuid": "8ae4e51a-83d0-4af0-925e-c4958159c6d7"
+        },
+        {
+            "index": 319,
+            "name": "Mesh.316",
+            "sourceHash": 17718745346989334299,
+            "type": "Mesh",
+            "uuid": "84ac79c9-38c7-4fe9-9721-823753f4f9a3"
+        },
+        {
+            "index": 321,
+            "name": "Mesh.318",
+            "sourceHash": 17718745333087382117,
+            "type": "Mesh",
+            "uuid": "7bf6fb1b-f98c-4d98-a835-f67d8d5baf5e"
+        },
+        {
+            "index": 323,
+            "name": "Mesh.320",
+            "sourceHash": 17718745336106301127,
+            "type": "Mesh",
+            "uuid": "4b04a7e2-f477-438b-858d-e570b3d43dfa"
+        },
+        {
+            "index": 325,
+            "name": "Mesh.322",
+            "sourceHash": 17718745390924841249,
+            "type": "Mesh",
+            "uuid": "44246986-6fce-4d8e-b2c6-0fd16e19aff4"
+        },
+        {
+            "index": 327,
+            "name": "Mesh.324",
+            "sourceHash": 17718745385613872515,
+            "type": "Mesh",
+            "uuid": "826f82c8-eddd-4ca3-a308-e20b2f4b773b"
+        },
+        {
+            "index": 329,
+            "name": "Mesh.326",
+            "sourceHash": 17718745388624402669,
+            "type": "Mesh",
+            "uuid": "6bfbc071-eba4-4ff8-90c0-0041fbc6da94"
+        },
+        {
+            "index": 331,
+            "name": "Mesh.328",
+            "sourceHash": 17718745374731889487,
+            "type": "Mesh",
+            "uuid": "d0cbdf6a-e0ac-42aa-b292-a6e394d239fb"
+        },
+        {
+            "index": 333,
+            "name": "Mesh.330",
+            "sourceHash": 17718745377742419881,
+            "type": "Mesh",
+            "uuid": "0b5396e8-7558-4ae6-adf9-39a194679429"
+        },
+        {
+            "index": 335,
+            "name": "Mesh.332",
+            "sourceHash": 17718745372431417867,
+            "type": "Mesh",
+            "uuid": "b49a9e80-d451-4fe9-80ac-9c392b604d56"
+        },
+        {
+            "index": 337,
+            "name": "Mesh.334",
+            "sourceHash": 17718745426980507285,
+            "type": "Mesh",
+            "uuid": "91b18b06-0da7-404f-831f-c24d70d8e653"
+        },
+        {
+            "index": 339,
+            "name": "Mesh.336",
+            "sourceHash": 17718745430267861495,
+            "type": "Mesh",
+            "uuid": "f6f851e8-5c3e-4565-9516-6757c8e20067"
+        },
+        {
+            "index": 341,
+            "name": "Mesh.338",
+            "sourceHash": 17718745418246005841,
+            "type": "Mesh",
+            "uuid": "fe381baf-2001-4160-bc60-f9febe604101"
+        },
+        {
+            "index": 343,
+            "name": "Mesh.340",
+            "sourceHash": 17718745421524971699,
+            "type": "Mesh",
+            "uuid": "60c5a3ac-f954-4136-94e8-59e9a6188fd8"
+        },
+        {
+            "index": 344,
+            "name": "Mesh.341",
+            "sourceHash": 17718745409205877068,
+            "type": "Mesh",
+            "uuid": "2f84b041-f990-4109-93c5-5a59fb2d8a2d"
+        },
+        {
+            "index": 345,
+            "name": "Mesh.342",
+            "sourceHash": 17718745416214102813,
+            "type": "Mesh",
+            "uuid": "f66d5f76-33db-4dff-b2b7-95bbdb6d637d"
+        },
+        {
+            "index": 346,
+            "name": "Mesh.343",
+            "sourceHash": 17718745412224763310,
+            "type": "Mesh",
+            "uuid": "d32e48e6-cabc-449b-b676-151951d1fe5f"
+        },
+        {
+            "index": 347,
+            "name": "Mesh.344",
+            "sourceHash": 17718745402053152383,
+            "type": "Mesh",
+            "uuid": "7804cae8-6aca-4b58-8b90-900fb4c05399"
+        },
+        {
+            "index": 349,
+            "name": "Mesh.346",
+            "sourceHash": 17718745405332118233,
+            "type": "Mesh",
+            "uuid": "177faf06-a96b-4e5b-979a-b329866b6ffe"
+        },
+        {
+            "index": 350,
+            "name": "Mesh.347",
+            "sourceHash": 17718745461463933802,
+            "type": "Mesh",
+            "uuid": "94947ab2-f985-41b8-b348-61425fd38125"
+        },
+        {
+            "index": 351,
+            "name": "Mesh.348",
+            "sourceHash": 17718745459881207099,
+            "type": "Mesh",
+            "uuid": "7ed1398a-3ba7-49d6-a7ae-96b9ed4a5105"
+        },
+        {
+            "index": 353,
+            "name": "Mesh.350",
+            "sourceHash": 17718745454578626949,
+            "type": "Mesh",
+            "uuid": "99c283d1-d13a-4a8a-b16a-2179188242af"
+        },
+        {
+            "index": 355,
+            "name": "Mesh.352",
+            "sourceHash": 17718745457589157095,
+            "type": "Mesh",
+            "uuid": "e5fb19cb-117c-4023-94b5-4d1838c974d5"
+        },
+        {
+            "index": 357,
+            "name": "Mesh.354",
+            "sourceHash": 17718745443688222529,
+            "type": "Mesh",
+            "uuid": "e6b7c703-c368-47fc-89d0-f32c6449ad2e"
+        },
+        {
+            "index": 359,
+            "name": "Mesh.356",
+            "sourceHash": 17718745446698752931,
+            "type": "Mesh",
+            "uuid": "b272e964-6b43-43a0-88ff-325099a0f5a3"
+        },
+        {
+            "index": 361,
+            "name": "Mesh.358",
+            "sourceHash": 17718745441396172301,
+            "type": "Mesh",
+            "uuid": "31bb013a-2acd-48f0-acd1-a00c5be2e413"
+        },
+        {
+            "index": 363,
+            "name": "Mesh.360",
+            "sourceHash": 17718745496214745455,
+            "type": "Mesh",
+            "uuid": "1d11ddf4-4ba3-4080-99d0-10945da8c37b"
+        },
+        {
+            "index": 365,
+            "name": "Mesh.362",
+            "sourceHash": 17718745499225275849,
+            "type": "Mesh",
+            "uuid": "a321c72e-5e63-42e3-8889-f651263c2254"
+        },
+        {
+            "index": 367,
+            "name": "Mesh.364-0",
+            "sourceHash": 17718745485323290667,
+            "type": "Mesh",
+            "uuid": "c13f1d2e-f9f0-4d69-9d47-eae86cf9d59f"
+        },
+        {
+            "index": 369,
+            "name": "Mesh.365-0",
+            "sourceHash": 17718745479752275125,
+            "type": "Mesh",
+            "uuid": "11f73b09-afaa-4177-aa5c-a4a878e6a46f"
+        },
+        {
+            "index": 371,
+            "name": "Mesh.366-0",
+            "sourceHash": 17718745483031242519,
+            "type": "Mesh",
+            "uuid": "580de282-43d9-47fc-b85b-23bbb879c438"
+        },
+        {
+            "index": 373,
+            "name": "Mesh.367-0",
+            "sourceHash": 17718745468861903473,
+            "type": "Mesh",
+            "uuid": "73286260-7b03-45b9-a00c-151930c48fd5"
+        },
+        {
+            "index": 375,
+            "name": "Mesh.368-0",
+            "sourceHash": 17718745472140869331,
+            "type": "Mesh",
+            "uuid": "4d009d73-3dcf-45f6-a3c9-710b0d44cab8"
+        },
+        {
+            "index": 377,
+            "name": "Mesh.369-0",
+            "sourceHash": 17718745528846846269,
+            "type": "Mesh",
+            "uuid": "9132554d-7de1-4547-872f-1e006c9d7252"
+        },
+        {
+            "index": 379,
+            "name": "Mesh.370-0",
+            "sourceHash": 17718745523535877535,
+            "type": "Mesh",
+            "uuid": "147c1f70-15ab-4d7c-8535-17f3710d6e0c"
+        },
+        {
+            "index": 381,
+            "name": "Mesh.371",
+            "sourceHash": 17718745526814843129,
+            "type": "Mesh",
+            "uuid": "cc2dceae-2265-4d94-b122-1dc367bf0749"
+        },
+        {
+            "index": 383,
+            "name": "Mesh.373",
+            "sourceHash": 17718745512652845915,
+            "type": "Mesh",
+            "uuid": "a9909bf7-56b7-433d-bfdb-b3b524bd59a4"
+        },
+        {
+            "index": 384,
+            "name": "Mesh.374",
+            "sourceHash": 17718745517513618708,
+            "type": "Mesh",
+            "uuid": "a17973ba-8312-4ca4-a104-60d324a2a064"
+        },
+        {
+            "index": 386,
+            "name": "Mesh.375-1",
+            "sourceHash": 17718745503344246902,
+            "type": "Mesh",
+            "uuid": "6c9ac7ba-c0ad-4996-8ea5-82959a5e685a"
+        },
+        {
+            "index": 388,
+            "name": "Mesh.376-1",
+            "sourceHash": 17718745506623212752,
+            "type": "Mesh",
+            "uuid": "38ed9684-e0f2-41fc-9402-b5c6804825b1"
+        },
+        {
+            "index": 390,
+            "name": "Mesh.378",
+            "sourceHash": 17718745570031722290,
+            "type": "Mesh",
+            "uuid": "739f0e6b-2e81-4957-9065-51756e07e85a"
+        },
+        {
+            "index": 392,
+            "name": "Mesh.380",
+            "sourceHash": 17718745555870772124,
+            "type": "Mesh",
+            "uuid": "0a593db5-0dc3-4fc6-a8af-2911465b5572"
+        }
+    ],
+    "uuid": "6d11fcb3-ac79-47b4-88b4-0c7c01c69a99"
+}

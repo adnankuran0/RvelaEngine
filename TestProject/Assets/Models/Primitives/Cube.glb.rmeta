@@ -1,0 +1,23 @@
+{
+    "dependencies": [],
+    "importerID": "ModelImporter",
+    "importerSettings": {},
+    "sourceHash": 12480412423332457319,
+    "subAssets": [
+        {
+            "index": 0,
+            "name": "Cube_Mat0",
+            "sourceHash": 0,
+            "type": "Material",
+            "uuid": "a9c5fb0f-1ac6-47f5-8750-5878b0934986"
+        },
+        {
+            "index": 0,
+            "name": "Cube.001",
+            "sourceHash": 12480412423332457319,
+            "type": "Mesh",
+            "uuid": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
+        }
+    ],
+    "uuid": "4e2826e0-d6da-4568-93ae-d443fc9aad64"
+}

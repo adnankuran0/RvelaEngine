@@ -50,7 +50,8 @@ void Texture::Bind() const
 
 void Texture::Destroy() const
 {
-    glDeleteTextures(1, &m_Texture);
+    if (m_Texture != 0)
+        glDeleteTextures(1, &m_Texture);
 }
 
 void Texture::GenerateFromImage(const std::string& path)

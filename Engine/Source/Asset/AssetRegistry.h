@@ -20,7 +20,15 @@ public:
     const std::filesystem::path& GetAssetDir() const { return m_AssetDir; }
     AssetUUID GetUUID(const std::filesystem::path& path) const;
     std::vector<AssetUUID> GetDependencies(const AssetUUID& uuid) const;
-
+    void RegisterPath(const AssetUUID& uuid, const std::filesystem::path& path)
+    {
+        m_UUIDToPath[uuid] = path;
+        m_PathToUUID[path.string()] = uuid;
+    }
+    void RegisterSubAsset(const AssetUUID& uuid,
+        const std::filesystem::path& cachePath,
+        const std::string& importerID);
+  
 private:
     std::filesystem::path m_AssetDir;
     tsl::robin_map<AssetUUID, std::filesystem::path> m_UUIDToPath;

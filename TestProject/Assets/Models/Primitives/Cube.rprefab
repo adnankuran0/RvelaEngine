@@ -1,0 +1,35 @@
+{
+    "Entities": [
+        {
+            "Material": {
+                "material": "a9c5fb0f-1ac6-47f5-8750-5878b0934986"
+            },
+            "Mesh": {
+                "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
+            },
+            "Tag": {
+                "tag": "Cube"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 7
+        }
+    ]
+}

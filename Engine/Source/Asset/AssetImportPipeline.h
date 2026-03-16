@@ -5,7 +5,7 @@
 namespace rv {
 
 class AssetRegistry;
-class AssetMeta;
+struct AssetMeta;
 
 class AssetImportPipeline
 {

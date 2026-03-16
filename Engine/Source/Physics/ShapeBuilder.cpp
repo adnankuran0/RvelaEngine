@@ -10,6 +10,7 @@
 #include <Jolt/Physics/Collision/Shape/CylinderShape.h>
 #include <Jolt/Physics/Collision/Shape/ConvexHullShape.h>
 #include <Jolt/Physics/Collision/Shape/MeshShape.h>
+#include <Core/Ref.h>
 
 using namespace rv::Physics;
 
@@ -103,22 +104,22 @@ bool ShapeBuilder::TryAddMeshShape(ShapeBuildParams& params)
 		Ref<MeshAsset> mesh = params.meshComponent->GetMesh();
 
 		JPH::Array<JPH::Float3> joltVertices;
-		joltVertices.reserve(mesh->vertices.size());
+		joltVertices.reserve(mesh->GetVertices().size());
 
-		for (const auto& v : mesh->vertices)
+		for (const auto& v : mesh->GetVertices())
 		{
 			joltVertices.push_back(JPH::Float3(v.position.x, v.position.y, v.position.z));
 		}
 
 		JPH::Array<JPH::IndexedTriangle> joltTriangles;
-		joltTriangles.reserve(mesh->indices.size() / 3);
+		joltTriangles.reserve(mesh->GetIndices().size() / 3);
 
-		for (size_t i = 0; i < mesh->indices.size(); i += 3)
+		for (size_t i = 0; i < mesh->GetIndices().size(); i += 3)
 		{
 			joltTriangles.push_back(JPH::IndexedTriangle(
-				mesh->indices[i],
-				mesh->indices[i + 1],
-				mesh->indices[i + 2]
+				mesh->GetIndices()[i],
+				mesh->GetIndices()[i + 1],
+				mesh->GetIndices()[i + 2]
 			));
 		}
 
@@ -144,9 +145,9 @@ bool ShapeBuilder::TryAddConvexHullShape(ShapeBuildParams& params)
 		Ref<MeshAsset> mesh = params.meshComponent->GetMesh();
 
 		JPH::Array<JPH::Vec3> points;
-		points.reserve(mesh->vertices.size());
+		points.reserve(mesh->GetVertices().size());
 
-		for (const auto& v : mesh->vertices)
+		for (const auto& v : mesh->GetVertices())
 		{
 			points.push_back(math::ToJoltVec3(v.position));
 		}
