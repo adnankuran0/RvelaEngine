@@ -1,56 +1,15 @@
 {
     "Entities": [
         {
-            "BoxColliderComponent": {
-                "offset": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "size": [
-                    0.5,
-                    0.5,
-                    0.5
-                ]
-            },
-            "Material": {
-                "material": "ee3dde12-6263-4f11-bb1d-812b3e196ab7"
-            },
-            "Mesh": {
-                "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
-            },
             "ParentUUID": 0,
-            "RigidbodyComponent": {
-                "allowSleep": 1,
-                "angularDamping": 0.05000000074505806,
-                "autoCalculateMass": 1,
-                "bodyType": 0,
-                "collisionLayer": 1,
-                "collisionMask": 4294967295,
-                "friction": 0.5,
-                "gravityFactor": 1.0,
-                "isSensor": false,
-                "linearDamping": 0.05000000074505806,
-                "lockRotationX": false,
-                "lockRotationY": false,
-                "lockRotationZ": false,
-                "lockTranslationX": false,
-                "lockTranslationY": false,
-                "lockTranslationZ": false,
-                "mass": 1.0,
-                "maxAngularVelocity": 50.0,
-                "maxLinearVelocity": 500.0,
-                "restitution": 0.0,
-                "useCCD": false
-            },
             "Tag": {
-                "tag": "Cube"
+                "tag": ""
             },
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
                     0.0,
-                    -0.49595487117767334,
+                    0.0,
                     0.0
                 ],
                 "rotation": [
@@ -59,12 +18,37 @@
                     0.0
                 ],
                 "scale": [
-                    6.0,
                     1.0,
-                    6.0
+                    1.0,
+                    1.0
                 ]
             },
-            "UUID": 6
+            "UUID": 3
+        },
+        {
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": ""
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 13
         },
         {
             "Material": {
@@ -76,6 +60,56 @@
             "ParentUUID": 0,
             "Tag": {
                 "tag": "mid_century_lounge_chair"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    1.43927001953125,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 2
+        },
+        {
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": ""
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 11
+        },
+        {
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": ""
             },
             "Transform": {
                 "lockScaleRatio": false,
@@ -96,6 +130,31 @@
                 ]
             },
             "UUID": 5
+        },
+        {
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": ""
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 9
         },
         {
             "DirectionalLight": {
@@ -129,12 +188,137 @@
                     1.0
                 ]
             },
-            "UUID": 2
+            "UUID": 9
+        },
+        {
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": ""
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 7
+        },
+        {
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": ""
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 7
+        },
+        {
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": ""
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 5
+        },
+        {
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": ""
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 3
+        },
+        {
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": ""
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 3
         }
     ],
     "Environment": {
         "Bloom": true,
-        "Bloom_Intensity": 0.0,
+        "Bloom_Intensity": 1.0,
         "Bloom_Knee": 0.5,
         "Bloom_Treshold": 1.0,
         "HDRPath": "Assets\\Textures\\skybox\\environment.hdr",

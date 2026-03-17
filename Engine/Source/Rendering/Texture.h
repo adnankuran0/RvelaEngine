@@ -15,10 +15,9 @@ public:
     Texture(Texture&& other) noexcept
         : m_Texture(other.m_Texture), m_Width(other.m_Width),
         m_Height(other.m_Height), m_NrChannels(other.m_NrChannels),
-        m_Path(std::move(other.m_Path)), m_Data(other.m_Data)
+        m_Path(std::move(other.m_Path))
     {
         other.m_Texture = 0;
-        other.m_Data = nullptr;
     }
 
     Texture& operator=(Texture&& other) noexcept
@@ -31,15 +30,13 @@ public:
             m_Height = other.m_Height;
             m_NrChannels = other.m_NrChannels;
             m_Path = std::move(other.m_Path);
-            m_Data = other.m_Data;
             other.m_Texture = 0;
-            other.m_Data = nullptr;
         }
         return *this;
     }
 
     void Init();
-    void Destroy() const;
+    void Destroy();
     void Bind(unsigned int activeTexture) const;
     void Bind() const;
     void GenerateFromImage(const std::string& path);
@@ -59,7 +56,6 @@ public:
 private:
     std::string m_Path;
     unsigned int m_Texture{};
-    unsigned char* m_Data{};
     int m_Width{}, m_Height{}, m_NrChannels{};
 };
 

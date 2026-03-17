@@ -14,6 +14,8 @@ void DebugPass::Init(const RenderContext& ctx, RenderFrame& frame)
 
 void DebugPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
+    
+
     if (DebugRenderer::Get().GetSettings().drawBoundingBoxes)
         DrawAABBs(ctx);
 

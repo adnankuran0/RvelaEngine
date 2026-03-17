@@ -31,6 +31,10 @@ json MaterialComponent::Serialize() const
 {
     json j;
     j["material"] = m_MaterialUUID.ToString();
+
+    if (m_Instance.HasAnyOverride())
+        j["overrides"] = m_Instance.SerializeOverrides();
+
     return j;
 }
 
@@ -38,4 +42,7 @@ void MaterialComponent::Deserialize(const json& j)
 {
     AssetUUID uuid = AssetUUID::FromString(j.at("material").get<std::string>());
     Load(uuid);
+
+    if (j.contains("overrides"))
+        m_Instance.DeserializeOverrides(j["overrides"]);
 }

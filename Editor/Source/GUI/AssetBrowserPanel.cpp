@@ -74,9 +74,18 @@ static void RefreshAssets(const std::filesystem::path& directory)
     {
         for (const auto& entry : std::filesystem::directory_iterator(directory))
         {
+            if (entry.is_regular_file() && entry.path().extension() == ".rmeta")
+                continue;
+
             if (entry.is_regular_file() || entry.is_directory())
                 s_CachedFiles.emplace_back(entry);
         }
+
+        std::stable_sort(s_CachedFiles.begin(), s_CachedFiles.end(),
+            [](const std::filesystem::directory_entry& a, const std::filesystem::directory_entry& b)
+            {
+                return a.is_directory() > b.is_directory();
+            });
     }
     catch (...)
     {
@@ -97,6 +106,9 @@ static void CollectSearchResults(const std::vector<std::filesystem::directory_en
     for (const auto& entry : files)
     {
         if (!entry.is_regular_file())
+            continue;
+
+        if (entry.path().extension() == ".rmeta")
             continue;
 
         auto filename = entry.path().filename().string();
@@ -279,4 +291,3 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
     ImGui::EndChild();
     ImGui::End();
 }
-

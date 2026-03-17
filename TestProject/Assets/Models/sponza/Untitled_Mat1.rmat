@@ -7,7 +7,7 @@
         1.0,
         1.0
     ],
-    "albedoTexture": "6975ef2b-9228-4daa-acf1-42e0f3fb4e55",
+    "albedoTexture": "0c34555d-ec1c-40e7-9267-aa7cc40a993e",
     "ao": 1.0,
     "emissiveColor": [
         0.0,
@@ -18,7 +18,7 @@
     "heightScale": 0.10000000149011612,
     "metallic": 0.5,
     "normalScale": 1.0,
-    "normalTexture": "1251b483-f287-4b48-9d09-1b40622b27c8",
+    "normalTexture": "ffae2403-cd3a-4819-a431-980fd6746fd9",
     "roughness": 0.6535898447036743,
     "specular": 1.0
 }

@@ -154,12 +154,13 @@ const aiScene* ModelImporter::LoadScene(
 
     unsigned int flags =
         aiProcess_Triangulate |
+        aiProcess_GenSmoothNormals |
+        aiProcess_GenUVCoords |          
+        aiProcess_TransformUVCoords |
+        aiProcess_CalcTangentSpace |     
         aiProcess_JoinIdenticalVertices |
         aiProcess_ImproveCacheLocality |
         aiProcess_GenBoundingBoxes;
-
-    if (settings.importNormals)  flags |= aiProcess_GenSmoothNormals;
-    if (settings.importTangents) flags |= aiProcess_CalcTangentSpace;
 
     const aiScene* scene = m_Importer.ReadFile(path.string(), flags);
 

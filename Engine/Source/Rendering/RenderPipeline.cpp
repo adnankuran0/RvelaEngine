@@ -63,6 +63,7 @@ void RenderPipeline::Execute(const RenderContext& ctx)
 {
 	for (auto& [id, pass] : m_RenderPasses)
 		pass->Execute(ctx, m_RenderFrame);
+	GLenum afterErr = glGetError();
 	
 	m_RenderFrame.Reset();
 

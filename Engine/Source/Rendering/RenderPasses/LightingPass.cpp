@@ -191,6 +191,7 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         { material.IsUsingHeightMap(),    "heightMap",    5, "useHeightMap",    material.GetHeightTexture() }
         } };
 
+        
         for (const auto& map : maps) 
         {
             shader.setBool(map.useUniform, map.isUsing);
@@ -201,6 +202,9 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
                 material.GetSampler().Bind(map.slot);
             }
         }
+      
+
+        
 
         shader.setMat4("model", command.transform.GetWorldMatrix());
         glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(command.transform.GetWorldMatrix())));

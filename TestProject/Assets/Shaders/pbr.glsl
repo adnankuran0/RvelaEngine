@@ -297,7 +297,7 @@ void main()
     if(albedoTex.a < 0.2) discard;
 
     // Material properties
-    vec3 albedo = albedoTex.rgb; 
+    vec3 albedo = albedoTex.rgb;
     float metallic = useMetallicMap ? texture(metallicMap, mappedTexCoords).r : metallicValue;
     float roughnessMapValue = useRoughnessMap ? texture(roughnessMap, mappedTexCoords).r : 1.0;
     float roughness = clamp(roughnessValue * roughnessMapValue, 0.0, 1.0);
@@ -415,7 +415,7 @@ void main()
     
     vec3 color = ambient + Lo + emmisiveColor * emmisiveIntensity;
 
-    FragColor = vec4(color,albedoTex.a);
+    FragColor = vec4(color, albedoTex.a);
 
    
 }

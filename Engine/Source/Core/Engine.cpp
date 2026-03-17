@@ -182,6 +182,7 @@ void Engine::Render()
 		layer->OnRender();
 	
 
+
 	m_Renderer.EndFrame();
 	
 	glfwSwapBuffers(GetWindow().GetGLFWWindow());

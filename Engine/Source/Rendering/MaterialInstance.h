@@ -5,70 +5,124 @@
 #include "Core/Ref.h"
 #include "Rendering/Sampler.h"
 #include <glm/glm.hpp>
+#include <bitset>
+#include <nlohmann/json.hpp>
+#include "Asset/AssetManager.h"
 
 namespace rv {
+
+enum class MatField : uint8_t {
+    AlbedoColor = 0,
+    EmissiveColor,
+    EmissiveIntensity,
+    Metallic,
+    Specular,
+    Roughness,
+    AO,
+    NormalScale,
+    HeightScale,
+    UVScale,
+    UVOffset,
+    AlbedoTex,
+    NormalTex,
+    MetallicTex,
+    RoughnessTex,
+    AOTex,
+    HeightTex,
+    COUNT
+};
 
 class MaterialInstance
 {
 public:
     static MaterialInstance CreateFromAsset(const Ref<MaterialAsset>& asset);
 
-    AssetUUID GetSourceUUID() const { return m_SourceUUID; }
+    Ref<MaterialAsset> GetSourceAsset() const { return m_SourceAsset; }
+    AssetUUID GetSourceUUID() const { return m_SourceAsset ? m_SourceAsset->GetUUID() : AssetUUID{}; }
 
-    Ref<TextureAsset> GetAlbedoTexture() const { return m_AlbedoTex; }
-    Ref<TextureAsset> GetNormalTexture() const { return m_NormalTex; }
-    Ref<TextureAsset> GetMetallicTexture() const { return m_MetallicTex; }
-    Ref<TextureAsset> GetRoughnessTex() const { return m_RoughnessTex; }
-    Ref<TextureAsset> GetAOTexture() const { return m_AOTex; }
-    Ref<TextureAsset> GetHeightTexture() const { return m_HeightTex; }
+    Ref<TextureAsset> GetAlbedoTexture() const { return IsOverridden(MatField::AlbedoTex) ? m_AlbedoTex : m_CachedAlbedoTex; }
+    Ref<TextureAsset> GetNormalTexture() const { return IsOverridden(MatField::NormalTex) ? m_NormalTex : m_CachedNormalTex; }
+    Ref<TextureAsset> GetMetallicTexture() const { return IsOverridden(MatField::MetallicTex) ? m_MetallicTex : m_CachedMetallicTex; }
+    Ref<TextureAsset> GetRoughnessTex() const { return IsOverridden(MatField::RoughnessTex) ? m_RoughnessTex : m_CachedRoughnessTex; }
+    Ref<TextureAsset> GetAOTexture() const { return IsOverridden(MatField::AOTex) ? m_AOTex : m_CachedAOTex; }
+    Ref<TextureAsset> GetHeightTexture() const { return IsOverridden(MatField::HeightTex) ? m_HeightTex : m_CachedHeightTex; }
 
-    void SetAlbedoTexture(Ref<TextureAsset> tex) { m_AlbedoTex = tex; m_UseAlbedoMap = static_cast<bool>(tex); }
-    void SetNormalTexture(Ref<TextureAsset> tex) { m_NormalTex = tex; m_UseNormalMap = static_cast<bool>(tex); }
-    void SetMetallicTexture(Ref<TextureAsset> tex) { m_MetallicTex = tex; m_UseMetallicMap = static_cast<bool>(tex); }
-    void SetRoughnessTexture(Ref<TextureAsset> tex) { m_RoughnessTex = tex; m_UseRoughnessMap = static_cast<bool>(tex); }
-    void SetAOTexture(Ref<TextureAsset> tex) { m_AOTex = tex; m_UseAOMap = static_cast<bool>(tex); }
-    void SetHeightTexture(Ref<TextureAsset> tex) { m_HeightTex = tex; m_UseHeightMap = static_cast<bool>(tex); }
+    void SetAlbedoTexture(Ref<TextureAsset> tex) { m_AlbedoTex = tex; m_UseAlbedoMap = static_cast<bool>(tex); SetOverride(MatField::AlbedoTex); }
+    void SetNormalTexture(Ref<TextureAsset> tex) { m_NormalTex = tex; m_UseNormalMap = static_cast<bool>(tex); SetOverride(MatField::NormalTex); }
+    void SetMetallicTexture(Ref<TextureAsset> tex) { m_MetallicTex = tex; m_UseMetallicMap = static_cast<bool>(tex); SetOverride(MatField::MetallicTex); }
+    void SetRoughnessTexture(Ref<TextureAsset> tex) { m_RoughnessTex = tex; m_UseRoughnessMap = static_cast<bool>(tex); SetOverride(MatField::RoughnessTex); }
+    void SetAOTexture(Ref<TextureAsset> tex) { m_AOTex = tex; m_UseAOMap = static_cast<bool>(tex); SetOverride(MatField::AOTex); }
+    void SetHeightTexture(Ref<TextureAsset> tex) { m_HeightTex = tex; m_UseHeightMap = static_cast<bool>(tex); SetOverride(MatField::HeightTex); }
 
-    glm::vec3& AlbedoColor() { return m_AlbedoColor; }
-    glm::vec3& EmissiveColor() { return m_EmissiveColor; }
-    float& EmissiveIntensity() { return m_EmissiveIntensity; }
-    float& Metallic() { return m_Metallic; }
-    float& Specular() { return m_Specular; }
-    float& Roughness() { return m_Roughness; }
-    float& AO() { return m_AO; }
-    float& NormalScale() { return m_NormalScale; }
-    float& HeightScale() { return m_HeightScale; }
-    glm::vec2& UVScale() { return m_UVScale; }
-    glm::vec2& UVOffset() { return m_UVOffset; }
+    void SetAlbedoColor(const glm::vec3& v) { m_AlbedoColor = v; SetOverride(MatField::AlbedoColor); }
+    void SetEmissiveColor(const glm::vec3& v) { m_EmissiveColor = v; SetOverride(MatField::EmissiveColor); }
+    void SetEmissiveIntensity(float v) { m_EmissiveIntensity = v; SetOverride(MatField::EmissiveIntensity); }
+    void SetMetallic(float v) { m_Metallic = v; SetOverride(MatField::Metallic); }
+    void SetSpecular(float v) { m_Specular = v; SetOverride(MatField::Specular); }
+    void SetRoughness(float v) { m_Roughness = v; SetOverride(MatField::Roughness); }
+    void SetAO(float v) { m_AO = v; SetOverride(MatField::AO); }
+    void SetNormalScale(float v) { m_NormalScale = v; SetOverride(MatField::NormalScale); }
+    void SetHeightScale(float v) { m_HeightScale = v; SetOverride(MatField::HeightScale); }
+    void SetUVScale(const glm::vec2& v) { m_UVScale = v; SetOverride(MatField::UVScale); }
+    void SetUVOffset(const glm::vec2& v) { m_UVOffset = v; SetOverride(MatField::UVOffset); }
 
-    const glm::vec3& AlbedoColor() const { return m_AlbedoColor; }
-    const glm::vec3& EmissiveColor() const { return m_EmissiveColor; }
-    float EmissiveIntensity() const { return m_EmissiveIntensity; }
-    float Metallic() const { return m_Metallic; }
-    float Specular() const { return m_Specular; }
-    float Roughness() const { return m_Roughness; }
-    float AO() const { return m_AO; }
-    float NormalScale() const { return m_NormalScale; }
-    float HeightScale() const { return m_HeightScale; }
-    const glm::vec2& UVScale() const { return m_UVScale; }
-    const glm::vec2& UVOffset() const { return m_UVOffset; }
+    glm::vec3 GetAlbedoColor() const { return IsOverridden(MatField::AlbedoColor) ? m_AlbedoColor : (m_SourceAsset ? m_SourceAsset->albedoColor : m_AlbedoColor); }
+    glm::vec3 GetEmissiveColor() const { return IsOverridden(MatField::EmissiveColor) ? m_EmissiveColor : (m_SourceAsset ? m_SourceAsset->emissiveColor : m_EmissiveColor); }
+    float GetEmissiveIntensity() const { return IsOverridden(MatField::EmissiveIntensity) ? m_EmissiveIntensity : (m_SourceAsset ? m_SourceAsset->emissiveIntensity : m_EmissiveIntensity); }
+    float GetMetallic() const { return IsOverridden(MatField::Metallic) ? m_Metallic : (m_SourceAsset ? m_SourceAsset->metallic : m_Metallic); }
+    float GetSpecular() const { return IsOverridden(MatField::Specular) ? m_Specular : (m_SourceAsset ? m_SourceAsset->specular : m_Specular); }
+    float GetRoughness() const { return IsOverridden(MatField::Roughness) ? m_Roughness : (m_SourceAsset ? m_SourceAsset->roughness : m_Roughness); }
+    float GetAO() const { return IsOverridden(MatField::AO) ? m_AO : (m_SourceAsset ? m_SourceAsset->ao : m_AO); }
+    float GetNormalScale() const { return IsOverridden(MatField::NormalScale) ? m_NormalScale : (m_SourceAsset ? m_SourceAsset->normalScale : m_NormalScale); }
+    float GetHeightScale() const { return IsOverridden(MatField::HeightScale) ? m_HeightScale : (m_SourceAsset ? m_SourceAsset->heightScale : m_HeightScale); }
+    glm::vec2 GetUVScale() const { return IsOverridden(MatField::UVScale) ? m_UVScale : (m_SourceAsset ? m_SourceAsset->UVScale : m_UVScale); }
+    glm::vec2 GetUVOffset() const { return IsOverridden(MatField::UVOffset) ? m_UVOffset : (m_SourceAsset ? m_SourceAsset->UVOffset : m_UVOffset); }
 
-    bool UsesAlbedoMap() const { return m_UseAlbedoMap; }
-    bool UsesNormalMap() const { return m_UseNormalMap; }
-    bool UsesMetallicMap() const { return m_UseMetallicMap; }
-    bool UsesRoughnessMap() const { return m_UseRoughnessMap; }
-    bool UsesAOMap() const { return m_UseAOMap; }
-    bool UsesHeightMap() const { return m_UseHeightMap; }
+    bool UsesAlbedoMap() const { return IsOverridden(MatField::AlbedoTex) ? m_UseAlbedoMap : (m_SourceAsset ? m_SourceAsset->useAlbedoMap : false); }
+    bool UsesNormalMap() const { return IsOverridden(MatField::NormalTex) ? m_UseNormalMap : (m_SourceAsset ? m_SourceAsset->useNormalMap : false); }
+    bool UsesMetallicMap() const { return IsOverridden(MatField::MetallicTex) ? m_UseMetallicMap : (m_SourceAsset ? m_SourceAsset->useMetallicMap : false); }
+    bool UsesRoughnessMap() const { return IsOverridden(MatField::RoughnessTex) ? m_UseRoughnessMap : (m_SourceAsset ? m_SourceAsset->useRoughnessMap : false); }
+    bool UsesAOMap() const { return IsOverridden(MatField::AOTex) ? m_UseAOMap : (m_SourceAsset ? m_SourceAsset->useAOMap : false); }
+    bool UsesHeightMap() const { return IsOverridden(MatField::HeightTex) ? m_UseHeightMap : (m_SourceAsset ? m_SourceAsset->useHeightMap : false); }
+
+    void ClearAlbedoColor() { ClearOverride(MatField::AlbedoColor); }
+    void ClearEmissiveColor() { ClearOverride(MatField::EmissiveColor); }
+    void ClearEmissiveIntensity() { ClearOverride(MatField::EmissiveIntensity); }
+    void ClearMetallic() { ClearOverride(MatField::Metallic); }
+    void ClearSpecular() { ClearOverride(MatField::Specular); }
+    void ClearRoughness() { ClearOverride(MatField::Roughness); }
+    void ClearAO() { ClearOverride(MatField::AO); }
+    void ClearNormalScale() { ClearOverride(MatField::NormalScale); }
+    void ClearHeightScale() { ClearOverride(MatField::HeightScale); }
+    void ClearUVScale() { ClearOverride(MatField::UVScale); }
+    void ClearUVOffset() { ClearOverride(MatField::UVOffset); }
+    void ClearAlbedoTexture() { m_AlbedoTex = nullptr; m_UseAlbedoMap = false; ClearOverride(MatField::AlbedoTex); }
+    void ClearNormalTexture() { m_NormalTex = nullptr; m_UseNormalMap = false; ClearOverride(MatField::NormalTex); }
+    void ClearMetallicTexture() { m_MetallicTex = nullptr; m_UseMetallicMap = false; ClearOverride(MatField::MetallicTex); }
+    void ClearRoughnessTexture() { m_RoughnessTex = nullptr; m_UseRoughnessMap = false; ClearOverride(MatField::RoughnessTex); }
+    void ClearAOTexture() { m_AOTex = nullptr; m_UseAOMap = false; ClearOverride(MatField::AOTex); }
+    void ClearHeightTexture() { m_HeightTex = nullptr; m_UseHeightMap = false; ClearOverride(MatField::HeightTex); }
 
     Sampler& GetSampler() { return m_Sampler; }
     const Sampler& GetSampler() const { return m_Sampler; }
 
-    bool IsValid() const { return m_SourceUUID.IsValid(); }
+    bool IsOverridden(MatField f) const { return m_OverrideMask.test((size_t)f); }
+    bool HasAnyOverride() const { return m_OverrideMask.any(); }
+    void ClearAllOverrides() { m_OverrideMask.reset(); }
+    bool IsValid() const { return m_SourceAsset.Get() != nullptr; }
+    void RebuildCache();
+
+    nlohmann::json SerializeOverrides() const;
+    void DeserializeOverrides(const nlohmann::json& j);
 
 private:
+    void SetOverride(MatField f) { m_OverrideMask.set((size_t)f); }
+    void ClearOverride(MatField f) { m_OverrideMask.reset((size_t)f); }
+
     friend struct MaterialComponent;
 
-    AssetUUID m_SourceUUID;
+    Ref<MaterialAsset> m_SourceAsset;
+    std::bitset<(size_t)MatField::COUNT> m_OverrideMask;
 
     Ref<TextureAsset> m_AlbedoTex;
     Ref<TextureAsset> m_NormalTex;
@@ -76,6 +130,13 @@ private:
     Ref<TextureAsset> m_RoughnessTex;
     Ref<TextureAsset> m_AOTex;
     Ref<TextureAsset> m_HeightTex;
+
+    Ref<TextureAsset> m_CachedAlbedoTex;
+    Ref<TextureAsset> m_CachedNormalTex;
+    Ref<TextureAsset> m_CachedMetallicTex;
+    Ref<TextureAsset> m_CachedRoughnessTex;
+    Ref<TextureAsset> m_CachedAOTex;
+    Ref<TextureAsset> m_CachedHeightTex;
 
     glm::vec3 m_AlbedoColor = glm::vec3(1.0f);
     glm::vec3 m_EmissiveColor = glm::vec3(0.0f);

@@ -81,8 +81,8 @@ void AssetRegistry::Scan(const std::filesystem::path& assetDir)
 
             if (!hasMeta)
             {
-                LOG_WARN("Cache file with no meta. Consider deleting: {}",
-                    cachePath.filename().string());
+                /*LOG_WARN("Cache file with no meta. Consider deleting: {}",
+                    cachePath.filename().string());*/
                 continue;
             }
 

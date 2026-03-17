@@ -48,28 +48,31 @@ void Texture::Bind() const
     glBindTexture(GL_TEXTURE_2D, m_Texture);
 }
 
-void Texture::Destroy() const
+void Texture::Destroy()
 {
     if (m_Texture != 0)
+    {
         glDeleteTextures(1, &m_Texture);
+        m_Texture = 0;
+    }
 }
 
 void Texture::GenerateFromImage(const std::string& path)
 {
     m_Path = path;
 
-    m_Data = stbi_load(path.c_str(), &m_Width, &m_Height, &m_NrChannels, 0);
+    unsigned char* data = stbi_load(path.c_str(), &m_Width, &m_Height, &m_NrChannels, 0);
 
-    if (m_Data)
+    if (data)
     {
-        ToImage(m_Width, m_Height, m_Data, m_NrChannels);
+        ToImage(m_Width, m_Height, data, m_NrChannels);
         GenerateMipmaps();
     }
     else
     {
         LOG_ERROR("Failed to load texture: {}", path);
     }
-    stbi_image_free(m_Data);
+    stbi_image_free(data);
 
     glBindTexture(GL_TEXTURE_2D, 0);
 }
@@ -170,11 +173,6 @@ int Texture::GetWidth() const
 int Texture::GetHeight() const
 {
     return m_Height;
-}
-
-unsigned char* Texture::GetTexture() const
-{
-    return m_Data;
 }
 
 int Texture::GetNrChannels() const

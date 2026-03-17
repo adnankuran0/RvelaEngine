@@ -62,8 +62,7 @@ bool TextureImporter::Import(
 
     if (lowerFilename.find("ao") != std::string::npos ||
         lowerFilename.find("rough") != std::string::npos ||
-        lowerFilename.find("metal") != std::string::npos ||
-        lowerFilename.find("orm") != std::string::npos)
+        lowerFilename.find("metal") != std::string::npos)
     {
         desiredChannels = 1;
         forceSRGB = false;
@@ -103,12 +102,18 @@ bool TextureImporter::Import(
             settings.maxSize, w, h, sourcePath.string());
 
     int loadedChannels = desiredChannels > 0 ? desiredChannels : channels;
+
+    LOG_INFO("DEBUG: desiredChannels={} stbi_channels={} loadedChannels={}",
+        desiredChannels, channels, loadedChannels);
+
+    assert(!(isNormal && loadedChannels != 3) && "Normal map must be RGB8!");
+
     TextureFormat format = TextureFormat::Unknown;
     switch (loadedChannels)
     {
-    case 1: format = TextureFormat::R8;      break;
-    case 3: format = TextureFormat::RGB8;    break;
-    case 4: format = TextureFormat::RGBA8;   break;
+    case 1: format = TextureFormat::R8; break;
+    case 3: format = TextureFormat::RGB8; break;
+    case 4: format = TextureFormat::RGBA8; break;
     default:
         LOG_ERROR("Unsupported channel count: {}", loadedChannels);
         stbi_image_free(pixels);

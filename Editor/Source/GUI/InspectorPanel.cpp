@@ -2,7 +2,8 @@
 #include "ImGui/imgui.h"
 #include "Core/Engine.h"
 #include "Rendering/RenderLayer.h"
-#include "EditorUtils.h"  
+#include "EditorUtils.h"
+#include "AssetImporters/MaterialSerializer.h"
 
 using namespace rv;
 
@@ -554,290 +555,229 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                     if (registry.any_of<MaterialComponent>(selectedEntity))
                     {
                         bool open = ImGui::CollapsingHeader("Material");
-
                         if (ImGui::BeginPopupContextItem("MaterialComponentContext"))
                         {
                             if (ImGui::MenuItem("Remove Component"))
                                 registry.remove<MaterialComponent>(selectedEntity);
                             ImGui::EndPopup();
                         }
-
                         if (open)
                         {
                             ImGui::Indent();
                             MaterialComponent& material = registry.get<MaterialComponent>(selectedEntity);
+                            const MaterialInstance& inst = material.GetInstance();
 
                             ImGui::Button("Material Slot", ImVec2(200, 20));
                             if (ImGui::BeginDragDropTarget())
                             {
                                 if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
                                 {
-                                    const char* path = (const char*)payload->Data;
-                                    std::string pathStr(path);
+                                    std::string pathStr((const char*)payload->Data);
                                     if (pathStr.ends_with(".rmat"))
                                     {
                                         AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
-                                        if (uuid.IsValid())
-                                            material.SetMaterial(uuid);
-                                        else
-                                            LOG_ERROR("Could not find UUID for material: {}", pathStr);
+                                        if (uuid.IsValid()) material.SetMaterial(uuid);
+                                        else LOG_ERROR("Could not find UUID for material: {}", pathStr);
                                     }
                                 }
                                 ImGui::EndDragDropTarget();
                             }
 
-                            // ---------- Albedo ----------
+                            if (inst.GetSourceAsset())
+                            {
+                                ImGui::SameLine();
+                                if (ImGui::Button("Save##matsave"))
+                                {
+                                    auto asset = inst.GetSourceAsset();
+                                    if (inst.IsOverridden(MatField::AlbedoColor)) asset->albedoColor = material.GetAlbedoColor();
+                                    if (inst.IsOverridden(MatField::EmissiveColor)) asset->emissiveColor = material.GetEmissiveColor();
+                                    if (inst.IsOverridden(MatField::EmissiveIntensity)) asset->emissiveIntensity = material.GetEmissiveIntensity();
+                                    if (inst.IsOverridden(MatField::Metallic)) asset->metallic = material.GetMetallic();
+                                    if (inst.IsOverridden(MatField::Specular)) asset->specular = material.GetSpecular();
+                                    if (inst.IsOverridden(MatField::Roughness)) asset->roughness = material.GetRoughness();
+                                    if (inst.IsOverridden(MatField::AO)) asset->ao = material.GetAO();
+                                    if (inst.IsOverridden(MatField::NormalScale)) asset->normalScale = material.GetNormalScale();
+                                    if (inst.IsOverridden(MatField::HeightScale)) asset->heightScale = material.GetHeightScale();
+                                    if (inst.IsOverridden(MatField::UVScale)) asset->UVScale = material.GetUVScale();
+                                    if (inst.IsOverridden(MatField::UVOffset)) asset->UVOffset = material.GetUVOffset();
+                                    if (inst.IsOverridden(MatField::AlbedoTex)) { asset->albedoTextureUUID = material.GetAlbedoTexture() ? material.GetAlbedoTexture()->GetUUID() : AssetUUID{}; asset->useAlbedoMap = material.IsUsingAlbedoMap(); }
+                                    if (inst.IsOverridden(MatField::NormalTex)) { asset->normalTextureUUID = material.GetNormalTexture() ? material.GetNormalTexture()->GetUUID() : AssetUUID{}; asset->useNormalMap = material.IsUsingNormalMap(); }
+                                    if (inst.IsOverridden(MatField::MetallicTex)) { asset->metallicTextureUUID = material.GetMetallicTexture() ? material.GetMetallicTexture()->GetUUID() : AssetUUID{}; asset->useMetallicMap = material.IsUsingMetallicMap(); }
+                                    if (inst.IsOverridden(MatField::RoughnessTex)) { asset->roughnessTextureUUID = material.GetRoughnessTexture() ? material.GetRoughnessTexture()->GetUUID() : AssetUUID{}; asset->useRoughnessMap = material.IsUsingRoughnessMap(); }
+                                    if (inst.IsOverridden(MatField::AOTex)) { asset->aoTextureUUID = material.GetAOTexture() ? material.GetAOTexture()->GetUUID() : AssetUUID{}; asset->useAOMap = material.IsUsingAOMap(); }
+                                    if (inst.IsOverridden(MatField::HeightTex)) { asset->heightTextureUUID = material.GetHeightTexture() ? material.GetHeightTexture()->GetUUID() : AssetUUID{}; asset->useHeightMap = material.IsUsingHeightMap(); }
+
+                                    auto path = AssetManager::Get().GetRegistry().GetPath(asset->GetUUID());
+                                    MaterialSerializer::Save(asset, path);
+                                    material.GetInstance().ClearAllOverrides();
+                                    material.GetInstance().RebuildCache();
+                                }
+                            }
+
+                            auto RevertButton = [](const char* id, auto clearFn)
+                                {
+                                    ImGui::SameLine();
+                                    if (ImGui::Button(id, ImVec2(20, 20))) clearFn();
+                                };
+
+                            auto TextureSlot = [&](const char* label, const char* idSuffix, bool usingMap, bool overridden,
+                                auto setTexFn, auto clearTexFn)
+                                {
+                                    ImGui::Button(label, ImVec2(200, 20));
+                                    if (ImGui::BeginDragDropTarget())
+                                    {
+                                        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
+                                        {
+                                            std::string pathStr((const char*)payload->Data);
+                                            static constexpr std::array exts = { ".png", ".jpg", ".jpeg", ".tga", ".hdr", ".rtex" };
+                                            bool isImage = std::any_of(exts.begin(), exts.end(), [&](const char* e) { return pathStr.ends_with(e); });
+                                            if (isImage)
+                                            {
+                                                AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
+                                                if (uuid.IsValid()) setTexFn(uuid);
+                                                else LOG_ERROR("Could not find UUID for texture: {}", pathStr);
+                                            }
+                                        }
+                                        ImGui::EndDragDropTarget();
+                                    }
+                                    
+                                    if (overridden)
+                                    {
+                                        ImGui::SameLine();
+                                        RevertButton((std::string("R##r") + idSuffix).c_str(), clearTexFn);
+                                    }
+                                };
+
                             if (ImGui::CollapsingHeader("Albedo"))
                             {
                                 ImGui::Indent();
-                                glm::vec3 albedoColor = material.GetAlbedoColor();
-                                float color[3] = { albedoColor.r, albedoColor.g, albedoColor.b };
-
-                                ImGui::Button("Albedo Slot", ImVec2(200, 20));
-                                if (ImGui::BeginDragDropTarget())
-                                {
-                                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
-                                    {
-                                        const char* path = (const char*)payload->Data;
-                                        std::string pathStr(path);
-                                        if (pathStr.ends_with(".png") || pathStr.ends_with(".jpg") ||
-                                            pathStr.ends_with(".jpeg") || pathStr.ends_with(".tga") ||
-                                            pathStr.ends_with(".hdr") || pathStr.ends_with(".rtex"))
-                                        {
-                                            AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
-                                            if (uuid.IsValid())
-                                            {
-                                                material.SetAlbedoTexture(uuid);
-                                                material.SetUseAlbedoMap(true);
-                                            }
-                                            else
-                                                LOG_ERROR("Could not find UUID for texture: {}", pathStr);
-                                        }
-                                    }
-                                    ImGui::EndDragDropTarget();
-                                }
+                                bool usingMap = material.IsUsingAlbedoMap();
+                                bool texOvr = inst.IsOverridden(MatField::AlbedoTex);
+                                bool colorOvr = inst.IsOverridden(MatField::AlbedoColor);
+                                TextureSlot("Albedo Slot", "alb", usingMap, texOvr,
+                                    [&](AssetUUID uuid) { material.SetAlbedoTexture(uuid); },
+                                    [&]() { material.ClearAlbedoTexture(); });
+                                glm::vec3 c = material.GetAlbedoColor();
+                                float col[3] = { c.r, c.g, c.b };
+                                ImGui::Text("Albedo Color");
                                 ImGui::SameLine();
-                                if (ImGui::Button("X##alb", ImVec2(20, 20)))
-                                    material.SetUseAlbedoMap(!material.IsUsingAlbedoMap());
-
-                                if (ImGui::ColorEdit3("Albedo", color))
-                                    material.SetAlbedoColor(glm::vec3(color[0], color[1], color[2]));
-
+                                if (ImGui::ColorEdit3("##albedocol", col))
+                                    material.SetAlbedoColor({ col[0], col[1], col[2] });
+                                if (colorOvr)
+                                    RevertButton("R##albcol", [&]() { material.ClearAlbedoColor(); });
                                 ImGui::Unindent();
                             }
 
-                            // ---------- Normal ----------
                             if (ImGui::CollapsingHeader("Normal"))
                             {
                                 ImGui::Indent();
-                                ImGui::Button("Normal Slot", ImVec2(200, 20));
-                                if (ImGui::BeginDragDropTarget())
-                                {
-                                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
-                                    {
-                                        const char* path = (const char*)payload->Data;
-                                        std::string pathStr(path);
-                                        if (pathStr.ends_with(".png") || pathStr.ends_with(".jpg") ||
-                                            pathStr.ends_with(".jpeg") || pathStr.ends_with(".tga") ||
-                                            pathStr.ends_with(".hdr") || pathStr.ends_with(".rtex"))
-                                        {
-                                            AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
-                                            if (uuid.IsValid())
-                                            {
-                                                material.SetNormalTexture(uuid);
-                                                material.SetUseNormalMap(true);
-                                            }
-                                            else
-                                                LOG_ERROR("Could not find UUID for texture: {}", pathStr);
-                                        }
-                                    }
-                                    ImGui::EndDragDropTarget();
-                                }
-                                ImGui::SameLine();
-                                if (ImGui::Button("X##nrm", ImVec2(20, 20)))
-                                    material.SetUseNormalMap(!material.IsUsingNormalMap());
-
+                                bool usingMap = material.IsUsingNormalMap();
+                                bool texOvr = inst.IsOverridden(MatField::NormalTex);
+                                bool scaleOvr = inst.IsOverridden(MatField::NormalScale);
+                                TextureSlot("Normal Slot", "nrm", usingMap, texOvr,
+                                    [&](AssetUUID uuid) { material.SetNormalTexture(uuid); },
+                                    [&]() { material.ClearNormalTexture(); });
                                 float normalScale = material.GetNormalScale();
-                                if (ImGui::SliderFloat("Normal Scale", &normalScale, -10.0f, 10.0f))
+                                if (ImGui::SliderFloat("Normal Scale##nrmscl", &normalScale, -10.0f, 10.0f))
                                     material.SetNormalScale(normalScale);
-
+                                if (scaleOvr)
+                                    RevertButton("R##nrmscl", [&]() { material.ClearNormalScale(); });
                                 ImGui::Unindent();
                             }
 
-                            // ---------- Roughness ----------
-                            if (ImGui::CollapsingHeader("Roughness##31"))
+                            if (ImGui::CollapsingHeader("Roughness##rhdr"))
                             {
                                 ImGui::Indent();
-                                ImGui::Button("Roughness Slot", ImVec2(200, 20));
-                                if (ImGui::BeginDragDropTarget())
-                                {
-                                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
-                                    {
-                                        const char* path = (const char*)payload->Data;
-                                        std::string pathStr(path);
-                                        if (pathStr.ends_with(".png") || pathStr.ends_with(".jpg") ||
-                                            pathStr.ends_with(".jpeg") || pathStr.ends_with(".tga") ||
-                                            pathStr.ends_with(".hdr") || pathStr.ends_with(".rtex"))
-                                        {
-                                            AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
-                                            if (uuid.IsValid())
-                                            {
-                                                material.SetRoughnessTexture(uuid);
-                                                material.SetUseRoughnessMap(true);
-                                            }
-                                            else
-                                                LOG_ERROR("Could not find UUID for texture: {}", pathStr);
-                                        }
-                                    }
-                                    ImGui::EndDragDropTarget();
-                                }
-                                ImGui::SameLine();
-                                if (ImGui::Button("X##rgh", ImVec2(20, 20)))
-                                    material.SetUseRoughnessMap(!material.IsUsingRoughnessMap());
-
+                                bool usingMap = material.IsUsingRoughnessMap();
+                                bool texOvr = inst.IsOverridden(MatField::RoughnessTex);
+                                bool valOvr = inst.IsOverridden(MatField::Roughness);
+                                TextureSlot("Roughness Slot", "rgh", usingMap, texOvr,
+                                    [&](AssetUUID uuid) { material.SetRoughnessTexture(uuid); },
+                                    [&]() { material.ClearRoughnessTexture(); });
                                 float roughness = material.GetRoughness();
-                                if (ImGui::SliderFloat("Roughness##32", &roughness, 0.0f, 1.0f))
+                                if (ImGui::SliderFloat("Roughness##rghval", &roughness, 0.0f, 1.0f))
                                     material.SetRoughness(roughness);
-
+                                if (valOvr)
+                                    RevertButton("R##rghval", [&]() { material.ClearRoughness(); });
                                 ImGui::Unindent();
                             }
 
-                            // ---------- Metallic ----------
-                            if (ImGui::CollapsingHeader("Metallic##33"))
+                            if (ImGui::CollapsingHeader("Metallic##mhdr"))
                             {
                                 ImGui::Indent();
-                                ImGui::Button("Metallic Slot", ImVec2(200, 20));
-                                if (ImGui::BeginDragDropTarget())
-                                {
-                                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
-                                    {
-                                        const char* path = (const char*)payload->Data;
-                                        std::string pathStr(path);
-                                        if (pathStr.ends_with(".png") || pathStr.ends_with(".jpg") ||
-                                            pathStr.ends_with(".jpeg") || pathStr.ends_with(".tga") ||
-                                            pathStr.ends_with(".hdr") || pathStr.ends_with(".rtex"))
-                                        {
-                                            AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
-                                            if (uuid.IsValid())
-                                            {
-                                                material.SetMetallicTexture(uuid);
-                                                material.SetUseMetallicMap(true);
-                                            }
-                                            else
-                                                LOG_ERROR("Could not find UUID for texture: {}", pathStr);
-                                        }
-                                    }
-                                    ImGui::EndDragDropTarget();
-                                }
-                                ImGui::SameLine();
-                                if (ImGui::Button("X##mtl", ImVec2(20, 20)))
-                                    material.SetUseMetallicMap(!material.IsUsingMetallicMap());
-
+                                bool usingMap = material.IsUsingMetallicMap();
+                                bool texOvr = inst.IsOverridden(MatField::MetallicTex);
+                                bool mtlOvr = inst.IsOverridden(MatField::Metallic);
+                                bool spcOvr = inst.IsOverridden(MatField::Specular);
+                                TextureSlot("Metallic Slot", "mtl", usingMap, texOvr,
+                                    [&](AssetUUID uuid) { material.SetMetallicTexture(uuid); },
+                                    [&]() { material.ClearMetallicTexture(); });
                                 float metallic = material.GetMetallic();
-                                if (ImGui::SliderFloat("Metallic##34", &metallic, 0.0f, 1.0f))
+                                if (ImGui::SliderFloat("Metallic##mtlval", &metallic, 0.0f, 1.0f))
                                     material.SetMetallic(metallic);
-
+                                if (mtlOvr)
+                                    RevertButton("R##mtlval", [&]() { material.ClearMetallic(); });
                                 float specular = material.GetSpecular();
-                                if (ImGui::SliderFloat("Specular##34", &specular, 0.0f, 1.0f))
+                                if (ImGui::SliderFloat("Specular##spcval", &specular, 0.0f, 1.0f))
                                     material.SetSpecular(specular);
-
+                                if (spcOvr)
+                                    RevertButton("R##spcval", [&]() { material.ClearSpecular(); });
                                 ImGui::Unindent();
                             }
 
-                            // ---------- Height ----------
                             if (ImGui::CollapsingHeader("Height"))
                             {
                                 ImGui::Indent();
-                                ImGui::Button("Height Slot", ImVec2(200, 20));
-                                if (ImGui::BeginDragDropTarget())
-                                {
-                                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
-                                    {
-                                        const char* path = (const char*)payload->Data;
-                                        std::string pathStr(path);
-                                        if (pathStr.ends_with(".png") || pathStr.ends_with(".jpg") ||
-                                            pathStr.ends_with(".jpeg") || pathStr.ends_with(".tga") ||
-                                            pathStr.ends_with(".hdr") || pathStr.ends_with(".rtex"))
-                                        {
-                                            AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
-                                            if (uuid.IsValid())
-                                            {
-                                                material.SetHeightTexture(uuid);
-                                                material.SetUseHeightMap(true);
-                                            }
-                                            else
-                                                LOG_ERROR("Could not find UUID for texture: {}", pathStr);
-                                        }
-                                    }
-                                    ImGui::EndDragDropTarget();
-                                }
-                                ImGui::SameLine();
-                                if (ImGui::Button("X##hgt", ImVec2(20, 20)))
-                                    material.SetUseHeightMap(!material.IsUsingHeightMap());
-
+                                bool usingMap = material.IsUsingHeightMap();
+                                bool texOvr = inst.IsOverridden(MatField::HeightTex);
+                                bool scaleOvr = inst.IsOverridden(MatField::HeightScale);
+                                TextureSlot("Height Slot", "hgt", usingMap, texOvr,
+                                    [&](AssetUUID uuid) { material.SetHeightTexture(uuid); },
+                                    [&]() { material.ClearHeightTexture(); });
                                 float heightScale = material.GetHeightScale();
-                                if (ImGui::SliderFloat("Height Scale", &heightScale, 0.0f, 1.0f))
+                                if (ImGui::SliderFloat("Height Scale##hgtscl", &heightScale, 0.0f, 1.0f))
                                     material.SetHeightScale(heightScale);
-
+                                if (scaleOvr)
+                                    RevertButton("R##hgtscl", [&]() { material.ClearHeightScale(); });
                                 ImGui::Unindent();
                             }
 
-                            // ---------- AO ----------
-                            if (ImGui::CollapsingHeader("AO##35"))
+                            if (ImGui::CollapsingHeader("AO##aohdr"))
                             {
                                 ImGui::Indent();
-                                ImGui::Button("AO Slot", ImVec2(200, 20));
-                                if (ImGui::BeginDragDropTarget())
-                                {
-                                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
-                                    {
-                                        const char* path = (const char*)payload->Data;
-                                        std::string pathStr(path);
-                                        if (pathStr.ends_with(".png") || pathStr.ends_with(".jpg") ||
-                                            pathStr.ends_with(".jpeg") || pathStr.ends_with(".tga") ||
-                                            pathStr.ends_with(".hdr") || pathStr.ends_with(".rtex"))
-                                        {
-                                            AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
-                                            if (uuid.IsValid())
-                                            {
-                                                material.SetAOTexture(uuid);
-                                                material.SetUseAOMap(true);
-                                            }
-                                            else
-                                                LOG_ERROR("Could not find UUID for texture: {}", pathStr);
-                                        }
-                                    }
-                                    ImGui::EndDragDropTarget();
-                                }
-                                ImGui::SameLine();
-                                if (ImGui::Button("X##ao", ImVec2(20, 20)))
-                                    material.SetUseAOMap(!material.IsUsingAOMap());
-
+                                bool usingMap = material.IsUsingAOMap();
+                                bool texOvr = inst.IsOverridden(MatField::AOTex);
+                                bool valOvr = inst.IsOverridden(MatField::AO);
+                                TextureSlot("AO Slot", "ao", usingMap, texOvr,
+                                    [&](AssetUUID uuid) { material.SetAOTexture(uuid); },
+                                    [&]() { material.ClearAOTexture(); });
                                 float ao = material.GetAO();
-                                if (ImGui::SliderFloat("AO##36", &ao, 0.0f, 1.0f))
+                                if (ImGui::SliderFloat("AO##aoval", &ao, 0.0f, 1.0f))
                                     material.SetAO(ao);
-
+                                if (valOvr)
+                                    RevertButton("R##aoval", [&]() { material.ClearAO(); });
                                 ImGui::Unindent();
                             }
 
-                            // ---------- Emissive ----------
                             if (ImGui::CollapsingHeader("Emissive"))
                             {
                                 ImGui::Indent();
-                                glm::vec3 emissiveColor = material.GetEmissiveColor();
+                                glm::vec3 ec = material.GetEmissiveColor();
+                                float col[3] = { ec.r, ec.g, ec.b };
+                                bool ecOvr = inst.IsOverridden(MatField::EmissiveColor);
+                                bool eiOvr = inst.IsOverridden(MatField::EmissiveIntensity);
+                                if (ImGui::ColorEdit3("##emcol", col))
+                                    material.SetEmissiveColor({ col[0], col[1], col[2] });
+                                if (ecOvr)
+                                    RevertButton("R##emcol", [&]() { material.ClearEmissiveColor(); });
                                 float intensity = material.GetEmissiveIntensity();
-                                float color[3] = { emissiveColor.r, emissiveColor.g, emissiveColor.b };
-
-                                if (ImGui::ColorEdit3("Emissive Color", color))
-                                    material.SetEmissiveColor(glm::vec3(color[0], color[1], color[2]));
-
-                                if (ImGui::SliderFloat("Intensity", &intensity, 0.0f, 20.0f, "%.1f"))
+                                if (ImGui::SliderFloat("Intensity##emint", &intensity, 0.0f, 20.0f, "%.1f"))
                                     material.SetEmissiveIntensity(intensity);
-
+                                if (eiOvr)
+                                    RevertButton("R##emint", [&]() { material.ClearEmissiveIntensity(); });
                                 ImGui::Unindent();
                             }
 
-                            // ---------- Sampler ----------
                             if (ImGui::CollapsingHeader("Sampler"))
                             {
                                 ImGui::Indent();
@@ -845,56 +785,33 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                                 const char* magFilterTypes[] = { "Nearest", "Linear" };
                                 const char* wrapTypes[] = { "Repeat", "Mirror Repeat", "Clamp to edge", "Clamp to border", "Mirror clamp to edge" };
                                 const char* anisoLevels[] = { "1x", "2x", "4x", "8x", "16x" };
-
                                 SamplerDesc desc = material.GetSampler().GetDesc();
-                                int currentMinFilter = static_cast<uint8_t>(desc.minFilter);
-                                int currentMagFilter = static_cast<uint8_t>(desc.magFilter);
-                                int currentWrap = static_cast<uint8_t>(desc.wrap);
-
-                                int currentAnisoIdx = 0;
-                                if (desc.anisotropy > 8.0f)      currentAnisoIdx = 4;
-                                else if (desc.anisotropy > 4.0f) currentAnisoIdx = 3;
-                                else if (desc.anisotropy > 2.0f) currentAnisoIdx = 2;
-                                else if (desc.anisotropy > 1.0f) currentAnisoIdx = 1;
-
-                                bool isDirty = false;
-
-                                if (ImGui::Combo("Min Filter", &currentMinFilter, minFilterTypes, 4))
+                                int minF = static_cast<uint8_t>(desc.minFilter);
+                                int magF = static_cast<uint8_t>(desc.magFilter);
+                                int wrap = static_cast<uint8_t>(desc.wrap);
+                                int aniso = desc.anisotropy > 8.0f ? 4 : desc.anisotropy > 4.0f ? 3 : desc.anisotropy > 2.0f ? 2 : desc.anisotropy > 1.0f ? 1 : 0;
+                                bool dirty = false;
+                                if (ImGui::Combo("Min Filter", &minF, minFilterTypes, 4)) { desc.minFilter = static_cast<MinFilter>(minF); dirty = true; }
+                                if (ImGui::Combo("Mag Filter", &magF, magFilterTypes, 2)) { desc.magFilter = static_cast<MagFilter>(magF); dirty = true; }
+                                if (ImGui::Combo("Wrap", &wrap, wrapTypes, 5)) { desc.wrap = static_cast<Wrap>(wrap);      dirty = true; }
+                                if (ImGui::Combo("Anisotropy", &aniso, anisoLevels, 5))
                                 {
-                                    desc.minFilter = static_cast<MinFilter>(currentMinFilter);
-                                    isDirty = true;
+                                    constexpr float values[] = { 1.0f, 2.0f, 4.0f, 8.0f, 16.0f };
+                                    desc.anisotropy = values[aniso];
+                                    dirty = true;
                                 }
-                                if (ImGui::Combo("Mag Filter", &currentMagFilter, magFilterTypes, 2))
-                                {
-                                    desc.magFilter = static_cast<MagFilter>(currentMagFilter);
-                                    isDirty = true;
-                                }
-                                if (ImGui::Combo("Wrap", &currentWrap, wrapTypes, 5))
-                                {
-                                    desc.wrap = static_cast<Wrap>(currentWrap);
-                                    isDirty = true;
-                                }
-                                if (ImGui::Combo("Anisotropy", &currentAnisoIdx, anisoLevels, 5))
-                                {
-                                    float values[] = { 1.0f, 2.0f, 4.0f, 8.0f, 16.0f };
-                                    desc.anisotropy = values[currentAnisoIdx];
-                                    isDirty = true;
-                                }
-
-                                if (isDirty)
-                                    material.GetSampler().Init(desc);
-
+                                if (dirty) material.GetSampler().Init(desc);
                                 ImGui::Unindent();
                             }
 
-                            // ---------- UV ----------
                             glm::vec2 uvOffset = material.GetUVOffset();
                             glm::vec2 uvScale = material.GetUVScale();
-
-                            if (ImGui::DragFloat2("UV Offset", &uvOffset[0], 0.05f))
-                                material.SetUVOffset(uvOffset);
-                            if (ImGui::DragFloat2("UV Scale", &uvScale[0], 0.05f))
-                                material.SetUVScale(uvScale);
+                            bool uvOffOvr = inst.IsOverridden(MatField::UVOffset);
+                            bool uvSclOvr = inst.IsOverridden(MatField::UVScale);
+                            if (ImGui::DragFloat2("UV Offset##uvoff", &uvOffset[0], 0.05f)) material.SetUVOffset(uvOffset);
+                            if (uvOffOvr) RevertButton("R##uvoff", [&]() { material.ClearUVOffset(); });
+                            if (ImGui::DragFloat2("UV Scale##uvscl", &uvScale[0], 0.05f)) material.SetUVScale(uvScale);
+                            if (uvSclOvr) RevertButton("R##uvscl", [&]() { material.ClearUVScale(); });
 
                             ImGui::Unindent();
                         }
