@@ -1,0 +1,65 @@
+{
+    "Entities": [
+        {
+            "ConvexHullColliderComponent": {
+                "maxConvexRadius": 0.0,
+                "offset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ]
+            },
+            "Material": {
+                "material": "f93d7599-ebd5-4dab-af6c-06858b61612f"
+            },
+            "Mesh": {
+                "mesh": "1b8e0e23-21b6-4020-9f6e-d3fd22f35ca6"
+            },
+            "RigidbodyComponent": {
+                "allowSleep": 1,
+                "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 0,
+                "bodyType": 2,
+                "collisionLayer": 1,
+                "collisionMask": 4294967295,
+                "friction": 0.5,
+                "gravityFactor": 1.0,
+                "isSensor": false,
+                "linearDamping": 0.05000000074505806,
+                "lockRotationX": false,
+                "lockRotationY": false,
+                "lockRotationZ": false,
+                "lockTranslationX": false,
+                "lockTranslationY": false,
+                "lockTranslationZ": false,
+                "mass": 5.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
+                "restitution": 0.0,
+                "useCCD": false
+            },
+            "Tag": {
+                "tag": "utility_box_02"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    0.9998430013656616,
+                    0.9998430013656616
+                ]
+            },
+            "UUID": 14
+        }
+    ]
+}

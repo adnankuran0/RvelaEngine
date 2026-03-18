@@ -12,12 +12,24 @@ void SceneSerializer::SaveScene(Scene& scene, const std::string& path)
     sceneJson["Environment"] = scene.GetEnvironment().Serialize();
     sceneJson["Entities"] = json::array();
 
+    std::unordered_set<entt::entity> prefabChildren;
+    auto prefabView = scene.GetRegistry().view<PrefabComponent>();
+    for (auto e : prefabView)
+    {
+        if (scene.HasComponent<SceneTreeComponent>(e))
+        {
+            for (auto child : scene.GetComponent<SceneTreeComponent>(e).children)
+                CollectChildrenRecursively(scene, child, prefabChildren);
+        }
+    }
+
     auto view = scene.GetRegistry().view<UUIDComponent, SceneTreeComponent>();
     entt::entity root = scene.GetRootEntity();
 
     for (auto e : view)
     {
         if (e == root) continue;
+        if (prefabChildren.count(e)) continue;
         sceneJson["Entities"].push_back(SerializeEntity(scene, e));
     }
 
@@ -36,6 +48,7 @@ void SceneSerializer::LoadScene(Scene& scene, const std::string& path)
         scene.GetEnvironment().Deserialize(j["Environment"]);
 
     std::unordered_map<EntityUUID, entt::entity> uuidToEntity;
+    std::unordered_set<entt::entity> prefabInstances;
 
     for (auto& entityJson : j["Entities"])
     {
@@ -52,15 +65,18 @@ void SceneSerializer::LoadScene(Scene& scene, const std::string& path)
                 EntityUUID savedUUID = entityJson["UUID"];
                 uuidToEntity[savedUUID] = instance.GetHandle();
             }
+
+            prefabInstances.insert(instance.GetHandle());
             continue;
         }
 
-        Entity e = scene.CreateEntity("");
         DeserializeEntity(scene, entityJson, uuidToEntity);
     }
 
     for (auto& [uuid, entity] : uuidToEntity)
     {
+        if (prefabInstances.count(entity)) continue;
+
         auto& tree = scene.GetComponent<SceneTreeComponent>(entity);
         if (tree.parentUUID != 0 && uuidToEntity.contains(tree.parentUUID))
             scene.SetParentKeepLocal(entity, uuidToEntity[tree.parentUUID]);
@@ -214,4 +230,12 @@ void SceneSerializer::DeserializeEntity(
 
     if (entityJson.contains("ParentUUID"))
         scene.GetComponent<SceneTreeComponent>(handle).parentUUID = entityJson["ParentUUID"];
+}
+
+void SceneSerializer::CollectChildrenRecursively(Scene& scene, entt::entity e, std::unordered_set<entt::entity>& out)
+{
+    out.insert(e);
+    if (scene.HasComponent<SceneTreeComponent>(e))
+        for (auto child : scene.GetComponent<SceneTreeComponent>(e).children)
+            CollectChildrenRecursively(scene, child, out);
 }

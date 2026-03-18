@@ -23,7 +23,6 @@ void SceneManager::SaveScene(const std::string& path)
 
 void SceneManager::LoadScene(const std::string& path)
 {
-    TextureCache::Get().Clear();
     m_PendingScenePath = path;
     m_HasPendingScene = true;
 }

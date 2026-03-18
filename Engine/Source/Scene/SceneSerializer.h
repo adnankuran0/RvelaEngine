@@ -13,6 +13,8 @@ public:
     static void DeserializeEntity(Scene& scene, const json& entityJson,
         std::unordered_map<EntityUUID, entt::entity>& uuidToEntity);
 
+private:
+    void CollectChildrenRecursively(Scene& scene,entt::entity e,std::unordered_set<entt::entity>& out);
 };
 
 }

@@ -35,8 +35,7 @@ static Entity LoadPrimitive(Scene& scene, const std::string& primitiveMeshName)
     root.AddComponent<MeshComponent>(m->GetUUID());
     root.AddComponent<MeshRendererComponent>(m);
     root.GetComponent<TagComponent>().tag = cfg.name;
-    AssetUUID defaultMaterialId = AssetUUID::FromString("ee3dde12-6263-4f11-bb1d-812b3e196ab7");
-    root.AddComponent<MaterialComponent>(defaultMaterialId);
+    root.AddComponent<MaterialComponent>();
     root.AddComponent<RigidbodyComponent>();
     if (primitiveMeshName == "Cube")
         root.AddComponent<BoxColliderComponent>();

@@ -20,26 +20,65 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
         {
             if (selectedEntity != entt::null)
             {
-                ImGui::Text("Selected Entity: %u", (uint32_t)selectedEntity);
-
-                bool isPrefab = registry.any_of<PrefabComponent>(selectedEntity);
-
-                // ---------- Tag ----------
-                if (registry.any_of<TagComponent>(selectedEntity))
+                if (selectedEntity != entt::null)
                 {
-                    if (ImGui::CollapsingHeader("Name Tag", ImGuiTreeNodeFlags_DefaultOpen))
+                    if (registry.any_of<TagComponent>(selectedEntity))
                     {
                         auto& tag = registry.get<TagComponent>(selectedEntity);
                         static char buffer[256];
                         std::strncpy(buffer, tag.tag.c_str(), sizeof(buffer));
-                        if (ImGui::InputText("##hidden", buffer, sizeof(buffer)))
-                        {
-                            if (buffer != "")
-                                tag.tag = buffer;
-                        }
+
+                        static bool enabled = true; // placeholder
+                        ImGui::Checkbox("##enabled", &enabled);
+                        ImGui::SameLine();
+                        ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - 120.0f);
+                        if (ImGui::InputText("##tagname", buffer, sizeof(buffer)))
+                            if (buffer[0] != '\0') tag.tag = buffer;
+                    }
+
+                    ImGui::SameLine();
+                    if (ImGui::Button("Add Component", ImVec2(110.0f, 0)))
+                        ImGui::OpenPopup("AddComponentPopup");
+
+                    ImGui::Separator();
+
+                    if (ImGui::BeginPopup("AddComponentPopup"))
+                    {
+                        if (!registry.any_of<ScriptComponent>(selectedEntity))
+                            if (ImGui::MenuItem("Script")) { registry.emplace<ScriptComponent>(selectedEntity); ImGui::CloseCurrentPopup(); }
+                        if (!registry.any_of<MaterialComponent>(selectedEntity))
+                            if (ImGui::MenuItem("Material")) { registry.emplace<MaterialComponent>(selectedEntity, AssetUUID::FromString("ee3dde12-6263-4f11-bb1d-812b3e196ab7")); ImGui::CloseCurrentPopup(); }
+                        if (!registry.any_of<MeshComponent>(selectedEntity))
+                            if (ImGui::MenuItem("Mesh")) { registry.emplace<MeshComponent>(selectedEntity); ImGui::CloseCurrentPopup(); }
+                        if (!registry.any_of<MeshRendererComponent>(selectedEntity))
+                            if (ImGui::MenuItem("Mesh renderer")) { registry.emplace<MeshRendererComponent>(selectedEntity); ImGui::CloseCurrentPopup(); }
+                        if (!registry.any_of<PointLightComponent>(selectedEntity))
+                            if (ImGui::MenuItem("Point light")) { registry.emplace<PointLightComponent>(selectedEntity); ImGui::CloseCurrentPopup(); }
+                        if (!registry.any_of<DirectionalLightComponent>(selectedEntity))
+                            if (ImGui::MenuItem("Directional light")) { registry.emplace<DirectionalLightComponent>(selectedEntity); ImGui::CloseCurrentPopup(); }
+                        if (!registry.any_of<RigidbodyComponent>(selectedEntity))
+                            if (ImGui::MenuItem("Rigidbody")) { registry.emplace<RigidbodyComponent>(selectedEntity); ImGui::CloseCurrentPopup(); }
+                        if (!registry.any_of<CharacterBodyComponent>(selectedEntity))
+                            if (ImGui::MenuItem("CharacterBody")) { registry.emplace<CharacterBodyComponent>(selectedEntity); ImGui::CloseCurrentPopup(); }
+                        if (!registry.any_of<BoxColliderComponent>(selectedEntity))
+                            if (ImGui::MenuItem("BoxCollider")) { registry.emplace<BoxColliderComponent>(selectedEntity); ImGui::CloseCurrentPopup(); }
+                        if (!registry.any_of<SphereColliderComponent>(selectedEntity))
+                            if (ImGui::MenuItem("SphereCollider")) { registry.emplace<SphereColliderComponent>(selectedEntity); ImGui::CloseCurrentPopup(); }
+                        if (!registry.any_of<CapsuleColliderComponent>(selectedEntity))
+                            if (ImGui::MenuItem("CapsuleCollider")) { registry.emplace<CapsuleColliderComponent>(selectedEntity); ImGui::CloseCurrentPopup(); }
+                        if (!registry.any_of<CylinderColliderComponent>(selectedEntity))
+                            if (ImGui::MenuItem("CylinderCollider")) { registry.emplace<CylinderColliderComponent>(selectedEntity); ImGui::CloseCurrentPopup(); }
+                        if (!registry.any_of<MeshColliderComponent>(selectedEntity))
+                            if (ImGui::MenuItem("MeshCollider")) { registry.emplace<MeshColliderComponent>(selectedEntity); ImGui::CloseCurrentPopup(); }
+                        if (!registry.any_of<ConvexHullColliderComponent>(selectedEntity))
+                            if (ImGui::MenuItem("ConvexHullCollider")) { registry.emplace<ConvexHullColliderComponent>(selectedEntity); ImGui::CloseCurrentPopup(); }
+                        ImGui::EndPopup();
                     }
                 }
 
+                bool isPrefab = registry.any_of<PrefabComponent>(selectedEntity);
+
+               
                 // ---------- Transform ----------
                 if (registry.any_of<TransformComponent>(selectedEntity))
                 {
@@ -880,119 +919,11 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                                 const char* path = (const char*)payload->Data;
                                 std::string pathStr(path);
                                 if (pathStr.ends_with(".lua"))
-                                    scriptComp.luaFile = pathStr; // Lua için doğrudan yol kullanılıyor (UUID'siz)
+                                    scriptComp.luaFile = pathStr; 
                             }
                             ImGui::EndDragDropTarget();
                         }
                     }
-                }
-
-                // ---------- Add Component ----------
-                if (ImGui::Button("Add Component"))
-                    ImGui::OpenPopup("AddComponentPopup");
-
-                if (ImGui::BeginPopup("AddComponentPopup"))
-                {
-                    if (!registry.any_of<ScriptComponent>(selectedEntity))
-                        if (ImGui::MenuItem("Script"))
-                        {
-                            registry.emplace<ScriptComponent>(selectedEntity);
-                            ImGui::CloseCurrentPopup();
-                        }
-
-                    if (!registry.any_of<MaterialComponent>(selectedEntity))
-                        if (ImGui::MenuItem("Material"))
-                        {
-                            AssetUUID defaultMaterialId = AssetUUID::FromString("ee3dde12-6263-4f11-bb1d-812b3e196ab7");
-                            registry.emplace<MaterialComponent>(selectedEntity, defaultMaterialId);
-                            ImGui::CloseCurrentPopup();
-                        }
-
-                    if (!registry.any_of<MeshComponent>(selectedEntity))
-                        if (ImGui::MenuItem("Mesh"))
-                        {
-                            registry.emplace<MeshComponent>(selectedEntity);
-                            ImGui::CloseCurrentPopup();
-                        }
-
-                    if (!registry.any_of<MeshRendererComponent>(selectedEntity))
-                        if (ImGui::MenuItem("Mesh renderer"))
-                        {
-                            registry.emplace<MeshRendererComponent>(selectedEntity);
-                            ImGui::CloseCurrentPopup();
-                        }
-
-                    if (!registry.any_of<PointLightComponent>(selectedEntity))
-                        if (ImGui::MenuItem("Point light"))
-                        {
-                            registry.emplace<PointLightComponent>(selectedEntity);
-                            ImGui::CloseCurrentPopup();
-                        }
-
-                    if (!registry.any_of<DirectionalLightComponent>(selectedEntity))
-                        if (ImGui::MenuItem("Directional light"))
-                        {
-                            registry.emplace<DirectionalLightComponent>(selectedEntity);
-                            ImGui::CloseCurrentPopup();
-                        }
-
-                    if (!registry.any_of<RigidbodyComponent>(selectedEntity))
-                        if (ImGui::MenuItem("Rigidbody"))
-                        {
-                            registry.emplace<RigidbodyComponent>(selectedEntity);
-                            ImGui::CloseCurrentPopup();
-                        }
-
-                    if (!registry.any_of<CharacterBodyComponent>(selectedEntity))
-                        if (ImGui::MenuItem("CharacterBody"))
-                        {
-                            registry.emplace<CharacterBodyComponent>(selectedEntity);
-                            ImGui::CloseCurrentPopup();
-                        }
-
-                    if (!registry.any_of<BoxColliderComponent>(selectedEntity))
-                        if (ImGui::MenuItem("BoxCollider"))
-                        {
-                            registry.emplace<BoxColliderComponent>(selectedEntity);
-                            ImGui::CloseCurrentPopup();
-                        }
-
-                    if (!registry.any_of<SphereColliderComponent>(selectedEntity))
-                        if (ImGui::MenuItem("SphereCollider"))
-                        {
-                            registry.emplace<SphereColliderComponent>(selectedEntity);
-                            ImGui::CloseCurrentPopup();
-                        }
-
-                    if (!registry.any_of<CapsuleColliderComponent>(selectedEntity))
-                        if (ImGui::MenuItem("CapsuleCollider"))
-                        {
-                            registry.emplace<CapsuleColliderComponent>(selectedEntity);
-                            ImGui::CloseCurrentPopup();
-                        }
-
-                    if (!registry.any_of<CylinderColliderComponent>(selectedEntity))
-                        if (ImGui::MenuItem("CylinderCollider"))
-                        {
-                            registry.emplace<CylinderColliderComponent>(selectedEntity);
-                            ImGui::CloseCurrentPopup();
-                        }
-
-                    if (!registry.any_of<MeshColliderComponent>(selectedEntity))
-                        if (ImGui::MenuItem("MeshCollider"))
-                        {
-                            registry.emplace<MeshColliderComponent>(selectedEntity);
-                            ImGui::CloseCurrentPopup();
-                        }
-
-                    if (!registry.any_of<ConvexHullColliderComponent>(selectedEntity))
-                        if (ImGui::MenuItem("ConvexHullCollider"))
-                        {
-                            registry.emplace<ConvexHullColliderComponent>(selectedEntity);
-                            ImGui::CloseCurrentPopup();
-                        }
-
-                    ImGui::EndPopup();
                 }
             }
             else

@@ -29,7 +29,7 @@ Ref<PrefabAsset> PrefabImporter::CreatePrefabAsset(
             if (entityJson.contains("Transform"))
             {
                 entityJson["Transform"]["position"] = { 0.0f, 0.0f, 0.0f };
-                entityJson["Transform"]["rotation"] = { 1.0f, 0.0f, 0.0f, 0.0f };
+                entityJson["Transform"]["rotation"] = { 0.0f, 0.0f, 0.0f };
             }
             entityJson.erase("_isRoot");
             entityJson.erase("ParentUUID");
@@ -60,7 +60,7 @@ void PrefabImporter::SerializeEntityRecursively(
     json& outEntities)
 {
     json entityJson = SceneSerializer::SerializeEntity(scene, e);
-
+    
     if (e == rootEntity)
         entityJson["_isRoot"] = true;
 

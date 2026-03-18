@@ -10,6 +10,7 @@ struct MaterialComponent
 {
 public:
     MaterialComponent() = default;
+
     explicit MaterialComponent(const AssetUUID& uuid) { Load(uuid); }
 
     MaterialInstance& GetInstance() { return m_Instance; }

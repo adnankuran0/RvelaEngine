@@ -271,7 +271,7 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
                 if (uuid.IsValid())
                     engine->GetActiveScene().Instantiate(uuid);
             }
-            else if (extension == ".glsl")
+            else if (extension == ".glsl" || extension == ".lua")
             {
                 std::string command = "code \"" + entry.path().string() + "\"";
                 std::system(command.c_str());

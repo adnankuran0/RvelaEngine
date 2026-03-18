@@ -127,8 +127,6 @@ public:
         return roots;
     }
 
-    [[nodiscard]] unsigned int GetComponentCount(entt::entity entity) noexcept;
-
     inline TransformSystem& GetTransformSystem() noexcept { return m_TransformSystem; }
     inline CameraSystem& GetCameraSystem() noexcept { return m_CameraSystem; }
     inline ScriptSystem& GetScriptSystem() noexcept { return m_ScriptSystem; }

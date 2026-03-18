@@ -266,7 +266,7 @@ void Scene::SetParentKeepLocal(entt::entity child, entt::entity parent)
 {
     auto& childTree = GetComponent<SceneTreeComponent>(child);
 
-    if (childTree.parent != entt::null)
+    if (childTree.parent != entt::null && m_Registry.valid(childTree.parent))
     {
         auto& oldParentTree = GetComponent<SceneTreeComponent>(childTree.parent);
         std::erase(oldParentTree.children, child);
@@ -276,7 +276,12 @@ void Scene::SetParentKeepLocal(entt::entity child, entt::entity parent)
 
     if (parent != entt::null)
     {
-        GetComponent<SceneTreeComponent>(parent).children.push_back(child);
+        auto& parentTree = GetComponent<SceneTreeComponent>(parent);
+        if (std::find(parentTree.children.begin(), parentTree.children.end(), child)
+            == parentTree.children.end())
+        {
+            parentTree.children.push_back(child);
+        }
     }
 }
 
@@ -357,6 +362,30 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
         if (entityJson.contains("CameraComponent"))
             e.AddComponent<CameraComponent>().Deserialize(entityJson["CameraComponent"]);
 
+        if (entityJson.contains("RigidbodyComponent"))
+            e.AddComponent<RigidbodyComponent>().Deserialize(entityJson["RigidbodyComponent"]);
+
+        if (entityJson.contains("CharacterBodyComponent"))
+            e.AddComponent<CharacterBodyComponent>().Deserialize(entityJson["CharacterBodyComponent"]);
+
+        if (entityJson.contains("BoxColliderComponent"))
+            e.AddComponent<BoxColliderComponent>().Deserialize(entityJson["BoxColliderComponent"]);
+
+        if (entityJson.contains("SphereColliderComponent"))
+            e.AddComponent<SphereColliderComponent>().Deserialize(entityJson["SphereColliderComponent"]);
+
+        if (entityJson.contains("CapsuleColliderComponent"))
+            e.AddComponent<CapsuleColliderComponent>().Deserialize(entityJson["CapsuleColliderComponent"]);
+
+        if (entityJson.contains("CylinderColliderComponent"))
+            e.AddComponent<CylinderColliderComponent>().Deserialize(entityJson["CylinderColliderComponent"]);
+
+        if (entityJson.contains("MeshColliderComponent"))
+            e.AddComponent<MeshColliderComponent>().Deserialize(entityJson["MeshColliderComponent"]);
+
+        if (entityJson.contains("ConvexHullColliderComponent"))
+            e.AddComponent<ConvexHullColliderComponent>().Deserialize(entityJson["ConvexHullColliderComponent"]);
+
         if (entityJson.contains("ScriptComponent"))
             e.AddComponent<ScriptComponent>().Deserialize(entityJson["ScriptComponent"]);
 
@@ -395,27 +424,6 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
     }
 
     return rootEntity;
-}
-
-[[nodiscard]] unsigned int Scene::GetComponentCount(entt::entity entity) noexcept
-{
-    auto& registry = GetRegistry();
-    unsigned int count = 0;
-
-    if (registry.any_of<TransformComponent>(entity)) count++;
-    if (registry.any_of<MeshComponent>(entity)) count++;
-    if (registry.any_of<DirectionalLightComponent>(entity)) count++;
-    if (registry.any_of<MaterialComponent>(entity)) count++;
-    if (registry.any_of<MeshRendererComponent>(entity)) count++;
-    if (registry.any_of<PointLightComponent>(entity)) count++;
-    if (registry.any_of<SceneTreeComponent>(entity)) count++;
-    if (registry.any_of<SpotLightComponent>(entity)) count++;
-    if (registry.any_of<TagComponent>(entity)) count++;
-    if (registry.any_of<UUIDComponent>(entity)) count++;
-    if (registry.any_of<PrefabComponent>(entity)) count++;
-    if (registry.any_of<CameraComponent>(entity)) count++;
-
-    return count;
 }
 
 unsigned int Scene::CountEntitiesRecursively(entt::entity& rootEntity)
