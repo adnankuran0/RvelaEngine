@@ -10,6 +10,10 @@ void AssetRegistry::Scan(const std::filesystem::path& assetDir)
     m_AssetDir = assetDir;
     auto cacheRoot = assetDir / ".cache";
 
+    static const std::unordered_set<std::string> s_TrackOnlyExtensions = {
+        ".rscene", ".lua"
+    };
+
     for (auto& entry : std::filesystem::recursive_directory_iterator(assetDir))
     {
         if (!entry.is_regular_file()) continue;
@@ -20,8 +24,23 @@ void AssetRegistry::Scan(const std::filesystem::path& assetDir)
             continue;
 
         auto metaPath = AssetMeta::GetMetaPath(path);
+
         if (!std::filesystem::exists(metaPath))
         {
+            if (s_TrackOnlyExtensions.count(path.extension().string()))
+            {
+                AssetMeta meta;
+                meta.uuid = AssetUUID{};
+                meta.importerID = "";
+                meta.sourceHash = 0;
+                meta.SaveToFile(metaPath);
+
+                m_UUIDToPath[meta.uuid] = path;
+                m_PathToUUID[path.string()] = meta.uuid;
+                m_Metas[meta.uuid] = meta;
+
+                LOG_INFO("Auto-created meta for: {}", path.filename().string());
+            }
             continue;
         }
 
@@ -66,7 +85,7 @@ void AssetRegistry::Scan(const std::filesystem::path& assetDir)
             auto ext = cachePath.extension().string();
 
 
-            if (ext != ".rmesh" && ext != ".rtexture" && ext != ".rtex" && ext != ".rprefab" && ext != ".rmat")
+            if (ext != ".rmesh" && ext != ".rtex" && ext != ".rprefab" && ext != ".rmat")
                 continue;
 
             auto uuid = AssetUUID::FromString(cachePath.stem().string());

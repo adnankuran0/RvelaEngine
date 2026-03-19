@@ -906,11 +906,6 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                     {
                         auto& scriptComp = registry.get<ScriptComponent>(selectedEntity);
 
-                        char buffer[512];
-                        std::strncpy(buffer, scriptComp.luaFile.c_str(), sizeof(buffer));
-                        if (ImGui::InputText("Path", buffer, sizeof(buffer)))
-                            scriptComp.luaFile = buffer;
-
                         ImGui::Button("Drop Lua Script Here", ImVec2(200, 20));
                         if (ImGui::BeginDragDropTarget())
                         {
@@ -919,7 +914,10 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                                 const char* path = (const char*)payload->Data;
                                 std::string pathStr(path);
                                 if (pathStr.ends_with(".lua"))
-                                    scriptComp.luaFile = pathStr; 
+                                {
+                                    AssetUUID scriptUUID = EditorUtils::ReadUUIDFromMeta(pathStr);
+                                    scriptComp.scriptAssetUUID = scriptUUID;
+                                }
                             }
                             ImGui::EndDragDropTarget();
                         }

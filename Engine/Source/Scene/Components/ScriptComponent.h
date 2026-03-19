@@ -1,13 +1,16 @@
 #pragma once
 #include "sol/sol.hpp"
 #include "json.hpp"
+#include "Asset/AssetUUID.h"
 
 namespace rv {
 
 using json = nlohmann::json;
 
-struct ScriptComponent {
-    std::string luaFile;
+struct ScriptComponent 
+{
+    AssetUUID scriptAssetUUID{};
+
     sol::state* luaState = nullptr;
     sol::table luaInstance;
 

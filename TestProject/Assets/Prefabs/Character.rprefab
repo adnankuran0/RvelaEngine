@@ -24,13 +24,13 @@
                 ]
             },
             "Material": {
-                "material": "ee3dde12-6263-4f11-bb1d-812b3e196ab7"
+                "material": "6f565b83-e131-46f0-9aad-316fee6b6ff2"
             },
             "Mesh": {
                 "mesh": "62345031-f93b-40f4-aa76-18c59801997d"
             },
             "ScriptComponent": {
-                "luaFile": "C:\\RvelaEngine\\TestProject\\Assets\\Scripts\\CharacterController.lua"
+                "scriptAssetUUID": "b3326755-edfb-4522-ada1-080110d5fba5"
             },
             "Tag": {
                 "tag": "Character"
@@ -43,7 +43,6 @@
                     0.0
                 ],
                 "rotation": [
-                    1.0,
                     0.0,
                     0.0,
                     0.0
@@ -54,12 +53,12 @@
                     1.0
                 ]
             },
-            "UUID": 3
+            "UUID": 6
         },
         {
-            "ParentUUID": 3,
+            "ParentUUID": 6,
             "ScriptComponent": {
-                "luaFile": "C:\\RvelaEngine\\TestProject\\Assets\\Scripts\\camera.lua"
+                "scriptAssetUUID": "bc183720-0ea6-40c0-adb4-6438019b61d8"
             },
             "Tag": {
                 "tag": "CameraHolder"
@@ -68,7 +67,7 @@
                 "lockScaleRatio": false,
                 "position": [
                     0.0,
-                    0.4983108639717102,
+                    0.5102748870849609,
                     0.0
                 ],
                 "rotation": [
@@ -82,7 +81,7 @@
                     1.0
                 ]
             },
-            "UUID": 4
+            "UUID": 7
         },
         {
             "CameraComponent": {
@@ -92,7 +91,7 @@
                 "nearClip": 0.10000000149011612,
                 "projectionType": 0
             },
-            "ParentUUID": 4,
+            "ParentUUID": 7,
             "Tag": {
                 "tag": "Camera"
             },
@@ -114,7 +113,7 @@
                     1.0
                 ]
             },
-            "UUID": 5
+            "UUID": 8
         }
     ]
 }
