@@ -1,6 +1,5 @@
 #include "rvelapch.h"
 #include "EventManager.h"
-#include "EventDispatcher.h"
 #include <functional>
 #include "Events.h"
 #include "MouseEvents.h"
@@ -30,6 +29,5 @@ void EventManager::DispatchEvents(const std::function<void(Event&)>& handler) no
         return;
     }
 
-    EventDispatcher::Dispatch(m_EventQueue, handler);
-    ClearEvents();
+    Dispatch(m_EventQueue, handler);
 }

@@ -17,6 +17,9 @@ bool AssetImportPipeline::ImportAsset(const std::filesystem::path& sourcePath, A
 {
     auto ext = sourcePath.extension().string();
 
+    if (ext == ".bin")
+        return false;
+
     IAssetImporter* importer = FindImporter(ext);
     if (!importer)
     {

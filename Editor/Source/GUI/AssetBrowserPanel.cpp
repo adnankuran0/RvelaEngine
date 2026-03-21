@@ -10,6 +10,7 @@
 #include "EditorUtils.h"
 #include "Core/Engine.h"
 #include "Scene/Entity.h"
+#include "AssetImporters/MaterialSerializer.h"
 
 using namespace rv;
 
@@ -28,6 +29,74 @@ static std::vector<DirNode> s_DirectoryTree;
 
 static bool s_NeedsRefresh = true;
 static bool s_DirectoryTreeDirty = true;
+
+static bool s_RenamingActive = false;
+static std::filesystem::path s_RenamingPath;
+static char s_RenameBuffer[256] = "";
+
+
+static void DeletePathWithMeta(const std::filesystem::path& path)
+{
+    std::error_code ec;
+
+    if (std::filesystem::is_directory(path))
+    {
+        std::filesystem::remove_all(path, ec);
+        if (ec) { LOG_ERROR("Delete failed: {}", ec.message()); return; }
+        LOG_INFO("Deleted folder: {}", path.string());
+    }
+    else
+    {
+        std::filesystem::remove(path, ec);
+        if (ec) { LOG_ERROR("Delete failed: {}", ec.message()); return; }
+
+        auto metaPath = std::filesystem::path(path.string() + ".rmeta");
+        if (std::filesystem::exists(metaPath))
+        {
+            std::filesystem::remove(metaPath, ec);
+            if (ec)
+                LOG_WARN("Meta delete failed: {}", ec.message());
+            else
+                LOG_INFO("Deleted meta: {}", metaPath.string());
+        }
+
+        LOG_INFO("Deleted: {}", path.string());
+    }
+
+    s_NeedsRefresh = true;
+    s_DirectoryTreeDirty = true;
+}
+
+static void CreateEmptyTextFile(const std::filesystem::path& path, const std::string& content = "")
+{
+    std::ofstream f(path);
+    if (!f) { LOG_ERROR("Could not create file: {}", path.string()); return; }
+    f << content;
+}
+
+static void RenamePathWithMeta(const std::filesystem::path& oldPath, const std::string& newName)
+{
+    if (newName.empty()) return;
+
+    auto newPath = oldPath.parent_path() / newName;
+
+    std::error_code ec;
+    std::filesystem::rename(oldPath, newPath, ec);
+    if (ec) { LOG_ERROR("Rename failed: {}", ec.message()); return; }
+
+    auto oldMeta = std::filesystem::path(oldPath.string() + ".rmeta");
+    auto newMeta = std::filesystem::path(newPath.string() + ".rmeta");
+    if (std::filesystem::exists(oldMeta))
+    {
+        std::filesystem::rename(oldMeta, newMeta, ec);
+        if (ec) LOG_WARN("Meta rename failed: {}", ec.message());
+    }
+
+    LOG_INFO("Renamed: {} -> {}", oldPath.filename().string(), newName);
+    s_NeedsRefresh = true;
+    s_DirectoryTreeDirty = true;
+}
+
 
 static void BuildDirectoryTreeRecursive(const std::filesystem::path& path, std::vector<DirNode>& out)
 {
@@ -65,6 +134,7 @@ static void RenderDirectoryRecursiveCached(const std::vector<DirNode>& nodes, st
     }
 }
 
+
 static void RefreshAssets(const std::filesystem::path& directory)
 {
     s_CachedFiles.clear();
@@ -87,9 +157,7 @@ static void RefreshAssets(const std::filesystem::path& directory)
                 return a.is_directory() > b.is_directory();
             });
     }
-    catch (...)
-    {
-    }
+    catch (...) {}
 
     s_NeedsRefresh = false;
 }
@@ -105,14 +173,10 @@ static void CollectSearchResults(const std::vector<std::filesystem::directory_en
 
     for (const auto& entry : files)
     {
-        if (!entry.is_regular_file())
-            continue;
-
-        if (entry.path().extension() == ".rmeta")
-            continue;
+        if (!entry.is_regular_file()) continue;
+        if (entry.path().extension() == ".rmeta") continue;
 
         auto filename = entry.path().filename().string();
-
         std::string filenameLower;
         filenameLower.reserve(filename.size());
         std::transform(filename.begin(), filename.end(), std::back_inserter(filenameLower), ::tolower);
@@ -121,6 +185,147 @@ static void CollectSearchResults(const std::vector<std::filesystem::directory_en
             s_SearchResults.emplace_back(entry);
     }
 }
+
+static void DrawBackgroundContextMenu(Engine* engine, const std::filesystem::path& currentDir)
+{
+    if (ImGui::BeginPopup("##BrowserBgMenu"))
+    {
+        if (ImGui::BeginMenu("New"))
+        {
+            if (ImGui::MenuItem("Folder"))
+            {
+                auto newPath = currentDir / "New Folder";
+                std::error_code ec;
+                int i = 1;
+                while (std::filesystem::exists(newPath))
+                    newPath = currentDir / ("New Folder " + std::to_string(i++));
+
+                std::filesystem::create_directory(newPath, ec);
+                if (!ec)
+                {
+                    s_RenamingPath = newPath;
+                    s_RenamingActive = true;
+                    strncpy_s(s_RenameBuffer, sizeof(s_RenameBuffer),
+                        newPath.filename().string().c_str(), _TRUNCATE);
+                    s_NeedsRefresh = true;
+                    s_DirectoryTreeDirty = true;
+                }
+                else LOG_ERROR("Create folder failed: {}", ec.message());
+            }
+
+            ImGui::Separator();
+
+            auto& assetReg = AssetManager::Get().GetRegistry();
+
+            if (ImGui::MenuItem("Material"))
+            {
+                auto newPath = currentDir / "NewMaterial.rmat";
+                int i = 1;
+                while (std::filesystem::exists(newPath))
+                    newPath = currentDir / ("NewMaterial" + std::to_string(i++) + ".rmat");
+                MaterialSerializer::CreateNew(newPath, assetReg);
+                assetReg.Scan(assetReg.GetAssetDir());
+                s_NeedsRefresh = true;
+            }
+
+            if (ImGui::MenuItem("Scene"))
+            {
+                auto newPath = currentDir / "NewScene.rscene";
+                int i = 1;
+                while (std::filesystem::exists(newPath))
+                    newPath = currentDir / ("NewScene" + std::to_string(i++) + ".rscene");
+                auto scene = engine->GetSceneManager().CreateScene("NewScene");
+                engine->GetSceneManager().SaveScene(*scene,newPath.string());
+                assetReg.Scan(assetReg.GetAssetDir());
+                s_NeedsRefresh = true;
+                
+            }
+
+            if (ImGui::MenuItem("Lua Script"))
+            {
+                auto newPath = currentDir / "NewScript.lua";
+                int i = 1;
+                while (std::filesystem::exists(newPath))
+                    newPath = currentDir / ("NewScript" + std::to_string(i++) + ".lua");
+                CreateEmptyTextFile(newPath, "-- New Script\n");
+                s_NeedsRefresh = true;
+
+            }
+
+            ImGui::EndMenu();
+        }
+
+        ImGui::Separator();
+
+        if (ImGui::MenuItem("Refresh"))
+        {
+            s_NeedsRefresh = true;
+            s_DirectoryTreeDirty = true;
+        }
+
+        if (ImGui::MenuItem("Open in Explorer"))
+        {
+            std::string cmd = "explorer \"" + currentDir.string() + "\"";
+            std::system(cmd.c_str());
+        }
+
+        ImGui::EndPopup();
+    }
+}
+
+static void DrawItemContextMenu(const std::filesystem::path& itemPath)
+{
+    std::string popupId = "##ItemMenu_" + itemPath.filename().string();
+
+    if (ImGui::BeginPopup(popupId.c_str()))
+    {
+        ImGui::TextDisabled("%s", itemPath.filename().string().c_str());
+        ImGui::Separator();
+
+        if (ImGui::MenuItem("Rename"))
+        {
+            s_RenamingPath = itemPath;
+            s_RenamingActive = true;
+            strncpy_s(s_RenameBuffer, sizeof(s_RenameBuffer),
+                itemPath.filename().string().c_str(), _TRUNCATE);
+        }
+
+        if (ImGui::MenuItem("Delete"))
+        {
+            DeletePathWithMeta(itemPath);
+        }
+
+        ImGui::Separator();
+
+        if (ImGui::MenuItem("Open in Explorer"))
+        {
+            auto dir = std::filesystem::is_directory(itemPath)
+                ? itemPath
+                : itemPath.parent_path();
+            std::string cmd = "explorer \"" + dir.string() + "\"";
+            std::system(cmd.c_str());
+        }
+
+        if (!std::filesystem::is_directory(itemPath))
+        {
+            auto ext = itemPath.extension();
+            if (ext == ".glsl" || ext == ".lua")
+            {
+                if (ImGui::MenuItem("Open in VS Code"))
+                {
+                    std::string cmd = "code \"" + itemPath.string() + "\"";
+                    std::system(cmd.c_str());
+                }
+            }
+
+            if (ImGui::MenuItem("Copy Path"))
+                ImGui::SetClipboardText(itemPath.string().c_str());
+        }
+
+        ImGui::EndPopup();
+    }
+}
+
 
 AssetBrowserPanel::AssetBrowserPanel()
 {
@@ -139,6 +344,7 @@ AssetBrowserPanel::AssetBrowserPanel()
     meshIcon.Init();
     meshIcon.GenerateFromImage("C:\\RvelaEngine\\Resources\\Editor\\Icons\\mesh.png");
 }
+
 
 void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDirectory)
 {
@@ -181,19 +387,15 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
 
     ImGui::BeginChild("Files", ImVec2(0, 0), true);
 
-    bool isAtRoot = s_CurrentDirectory == rootDirectory;
+    bool isAtRoot = (s_CurrentDirectory == rootDirectory);
 
-    if (isAtRoot)
-        ImGui::BeginDisabled();
-
+    if (isAtRoot) ImGui::BeginDisabled();
     if (ImGui::Button(" ^ "))
     {
         s_CurrentDirectory = s_CurrentDirectory.parent_path();
         s_NeedsRefresh = true;
     }
-
-    if (isAtRoot)
-        ImGui::EndDisabled();
+    if (isAtRoot) ImGui::EndDisabled();
 
     ImGui::SameLine();
 
@@ -221,7 +423,7 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
     constexpr float cellSize = thumbnailSize + padding;
 
     float panelWidth = ImGui::GetContentRegionAvail().x;
-    int columnCount = static_cast<int>(panelWidth / cellSize);
+    int   columnCount = static_cast<int>(panelWidth / cellSize);
     if (columnCount < 1) columnCount = 1;
 
     ImGui::Columns(columnCount, 0, false);
@@ -230,20 +432,43 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
 
     for (const auto& entry : filesToShow)
     {
-        ImTextureID icon;
         auto extension = entry.path().extension();
+        auto filename = entry.path().filename().string();
 
+        if (s_RenamingActive && s_RenamingPath == entry.path())
+        {
+            ImGui::SetNextItemWidth(cellSize - 4.0f);
+            ImGui::SetKeyboardFocusHere();
+            if (ImGui::InputText("##rename", s_RenameBuffer, sizeof(s_RenameBuffer),
+                ImGuiInputTextFlags_EnterReturnsTrue |
+                ImGuiInputTextFlags_AutoSelectAll))
+            {
+                RenamePathWithMeta(s_RenamingPath, s_RenameBuffer);
+                s_RenamingActive = false;
+            }
+            if (ImGui::IsKeyPressed(ImGuiKey_Escape))
+                s_RenamingActive = false;
+
+            ImGui::NextColumn();
+            continue;
+        }
+
+        ImTextureID icon;
         if (extension == ".rscene") icon = sceneIcon.GetID();
         else if (extension == ".rprefab") icon = prefabIcon.GetID();
         else if (entry.is_directory()) icon = folderIcon.GetID();
-        else if (extension == ".rtex" || extension == ".png" || extension == ".jpeg" || extension == ".jpg" || extension == ".tga") icon = textureIcon.GetID();
+        else if (extension == ".rtex" ||
+            extension == ".png" || extension == ".jpeg" ||
+            extension == ".jpg" || extension == ".tga") icon = textureIcon.GetID();
         else if (extension == ".rmat") icon = materialIcon.GetID();
         else if (extension == ".rmesh") icon = meshIcon.GetID();
         else icon = scriptIcon.GetID();
 
-        auto filename = entry.path().filename().string();
-
         ImGui::ImageButton(filename.c_str(), icon, ImVec2(thumbnailSize, thumbnailSize));
+
+        if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
+            ImGui::OpenPopup(("##ItemMenu_" + filename).c_str());
+        DrawItemContextMenu(entry.path());
 
         if (ImGui::BeginDragDropSource())
         {
@@ -266,7 +491,6 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
             }
             else if (extension == ".rprefab")
             {
-                auto pathStr = entry.path().string();
                 AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(entry.path().string());
                 if (uuid.IsValid())
                     engine->GetActiveScene().Instantiate(uuid);
@@ -276,7 +500,8 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
                 std::string command = "code \"" + entry.path().string() + "\"";
                 std::system(command.c_str());
             }
-            else if (extension == ".png" || extension == ".jpeg" || extension == ".jpg" || extension == ".tga")
+            else if (extension == ".png" || extension == ".jpeg" ||
+                extension == ".jpg" || extension == ".tga")
             {
                 std::string command = "\"" + entry.path().string() + "\"";
                 std::system(command.c_str());
@@ -288,6 +513,68 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
     }
 
     ImGui::Columns(1);
+
+    if (ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows) &&
+        ImGui::IsMouseClicked(ImGuiMouseButton_Right) &&
+        !ImGui::IsAnyItemHovered())
+    {
+        ImGui::OpenPopup("##BrowserBgMenu");
+    }
+    DrawBackgroundContextMenu(engine,s_CurrentDirectory);
+
     ImGui::EndChild();
     ImGui::End();
+}
+
+void AssetBrowserPanel::HandleFileDrop(FileDroppedEvent& event, AssetImportPipeline& importPipeline)
+{
+    if (s_CurrentDirectory.empty())
+        return;
+
+    std::vector<std::filesystem::path> toImport;
+
+    for (const auto& sourcePath : event.GetPaths())
+    {
+        auto destPath = s_CurrentDirectory / sourcePath.filename();
+
+        if (sourcePath == destPath)
+            continue;
+
+        std::error_code ec;
+
+        if (std::filesystem::is_directory(sourcePath))
+        {
+            std::filesystem::copy(
+                sourcePath, destPath,
+                std::filesystem::copy_options::recursive |
+                std::filesystem::copy_options::overwrite_existing,
+                ec);
+
+            if (ec) { LOG_ERROR("Folder copy failed: {}", ec.message()); continue; }
+            LOG_INFO("Folder copied: {}", destPath.string());
+
+            for (const auto& entry : std::filesystem::recursive_directory_iterator(destPath, ec))
+            {
+                if (entry.is_regular_file())
+                    toImport.push_back(entry.path());
+            }
+        }
+        else
+        {
+            std::filesystem::copy_file(
+                sourcePath, destPath,
+                std::filesystem::copy_options::overwrite_existing,
+                ec);
+
+            if (ec) { LOG_ERROR("File copy failed: {}", ec.message()); continue; }
+            LOG_INFO("Copied: {}", destPath.string());
+            toImport.push_back(destPath);
+        }
+    }
+
+    for (const auto& path : toImport)
+        importPipeline.ImportAsset(path, AssetManager::Get().GetRegistry());
+
+    s_NeedsRefresh = true;
+    s_DirectoryTreeDirty = true;
 }

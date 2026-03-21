@@ -32,6 +32,7 @@ void Window::SetCallbacks() noexcept
     glfwSetCursorPosCallback(m_Window, MouseMovedCallback);
     glfwSetScrollCallback(m_Window, MouseScrolledCallback);
     glfwSetFramebufferSizeCallback(m_Window, FramebufferSizeCallback);
+    glfwSetDropCallback(m_Window, FileDropCallback);
 }
 
 void Window::Init()
@@ -47,7 +48,8 @@ void Window::Init()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     m_Window = glfwCreateWindow(m_WindowData.size.width, m_WindowData.size.height, m_WindowData.title.c_str(), nullptr, nullptr);
-    if (!m_Window) {
+    if (!m_Window) 
+    {
         LOG_ERROR("Failed to create GLFW window");
         glfwTerminate();
         throw std::runtime_error("Failed to create GLFW window");
@@ -67,7 +69,8 @@ void Window::Init()
         
     
     glfwMakeContextCurrent(m_Window);
-    if (!gladLoadGL((GLADloadfunc)glfwGetProcAddress)) {
+    if (!gladLoadGL((GLADloadfunc)glfwGetProcAddress)) 
+    {
         
         LOG_ERROR("Failed to initialize GLAD");
     }
@@ -90,38 +93,51 @@ Window Window::Create(const std::string& title, int width, int height) noexcept
 
 void Window::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) noexcept
 {
-    if (action == GLFW_PRESS) {
+    if (action == GLFW_PRESS) 
+    {
         KeyCode keyCode = static_cast<KeyCode>(key);
         EventManager::PushEvent(new KeyPressedEvent(keyCode));
     }
-    else if (action == GLFW_RELEASE) {
+    else if (action == GLFW_RELEASE) 
+    {
         KeyCode keyCode = static_cast<KeyCode>(key);
         EventManager::PushEvent(new KeyReleasedEvent(keyCode));
     }
 }
 
-void Window::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods) noexcept {
-    if (action == GLFW_PRESS) {
+void Window::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods) noexcept 
+{
+    if (action == GLFW_PRESS) 
+    {
         MouseCode mouseCode = static_cast<MouseCode>(button);
         EventManager::PushEvent(new MouseButtonPressedEvent(mouseCode));
     }
-    else if (action == GLFW_RELEASE) {
+    else if (action == GLFW_RELEASE) 
+    {
         MouseCode mouseCode = static_cast<MouseCode>(button);
         EventManager::PushEvent(new MouseButtonReleasedEvent(mouseCode));
     }
 }
 
-void Window::MouseMovedCallback(GLFWwindow* window, double xpos, double ypos) noexcept {
+void Window::MouseMovedCallback(GLFWwindow* window, double xpos, double ypos) noexcept 
+{
     EventManager::PushEvent(new MouseMovedEvent(static_cast<float>(xpos), static_cast<float>(ypos)));
 }
 
-void Window::MouseScrolledCallback(GLFWwindow* window, double xoffset, double yoffset) noexcept {
+void Window::MouseScrolledCallback(GLFWwindow* window, double xoffset, double yoffset) noexcept 
+{
     EventManager::PushEvent(new MouseScrolledEvent(static_cast<float>(xoffset), static_cast<float>(yoffset)));
 }
 
-void Window::FramebufferSizeCallback(GLFWwindow* window, int width, int height) noexcept {
+void Window::FramebufferSizeCallback(GLFWwindow* window, int width, int height) noexcept 
+{
     glViewport(0, 0, width, height);
     EventManager::PushEvent(new WindowResizedEvent(width, height));
+}
+
+void Window::FileDropCallback(GLFWwindow* window, int pathCount, const char* paths[]) noexcept
+{
+    EventManager::PushEvent(new FileDroppedEvent(pathCount, paths));
 }
 
 WindowSize Window::GetSize() noexcept
@@ -136,6 +152,6 @@ WindowSize Window::GetSize() noexcept
 
 void Window::Shutdown() const
 {
-        glfwDestroyWindow(m_Window);
+    glfwDestroyWindow(m_Window);
 }
 

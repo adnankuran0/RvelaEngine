@@ -15,6 +15,9 @@
 #include "AssetImporters/TextureImporter.h"
 #include "AssetImporters/MeshImporter.h"
 #include <memory>
+#include "Event/Event.h"
+#include "Event/MouseEvents.h"
+#include <Event/WindowEvents.h>
 
 using namespace rv;
 
@@ -87,6 +90,61 @@ void EditorLayer::OnFixedUpdate()
 
 void EditorLayer::OnLateUpdate()
 {
+}
+
+void EditorLayer::OnEvent(Event& event)
+{
+    switch (event.GetEventType())
+    {
+    case EventType::MouseMoved:
+    {
+        if (MouseMovedEvent* mouseEvent = static_cast<MouseMovedEvent*>(&event))
+        {
+            if (m_Engine->GetActiveScene().GetState() == SceneState::EDIT)
+            {
+                m_EditorCamera.OnMouseMoved(
+                    mouseEvent->GetX(),
+                    mouseEvent->GetY(),
+                    m_Engine->GetWindow().GetGLFWWindow()
+                );
+            }
+
+        }
+        break;
+    }
+    case EventType::MouseScrolled:
+    {
+        if (Input::IsMouseButtonPressed(MouseCode::Button1))
+        {
+            if (MouseScrolledEvent* scrollEvent = static_cast<MouseScrolledEvent*>(&event))
+            {
+                // Adjust sprint speed based on scroll input
+                m_EditorCamera.MovementSpeed += scrollEvent->GetYOffset();
+                m_EditorCamera.MovementSpeed = std::clamp(m_EditorCamera.MovementSpeed, 1.0f, 100.0f);
+            }
+        }
+        break;
+    }
+    case EventType::KeyPressed:
+    {
+        if (Input::IsKeyJustPressed(KeyCode::End))
+        {
+            LOG_DEBUG("Shaders reloaded.");
+            ShaderManager::ReloadAll();
+        }
+        break;
+    }
+    case EventType::FileDropped:
+    {
+        if (FileDroppedEvent* fileEvent = static_cast<FileDroppedEvent*>(&event))
+        {
+            m_AssetBrowserPanel.HandleFileDrop(*fileEvent, m_AssetImportPipeline);
+        }
+        break;
+    }
+    default:
+        break;
+    }
 }
 
 void EditorLayer::Render()

@@ -109,7 +109,15 @@ void AssetRegistry::Scan(const std::filesystem::path& assetDir)
             bool hasPath = m_UUIDToPath.contains(uuid);
 
             if (!hasMeta)
+            {
+                std::error_code ec;
+                std::filesystem::remove(cachePath, ec);
+
+                if (ec)
+                    LOG_ERROR("Failed to delete cache: {}", cachePath.string());
+
                 continue;
+            }
 
             bool alreadyHasCachePath = hasPath &&
                 m_UUIDToPath[uuid].string().find(".cache") != std::string::npos;

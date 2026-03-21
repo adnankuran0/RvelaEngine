@@ -31,6 +31,7 @@ public:
     void OnRender() override;
     void OnFixedUpdate() override;
     void OnLateUpdate() override;
+    void OnEvent(Event& event) override;
     void Render();
 
     EditorCamera& GetEditorCamera() { return m_EditorCamera; }

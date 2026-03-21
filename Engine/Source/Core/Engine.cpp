@@ -117,50 +117,13 @@ void Engine::Run()
 
 void Engine::HandleEvents() noexcept
 {
-	EventManager::DispatchEvents([this](Event& event) {
-		switch (event.GetEventType())
+	EventManager::DispatchEvents([this](Event& event) 
 		{
-		case EventType::MouseMoved:
-		{
-			if (auto* mouseEvent = dynamic_cast<MouseMovedEvent*>(&event) )
+		
+			for (auto* layer : m_LayerStack)
 			{
-				if (GetActiveScene().GetState() == SceneState::EDIT && m_EditorCamera)
-				{
-					m_EditorCamera->OnMouseMoved(
-						mouseEvent->GetX(),
-						mouseEvent->GetY(),
-						m_Window.GetGLFWWindow()
-					);
-				}
-				
+				layer->OnEvent(event);
 			}
-			break;
-		}
-		case EventType::MouseScrolled:
-		{
-			if (Input::IsMouseButtonPressed(MouseCode::Button1))
-			{
-				if (auto* scrollEvent = dynamic_cast<MouseScrolledEvent*>(&event))
-				{
-					// Adjust sprint speed based on scroll input
-					m_EditorCamera->MovementSpeed += scrollEvent->GetYOffset();
-					m_EditorCamera->MovementSpeed = std::clamp(m_EditorCamera->MovementSpeed, 1.0f, 100.0f);
-				}
-			}
-			break;
-		}
-		case EventType::KeyPressed:
-		{
-			if (Input::IsKeyJustPressed(KeyCode::End))
-			{
-				LOG_DEBUG("Shaders reloaded.");
-				ShaderManager::ReloadAll();
-			}
-			break;
-		}
-		default:
-			break;
-		}
 		});
 }
 

@@ -17,8 +17,12 @@ void SceneManager::Init()
 
 void SceneManager::SaveScene(const std::string& path)
 {
-    
     m_SceneSerializer.SaveScene(GetActiveScene(), path);
+}
+
+void SceneManager::SaveScene(Scene& scene, const std::string& path)
+{
+    m_SceneSerializer.SaveScene(scene, path);
 }
 
 void SceneManager::LoadScene(const std::string& path)
