@@ -39,9 +39,9 @@ public:
 
         if (asset->useNormalMap) j["normalTexture"] = asset->normalTextureUUID.ToString();
         if (asset->useMetallicMap) j["metallicTexture"] = asset->metallicTextureUUID.ToString();
-        else j["metallic"] = asset->metallic;
+        j["metallic"] = asset->metallic;
         if (asset->useRoughnessMap) j["roughnessTexture"] = asset->roughnessTextureUUID.ToString();
-        else j["roughness"] = asset->roughness;
+        j["roughness"] = asset->roughness;
         if (asset->useAOMap) j["aoTexture"] = asset->aoTextureUUID.ToString();
         if (asset->useHeightMap) j["heightTexture"] = asset->heightTextureUUID.ToString();
 

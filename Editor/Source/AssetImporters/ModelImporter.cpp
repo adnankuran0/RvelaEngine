@@ -58,9 +58,10 @@ std::filesystem::path ModelImporter::GetCachePath(
     const AssetMeta& meta,
     const std::filesystem::path& cacheRoot) const
 {
-    return cacheRoot / (meta.uuid.ToString() + ".rprefab");
+    auto prefabPath = sourcePath;
+    prefabPath.replace_extension(".rprefab");
+    return prefabPath;
 }
-
 bool ModelImporter::Import(const std::filesystem::path& sourcePath,
     const std::filesystem::path& outCachePath,
     const std::string& settingsJson)
@@ -110,7 +111,7 @@ void ModelImporter::MergeAndSaveSubAssets(
             if (sub.type == entry.type && sub.index == entry.index)
             {
                 sub.uuid = entry.uuid;
-                sub.sourceHash = entry.sourceHash;
+                sub.hasCache = entry.hasCache;
                 return;
             }
         parentMeta.subAssets.push_back(entry);
@@ -125,8 +126,7 @@ void ModelImporter::MergeAndSaveSubAssets(
             entry.name = modelPath.stem().string() + "_Mesh" + std::to_string(meshIndex);
         entry.type = "Mesh";
         entry.index = meshIndex;
-        entry.sourceHash = IAssetImporter::HashFile(modelPath)
-            ^ (uint64_t(meshIndex) * 2654435761ULL);
+        entry.hasCache = true;
         ensureSubAsset(entry);
     }
 
@@ -137,7 +137,7 @@ void ModelImporter::MergeAndSaveSubAssets(
         entry.name = modelPath.stem().string() + "_Mat" + std::to_string(matIndex);
         entry.type = "Material";
         entry.index = matIndex;
-        entry.sourceHash = 0; 
+        entry.hasCache = false;
         ensureSubAsset(entry);
     }
 
@@ -213,13 +213,26 @@ void ModelImporter::ExtractTextures(
         auto cachePath = m_TextureImporter.GetCachePath(texPath, meta, cacheRoot);
         std::filesystem::create_directories(cachePath.parent_path());
 
-        uint64_t currentHash = IAssetImporter::HashFile(texPath);
-        if (meta.sourceHash != currentHash || !std::filesystem::exists(cachePath))
+        std::error_code ec;
+        auto lastWrite = std::filesystem::last_write_time(texPath, ec);
+        uint64_t currentTimeStamp = 0;
+        if (!ec)
         {
+            currentTimeStamp = std::chrono::duration_cast<std::chrono::seconds>(
+                lastWrite.time_since_epoch()).count();
+        }
+
+        bool needsImport = !std::filesystem::exists(cachePath) ||
+            meta.lastWriteTime != currentTimeStamp;
+
+        if (needsImport)
+        {
+            LOG_INFO("Importing texture: {}", texPath.filename().string());
+
             if (m_TextureImporter.Import(texPath, cachePath, meta.importerSettingsJson))
             {
                 meta.importerID = m_TextureImporter.GetImporterID();
-                meta.sourceHash = currentHash;
+                meta.lastWriteTime = currentTimeStamp;
                 registry.SaveMeta(texPath, meta);
             }
             else
@@ -359,6 +372,7 @@ void ModelImporter::ExtractMaterials(
             entry.name = modelPath.stem().string() + "_Mat" + std::to_string(i);
             entry.type = "Material";
             entry.index = i;
+            entry.hasCache = false;
             parentMeta.subAssets.push_back(entry);
         }
     }
@@ -388,13 +402,9 @@ void ModelImporter::ExtractMeshes(
             }
         }
 
-        uint64_t hash = IAssetImporter::HashFile(modelPath)
-            ^ (uint64_t(meshIndex) * 2654435761ULL);
-
         if (existing)
         {
             existing->uuid = meshUUID;
-            existing->sourceHash = hash;
         }
         else
         {
@@ -405,7 +415,7 @@ void ModelImporter::ExtractMeshes(
                 entry.name = modelPath.stem().string() + "_Mesh" + std::to_string(meshIndex);
             entry.type = "Mesh";
             entry.index = meshIndex;
-            entry.sourceHash = hash;
+            entry.hasCache = true;
             parentMeta.subAssets.push_back(entry);
         }
     }

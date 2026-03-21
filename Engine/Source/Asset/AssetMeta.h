@@ -12,14 +12,15 @@ struct SubAssetEntry
     std::string name;
     std::string type;
     uint32_t index = 0;
-    uint64_t sourceHash = 0;
+    uint64_t lastWriteTime = 0;
+    bool hasCache = false;
 };
 
 struct AssetMeta
 {
     AssetUUID uuid;
     std::string importerID;
-    uint64_t sourceHash = 0;
+    uint64_t lastWriteTime = 0;
     std::string importerSettingsJson;
 
     std::vector<AssetUUID> dependencies;  
@@ -32,6 +33,9 @@ struct AssetMeta
     {
         return std::filesystem::path(assetPath.string() + ".rmeta");
     }
+
+    bool IsModified(const std::filesystem::path& path) const;
+    
 };
 
 }

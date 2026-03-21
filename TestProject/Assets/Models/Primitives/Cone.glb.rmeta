@@ -2,19 +2,19 @@
     "dependencies": [],
     "importerID": "ModelImporter",
     "importerSettings": {},
-    "sourceHash": 11326287834794277222,
+    "lastWriteTime": 13415805096,
     "subAssets": [
         {
+            "hasCache": false,
             "index": 0,
             "name": "Cone_Mat0",
-            "sourceHash": 0,
             "type": "Material",
             "uuid": "f49d135b-9a56-4137-ad0c-aad770dee627"
         },
         {
+            "hasCache": false,
             "index": 0,
             "name": "Cone",
-            "sourceHash": 11326287834794277222,
             "type": "Mesh",
             "uuid": "92ffc5c9-9f6f-4332-ad83-e1d03b046a53"
         }

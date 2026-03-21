@@ -16,9 +16,9 @@
     ],
     "emissiveIntensity": 0.0,
     "heightScale": 0.10000000149011612,
-    "metallic": 0.0,
-    "normalScale": -1.0,
+    "metallic": 0.5,
+    "normalScale": 1.0,
     "normalTexture": "577ce1ed-953b-42a4-8b38-9632af00414c",
-    "roughness": 1.0,
+    "roughness": 0.6535898447036743,
     "specular": 1.0
 }

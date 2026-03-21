@@ -63,6 +63,11 @@ void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter)
                 }
             }
 
+            if (ImGui::MenuItem("Reimport all assets"))
+            {
+                assetImporter.ReimportAll(AssetManager::Get().GetRegistry());
+            }
+
             if (ImGui::MenuItem("Create Material"))
             {
                 const char* filterPatterns[] = { "*.rmat" };

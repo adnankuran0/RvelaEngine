@@ -2,19 +2,19 @@
     "dependencies": [],
     "importerID": "ModelImporter",
     "importerSettings": {},
-    "sourceHash": 15228523430237185247,
+    "lastWriteTime": 13415805344,
     "subAssets": [
         {
+            "hasCache": false,
             "index": 0,
             "name": "Torus_Mat0",
-            "sourceHash": 0,
             "type": "Material",
             "uuid": "3814bb3f-5522-4d10-944c-17147f860100"
         },
         {
+            "hasCache": false,
             "index": 0,
             "name": "Torus",
-            "sourceHash": 15228523430237185247,
             "type": "Mesh",
             "uuid": "db65917a-cf92-4335-addb-f30e2608d318"
         }

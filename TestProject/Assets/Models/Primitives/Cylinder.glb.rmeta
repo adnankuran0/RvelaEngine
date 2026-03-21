@@ -2,19 +2,19 @@
     "dependencies": [],
     "importerID": "ModelImporter",
     "importerSettings": {},
-    "sourceHash": 18273870776273637136,
+    "lastWriteTime": 13415805042,
     "subAssets": [
         {
+            "hasCache": false,
             "index": 0,
             "name": "Cylinder_Mat0",
-            "sourceHash": 0,
             "type": "Material",
             "uuid": "a7b6cf4f-3e75-4a4b-b8e9-ab246feea70d"
         },
         {
+            "hasCache": false,
             "index": 0,
             "name": "Cylinder",
-            "sourceHash": 18273870776273637136,
             "type": "Mesh",
             "uuid": "2c4d9b01-fea1-4eec-b741-bb054229ba61"
         }

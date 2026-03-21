@@ -2,19 +2,19 @@
     "dependencies": [],
     "importerID": "ModelImporter",
     "importerSettings": {},
-    "sourceHash": 11701999077847563597,
+    "lastWriteTime": 13415805292,
     "subAssets": [
         {
+            "hasCache": false,
             "index": 0,
             "name": "Monkey_Mat0",
-            "sourceHash": 0,
             "type": "Material",
             "uuid": "ab90d890-0861-4c4c-809b-98515bf111db"
         },
         {
+            "hasCache": false,
             "index": 0,
             "name": "Suzanne",
-            "sourceHash": 11701999077847563597,
             "type": "Mesh",
             "uuid": "d5b8e68a-8170-4b1a-b439-62ae98d391f8"
         }

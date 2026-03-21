@@ -11,7 +11,7 @@ bool AssetMeta::SaveToFile(const std::filesystem::path& metaPath) const
     json j;
     j["uuid"] = uuid.ToString();
     j["importerID"] = importerID;
-    j["sourceHash"] = sourceHash;
+    j["lastWriteTime"] = lastWriteTime;
     j["importerSettings"] = importerSettingsJson.empty() ? json::object() : json::parse(importerSettingsJson);
 
     json deps = json::array();
@@ -27,7 +27,7 @@ bool AssetMeta::SaveToFile(const std::filesystem::path& metaPath) const
             {"name",  sub.name},
             {"type",  sub.type},
             {"index", sub.index},
-            { "sourceHash", sub.sourceHash }
+            {"hasCache", sub.hasCache}
             });
     }
     j["subAssets"] = jSubAssets;
@@ -52,9 +52,9 @@ bool AssetMeta::LoadFromFile(const std::filesystem::path& metaPath)
     }
 
     json j;
-    try 
-    { 
-        j = json::parse(file); 
+    try
+    {
+        j = json::parse(file);
     }
     catch (const json::exception& e)
     {
@@ -64,7 +64,12 @@ bool AssetMeta::LoadFromFile(const std::filesystem::path& metaPath)
 
     uuid = AssetUUID::FromString(j.value("uuid", ""));
     importerID = j.value("importerID", "");
-    sourceHash = j.value<uint64_t>("sourceHash",0);
+
+    if (j.contains("lastWriteTime"))
+        lastWriteTime = j.value<uint64_t>("lastWriteTime", 0);
+    else if (j.contains("sourceHash"))
+        lastWriteTime = j.value<uint64_t>("sourceHash", 0);
+
     importerSettingsJson = j.contains("importerSettings") ? j["importerSettings"].dump() : "{}";
 
     dependencies.clear();
@@ -82,10 +87,22 @@ bool AssetMeta::LoadFromFile(const std::filesystem::path& metaPath)
             entry.name = jSub.value("name", "");
             entry.type = jSub.value("type", "");
             entry.index = jSub.value("index", 0u);
-            entry.sourceHash = jSub.value<uint64_t>("sourceHash", 0);
+            entry.hasCache = jSub.value("hasCache", false);
             subAssets.push_back(entry);
         }
     }
 
     return true;
+}
+
+bool AssetMeta::IsModified(const std::filesystem::path& path) const
+{
+    std::error_code ec;
+    auto currentTime = std::filesystem::last_write_time(path, ec);
+    if (ec) return true;
+
+    auto currentTimeStamp = std::chrono::duration_cast<std::chrono::seconds>(
+        currentTime.time_since_epoch()).count();
+
+    return currentTimeStamp != lastWriteTime;
 }

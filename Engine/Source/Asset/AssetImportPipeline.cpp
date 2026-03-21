@@ -26,7 +26,6 @@ bool AssetImportPipeline::ImportAsset(const std::filesystem::path& sourcePath, A
 
     AssetMeta meta = registry.GetOrCreateMeta(sourcePath);
 
-    // set importer id for first loaded assets
     if (meta.importerID.empty())
     {
         meta.importerID = importer->GetImporterID();
@@ -51,11 +50,19 @@ bool AssetImportPipeline::ImportAsset(const std::filesystem::path& sourcePath, A
         return false;
     }
 
-    meta.sourceHash = IAssetImporter::HashFile(sourcePath);
-    AssetMeta updatedMeta = registry.GetMeta(meta.uuid);
-    updatedMeta.sourceHash = IAssetImporter::HashFile(sourcePath);
-    registry.SaveMeta(sourcePath, updatedMeta);
+    std::error_code ec;
+    auto lastWrite = std::filesystem::last_write_time(sourcePath, ec);
+    if (!ec)
+    {
+        meta.lastWriteTime = std::chrono::duration_cast<std::chrono::seconds>(
+            lastWrite.time_since_epoch()).count();
+    }
+    else
+    {
+        meta.lastWriteTime = 0;
+    }
 
+    registry.SaveMeta(sourcePath, meta);
     registry.RegisterPath(meta.uuid, cachePath);
 
     return true;
@@ -85,33 +92,39 @@ void AssetImportPipeline::ReimportAll(AssetRegistry& registry)
     }
 }
 
-bool AssetImportPipeline::NeedsReimport(
-    const std::filesystem::path& sourcePath,
-    const AssetMeta& meta) const
+bool AssetImportPipeline::NeedsReimport(const std::filesystem::path& sourcePath, const AssetMeta& meta) const
 {
-    if (meta.sourceHash == 0) return true;
+    if (meta.lastWriteTime == 0)
+        return true;
+
+    if (meta.IsModified(sourcePath))
+        return true;
 
     IAssetImporter* importer = FindImporter(sourcePath.extension().string());
-    if (!importer) return false;
+    if (!importer)
+        return false;
 
     auto& registry = AssetManager::Get().GetRegistry();
     auto cacheRoot = registry.GetAssetDir() / ".cache";
-
     auto cachePath = importer->GetCachePath(sourcePath, meta, cacheRoot);
-    if (!std::filesystem::exists(cachePath)) return true;
+
+    if (!std::filesystem::exists(cachePath))
+        return true;
 
     for (auto& sub : meta.subAssets)
     {
         if (!sub.uuid.IsValid()) continue;
-        auto subCachePath = cacheRoot / (sub.uuid.ToString() +
-            (sub.type == "Mesh" ? ".rmesh" :
-                sub.type == "Material" ? ".rmat" :
-                sub.type == "Texture" ? ".rtexture" : ""));
-        if (!subCachePath.empty() && !std::filesystem::exists(subCachePath))
+        if (!sub.hasCache) continue;
+
+        auto subCachePath = registry.GetPath(sub.uuid);
+        if (subCachePath.empty())
+            return true;
+
+        if (!std::filesystem::exists(subCachePath))
             return true;
     }
 
-    return IAssetImporter::HashFile(sourcePath) != meta.sourceHash;
+    return false;
 }
 
 IAssetImporter* AssetImportPipeline::FindImporter(const std::string& ext) const

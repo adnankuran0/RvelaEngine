@@ -32,14 +32,12 @@ void AssetRegistry::Scan(const std::filesystem::path& assetDir)
                 AssetMeta meta;
                 meta.uuid = AssetUUID{};
                 meta.importerID = "";
-                meta.sourceHash = 0;
+                meta.lastWriteTime = 0;
                 meta.SaveToFile(metaPath);
 
                 m_UUIDToPath[meta.uuid] = path;
                 m_PathToUUID[path.string()] = meta.uuid;
                 m_Metas[meta.uuid] = meta;
-
-                LOG_INFO("Auto-created meta for: {}", path.filename().string());
             }
             continue;
         }
@@ -54,6 +52,19 @@ void AssetRegistry::Scan(const std::filesystem::path& assetDir)
         {
             LOG_WARN("Invalid UUID: {}", metaPath.filename().string());
             continue;
+        }
+
+       
+        if (meta.lastWriteTime == 0)
+        {
+            std::error_code ec;
+            auto lastWrite = std::filesystem::last_write_time(path, ec);
+            if (!ec)
+            {
+                meta.lastWriteTime = std::chrono::duration_cast<std::chrono::seconds>(
+                    lastWrite.time_since_epoch()).count();
+                meta.SaveToFile(metaPath);
+            }
         }
 
         m_UUIDToPath[meta.uuid] = path;
@@ -84,7 +95,6 @@ void AssetRegistry::Scan(const std::filesystem::path& assetDir)
             auto cachePath = entry.path();
             auto ext = cachePath.extension().string();
 
-
             if (ext != ".rmesh" && ext != ".rtex" && ext != ".rprefab" && ext != ".rmat")
                 continue;
 
@@ -99,11 +109,7 @@ void AssetRegistry::Scan(const std::filesystem::path& assetDir)
             bool hasPath = m_UUIDToPath.contains(uuid);
 
             if (!hasMeta)
-            {
-                /*LOG_WARN("Cache file with no meta. Consider deleting: {}",
-                    cachePath.filename().string());*/
                 continue;
-            }
 
             bool alreadyHasCachePath = hasPath &&
                 m_UUIDToPath[uuid].string().find(".cache") != std::string::npos;
@@ -119,7 +125,6 @@ void AssetRegistry::Scan(const std::filesystem::path& assetDir)
     {
         LOG_WARN(".cache does not exist: {}", cacheRoot.string());
     }
-
 }
 
 void AssetRegistry::RegisterSubAsset(const AssetUUID& uuid,
@@ -171,6 +176,18 @@ AssetMeta AssetRegistry::GetOrCreateMeta(const std::filesystem::path& path)
         AssetMeta meta;
         if (meta.LoadFromFile(metaPath))
         {
+            if (meta.lastWriteTime == 0)
+            {
+                std::error_code ec;
+                auto lastWrite = std::filesystem::last_write_time(path, ec);
+                if (!ec)
+                {
+                    meta.lastWriteTime = std::chrono::duration_cast<std::chrono::seconds>(
+                        lastWrite.time_since_epoch()).count();
+                    meta.SaveToFile(metaPath);
+                }
+            }
+
             m_UUIDToPath[meta.uuid] = path;
             m_PathToUUID[path.string()] = meta.uuid;
             m_Metas[meta.uuid] = meta;
@@ -181,7 +198,7 @@ AssetMeta AssetRegistry::GetOrCreateMeta(const std::filesystem::path& path)
     AssetMeta meta;
     meta.uuid = AssetUUID{}; // generates a new UUID
     meta.importerID = "";
-    meta.sourceHash = 0;
+    meta.lastWriteTime = 0;
 
     meta.SaveToFile(metaPath);
 
@@ -246,4 +263,10 @@ std::vector<AssetUUID> AssetRegistry::GetDependencies(const AssetUUID& uuid) con
     if (it == m_Metas.end())
         return {};
     return it->second.dependencies;
+}
+
+void AssetRegistry::RegisterPath(const AssetUUID& uuid, const std::filesystem::path& path)
+{
+    m_UUIDToPath[uuid] = path;
+    m_PathToUUID[path.string()] = uuid;
 }

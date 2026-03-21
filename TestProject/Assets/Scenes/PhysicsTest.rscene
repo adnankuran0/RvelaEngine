@@ -10,6 +10,68 @@
                 ]
             },
             "Material": {
+                "material": "82e248a8-0e79-4d85-ab0e-9583f4b2b54d"
+            },
+            "Mesh": {
+                "mesh": "2a7b6688-8d79-4fd9-9ed1-21381e0ffb11"
+            },
+            "ParentUUID": 0,
+            "RigidbodyComponent": {
+                "allowSleep": 1,
+                "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 0,
+                "bodyType": 2,
+                "collisionLayer": 1,
+                "collisionMask": 4294967295,
+                "friction": 0.5,
+                "gravityFactor": 1.0,
+                "isSensor": false,
+                "linearDamping": 0.05000000074505806,
+                "lockRotationX": false,
+                "lockRotationY": false,
+                "lockRotationZ": false,
+                "lockTranslationX": false,
+                "lockTranslationY": false,
+                "lockTranslationZ": false,
+                "mass": 30.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
+                "restitution": 0.0,
+                "useCCD": false
+            },
+            "Tag": {
+                "tag": "mid_century_lounge_chair"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    3.547210931777954,
+                    1.5284558534622192,
+                    3.752641714527272e-05
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 22
+        },
+        {
+            "ConvexHullColliderComponent": {
+                "maxConvexRadius": 0.0,
+                "offset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ]
+            },
+            "Material": {
                 "material": "f93d7599-ebd5-4dab-af6c-06858b61612f"
             },
             "Mesh": {
@@ -45,19 +107,19 @@
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
-                    0.0,
+                    -0.0003421008586883545,
                     1.7502150535583496,
                     2.089085340499878
                 ],
                 "rotation": [
-                    -89.99576568603516,
+                    -89.99269104003906,
                     0.0,
                     0.0
                 ],
                 "scale": [
                     1.3199999332427979,
-                    1.319735050201416,
-                    1.319735050201416
+                    1.3196022510528564,
+                    1.3196022510528564
                 ]
             },
             "UUID": 10
@@ -334,7 +396,73 @@
                     1.0
                 ]
             },
-            "UUID": 21
+            "UUID": 4
+        },
+        {
+            "BoxColliderComponent": {
+                "offset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    0.5,
+                    0.5,
+                    0.5
+                ]
+            },
+            "Material": {
+                "material": "1d3e6ca6-0cc0-4c85-ae73-36db93d0aee4"
+            },
+            "Mesh": {
+                "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
+            },
+            "ParentUUID": 0,
+            "RigidbodyComponent": {
+                "allowSleep": 1,
+                "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
+                "bodyType": 0,
+                "collisionLayer": 1,
+                "collisionMask": 4294967295,
+                "friction": 0.5,
+                "gravityFactor": 1.0,
+                "isSensor": false,
+                "linearDamping": 0.05000000074505806,
+                "lockRotationX": false,
+                "lockRotationY": false,
+                "lockRotationZ": false,
+                "lockTranslationX": false,
+                "lockTranslationY": false,
+                "lockTranslationZ": false,
+                "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
+                "restitution": 0.0,
+                "useCCD": false
+            },
+            "Tag": {
+                "tag": "Cube"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    10.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    10.0,
+                    1.0,
+                    10.0
+                ]
+            },
+            "UUID": 12
         }
     ],
     "Environment": {

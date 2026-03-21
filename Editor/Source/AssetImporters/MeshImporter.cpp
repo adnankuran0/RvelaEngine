@@ -71,6 +71,7 @@ bool MeshImporter::ImportFromScene(
     std::filesystem::create_directories(cacheRoot);
 
     AssetMeta parentMeta = registry.GetOrCreateMeta(sourcePath);
+
     std::unordered_map<uint32_t, SubAssetEntry> existingByIndex;
     for (auto& sub : parentMeta.subAssets)
         if (sub.type == "Mesh")
@@ -82,9 +83,6 @@ bool MeshImporter::ImportFromScene(
         std::string meshName = mesh->mName.C_Str();
         if (meshName.empty()) meshName = "Mesh_" + std::to_string(i);
 
-        uint64_t currentHash = IAssetImporter::HashFile(sourcePath)
-            ^ (uint64_t(i) * 2654435761ULL);
-
         AssetUUID meshUUID;
         auto existIt = existingByIndex.find(i);
         if (existIt != existingByIndex.end())
@@ -94,9 +92,7 @@ bool MeshImporter::ImportFromScene(
 
         auto cachePath = cacheRoot / (meshUUID.ToString() + ".rmesh");
 
-        bool needsImport = !std::filesystem::exists(cachePath)
-            || existIt == existingByIndex.end()
-            || existIt->second.sourceHash != currentHash;
+        bool needsImport = !std::filesystem::exists(cachePath);
 
         if (needsImport)
         {

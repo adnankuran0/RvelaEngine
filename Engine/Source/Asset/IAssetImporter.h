@@ -21,7 +21,6 @@ public:
 		const std::filesystem::path& outCachePath,
 		const std::string& settingsJson) = 0;
 
-	static uint64_t HashFile(const std::filesystem::path& path);
 };
 	
 }

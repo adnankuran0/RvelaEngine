@@ -103,9 +103,6 @@ bool TextureImporter::Import(
 
     int loadedChannels = desiredChannels > 0 ? desiredChannels : channels;
 
-    LOG_INFO("DEBUG: desiredChannels={} stbi_channels={} loadedChannels={}",
-        desiredChannels, channels, loadedChannels);
-
     assert(!(isNormal && loadedChannels != 3) && "Normal map must be RGB8!");
 
     TextureFormat format = TextureFormat::Unknown;
@@ -128,9 +125,7 @@ bool TextureImporter::Import(
 
     size_t pixelSize = static_cast<size_t>(w) * h * loadedChannels;
 
-    LOG_INFO("Importing {} -> w={} h={} format={} isSRGB={}",
-        filename, w, h, static_cast<int>(format), header.isSRGB);
-
+   
     std::ofstream file(outCachePath, std::ios::binary);
     if (!file)
     {
