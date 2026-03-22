@@ -124,7 +124,6 @@ bool TextureImporter::Import(
     header.isSRGB = forceSRGB ? 1 : 0;
 
     size_t pixelSize = static_cast<size_t>(w) * h * loadedChannels;
-
    
     std::ofstream file(outCachePath, std::ios::binary);
     if (!file)

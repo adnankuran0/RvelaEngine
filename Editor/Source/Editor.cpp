@@ -1,8 +1,6 @@
 #include "Editor.h"
 #include "EditorLayer.h"
 
-
-
 Editor::Editor()
 {
     rv::EditorLayer* editorLayer = new rv::EditorLayer(&m_Engine);
