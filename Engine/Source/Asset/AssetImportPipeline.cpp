@@ -32,6 +32,7 @@ bool AssetImportPipeline::ImportAsset(const std::filesystem::path& sourcePath, A
     if (meta.importerID.empty())
     {
         meta.importerID = importer->GetImporterID();
+        meta.importerSettingsJson = importer->GetDefaultSettings();
         registry.SaveMeta(sourcePath, meta);
     }
 
@@ -93,6 +94,17 @@ void AssetImportPipeline::ReimportAll(AssetRegistry& registry)
         else
             ++failed;
     }
+}
+
+void AssetImportPipeline::Reimport(const std::filesystem::path& sourcePath, AssetRegistry& registry)
+{
+    auto ext = sourcePath.extension().string();
+    if (ext == ".rmeta") return;
+
+    IAssetImporter* importer = FindImporter(sourcePath.extension().string());
+    if (!importer) return;
+
+    ImportAsset(sourcePath, registry);
 }
 
 bool AssetImportPipeline::NeedsReimport(const std::filesystem::path& sourcePath, const AssetMeta& meta) const

@@ -12,8 +12,9 @@ class AssetImportPipeline
 public:
     void RegisterImporter(std::unique_ptr<IAssetImporter> importer);
 
-    bool ImportAsset(const std::filesystem::path& sourcePath, AssetRegistry& db);
+    bool ImportAsset(const std::filesystem::path& sourcePath, AssetRegistry& registry);
     void ReimportAll(AssetRegistry& db);
+    void Reimport(const std::filesystem::path& sourcePath, AssetRegistry& registry);
     bool NeedsReimport(const std::filesystem::path& sourcePath, const AssetMeta& meta) const;
 
 private:

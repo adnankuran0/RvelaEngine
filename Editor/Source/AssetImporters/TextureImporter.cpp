@@ -12,14 +12,8 @@
 using namespace rv;
 using json = nlohmann::json;
 
-struct TextureImportSettings
-{
-    bool sRGB = true;
-    bool generateMips = false;
-    int maxSize = 2048;
-};
 
-static TextureImportSettings ParseSettings(const std::string& settingsJson)
+TextureImportSettings TextureImporter::ParseSettings(const std::string& settingsJson)
 {
     TextureImportSettings settings;
     if (settingsJson.empty() || settingsJson == "{}")
@@ -138,4 +132,14 @@ bool TextureImporter::Import(
 
     stbi_image_free(pixels);
     return true;
+}
+
+std::string rv::TextureImporter::GetDefaultSettings() const
+{
+    TextureImportSettings s;
+    json j;
+    j["sRGB"] = s.sRGB;
+    j["generateMips"] = s.generateMips;
+    j["maxSize"] = s.maxSize;
+    return j.dump();
 }

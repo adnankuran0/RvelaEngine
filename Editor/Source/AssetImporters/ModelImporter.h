@@ -63,6 +63,9 @@ public:
         AssetRegistry& registry,
         const ModelImportSettings& settings = {});
 
+    std::string GetDefaultSettings() const override;
+    static ModelImportSettings ParseSettings(const std::string& settingsJson);
+
 private:
     const aiScene* LoadScene(
         const std::filesystem::path& path,
@@ -120,7 +123,6 @@ private:
         const std::string& texPath,
         const std::filesystem::path& modelPath) const;
 
-    static ModelImportSettings ParseSettings(const std::string& settingsJson);
     static std::string SanitizeFilename(const std::string& name);
 
     MeshImporter m_MeshImporter;

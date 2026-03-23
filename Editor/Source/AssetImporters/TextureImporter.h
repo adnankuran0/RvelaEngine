@@ -3,6 +3,13 @@
 
 namespace rv {
 
+struct TextureImportSettings
+{
+    bool sRGB = false;
+    bool generateMips = false;
+    int maxSize = 2048;
+};
+
 class TextureImporter : public IAssetImporter
 {
 public:
@@ -22,6 +29,11 @@ public:
         const std::filesystem::path& sourcePath,
         const std::filesystem::path& outCachePath,
         const std::string& settingsJson) override;
+
+    std::string GetDefaultSettings() const override;
+
+    static TextureImportSettings ParseSettings(const std::string& settingsJson);
+
 };
 
 }

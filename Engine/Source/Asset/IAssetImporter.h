@@ -15,6 +15,7 @@ public:
 		const AssetMeta& meta,
 		const std::filesystem::path& cacheRoot) const = 0;
 	virtual std::vector<std::string> GetSupportedExtensions() const = 0;
+	virtual std::string GetDefaultSettings() const = 0;
 
 	virtual bool Import(
 		const std::filesystem::path& sourcePath,

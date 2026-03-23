@@ -1,7 +1,15 @@
 {
     "dependencies": [],
     "importerID": "ModelImporter",
-    "importerSettings": {},
+    "importerSettings": {
+        "generatePrefab": true,
+        "importMaterials": true,
+        "importNormals": true,
+        "importTangents": true,
+        "importTextures": true,
+        "importUVs": true,
+        "scale": 0.10100000351667404
+    },
     "lastWriteTime": 13414169305,
     "subAssets": [
         {

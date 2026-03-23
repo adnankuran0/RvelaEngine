@@ -36,6 +36,8 @@ public:
         AssetRegistry& registry,
         std::unordered_map<unsigned int, AssetUUID>& outMeshMap);
 
+    std::string GetDefaultSettings() const override { return ""; }
+
 private:
     std::vector<Vertex>       ProcessVertices(aiMesh* mesh);
     std::vector<unsigned int> ProcessIndices(aiMesh* mesh);

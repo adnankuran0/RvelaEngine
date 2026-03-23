@@ -98,6 +98,22 @@ ModelImportResult ModelImporter::ImportModel(
     return result;
 }
 
+std::string ModelImporter::GetDefaultSettings() const
+{ 
+    ModelImportSettings s;
+
+    json j;
+    j["scale"] = s.scale;
+    j["importNormals"] = s.importNormals;
+    j["importTangents"] = s.importTangents;
+    j["importUVs"] = s.importUVs;
+    j["importTextures"] = s.importTextures;
+    j["importMaterials"] = s.importMaterials;
+    j["generatePrefab"] = s.generatePrefab;
+
+    return j.dump();
+}
+
 void ModelImporter::MergeAndSaveSubAssets(
     const aiScene* scene,
     const std::filesystem::path& modelPath,
@@ -154,7 +170,6 @@ const aiScene* ModelImporter::LoadScene(
 
     unsigned int flags =
         aiProcess_Triangulate |
-        aiProcess_GenSmoothNormals |
         aiProcess_GenUVCoords |          
         aiProcess_TransformUVCoords |
         aiProcess_CalcTangentSpace |     

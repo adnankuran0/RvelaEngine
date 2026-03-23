@@ -11,8 +11,22 @@
 #include "Core/Engine.h"
 #include "Scene/Entity.h"
 #include "AssetImporters/MaterialSerializer.h"
+#include <AssetImporters/TextureImporter.h>
+#include <AssetImporters/ModelImporter.h>
 
 using namespace rv;
+
+struct ReimportWindowState
+{
+    bool open = false;
+    std::filesystem::path path;
+    std::string importerID;
+
+    TextureImportSettings textureSettings;
+    ModelImportSettings modelSettings;
+};
+
+static ReimportWindowState s_ReimportState;
 
 struct DirNode
 {
@@ -34,6 +48,100 @@ static bool s_RenamingActive = false;
 static std::filesystem::path s_RenamingPath;
 static char s_RenameBuffer[256] = "";
 
+static void DrawReimportWindow(AssetImportPipeline& importPipeline)
+{
+    if (!s_ReimportState.open)
+        return;
+
+    ImGui::Begin("Reimport Settings", &s_ReimportState.open);
+
+    if (s_ReimportState.importerID == "TextureImporter")
+    {
+        auto& s = s_ReimportState.textureSettings;
+
+        ImGui::Checkbox("sRGB", &s.sRGB);
+        ImGui::Checkbox("Generate Mips", &s.generateMips);
+        ImGui::DragInt("Max Size", &s.maxSize, 1, 1, 8192);
+    }
+    if (s_ReimportState.importerID == "ModelImporter")
+    {
+        auto& s = s_ReimportState.modelSettings;
+
+        ImGui::DragFloat("Scale", &s.scale, 0.01f, 0.001f, 100.0f);
+
+        ImGui::Separator();
+
+        ImGui::Checkbox("Import Normals", &s.importNormals);
+        ImGui::Checkbox("Import Tangents", &s.importTangents);
+        ImGui::Checkbox("Import UVs", &s.importUVs);
+
+        ImGui::Separator();
+
+        ImGui::Checkbox("Import Textures", &s.importTextures);
+        ImGui::Checkbox("Import Materials", &s.importMaterials);
+        ImGui::Checkbox("Generate Prefab", &s.generatePrefab);
+    }
+
+    if (ImGui::Button("Reimport"))
+    {
+        auto& registry = AssetManager::Get().GetRegistry();
+
+        auto metaPath = std::filesystem::path(s_ReimportState.path.string() + ".rmeta");
+
+        AssetMeta meta;
+        meta.LoadFromFile(metaPath);
+
+        json j;
+
+        if (s_ReimportState.importerID == "TextureImporter")
+        {
+            auto& s = s_ReimportState.textureSettings;
+            j["sRGB"] = s.sRGB;
+            j["generateMips"] = s.generateMips;
+            j["maxSize"] = s.maxSize;
+        }
+
+        if (s_ReimportState.importerID == "ModelImporter")
+        {
+            auto& s = s_ReimportState.modelSettings;
+            j["scale"] = s.scale;
+            j["importNormals"] = s.importNormals;
+            j["importTangents"] = s.importTangents;
+            j["importUVs"] = s.importUVs;
+            j["importTextures"] = s.importTextures;
+            j["importMaterials"] = s.importMaterials;
+            j["generatePrefab"] = s.generatePrefab;
+        }
+
+        meta.importerSettingsJson = j.dump();
+
+        registry.SaveMeta(s_ReimportState.path, meta);
+
+        importPipeline.Reimport(s_ReimportState.path, registry);
+
+        s_ReimportState.open = false;
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Reset"))
+    {
+        if (s_ReimportState.importerID == "TextureImporter")
+            s_ReimportState.textureSettings = TextureImportSettings();
+
+        if (s_ReimportState.importerID == "ModelImporter")
+            s_ReimportState.modelSettings = ModelImportSettings();
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Cancel"))
+    {
+        s_ReimportState.open = false;
+    }
+
+    ImGui::End();
+}
 
 static void DeletePathWithMeta(const std::filesystem::path& path)
 {
@@ -43,7 +151,6 @@ static void DeletePathWithMeta(const std::filesystem::path& path)
     {
         std::filesystem::remove_all(path, ec);
         if (ec) { LOG_ERROR("Delete failed: {}", ec.message()); return; }
-        LOG_INFO("Deleted folder: {}", path.string());
     }
     else
     {
@@ -56,15 +163,38 @@ static void DeletePathWithMeta(const std::filesystem::path& path)
             std::filesystem::remove(metaPath, ec);
             if (ec)
                 LOG_WARN("Meta delete failed: {}", ec.message());
-            else
-                LOG_INFO("Deleted meta: {}", metaPath.string());
         }
 
-        LOG_INFO("Deleted: {}", path.string());
     }
 
     s_NeedsRefresh = true;
     s_DirectoryTreeDirty = true;
+}
+
+static void HandleReimport(const std::filesystem::path& path, AssetImportPipeline& importPipeline)
+{
+    auto metaPath = std::filesystem::path(path.string() + ".rmeta");
+    if (std::filesystem::exists(metaPath))
+    {
+        AssetMeta meta;
+        meta.LoadFromFile(metaPath);
+
+        if (meta.importerID.empty() || meta.importerSettingsJson.empty())
+        {
+            importPipeline.Reimport(path, AssetManager::Get().GetRegistry());
+            return;
+        }
+            
+        s_ReimportState.open = true;
+        s_ReimportState.path = path;
+        s_ReimportState.importerID = meta.importerID;
+
+        if (meta.importerID == "TextureImporter")
+            s_ReimportState.textureSettings = TextureImporter::ParseSettings(meta.importerSettingsJson);
+
+        if (meta.importerID == "ModelImporter")
+            s_ReimportState.modelSettings = ModelImporter::ParseSettings(meta.importerSettingsJson);
+    }
 }
 
 static void CreateEmptyTextFile(const std::filesystem::path& path, const std::string& content = "")
@@ -273,7 +403,7 @@ static void DrawBackgroundContextMenu(Engine* engine, const std::filesystem::pat
     }
 }
 
-static void DrawItemContextMenu(const std::filesystem::path& itemPath)
+static void DrawItemContextMenu(const std::filesystem::path& itemPath, AssetImportPipeline& importPipeline)
 {
     std::string popupId = "##ItemMenu_" + itemPath.filename().string();
 
@@ -294,6 +424,8 @@ static void DrawItemContextMenu(const std::filesystem::path& itemPath)
         {
             DeletePathWithMeta(itemPath);
         }
+
+        
 
         ImGui::Separator();
 
@@ -320,6 +452,9 @@ static void DrawItemContextMenu(const std::filesystem::path& itemPath)
 
             if (ImGui::MenuItem("Copy Path"))
                 ImGui::SetClipboardText(itemPath.string().c_str());
+
+            if (ImGui::MenuItem("Reimport"))
+                HandleReimport(itemPath,importPipeline);
         }
 
         ImGui::EndPopup();
@@ -346,7 +481,7 @@ AssetBrowserPanel::AssetBrowserPanel()
 }
 
 
-void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDirectory)
+void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDirectory, AssetImportPipeline& importPipeline)
 {
     if (s_CurrentDirectory.empty())
     {
@@ -468,7 +603,7 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
 
         if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
             ImGui::OpenPopup(("##ItemMenu_" + filename).c_str());
-        DrawItemContextMenu(entry.path());
+        DrawItemContextMenu(entry.path(),importPipeline);
 
         if (ImGui::BeginDragDropSource())
         {
@@ -524,6 +659,8 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
 
     ImGui::EndChild();
     ImGui::End();
+
+    DrawReimportWindow(importPipeline);
 }
 
 void AssetBrowserPanel::HandleFileDrop(FileDroppedEvent& event, AssetImportPipeline& importPipeline)
@@ -551,7 +688,6 @@ void AssetBrowserPanel::HandleFileDrop(FileDroppedEvent& event, AssetImportPipel
                 ec);
 
             if (ec) { LOG_ERROR("Folder copy failed: {}", ec.message()); continue; }
-            LOG_INFO("Folder copied: {}", destPath.string());
 
             for (const auto& entry : std::filesystem::recursive_directory_iterator(destPath, ec))
             {
@@ -567,7 +703,6 @@ void AssetBrowserPanel::HandleFileDrop(FileDroppedEvent& event, AssetImportPipel
                 ec);
 
             if (ec) { LOG_ERROR("File copy failed: {}", ec.message()); continue; }
-            LOG_INFO("Copied: {}", destPath.string());
             toImport.push_back(destPath);
         }
     }

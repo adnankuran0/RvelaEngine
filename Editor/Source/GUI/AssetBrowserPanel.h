@@ -12,7 +12,7 @@ class AssetBrowserPanel
 {
 public:
 	AssetBrowserPanel();
-	void Draw(Engine* engine ,const std::filesystem::path& rootDirectory);
+	void Draw(Engine* engine ,const std::filesystem::path& rootDirectory, AssetImportPipeline& importPipeline);
 	void HandleFileDrop(FileDroppedEvent& event, AssetImportPipeline& importPipeline);
 private:
 	Texture folderIcon;
