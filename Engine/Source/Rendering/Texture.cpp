@@ -128,6 +128,56 @@ void Texture::GenerateFromMemory(const uint8_t* data, int width, int height, Tex
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+void Texture::GenerateFromAsset(Ref<TextureAsset> asset)
+{
+    Bind();
+
+    GLenum internalFormat, dataFormat;
+    size_t bytesPerPixel;
+
+    switch (asset->GetFormat())
+    {
+    case TextureFormat::RGBA8:
+        internalFormat = asset->IsSRGB() ? GL_SRGB8_ALPHA8 : GL_RGBA8;
+        dataFormat = GL_RGBA;
+        bytesPerPixel = 4;
+        break;
+    case TextureFormat::RGB8:
+        internalFormat = asset->IsSRGB() ? GL_SRGB8 : GL_RGB8;
+        dataFormat = GL_RGB;
+        bytesPerPixel = 3;
+        break;
+    case TextureFormat::R8:
+        internalFormat = GL_R8;
+        dataFormat = GL_RED;
+        bytesPerPixel = 1;
+        break;
+    default:
+        LOG_ERROR("Unsupported texture format.");
+        return;
+    }
+
+    const uint8_t* ptr = asset->GetPixels().data();
+    uint32_t mipW = asset->GetWidth();
+    uint32_t mipH = asset->GetHeight();
+
+    for (uint16_t i = 0; i < asset->GetMipCount(); i++)
+    {
+        glTexImage2D(GL_TEXTURE_2D, i, internalFormat,
+            mipW, mipH, 0,
+            dataFormat, GL_UNSIGNED_BYTE, ptr);
+
+        ptr += mipW * mipH * bytesPerPixel;
+        mipW = std::max(1u, mipW / 2);
+        mipH = std::max(1u, mipH / 2);
+    }
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, asset->GetMipCount() - 1);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 void Texture::ToImage(int width, int height, const unsigned char* data, int nrChannels)
 {
     GLenum format;

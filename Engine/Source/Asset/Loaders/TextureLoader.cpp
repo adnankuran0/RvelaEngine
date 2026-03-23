@@ -44,25 +44,30 @@ Ref<Asset> TextureLoader::Load(const std::filesystem::path& assetPath, const Ass
         return nullptr;
     }
 
-    size_t pixelSize = static_cast<size_t>(header.width) * header.height;
+    size_t bytesPerPixel = 0;
     switch (header.format)
     {
-    case TextureFormat::R8: pixelSize *= 1; break;
-    case TextureFormat::RG8: pixelSize *= 2; break;
-    case TextureFormat::RGB8: pixelSize *= 3; break;
-    case TextureFormat::RGBA8: pixelSize *= 4; break;
+    case TextureFormat::R8:    bytesPerPixel = 1; break;
+    case TextureFormat::RG8:   bytesPerPixel = 2; break;
+    case TextureFormat::RGB8:  bytesPerPixel = 3; break;
+    case TextureFormat::RGBA8: bytesPerPixel = 4; break;
     default:
         LOG_ERROR("Unsupported format: {}", assetPath.string());
         return nullptr;
     }
 
-    std::vector<uint8_t> pixels(pixelSize);
-    file.read(reinterpret_cast<char*>(pixels.data()), pixelSize);
-    if (!file)
+    size_t totalSize = 0;
+    uint32_t mipW = header.width;
+    uint32_t mipH = header.height;
+    for (uint16_t i = 0; i < header.mipCount; i++)
     {
-        LOG_ERROR("Failed to read pixel data: {}", assetPath.string());
-        return nullptr;
+        totalSize += mipW * mipH * bytesPerPixel;
+        mipW = std::max(1u, mipW / 2);
+        mipH = std::max(1u, mipH / 2);
     }
+
+    std::vector<uint8_t> pixels(totalSize);
+    file.read(reinterpret_cast<char*>(pixels.data()), totalSize);
 
     auto asset = CreateRef<TextureAsset>(meta.uuid);
     asset->m_Width = header.width;

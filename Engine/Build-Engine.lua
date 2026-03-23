@@ -27,7 +27,7 @@ project "RvelaEngine"
       "../Vendor/GLAD/include",
       "../Vendor/glm",
       "../Vendor/spdlog/include",
-      "../Vendor/stb_image",
+      "../Vendor/stb",
       "../Vendor/entt",
       "../Vendor/tiny_obj_loader",
       "../Vendor/Assimp/include",

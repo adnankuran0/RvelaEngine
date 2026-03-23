@@ -33,6 +33,18 @@ public:
     std::string GetDefaultSettings() const override;
 
     static TextureImportSettings ParseSettings(const std::string& settingsJson);
+private:
+    struct Mip
+    {
+        unsigned int mipLevel = 0;
+        std::vector<unsigned char> data;
+        int w;
+        int h;
+    };
+private:
+    unsigned int CalculateMipCount(unsigned int w, unsigned int h);
+    std::vector<Mip> GenerateMipChain(unsigned char* data, int w, int h, int channels, 
+        unsigned int mipCount, bool isSRGB = false, bool isNormal = false);
 
 };
 

@@ -23,13 +23,7 @@ Texture& TextureCache::GetOrCreate(const Ref<TextureAsset>& asset)
         EvictLRU();
 
     Texture tex;
-    tex.GenerateFromMemory(
-        asset->GetPixels().data(),
-        asset->GetWidth(),
-        asset->GetHeight(),
-        asset->GetFormat(),
-        asset->IsSRGB()
-    );
+    tex.GenerateFromAsset(asset);
 
     m_LRUList.push_front(uuid);
     m_LRUPosition[uuid] = m_LRUList.begin();

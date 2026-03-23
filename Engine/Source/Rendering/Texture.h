@@ -1,5 +1,6 @@
 #pragma once
 #include "Asset/Types/TextureAsset.h"
+#include "Core/Ref.h"
 
 namespace rv { 
 
@@ -41,13 +42,13 @@ public:
     void Bind() const;
     void GenerateFromImage(const std::string& path);
     void GenerateFromMemory(const uint8_t* data, int width, int height, TextureFormat format = TextureFormat::RGBA8, bool srgb = false);
+    void GenerateFromAsset(Ref<TextureAsset> asset);
 
     static Texture Create();
     static void ToImage(int width, int height, const unsigned char* data,int nrChannels);
     void GenerateMipmaps();
 
     unsigned int GetID() const;
-    inline unsigned char* GetTexture() const;
     inline int GetWidth() const;
     inline int GetHeight() const;
     inline int GetNrChannels() const;
