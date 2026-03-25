@@ -11,12 +11,17 @@ constexpr uint16_t TEXTURE_CACHE_VERSION = 1;
     {
         uint32_t magic = MAGIC_TEXTURE;
         uint16_t version = TEXTURE_CACHE_VERSION;
+
         uint32_t width = 0;
         uint32_t height = 0;
         uint16_t mipCount = 1;
+
         TextureFormat format = TextureFormat::Unknown;
         uint8_t isSRGB = 0;
-        uint8_t reserved[5] = {}; // alignment
+
+        uint32_t dataSize = 0;
+
+        uint8_t reserved[1] = {};
     };
 #pragma pack(pop)
 

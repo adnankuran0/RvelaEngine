@@ -1,6 +1,5 @@
 #include "rvelapch.h"
 #include "TextureLoader.h"
-#include "Asset/Types/TextureAsset.h"
 #include "Asset/CacheTypes/TextureCacheHeader.h"
 #include "Core/Log.h"
 #include <fstream>
@@ -44,30 +43,8 @@ Ref<Asset> TextureLoader::Load(const std::filesystem::path& assetPath, const Ass
         return nullptr;
     }
 
-    size_t bytesPerPixel = 0;
-    switch (header.format)
-    {
-    case TextureFormat::R8:    bytesPerPixel = 1; break;
-    case TextureFormat::RG8:   bytesPerPixel = 2; break;
-    case TextureFormat::RGB8:  bytesPerPixel = 3; break;
-    case TextureFormat::RGBA8: bytesPerPixel = 4; break;
-    default:
-        LOG_ERROR("Unsupported format: {}", assetPath.string());
-        return nullptr;
-    }
-
-    size_t totalSize = 0;
-    uint32_t mipW = header.width;
-    uint32_t mipH = header.height;
-    for (uint16_t i = 0; i < header.mipCount; i++)
-    {
-        totalSize += mipW * mipH * bytesPerPixel;
-        mipW = std::max(1u, mipW / 2);
-        mipH = std::max(1u, mipH / 2);
-    }
-
-    std::vector<uint8_t> pixels(totalSize);
-    file.read(reinterpret_cast<char*>(pixels.data()), totalSize);
+    std::vector<uint8_t> pixels(header.dataSize);
+    file.read(reinterpret_cast<char*>(pixels.data()), header.dataSize);
 
     auto asset = CreateRef<TextureAsset>(meta.uuid);
     asset->m_Width = header.width;
@@ -79,3 +56,4 @@ Ref<Asset> TextureLoader::Load(const std::filesystem::path& assetPath, const Ass
 
     return asset;
 }
+

@@ -170,7 +170,11 @@ vec2 parallaxOcclusionMapping(vec2 texCoords, vec3 viewDirTS)
 
 vec3 getNormalFromMap() {
     if (!useNormalMap) return normalize(Normal);
-    vec3 tangentNormal = texture(normalMap, TexCoords).xyz * 2.0 - 1.0;
+    
+    vec2 rg = texture(normalMap, TexCoords).rg * 2.0 - 1.0;
+    float b = sqrt(max(0.0, 1.0 - dot(rg, rg)));
+    vec3 tangentNormal = vec3(rg, b);
+    
     tangentNormal.xy *= normalScale;
     
     float tnLen = length(tangentNormal);
@@ -179,10 +183,9 @@ vec3 getNormalFromMap() {
     
     vec3 N = normalize(Normal);
     vec3 T = normalize(Tangent);
-    vec3 B = normalize(Bitangent);
     
     T = normalize(T - dot(T, N) * N);
-    B = cross(N, T);
+    vec3 B = cross(N, T);
     
     mat3 TBN = mat3(T, B, N);
     vec3 result = TBN * tangentNormal;

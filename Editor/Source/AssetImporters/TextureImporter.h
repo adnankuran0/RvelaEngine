@@ -1,5 +1,7 @@
 #pragma once
 #include "Asset/IAssetImporter.h"
+#include "DirectXTex/DirectXTex.h"
+#include "Asset/Types/TextureAsset.h"
 
 namespace rv {
 
@@ -7,7 +9,8 @@ struct TextureImportSettings
 {
     bool sRGB = false;
     bool generateMips = false;
-    int maxSize = 2048;
+    int maxSize = 4096;
+    bool compress = true;
 };
 
 class TextureImporter : public IAssetImporter
@@ -42,10 +45,17 @@ private:
         int h;
     };
 private:
+    DXGI_FORMAT ToDXGI(TextureFormat format, bool sRGB);
     unsigned int CalculateMipCount(unsigned int w, unsigned int h);
     std::vector<Mip> GenerateMipChain(unsigned char* data, int w, int h, int channels, 
         unsigned int mipCount, bool isSRGB = false, bool isNormal = false);
-
+    std::vector<DirectX::Image> BuildImages(const std::vector<TextureImporter::Mip>& mips, int channels,
+        std::vector<std::vector<uint8_t>>& expandedBuffers);
+    std::vector<uint8_t> CompressMips(
+        const std::vector<TextureImporter::Mip>& mips,
+        int channels,
+        TextureFormat format,
+        bool isSRGB);
 };
 
 }

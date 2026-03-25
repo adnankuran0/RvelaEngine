@@ -1,5 +1,6 @@
 #pragma once
 #include "Asset/IAssetLoader.h"
+#include "Asset/Types/TextureAsset.h"
 
 namespace rv {
 

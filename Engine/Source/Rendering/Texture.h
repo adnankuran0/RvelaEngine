@@ -58,6 +58,7 @@ private:
     std::string m_Path;
     unsigned int m_Texture{};
     int m_Width{}, m_Height{}, m_NrChannels{};
+
 };
 
 }

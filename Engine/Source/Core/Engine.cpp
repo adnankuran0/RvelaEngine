@@ -9,6 +9,7 @@
 #include <Event/MouseEvents.h>
 #include "Rendering/DebugRenderer.h"
 #include "Asset/AssetManager.h"
+#include "Rendering/Texture.h"
 
 using namespace rv;
 
@@ -38,7 +39,6 @@ Engine::Engine()
 	{
 		LOG_WARN("Another instance of Engine already exists!");
 	}
-	
 }
 
 Engine::~Engine()

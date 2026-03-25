@@ -5,6 +5,20 @@
 #include "stb_image.h"
 #include <Core/Log.h>
 
+#ifndef GL_COMPRESSED_RGB_S3TC_DXT1_EXT
+#define GL_COMPRESSED_RGB_S3TC_DXT1_EXT   0x83F0
+#define GL_COMPRESSED_RGBA_S3TC_DXT1_EXT  0x83F1
+#define GL_COMPRESSED_RGBA_S3TC_DXT3_EXT  0x83F2
+#define GL_COMPRESSED_RGBA_S3TC_DXT5_EXT  0x83F3
+#endif
+
+#ifndef GL_COMPRESSED_SRGB_S3TC_DXT1_EXT
+#define GL_COMPRESSED_SRGB_S3TC_DXT1_EXT        0x8C4C
+#define GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT  0x8C4D
+#define GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT  0x8C4E
+#define GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT  0x8C4F
+#endif
+
 using namespace rv;
 
 Texture::Texture()
@@ -132,11 +146,18 @@ void Texture::GenerateFromAsset(Ref<TextureAsset> asset)
 {
     Bind();
 
-    GLenum internalFormat, dataFormat;
-    size_t bytesPerPixel;
+    const uint8_t* ptr = asset->GetPixels().data();
+    uint32_t mipW = asset->GetWidth();
+    uint32_t mipH = asset->GetHeight();
+
+    bool isCompressed = false;
+    GLenum internalFormat;
+    GLenum dataFormat = GL_RGBA;
+    size_t bytesPerPixel = 0;
 
     switch (asset->GetFormat())
     {
+    // UNCOMPRESSED
     case TextureFormat::RGBA8:
         internalFormat = asset->IsSRGB() ? GL_SRGB8_ALPHA8 : GL_RGBA8;
         dataFormat = GL_RGBA;
@@ -152,29 +173,67 @@ void Texture::GenerateFromAsset(Ref<TextureAsset> asset)
         dataFormat = GL_RED;
         bytesPerPixel = 1;
         break;
+    case TextureFormat::RG8:
+        internalFormat = GL_RG8;
+        dataFormat = GL_RG;
+        bytesPerPixel = 2;
+        break;
+
+    // COMPRESSED
+    case TextureFormat::BC1:
+        internalFormat = asset->IsSRGB() ? GL_COMPRESSED_SRGB_S3TC_DXT1_EXT
+            : GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
+        isCompressed = true;
+        break;
+    case TextureFormat::BC3:
+        internalFormat = asset->IsSRGB() ? GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT
+            : GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+        isCompressed = true;
+        break;
+    case TextureFormat::BC4:
+        internalFormat = GL_COMPRESSED_RED_RGTC1;
+        isCompressed = true;
+        break;
+    case TextureFormat::BC5:
+        internalFormat = GL_COMPRESSED_RG_RGTC2;
+        isCompressed = true;
+        break;
+
     default:
-        LOG_ERROR("Unsupported texture format.");
+        LOG_ERROR("Unsupported texture format in GenerateFromAsset");
         return;
     }
 
-    const uint8_t* ptr = asset->GetPixels().data();
-    uint32_t mipW = asset->GetWidth();
-    uint32_t mipH = asset->GetHeight();
-
     for (uint16_t i = 0; i < asset->GetMipCount(); i++)
     {
-        glTexImage2D(GL_TEXTURE_2D, i, internalFormat,
-            mipW, mipH, 0,
-            dataFormat, GL_UNSIGNED_BYTE, ptr);
+        if (isCompressed)
+        {
+            size_t blockSize = (asset->GetFormat() == TextureFormat::BC1 ||
+                asset->GetFormat() == TextureFormat::BC4) ? 8 : 16;
 
-        ptr += mipW * mipH * bytesPerPixel;
+            size_t mipSize = std::max(1u, (mipW + 3) / 4) *
+                std::max(1u, (mipH + 3) / 4) *
+                blockSize;
+
+            glCompressedTexImage2D(GL_TEXTURE_2D, i, internalFormat,
+                mipW, mipH, 0,
+                (GLsizei)mipSize, ptr);
+            ptr += mipSize;
+        }
+        else
+        {
+            glTexImage2D(GL_TEXTURE_2D, i, internalFormat,
+                mipW, mipH, 0,
+                dataFormat, GL_UNSIGNED_BYTE, ptr);
+            ptr += mipW * mipH * bytesPerPixel;
+        }
+
         mipW = std::max(1u, mipW / 2);
         mipH = std::max(1u, mipH / 2);
     }
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, asset->GetMipCount() - 1);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -195,8 +254,6 @@ void Texture::ToImage(int width, int height, const unsigned char* data, int nrCh
 
 void Texture::GenerateMipmaps()
 {
-    Bind();
-
     glGenerateMipmap(GL_TEXTURE_2D);
     int maxLevel = static_cast<int>(std::floor(std::log2(std::max(m_Width, m_Height))));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, maxLevel);
