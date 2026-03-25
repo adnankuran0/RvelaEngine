@@ -9,6 +9,7 @@
 #include <Assimp/Importer.hpp>
 #include <Assimp/scene.h>
 #include <Assimp/postprocess.h>
+#include "meshoptimizer/meshoptimizer.h"
 
 using namespace rv;
 
