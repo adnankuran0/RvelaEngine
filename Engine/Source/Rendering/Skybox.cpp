@@ -54,6 +54,7 @@ void Skybox::Init(const std::vector<Path>& faces)
 
 void Skybox::InitHDR(const Path& hdrFilePath)
 {
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     GLuint hdrTexture = LoadHDRTexture(hdrFilePath);
     m_Path = hdrFilePath;
     setupSkybox();  

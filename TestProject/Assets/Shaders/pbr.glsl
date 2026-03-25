@@ -169,6 +169,7 @@ vec2 parallaxOcclusionMapping(vec2 texCoords, vec3 viewDirTS)
     float afterDepth = currentDepthMapValue - currentLayerDepth;
     float beforeDepth = texture(heightMap, prevTexCoords).r - (currentLayerDepth - layerDepth);
     float weight = afterDepth / (afterDepth - beforeDepth + 0.0001);
+    
     return mix(currentTexCoords, prevTexCoords, weight);
 }
 
@@ -226,6 +227,10 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
 vec3 fresnelSchlick(float cosTheta, vec3 F0) {
     cosTheta = clamp(cosTheta, 0.0, 1.0);
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+}
+
+vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
 // Shadow calculations
@@ -313,10 +318,7 @@ void main()
     // View direction and normal
     vec3 V = normalize(camPos - FragPos);
     vec3 Nmap = getNormalFromMap();
-    vec3 baseF0 = vec3(0.04); 
-    baseF0 = mix(baseF0, albedo, metallic);
-    baseF0 = mix(baseF0, vec3(0.0), 1.0 - metallic); 
-    vec3 F0 = baseF0;
+    vec3 F0 = mix(vec3(0.04), albedo, metallic);
 
     vec3 Lo = vec3(0.0);
 
@@ -338,7 +340,7 @@ void main()
         vec3 specular = numerator / denominator;
         specular *= specularIntensity;
         float NdotL = max(dot(Nmap, L), 0.0);
-        float shadow = directionalLight.castShadows ? 
+        float shadow = directionalLight.castShadows ?   
             calculateDirectionalShadow(FragPosLightSpace, Nmap, L, directionalLight.shadowBias, directionalLight.blurRadius) : 0.0;
 
         Lo += (1.0 - shadow) * (kD * albedo / PI + specular) * 
@@ -362,8 +364,8 @@ void main()
         vec3 H = normalize(V + L);
         
         // Attenuation 
-        float attenuation = 1.0 / (1.0 + light.falloff * dist2);
-        attenuation *= 1.0 - smoothstep(light.radius * 0.75, light.radius, distance);
+        float num = clamp(1.0 - (dist2 / radius2) * (dist2 / radius2), 0.0, 1.0);
+        float attenuation = (num * num) / (dist2 + 1.0);
         
         // Cook-Torrance BRDF
         float NDF = DistributionGGX(Nmap, H, roughness);
@@ -393,7 +395,7 @@ void main()
 
     if(useIBL)
     {
-        vec3 R = reflect(-V, Nmap);
+        vec3 R = normalize(reflect(-V, Nmap));
         
         float NdotV = max(dot(Nmap, V), 0.0);
         vec3 F = fresnelSchlick(NdotV, F0);

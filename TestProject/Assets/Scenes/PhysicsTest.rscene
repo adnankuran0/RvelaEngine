@@ -180,7 +180,7 @@
                     ],
                     "albedoTex": "e1f28315-9413-41d9-b4cd-df85a38bde35",
                     "aoTex": "ab64387c-0f46-4540-a8be-33e82968d6ef",
-                    "heightScale": 0.009999999776482582,
+                    "heightScale": 0.05299999937415123,
                     "heightTex": "181510e0-9bd5-4fab-a453-f9c0420708e3",
                     "normalScale": 1.0,
                     "normalTex": "980c6850-59d2-4024-9fbc-d3889eb142eb",
@@ -400,7 +400,7 @@
                     1.0
                 ]
             },
-            "UUID": 26
+            "UUID": 15
         },
         {
             "BoxColliderComponent": {
@@ -418,7 +418,15 @@
             "Material": {
                 "material": "1d3e6ca6-0cc0-4c85-ae73-36db93d0aee4",
                 "overrides": {
-                    "normalScale": 1.0
+                    "albedoColor": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "ao": 1.0,
+                    "heightScale": 0.00800000037997961,
+                    "normalScale": 1.0,
+                    "roughness": 0.6690000295639038
                 }
             },
             "Mesh": {
@@ -474,7 +482,7 @@
     ],
     "Environment": {
         "Bloom": true,
-        "Bloom_Intensity": 0.17100000381469727,
+        "Bloom_Intensity": 1.0,
         "Bloom_Knee": 0.0,
         "Bloom_Treshold": 1.0,
         "HDRPath": "Assets\\Textures\\skybox\\environment.hdr",
