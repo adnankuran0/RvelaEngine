@@ -157,6 +157,7 @@ void ModelImporter::MergeAndSaveSubAssets(
         ensureSubAsset(entry);
     }
 
+
     registry.SaveMeta(modelPath, parentMeta);
 }
 

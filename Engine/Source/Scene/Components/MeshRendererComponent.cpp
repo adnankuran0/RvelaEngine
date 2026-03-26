@@ -23,7 +23,6 @@ void MeshRendererComponent::RecreateFromMesh(Ref<MeshAsset> mesh)
     layout.Push<float>(3); // Position
     layout.Push<float>(3); // Normal
     layout.Push<float>(3); // Tangent
-    layout.Push<float>(3); // Bitangent
     layout.Push<float>(2); // UV
 
     VAO.SetBufferLayout(layout);

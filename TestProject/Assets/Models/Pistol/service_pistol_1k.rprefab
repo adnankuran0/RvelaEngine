@@ -1,0 +1,369 @@
+{
+    "Entities": [
+        {
+            "Tag": {
+                "tag": "ROOT"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 3
+        },
+        {
+            "Material": {
+                "material": "a5bc5017-6177-4737-bd9e-c0db974ea476"
+            },
+            "Mesh": {
+                "mesh": "062daf41-467f-4bda-872a-bd649b1e42c4"
+            },
+            "ParentUUID": 3,
+            "Tag": {
+                "tag": "service_pistol_pistol_a"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 4
+        },
+        {
+            "Material": {
+                "material": "a5bc5017-6177-4737-bd9e-c0db974ea476"
+            },
+            "Mesh": {
+                "mesh": "24f895fc-c29a-4ea3-a98f-e368513ef9bb"
+            },
+            "ParentUUID": 3,
+            "Tag": {
+                "tag": "service_pistol_slide_a"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.030211396515369415,
+                    0.06099604815244675,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 5
+        },
+        {
+            "Material": {
+                "material": "a5bc5017-6177-4737-bd9e-c0db974ea476"
+            },
+            "Mesh": {
+                "mesh": "9194d5be-8133-46c0-b30d-e13600a98833"
+            },
+            "ParentUUID": 3,
+            "Tag": {
+                "tag": "service_pistol_magazine_loaded"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    -0.10000000149011612,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 6
+        },
+        {
+            "Material": {
+                "material": "a5bc5017-6177-4737-bd9e-c0db974ea476"
+            },
+            "Mesh": {
+                "mesh": "e2fbffaa-f084-45ee-aa89-84f51ab88689"
+            },
+            "ParentUUID": 3,
+            "Tag": {
+                "tag": "service_pistol_magazine_empty"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    -0.10000000149011612,
+                    0.15000000596046448,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 7
+        },
+        {
+            "Material": {
+                "material": "a5bc5017-6177-4737-bd9e-c0db974ea476"
+            },
+            "Mesh": {
+                "mesh": "de010b82-6765-4214-aa02-80b55f51cf18"
+            },
+            "ParentUUID": 3,
+            "Tag": {
+                "tag": "service_pistol_bullet"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 8
+        },
+        {
+            "Material": {
+                "material": "a5bc5017-6177-4737-bd9e-c0db974ea476"
+            },
+            "Mesh": {
+                "mesh": "390af5eb-0666-42b7-894b-db064d9f397c"
+            },
+            "ParentUUID": 3,
+            "Tag": {
+                "tag": "service_pistol_hammer_a"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    -0.029023123905062675,
+                    0.049381040036678314,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 9
+        },
+        {
+            "Material": {
+                "material": "a5bc5017-6177-4737-bd9e-c0db974ea476"
+            },
+            "Mesh": {
+                "mesh": "8e5221de-2034-43b7-91ea-696557445104"
+            },
+            "ParentUUID": 3,
+            "Tag": {
+                "tag": "service_pistol_trigger_a"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0512087456882,
+                    0.03575684875249863,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 10
+        },
+        {
+            "Material": {
+                "material": "a5bc5017-6177-4737-bd9e-c0db974ea476"
+            },
+            "Mesh": {
+                "mesh": "15ff2259-8631-447f-9441-6f6df200ec90"
+            },
+            "ParentUUID": 3,
+            "Tag": {
+                "tag": "service_pistol_pistol_b"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.15000000596046448,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 11
+        },
+        {
+            "Material": {
+                "material": "a5bc5017-6177-4737-bd9e-c0db974ea476"
+            },
+            "Mesh": {
+                "mesh": "ba922ebc-63f0-4d74-b1a1-b818d72e5517"
+            },
+            "ParentUUID": 3,
+            "Tag": {
+                "tag": "service_pistol_slide_b"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.030211396515369415,
+                    0.21099606156349182,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 12
+        },
+        {
+            "Material": {
+                "material": "a5bc5017-6177-4737-bd9e-c0db974ea476"
+            },
+            "Mesh": {
+                "mesh": "f5729cd4-250e-45e0-9f57-bfd6d91811f7"
+            },
+            "ParentUUID": 3,
+            "Tag": {
+                "tag": "service_pistol_hammer_b"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    -0.029023123905062675,
+                    0.1993810534477234,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 13
+        },
+        {
+            "Material": {
+                "material": "a5bc5017-6177-4737-bd9e-c0db974ea476"
+            },
+            "Mesh": {
+                "mesh": "08b43c72-8830-4573-bfe8-0a8c99798ecc"
+            },
+            "ParentUUID": 3,
+            "Tag": {
+                "tag": "service_pistol_trigger_b"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0512087456882,
+                    0.1857568621635437,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 14
+        }
+    ]
+}

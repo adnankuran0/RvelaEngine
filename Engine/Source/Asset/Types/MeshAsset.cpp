@@ -7,13 +7,12 @@ using namespace rv;
 void rv::PackVertices(std::span<const Vertex> verts, std::vector<float>& out)
 {
     out.clear();
-    out.reserve(verts.size() * 14);
+    out.reserve(verts.size() * 14); // maybe 11?
     for (const auto& v : verts)
     {
         out.insert(out.end(), glm::value_ptr(v.position), glm::value_ptr(v.position) + 3);
         out.insert(out.end(), glm::value_ptr(v.normal), glm::value_ptr(v.normal) + 3);
         out.insert(out.end(), glm::value_ptr(v.tangent), glm::value_ptr(v.tangent) + 3);
-        out.insert(out.end(), glm::value_ptr(v.bitangent), glm::value_ptr(v.bitangent) + 3);
         out.insert(out.end(), glm::value_ptr(v.texCoord), glm::value_ptr(v.texCoord) + 2);
     }
 }

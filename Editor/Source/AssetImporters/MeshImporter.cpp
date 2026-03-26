@@ -52,6 +52,7 @@ bool MeshImporter::Import(
     aiMesh* mesh = scene->mMeshes[0];
     auto vertices = ProcessVertices(mesh);
     auto indices = ProcessIndices(mesh);
+    OptimizeMesh(vertices, indices);
 
     aiVector3D min = mesh->mAABB.mMin;
     aiVector3D max = mesh->mAABB.mMax;
@@ -99,6 +100,7 @@ bool MeshImporter::ImportFromScene(
         {
             auto vertices = ProcessVertices(mesh);
             auto indices = ProcessIndices(mesh);
+            OptimizeMesh(vertices, indices);
             aiVector3D mn = mesh->mAABB.mMin, mx = mesh->mAABB.mMax;
             AABB aabb(glm::vec3(mn.x, mn.y, mn.z), glm::vec3(mx.x, mx.y, mx.z));
 
@@ -151,6 +153,66 @@ bool MeshImporter::WriteMeshCache(
     return file.good();
 }
 
+void MeshImporter::OptimizeMesh(std::vector<Vertex>& outVertices, std::vector<unsigned int>& outIndices)
+{
+    size_t vertexCount = outVertices.size();
+    size_t indexCount = outIndices.size();
+
+    if (vertexCount == 0 || indexCount == 0) return;
+
+    std::vector<unsigned int> remap(vertexCount);
+    size_t newVertexCount = meshopt_generateVertexRemap(
+        remap.data(),
+        outIndices.data(),
+        indexCount,
+        outVertices.data(),
+        vertexCount,
+        sizeof(Vertex));
+
+    std::vector<unsigned int> remappedIndices(indexCount);
+    std::vector<Vertex> remappedVertices(newVertexCount);
+
+    meshopt_remapIndexBuffer(
+        remappedIndices.data(),
+        outIndices.data(),
+        indexCount,
+        remap.data());
+
+    meshopt_remapVertexBuffer(
+        remappedVertices.data(),
+        outVertices.data(),
+        vertexCount,
+        sizeof(Vertex),
+        remap.data());
+
+    outIndices = std::move(remappedIndices);
+    outVertices = std::move(remappedVertices);
+    vertexCount = newVertexCount;
+
+    meshopt_optimizeVertexCache(
+        outIndices.data(),
+        outIndices.data(),
+        indexCount,
+        vertexCount);
+
+    meshopt_optimizeOverdraw(
+        outIndices.data(),
+        outIndices.data(),
+        indexCount,
+        &outVertices[0].position.x,
+        vertexCount,
+        sizeof(Vertex),
+        1.05f);
+
+    meshopt_optimizeVertexFetch(
+        outVertices.data(),
+        outIndices.data(),
+        indexCount,
+        outVertices.data(),
+        vertexCount,
+        sizeof(Vertex));
+}
+
 std::vector<Vertex> MeshImporter::ProcessVertices(aiMesh* mesh)
 {
     std::vector<Vertex> vertices(mesh->mNumVertices);
@@ -170,11 +232,6 @@ std::vector<Vertex> MeshImporter::ProcessVertices(aiMesh* mesh)
         if (hasTangents)
         {
             vertices[i].tangent = glm::vec3(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
-            vertices[i].bitangent = glm::vec3(mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z);
-        }
-        else
-        {
-            vertices[i].tangent = vertices[i].bitangent = glm::vec3(0.0f);
         }
 
         vertices[i].texCoord = hasTexCoords

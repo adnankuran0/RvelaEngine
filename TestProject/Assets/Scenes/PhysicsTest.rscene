@@ -400,7 +400,7 @@
                     1.0
                 ]
             },
-            "UUID": 15
+            "UUID": 5
         },
         {
             "BoxColliderComponent": {
@@ -485,7 +485,7 @@
         "Bloom_Intensity": 1.0,
         "Bloom_Knee": 0.0,
         "Bloom_Treshold": 1.0,
-        "HDRPath": "Assets\\Textures\\skybox\\environment.hdr",
+        "HDRPath": "Assets\\Textures\\skybox\\bryanston_park_sunrise_1k.hdr",
         "Lighting_AmbientColor": [
             1.0,
             1.0,

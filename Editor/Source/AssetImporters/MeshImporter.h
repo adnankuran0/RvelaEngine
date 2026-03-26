@@ -48,6 +48,8 @@ private:
         const std::vector<Vertex>& vertices,
         const std::vector<unsigned int>& indices,
         const AABB& aabb);
+
+    void OptimizeMesh(std::vector<Vertex>& outVertices, std::vector<unsigned int>& outIndices);
 };
 
 }

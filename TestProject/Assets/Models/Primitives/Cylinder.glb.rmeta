@@ -1,7 +1,15 @@
 {
     "dependencies": [],
     "importerID": "ModelImporter",
-    "importerSettings": {},
+    "importerSettings": {
+        "generatePrefab": true,
+        "importMaterials": true,
+        "importNormals": true,
+        "importTangents": true,
+        "importTextures": true,
+        "importUVs": true,
+        "scale": 1.0
+    },
     "lastWriteTime": 13415805042,
     "subAssets": [
         {
@@ -12,7 +20,7 @@
             "uuid": "a7b6cf4f-3e75-4a4b-b8e9-ab246feea70d"
         },
         {
-            "hasCache": false,
+            "hasCache": true,
             "index": 0,
             "name": "Cylinder",
             "type": "Mesh",

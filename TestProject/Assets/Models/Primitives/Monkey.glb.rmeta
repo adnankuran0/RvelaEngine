@@ -1,7 +1,15 @@
 {
     "dependencies": [],
     "importerID": "ModelImporter",
-    "importerSettings": {},
+    "importerSettings": {
+        "generatePrefab": true,
+        "importMaterials": true,
+        "importNormals": true,
+        "importTangents": true,
+        "importTextures": true,
+        "importUVs": true,
+        "scale": 1.0
+    },
     "lastWriteTime": 13415805292,
     "subAssets": [
         {
@@ -12,7 +20,7 @@
             "uuid": "ab90d890-0861-4c4c-809b-98515bf111db"
         },
         {
-            "hasCache": false,
+            "hasCache": true,
             "index": 0,
             "name": "Suzanne",
             "type": "Mesh",

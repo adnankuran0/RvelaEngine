@@ -66,8 +66,10 @@ bool AssetImportPipeline::ImportAsset(const std::filesystem::path& sourcePath, A
         meta.lastWriteTime = 0;
     }
 
-    registry.SaveMeta(sourcePath, meta);
-    registry.RegisterPath(meta.uuid, cachePath);
+    auto updatedMeta = registry.GetMeta(meta.uuid);
+    updatedMeta.lastWriteTime = meta.lastWriteTime;
+    registry.SaveMeta(sourcePath, updatedMeta);
+    registry.RegisterPath(updatedMeta.uuid, cachePath);
 
     return true;
 }

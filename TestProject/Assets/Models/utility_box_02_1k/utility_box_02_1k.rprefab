@@ -22,7 +22,7 @@
                     1.0
                 ]
             },
-            "UUID": 431
+            "UUID": 3
         },
         {
             "Material": {
@@ -31,7 +31,7 @@
             "Mesh": {
                 "mesh": "1b8e0e23-21b6-4020-9f6e-d3fd22f35ca6"
             },
-            "ParentUUID": 431,
+            "ParentUUID": 3,
             "Tag": {
                 "tag": "utility_box_02"
             },
@@ -53,7 +53,7 @@
                     99.99999237060547
                 ]
             },
-            "UUID": 432
+            "UUID": 4
         }
     ]
 }

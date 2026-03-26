@@ -3,7 +3,7 @@
 layout(location = 0) in vec3 aPos;
 layout(location = 1) in vec3 aNormal;
 layout(location = 2) in vec3 aTangent;
-layout(location = 4) in vec2 aTexCoords;
+layout(location = 3) in vec2 aTexCoords;
 
 out vec3 FragPos;
 out vec3 Normal;
@@ -154,7 +154,7 @@ vec2 parallaxOcclusionMapping(vec2 texCoords, vec3 viewDirTS)
     float currentLayerDepth = 0.0;
     vec2 P = normalize(viewDirTS).xy * -heightScale; 
     vec2 deltaTexCoords = P / numLayers;
-
+    
     vec2 currentTexCoords = texCoords;
     float currentDepthMapValue = texture(heightMap, currentTexCoords).r;
 
@@ -173,10 +173,11 @@ vec2 parallaxOcclusionMapping(vec2 texCoords, vec3 viewDirTS)
     return mix(currentTexCoords, prevTexCoords, weight);
 }
 
-vec3 getNormalFromMap() {
+vec3 getNormalFromMap(vec2 texCoords) 
+{
     if (!useNormalMap) return normalize(Normal);
     
-    vec2 rg = texture(normalMap, TexCoords).rg * 2.0 - 1.0;
+    vec2 rg = texture(normalMap, texCoords).rg * 2.0 - 1.0;
     float b = sqrt(max(0.0, 1.0 - dot(rg, rg)));
     vec3 tangentNormal = vec3(rg, b);
     
@@ -188,7 +189,6 @@ vec3 getNormalFromMap() {
     
     vec3 N = normalize(Normal);
     vec3 T = normalize(Tangent);
-    
     T = normalize(T - dot(T, N) * N);
     vec3 B = cross(N, T);
     
@@ -197,7 +197,6 @@ vec3 getNormalFromMap() {
     
     float rLen = length(result);
     if (rLen < 0.001) return N;
-    
     return result / rLen;
 }
 
@@ -317,7 +316,7 @@ void main()
 
     // View direction and normal
     vec3 V = normalize(camPos - FragPos);
-    vec3 Nmap = getNormalFromMap();
+    vec3 Nmap = getNormalFromMap(mappedTexCoords);
     vec3 F0 = mix(vec3(0.04), albedo, metallic);
 
     vec3 Lo = vec3(0.0);

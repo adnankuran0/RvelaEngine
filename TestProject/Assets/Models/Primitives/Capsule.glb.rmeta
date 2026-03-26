@@ -1,7 +1,15 @@
 {
     "dependencies": [],
     "importerID": "ModelImporter",
-    "importerSettings": {},
+    "importerSettings": {
+        "generatePrefab": true,
+        "importMaterials": true,
+        "importNormals": true,
+        "importTangents": true,
+        "importTextures": true,
+        "importUVs": true,
+        "scale": 1.0
+    },
     "lastWriteTime": 13415805147,
     "subAssets": [
         {
@@ -12,7 +20,7 @@
             "uuid": "c041d50e-c5c8-4673-95be-7b01ea4e9718"
         },
         {
-            "hasCache": false,
+            "hasCache": true,
             "index": 0,
             "name": "Capsule",
             "type": "Mesh",

@@ -1,7 +1,15 @@
 {
     "dependencies": [],
     "importerID": "ModelImporter",
-    "importerSettings": {},
+    "importerSettings": {
+        "generatePrefab": true,
+        "importMaterials": true,
+        "importNormals": true,
+        "importTangents": true,
+        "importTextures": true,
+        "importUVs": true,
+        "scale": 1.0
+    },
     "lastWriteTime": 13418165232,
     "subAssets": [
         {
@@ -19,7 +27,7 @@
             "uuid": "8e4e74ed-239d-4959-a0b2-f8a9fffad946"
         },
         {
-            "hasCache": false,
+            "hasCache": true,
             "index": 0,
             "name": "lounge_chair",
             "type": "Mesh",

@@ -229,6 +229,7 @@ void AssetRegistry::SaveMeta(const std::filesystem::path& path, const AssetMeta&
     for (auto& sub : meta.subAssets)
     {
         if (!sub.uuid.IsValid()) continue;
+
         if (!m_Metas.contains(sub.uuid))
         {
             AssetMeta subMeta;

@@ -1,7 +1,15 @@
 {
     "dependencies": [],
     "importerID": "ModelImporter",
-    "importerSettings": {},
+    "importerSettings": {
+        "generatePrefab": true,
+        "importMaterials": true,
+        "importNormals": true,
+        "importTangents": true,
+        "importTextures": true,
+        "importUVs": true,
+        "scale": 1.0
+    },
     "lastWriteTime": 13415805229,
     "subAssets": [
         {
@@ -12,7 +20,7 @@
             "uuid": "fdea0b55-b65e-44c3-92ff-69700022b263"
         },
         {
-            "hasCache": false,
+            "hasCache": true,
             "index": 0,
             "name": "Plane",
             "type": "Mesh",

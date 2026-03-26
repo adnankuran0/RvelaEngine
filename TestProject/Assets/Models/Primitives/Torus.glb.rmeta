@@ -1,7 +1,15 @@
 {
     "dependencies": [],
     "importerID": "ModelImporter",
-    "importerSettings": {},
+    "importerSettings": {
+        "generatePrefab": true,
+        "importMaterials": true,
+        "importNormals": true,
+        "importTangents": true,
+        "importTextures": true,
+        "importUVs": true,
+        "scale": 1.0
+    },
     "lastWriteTime": 13415805344,
     "subAssets": [
         {
@@ -12,7 +20,7 @@
             "uuid": "3814bb3f-5522-4d10-944c-17147f860100"
         },
         {
-            "hasCache": false,
+            "hasCache": true,
             "index": 0,
             "name": "Torus",
             "type": "Mesh",

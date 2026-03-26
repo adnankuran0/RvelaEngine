@@ -1,7 +1,15 @@
 {
     "dependencies": [],
     "importerID": "ModelImporter",
-    "importerSettings": {},
+    "importerSettings": {
+        "generatePrefab": true,
+        "importMaterials": true,
+        "importNormals": true,
+        "importTangents": true,
+        "importTextures": true,
+        "importUVs": true,
+        "scale": 1.0
+    },
     "lastWriteTime": 13414169305,
     "subAssets": [
         {
@@ -12,7 +20,7 @@
             "uuid": "f93d7599-ebd5-4dab-af6c-06858b61612f"
         },
         {
-            "hasCache": false,
+            "hasCache": true,
             "index": 0,
             "name": "Cube.016",
             "type": "Mesh",
