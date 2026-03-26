@@ -21,8 +21,8 @@ private:
     GLuint o_DirectionalShadowMap = 0;
     GLuint pointFBO = 0;
     GLuint o_PointShadowMap = 0;
-    const unsigned int SHADOW_WIDTH = 4096, SHADOW_HEIGHT = 4096;
-    const unsigned int POINT_SHADOW_WIDTH = 1024, POINT_SHADOW_HEIGHT = 1024;
+    const unsigned int SHADOW_WIDTH = 2048, SHADOW_HEIGHT = 2048;
+    const unsigned int POINT_SHADOW_WIDTH = 512, POINT_SHADOW_HEIGHT = 512;
 };
 
 }

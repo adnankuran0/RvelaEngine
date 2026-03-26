@@ -32,14 +32,20 @@ project "RvelaEditor"
       "../Vendor/nlohmann",
       "../Vendor/robin_map/include",
       "../Vendor/lua/include",
-      "../Vendor/Jolt/include"
+      "../Vendor/Jolt/include",
+      "../Vendor/DirectXTex/include",
+      "../Vendor/meshoptimizer/include",
+
    }
 
    libdirs
    {
       "../Vendor/GLFW/lib",
       "../Vendor/lua/lib",
-      "../Vendor/Jolt/lib"
+      "../Vendor/Jolt/lib",
+      "../Vendor/DirectXTex/lib",
+      "../Vendor/meshoptimizer/lib",
+
    }
 
    links
@@ -47,6 +53,8 @@ project "RvelaEditor"
       "RvelaEngine",
         "glfw3",
         "lua54",
+        "DirectXTex",
+        "meshoptimizer",
    }
 
    targetdir ("../Binaries/" .. OutputDir .. "/%{prj.name}")

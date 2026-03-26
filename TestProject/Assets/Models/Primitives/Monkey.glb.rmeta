@@ -1,0 +1,31 @@
+{
+    "dependencies": [],
+    "importerID": "ModelImporter",
+    "importerSettings": {
+        "generatePrefab": true,
+        "importMaterials": true,
+        "importNormals": true,
+        "importTangents": true,
+        "importTextures": true,
+        "importUVs": true,
+        "scale": 1.0
+    },
+    "lastWriteTime": 13415805292,
+    "subAssets": [
+        {
+            "hasCache": false,
+            "index": 0,
+            "name": "Monkey_Mat0",
+            "type": "Material",
+            "uuid": "ab90d890-0861-4c4c-809b-98515bf111db"
+        },
+        {
+            "hasCache": true,
+            "index": 0,
+            "name": "Suzanne",
+            "type": "Mesh",
+            "uuid": "d5b8e68a-8170-4b1a-b439-62ae98d391f8"
+        }
+    ],
+    "uuid": "b731d965-2d99-4a74-ae09-4243f445e178"
+}

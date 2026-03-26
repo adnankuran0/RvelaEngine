@@ -1,0 +1,31 @@
+{
+    "dependencies": [],
+    "importerID": "ModelImporter",
+    "importerSettings": {
+        "generatePrefab": true,
+        "importMaterials": true,
+        "importNormals": true,
+        "importTangents": true,
+        "importTextures": true,
+        "importUVs": true,
+        "scale": 1.0
+    },
+    "lastWriteTime": 13415804964,
+    "subAssets": [
+        {
+            "hasCache": false,
+            "index": 0,
+            "name": "Sphere_Mat0",
+            "type": "Material",
+            "uuid": "137142de-e09f-4b0a-85d9-4fa3fcae426d"
+        },
+        {
+            "hasCache": true,
+            "index": 0,
+            "name": "Sphere",
+            "type": "Mesh",
+            "uuid": "b6c7f2a2-cce2-4b68-be50-19a8f552e727"
+        }
+    ],
+    "uuid": "9a1970cb-c49c-49b9-abc2-2eb53eb00bce"
+}

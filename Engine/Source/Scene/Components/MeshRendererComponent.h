@@ -3,7 +3,7 @@
 #include "Rendering/VertexBuffer.h"
 #include "Rendering/ElementBuffer.h"
 #include <Rendering/AABB.h>
-#include "Assets/MeshAsset.h"
+#include "Asset/Types/MeshAsset.h"
 #include "Core/Ref.h"
 
 namespace rv {

@@ -1,57 +1,48 @@
 #include "rvelapch.h"
 #include "MaterialComponent.h"
+#include "Asset/AssetManager.h"
+#include "Core/Log.h"
 
 using namespace rv;
 
+using json = nlohmann::json;
+
 void MaterialComponent::Load(const AssetUUID& uuid)
 {
-	if (!uuid.IsValid())
-	{
-		LOG_WARN("Material UUID is not valid!");
-		return;
-	}
-	materialUUID = uuid;
+    if (!uuid.IsValid())
+    {
+        LOG_WARN("Invalid UUID");
+        return;
+    }
 
-	// Clear existing
-	material.Reset();
-	albedoTexture.Reset();
-	normalTexture.Reset();
-	metallicTexture.Reset();
-	roughnessTexture.Reset();
-	aoTexture.Reset();
-	heightTexture.Reset();
+    m_MaterialUUID = uuid;
 
-	material = AssetRegistry::GetAsset<MaterialAsset>(materialUUID);
-	if (!material)
-	{
-		LOG_ERROR("Material asset not found for UUID {}", materialUUID.ToString());
-		return;
-	}
-	if (material->useAlbedoMap)
-		albedoTexture = AssetRegistry::GetAsset<TextureAsset>(material->albedoTextureUUID);
-	if (material->useNormalMap)
-		normalTexture = AssetRegistry::GetAsset<TextureAsset>(material->normalTextureUUID);
-	if (material->useMetallicMap)
-		metallicTexture = AssetRegistry::GetAsset<TextureAsset>(material->metallicTextureUUID);
-	if (material->useRoughnessMap)
-		roughnessTexture = AssetRegistry::GetAsset<TextureAsset>(material->roughnessTextureUUID);
-	if (material->useAOMap)
-		aoTexture = AssetRegistry::GetAsset<TextureAsset>(material->aoTextureUUID);
-	if (material->useHeightMap)
-		heightTexture = AssetRegistry::GetAsset<TextureAsset>(material->heightTextureUUID);
+    Ref<MaterialAsset> asset = AssetManager::Get().GetAsset<MaterialAsset>(uuid);
+    if (!asset)
+    {
+        LOG_ERROR("MaterialAsset not found: {}", uuid.ToString());
+        return;
+    }
+
+    m_Instance = MaterialInstance::CreateFromAsset(asset);
 }
 
 json MaterialComponent::Serialize() const
 {
-	json j;
-	j["material"] = materialUUID.ToString();
-	material->Serialize();
-	return j;
+    json j;
+    j["material"] = m_MaterialUUID.ToString();
+
+    if (m_Instance.HasAnyOverride())
+        j["overrides"] = m_Instance.SerializeOverrides();
+
+    return j;
 }
+
 void MaterialComponent::Deserialize(const json& j)
 {
-	std::string materialUUIDstr = j.at("material").get<std::string>();
-	materialUUID = AssetUUID::FromString(materialUUIDstr);
-	Load(materialUUID);
+    AssetUUID uuid = AssetUUID::FromString(j.at("material").get<std::string>());
+    Load(uuid);
 
+    if (j.contains("overrides"))
+        m_Instance.DeserializeOverrides(j["overrides"]);
 }

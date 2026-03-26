@@ -1,4 +1,5 @@
 #pragma once
+#include "Asset/AssetUUID.h"
 
 namespace rv {
 
@@ -11,7 +12,8 @@ public:
 	static void OpenScene(Engine& engine);
 	static bool SaveScene(Engine& engine);
 	static bool SaveSceneAs(Engine& engine);
-
+    static AssetUUID ReadUUIDFromMeta(const std::string& assetPath);
+   
 
 };
 

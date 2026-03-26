@@ -8,6 +8,8 @@
 #include <Rendering/EditorCamera.h>
 #include <Event/MouseEvents.h>
 #include "Rendering/DebugRenderer.h"
+#include "Asset/AssetManager.h"
+#include "Rendering/Texture.h"
 
 using namespace rv;
 
@@ -19,7 +21,11 @@ Engine::Engine()
 
 	m_Window.Init();
 	m_ProjectManager.LoadProject("C:\\RvelaEngine\\TestProject\\TestProject.rproj");
-	m_AssetRegistry.Init(m_ProjectManager.GetProjectPath()); //TODO: Make this works with assets path
+	m_AssetRegistry.Scan(ProjectManager::GetProjectPath() / "Assets");
+	AssetManager& assetManager = AssetManager::Get();
+
+	assetManager.Init(m_AssetRegistry);
+
 	m_Renderer.Init(m_Window.GetGLFWWindow());
 	m_SceneManager.Init();
 	m_RenderLayer = new RenderLayer(this);
@@ -33,7 +39,6 @@ Engine::Engine()
 	{
 		LOG_WARN("Another instance of Engine already exists!");
 	}
-	
 }
 
 Engine::~Engine()
@@ -112,50 +117,13 @@ void Engine::Run()
 
 void Engine::HandleEvents() noexcept
 {
-	EventManager::DispatchEvents([this](Event& event) {
-		switch (event.GetEventType())
+	EventManager::DispatchEvents([this](Event& event) 
 		{
-		case EventType::MouseMoved:
-		{
-			if (auto* mouseEvent = dynamic_cast<MouseMovedEvent*>(&event) )
+		
+			for (auto* layer : m_LayerStack)
 			{
-				if (GetActiveScene().GetState() == SceneState::EDIT && m_EditorCamera)
-				{
-					m_EditorCamera->OnMouseMoved(
-						mouseEvent->GetX(),
-						mouseEvent->GetY(),
-						m_Window.GetGLFWWindow()
-					);
-				}
-				
+				layer->OnEvent(event);
 			}
-			break;
-		}
-		case EventType::MouseScrolled:
-		{
-			if (Input::IsMouseButtonPressed(MouseCode::Button1))
-			{
-				if (auto* scrollEvent = dynamic_cast<MouseScrolledEvent*>(&event))
-				{
-					// Adjust sprint speed based on scroll input
-					m_EditorCamera->MovementSpeed += scrollEvent->GetYOffset();
-					m_EditorCamera->MovementSpeed = std::clamp(m_EditorCamera->MovementSpeed, 1.0f, 100.0f);
-				}
-			}
-			break;
-		}
-		case EventType::KeyPressed:
-		{
-			if (Input::IsKeyJustPressed(KeyCode::End))
-			{
-				LOG_DEBUG("Shaders reloaded.");
-				ShaderManager::ReloadAll();
-			}
-			break;
-		}
-		default:
-			break;
-		}
 		});
 }
 
@@ -176,6 +144,7 @@ void Engine::Render()
 	for (Layer* layer : m_LayerStack)
 		layer->OnRender();
 	
+
 
 	m_Renderer.EndFrame();
 	

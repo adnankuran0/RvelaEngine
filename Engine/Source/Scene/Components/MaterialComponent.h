@@ -1,131 +1,109 @@
 #pragma once
-#include "Utils/FileUtils.h"
-#include "json.hpp"
-#include "Core/Ref.h"
-#include "Assets/AssetRegistry.h"
-#include "Assets/TextureAsset.h"
-#include "Assets/MaterialAsset.h"
+#include "Asset/AssetUUID.h"
+#include "Rendering/MaterialInstance.h"
+#include "Asset/AssetManager.h"
+#include <nlohmann/json.hpp>
 
 namespace rv {
-
-using json = nlohmann::json;
 
 struct MaterialComponent
 {
 public:
-	MaterialComponent() {}
-	MaterialComponent(const AssetUUID& uuid) 
-	{
-		Load(uuid);
-	}
+    MaterialComponent() = default;
 
-	inline glm::vec3 GetAlbedoColor() const noexcept { return material->albedoColor; }
-	inline void SetAlbedoColor(const glm::vec3& albedoColor) noexcept { material->albedoColor = albedoColor; }
-	inline glm::vec3 GetEmmisiveColor() const noexcept { return material->emmisiveColor; }
-	inline void SetEmmisiveColor(const glm::vec3& emmisiveColor) noexcept { material->emmisiveColor = emmisiveColor; }
-	inline float GetEmmisiveIntensity() const noexcept { return material->emmisiveIntensity; }
-	inline void SetEmmisiveIntensity(float emmisiveIntensity) const noexcept { material->emmisiveIntensity = emmisiveIntensity; }
-	inline float GetMetallic() const noexcept { return material->metallic; }
-	inline void SetMetallic(float metallic) noexcept { material->metallic = metallic; }
-	inline float GetSpecular() const noexcept { return material->specular; }
-	inline void SetSpecular(float specular) noexcept { material->specular = specular; }
-	inline float GetRoughness() const noexcept { return material->roughness; }
-	inline void SetRoughness(float roughness) noexcept { material->roughness = roughness; }
-	inline float GetAO() const noexcept { return material->ao; }
-	inline void SetAO(float ao) noexcept { material->ao = ao; }
-	inline float GetNormalScale() const noexcept { return material->normalScale; }
-	inline void SetNormalScale(float normalScale) noexcept { material->normalScale = normalScale; }
-	inline float GetHeightScale() const noexcept { return material->heightScale; }
-	inline void SetHeightScale(float heightScale) noexcept { material->heightScale = heightScale; }
-	inline glm::vec2 GetUVScale() const noexcept { return material->UVScale; }
-	inline void SetUVScale(const glm::vec2& UVScale) noexcept { material->UVScale = UVScale; }
-	inline glm::vec2 GetUVOffset() const noexcept { return material->UVOffset; }
-	inline void SetUVOffset(const glm::vec2& UVOffset) noexcept { material->UVOffset = UVOffset; }
+    explicit MaterialComponent(const AssetUUID& uuid) { Load(uuid); }
 
-	inline bool IsUsingAlbedoMap() const noexcept { return material->useAlbedoMap; }
-	inline void SetUseAlbedoMap(bool value) noexcept { material->useAlbedoMap = value; }
-	inline bool IsUsingNormalMap() const noexcept { return material->useNormalMap; }
-	inline void SetUseNormalMap(bool value) noexcept { material->useNormalMap = value; }
-	inline bool IsUsingMetallicMap() const noexcept { return material->useMetallicMap; }
-	inline void SetUseMetallicMap(bool value) noexcept { material->useMetallicMap = value; }
-	inline bool IsUsingRoughnessMap() const noexcept { return material->useRoughnessMap; }
-	inline void SetUseRoughnessMap(bool value) noexcept { material->useRoughnessMap = value; }
-	inline bool IsUsingAOMap() const noexcept { return material->useAOMap; }
-	inline void SetUseAOMap(bool value) noexcept { material->useAOMap = value; }
-	inline bool IsUsingHeightMap() const noexcept { return material->useHeightMap; }
-	inline void SetUseHeightMap(bool value) noexcept { material->useHeightMap = value; }
+    MaterialInstance& GetInstance() { return m_Instance; }
+    const MaterialInstance& GetInstance() const { return m_Instance; }
 
-	inline Ref<TextureAsset> GetAlbedoTexture() const { return albedoTexture; }
-	inline void SetAlbedoTexture(const AssetUUID& textureUIID)
-	{
-		material->albedoTextureUUID = textureUIID;
-		
-		albedoTexture = AssetRegistry::GetAsset<TextureAsset>(textureUIID);
-	}
+    const AssetUUID& GetMaterialUUID() const { return m_MaterialUUID; }
 
-	inline Ref<TextureAsset> GetNormalTexture() const { return normalTexture; }
-	inline void SetNormalTexture(const AssetUUID& textureUIID)
-	{
-		material->normalTextureUUID = textureUIID;
-		normalTexture = AssetRegistry::GetAsset<TextureAsset>(textureUIID);
-	}
+    void SetMaterial(const AssetUUID& uuid) { Load(uuid); }
+    void Reload() { Load(m_MaterialUUID); }
 
-	inline Ref<TextureAsset> GetMetallicTexture() const { return metallicTexture; }
-	inline void SetMetallicTexture(const AssetUUID& textureUIID)
-	{
-		material->metallicTextureUUID = textureUIID;
-		metallicTexture = AssetRegistry::GetAsset<TextureAsset>(textureUIID);
-	}
+    glm::vec3 GetAlbedoColor() const { return m_Instance.GetAlbedoColor(); }
+    void SetAlbedoColor(const glm::vec3& v) { m_Instance.SetAlbedoColor(v); }
+    void ClearAlbedoColor() { m_Instance.ClearAlbedoColor(); }
 
-	inline Ref<TextureAsset> GetRoughnessTexture() const { return roughnessTexture; }
-	inline void SetRoughnessTexture(const AssetUUID& textureUIID)
-	{
-		material->roughnessTextureUUID = textureUIID;
-		roughnessTexture = AssetRegistry::GetAsset<TextureAsset>(textureUIID);
-	}
+    glm::vec3 GetEmissiveColor() const { return m_Instance.GetEmissiveColor(); }
+    void SetEmissiveColor(const glm::vec3& v) { m_Instance.SetEmissiveColor(v); }
+    void ClearEmissiveColor() { m_Instance.ClearEmissiveColor(); }
 
-	inline Ref<TextureAsset> GetAOTexture() const { return aoTexture; }
-	inline void SetAOTexture(const AssetUUID& textureUIID)
-	{
-		material->aoTextureUUID = textureUIID;
-		aoTexture = AssetRegistry::GetAsset<TextureAsset>(textureUIID);
-	}
+    float GetEmissiveIntensity() const { return m_Instance.GetEmissiveIntensity(); }
+    void SetEmissiveIntensity(float v) { m_Instance.SetEmissiveIntensity(v); }
+    void ClearEmissiveIntensity() { m_Instance.ClearEmissiveIntensity(); }
 
-	inline Ref<TextureAsset> GetHeightTexture() const { return heightTexture; }
-	inline void SetHeightTexture(const AssetUUID& textureUIID)
-	{
-		material->heightTextureUUID = textureUIID;
-		heightTexture = AssetRegistry::GetAsset<TextureAsset>(textureUIID);
-	}
+    float GetMetallic() const { return m_Instance.GetMetallic(); }
+    void SetMetallic(float v) { m_Instance.SetMetallic(v); }
+    void ClearMetallic() { m_Instance.ClearMetallic(); }
 
-	Ref<MaterialAsset> GetMaterial() { return material; }
-	void SetMaterial(AssetUUID newMaterialUUID)
-	{
-		Load(newMaterialUUID);
-	}
-	void Reload() { Load(materialUUID); }
+    float GetSpecular() const { return m_Instance.GetSpecular(); }
+    void SetSpecular(float v) { m_Instance.SetSpecular(v); }
+    void ClearSpecular() { m_Instance.ClearSpecular(); }
 
-	Sampler& GetSampler() { return material->sampler; }
-	void SetSampler(const SamplerDesc& samplerDescc) { material->sampler.Init(samplerDescc); }
+    float GetRoughness() const { return m_Instance.GetRoughness(); }
+    void SetRoughness(float v) { m_Instance.SetRoughness(v); }
+    void ClearRoughness() { m_Instance.ClearRoughness(); }
 
-	inline const AssetUUID& GetMaterialID() const noexcept{ return materialUUID; }
+    float GetAO() const { return m_Instance.GetAO(); }
+    void SetAO(float v) { m_Instance.SetAO(v); }
+    void ClearAO() { m_Instance.ClearAO(); }
 
-	json Serialize() const;
-	void Deserialize(const json& j);
+    float GetNormalScale() const { return m_Instance.GetNormalScale(); }
+    void SetNormalScale(float v) { m_Instance.SetNormalScale(v); }
+    void ClearNormalScale() { m_Instance.ClearNormalScale(); }
+
+    float GetHeightScale() const { return m_Instance.GetHeightScale(); }
+    void SetHeightScale(float v) { m_Instance.SetHeightScale(v); }
+    void ClearHeightScale() { m_Instance.ClearHeightScale(); }
+
+    glm::vec2 GetUVScale() const { return m_Instance.GetUVScale(); }
+    void SetUVScale(const glm::vec2& v) { m_Instance.SetUVScale(v); }
+    void ClearUVScale() { m_Instance.ClearUVScale(); }
+
+    glm::vec2 GetUVOffset() const { return m_Instance.GetUVOffset(); }
+    void SetUVOffset(const glm::vec2& v) { m_Instance.SetUVOffset(v); }
+    void ClearUVOffset() { m_Instance.ClearUVOffset(); }
+
+    bool IsUsingAlbedoMap() const { return m_Instance.UsesAlbedoMap(); }
+    bool IsUsingNormalMap() const { return m_Instance.UsesNormalMap(); }
+    bool IsUsingMetallicMap() const { return m_Instance.UsesMetallicMap(); }
+    bool IsUsingRoughnessMap() const { return m_Instance.UsesRoughnessMap(); }
+    bool IsUsingAOMap() const { return m_Instance.UsesAOMap(); }
+    bool IsUsingHeightMap() const { return m_Instance.UsesHeightMap(); }
+
+    Ref<TextureAsset> GetAlbedoTexture() const { return m_Instance.GetAlbedoTexture(); }
+    Ref<TextureAsset> GetNormalTexture() const { return m_Instance.GetNormalTexture(); }
+    Ref<TextureAsset> GetMetallicTexture() const { return m_Instance.GetMetallicTexture(); }
+    Ref<TextureAsset> GetRoughnessTexture() const { return m_Instance.GetRoughnessTex(); }
+    Ref<TextureAsset> GetAOTexture() const { return m_Instance.GetAOTexture(); }
+    Ref<TextureAsset> GetHeightTexture() const { return m_Instance.GetHeightTexture(); }
+
+    void SetAlbedoTexture(const AssetUUID& uuid) { m_Instance.SetAlbedoTexture(AssetManager::Get().GetAsset<TextureAsset>(uuid)); }
+    void SetNormalTexture(const AssetUUID& uuid) { m_Instance.SetNormalTexture(AssetManager::Get().GetAsset<TextureAsset>(uuid)); }
+    void SetMetallicTexture(const AssetUUID& uuid) { m_Instance.SetMetallicTexture(AssetManager::Get().GetAsset<TextureAsset>(uuid)); }
+    void SetRoughnessTexture(const AssetUUID& uuid) { m_Instance.SetRoughnessTexture(AssetManager::Get().GetAsset<TextureAsset>(uuid)); }
+    void SetAOTexture(const AssetUUID& uuid) { m_Instance.SetAOTexture(AssetManager::Get().GetAsset<TextureAsset>(uuid)); }
+    void SetHeightTexture(const AssetUUID& uuid) { m_Instance.SetHeightTexture(AssetManager::Get().GetAsset<TextureAsset>(uuid)); }
+
+    void ClearAlbedoTexture() { m_Instance.ClearAlbedoTexture(); }
+    void ClearNormalTexture() { m_Instance.ClearNormalTexture(); }
+    void ClearMetallicTexture() { m_Instance.ClearMetallicTexture(); }
+    void ClearRoughnessTexture() { m_Instance.ClearRoughnessTexture(); }
+    void ClearAOTexture() { m_Instance.ClearAOTexture(); }
+    void ClearHeightTexture() { m_Instance.ClearHeightTexture(); }
+
+    Sampler& GetSampler() { return m_Instance.GetSampler(); }
+    const Sampler& GetSampler() const { return m_Instance.GetSampler(); }
+
+    nlohmann::json Serialize() const;
+    void Deserialize(const nlohmann::json& j);
 
 private:
+    void Load(const AssetUUID& uuid);
 
-	void Load(const AssetUUID& uuid);
-
-	Ref<TextureAsset> albedoTexture;
-	Ref<TextureAsset> normalTexture;
-	Ref<TextureAsset> metallicTexture;
-	Ref<TextureAsset> roughnessTexture;
-	Ref<TextureAsset> aoTexture;
-	Ref<TextureAsset> heightTexture;
-	Ref<MaterialAsset> material;
-	AssetUUID materialUUID;
-
+    AssetUUID m_MaterialUUID;
+    MaterialInstance m_Instance;
 };
 
 }

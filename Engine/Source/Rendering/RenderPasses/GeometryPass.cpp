@@ -4,6 +4,7 @@
 #include "Rendering/RenderContext.h"
 #include <Rendering/RenderFrame.h>
 #include "Rendering/ShaderManager.h"
+#include "Rendering/TextureCache.h"
 
 using namespace rv;
 
@@ -86,7 +87,6 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     geometryShader.use();
 
-
     glm::mat4 projection = ctx.camera->GetProjectionMatrix();
     glm::mat4 view = ctx.camera->GetViewMatrix();
 
@@ -110,7 +110,7 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             Ref<TextureAsset> roughnessTexture = material.GetRoughnessTexture();
             geometryShader.setBool("useRoughnessMap", true);
             geometryShader.setInt("roughnessMap", 0);
-            roughnessTexture->GetTexture().Bind(0);
+            TextureCache::Get().GetOrCreate(roughnessTexture).Bind(0);
             material.GetSampler().Bind(0);
 
         }
@@ -125,7 +125,7 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             Ref<TextureAsset> metallicTexture = material.GetMetallicTexture();
             geometryShader.setBool("useMetallicMap", true);
             geometryShader.setInt("metallicMap", 1);
-            metallicTexture->GetTexture().Bind(1);
+            TextureCache::Get().GetOrCreate(metallicTexture).Bind(1);
             material.GetSampler().Bind(1);
 
         }

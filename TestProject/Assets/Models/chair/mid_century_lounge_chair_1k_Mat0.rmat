@@ -1,0 +1,27 @@
+{
+    "UVOffset": [
+        0.0,
+        0.0
+    ],
+    "UVScale": [
+        1.0,
+        1.0
+    ],
+    "albedoTexture": "40fceb24-5254-4945-9ae0-f01f82444558",
+    "ao": 1.0,
+    "aoTexture": "55bd61b2-7f90-4950-ac41-0033152ad0df",
+    "emissiveColor": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "emissiveIntensity": 0.0,
+    "heightScale": 0.10000000149011612,
+    "metallic": 0.0,
+    "metallicTexture": "fabac28f-68aa-426e-87e1-ef02a273a2fc",
+    "normalScale": 1.0,
+    "normalTexture": "9c6e8801-2387-454f-aa81-d0832cad2d0a",
+    "roughness": 1.0,
+    "roughnessTexture": "8f5882ea-5660-4adb-baef-523858472a51",
+    "specular": 1.0
+}

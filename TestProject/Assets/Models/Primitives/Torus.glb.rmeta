@@ -1,0 +1,31 @@
+{
+    "dependencies": [],
+    "importerID": "ModelImporter",
+    "importerSettings": {
+        "generatePrefab": true,
+        "importMaterials": true,
+        "importNormals": true,
+        "importTangents": true,
+        "importTextures": true,
+        "importUVs": true,
+        "scale": 1.0
+    },
+    "lastWriteTime": 13415805344,
+    "subAssets": [
+        {
+            "hasCache": false,
+            "index": 0,
+            "name": "Torus_Mat0",
+            "type": "Material",
+            "uuid": "3814bb3f-5522-4d10-944c-17147f860100"
+        },
+        {
+            "hasCache": true,
+            "index": 0,
+            "name": "Torus",
+            "type": "Mesh",
+            "uuid": "db65917a-cf92-4335-addb-f30e2608d318"
+        }
+    ],
+    "uuid": "4d1f9dbe-5862-47d5-867b-4b3a54548590"
+}

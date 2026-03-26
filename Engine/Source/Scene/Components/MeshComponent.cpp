@@ -1,5 +1,6 @@
 #include "rvelapch.h"
 #include "MeshComponent.h"
+#include "Asset/AssetManager.h"
 
 using namespace rv;
 
@@ -12,7 +13,7 @@ void MeshComponent::Load(const AssetUUID& uuid)
     }
     meshUUID = uuid;
     mesh.Reset();
-    mesh = AssetRegistry::GetAsset<MeshAsset>(meshUUID);
+    mesh = AssetManager::Get().GetAsset<MeshAsset>(meshUUID);
 }
 
 json MeshComponent::Serialize() const

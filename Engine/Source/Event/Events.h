@@ -17,7 +17,9 @@ enum class EventType {
 
     MouseScrolled,
 
-    WindowResized
+    WindowResized,
+
+    FileDropped
 };
 
 }

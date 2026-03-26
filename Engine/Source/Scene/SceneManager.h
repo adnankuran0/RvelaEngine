@@ -26,6 +26,7 @@ public:
     }
 
     void SaveScene(const std::string& path);
+    void SaveScene(Scene& scene, const std::string& path);
     void LoadScene(const std::string& path);
 
     void Update();

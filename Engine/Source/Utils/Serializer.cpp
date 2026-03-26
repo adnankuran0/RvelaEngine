@@ -112,7 +112,7 @@ void SerializeBin_MaterialComp(const MaterialComponent& comp, std::vector<std::b
 {
 	std::vector<std::byte> tempOut;
 
-	const UUIDv4::UUID& raw = comp.GetMaterialID().Raw();
+	const UUIDv4::UUID& raw = comp.GetMaterialUUID().Raw();
 	WriteBytesToBuffer(tempOut, reinterpret_cast<const char*>(&raw), sizeof(UUIDv4::UUID));
 
 	size_t payloadSize = tempOut.size();

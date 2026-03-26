@@ -1,0 +1,22 @@
+{
+    "dependencies": [
+        "062daf41-467f-4bda-872a-bd649b1e42c4",
+        "24f895fc-c29a-4ea3-a98f-e368513ef9bb",
+        "9194d5be-8133-46c0-b30d-e13600a98833",
+        "e2fbffaa-f084-45ee-aa89-84f51ab88689",
+        "de010b82-6765-4214-aa02-80b55f51cf18",
+        "390af5eb-0666-42b7-894b-db064d9f397c",
+        "8e5221de-2034-43b7-91ea-696557445104",
+        "15ff2259-8631-447f-9441-6f6df200ec90",
+        "ba922ebc-63f0-4d74-b1a1-b818d72e5517",
+        "f5729cd4-250e-45e0-9f57-bfd6d91811f7",
+        "08b43c72-8830-4573-bfe8-0a8c99798ecc",
+        "a5bc5017-6177-4737-bd9e-c0db974ea476",
+        "497b5055-2a9a-466c-9468-a0959e97115b"
+    ],
+    "importerID": "PrefabImporter",
+    "importerSettings": {},
+    "lastWriteTime": 13418989666,
+    "subAssets": [],
+    "uuid": "ea1291fa-60d1-4433-b894-a8043ae23a9b"
+}

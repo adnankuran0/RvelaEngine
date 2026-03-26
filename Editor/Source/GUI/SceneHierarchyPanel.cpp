@@ -1,7 +1,7 @@
 ﻿#include "SceneHierarchyPanel.h"
 #include "ImGui/imgui.h"
 #include <ImGui/tinyfiledialogs.h>
-#include "AssetImporter/PrefabImporter.h"
+#include "AssetImporters/PrefabImporter.h"
 #include "Core/Engine.h"
 #include "Scene/Entity.h"
 
@@ -12,25 +12,30 @@ static Entity LoadPrimitive(Scene& scene, const std::string& primitiveMeshName)
 {
     static const std::unordered_map<std::string, PrimitiveConfig> map =
     {
-        {"Cube", {"Cube", AssetUUID::FromString("36468d32-bba5-4eb4-82db-0d4da5cd6c65")}},
-        {"Sphere", {"Sphere", AssetUUID::FromString("7f8ebf7d-a783-4a96-93e5-effcc76f557d")}},
-        {"Cylinder", {"Cylinder", AssetUUID::FromString("dcb9be97-2538-4f80-8838-881c19d33ac4")}},
-        {"Cone", {"Cone", AssetUUID::FromString("f91f0572-6cf8-4b72-adc0-18a17b7c05d8")}},
-        {"Capsule", {"Capsule", AssetUUID::FromString("395a97e7-2cbe-4d65-95af-dea85f856252")}},
-        {"Plane", {"Plane", AssetUUID::FromString("80da4157-714d-42a6-aedb-54eee61081f1")}},
-        {"Monkey", {"Monkey", AssetUUID::FromString("e2e22656-e04b-4fb6-b7dd-70758a6c4762")}},
-        {"Torus", {"Torus", AssetUUID::FromString("fe4c1c3d-4a95-4d2c-9883-bbf9c3e83530")}}
+        {"Cube", {"Cube", AssetUUID::FromString("55dee74b-34c1-4aac-80c9-627b95a8cf58")}},
+        {"Sphere", {"Sphere", AssetUUID::FromString("b6c7f2a2-cce2-4b68-be50-19a8f552e727")}},
+        {"Cylinder", {"Cylinder", AssetUUID::FromString("2c4d9b01-fea1-4eec-b741-bb054229ba61")}},
+        {"Cone", {"Cone", AssetUUID::FromString("92ffc5c9-9f6f-4332-ad83-e1d03b046a53")}},
+        {"Capsule", {"Capsule", AssetUUID::FromString("62345031-f93b-40f4-aa76-18c59801997d")}},
+        {"Plane", {"Plane", AssetUUID::FromString("077f6760-e8d5-44b4-895c-5d88be2db952")}},
+        {"Monkey", {"Monkey", AssetUUID::FromString("d5b8e68a-8170-4b1a-b439-62ae98d391f8")}},
+        {"Torus", {"Torus", AssetUUID::FromString("db65917a-cf92-4335-addb-f30e2608d318")}}
     };
     auto it = map.find(primitiveMeshName);
     if (it == map.end()) return Entity{};
     const auto& cfg = it->second;
     Entity root = scene.CreateEntity(cfg.name);
-    Ref<MeshAsset> m = AssetRegistry::GetAsset<MeshAsset>(cfg.uuid);
-    root.AddComponent<MeshRendererComponent>(m);
+    
+    Ref<MeshAsset> m = AssetManager::Get().GetAsset<MeshAsset>(cfg.uuid);
+    if (!m)
+    {
+        LOG_ERROR("Mesh not found: {}", cfg.name);
+        return root;
+    }
     root.AddComponent<MeshComponent>(m->GetUUID());
+    root.AddComponent<MeshRendererComponent>(m);
     root.GetComponent<TagComponent>().tag = cfg.name;
-    AssetUUID defaultMaterialId = AssetUUID::FromString("ee3dde12-6263-4f11-bb1d-812b3e196ab7");
-    root.AddComponent<MaterialComponent>(defaultMaterialId);
+    root.AddComponent<MaterialComponent>();
     root.AddComponent<RigidbodyComponent>();
     if (primitiveMeshName == "Cube")
         root.AddComponent<BoxColliderComponent>();
@@ -212,19 +217,29 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 
         if (ImGui::MenuItem("Save as prefab"))
         {
-            if (selectedEntity == entt::null) return;
-            const char* filterPatterns[] = { "*.rprefab" };
-            const char* filePath = tinyfd_saveFileDialog("Create prefab as", "prefab.rprefab", 1, filterPatterns, NULL);
-
-            std::string file = filePath ? std::string(filePath) : "";
-            if (!file.empty())
+            if (selectedEntity != entt::null)
             {
-                std::ofstream ofs(file);
-                if (ofs.is_open())
+                const char* filterPatterns[] = { "*.rprefab" };
+                const char* filePath = tinyfd_saveFileDialog(
+                    "Create prefab as", "prefab.rprefab", 1, filterPatterns, NULL);
+
+                if (filePath)
                 {
-                    ofs.close();
-                    PrefabImporter::CreatePrefabAsset(file, scene, selectedEntity);
-                    AssetRegistry::ScanAssets();
+                    std::filesystem::path prefabPath = filePath;
+
+                    AssetRegistry& registry = AssetManager::Get().GetRegistry();
+                    AssetMeta meta = registry.GetOrCreateMeta(prefabPath);
+
+                    Ref<PrefabAsset> prefab = PrefabImporter::CreatePrefabAsset(
+                        prefabPath, meta.uuid, scene, selectedEntity);
+
+                    if (prefab)
+                    {
+                        meta.importerID = "PrefabImporter";
+                        registry.SaveMeta(prefabPath, meta);
+                        registry.Scan(registry.GetAssetDir());
+                        LOG_INFO("Prefab saved: {}", prefabPath.string());
+                    }
                 }
             }
         }

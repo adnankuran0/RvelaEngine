@@ -1,0 +1,34 @@
+{
+    "Entities": [
+        {
+            "Material": {
+                "material": "82e248a8-0e79-4d85-ab0e-9583f4b2b54d"
+            },
+            "Mesh": {
+                "mesh": "2a7b6688-8d79-4fd9-9ed1-21381e0ffb11"
+            },
+            "Tag": {
+                "tag": "mid_century_lounge_chair"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 8
+        }
+    ]
+}

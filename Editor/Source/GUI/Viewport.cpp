@@ -29,15 +29,13 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
     glm::mat4 view = engine->GetCamera()->GetViewMatrix();
     glm::mat4 projection = engine->GetCamera()->GetProjectionMatrix();
 
-    static ImGuizmo::OPERATION currentGizmoOperation = ImGuizmo::TRANSLATE;
-    static ImGuizmo::MODE currentGizmoMode = ImGuizmo::WORLD;
     if (ImGui::IsKeyPressed(ImGuiKey_T)) {
-        currentGizmoMode = (currentGizmoMode == ImGuizmo::WORLD) ? ImGuizmo::LOCAL : ImGuizmo::WORLD;
+        m_CurrentGizmoMode = (m_CurrentGizmoMode == ImGuizmo::WORLD) ? ImGuizmo::LOCAL : ImGuizmo::WORLD;
     }
     if (!ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
-        if (ImGui::IsKeyPressed(ImGuiKey_W)) currentGizmoOperation = ImGuizmo::TRANSLATE;
-        if (ImGui::IsKeyPressed(ImGuiKey_E)) currentGizmoOperation = ImGuizmo::ROTATE;
-        if (ImGui::IsKeyPressed(ImGuiKey_R)) currentGizmoOperation = ImGuizmo::SCALE;
+        if (ImGui::IsKeyPressed(ImGuiKey_W)) m_CurrentGizmoOperation = ImGuizmo::TRANSLATE;
+        if (ImGui::IsKeyPressed(ImGuiKey_E)) m_CurrentGizmoOperation = ImGuizmo::ROTATE;
+        if (ImGui::IsKeyPressed(ImGuiKey_R)) m_CurrentGizmoOperation = ImGuizmo::SCALE;
     }
 
     ImGuizmo::GetStyle().RotationLineThickness = 4.0f;
@@ -48,75 +46,55 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
 
     bool useSnap = ImGui::IsKeyDown(ImGuiKey_LeftCtrl);
 
+    float snapTranslate[3] = { m_snapTranslate, m_snapTranslate, m_snapTranslate };
+    float snapScale[3] = { m_snapScale, m_snapScale, m_snapScale };
 
-    float snapTranslate[3] = { 1.0f, 1.0f, 1.0f };
-    float snapRotate = 15.0f;
-    float snapScale[3] = { 1.f, 1.f, 1.f };
-
-    if (currentGizmoOperation == ImGuizmo::TRANSLATE) {
+    if (m_CurrentGizmoOperation == ImGuizmo::TRANSLATE) {
         ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection),
-            currentGizmoOperation, currentGizmoMode,
+            m_CurrentGizmoOperation, m_CurrentGizmoMode,
             glm::value_ptr(transform), nullptr,
             useSnap ? snapTranslate : nullptr);
     }
-    else if (currentGizmoOperation == ImGuizmo::ROTATE) {
+    else if (m_CurrentGizmoOperation == ImGuizmo::ROTATE) {
         ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection),
-            currentGizmoOperation, currentGizmoMode,
+            m_CurrentGizmoOperation, m_CurrentGizmoMode,
             glm::value_ptr(transform), nullptr,
-            useSnap ? &snapRotate : nullptr);
+            useSnap ? &m_snapRotate : nullptr);
     }
-    else if (currentGizmoOperation == ImGuizmo::SCALE) {
+    else if (m_CurrentGizmoOperation == ImGuizmo::SCALE) {
         ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection),
-            currentGizmoOperation, currentGizmoMode,
+            m_CurrentGizmoOperation, m_CurrentGizmoMode,
             glm::value_ptr(transform), nullptr,
-            useSnap ? snapScale : nullptr);
+            nullptr);
     }
 
 
     if (ImGuizmo::IsUsing()) {
-        glm::vec3 translation, rotation, scale;
-        ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(transform),
-            glm::value_ptr(translation),
-            glm::value_ptr(rotation),
-            glm::value_ptr(scale));
-
-
-
-        if (currentGizmoMode == ImGuizmo::LOCAL) {
-            glm::mat4 parentWorld(1.0f);
-            auto& scene = engine->GetActiveScene();
-            auto& reg = scene.GetRegistry();
-            auto& node = reg.get<SceneTreeComponent>(selectedEntity);
-            if (node.parent != entt::null && reg.valid(node.parent)) {
-                parentWorld = reg.get<TransformComponent>(node.parent).GetWorldMatrix();
-            }
-            glm::mat4 localM = glm::inverse(parentWorld) * transform;
-            glm::vec3 lPos, lScale, skew;
-            glm::quat lRot;
-            glm::vec4 persp;
-            glm::decompose(localM, lScale, lRot, lPos, skew, persp);
-
-            tc.SetPosition(lPos);
-            tc.SetScale(lScale);
-            tc.SetRotation(lRot);
+        glm::mat4 parentWorld(1.0f);
+        auto& scene = engine->GetActiveScene();
+        auto& reg = scene.GetRegistry();
+        auto& node = reg.get<SceneTreeComponent>(selectedEntity);
+        if (node.parent != entt::null && reg.valid(node.parent)) {
+            parentWorld = reg.get<TransformComponent>(node.parent).GetWorldMatrix();
         }
-        else if (currentGizmoMode == ImGuizmo::WORLD) {
-            glm::mat4 parentWorld(1.0f);
-            auto& scene = engine->GetActiveScene();
-            auto& reg = scene.GetRegistry();
-            auto& node = reg.get<SceneTreeComponent>(selectedEntity);
-            if (node.parent != entt::null && reg.valid(node.parent)) {
-                parentWorld = reg.get<TransformComponent>(node.parent).GetWorldMatrix();
+
+        glm::mat4 localM = glm::inverse(parentWorld) * transform;
+        glm::vec3 lPos, lScale, skew;
+        glm::quat lRot;
+        glm::vec4 persp;
+        glm::decompose(localM, lScale, lRot, lPos, skew, persp);
+
+        if (useSnap) {
+            if (m_CurrentGizmoOperation == ImGuizmo::SCALE) {
+                lScale.x = glm::round(lScale.x / m_snapScale) * m_snapScale;
+                lScale.y = glm::round(lScale.y / m_snapScale) * m_snapScale;
+                lScale.z = glm::round(lScale.z / m_snapScale) * m_snapScale;
             }
-            glm::mat4 localM = glm::inverse(parentWorld) * transform;
-            glm::vec3 lPos, lScale, skew;
-            glm::quat lRot;
-            glm::vec4 persp;
-            glm::decompose(localM, lScale, lRot, lPos, skew, persp);
-            tc.SetPosition(lPos);
-            tc.SetScale(lScale);
-            tc.SetRotation(lRot);
         }
+
+        tc.SetPosition(lPos);
+        tc.SetScale(lScale);
+        tc.SetRotation(lRot);
     }
 }
 
@@ -125,24 +103,72 @@ void Viewport::DrawPopups(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
     auto& debugSettings = DebugRenderer::Get().GetSettings();
 
     float buttonSize = 25.0f;
-
-    ImVec2 buttonPos = {
-        displayPos.x + 6.0f,
-        displayPos.y + 6.0f
-    };
-
+    ImVec2 buttonPos = { displayPos.x + 6.0f, displayPos.y + 6.0f };
     ImGui::SetCursorScreenPos(buttonPos);
 
     if (ImGui::Button("...", ImVec2(buttonSize, buttonSize)))
-    {
         ImGui::OpenPopup("ViewportOptions");
-    }
 
     if (ImGui::BeginPopup("ViewportOptions"))
     {
         ImGui::Checkbox("Draw Colliders", &debugSettings.drawColliders);
         ImGui::Checkbox("Draw Bounding Boxes", &debugSettings.drawBoundingBoxes);
+
+        ImGui::Separator();
+        ImGui::Text("Snap Settings");
+
+        ImGui::Text("Translate (m)");
+        ImGui::SetNextItemWidth(80);
+        ImGui::InputFloat("##snapT", &m_snapTranslate, 0.0f, 0.0f, "%.2f");
+        m_snapTranslate = glm::max(0.01f, m_snapTranslate);
+        ImGui::SameLine();
+        if (ImGui::SmallButton("0.1"))  m_snapTranslate = 0.1f;
+        ImGui::SameLine();
+        if (ImGui::SmallButton("0.5"))  m_snapTranslate = 0.5f;
+        ImGui::SameLine();
+        if (ImGui::SmallButton("1"))    m_snapTranslate = 1.0f;
+        ImGui::SameLine();
+        if (ImGui::SmallButton("5"))    m_snapTranslate = 5.0f;
+
+        ImGui::Text("Rotate (deg)");
+        ImGui::SetNextItemWidth(80);
+        ImGui::InputFloat("##snapR", &m_snapRotate, 0.0f, 0.0f, "%.1f");
+        m_snapRotate = glm::max(0.1f, m_snapRotate);
+        ImGui::SameLine();
+        if (ImGui::SmallButton("5"))   m_snapRotate = 5.0f;
+        ImGui::SameLine();
+        if (ImGui::SmallButton("15"))  m_snapRotate = 15.0f;
+        ImGui::SameLine();
+        if (ImGui::SmallButton("45"))  m_snapRotate = 45.0f;
+        ImGui::SameLine();
+        if (ImGui::SmallButton("90"))  m_snapRotate = 90.0f;
+
+        ImGui::Text("Scale");
+        ImGui::SetNextItemWidth(80);
+        ImGui::InputFloat("##snapS", &m_snapScale, 0.0f, 0.0f, "%.2f");
+        m_snapScale = glm::max(0.01f, m_snapScale);
+        ImGui::SameLine();
+        if (ImGui::SmallButton("0.25")) m_snapScale = 0.25f;
+        ImGui::SameLine();
+        if (ImGui::SmallButton("0.5"))  m_snapScale = 0.5f;
+        ImGui::SameLine();
+        if (ImGui::SmallButton("1"))    m_snapScale = 1.0f;
+
         ImGui::EndPopup();
+    }
+
+    if (ImGui::GetIO().KeyCtrl)
+    {
+        const char* label = "";
+        float val = 0;
+        if (m_CurrentGizmoOperation == ImGuizmo::TRANSLATE) { label = "Snap: %.2fm"; val = m_snapTranslate; }
+        else if (m_CurrentGizmoOperation == ImGuizmo::ROTATE) { label = "Snap: %.1f°"; val = m_snapRotate; }
+        else if (m_CurrentGizmoOperation == ImGuizmo::SCALE) { label = "Snap: %.2f";  val = m_snapScale; }
+
+        char buf[64];
+        snprintf(buf, sizeof(buf), label, val);
+        ImVec2 textPos = { displayPos.x + 6.0f, displayPos.y + 36.0f };
+        ImGui::GetWindowDrawList()->AddText(textPos, IM_COL32(255, 220, 0, 255), buf);
     }
 }
 

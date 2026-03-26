@@ -3,12 +3,12 @@
 namespace rv {
 
 class Engine;
-class AssetImporterRegistry;
+class AssetImportPipeline;
 
 class MenuBar
 {
 public:
-	void Draw(Engine* engine, AssetImporterRegistry& assetImporter);
+	void Draw(Engine* engine, AssetImportPipeline& assetImporter);
 };
 
 }

@@ -85,7 +85,7 @@ function Player:OnUpdate(dt)
         local camT   = self.cam:GetComponent("TransformComponent")
         local moving = inputDir:LengthSq() > 0 and isGrounded
         local freq   = isSprinting and 14.0 or 8.0
-        local amp    = isSprinting and 0.01 or 0.03
+        local amp    = isSprinting and 0.05 or 0.06
 
         if moving then
             self.headBobTime = self.headBobTime + dt * freq
@@ -94,6 +94,7 @@ function Player:OnUpdate(dt)
         end
 
         local pos = camT:GetPosition()
+        
         pos.y = self.camStartY + math.sin(self.headBobTime) * amp
         camT:SetPosition(pos)
     end

@@ -1,0 +1,27 @@
+{
+    "UVOffset": [
+        0.0,
+        0.0
+    ],
+    "UVScale": [
+        1.0,
+        1.0
+    ],
+    "albedoColor": [
+        1.0,
+        1.0,
+        1.0
+    ],
+    "ao": 1.0,
+    "emissiveColor": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "emissiveIntensity": 0.0,
+    "heightScale": 0.10000000149011612,
+    "metallic": 0.0,
+    "normalScale": 1.0,
+    "roughness": 1.0,
+    "specular": 1.0
+}

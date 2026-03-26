@@ -4,6 +4,7 @@
 #include "Scene/Components/MaterialComponent.h"
 #include "Scene/Entity.h"
 #include "Physics/CollisionInfo.h"
+#include <Asset/Types/ScriptAsset.h>
 
 using namespace rv;
 
@@ -122,7 +123,6 @@ void ScriptSystem::OnStop()
         }
     } 
 
-    //TODO: Runtime material instances
     auto mcView = m_Scene.GetRegistry().view<MaterialComponent>();
     for (auto entity : mcView)
     {
@@ -135,17 +135,37 @@ void ScriptSystem::OnStop()
 
 void ScriptSystem::BindLuaScript(ScriptComponent& sc, entt::entity e)
 {
+    auto scriptAsset = AssetManager::Get().GetAsset<ScriptAsset>(sc.scriptAssetUUID);
+    if (!scriptAsset || !scriptAsset->IsValid())
+    {
+        LOG_ERROR("ScriptAsset not found or invalid, UUID: {}", sc.scriptAssetUUID.ToString());
+        return;
+    }
+
     sc.luaState = &m_ScriptEngine.GetState();
 
-    sol::load_result script = sc.luaState->load_file(sc.luaFile);
-    if (!script.valid()) { LOG_ERROR(script); return; }
+    sol::load_result script = sc.luaState->load(
+        scriptAsset->GetSource(),
+        scriptAsset->GetScriptName()
+    );
+
+    if (!script.valid())
+    {
+        sol::error err = script;
+        LOG_ERROR("Lua load error [{}]: {}", scriptAsset->GetScriptName(), err.what());
+        return;
+    }
 
     sol::protected_function func = script;
     sol::protected_function_result result = func();
-    if (!result.valid()) { LOG_ERROR(result); return; }
+    if (!result.valid())
+    {
+        sol::error err = result;
+        LOG_ERROR("Lua exec error [{}]: {}", scriptAsset->GetScriptName(), err.what());
+        return;
+    }
 
     sc.luaInstance = result;
-
     sc.luaInstance["entity"] = Entity(e, &m_Scene);
     sc.luaInstance["scene"] = &m_Scene;
     sc.luaInstance["physics"] = &m_Scene.GetPhysicsSystem().GetPhysicsWorld();
@@ -155,12 +175,9 @@ void ScriptSystem::BindLuaScript(ScriptComponent& sc, entt::entity e)
     sc.OnFixedUpdate = sc.luaInstance["OnFixedUpdate"];
     sc.OnLateUpdate = sc.luaInstance["OnLateUpdate"];
     sc.OnDestroy = sc.luaInstance["OnDestroy"];
-
     sc.OnCollisionEnter = sc.luaInstance["OnCollisionEnter"];
     sc.OnCollisionStay = sc.luaInstance["OnCollisionStay"];
     sc.OnCollisionExit = sc.luaInstance["OnCollisionExit"];
-
-    
 }
 
 void ScriptSystem::DispatchCollisionEvents()

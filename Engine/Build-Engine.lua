@@ -27,7 +27,7 @@ project "RvelaEngine"
       "../Vendor/GLAD/include",
       "../Vendor/glm",
       "../Vendor/spdlog/include",
-      "../Vendor/stb_image",
+      "../Vendor/stb",
       "../Vendor/entt",
       "../Vendor/tiny_obj_loader",
       "../Vendor/Assimp/include",
@@ -36,8 +36,8 @@ project "RvelaEngine"
       "../Vendor/robin_map/include",
       "../Vendor/sol",
       "../Vendor/lua/include",
-      "../Vendor/Jolt/include"
-      
+      "../Vendor/Jolt/include",
+      "../Vendor/meshoptimizer/include",
    }
 
    libdirs
@@ -45,7 +45,8 @@ project "RvelaEngine"
       "../Vendor/GLFW/lib",
       "../Vendor/Assimp/lib",
       "../Vendor/lua/lib",
-      "../Vendor/Jolt/lib"
+      "../Vendor/Jolt/lib",
+      "../Vendor/meshoptimizer/lib",
 
    }
 
@@ -55,6 +56,7 @@ project "RvelaEngine"
       "opengl32",
       "assimp-vc143-mt",
       "lua54",
+      "meshoptimizer",
       
    }
 

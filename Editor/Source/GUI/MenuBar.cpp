@@ -1,93 +1,92 @@
 ﻿#include "MenuBar.h"
-
-#include <AssetImporter/MaterialImporter.h>
 #include "Core/Engine.h"
-#include "AssetImporter/AssetImporterRegistry.h"
+#include "Asset/AssetImportPipeline.h"
+#include "Asset/AssetRegistry.h"
+#include "AssetImporters/MaterialSerializer.h"
 #include <imgui.h>
 #include "Dialogs.h"
 #include "EditorUtils.h"
 #include "tinyfiledialogs.h"
+#include "Asset/AssetManager.h"
 
 using namespace rv;
 
-void MenuBar::Draw(Engine* engine, AssetImporterRegistry& assetImporter)
+void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter)
 {
+    auto& registry = AssetManager::Get().GetRegistry();
+
+
     if (ImGui::BeginMainMenuBar())
     {
         if (ImGui::BeginMenu("File"))
         {
             if (ImGui::MenuItem("New scene (Ctrl + N)"))
-            {
                 EditorUtils::CreateScene(*engine);
-            }
+
             if (ImGui::MenuItem("Open scene (Ctrl + O)"))
-            {
                 EditorUtils::OpenScene(*engine);
-            }
+
             if (ImGui::MenuItem("Save scene (Ctrl + S)"))
-            {
                 EditorUtils::SaveScene(*engine);
-            }
+
             if (ImGui::MenuItem("Save scene as (Ctrl + Shift + S)"))
-            {
                 EditorUtils::SaveSceneAs(*engine);
-               
-            }
+
             if (ImGui::MenuItem("Import assets"))
             {
-                const char* filterPatterns[] = { "*.png", "*.jpeg", "*.jpg", "*.tga", "*.fbx", "*.gltf", "*.obj", "*.glb"};
-                char const* lTheOpenFileName = tinyfd_openFileDialog(
-                    "Select assets to import",
-                    "",
-                    8,
-                    filterPatterns,
-                    NULL,
-                    1); 
+                const char* filterPatterns[] = {
+                    "*.png", "*.jpeg", "*.jpg", "*.tga",
+                    "*.fbx", "*.gltf", "*.obj", "*.glb"
+                };
+                const char* selected = tinyfd_openFileDialog(
+                    "Select assets to import", "", 8, filterPatterns, NULL, 1);
 
-                if (lTheOpenFileName)
+
+                if (selected)
                 {
-                    // tinyfd returns paths separated by |
-                    std::string pathsStr(lTheOpenFileName);
+                    std::string pathsStr(selected);
                     size_t start = 0;
                     size_t end = pathsStr.find('|');
+
                     while (end != std::string::npos)
                     {
-                        std::string file = pathsStr.substr(start, end - start);
-                        assetImporter.Import(file);
+                        assetImporter.ImportAsset(pathsStr.substr(start, end - start), registry);
                         start = end + 1;
                         end = pathsStr.find('|', start);
                     }
-                    // Last file (or only file if no |)
+
                     std::string lastFile = pathsStr.substr(start);
                     if (!lastFile.empty())
-                    {
-                        assetImporter.Import(lastFile);
-                    }
+                        assetImporter.ImportAsset(lastFile, registry);
 
+                    registry.Scan(registry.GetAssetDir());
                 }
             }
+
+            if (ImGui::MenuItem("Reimport all assets"))
+            {
+                assetImporter.ReimportAll(AssetManager::Get().GetRegistry());
+            }
+
             if (ImGui::MenuItem("Create Material"))
             {
                 const char* filterPatterns[] = { "*.rmat" };
-                const char* filePath = tinyfd_saveFileDialog("Create material as", "material.rmat", 1, filterPatterns, NULL);
+                const char* filePath = tinyfd_saveFileDialog(
+                    "Create material as", "material.rmat", 1, filterPatterns, NULL);
 
-                std::string file = filePath ? std::string(filePath) : "";
-                if (!file.empty())
+                if (filePath)
                 {
-                    std::ofstream ofs(file);
-                    if (ofs.is_open())
-                    {
-                        ofs.close();
-                        MaterialImporter::Get().CreateMaterialAsset(file);
-                        AssetRegistry::ScanAssets();
-                    }
+                    std::filesystem::path matPath = filePath;
+                    MaterialSerializer::CreateNew(matPath, registry);
+                    registry.Scan(registry.GetAssetDir());
                 }
             }
+
             ImGui::Separator();
+
             if (ImGui::MenuItem("Quit"))
-            {
                 glfwSetWindowShouldClose(engine->GetWindow().GetGLFWWindow(), true);
-            }
+
             ImGui::EndMenu();
         }
 
@@ -101,4 +100,3 @@ void MenuBar::Draw(Engine* engine, AssetImporterRegistry& assetImporter)
         ImGui::EndMainMenuBar();
     }
 }
-

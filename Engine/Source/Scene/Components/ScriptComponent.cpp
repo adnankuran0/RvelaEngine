@@ -6,10 +6,10 @@ using namespace rv;
 json ScriptComponent::Serialize() const
 {
     json j;
-    j["luaFile"] = luaFile;
+    j["scriptAssetUUID"] = scriptAssetUUID.ToString();
     return j;
 }
 void ScriptComponent::Deserialize(const json& j)
 {
-    luaFile = j.at("luaFile").get<std::string>();
+    scriptAssetUUID = AssetUUID::FromString(j.at("scriptAssetUUID").get<std::string>());
 }

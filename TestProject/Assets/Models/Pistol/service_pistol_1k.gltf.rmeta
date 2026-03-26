@@ -1,0 +1,108 @@
+{
+    "dependencies": [],
+    "importerID": "ModelImporter",
+    "importerSettings": {
+        "generatePrefab": true,
+        "importMaterials": true,
+        "importNormals": true,
+        "importTangents": true,
+        "importTextures": true,
+        "importUVs": true,
+        "scale": 1.0
+    },
+    "lastWriteTime": 13418951534,
+    "subAssets": [
+        {
+            "hasCache": false,
+            "index": 0,
+            "name": "service_pistol_1k_Mat0",
+            "type": "Material",
+            "uuid": "a5bc5017-6177-4737-bd9e-c0db974ea476"
+        },
+        {
+            "hasCache": false,
+            "index": 1,
+            "name": "service_pistol_1k_Mat1",
+            "type": "Material",
+            "uuid": "497b5055-2a9a-466c-9468-a0959e97115b"
+        },
+        {
+            "hasCache": true,
+            "index": 0,
+            "name": "Cylinder.003",
+            "type": "Mesh",
+            "uuid": "062daf41-467f-4bda-872a-bd649b1e42c4"
+        },
+        {
+            "hasCache": true,
+            "index": 1,
+            "name": "Cylinder.004",
+            "type": "Mesh",
+            "uuid": "24f895fc-c29a-4ea3-a98f-e368513ef9bb"
+        },
+        {
+            "hasCache": true,
+            "index": 2,
+            "name": "Cube.011",
+            "type": "Mesh",
+            "uuid": "9194d5be-8133-46c0-b30d-e13600a98833"
+        },
+        {
+            "hasCache": true,
+            "index": 3,
+            "name": "Cube.017",
+            "type": "Mesh",
+            "uuid": "e2fbffaa-f084-45ee-aa89-84f51ab88689"
+        },
+        {
+            "hasCache": true,
+            "index": 4,
+            "name": "Cylinder.028",
+            "type": "Mesh",
+            "uuid": "de010b82-6765-4214-aa02-80b55f51cf18"
+        },
+        {
+            "hasCache": true,
+            "index": 5,
+            "name": "Cylinder.005",
+            "type": "Mesh",
+            "uuid": "390af5eb-0666-42b7-894b-db064d9f397c"
+        },
+        {
+            "hasCache": true,
+            "index": 6,
+            "name": "Cylinder.010",
+            "type": "Mesh",
+            "uuid": "8e5221de-2034-43b7-91ea-696557445104"
+        },
+        {
+            "hasCache": true,
+            "index": 7,
+            "name": "Cylinder.012",
+            "type": "Mesh",
+            "uuid": "15ff2259-8631-447f-9441-6f6df200ec90"
+        },
+        {
+            "hasCache": true,
+            "index": 8,
+            "name": "Cylinder.013",
+            "type": "Mesh",
+            "uuid": "ba922ebc-63f0-4d74-b1a1-b818d72e5517"
+        },
+        {
+            "hasCache": true,
+            "index": 9,
+            "name": "Cylinder.014",
+            "type": "Mesh",
+            "uuid": "f5729cd4-250e-45e0-9f57-bfd6d91811f7"
+        },
+        {
+            "hasCache": true,
+            "index": 10,
+            "name": "Cylinder.015",
+            "type": "Mesh",
+            "uuid": "08b43c72-8830-4573-bfe8-0a8c99798ecc"
+        }
+    ],
+    "uuid": "3d01eea4-57a7-4cf8-ba7e-40c06da7dc13"
+}

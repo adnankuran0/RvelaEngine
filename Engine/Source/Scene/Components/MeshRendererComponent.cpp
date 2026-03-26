@@ -8,9 +8,9 @@ void MeshRendererComponent::RecreateFromMesh(Ref<MeshAsset> mesh)
     Destroy();
 
     std::vector<float> packedVertices;
-    PackVertices(mesh->vertices, packedVertices);
+    PackVertices(mesh->GetVertices(), packedVertices);
 
-    indexCount = (unsigned int)mesh->indices.size();
+    indexCount = (unsigned int)mesh->GetIndices().size();
 
     VAO.Init();
     VAO.Bind();
@@ -23,14 +23,13 @@ void MeshRendererComponent::RecreateFromMesh(Ref<MeshAsset> mesh)
     layout.Push<float>(3); // Position
     layout.Push<float>(3); // Normal
     layout.Push<float>(3); // Tangent
-    layout.Push<float>(3); // Bitangent
     layout.Push<float>(2); // UV
 
     VAO.SetBufferLayout(layout);
 
-    EBO.Init(mesh->indices.data(), mesh->indices.size() * sizeof(unsigned int));
+    EBO.Init(mesh->GetIndices().data(), mesh->GetIndices().size() * sizeof(unsigned int));
     EBO.Bind();
-    localAABB = mesh->localAABB;
+    localAABB = mesh->GetAABB();
 
     //worldAABB = localAABB;
 }

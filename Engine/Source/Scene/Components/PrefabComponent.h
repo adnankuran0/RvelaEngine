@@ -1,5 +1,5 @@
 #pragma once
-#include "Assets/AssetUUID.h"
+#include "Asset/AssetUUID.h"
 #include "../nlohmann/json.hpp"
 
 namespace rv {

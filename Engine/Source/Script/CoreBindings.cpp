@@ -12,7 +12,6 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
         "SetName", &Entity::SetName,
         "GetUUID", &Entity::GetUUID,
         "HasComponent", [&](Entity& e, const std::string& type) {
-            // TODO: RTTR
             if (type == "TransformComponent") return e.HasComponent<TransformComponent>();
             else if (type == "CameraComponent") return e.HasComponent<CameraComponent>();
             else if (type == "DirectionalLightComponent") return e.HasComponent<DirectionalLightComponent>();

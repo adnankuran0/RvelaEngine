@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "Event/Event.h"
 
 namespace rv { 
 
@@ -16,6 +17,7 @@ public:
 	virtual void OnFixedUpdate() {}
 	virtual void OnLateUpdate() {}
 	virtual void OnRender() {}
+	virtual void OnEvent(Event& event) {}
 
 	inline const std::string& GetName() const noexcept { return m_DebugName; }
 

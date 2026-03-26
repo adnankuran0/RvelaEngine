@@ -1,12 +1,13 @@
 ﻿#include "rvelapch.h"
 #include "LightingPass.h"
 #include "Core/Log.h"
-#include "Assets/AssetUUID.h"
-#include "Assets/AssetRegistry.h"
+#include "Asset/AssetUUID.h"
+#include "Asset/AssetManager.h"
 #include "Scene/Components.h"
 #include "Rendering/RenderContext.h"
 #include "Scene/Environment.h"
 #include "Rendering/ShaderManager.h"
+#include "Rendering/TextureCache.h"
 
 using namespace rv;
 
@@ -172,8 +173,8 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         shader.setVec2("UVScale", material.GetUVScale());
         shader.setVec2("UVOffset", material.GetUVOffset());
         shader.setVec3("albedoColor", material.GetAlbedoColor());
-        shader.setVec3("emmisiveColor", material.GetEmmisiveColor());
-        shader.setFloat("emmisiveIntensity", material.GetEmmisiveIntensity());
+        shader.setVec3("emmisiveColor", material.GetEmissiveColor()); // shader typo 
+        shader.setFloat("emmisiveIntensity", material.GetEmissiveIntensity()); // shader typo
         shader.setFloat("metallicValue", material.GetMetallic());
         shader.setFloat("roughnessValue", material.GetRoughness());
         shader.setFloat("aoValue", material.GetAO());
@@ -190,16 +191,20 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         { material.IsUsingHeightMap(),    "heightMap",    5, "useHeightMap",    material.GetHeightTexture() }
         } };
 
+        
         for (const auto& map : maps) 
         {
             shader.setBool(map.useUniform, map.isUsing);
             if (map.isUsing)
             {
                 shader.setInt(map.uniformName, map.slot);
-                map.texture->GetTexture().Bind(map.slot);
+                TextureCache::Get().GetOrCreate(map.texture).Bind(map.slot);
                 material.GetSampler().Bind(map.slot);
             }
         }
+      
+
+        
 
         shader.setMat4("model", command.transform.GetWorldMatrix());
         glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(command.transform.GetWorldMatrix())));

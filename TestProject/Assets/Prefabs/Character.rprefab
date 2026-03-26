@@ -1,0 +1,119 @@
+{
+    "Entities": [
+        {
+            "CapsuleColliderComponent": {
+                "halfHeight": 0.5,
+                "offset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "radius": 0.5
+            },
+            "CharacterBodyComponent": {
+                "collisionLayer": 1,
+                "collisionMask": 4294967295,
+                "mass": 70.0,
+                "maxSlopeAngle": 50.0,
+                "maxStrength": 100.0,
+                "predictiveContactDistance": 0.10000000149011612,
+                "shapeOffset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ]
+            },
+            "Material": {
+                "material": "6f565b83-e131-46f0-9aad-316fee6b6ff2"
+            },
+            "Mesh": {
+                "mesh": "62345031-f93b-40f4-aa76-18c59801997d"
+            },
+            "ScriptComponent": {
+                "scriptAssetUUID": "b3326755-edfb-4522-ada1-080110d5fba5"
+            },
+            "Tag": {
+                "tag": "Character"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 6
+        },
+        {
+            "ParentUUID": 6,
+            "ScriptComponent": {
+                "scriptAssetUUID": "bc183720-0ea6-40c0-adb4-6438019b61d8"
+            },
+            "Tag": {
+                "tag": "CameraHolder"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.5102748870849609,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 7
+        },
+        {
+            "CameraComponent": {
+                "farClip": 1000.0,
+                "fov": 90.0,
+                "isActive": true,
+                "nearClip": 0.10000000149011612,
+                "projectionType": 0
+            },
+            "ParentUUID": 7,
+            "Tag": {
+                "tag": "Camera"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 8
+        }
+    ]
+}
