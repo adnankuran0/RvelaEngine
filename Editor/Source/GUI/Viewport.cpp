@@ -4,8 +4,8 @@
 #include "ImGui/ImGuizmo.h"
 #include "Core/Engine.h"
 #include <glm/gtx/matrix_decompose.hpp>
-#include "Rendering/RenderLayer.h"
-#include "Rendering/DebugRenderer.h"
+#include "Renderer/RenderLayer.h"
+#include "Renderer/DebugRenderer.h"
 
 using namespace rv;
 

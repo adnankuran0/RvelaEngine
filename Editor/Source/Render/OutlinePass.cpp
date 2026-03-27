@@ -2,7 +2,7 @@
 #include "OutlinePass.h"
 #include "Scene/Scene.h"
 #include "Scene/Components.h"
-#include "Rendering/RenderContext.h"
+#include "Renderer/RenderContext.h"
 
 using namespace rv;
 

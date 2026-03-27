@@ -3,7 +3,7 @@
 #include "Asset/CacheTypes/MeshCacheHeader.h"
 #include "Asset/AssetMeta.h"
 #include "Asset/AssetRegistry.h"
-#include "Rendering/AABB.h"
+#include "Renderer/AABB.h"
 #include "Core/Log.h"
 #include <fstream>
 #include <Assimp/Importer.hpp>

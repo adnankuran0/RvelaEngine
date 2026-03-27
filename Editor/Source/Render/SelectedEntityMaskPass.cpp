@@ -1,9 +1,9 @@
 #include "rvelapch.h"
 #include "SelectedEntityMaskPass.h"
-#include "Rendering/RenderContext.h"
-#include "Rendering/Renderer.h"
-#include "Rendering/RenderFrame.h"
-#include "Rendering/Camera.h"
+#include "Renderer/RenderContext.h"
+#include "Renderer/Renderer.h"
+#include "Renderer/RenderFrame.h"
+#include "Renderer/Camera.h"
 #include "Scene/Scene.h"
 
 using namespace rv;

@@ -1,7 +1,7 @@
 #pragma once
 #include "Asset/Asset.h"
 #include "Asset/AssetUUID.h"
-#include "Rendering/Sampler.h"
+#include "Renderer/Sampler.h"
 #include <glm/glm.hpp>
 
 namespace rv {

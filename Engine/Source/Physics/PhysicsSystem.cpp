@@ -19,7 +19,7 @@
 #include "ShapeBuilder.h"
 #include "UserData.h"
 
-#include "Rendering/DebugRenderer.h"
+#include "Renderer/DebugRenderer.h"
 
 JPH_SUPPRESS_WARNINGS
 
@@ -123,6 +123,7 @@ void PhysicsSystem::BindCallbacks()
 	reg.on_destroy<ConvexHullColliderComponent>().connect<&PhysicsSystem::OnShapeChanged>(this);
 	reg.on_construct<ConvexHullColliderComponent>().connect<&PhysicsSystem::OnShapeChanged>(this);
 }
+
 
 void PhysicsSystem::BuildBodies()
 {

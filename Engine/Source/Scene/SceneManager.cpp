@@ -4,7 +4,7 @@
 #include "EntityUUID.h"  
 #include "Core/Log.h"
 #include <Utils/Serializer.h>
-#include "Rendering/TextureCache.h"
+#include "Renderer/TextureCache.h"
 
 using namespace rv;
 

@@ -1,15 +1,16 @@
 ﻿#include "rvelapch.h"
 #include "Engine.h"
 #include "Core/Log.h"
-#include "Rendering/RenderLayer.h"
+#include "Renderer/RenderLayer.h"
 #include "Input/Input.h"
 #include "Event/EventManager.h"
 #include "Time.h"
-#include <Rendering/EditorCamera.h>
+#include <Renderer/EditorCamera.h>
 #include <Event/MouseEvents.h>
-#include "Rendering/DebugRenderer.h"
+#include "Renderer/DebugRenderer.h"
 #include "Asset/AssetManager.h"
-#include "Rendering/Texture.h"
+#include "Renderer/Texture.h"
+#include "Audio/AudioManager.h"
 
 using namespace rv;
 
@@ -23,8 +24,9 @@ Engine::Engine()
 	m_ProjectManager.LoadProject("C:\\RvelaEngine\\TestProject\\TestProject.rproj");
 	m_AssetRegistry.Scan(ProjectManager::GetProjectPath() / "Assets");
 	AssetManager& assetManager = AssetManager::Get();
-
 	assetManager.Init(m_AssetRegistry);
+
+	AudioManager::Init();
 
 	m_Renderer.Init(m_Window.GetGLFWWindow());
 	m_SceneManager.Init();
@@ -39,6 +41,7 @@ Engine::Engine()
 	{
 		LOG_WARN("Another instance of Engine already exists!");
 	}
+
 }
 
 Engine::~Engine()
@@ -59,6 +62,7 @@ void Engine::PopLayer(Layer* layer)
 void Engine::Update()
 {
 	m_SceneManager.Update();
+	AudioManager::Update(GetCamera());
 
 	for (Layer* layer : m_LayerStack)
 	{

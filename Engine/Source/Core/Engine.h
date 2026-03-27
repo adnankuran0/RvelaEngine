@@ -1,6 +1,6 @@
 #pragma once
 #include "Window.h"
-#include "Rendering/Renderer.h"
+#include "Renderer/Renderer.h"
 #include "Scene/SceneManager.h"
 #include "Utils/ProjectManager.h"
 #include "Scene/SelectionManager.h"

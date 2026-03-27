@@ -1,7 +1,7 @@
 #pragma once
 #include <glm/glm.hpp>
 #include "json.hpp"
-#include "Rendering/Camera.h"
+#include "Renderer/Camera.h"
 
 namespace rv {
 

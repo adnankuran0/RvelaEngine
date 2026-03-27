@@ -1,6 +1,6 @@
 #pragma once
 #include <filesystem>
-#include "Rendering/Texture.h"
+#include "Renderer/Texture.h"
 #include <Asset/AssetImportPipeline.h>
 #include "Event/WindowEvents.h"
 

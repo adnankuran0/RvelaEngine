@@ -12,7 +12,7 @@
 #include "entt/entt.h"
 #include "ShapeBuilder.h"
 #include "PhysicsWorld.h"
-#include "Rendering/JoltDebugRenderer.h"
+#include "Renderer/JoltDebugRenderer.h"
 
 namespace rv {
 

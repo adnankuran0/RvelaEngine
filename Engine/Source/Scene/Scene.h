@@ -3,13 +3,14 @@
 #include <entt/entt.h>
 #include "Math/RvelaMath.h"
 #include "Utils/ISerializable.h"
-#include "Rendering/Renderer.h"
+#include "Renderer/Renderer.h"
 #include "CameraSystem.h"
 #include "Script/ScriptSystem.h"
 #include "LightSystem.h"
 #include "TransformSystem.h"
 #include "Environment.h"
 #include "Physics/PhysicsSystem.h"
+#include "Audio/AudioSystem.h"
 
 namespace rv {
 
@@ -161,6 +162,7 @@ private:
     LightSystem m_LightSystem;
     entt::registry m_Registry;
     PhysicsSystem m_PhysicsSystem;
+    AudioSystem m_AudioSystem;
     Environment m_Environment;
 };
 

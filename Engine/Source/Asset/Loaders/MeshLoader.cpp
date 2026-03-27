@@ -2,7 +2,7 @@
 #include "MeshLoader.h"
 #include "Asset/Types/MeshAsset.h"
 #include "Asset/CacheTypes/MeshCacheHeader.h"
-#include "Rendering/AABB.h"
+#include "Renderer/AABB.h"
 #include "Core/Log.h"
 #include <fstream>
 #include "Asset/AssetMeta.h"

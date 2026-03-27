@@ -1,8 +1,8 @@
 #pragma once
-#include "Rendering/VertexArray.h"
-#include "Rendering/VertexBuffer.h"
-#include "Rendering/ElementBuffer.h"
-#include <Rendering/AABB.h>
+#include "Renderer/VertexArray.h"
+#include "Renderer/VertexBuffer.h"
+#include "Renderer/ElementBuffer.h"
+#include <Renderer/AABB.h>
 #include "Asset/Types/MeshAsset.h"
 #include "Core/Ref.h"
 

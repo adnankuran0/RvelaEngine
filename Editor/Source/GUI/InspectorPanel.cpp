@@ -1,9 +1,10 @@
 ﻿#include "InspectorPanel.h"
 #include "ImGui/imgui.h"
 #include "Core/Engine.h"
-#include "Rendering/RenderLayer.h"
+#include "Renderer/RenderLayer.h"
 #include "EditorUtils.h"
 #include "AssetImporters/MaterialSerializer.h"
+#include "Audio/AudioManager.h"
 
 using namespace rv;
 
@@ -72,6 +73,8 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                             if (ImGui::MenuItem("MeshCollider")) { registry.emplace<MeshColliderComponent>(selectedEntity); ImGui::CloseCurrentPopup(); }
                         if (!registry.any_of<ConvexHullColliderComponent>(selectedEntity))
                             if (ImGui::MenuItem("ConvexHullCollider")) { registry.emplace<ConvexHullColliderComponent>(selectedEntity); ImGui::CloseCurrentPopup(); }
+                        if (!registry.any_of<AudioEmitterComponent>(selectedEntity))
+                            if (ImGui::MenuItem("AudioEmitter")) { registry.emplace<AudioEmitterComponent>(selectedEntity); ImGui::CloseCurrentPopup(); }
                         ImGui::EndPopup();
                     }
                 }
@@ -921,6 +924,93 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                             }
                             ImGui::EndDragDropTarget();
                         }
+                    }
+                }
+
+                // ---------- AudioEmitter ----------
+                if (registry.any_of<AudioEmitterComponent>(selectedEntity))
+                {
+                    bool open = ImGui::CollapsingHeader("AudioEmitter");
+
+                    if (ImGui::BeginPopupContextItem("AudioEmitterComponent"))
+                    {
+                        if (ImGui::MenuItem("Remove Component"))
+                            registry.remove<AudioEmitterComponent>(selectedEntity);
+                        ImGui::EndPopup();
+                    }
+
+                    if (open)
+                    {
+                        auto& emitter = registry.get<AudioEmitterComponent>(selectedEntity);
+                        auto& audio = AudioManager::Get();
+
+                        ImGui::Button("Audio Clip", ImVec2(200, 20));
+
+                        if (ImGui::BeginDragDropTarget())
+                        {
+                            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
+                            {
+                                const char* path = (const char*)payload->Data;
+                                std::string pathStr(path);
+
+                                if (pathStr.ends_with(".wav") ||
+                                    pathStr.ends_with(".mp3") ||
+                                    pathStr.ends_with(".ogg"))
+                                {
+                                    emitter.path = pathStr;
+
+                                    // recreate runtime sound
+                                    audio.Create(&emitter, selectedEntity);
+
+                                    if (emitter.playOnCreate)
+                                        audio.Play(&emitter);
+                                }
+                            }
+                            ImGui::EndDragDropTarget();
+                        }
+                        if (!emitter.path.empty())
+                        {
+                            ImGui::TextWrapped("Path: %s", emitter.path.c_str());
+                        }
+
+                        if (ImGui::Button("Play"))
+                        {
+                            audio.Play(&emitter);
+                        }
+
+                        ImGui::SameLine();
+
+                        if (ImGui::Button("Stop"))
+                        {
+                            audio.Stop(&emitter);
+                        }
+
+                        float volume = emitter.volume;
+                        if (ImGui::SliderFloat("Volume", &volume, 0.0f, 10.0f, "%.2f"))
+                        {
+                            audio.SetVolume(&emitter, volume);
+                        }
+
+                        float pitch = emitter.pitch;
+                        if (ImGui::SliderFloat("Pitch", &pitch, 0.01f, 4.0f, "%.2f"))
+                        {
+                            audio.SetPitch(&emitter, pitch);
+                        }
+
+                        bool loop = emitter.loop;
+                        if (ImGui::Checkbox("Loop", &loop))
+                        {
+                            audio.SetLoop(&emitter, loop);
+                        }
+
+                        if (ImGui::Checkbox("Spatial 3D", &emitter.spatial))
+                        {
+                            emitter.recreate = true;
+                        }
+
+                        ImGui::Checkbox("Play on create", &emitter.playOnCreate);
+                       
+
                     }
                 }
             }

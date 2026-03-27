@@ -1,6 +1,6 @@
 #pragma once
 #include "Asset/AssetUUID.h"
-#include "Rendering/MaterialInstance.h"
+#include "Renderer/MaterialInstance.h"
 #include "Asset/AssetManager.h"
 #include <nlohmann/json.hpp>
 

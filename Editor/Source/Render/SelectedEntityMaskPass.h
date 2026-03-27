@@ -1,5 +1,5 @@
 #pragma once
-#include "Rendering/RenderPass.h"
+#include "Renderer/RenderPass.h"
 
 namespace rv {
 

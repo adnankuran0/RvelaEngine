@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "Rendering/Camera.h"
+#include "Renderer/Camera.h"
 
 namespace rv {
 

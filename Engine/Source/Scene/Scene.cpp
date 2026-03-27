@@ -17,7 +17,8 @@ m_ScriptSystem(*this),
 m_CameraSystem(*this), 
 m_LightSystem(*this),
 m_TransformSystem(*this),
-m_PhysicsSystem(*this)
+m_PhysicsSystem(*this),
+m_AudioSystem(*this)
 {
     m_ScenePath = "";
     m_SceneName = sceneName;
@@ -149,6 +150,7 @@ void Scene::Update()
     m_TransformSystem.Update();
     m_PhysicsSystem.Update(); 
     m_CameraSystem.Update();
+    m_AudioSystem.Update();
 }
 void Scene::FixedUpdate() 
 {                

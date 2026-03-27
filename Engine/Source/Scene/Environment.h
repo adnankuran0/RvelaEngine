@@ -1,5 +1,5 @@
 #pragma once
-#include "Rendering/Skybox.h"
+#include "Renderer/Skybox.h"
 #include "nlohmann/json.hpp"
 
 namespace rv {

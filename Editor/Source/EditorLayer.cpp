@@ -5,7 +5,7 @@
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_impl_glfw.h"
 #include "ImGui/imgui_impl_opengl3.h"
-#include "Rendering/RenderLayer.h"
+#include "Renderer/RenderLayer.h"
 #include <Render/OutlinePass.h>
 #include <Render/SelectedEntityMaskPass.h>
 #include "Input/Input.h"

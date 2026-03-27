@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Layer.h"
-#include "Rendering/EditorCamera.h"
+#include "Renderer/EditorCamera.h"
 #include "Asset/AssetImportPipeline.h"
 #include "GUI/SceneHierarchyPanel.h"
 #include "GUI/Style.h"
@@ -11,7 +11,7 @@
 #include "GUI/Viewport.h"
 #include "GUI/InspectorPanel.h"
 #include "GUI/AssetBrowserPanel.h"
-#include <Rendering/RenderPipeline.h>
+#include <Renderer/RenderPipeline.h>
 
 namespace rv {
 

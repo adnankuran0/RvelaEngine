@@ -1,6 +1,6 @@
 #pragma once
 #include "Asset/Asset.h"
-#include "Rendering/AABB.h"
+#include "Renderer/AABB.h"
 #include <span>
 #include <glm/glm.hpp>
 

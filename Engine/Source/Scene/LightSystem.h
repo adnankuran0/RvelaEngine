@@ -1,5 +1,5 @@
 #pragma once
-#include "Rendering/Light.h"
+#include "Renderer/Light.h"
 
 namespace rv {
 
