@@ -25,6 +25,9 @@ public:
    
     Frustum frustum{};
     glm::vec3 Position{};
+    glm::vec3 Velocity = { 0.0f, 0.0f, 0.0f };
+    glm::vec3 prevPosition = { 0.0f, 0.0f, 0.0f };
+    bool prevPosValid = false;
     glm::vec3 Front{ 0.0f, 0.0f, -1.0f };
     glm::vec3 Up{ 0.0f, 1.0f, 0.0f };
     glm::vec3 Right{1.0f,0.0f,0.0f};

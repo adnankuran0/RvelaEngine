@@ -945,72 +945,115 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                         auto& audio = AudioManager::Get();
 
                         ImGui::Button("Audio Clip", ImVec2(200, 20));
-
                         if (ImGui::BeginDragDropTarget())
                         {
                             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
                             {
-                                const char* path = (const char*)payload->Data;
-                                std::string pathStr(path);
-
-                                if (pathStr.ends_with(".wav") ||
-                                    pathStr.ends_with(".mp3") ||
-                                    pathStr.ends_with(".ogg"))
+                                std::string pathStr((const char*)payload->Data);
+                                if (pathStr.ends_with(".wav") || pathStr.ends_with(".mp3") || pathStr.ends_with(".ogg"))
                                 {
                                     emitter.path = pathStr;
-
-                                    // recreate runtime sound
                                     audio.Create(&emitter, selectedEntity);
-
                                     if (emitter.playOnCreate)
                                         audio.Play(&emitter);
                                 }
                             }
                             ImGui::EndDragDropTarget();
                         }
+
                         if (!emitter.path.empty())
-                        {
                             ImGui::TextWrapped("Path: %s", emitter.path.c_str());
-                        }
 
-                        if (ImGui::Button("Play"))
-                        {
-                            audio.Play(&emitter);
-                        }
+                        ImGui::Separator();
 
+                        if (ImGui::Button("Play"))   audio.Play(&emitter);
                         ImGui::SameLine();
+                        if (ImGui::Button("Pause"))  audio.Pause(&emitter);
+                        ImGui::SameLine();
+                        if (ImGui::Button("Stop"))   audio.Stop(&emitter);
 
-                        if (ImGui::Button("Stop"))
-                        {
-                            audio.Stop(&emitter);
-                        }
+
+                        ImGui::Separator();
 
                         float volume = emitter.volume;
-                        if (ImGui::SliderFloat("Volume", &volume, 0.0f, 10.0f, "%.2f"))
-                        {
+                        if (ImGui::SliderFloat("Volume", &volume, 0.0f, 2.0f, "%.2f"))
                             audio.SetVolume(&emitter, volume);
-                        }
 
                         float pitch = emitter.pitch;
                         if (ImGui::SliderFloat("Pitch", &pitch, 0.01f, 4.0f, "%.2f"))
-                        {
                             audio.SetPitch(&emitter, pitch);
-                        }
 
                         bool loop = emitter.loop;
                         if (ImGui::Checkbox("Loop", &loop))
-                        {
                             audio.SetLoop(&emitter, loop);
-                        }
+
+                        ImGui::Checkbox("Play On Create", &emitter.playOnCreate);
+
+                        ImGui::Separator();
 
                         if (ImGui::Checkbox("Spatial 3D", &emitter.spatial))
-                        {
                             emitter.recreate = true;
+
+                        if (emitter.spatial)
+                        {
+                            ImGui::Indent();
+
+                            if (ImGui::CollapsingHeader("Attenuation"))
+                            {
+                                ImGui::Indent();
+
+                                const char* attenuationModels[] = { "None", "Inverse", "Linear", "Exponential" };
+                                int currentModel = static_cast<int>(emitter.attenuationModel);
+                                if (ImGui::Combo("Model", &currentModel, attenuationModels, 4))
+                                {
+                                    audio.SetAttenuationModel(&emitter, static_cast<AttenuationModel>(currentModel));
+                                }
+
+                                if (emitter.attenuationModel != AttenuationModel::None)
+                                {
+                                    float minDist = emitter.minDistance;
+                                    if (ImGui::DragFloat("Min Distance", &minDist, 0.1f, 0.01f, emitter.maxDistance - 0.01f, "%.2f"))
+                                        audio.SetMinDistance(&emitter, minDist);
+
+                                    float maxDist = emitter.maxDistance;
+                                    if (ImGui::DragFloat("Max Distance", &maxDist, 0.5f, emitter.minDistance + 0.01f, 10000.0f, "%.2f"))
+                                        audio.SetMaxDistance(&emitter, maxDist);
+
+                                    if (emitter.attenuationModel == AttenuationModel::Inverse ||
+                                        emitter.attenuationModel == AttenuationModel::Exponential)
+                                    {
+                                        float rolloff = emitter.rolloff;
+                                        if (ImGui::SliderFloat("Rolloff", &rolloff, 0.0f, 10.0f, "%.2f"))
+                                            audio.SetRolloff(&emitter, rolloff);
+                                    }
+                                }
+
+                                ImGui::Unindent();
+                            }
+
+                            if (ImGui::CollapsingHeader("Doppler"))
+                            {
+                                ImGui::Indent();
+
+                                bool dopplerEnabled = emitter.doppler;
+                                if (ImGui::Checkbox("Enabled##doppler", &dopplerEnabled))
+                                {
+                                    emitter.doppler = dopplerEnabled;
+                                    audio.SetDopplerFactor(&emitter, dopplerEnabled ? emitter.dopplerFactor : 0.0f);
+                                }
+
+                                if (emitter.doppler)
+                                {
+                                    float dopplerFactor = emitter.dopplerFactor;
+                                    if (ImGui::SliderFloat("Factor", &dopplerFactor, 0.0f, 5.0f, "%.2f"))
+                                        audio.SetDopplerFactor(&emitter, dopplerFactor);
+                                }
+
+                                ImGui::Unindent();
+                            }
+
+                            ImGui::Unindent();
                         }
-
-                        ImGui::Checkbox("Play on create", &emitter.playOnCreate);
-                       
-
                     }
                 }
             }

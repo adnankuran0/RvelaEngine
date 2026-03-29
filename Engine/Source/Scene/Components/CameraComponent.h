@@ -15,6 +15,8 @@ struct CameraComponent
     void SetFOV(float fov) { camera.FOV = fov; }
     float GetFOV() { return camera.FOV; }
 
+   
+
     json Serialize() const;
     void Deserialize(const json& j);
 

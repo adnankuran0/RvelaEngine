@@ -9,27 +9,44 @@ void AudioSystem::Update()
 {
     auto& reg = m_Scene.GetRegistry();
     auto view = reg.view<AudioEmitterComponent, TransformComponent>();
+    AudioManager& am = AudioManager::Get();
 
     for (auto e : view)
     {
         auto [emitter, transform] = view.get<AudioEmitterComponent, TransformComponent>(e);
-        AudioManager& am = AudioManager::Get();
-        // recreate if asset or spatialization changes
+
+        // recreate instance if asset or spatialization changes
         if (emitter.recreate)
         {
             am.Destroy(&emitter);
             am.Create(&emitter, e);
             emitter.recreate = false;
+            emitter.prevPosValid = false;
+        }
+
+        if (!am.IsPlaying(&emitter) && !am.IsPaused(&emitter))
+        {
+            // TODO: sound finished event?
         }
 
         if (emitter.spatial)
         {
-            am.SetPosition(&emitter, transform.GetWorldPosition());
+            glm::vec3 worldPos = transform.GetWorldPosition();
+
+            am.SetPosition(&emitter, worldPos);
+
+            if (emitter.doppler)
+            {
+                if (emitter.prevPosValid)
+                {
+                    glm::vec3 vel = (worldPos - emitter.prevWorldPos) / Time::GetDeltaTime();
+                    am.SetVelocity(&emitter, vel);
+                }
+                emitter.prevWorldPos = worldPos;
+                emitter.prevPosValid = true;
+            }
         }
     }
-
-    
-    
 }
 
 void AudioSystem::BindCallbacks()

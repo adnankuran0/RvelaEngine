@@ -16,6 +16,9 @@ Camera* CameraSystem::GetActiveCamera()
             camera.Position = transformComp.GetWorldPosition();
             camera.Front = transformComp.GetForward();
             camera.Right = transformComp.GetRight();
+
+            
+
             return &camera;
         }
     }
