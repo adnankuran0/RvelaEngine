@@ -8,7 +8,9 @@ The engine is built around an ECS architecture and focuses on keeping systems mo
 
 ![Logo](Resources/Editor/logo.png)
 
-
+## Screenshots
+![Screenshot1](Resources/Editor/screenshot1.png)  
+![Screenshot2](Resources/Editor/screenshot2.png)  
 
 ## Features
 
@@ -24,28 +26,6 @@ The engine is built around an ECS architecture and focuses on keeping systems mo
 - Lua scripting  
 - Physics  
 - Audio system  
-## Screenshots
-![Screenshot1](Resources/Editor/screenshot1.png)  
-![Screenshot2](Resources/Editor/screenshot2.png)  
-## Build
-
-To get the project up and running, you'll need to follow the setup instructions for your platform.
-
-#### For Windows
-1. Navigate to the `Scripts` folder in the project directory.
-2. Run the `Setup-Windows.bat` batch file.
-
-#### For Linux
-
-1. Navigate to the `Scripts` folder in the project directory.
-
-2. Make the `Setup-Linux.sh` script executable:
-   
-   ```bash
-   chmod +x Setup-Linux.sh
-3. Run the script to install necessary dependencies and set up the project:
-   ```bash
-   ./Setup-Linux.sh
 
 ## Used Dependencies
 - [ImGui](https://github.com/ocornut/imgui)  
@@ -68,6 +48,29 @@ To get the project up and running, you'll need to follow the setup instructions 
 - [spdlog](https://github.com/gabime/spdlog)  
 - [tinyobjloader](https://github.com/tinyobjloader/tinyobjloader)  
 - [uuid_v4](https://github.com/crashoz/uuid_v4)   
+
+
+## Build
+
+To get the project up and running, you'll need to follow the setup instructions for your platform.
+
+#### For Windows
+1. Navigate to the `Scripts` folder in the project directory.
+2. Run the `Setup-Windows.bat` batch file.
+
+#### For Linux
+
+1. Navigate to the `Scripts` folder in the project directory.
+
+2. Make the `Setup-Linux.sh` script executable:
+   
+   ```bash
+   chmod +x Setup-Linux.sh
+3. Run the script to install necessary dependencies and set up the project:
+   ```bash
+   ./Setup-Linux.sh
+
+
 ## Roadmap (TODO)
 
 - Audio system  
