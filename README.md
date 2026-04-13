@@ -6,7 +6,7 @@ Rvela is a 3D game engine written in C++. This project is mainly designed for le
 The engine is built around an ECS architecture and focuses on keeping systems modular and data-oriented where possible.
 
 
-![Rvela (1)](https://github.com/user-attachments/assetsd064ea15-859c-43cc-95c6-1f9f7a11ec17)
+![Logo](Resources/Editor/logo.png)
 
 
 
@@ -25,6 +25,8 @@ The engine is built around an ECS architecture and focuses on keeping systems mo
 - Physics  
 - Audio system  
 ## Screenshots
+![Screenshot1](Resources/Editor/screenshot1.png)  
+![Screenshot2](Resources/Editor/screenshot2.png)  
 ## Build
 
 To get the project up and running, you'll need to follow the setup instructions for your platform.
