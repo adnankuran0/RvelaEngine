@@ -251,8 +251,8 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
             IM_COL32_WHITE
         );
 
-        ImGui::TextColored(ImVec4(1, 1, 0, 1), "Viewport: %.0fx%.0f | Texture: 1920x1080 | Display: %.0fx%.0f | FPS: %.1f",
-            viewportSize.x, viewportSize.y, displaySize.x, displaySize.y, ImGui::GetIO().Framerate);
+        /*ImGui::TextColored(ImVec4(1, 1, 0, 1), "Viewport: %.0fx%.0f | Texture: 1920x1080 | Display: %.0fx%.0f | FPS: %.1f",
+            viewportSize.x, viewportSize.y, displaySize.x, displaySize.y, ImGui::GetIO().Framerate);*/
 
         DrawGizmos(engine, displayPos, displaySize, selectedEntity);
         HandleSelection(engine, displayPos, displaySize, selectedEntity);

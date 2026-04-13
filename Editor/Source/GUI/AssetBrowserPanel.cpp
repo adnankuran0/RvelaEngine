@@ -277,6 +277,9 @@ static void RefreshAssets(const std::filesystem::path& directory)
             if (entry.is_regular_file() && entry.path().extension() == ".rmeta")
                 continue;
 
+            if (entry.is_directory() && entry.path().filename().string().front() == '.')
+                continue;
+
             if (entry.is_regular_file() || entry.is_directory())
                 s_CachedFiles.emplace_back(entry);
         }
