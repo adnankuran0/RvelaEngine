@@ -4,11 +4,11 @@
 
 namespace rv {
 
-
 struct AudioInstance
 {
-	ma_sound sound{};
-	entt::entity entity{};
+    ma_sound sound{};
+    entt::entity entity{ entt::null };
+    uint32_t busID = 0;
 };
 
-}
+} // namespace rv

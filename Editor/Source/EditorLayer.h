@@ -11,6 +11,7 @@
 #include "GUI/Viewport.h"
 #include "GUI/InspectorPanel.h"
 #include "GUI/AssetBrowserPanel.h"
+#include "GUI/MixerPanel.h"
 #include <Renderer/RenderPipeline.h>
 
 namespace rv {
@@ -46,6 +47,7 @@ private:
     SceneHierarchyPanel m_SceneHierarchyPanel;
     InspectorPanel m_InspectorPanel;
     AssetBrowserPanel m_AssetBrowserPanel;
+    MixerPanel m_MixerPanel;
     Viewport m_Viewport;
 
     RenderPassHandle m_OutlinePass;

@@ -22,7 +22,6 @@ struct AudioEmitterComponent
     float pitch = 1.0f;
     bool loop = false;
     bool playOnCreate = false;
-
     bool spatial = true;
 
     AttenuationModel attenuationModel = AttenuationModel::Inverse;
@@ -33,6 +32,9 @@ struct AudioEmitterComponent
     bool doppler = true;
     float dopplerFactor = 1.0f;
 
+    uint32_t busID = 0;
+
+    // local variables
     bool recreate = true;
     uint32_t instanceID = UINT32_MAX;
 

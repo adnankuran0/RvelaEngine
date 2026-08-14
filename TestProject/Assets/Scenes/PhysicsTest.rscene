@@ -97,7 +97,7 @@
                     1.0
                 ]
             },
-            "UUID": 20
+            "UUID": 9
         },
         {
             "BoxColliderComponent": {
@@ -401,23 +401,37 @@
                 "lockScaleRatio": false,
                 "position": [
                     -0.0003421008586883545,
-                    1.7502150535583496,
+                    2.5557494163513184,
                     2.089085340499878
                 ],
                 "rotation": [
-                    -89.99269104003906,
-                    0.0,
-                    0.0
+                    -72.18785858154297,
+                    14.141063690185547,
+                    -1.7609077076485846e-06
                 ],
                 "scale": [
-                    1.3199999332427979,
-                    1.3196022510528564,
-                    1.3196022510528564
+                    1.320000171661377,
+                    1.3195748329162598,
+                    1.3195760250091553
                 ]
             },
             "UUID": 10
         },
         {
+            "AudioEmitterComponent": {
+                "attenuationModel": 1,
+                "doppler": true,
+                "dopplerFactor": 1.0,
+                "loop": true,
+                "maxDistance": 509.0199890136719,
+                "minDistance": 0.7099999785423279,
+                "path": "C:\\RvelaEngine\\TestProject\\Assets\\Sounds\\data_pion-st1-footstep-sfx-323053.mp3",
+                "pitch": 4.0,
+                "playOnCreate": true,
+                "rolloff": 0.6899999976158142,
+                "spatial": true,
+                "volume": 2.0
+            },
             "ConvexHullColliderComponent": {
                 "maxConvexRadius": 0.0,
                 "offset": [
@@ -462,7 +476,7 @@
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
-                    5.590645790100098,
+                    4.310460567474365,
                     3.2082808017730713,
                     -2.191044950450305e-05
                 ],

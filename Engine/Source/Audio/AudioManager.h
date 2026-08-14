@@ -2,6 +2,7 @@
 #include "miniaudio/miniaudio.h"
 #include "Scene/Components/AudioEmitterComponent.h"
 #include "Audio/AudioInstance.h"
+#include "Audio/AudioBus.h"
 #include <entt/entt.h>
 
 
@@ -39,6 +40,7 @@ public:
     void SetVolume(AudioEmitterComponent* comp, float volume);
     void SetPitch(AudioEmitterComponent* comp, float pitch);
     void SetLoop(AudioEmitterComponent* comp, bool loop);
+    void SetSpatial(AudioEmitterComponent* comp, bool spatial);
 
     void SetPosition(AudioEmitterComponent* comp, const glm::vec3& pos);
     void SetVelocity(AudioEmitterComponent* comp, const glm::vec3& vel);
@@ -54,17 +56,31 @@ public:
     void SetListenerDirection(const glm::vec3& forward, const glm::vec3& up);
     void SetListenerVelocity(const glm::vec3& vel);
 
+    AudioBus* CreateBus();
+    bool DestroyBus(uint32_t busID);
+    AudioBus* GetBus(uint32_t id);
+    int GetBusID(const std::string& name);
+    void SetBusVolume(uint32_t id, float volume);
+    bool SetParentBus(uint32_t busID, uint32_t parentBusID);
+    void SetBus(AudioEmitterComponent* comp, uint32_t busID);
+    std::vector<std::unique_ptr<AudioBus>>& GetBusses() { return m_Busses; }
+
     static void Update(Camera* camera);
 
 private:
     AudioInstance* GetInstance(AudioEmitterComponent* comp);
     const AudioInstance* GetInstance(AudioEmitterComponent* comp) const;
     static ma_attenuation_model ToMA(AttenuationModel model);
+    void CreateMasterBus();
 private:
     ma_engine m_Engine;
     
-    std::unordered_map<uint32_t, AudioInstance> m_Instances;
     uint32_t m_NextID = 0;
+    std::unordered_map<uint32_t, AudioInstance> m_Instances;
+
+    std::vector<std::unique_ptr<AudioBus>> m_Busses;
+    AudioBus* m_MasterBus = nullptr;
+    uint32_t m_NextBusID = 1; // 0 is assigned to master bus
 };
 
 }

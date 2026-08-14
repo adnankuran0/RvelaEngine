@@ -966,6 +966,49 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 
                         ImGui::Separator();
 
+                        // bus selection start
+
+                        auto& busses = audio.GetBusses();
+                        AudioBus* currentBus = audio.GetBus(emitter.busID);
+
+                        if (!currentBus) 
+                        {
+                            audio.SetBus(&emitter, 1); // the bus is no longer valid so assign it to the master bus
+                            currentBus = audio.GetBus(emitter.busID);
+                        }
+
+                        std::string currentBusName = currentBus ? currentBus->GetName() : "Master";
+
+                        for (const auto& bus : busses)
+                        {
+                            if (bus->GetID() == emitter.busID)
+                            {
+                                currentBusName = bus->GetName();
+                                break;
+                            }
+                        }
+
+                        if (ImGui::BeginCombo("Output Bus", currentBusName.c_str()))
+                        {
+                            for (const auto& bus : busses)
+                            {
+                                bool isSelected = (emitter.busID == bus->GetID());
+                                if (ImGui::Selectable(bus->GetName().c_str(), isSelected))
+                                {
+                                    audio.SetBus(&emitter, bus->GetID());
+                                }
+
+                                if (isSelected)
+                                    ImGui::SetItemDefaultFocus();
+                            }
+                            ImGui::EndCombo();
+                        }
+
+                        // bus selection end
+
+
+                        ImGui::Separator();
+
                         if (ImGui::Button("Play"))   audio.Play(&emitter);
                         ImGui::SameLine();
                         if (ImGui::Button("Pause"))  audio.Pause(&emitter);

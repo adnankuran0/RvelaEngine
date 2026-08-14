@@ -158,6 +158,9 @@ json SceneSerializer::SerializeEntity(Scene& scene, entt::entity e)
             : 0;
     }
 
+    if (scene.HasComponent<AudioEmitterComponent>(e))
+        j["AudioEmitterComponent"] = scene.GetComponent<AudioEmitterComponent>(e).Serialize();
+
     return j;
 }
 
@@ -230,6 +233,9 @@ void SceneSerializer::DeserializeEntity(
 
     if (entityJson.contains("ParentUUID"))
         scene.GetComponent<SceneTreeComponent>(handle).parentUUID = entityJson["ParentUUID"];
+
+    if (entityJson.contains("AudioEmitterComponent"))
+        scene.AddComponent<AudioEmitterComponent>(handle).Deserialize(entityJson["AudioEmitterComponent"]);
 }
 
 void SceneSerializer::CollectChildrenRecursively(Scene& scene, entt::entity e, std::unordered_set<entt::entity>& out)

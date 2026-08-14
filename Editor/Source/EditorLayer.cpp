@@ -167,6 +167,8 @@ void EditorLayer::Render()
 
     m_AssetBrowserPanel.Draw(m_Engine, m_Engine->GetProjectManager().GetProjectPath() / "Assets",m_AssetImportPipeline);
 
+    m_MixerPanel.Draw();
+
     m_Viewport.Draw(m_Engine, m_SelectedEntity);
 
     ImGui::Render();
