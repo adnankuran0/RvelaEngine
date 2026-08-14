@@ -9,7 +9,7 @@ class Scene; // forward declaration
 class AudioSystem
 {
 public:
-    AudioSystem(Scene& scene) : m_Scene(scene) {}
+    AudioSystem(Scene& scene) : m_Scene(scene) { BindCallbacks(); }
 
     void Update();
 
