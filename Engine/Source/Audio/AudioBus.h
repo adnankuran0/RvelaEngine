@@ -21,7 +21,6 @@ public:
 
 	ma_sound_group* GetGroup();
 
-	void SetVolume(float volume);
 private:
 	unsigned int m_ID;
 	unsigned int m_ParentBus = 0; // master bus by default

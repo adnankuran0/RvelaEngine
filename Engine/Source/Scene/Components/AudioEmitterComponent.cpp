@@ -7,7 +7,7 @@ json AudioEmitterComponent::Serialize() const
 {
     json j;
 
-    j["path"] = path;
+    j["audioClip"] = audioClipUUID.ToString();
     j["volume"] = volume;
     j["pitch"] = pitch;
     j["loop"] = loop;
@@ -27,7 +27,7 @@ json AudioEmitterComponent::Serialize() const
 
 void AudioEmitterComponent::Deserialize(const json& j)
 {
-    path = j["path"];
+    audioClipUUID = AssetUUID::FromString(j.at("audioClip").get<std::string>());
     volume = j["volume"];
     pitch = j["pitch"];
     loop = j["loop"];

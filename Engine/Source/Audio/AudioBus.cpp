@@ -25,7 +25,3 @@ ma_sound_group* AudioBus::GetGroup()
     return &m_Group;
 }
 
-void AudioBus::SetVolume(float volume)
-{
-    ma_sound_group_set_volume(&m_Group, volume);
-}

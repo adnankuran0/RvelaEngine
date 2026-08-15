@@ -2,7 +2,7 @@
 #define MINIAUDIO_IMPLEMENTATION
 #include "AudioManager.h"
 #include <Renderer/Camera.h>
-
+#include "Asset/AssetManager.h"
 
 using namespace rv;
 
@@ -62,28 +62,34 @@ void AudioManager::CreateMasterBus()
     m_Busses.push_back(std::move(master));
 }
 
-void AudioManager::Create(AudioEmitterComponent* comp, entt::entity entity)
+void AudioManager::CreateInstance(AudioEmitterComponent* comp)
 {
-    if (!comp || comp->path.empty()) return;
-    Destroy(comp);
+    if (!comp) return;
 
-    uint32_t id = m_NextID++;
+    comp->audioClip = AssetManager::Get().GetAsset<AudioClipAsset>(comp->audioClipUUID);
+    if (!comp->audioClip || !comp->audioClip->IsValid()) return;
 
+    DestroyInstance(comp);
+
+    uint32_t id = m_NextInstanceID++;
     AudioInstance& instance = m_Instances[id];
-    instance.entity = entity;
 
     AudioBus* bus = GetBus(comp->busID);
     if (!bus)
         bus = m_MasterBus;
     instance.busID = bus->GetID();
 
+    if (comp->audioClip->InitBufferRef(&instance.bufferRef) != MA_SUCCESS)
+    {
+        m_Instances.erase(id);
+        return;
+    }
 
-    ma_result result = ma_sound_init_from_file(
+    ma_result result = ma_sound_init_from_data_source(
         &m_Engine,
-        comp->path.c_str(),
+        (ma_data_source*)&instance.bufferRef,
         0,
         bus->GetGroup(),
-        nullptr,
         &instance.sound
     );
 
@@ -92,6 +98,7 @@ void AudioManager::Create(AudioEmitterComponent* comp, entt::entity entity)
         m_Instances.erase(id);
         return;
     }
+
     comp->instanceID = id;
 
     SetVolume(comp, comp->volume);
@@ -106,12 +113,9 @@ void AudioManager::Create(AudioEmitterComponent* comp, entt::entity entity)
     {
         Play(comp);
     }
-
-
 }
 
-
-void AudioManager::Destroy(AudioEmitterComponent* comp)
+void AudioManager::DestroyInstance(AudioEmitterComponent* comp)
 {
     if (!comp || comp->instanceID == UINT32_MAX) return;
 
@@ -123,6 +127,14 @@ void AudioManager::Destroy(AudioEmitterComponent* comp)
     }
 
     comp->instanceID = UINT32_MAX;
+}
+
+void AudioManager::SetClip(AudioEmitterComponent* comp, Ref<AudioClipAsset> clip)
+{
+    if (!comp || !clip->IsValid()) return;
+    DestroyInstance(comp);
+    comp->audioClipUUID = clip ? clip->GetUUID() : AssetUUID::Invalid();
+    CreateInstance(comp);
 }
 
 void AudioManager::Play(AudioEmitterComponent* comp)
@@ -414,9 +426,9 @@ int AudioManager::GetBusID(const std::string& name)
     return it != m_Busses.end() ? it->get()->GetID() : -1;
 }
 
-void AudioManager::SetBusVolume(uint32_t id, float volume)
+void AudioManager::SetBusVolume(uint32_t busID, float volume)
 {
-    AudioBus* bus = GetBus(id);
+    AudioBus* bus = GetBus(busID);
     if (!bus) return;
 
     ma_sound_group_set_volume(bus->GetGroup(), volume);

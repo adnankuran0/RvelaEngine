@@ -18,8 +18,8 @@ void AudioSystem::Update()
         // recreate instance if asset or spatialization changes
         if (emitter.recreate)
         {
-            am.Destroy(&emitter);
-            am.Create(&emitter, e);
+            am.DestroyInstance(&emitter);
+            am.CreateInstance(&emitter);
             emitter.recreate = false;
             emitter.prevPosValid = false;
         }
@@ -59,7 +59,7 @@ void AudioSystem::OnAudioEmitterCostructed(entt::registry& reg, entt::entity e)
 {
 	auto& emitter = reg.get<AudioEmitterComponent>(e);
 
-	AudioManager::Get().Create(&emitter, e);
+	AudioManager::Get().CreateInstance(&emitter);
 }
 
 
@@ -67,5 +67,5 @@ void AudioSystem::OnAudioEmitterDestructed(entt::registry& reg, entt::entity e)
 {
 	auto& emitter = reg.get<AudioEmitterComponent>(e);
 
-	AudioManager::Get().Destroy(&emitter);
+	AudioManager::Get().DestroyInstance(&emitter);
 }

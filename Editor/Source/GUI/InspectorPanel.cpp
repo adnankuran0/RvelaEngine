@@ -950,19 +950,17 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
                             {
                                 std::string pathStr((const char*)payload->Data);
-                                if (pathStr.ends_with(".wav") || pathStr.ends_with(".mp3") || pathStr.ends_with(".ogg"))
+                                if (pathStr.ends_with(".wav") || pathStr.ends_with(".mp3"))
                                 {
-                                    emitter.path = pathStr;
-                                    audio.Create(&emitter, selectedEntity);
-                                    if (emitter.playOnCreate)
-                                        audio.Play(&emitter);
+                                    AssetUUID audioClipUUID = EditorUtils::ReadUUIDFromMeta(pathStr);
+                                    emitter.audioClipUUID = audioClipUUID;
+                                    audio.CreateInstance(&emitter);
+                                    // TODO: do we really need to create instance here? because of "recreate"
+                                    
                                 }
                             }
                             ImGui::EndDragDropTarget();
                         }
-
-                        if (!emitter.path.empty())
-                            ImGui::TextWrapped("Path: %s", emitter.path.c_str());
 
                         ImGui::Separator();
 

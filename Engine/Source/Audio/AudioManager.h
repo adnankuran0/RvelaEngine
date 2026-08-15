@@ -23,8 +23,10 @@ public:
         return instance; 
     }
 
-    void Create(AudioEmitterComponent* comp, entt::entity entity);
-    void Destroy(AudioEmitterComponent* comp);
+    void CreateInstance(AudioEmitterComponent* comp);
+    void DestroyInstance(AudioEmitterComponent* comp);
+
+    void SetClip(AudioEmitterComponent* comp, Ref<AudioClipAsset> clip);
 
     void Play(AudioEmitterComponent* comp);
     void Stop(AudioEmitterComponent* comp);
@@ -60,7 +62,7 @@ public:
     bool DestroyBus(uint32_t busID);
     AudioBus* GetBus(uint32_t id);
     int GetBusID(const std::string& name);
-    void SetBusVolume(uint32_t id, float volume);
+    void SetBusVolume(uint32_t busID, float volume);
     bool SetParentBus(uint32_t busID, uint32_t parentBusID);
     void SetBus(AudioEmitterComponent* comp, uint32_t busID);
     std::vector<std::unique_ptr<AudioBus>>& GetBusses() { return m_Busses; }
@@ -75,7 +77,7 @@ private:
 private:
     ma_engine m_Engine;
     
-    uint32_t m_NextID = 0;
+    uint32_t m_NextInstanceID = 0;
     std::unordered_map<uint32_t, AudioInstance> m_Instances;
 
     std::vector<std::unique_ptr<AudioBus>> m_Busses;

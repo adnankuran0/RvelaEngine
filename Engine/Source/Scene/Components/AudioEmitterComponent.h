@@ -1,5 +1,7 @@
 #pragma once
 #include "json.hpp"
+#include "Asset/Types/AudioClipAsset.h"
+#include "Core/Ref.h"
 
 namespace rv {
 
@@ -15,8 +17,8 @@ enum class AttenuationModel
 
 struct AudioEmitterComponent
 {
-    // Ref<AudioClipAsset>
-    std::string path;
+    Ref<AudioClipAsset> audioClip;
+    AssetUUID audioClipUUID;
 
     float volume = 1.0f;
     float pitch = 1.0f;
