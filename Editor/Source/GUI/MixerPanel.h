@@ -13,9 +13,7 @@ namespace rv {
         void Draw();
 
     private:
-        std::unordered_map<uint32_t, float> m_BusVolumes;
-
-        uint32_t m_RenamingBusID = 0;
+        uint32_t m_RenamingBusID = UINT32_MAX;
         char m_RenameBuffer[256] = "";
     };
 

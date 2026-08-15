@@ -81,6 +81,7 @@
             "AudioEmitterComponent": {
                 "attenuationModel": 1,
                 "audioClip": "e7dc7a60-7295-4655-85f4-34ce2a2975d9",
+                "busID": 1,
                 "doppler": true,
                 "dopplerFactor": 1.0,
                 "loop": false,
@@ -529,6 +530,7 @@
             "AudioEmitterComponent": {
                 "attenuationModel": 1,
                 "audioClip": "4a0aefc7-3097-4826-b01e-d603ca9a4b19",
+                "busID": 1,
                 "doppler": true,
                 "dopplerFactor": 1.0,
                 "loop": false,

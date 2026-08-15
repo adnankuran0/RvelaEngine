@@ -63,9 +63,13 @@ public:
     AudioBus* GetBus(uint32_t id);
     int GetBusID(const std::string& name);
     void SetBusVolume(uint32_t busID, float volume);
+    float GetBusVolume(uint32_t busID);
     bool SetParentBus(uint32_t busID, uint32_t parentBusID);
     void SetBus(AudioEmitterComponent* comp, uint32_t busID);
     std::vector<std::unique_ptr<AudioBus>>& GetBusses() { return m_Busses; }
+
+    json SaveBusLayout();
+    void LoadBusLayout(const std::string& jsonStr);
 
     static void Update(Camera* camera);
 

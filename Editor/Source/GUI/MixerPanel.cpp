@@ -26,7 +26,7 @@ namespace rv {
         {
             uint32_t busID = bus->GetID();
 
-            bool isMaster = (bus->GetName() == "Master");
+            bool isMaster = (busID == 0);
 
             ImGui::PushID(busID);
             ImGui::BeginGroup();
@@ -41,11 +41,11 @@ namespace rv {
                 {
                     if (strlen(m_RenameBuffer) > 0)
                         bus->SetName(m_RenameBuffer);
-                    m_RenamingBusID = 0;
+                    m_RenamingBusID = UINT32_MAX;
                 }
                 if (ImGui::IsItemDeactivated() && ImGui::IsKeyPressed(ImGuiKey_Escape))
                 {
-                    m_RenamingBusID = 0;
+                    m_RenamingBusID = UINT32_MAX;
                 }
             }
             else
@@ -84,18 +84,13 @@ namespace rv {
 
             ImGui::Spacing();
 
-            if (m_BusVolumes.find(busID) == m_BusVolumes.end())
-            {
-                m_BusVolumes[busID] = 1.0f;
-            }
-            float vol = m_BusVolumes[busID];
+            float vol = AudioManager::Get().GetBusVolume(bus->GetID());
 
             const float sliderWidth = 20.0f;
             ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (stripWidth - sliderWidth) * 0.5f);
 
             if (ImGui::VSliderFloat("##vol", ImVec2(sliderWidth, 180.0f), &vol, 0.0f, 2.0f, ""))
             {
-                m_BusVolumes[busID] = vol;
                 AudioManager::Get().SetBusVolume(busID, vol);
             }
 
@@ -163,9 +158,8 @@ namespace rv {
         if (busToDelete != 0)
         {
             AudioManager::Get().DestroyBus(busToDelete);
-            m_BusVolumes.erase(busToDelete);
             if (m_RenamingBusID == busToDelete)
-                m_RenamingBusID = 0;
+                m_RenamingBusID = UINT32_MAX;
         }
 
         ImGui::EndChild();

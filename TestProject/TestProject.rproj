@@ -1,4 +1,12 @@
 {
+    "busLayout": [
+        {
+            "id": 0,
+            "name": "Master",
+            "parentId": 0,
+            "volume": 1.0
+        }
+    ],
     "name": "TestProject",
     "projectPath": "C:\\RvelaEngine\\TestProject"
 }

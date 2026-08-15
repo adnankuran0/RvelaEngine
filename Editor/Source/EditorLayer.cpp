@@ -192,6 +192,7 @@ void EditorLayer::HandleShortcuts()
         if (Input::IsKeyJustPressed(KeyCode::S))
         {
             EditorUtils::SaveScene(*m_Engine);
+            m_Engine->GetProjectManager().SaveActiveProject();
         }
         if (Input::IsKeyJustPressed(KeyCode::O))
         {

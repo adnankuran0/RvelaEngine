@@ -79,6 +79,7 @@ void rv::LuaBindings::RegisterAudioAPI(sol::state& lua)
 
     sol::table audio = lua.create_named_table("Audio");
     audio.set_function("SetBusVolume", [](uint32_t busID, float volume) { AudioManager::Get().SetBusVolume(busID, volume); });
+    audio.set_function("GetBusVolume", [](uint32_t busID) { AudioManager::Get().GetBusVolume(busID); });
     audio.set_function("GetBusID", [](const std::string& name) { return AudioManager::Get().GetBusID(name); });
     //audio.set_function("CreateBus", []() -> uint32_t { return AudioManager::Get().CreateBus()->GetID(); });
     //audio.set_function("DestroyBus", [](uint32_t busID) { return AudioManager::Get().DestroyBus(busID); });

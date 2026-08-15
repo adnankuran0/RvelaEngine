@@ -3,6 +3,7 @@
 #include "AudioManager.h"
 #include <Renderer/Camera.h>
 #include "Asset/AssetManager.h"
+#include "json.hpp"
 
 using namespace rv;
 
@@ -56,7 +57,7 @@ ma_attenuation_model AudioManager::ToMA(AttenuationModel model)
 void AudioManager::CreateMasterBus()
 {
     auto master = std::make_unique<AudioBus>(&m_Engine, nullptr);
-    master->SetID(m_NextBusID++);
+    master->SetID(0);
     master->SetName("Master");
     m_MasterBus = master.get();
     m_Busses.push_back(std::move(master));
@@ -384,8 +385,90 @@ void AudioManager::SetBus(AudioEmitterComponent* comp, uint32_t busID)
     instance->busID = busID;
 }
 
+json AudioManager::SaveBusLayout()
+{
+    json busesJson = json::array();
+    for (const auto& bus : AudioManager::Get().GetBusses())
+    {
+        json b;
+        b["id"] = bus->GetID();
+        b["parentId"] = bus->GetParentBusID();
+        b["name"] = bus->GetName();
+        b["volume"] = AudioManager::Get().GetBusVolume(bus->GetID());
+        busesJson.push_back(b);
+    }
+    return busesJson;
+}
+
+void AudioManager::LoadBusLayout(const std::string& jsonStr)
+{
+    if (jsonStr.empty()) return;
+
+    nlohmann::json jLayout = nlohmann::json::parse(jsonStr);
+
+    std::vector<uint32_t> busesToDestroy;
+    for (const auto& bus : m_Busses)
+    {
+        if (bus->GetID() != 0)
+            busesToDestroy.push_back(bus->GetID());
+    }
+    for (uint32_t id : busesToDestroy)
+    {
+        DestroyBus(id);
+    }
+
+    uint32_t highestID = 0;
+
+    for (const auto& bJson : jLayout)
+    {
+        uint32_t id = bJson.value("id", 0);
+        std::string name = bJson.value("name", "UnknownBus");
+        float volume = bJson.value("volume", 1.0f);
+
+        if (id == 0)
+        {
+            m_Busses[0]->SetName(name);
+            SetBusVolume(0, volume);
+            continue;
+        }
+
+        AudioBus* newBus = CreateBus();
+        newBus->SetID(id);
+        newBus->SetName(name);
+        SetBusVolume(id, volume);
+
+        if (id > highestID) highestID = id;
+    }
+
+    for (const auto& bJson : jLayout)
+    {
+        uint32_t id = bJson.value("id", 0);
+        uint32_t parentId = bJson.value("parentId", 0);
+
+        if (id != 0)
+        {
+            SetParentBus(id, parentId);
+        }
+    }
+
+    if (highestID >= m_NextBusID)
+    {
+        m_NextBusID = highestID + 1;
+    }
+}
+
 bool AudioManager::DestroyBus(uint32_t busID)
 {
+    if (busID == 0) return false;
+
+    for (auto& bus : m_Busses)
+    {
+        if (bus->GetParentBusID() == busID)
+        {
+            SetParentBus(bus->GetID(), 0);
+        }
+    }
+
     auto it = std::find_if(
         m_Busses.begin(),
         m_Busses.end(),
@@ -436,6 +519,14 @@ void AudioManager::SetBusVolume(uint32_t busID, float volume)
     if (!bus) return;
 
     ma_sound_group_set_volume(bus->GetGroup(), volume);
+}
+
+float rv::AudioManager::GetBusVolume(uint32_t busID)
+{
+    AudioBus* bus = GetBus(busID);
+    if (!bus) return 0.0f;
+
+    return ma_sound_group_get_volume(bus->GetGroup());
 }
 
 void rv::AudioManager::Update(Camera* camera)

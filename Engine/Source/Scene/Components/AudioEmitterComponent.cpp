@@ -22,6 +22,9 @@ json AudioEmitterComponent::Serialize() const
     j["doppler"] = doppler;
     j["dopplerFactor"] = dopplerFactor;
 
+    j["busID"] = busID;
+
+
     return j;
 }
 
@@ -41,6 +44,8 @@ void AudioEmitterComponent::Deserialize(const json& j)
 
     doppler = j["doppler"];
     dopplerFactor = j["dopplerFactor"];
+
+    busID = j["busID"];
 
     recreate = true;
 }
