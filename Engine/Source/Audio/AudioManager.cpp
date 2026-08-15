@@ -11,7 +11,7 @@ AudioManager::AudioManager()
 {
     ma_engine_config cfg = ma_engine_config_init();
     cfg.listenerCount = 1;
-    ma_engine_init(&cfg, &m_Engine);
+    ma_result result = ma_engine_init(&cfg, &m_Engine);
     assert(result == MA_SUCCESS);
 
     CreateMasterBus();
@@ -106,6 +106,7 @@ void AudioManager::CreateInstance(AudioEmitterComponent* comp)
     SetPitch(comp, comp->pitch);
     SetLoop(comp, comp->loop);
     SetSpatial(comp, comp->spatial);
+    SetAttenuationModel(comp, comp->attenuationModel);
     SetMinDistance(comp, comp->minDistance);
     SetMaxDistance(comp, comp->maxDistance);
     SetRolloff(comp, comp->rolloff);

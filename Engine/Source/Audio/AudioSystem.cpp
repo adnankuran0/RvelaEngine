@@ -60,6 +60,8 @@ void AudioSystem::OnAudioEmitterCostructed(entt::registry& reg, entt::entity e)
 	auto& emitter = reg.get<AudioEmitterComponent>(e);
 
 	AudioManager::Get().CreateInstance(&emitter);
+
+    emitter.recreate = false;
 }
 
 
