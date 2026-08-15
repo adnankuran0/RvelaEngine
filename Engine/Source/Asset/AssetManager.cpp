@@ -42,7 +42,7 @@ Ref<Asset> AssetManager::GetAssetInternal(const AssetUUID& uuid)
 
     if (!m_Registry->Exists(uuid))
     {
-        LOG_ERROR("UUID not found: {}", uuid.ToString());
+        // LOG_ERROR("UUID not found: {}", uuid.ToString()); TODO: DISABLED TO SUSPRESS DEFAULT MATERIAL UUID ERRORS
         return nullptr;
     }
 

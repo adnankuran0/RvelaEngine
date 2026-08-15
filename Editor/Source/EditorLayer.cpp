@@ -165,6 +165,8 @@ void EditorLayer::Render()
 
     m_InspectorPanel.Draw(m_Engine, m_SelectedEntity);
 
+    m_EnvironmentPanel.Draw(m_Engine);
+
     m_AssetBrowserPanel.Draw(m_Engine, m_Engine->GetProjectManager().GetProjectPath() / "Assets",m_AssetImportPipeline);
 
     m_MixerPanel.Draw();

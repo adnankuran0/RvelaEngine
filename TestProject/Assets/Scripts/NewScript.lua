@@ -1,13 +1,13 @@
 CallbackTest = {}
 
-
-function CallbackTest:OnCreate()
+function CallbackTest:OnCreate() 
     self.ae = self.entity:GetComponent("AudioEmitterComponent")
 end
 
-function CallbackTest:OnCollisionEnter(collisionInfo)
-    self.targetEntity = collisionInfo.other
-    self.ae:Play()
-    print(self.targetEntity:GetName())
+function CallbackTest:OnUpdate(dt)
+    if Input.IsKeyJustPressed(KeyCode.E)then
+        self.ae:Play()
+    end
 end
+
 return CallbackTest

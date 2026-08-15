@@ -20,7 +20,8 @@ void MaterialComponent::Load(const AssetUUID& uuid)
     Ref<MaterialAsset> asset = AssetManager::Get().GetAsset<MaterialAsset>(uuid);
     if (!asset)
     {
-        LOG_ERROR("MaterialAsset not found: {}", uuid.ToString());
+        // LOG_ERROR("MaterialAsset not found: {}", uuid.ToString());
+        // TODO: DEFAULT MATERIAL DOESNT NEED ANY UUID!!!
         return;
     }
 

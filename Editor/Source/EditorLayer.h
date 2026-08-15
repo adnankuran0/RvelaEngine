@@ -12,6 +12,7 @@
 #include "GUI/InspectorPanel.h"
 #include "GUI/AssetBrowserPanel.h"
 #include "GUI/MixerPanel.h"
+#include "GUI/EnvironmentPanel.h"
 #include <Renderer/RenderPipeline.h>
 
 namespace rv {
@@ -46,6 +47,7 @@ private:
     Dockspace m_Dockspace;
     SceneHierarchyPanel m_SceneHierarchyPanel;
     InspectorPanel m_InspectorPanel;
+    EnvironmentPanel m_EnvironmentPanel;
     AssetBrowserPanel m_AssetBrowserPanel;
     MixerPanel m_MixerPanel;
     Viewport m_Viewport;
