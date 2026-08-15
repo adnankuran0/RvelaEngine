@@ -1,20 +1,6 @@
 {
     "Entities": [
         {
-            "AudioEmitterComponent": {
-                "attenuationModel": 1,
-                "audioClip": "76362fac-aed9-428c-ae6e-571623ab0a27",
-                "doppler": true,
-                "dopplerFactor": 1.0,
-                "loop": true,
-                "maxDistance": 509.0199890136719,
-                "minDistance": 0.7099999785423279,
-                "pitch": 4.0,
-                "playOnCreate": true,
-                "rolloff": 0.6899999976158142,
-                "spatial": true,
-                "volume": 2.0
-            },
             "ConvexHullColliderComponent": {
                 "maxConvexRadius": 0.0,
                 "offset": [
@@ -395,7 +381,115 @@
             "UUID": 9
         },
         {
-            "Prefab": "77ab9391-0f96-41d1-b3ab-bdcf81f55114",
+            "CameraComponent": {
+                "farClip": 1000.0,
+                "fov": 90.0,
+                "isActive": true,
+                "nearClip": 0.10000000149011612,
+                "projectionType": 0
+            },
+            "ParentUUID": 28,
+            "Tag": {
+                "tag": "Camera"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 29
+        },
+        {
+            "ParentUUID": 27,
+            "ScriptComponent": {
+                "scriptAssetUUID": "bc183720-0ea6-40c0-adb4-6438019b61d8"
+            },
+            "Tag": {
+                "tag": "CameraHolder"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.5102748870849609,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 28
+        },
+        {
+            "AudioEmitterComponent": {
+                "attenuationModel": 1,
+                "audioClip": "e7dc7a60-7295-4655-85f4-34ce2a2975d9",
+                "doppler": true,
+                "dopplerFactor": 1.0,
+                "loop": false,
+                "maxDistance": 100.0,
+                "minDistance": 1.0,
+                "pitch": 1.0,
+                "playOnCreate": false,
+                "rolloff": 1.0,
+                "spatial": false,
+                "volume": 1.0
+            },
+            "CapsuleColliderComponent": {
+                "halfHeight": 0.5,
+                "offset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "radius": 0.5
+            },
+            "CharacterBodyComponent": {
+                "collisionLayer": 1,
+                "collisionMask": 4294967295,
+                "mass": 70.0,
+                "maxSlopeAngle": 50.0,
+                "maxStrength": 100.0,
+                "predictiveContactDistance": 0.10000000149011612,
+                "shapeOffset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ]
+            },
+            "Material": {
+                "material": "6f565b83-e131-46f0-9aad-316fee6b6ff2"
+            },
+            "Mesh": {
+                "mesh": "62345031-f93b-40f4-aa76-18c59801997d"
+            },
+            "ParentUUID": 0,
+            "ScriptComponent": {
+                "scriptAssetUUID": "b3326755-edfb-4522-ada1-080110d5fba5"
+            },
+            "Tag": {
+                "tag": "Character"
+            },
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
@@ -414,7 +508,7 @@
                     1.0
                 ]
             },
-            "UUID": 4
+            "UUID": 27
         },
         {
             "BoxColliderComponent": {

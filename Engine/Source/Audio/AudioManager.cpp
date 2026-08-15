@@ -140,7 +140,11 @@ void AudioManager::SetClip(AudioEmitterComponent* comp, Ref<AudioClipAsset> clip
 void AudioManager::Play(AudioEmitterComponent* comp)
 {
     if (auto* inst = GetInstance(comp))
+    {
+        ma_sound_stop(&inst->sound);
+        ma_sound_seek_to_pcm_frame(&inst->sound, 0);
         ma_sound_start(&inst->sound);
+    }
 }
 
 void AudioManager::Stop(AudioEmitterComponent* comp)

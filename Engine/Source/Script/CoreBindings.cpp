@@ -20,6 +20,7 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             else if (type == "MaterialComponent") return e.HasComponent<MaterialComponent>();
             else if (type == "RigidbodyComponent") return e.HasComponent<RigidbodyComponent>();
             else if (type == "CharacterBodyComponent") return e.HasComponent<CharacterBodyComponent>();
+            else if (type == "AudioEmitterComponent") return e.HasComponent<AudioEmitterComponent>();
             return false;
         },
         "GetComponent", [&](Entity& e, const std::string& type) -> sol::object {
@@ -47,6 +48,9 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             else if (type == "CharacterBodyComponent") {
                 return sol::make_object(lua, std::ref(e.GetComponent<CharacterBodyComponent>()));
             }
+            else if (type == "AudioEmitterComponent") {
+                return sol::make_object(lua, std::ref(e.GetComponent<AudioEmitterComponent>()));
+            }
             return sol::make_object(lua, sol::nil);
         },
         "AddComponent", [&](Entity& e, const std::string& typeName) -> sol::object {
@@ -54,9 +58,14 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
                 return sol::make_object(lua, &e.AddComponent<PointLightComponent>());
             else if (typeName == "DirectionalLightComponent")
                 return sol::make_object(lua, &e.AddComponent<DirectionalLightComponent>());
+            else if (typeName == "PointLightComponent")
+                return sol::make_object(lua, &e.AddComponent<PointLightComponent>());
             else if (typeName == "CameraComponent")
                 return sol::make_object(lua, &e.AddComponent<CameraComponent>());
-
+            else if (typeName == "RigidbodyComponent")
+                return sol::make_object(lua, &e.AddComponent<RigidbodyComponent>());
+            else if (typeName == "AudioEmitterComponent")
+                return sol::make_object(lua, &e.AddComponent<AudioEmitterComponent>());
             return sol::nil;
         }
     );

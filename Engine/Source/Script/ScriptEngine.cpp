@@ -14,6 +14,7 @@ void ScriptEngine::Init()
     LuaBindings::RegisterInputAPI(m_State);
     LuaBindings::RegisterSceneAPI(m_State);
     LuaBindings::RegisterPhysicsAPI(m_State);
+    LuaBindings::RegisterAudioAPI(m_State);
 
     
 }

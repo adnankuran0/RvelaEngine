@@ -5,3 +5,4 @@
 #include "InputBindings.h"
 #include "SceneBindings.h"
 #include "PhysicsBindings.h"
+#include "AudioBindings.h"

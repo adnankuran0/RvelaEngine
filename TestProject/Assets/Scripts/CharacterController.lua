@@ -9,6 +9,7 @@ Player.gravity = -20.0
 
 function Player:OnCreate()
     self.cb = self.entity:GetComponent("CharacterBodyComponent")
+    self.ae = self.entity:GetComponent("AudioEmitterComponent")
     self.camHolder  = self.scene:FindEntityByName("CameraHolder")
     self.cam        = self.scene:FindEntityByName("Camera")
     self.headBobTime = 0.0
@@ -17,6 +18,9 @@ function Player:OnCreate()
         local t = self.cam:GetComponent("TransformComponent")
         self.camStartY = t:GetPosition().y
     end
+
+    
+   
 end
 
 function Player:OnUpdate(dt)
@@ -67,6 +71,7 @@ function Player:OnUpdate(dt)
     end
 
     if Input.IsKeyJustPressed(KeyCode.Space) and isGrounded then
+        self.ae:Play()
         local v = self.physics:GetCharacterLinearVelocity(self.cb)
         self.physics:SetCharacterLinearVelocity(self.cb,
             Vec3.new(v.x, self.jumpStrength, v.z))
@@ -88,13 +93,21 @@ function Player:OnUpdate(dt)
         local amp    = isSprinting and 0.05 or 0.06
 
         if moving then
+            local previousBob = math.sin(self.headBobTime)
+
             self.headBobTime = self.headBobTime + dt * freq
+
+            local currentBob = math.sin(self.headBobTime)
+
+            if previousBob > 0.0 and currentBob <= 0.0 then
+                self.ae.pitch = 0.9 + math.random() * 0.20
+                self.ae:Play()
+            end
         else
             self.headBobTime = self.headBobTime * 0.85
         end
 
         local pos = camT:GetPosition()
-        
         pos.y = self.camStartY + math.sin(self.headBobTime) * amp
         camT:SetPosition(pos)
     end
