@@ -27,6 +27,7 @@ class Scene
 {
 public:
     Scene(const std::string& sceneName = "Untitled");
+    ~Scene();
     void SetState(SceneState newState);
     SceneState GetState() const { return m_State; };
     Scene(const Scene&) = delete;

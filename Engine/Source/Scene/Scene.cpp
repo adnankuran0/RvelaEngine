@@ -32,6 +32,11 @@ m_AudioSystem(*this)
 
 }
 
+Scene::~Scene()
+{
+    m_Registry.clear();
+}
+
 void Scene::SetState(SceneState newState)
 {
     if (newState == m_State) return;
