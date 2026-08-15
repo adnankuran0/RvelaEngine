@@ -194,12 +194,34 @@ void Scene::SetParent(entt::entity child, entt::entity parent)
 {
     if (child == entt::null || !m_Registry.valid(child)) return;
 
+    if (child == parent) return;
+
+    if (!HasComponent<SceneTreeComponent>(child))
+        AddComponent<SceneTreeComponent>(child);
+
+    auto& childNode = GetComponent<SceneTreeComponent>(child);
+
+    if (childNode.parent == parent) return;
+
+    if (parent != entt::null)
+    {
+        entt::entity curr = parent;
+        while (curr != entt::null && m_Registry.valid(curr))
+        {
+            if (curr == child)
+            {
+                return;
+            }
+            if (!HasComponent<SceneTreeComponent>(curr))
+                break;
+            curr = GetComponent<SceneTreeComponent>(curr).parent;
+        }
+    }
+
     if (parent != entt::null && !HasComponent<SceneTreeComponent>(parent))
         AddComponent<SceneTreeComponent>(parent);
 
-    auto& childNode = GetComponent<SceneTreeComponent>(child);
     EntityUUID childUUID = GetComponent<UUIDComponent>(child).uuid;
-
     glm::mat4 childWorldMatrix = GetComponent<TransformComponent>(child).GetWorldMatrix();
 
     if (childNode.parent != entt::null && m_Registry.valid(childNode.parent))
@@ -263,7 +285,6 @@ void Scene::SetParent(entt::entity child, entt::entity parent)
         childTransform.SetDirty();
     }
 }
-
 void Scene::SetParentKeepLocal(entt::entity child, entt::entity parent)
 {
     auto& childTree = GetComponent<SceneTreeComponent>(child);

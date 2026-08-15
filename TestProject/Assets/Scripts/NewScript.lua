@@ -1,13 +1,12 @@
-CallbackTest = {}
+Test = {}
 
-function CallbackTest:OnCreate() 
-    self.ae = self.entity:GetComponent("AudioEmitterComponent")
+function Test:OnCreate() 
+    local parentEntity = self.scene:FindEntityByName("Character")
+    local transform_comp = self.entity:GetComponent("TransformComponent")
+    local pos = transform_comp.position
+    self.entity:SetParent(parentEntity)
+    transform_comp.position = Vec3.new(pos.x,pos.y + 4.0,pos.z)
 end
 
-function CallbackTest:OnUpdate(dt)
-    if Input.IsKeyJustPressed(KeyCode.E)then
-        self.ae:Play()
-    end
-end
 
-return CallbackTest
+return Test

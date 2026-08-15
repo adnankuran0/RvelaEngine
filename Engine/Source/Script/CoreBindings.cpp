@@ -8,9 +8,19 @@ using namespace rv;
 void LuaBindings::RegisterCoreTypes(sol::state& lua)
 {
     lua.new_usertype<Entity>("Entity",
-        "GetName", &Entity::GetName,
-        "SetName", &Entity::SetName,
+        "name", sol::property(
+            &Entity::GetName,
+            &Entity::SetName
+        ),
         "GetUUID", &Entity::GetUUID,
+        "SetParent", [](Entity& self, sol::optional<Entity> parent) {
+            if (parent.has_value() && parent.value()) {
+                self.SetParent(parent.value());
+            }
+            else {
+                self.SetParent(Entity{ entt::null, nullptr });
+            }
+        },
         "HasComponent", [&](Entity& e, const std::string& type) {
             if (type == "TransformComponent") return e.HasComponent<TransformComponent>();
             else if (type == "CameraComponent") return e.HasComponent<CameraComponent>();

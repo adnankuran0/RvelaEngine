@@ -1,11 +1,11 @@
 Player = {}
 
-Player.jumpStrength     = 6.0
+Player.jumpStrength     = 5.0
 Player.walkSpeed        = 3.0
 Player.sprintSpeed      = 5.0
 Player.acceleration     = 20.0
 Player.deceleration     = 20.0
-Player.gravity = -20.0
+Player.gravity = -12.0
 
 function Player:OnCreate()
     self.cb = self.entity:GetComponent("CharacterBodyComponent")
@@ -16,7 +16,7 @@ function Player:OnCreate()
 
     if self.cam then
         local t = self.cam:GetComponent("TransformComponent")
-        self.camStartY = t:GetPosition().y
+        self.camStartY = t.position.y
     end
 
 end
@@ -29,17 +29,17 @@ function Player:OnUpdate(dt)
 
     if self.camHolder then
         local camT   = self.camHolder:GetComponent("TransformComponent")
-        camForward   = camT:GetForward()
+        camForward   = camT.forward
         camForward.y = 0
         camForward   = camForward:Normalized()
-        camRight     = Vec3.Cross(Vec3.UP(), camForward):Normalized()
+        camRight     = camT.right
     end
 
     local inputDir = Vec3.new(0, 0, 0)
     if Input.IsKeyPressed(KeyCode.W) then inputDir = inputDir + camForward end
     if Input.IsKeyPressed(KeyCode.S) then inputDir = inputDir - camForward end
-    if Input.IsKeyPressed(KeyCode.A) then inputDir = inputDir + camRight   end
-    if Input.IsKeyPressed(KeyCode.D) then inputDir = inputDir - camRight   end
+    if Input.IsKeyPressed(KeyCode.A) then inputDir = inputDir - camRight   end
+    if Input.IsKeyPressed(KeyCode.D) then inputDir = inputDir + camRight   end
 
     local isSprinting  = Input.IsKeyPressed(KeyCode.LeftShift)
     local targetSpeed  = isSprinting and self.sprintSpeed or self.walkSpeed
@@ -79,8 +79,8 @@ function Player:OnUpdate(dt)
         local camComp = self.cam:GetComponent("CameraComponent")
         if camComp then
             local targetFOV  = isSprinting and 90.0 or 75.0
-            local currentFOV = camComp:GetFOV()
-            camComp:SetFOV(currentFOV + (targetFOV - currentFOV) * math.min(1.0, 10.0 * dt))
+            local currentFOV = camComp.fov
+            camComp.fov = currentFOV + (targetFOV - currentFOV) * math.min(1.0, 10.0 * dt)
         end
     end
 
@@ -105,9 +105,9 @@ function Player:OnUpdate(dt)
             self.headBobTime = self.headBobTime * 0.85
         end
 
-        local pos = camT:GetPosition()
+        local pos = camT.position
         pos.y = self.camStartY + math.sin(self.headBobTime) * amp
-        camT:SetPosition(pos)
+        camT.position = pos
     end
 end
 

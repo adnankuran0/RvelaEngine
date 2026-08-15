@@ -56,6 +56,7 @@ public:
 	const std::string& GetName() { return GetComponent<TagComponent>().tag; }
 	void SetName(const std::string& name) { GetComponent<TagComponent>().tag = name; }
 	const entt::entity GetHandle() { return m_EntityHandle; }
+	void SetParent(const Entity& parent) { m_Scene->SetParent(m_EntityHandle, parent); }
 
 
 	bool operator==(const Entity& other) const

@@ -7,27 +7,38 @@ using namespace rv;
 void LuaBindings::RegisterComponents(sol::state& lua)
 {
     lua.new_usertype<TransformComponent>("TransformComponent",
-        "GetPosition", &TransformComponent::GetPosition,
-        "SetPosition", &TransformComponent::SetPosition,
-        "GetWorldPosition", &TransformComponent::GetWorldPosition,
+        "position", sol::property(
+            &TransformComponent::GetPosition,
+            &TransformComponent::SetPosition
+        ),
+        "worldPosition", sol::property(&TransformComponent::GetWorldPosition),
+        "rotation", sol::property(
+            &TransformComponent::GetRotation,
+            &TransformComponent::SetRotation
+        ),
+        "worldRotation", sol::property(&TransformComponent::GetWorldRotation),
+        "eulerRotation", sol::property(
+            &TransformComponent::GetEulerRotation,
+            &TransformComponent::SetEulerRotation
+        ),
+        "scale", sol::property(
+            &TransformComponent::GetScale,
+            &TransformComponent::SetScale
+        ),
+        "worldScale", sol::property(&TransformComponent::GetWorldScale),
+        "forward", sol::property(&TransformComponent::GetForward),
+        "up", sol::property(&TransformComponent::GetUp),
+        "right", sol::property(&TransformComponent::GetRight),
+
         "Translate", &TransformComponent::Translate,
-        "GetRotation", &TransformComponent::GetRotation,
-        "GetWorldRotation", &TransformComponent::GetWorldRotation,
-        "SetRotation", &TransformComponent::SetRotation,
-        "GetEulerRotation", &TransformComponent::GetEulerRotation,
-        "SetEulerRotation", &TransformComponent::SetEulerRotation,
-        "GetScale", &TransformComponent::GetScale,
-        "GetWorldScale", &TransformComponent::GetWorldScale,
-        "SetScale", &TransformComponent::SetScale,
-        "GetForward", &TransformComponent::GetForward,
-        "GetUp", &TransformComponent::GetUp,
-        "GetRight", &TransformComponent::GetRight,
         "LookAt", &TransformComponent::LookAt
     );
 
     lua.new_usertype<CameraComponent>("CameraComponent",
-        "GetFOV", [](CameraComponent& c) { return (double)c.GetFOV(); },
-        "SetFOV", &CameraComponent::SetFOV
+        "fov", sol::property(
+            [](CameraComponent& c) { return (double)c.GetFOV(); },
+            &CameraComponent::SetFOV
+        )
     );
 
     lua.new_usertype<rv::DirectionalLightComponent>("DirectionalLightComponent",
@@ -55,35 +66,60 @@ void LuaBindings::RegisterComponents(sol::state& lua)
     );
 
     lua.new_usertype<rv::MeshRendererComponent>("MeshRendererComponent",
-        "IsCastShadow", &rv::MeshRendererComponent::IsCastShadow,
-        "SetCastShadow", &rv::MeshRendererComponent::SetCastShadow,
-        "IsDoubleSided", &rv::MeshRendererComponent::IsDoubleSided,
-        "SetDoubleSided", &rv::MeshRendererComponent::SetDoubleSided
+        "castShadow", sol::property(
+            &rv::MeshRendererComponent::IsCastShadow,
+            &rv::MeshRendererComponent::SetCastShadow
+        ),
+        "doubleSided", sol::property(
+            &rv::MeshRendererComponent::IsDoubleSided,
+            &rv::MeshRendererComponent::SetDoubleSided
+        )
     );
 
     lua.new_usertype<rv::MaterialComponent>("MaterialComponent",
-        "GetAlbedoColor", &rv::MaterialComponent::GetAlbedoColor,
-        "SetAlbedoColor", &rv::MaterialComponent::SetAlbedoColor,
-        "GetEmmisiveColor", &rv::MaterialComponent::GetEmissiveColor,
-        "SetEmmisiveColor", &rv::MaterialComponent::SetEmissiveColor,
-        "GetEmmisiveIntensity", &rv::MaterialComponent::GetEmissiveIntensity,
-        "SetEmmisiveIntensity", &rv::MaterialComponent::SetEmissiveIntensity,
-
-        "GetMetallic", &rv::MaterialComponent::GetMetallic,
-        "SetMetallic", &rv::MaterialComponent::SetMetallic,
-        "GetSpecular", &rv::MaterialComponent::GetSpecular,
-        "SetSpecular", &rv::MaterialComponent::SetSpecular,
-        "GetRoughness", &rv::MaterialComponent::GetRoughness,
-        "SetRoughness", &rv::MaterialComponent::SetRoughness,
-        "GetAO", &rv::MaterialComponent::GetAO,
-        "SetAO", &rv::MaterialComponent::SetAO,
-        "GetNormalScale", &rv::MaterialComponent::GetNormalScale,
-        "SetNormalScale", &rv::MaterialComponent::SetNormalScale,
-        "GetHeightScale", &rv::MaterialComponent::GetHeightScale,
-        "SetHeightScale", &rv::MaterialComponent::SetHeightScale,
-        "GetUVScale", &rv::MaterialComponent::GetUVScale,
-        "SetUVScale", &rv::MaterialComponent::SetUVScale,
-        "GetUVOffset", &rv::MaterialComponent::GetUVOffset,
-        "SetUVOffset", &rv::MaterialComponent::SetUVOffset
+        "albedoColor", sol::property(
+            &rv::MaterialComponent::GetAlbedoColor,
+            &rv::MaterialComponent::SetAlbedoColor
+        ),
+        "emissiveColor", sol::property(
+            &rv::MaterialComponent::GetEmissiveColor,
+            &rv::MaterialComponent::SetEmissiveColor
+        ),
+        "emissiveIntensity", sol::property(
+            &rv::MaterialComponent::GetEmissiveIntensity,
+            &rv::MaterialComponent::SetEmissiveIntensity
+        ),
+        "metallic", sol::property(
+            &rv::MaterialComponent::GetMetallic,
+            &rv::MaterialComponent::SetMetallic
+        ),
+        "specular", sol::property(
+            &rv::MaterialComponent::GetSpecular,
+            &rv::MaterialComponent::SetSpecular
+        ),
+        "roughness", sol::property(
+            &rv::MaterialComponent::GetRoughness,
+            &rv::MaterialComponent::SetRoughness
+        ),
+        "ao", sol::property(
+            &rv::MaterialComponent::GetAO,
+            &rv::MaterialComponent::SetAO
+        ),
+        "normalScale", sol::property(
+            &rv::MaterialComponent::GetNormalScale,
+            &rv::MaterialComponent::SetNormalScale
+        ),
+        "heightScale", sol::property(
+            &rv::MaterialComponent::GetHeightScale,
+            &rv::MaterialComponent::SetHeightScale
+        ),
+        "uvScale", sol::property(
+            &rv::MaterialComponent::GetUVScale,
+            &rv::MaterialComponent::SetUVScale
+        ),
+        "uvOffset", sol::property(
+            &rv::MaterialComponent::GetUVOffset,
+            &rv::MaterialComponent::SetUVOffset
+        )
     );
 }

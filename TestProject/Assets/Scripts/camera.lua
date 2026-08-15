@@ -60,7 +60,7 @@ function Camera:OnUpdate(dt)
         self.pitch = -89.0
     end
 
-    transform:SetEulerRotation(Vec3.new(self.pitch, self.yaw, 0.0))
+    transform.eulerRotation = Vec3.new(self.pitch, self.yaw, 0.0)
 end
 
 return Camera
