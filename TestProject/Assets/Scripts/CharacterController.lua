@@ -19,8 +19,6 @@ function Player:OnCreate()
         self.camStartY = t:GetPosition().y
     end
 
-    
-   
 end
 
 function Player:OnUpdate(dt)
@@ -45,9 +43,10 @@ function Player:OnUpdate(dt)
 
     local isSprinting  = Input.IsKeyPressed(KeyCode.LeftShift)
     local targetSpeed  = isSprinting and self.sprintSpeed or self.walkSpeed
-    local isGrounded   = self.physics:IsCharacterGrounded(self.cb)
+    
+    local isGrounded   = self.cb.isGrounded
 
-    local velocity   = self.physics:GetCharacterLinearVelocity(self.cb)
+    local velocity   = self.cb.velocity
     local horizontal = Vec3.new(velocity.x, 0, velocity.z)
 
     local verticalVel = velocity.y
@@ -62,19 +61,18 @@ function Player:OnUpdate(dt)
         local targetVel = inputDir * targetSpeed
         local diff      = targetVel - horizontal
         local newH      = horizontal + diff * math.min(1.0, self.acceleration * dt)
-        self.physics:SetCharacterLinearVelocity(self.cb,
-            Vec3.new(newH.x, verticalVel, newH.z)) 
+        
+        self.cb.velocity = Vec3.new(newH.x, verticalVel, newH.z)
     else
         local newH = horizontal * math.max(0.0, 1.0 - self.deceleration * dt)
-        self.physics:SetCharacterLinearVelocity(self.cb,
-            Vec3.new(newH.x, verticalVel, newH.z))  
+        
+        self.cb.velocity = Vec3.new(newH.x, verticalVel, newH.z)  
     end
 
     if Input.IsKeyJustPressed(KeyCode.Space) and isGrounded then
         self.ae:Play()
-        local v = self.physics:GetCharacterLinearVelocity(self.cb)
-        self.physics:SetCharacterLinearVelocity(self.cb,
-            Vec3.new(v.x, self.jumpStrength, v.z))
+        local v = self.cb.velocity
+        self.cb.velocity = Vec3.new(v.x, self.jumpStrength, v.z)
     end
 
     if self.cam then
