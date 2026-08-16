@@ -38,7 +38,7 @@ void SelectedEntityMaskPass::Execute(const RenderContext& ctx, RenderFrame& fram
     if (m_SelectedEntity == entt::null || ctx.scene->GetState() != SceneState::EDIT)
         return;
 
-    auto& commands = frame.commands;
+    auto& commands = frame.opaqueCommands;
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer);
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
@@ -63,11 +63,11 @@ void SelectedEntityMaskPass::Execute(const RenderContext& ctx, RenderFrame& fram
         if (command.entityID != m_SelectedEntity)
             continue;
 
-        glm::mat4 model = command.transform.GetWorldMatrix();
+        glm::mat4 model = command.transform->GetWorldMatrix();
         shader.setMat4("model", model);
 
-        command.mesh.VAO.Bind();
-        glDrawElements(GL_TRIANGLES, command.mesh.indexCount, GL_UNSIGNED_INT, 0);
+        command.mesh->VAO.Bind();
+        glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
     }
 
     glEnable(GL_DEPTH_TEST);

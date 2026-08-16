@@ -71,7 +71,7 @@ void EntityBufferPass::Init(const RenderContext& ctx, RenderFrame& frame)
 
 void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
-    auto& commands = frame.commands;
+    auto& commands = frame.opaqueCommands;
     auto& resourceRegistry = frame.registry;
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer);
@@ -96,16 +96,16 @@ void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     for (auto& command : commands)
     {
-        if (!ctx.camera->Intersects(command.mesh.worldAABB)) continue;
+        if (!ctx.camera->Intersects(command.mesh->worldAABB)) continue;
 
-        glm::mat4 model = command.transform.GetWorldMatrix();
+        glm::mat4 model = command.transform->GetWorldMatrix();
         shader.setMat4("model", model);
 
       
         shader.setUInt("u_EntityID", static_cast<uint32_t>(command.entityID));
 
-        command.mesh.VAO.Bind();
-        glDrawElements(GL_TRIANGLES, command.mesh.indexCount, GL_UNSIGNED_INT, 0);
+        command.mesh->VAO.Bind();
+        glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
 
     }
 

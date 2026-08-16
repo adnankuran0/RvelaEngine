@@ -2,6 +2,7 @@
 #include "RenderLayer.h"
 #include "Core/Engine.h"
 #include "Light.h"
+#include "glm/gtx/norm.hpp"
 
 using namespace rv;
 
@@ -31,26 +32,48 @@ void RenderLayer::OnRender()
 
 void RenderLayer::CollectRenderCommands(Scene* scene)
 {
-	m_RenderPipeline->m_RenderFrame.commands.clear();
+	//m_RenderPipeline->m_RenderFrame.opaqueCommands.clear();
+	//m_RenderPipeline->m_RenderFrame.transparentCommands.clear();
+
+	Camera* camera = Engine::Get()->GetCamera();
+	glm::vec3 camPos = camera->Position;
 
 	auto view = scene->GetRegistry().view<TransformComponent, MeshComponent ,MeshRendererComponent, MaterialComponent>();
 	for (auto entity : view)
 	{
-
 		MeshComponent& meshComp = scene->GetComponent<MeshComponent>(entity);
-		
 		if (meshComp.IsDirty())
 		{
 			scene->GetComponent<MeshRendererComponent>(entity).RecreateFromMesh(meshComp.GetMesh());
 			meshComp.SetDirty(false);
 		}
 		
+		TransformComponent& transform = scene->GetComponent<TransformComponent>(entity);
+		MaterialComponent& matComp = scene->GetComponent<MaterialComponent>(entity);
+
 		RenderCommand cmd(scene->GetComponent<TransformComponent>(entity),
 			scene->GetComponent<MeshRendererComponent>(entity),
 			scene->GetComponent<MaterialComponent>(entity),
 			entity);
 
-		m_RenderPipeline->m_RenderFrame.commands.push_back(cmd);
+		if (matComp.GetTransparencyMode() == TransparencyMode::Alpha)
+		{
+			glm::vec3 objPos = glm::vec3(transform.GetWorldMatrix()[3]);
+			cmd.distanceToCamera = glm::length2(camPos - objPos);
+			m_RenderPipeline->m_RenderFrame.transparentCommands.push_back(cmd);
+		}
+		else
+		{
+			m_RenderPipeline->m_RenderFrame.opaqueCommands.push_back(cmd);
+		}
+
+		std::sort(
+			m_RenderPipeline->m_RenderFrame.transparentCommands.begin(),
+			m_RenderPipeline->m_RenderFrame.transparentCommands.end(),
+			[](const RenderCommand& a, const RenderCommand& b) {
+				return a.distanceToCamera > b.distanceToCamera;
+			}
+		);
 		
 	}
 

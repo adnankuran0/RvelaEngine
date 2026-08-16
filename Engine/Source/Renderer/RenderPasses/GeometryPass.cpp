@@ -76,7 +76,7 @@ GeometryPass::~GeometryPass()
 
 void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
-    auto& commands = frame.commands;
+    auto& commands = frame.opaqueCommands;
     auto& resourceRegisty = frame.registry;
 
     Shader& geometryShader = ShaderManager::Get("Geometry");
@@ -94,53 +94,53 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     geometryShader.setMat4("projection", projection);
 
     for (auto& command : commands) {
-        if (!ctx.camera->Intersects(command.mesh.worldAABB)) continue;
+        if (!ctx.camera->Intersects(command.mesh->worldAABB)) continue;
 
         auto& material = command.material;
-        glm::mat4 model = command.transform.GetWorldMatrix();
+        glm::mat4 model = command.transform->GetWorldMatrix();
 
         geometryShader.setMat4("model", model);
         glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(view * model)));
         geometryShader.setMat3("normalMatrix", normalMatrix);
-        geometryShader.setVec2("UVScale", material.GetUVScale());
-        geometryShader.setVec2("UVOffset", material.GetUVOffset());
+        geometryShader.setVec2("UVScale", material->GetUVScale());
+        geometryShader.setVec2("UVOffset", material->GetUVOffset());
 
-        if (material.IsUsingRoughnessMap())
+        if (material->IsUsingRoughnessMap())
         {
-            Ref<TextureAsset> roughnessTexture = material.GetRoughnessTexture();
+            Ref<TextureAsset> roughnessTexture = material->GetRoughnessTexture();
             geometryShader.setBool("useRoughnessMap", true);
             geometryShader.setInt("roughnessMap", 0);
             TextureCache::Get().GetOrCreate(roughnessTexture).Bind(0);
-            material.GetSampler().Bind(0);
+            material->GetSampler().Bind(0);
 
         }
         else
         {
             geometryShader.setBool("useRoughnessMap", false);
-            geometryShader.setFloat("roughness", material.GetRoughness());
+            geometryShader.setFloat("roughness", material->GetRoughness());
         }
 
-        if (material.IsUsingMetallicMap())
+        if (material->IsUsingMetallicMap())
         {
-            Ref<TextureAsset> metallicTexture = material.GetMetallicTexture();
+            Ref<TextureAsset> metallicTexture = material->GetMetallicTexture();
             geometryShader.setBool("useMetallicMap", true);
             geometryShader.setInt("metallicMap", 1);
             TextureCache::Get().GetOrCreate(metallicTexture).Bind(1);
-            material.GetSampler().Bind(1);
+            material->GetSampler().Bind(1);
 
         }
         else
         {
             geometryShader.setBool("useMetallicMap", false);
-            geometryShader.setFloat("metallic", material.GetMetallic());
+            geometryShader.setFloat("metallic", material->GetMetallic());
         }
 
 
-        command.mesh.VAO.Bind();
-        glDrawElements(GL_TRIANGLES, command.mesh.indexCount, GL_UNSIGNED_INT, 0);
+        command.mesh->VAO.Bind();
+        glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
         
-        material.GetSampler().Unbind(0);
-        material.GetSampler().Unbind(1);
+        material->GetSampler().Unbind(0);
+        material->GetSampler().Unbind(1);
     }
 
     resourceRegisty.Register("DepthTexture",{ RenderResourceType::Texture, o_Depth });

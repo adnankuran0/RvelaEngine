@@ -67,7 +67,7 @@ LightingPass::~LightingPass()
 
 void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
-    auto& commands = frame.commands;
+    auto& commands = frame.opaqueCommands;
     auto& resourceRegistry = frame.registry;
 
   
@@ -153,13 +153,18 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     glBindTextureUnit(9, skybox.GetPrefilterMap());
     glBindTextureUnit(10, skybox.GetBRDFLUTTexture());
 
+    for (auto& transparentCommand : frame.transparentCommands)
+    {
+        LOG_DEBUG(transparentCommand.distanceToCamera);
+    }
+
     size_t drawCallCounter = 0;
     for (auto& command : commands) {
-        if (!ctx.camera->Intersects(command.mesh.worldAABB)) continue;
+        if (!ctx.camera->Intersects(command.mesh->worldAABB)) continue;
         
          glDisable(GL_STENCIL_TEST);
 
-        if (!command.mesh.IsDoubleSided())
+        if (!command.mesh->IsDoubleSided())
         {
             glEnable(GL_CULL_FACE);
         }
@@ -170,25 +175,25 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
         auto& material = command.material;
 
-        shader.setVec2("UVScale", material.GetUVScale());
-        shader.setVec2("UVOffset", material.GetUVOffset());
-        shader.setVec3("albedoColor", material.GetAlbedoColor());
-        shader.setVec3("emmisiveColor", material.GetEmissiveColor()); // shader typo 
-        shader.setFloat("emmisiveIntensity", material.GetEmissiveIntensity()); // shader typo
-        shader.setFloat("metallicValue", material.GetMetallic());
-        shader.setFloat("roughnessValue", material.GetRoughness());
-        shader.setFloat("aoValue", material.GetAO());
-        shader.setFloat("normalScale", material.GetNormalScale());
-        shader.setFloat("specularIntensity", material.GetSpecular());
-        shader.setFloat("heightScale", material.GetHeightScale());
+        shader.setVec2("UVScale", material->GetUVScale());
+        shader.setVec2("UVOffset", material->GetUVOffset());
+        shader.setVec3("albedoColor", material->GetAlbedoColor());
+        shader.setVec3("emmisiveColor", material->GetEmissiveColor()); // shader typo 
+        shader.setFloat("emmisiveIntensity", material->GetEmissiveIntensity()); // shader typo
+        shader.setFloat("metallicValue", material->GetMetallic());
+        shader.setFloat("roughnessValue", material->GetRoughness());
+        shader.setFloat("aoValue", material->GetAO());
+        shader.setFloat("normalScale", material->GetNormalScale());
+        shader.setFloat("specularIntensity", material->GetSpecular());
+        shader.setFloat("heightScale", material->GetHeightScale());
 
         std::array<MapInfo, 6> maps = { {
-        { material.IsUsingAlbedoMap(),    "albedoMap",    0, "useAlbedoMap",    material.GetAlbedoTexture() },
-        { material.IsUsingNormalMap(),    "normalMap",    1, "useNormalMap",    material.GetNormalTexture() },
-        { material.IsUsingMetallicMap(),  "metallicMap",  2, "useMetallicMap",  material.GetMetallicTexture() },
-        { material.IsUsingRoughnessMap(), "roughnessMap", 3, "useRoughnessMap", material.GetRoughnessTexture() },
-        { material.IsUsingAOMap(),        "aoMap",        4, "useAOMap",        material.GetAOTexture() },
-        { material.IsUsingHeightMap(),    "heightMap",    5, "useHeightMap",    material.GetHeightTexture() }
+        { material->IsUsingAlbedoMap(),    "albedoMap",    0, "useAlbedoMap",    material->GetAlbedoTexture() },
+        { material->IsUsingNormalMap(),    "normalMap",    1, "useNormalMap",    material->GetNormalTexture() },
+        { material->IsUsingMetallicMap(),  "metallicMap",  2, "useMetallicMap",  material->GetMetallicTexture() },
+        { material->IsUsingRoughnessMap(), "roughnessMap", 3, "useRoughnessMap", material->GetRoughnessTexture() },
+        { material->IsUsingAOMap(),        "aoMap",        4, "useAOMap",        material->GetAOTexture() },
+        { material->IsUsingHeightMap(),    "heightMap",    5, "useHeightMap",    material->GetHeightTexture() }
         } };
 
         
@@ -199,19 +204,19 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             {
                 shader.setInt(map.uniformName, map.slot);
                 TextureCache::Get().GetOrCreate(map.texture).Bind(map.slot);
-                material.GetSampler().Bind(map.slot);
+                material->GetSampler().Bind(map.slot);
             }
         }
       
 
         
 
-        shader.setMat4("model", command.transform.GetWorldMatrix());
-        glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(command.transform.GetWorldMatrix())));
+        shader.setMat4("model", command.transform->GetWorldMatrix());
+        glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(command.transform->GetWorldMatrix())));
         shader.setMat3("normalMatrix", normalMatrix);
         
-        command.mesh.VAO.Bind();
-        glDrawElements(GL_TRIANGLES, command.mesh.indexCount, GL_UNSIGNED_INT, 0);
+        command.mesh->VAO.Bind();
+        glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
         drawCallCounter++;
         for (const auto& map : maps)
         {

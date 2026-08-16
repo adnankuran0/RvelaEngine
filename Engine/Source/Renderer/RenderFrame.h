@@ -8,14 +8,16 @@ namespace rv {
 struct RenderFrame
 {
 public:
-    std::vector<RenderCommand> commands;
+    std::vector<RenderCommand> opaqueCommands;
+    std::vector<RenderCommand> transparentCommands;
     RenderResourceRegistry registry;
 
 private:
     friend class RenderPipeline;
     void Reset()
     {
-        commands.clear();
+        opaqueCommands.clear();
+        transparentCommands.clear();
         //registry.Clear();
     }
 };

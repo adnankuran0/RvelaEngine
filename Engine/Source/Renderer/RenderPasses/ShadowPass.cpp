@@ -94,7 +94,7 @@ void ShadowPass::InitPointShadowMap()
 void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFrame& 
 frame)
 {
-    auto& commands = frame.commands;
+    auto& commands = frame.opaqueCommands;
 
     if (ctx.directionalLight && ctx.directionalLight->castShadows)
     {
@@ -121,12 +121,12 @@ frame)
         }
 
         for (auto& command : commands) {
-            if (!ctx.camera->Intersects(ctx.directionalLight->lightSpace,command.mesh.worldAABB)) continue;
-            if (!command.mesh.IsCastShadow()) continue;
+            if (!ctx.camera->Intersects(ctx.directionalLight->lightSpace,command.mesh->worldAABB)) continue;
+            if (!command.mesh->IsCastShadow()) continue;
 
-            shadowShader.setMat4("model", command.transform.GetWorldMatrix());
-            command.mesh.VAO.Bind();
-            glDrawElements(GL_TRIANGLES, command.mesh.indexCount, GL_UNSIGNED_INT, 0);
+            shadowShader.setMat4("model", command.transform->GetWorldMatrix());
+            command.mesh->VAO.Bind();
+            glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
         }
 
         glCullFace(GL_BACK);
@@ -137,7 +137,7 @@ frame)
 
 void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& frame)
 {
-    auto& commands = frame.commands;
+    auto& commands = frame.opaqueCommands;
 
     Shader& pointShadowShader = ShaderManager::Get("PointShadow");
     pointShadowShader.use();
@@ -172,13 +172,13 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
         {
             // TODO: skip if the mesh is outside of the light's radius
 
-            pointShadowShader.setMat4("model", command.transform.GetWorldMatrix());
-            command.mesh.VAO.Bind();
+            pointShadowShader.setMat4("model", command.transform->GetWorldMatrix());
+            command.mesh->VAO.Bind();
 
             for (unsigned int face = 0; face < 6; ++face) 
             {
-                if (!ctx.camera->Intersects(shadowTransforms[face], command.mesh.worldAABB)) continue;
-                if (!command.mesh.IsCastShadow()) continue;
+                if (!ctx.camera->Intersects(shadowTransforms[face], command.mesh->worldAABB)) continue;
+                if (!command.mesh->IsCastShadow()) continue;
                 // Set the current face's matrix
                 pointShadowShader.setMat4("shadowMatrix", shadowTransforms[face]);
                 // Set the current face layer
@@ -186,7 +186,7 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
 
                 glDrawElements(
                     GL_TRIANGLES,
-                    command.mesh.indexCount,
+                    command.mesh->indexCount,
                     GL_UNSIGNED_INT,
                     0
                 );
@@ -205,7 +205,7 @@ ShadowPass::~ShadowPass()
 
 void ShadowPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
-    if (frame.commands.empty()) return;
+    if (frame.opaqueCommands.empty()) return;
 
     auto& resourceRegistry = frame.registry;
 
