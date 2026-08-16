@@ -47,5 +47,4 @@ void AudioEmitterComponent::Deserialize(const json& j)
 
     busID = j["busID"];
 
-    recreate = true;
 }

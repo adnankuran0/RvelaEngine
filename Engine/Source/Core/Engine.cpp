@@ -62,7 +62,7 @@ void Engine::PopLayer(Layer* layer)
 void Engine::Update()
 {
 	m_SceneManager.Update();
-	AudioManager::Update(GetCamera());
+	AudioManager::Get().Update(GetCamera());
 
 	for (Layer* layer : m_LayerStack)
 	{

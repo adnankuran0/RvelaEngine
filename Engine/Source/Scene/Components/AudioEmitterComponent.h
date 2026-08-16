@@ -37,7 +37,6 @@ struct AudioEmitterComponent
     uint32_t busID = 0;
 
     // local variables
-    bool recreate = true;
     uint32_t instanceID = UINT32_MAX;
 
     glm::vec3 prevWorldPos = { 0.0f, 0.0, 0.0 };

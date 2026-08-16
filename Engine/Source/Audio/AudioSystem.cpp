@@ -5,6 +5,21 @@
 
 using namespace rv;
 
+void AudioSystem::OnStart()
+{
+    auto& reg = m_Scene.GetRegistry();
+    auto view = reg.view<AudioEmitterComponent, TransformComponent>();
+    AudioManager& am = AudioManager::Get();
+
+    for (auto e : view)
+    {
+        auto [emitter, transform] = view.get<AudioEmitterComponent, TransformComponent>(e);
+
+        if (emitter.playOnCreate)
+            am.Play(&emitter);
+    }
+}
+
 void AudioSystem::Update()
 {
     auto& reg = m_Scene.GetRegistry();
@@ -15,18 +30,12 @@ void AudioSystem::Update()
     {
         auto [emitter, transform] = view.get<AudioEmitterComponent, TransformComponent>(e);
 
-        // recreate instance if asset or spatialization changes
-        if (emitter.recreate)
-        {
-            am.DestroyInstance(&emitter);
-            am.CreateInstance(&emitter);
-            emitter.recreate = false;
-            emitter.prevPosValid = false;
-        }
 
+        am.SyncState(&emitter);
         if (!am.IsPlaying(&emitter) && !am.IsPaused(&emitter))
         {
-            // TODO: sound finished event?
+            am.DestroyInstance(&emitter);
+            // TODO: audio finished event
         }
 
         if (emitter.spatial)
@@ -51,17 +60,7 @@ void AudioSystem::Update()
 
 void AudioSystem::BindCallbacks()
 {
-	m_Scene.GetRegistry().on_construct<AudioEmitterComponent>().connect<&AudioSystem::OnAudioEmitterCostructed>(this);
 	m_Scene.GetRegistry().on_destroy<AudioEmitterComponent>().connect<&AudioSystem::OnAudioEmitterDestructed>(this);
-}
-
-void AudioSystem::OnAudioEmitterCostructed(entt::registry& reg, entt::entity e)
-{
-	auto& emitter = reg.get<AudioEmitterComponent>(e);
-
-	AudioManager::Get().CreateInstance(&emitter);
-
-    emitter.recreate = false;
 }
 
 

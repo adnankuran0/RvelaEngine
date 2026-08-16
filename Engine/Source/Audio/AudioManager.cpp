@@ -111,10 +111,7 @@ void AudioManager::CreateInstance(AudioEmitterComponent* comp)
     SetMaxDistance(comp, comp->maxDistance);
     SetRolloff(comp, comp->rolloff);
     SetDopplerFactor(comp, comp->dopplerFactor);
-    if (comp->playOnCreate)
-    {
-        Play(comp);
-    }
+    
 }
 
 void AudioManager::DestroyInstance(AudioEmitterComponent* comp)
@@ -141,48 +138,65 @@ void AudioManager::SetClip(AudioEmitterComponent* comp, Ref<AudioClipAsset> clip
 
 void AudioManager::Play(AudioEmitterComponent* comp)
 {
+    if (!comp) return;
+
+    if (comp->instanceID == UINT32_MAX)
+        CreateInstance(comp);
+
     if (auto* inst = GetInstance(comp))
     {
         ma_sound_stop(&inst->sound);
         ma_sound_seek_to_pcm_frame(&inst->sound, 0);
         ma_sound_start(&inst->sound);
+        inst->state = PlaybackState::Playing;
     }
 }
 
 void AudioManager::Stop(AudioEmitterComponent* comp)
 {
     if (auto* inst = GetInstance(comp))
+    {
         ma_sound_stop(&inst->sound);
+        ma_sound_seek_to_pcm_frame(&inst->sound, 0);
+        inst->state = PlaybackState::Stopped;
+    }
 }
 
 void AudioManager::Pause(AudioEmitterComponent* comp)
 {
     if (auto* inst = GetInstance(comp))
-        ma_sound_stop(&inst->sound);
+    {
+        if (inst->state == PlaybackState::Playing)
+        {
+            ma_sound_stop(&inst->sound);
+            inst->state = PlaybackState::Paused;
+        }
+    }
 }
 
 void AudioManager::Resume(AudioEmitterComponent* comp)
 {
     if (auto* inst = GetInstance(comp))
-        if (!ma_sound_at_end(&inst->sound))
+    {
+        if (inst->state == PlaybackState::Paused)
+        {
             ma_sound_start(&inst->sound);
+            inst->state = PlaybackState::Playing;
+        }
+    }
 }
 
 bool AudioManager::IsPlaying(AudioEmitterComponent* comp) const
 {
     if (const auto* inst = GetInstance(comp))
-        return ma_sound_is_playing(&inst->sound) == MA_TRUE;
+        return inst->state == PlaybackState::Playing && ma_sound_is_playing(&inst->sound) == MA_TRUE;
     return false;
 }
 
 bool AudioManager::IsPaused(AudioEmitterComponent* comp) const
 {
     if (const auto* inst = GetInstance(comp))
-    {
-        bool playing = ma_sound_is_playing(&inst->sound) == MA_TRUE;
-        bool finished = ma_sound_at_end(&inst->sound) == MA_TRUE;
-        return !playing && !finished;
-    }
+        return inst->state == PlaybackState::Paused;
     return false;
 }
 
@@ -528,6 +542,18 @@ float rv::AudioManager::GetBusVolume(uint32_t busID)
     if (!bus) return 0.0f;
 
     return ma_sound_group_get_volume(bus->GetGroup());
+}
+
+void AudioManager::SyncState(AudioEmitterComponent* comp)
+{
+    if (auto* inst = GetInstance(comp))
+    {
+        if (inst->state == PlaybackState::Playing &&
+            ma_sound_at_end(&inst->sound) == MA_TRUE)
+        {
+            inst->state = PlaybackState::Stopped;
+        }
+    }
 }
 
 void rv::AudioManager::Update(Camera* camera)

@@ -949,8 +949,6 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                         {
                             AssetUUID audioClipUUID = EditorUtils::ReadUUIDFromMeta(pathStr);
                             emitter.audioClipUUID = audioClipUUID;
-                            audio.CreateInstance(&emitter);
-                            // TODO: do we really need to create instance here? because of "recreate"
                                     
                         }
                     }
@@ -1027,8 +1025,9 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 
                 ImGui::Separator();
 
-                if (ImGui::Checkbox("Spatial 3D", &emitter.spatial))
-                    emitter.recreate = true;
+                bool spatial = emitter.spatial;
+                if (ImGui::Checkbox("Spatial 3D", &spatial))
+                    audio.SetSpatial(&emitter, spatial);
 
                 if (emitter.spatial)
                 {

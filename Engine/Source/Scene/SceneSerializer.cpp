@@ -1,6 +1,7 @@
 #include "rvelapch.h"
 #include "SceneSerializer.h"
 #include "Entity.h"
+#include "Audio/AudioManager.h"
 
 using namespace rv;
 
@@ -235,7 +236,11 @@ void SceneSerializer::DeserializeEntity(
         scene.GetComponent<SceneTreeComponent>(handle).parentUUID = entityJson["ParentUUID"];
 
     if (entityJson.contains("AudioEmitterComponent"))
-        scene.AddComponent<AudioEmitterComponent>(handle).Deserialize(entityJson["AudioEmitterComponent"]);
+    {
+        auto& audioComp = scene.AddComponent<AudioEmitterComponent>(handle);
+        audioComp.Deserialize(entityJson["AudioEmitterComponent"]);
+        AudioManager::Get().CreateInstance(&audioComp);
+    }
 }
 
 void SceneSerializer::CollectChildrenRecursively(Scene& scene, entt::entity e, std::unordered_set<entt::entity>& out)
