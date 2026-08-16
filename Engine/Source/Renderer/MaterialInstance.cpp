@@ -42,6 +42,15 @@ json MaterialInstance::SerializeOverrides() const
     if (IsOverridden(MatField::UVOffset))
         j["UVOffset"] = { m_UVOffset.x, m_UVOffset.y };
 
+    if (IsOverridden(MatField::TransparencyMode))
+        j["transparencyMode"] = static_cast<int>(m_TransparencyMode);
+    if (IsOverridden(MatField::BlendMode))
+        j["blendMode"] = static_cast<int>(m_BlendMode);
+    if (IsOverridden(MatField::CullMode))
+        j["cullMode"] = static_cast<int>(m_CullMode);
+    if (IsOverridden(MatField::AlphaCutoff))
+        j["alphaCutoff"] = m_AlphaCutoff;
+
     if (IsOverridden(MatField::AlbedoTex))
         j["albedoTex"] = m_AlbedoTex ? m_AlbedoTex->GetUUID().ToString() : "";
     if (IsOverridden(MatField::NormalTex))
@@ -116,6 +125,27 @@ void MaterialInstance::DeserializeOverrides(const json& j)
     {
         m_UVOffset = { j["UVOffset"][0], j["UVOffset"][1] };
         SetOverride(MatField::UVOffset);
+    }
+
+    if (j.contains("transparencyMode"))
+    {
+        m_TransparencyMode = static_cast<TransparencyMode>(j["transparencyMode"].get<int>());
+        SetOverride(MatField::TransparencyMode);
+    }
+    if (j.contains("blendMode"))
+    {
+        m_BlendMode = static_cast<BlendMode>(j["blendMode"].get<int>());
+        SetOverride(MatField::BlendMode);
+    }
+    if (j.contains("cullMode"))
+    {
+        m_CullMode = static_cast<CullMode>(j["cullMode"].get<int>());
+        SetOverride(MatField::CullMode);
+    }
+    if (j.contains("alphaCutoff"))
+    {
+        m_AlphaCutoff = j["alphaCutoff"].get<float>();
+        SetOverride(MatField::AlphaCutoff);
     }
 
     auto loadTex = [&](const char* key, Ref<TextureAsset>& target, bool& useFlag, MatField field)

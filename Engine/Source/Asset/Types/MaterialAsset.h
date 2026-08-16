@@ -3,6 +3,7 @@
 #include "Asset/AssetUUID.h"
 #include "Renderer/Sampler.h"
 #include <glm/glm.hpp>
+#include "Renderer/RenderTypes.h"
 
 namespace rv {
 
@@ -17,6 +18,11 @@ public:
     AssetUUID roughnessTextureUUID;
     AssetUUID aoTextureUUID;
     AssetUUID heightTextureUUID;
+
+    TransparencyMode transparencyMode = TransparencyMode::Opaque;
+    BlendMode blendMode = BlendMode::Mix;
+    CullMode cullMode = CullMode::Back;
+    float alphaCutoff = 0.5f;
 
     glm::vec3 albedoColor = glm::vec3(1.0f);
     glm::vec3 emissiveColor = glm::vec3(0.0f);

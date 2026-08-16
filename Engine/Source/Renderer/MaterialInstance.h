@@ -29,6 +29,10 @@ enum class MatField : uint8_t {
     RoughnessTex,
     AOTex,
     HeightTex,
+    TransparencyMode,
+    BlendMode,
+    CullMode,
+    AlphaCutoff,
     COUNT
 };
 
@@ -66,6 +70,11 @@ public:
     void SetUVScale(const glm::vec2& v) { m_UVScale = v; SetOverride(MatField::UVScale); }
     void SetUVOffset(const glm::vec2& v) { m_UVOffset = v; SetOverride(MatField::UVOffset); }
 
+    void SetTransparencyMode(TransparencyMode mode) { m_TransparencyMode = mode; SetOverride(MatField::TransparencyMode); }
+    void SetBlendMode(BlendMode mode) { m_BlendMode = mode; SetOverride(MatField::BlendMode); }
+    void SetCullMode(CullMode mode) { m_CullMode = mode; SetOverride(MatField::CullMode); }
+    void SetAlphaCutoff(float v) { m_AlphaCutoff = v; SetOverride(MatField::AlphaCutoff); }
+
     glm::vec3 GetAlbedoColor() const { return IsOverridden(MatField::AlbedoColor) ? m_AlbedoColor : (m_SourceAsset ? m_SourceAsset->albedoColor : m_AlbedoColor); }
     glm::vec3 GetEmissiveColor() const { return IsOverridden(MatField::EmissiveColor) ? m_EmissiveColor : (m_SourceAsset ? m_SourceAsset->emissiveColor : m_EmissiveColor); }
     float GetEmissiveIntensity() const { return IsOverridden(MatField::EmissiveIntensity) ? m_EmissiveIntensity : (m_SourceAsset ? m_SourceAsset->emissiveIntensity : m_EmissiveIntensity); }
@@ -77,6 +86,11 @@ public:
     float GetHeightScale() const { return IsOverridden(MatField::HeightScale) ? m_HeightScale : (m_SourceAsset ? m_SourceAsset->heightScale : m_HeightScale); }
     glm::vec2 GetUVScale() const { return IsOverridden(MatField::UVScale) ? m_UVScale : (m_SourceAsset ? m_SourceAsset->UVScale : m_UVScale); }
     glm::vec2 GetUVOffset() const { return IsOverridden(MatField::UVOffset) ? m_UVOffset : (m_SourceAsset ? m_SourceAsset->UVOffset : m_UVOffset); }
+
+    TransparencyMode GetTransparencyMode() const { return IsOverridden(MatField::TransparencyMode) ? m_TransparencyMode : (m_SourceAsset ? m_SourceAsset->transparencyMode : m_TransparencyMode); }
+    BlendMode GetBlendMode() const { return IsOverridden(MatField::BlendMode) ? m_BlendMode : (m_SourceAsset ? m_SourceAsset->blendMode : m_BlendMode); }
+    CullMode GetCullMode() const { return IsOverridden(MatField::CullMode) ? m_CullMode : (m_SourceAsset ? m_SourceAsset->cullMode : m_CullMode); }
+    float GetAlphaCutoff() const { return IsOverridden(MatField::AlphaCutoff) ? m_AlphaCutoff : (m_SourceAsset ? m_SourceAsset->alphaCutoff : m_AlphaCutoff); }
 
     bool UsesAlbedoMap() const { return IsOverridden(MatField::AlbedoTex) ? m_UseAlbedoMap : (m_SourceAsset ? m_SourceAsset->useAlbedoMap : false); }
     bool UsesNormalMap() const { return IsOverridden(MatField::NormalTex) ? m_UseNormalMap : (m_SourceAsset ? m_SourceAsset->useNormalMap : false); }
@@ -102,6 +116,11 @@ public:
     void ClearRoughnessTexture() { m_RoughnessTex = nullptr; m_UseRoughnessMap = false; ClearOverride(MatField::RoughnessTex); }
     void ClearAOTexture() { m_AOTex = nullptr; m_UseAOMap = false; ClearOverride(MatField::AOTex); }
     void ClearHeightTexture() { m_HeightTex = nullptr; m_UseHeightMap = false; ClearOverride(MatField::HeightTex); }
+
+    void ClearTransparencyMode() { ClearOverride(MatField::TransparencyMode); }
+    void ClearBlendMode() { ClearOverride(MatField::BlendMode); }
+    void ClearCullMode() { ClearOverride(MatField::CullMode); }
+    void ClearAlphaCutoff() { ClearOverride(MatField::AlphaCutoff); }
 
     Sampler& GetSampler() { return m_Sampler; }
     const Sampler& GetSampler() const { return m_Sampler; }
@@ -149,6 +168,11 @@ private:
     float m_HeightScale = 0.1f;
     glm::vec2 m_UVScale = glm::vec2(1.0f);
     glm::vec2 m_UVOffset = glm::vec2(0.0f);
+
+    TransparencyMode m_TransparencyMode = TransparencyMode::Opaque;
+    BlendMode m_BlendMode = BlendMode::Mix;
+    CullMode m_CullMode = CullMode::Back;
+    float m_AlphaCutoff = 0.5f;
 
     bool m_UseAlbedoMap = false;
     bool m_UseNormalMap = false;

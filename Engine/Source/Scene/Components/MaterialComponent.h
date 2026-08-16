@@ -65,6 +65,22 @@ public:
     void SetUVOffset(const glm::vec2& v) { m_Instance.SetUVOffset(v); }
     void ClearUVOffset() { m_Instance.ClearUVOffset(); }
 
+    TransparencyMode GetTransparencyMode() const { return m_Instance.GetTransparencyMode(); }
+    void SetTransparencyMode(TransparencyMode mode) { m_Instance.SetTransparencyMode(mode); }
+    void ClearTransparencyMode() { m_Instance.ClearTransparencyMode(); }
+
+    BlendMode GetBlendMode() const { return m_Instance.GetBlendMode(); }
+    void SetBlendMode(BlendMode mode) { m_Instance.SetBlendMode(mode); }
+    void ClearBlendMode() { m_Instance.ClearBlendMode(); }
+
+    CullMode GetCullMode() const { return m_Instance.GetCullMode(); }
+    void SetCullMode(CullMode mode) { m_Instance.SetCullMode(mode); }
+    void ClearCullMode() { m_Instance.ClearCullMode(); }
+
+    float GetAlphaCutoff() const { return m_Instance.GetAlphaCutoff(); }
+    void SetAlphaCutoff(float v) { m_Instance.SetAlphaCutoff(v); }
+    void ClearAlphaCutoff() { m_Instance.ClearAlphaCutoff(); }
+
     bool IsUsingAlbedoMap() const { return m_Instance.UsesAlbedoMap(); }
     bool IsUsingNormalMap() const { return m_Instance.UsesNormalMap(); }
     bool IsUsingMetallicMap() const { return m_Instance.UsesMetallicMap(); }

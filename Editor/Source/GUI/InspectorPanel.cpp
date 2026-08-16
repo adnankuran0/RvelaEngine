@@ -693,6 +693,12 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                             if (inst.IsOverridden(MatField::HeightScale)) asset->heightScale = material.GetHeightScale();
                             if (inst.IsOverridden(MatField::UVScale)) asset->UVScale = material.GetUVScale();
                             if (inst.IsOverridden(MatField::UVOffset)) asset->UVOffset = material.GetUVOffset();
+
+                            if (inst.IsOverridden(MatField::TransparencyMode)) asset->transparencyMode = material.GetTransparencyMode();
+                            if (inst.IsOverridden(MatField::BlendMode)) asset->blendMode = material.GetBlendMode();
+                            if (inst.IsOverridden(MatField::CullMode)) asset->cullMode = material.GetCullMode();
+                            if (inst.IsOverridden(MatField::AlphaCutoff)) asset->alphaCutoff = material.GetAlphaCutoff();
+
                             if (inst.IsOverridden(MatField::AlbedoTex)) { asset->albedoTextureUUID = material.GetAlbedoTexture() ? material.GetAlbedoTexture()->GetUUID() : AssetUUID{}; asset->useAlbedoMap = material.IsUsingAlbedoMap(); }
                             if (inst.IsOverridden(MatField::NormalTex)) { asset->normalTextureUUID = material.GetNormalTexture() ? material.GetNormalTexture()->GetUUID() : AssetUUID{}; asset->useNormalMap = material.IsUsingNormalMap(); }
                             if (inst.IsOverridden(MatField::MetallicTex)) { asset->metallicTextureUUID = material.GetMetallicTexture() ? material.GetMetallicTexture()->GetUUID() : AssetUUID{}; asset->useMetallicMap = material.IsUsingMetallicMap(); }
@@ -740,6 +746,46 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                                 RevertButton((std::string("R##r") + idSuffix).c_str(), clearTexFn);
                             }
                         };
+
+                    if (ImGui::CollapsingHeader("Transparency##transphdr"))
+                    {
+                        ImGui::Indent();
+
+                        const char* transModes[] = { "Opaque", "Alpha", "Alpha Scissor", "Depth Prepass" };
+                        int currentTransMode = static_cast<int>(material.GetTransparencyMode());
+                        bool transOvr = inst.IsOverridden(MatField::TransparencyMode);
+                        if (ImGui::Combo("Transparency Mode##tmode", &currentTransMode, transModes, 4))
+                            material.SetTransparencyMode(static_cast<TransparencyMode>(currentTransMode));
+                        if (transOvr) RevertButton("R##tmode", [&]() { material.ClearTransparencyMode(); });
+
+                        if (material.GetTransparencyMode() == TransparencyMode::AlphaScissor)
+                        {
+                            float cutoff = material.GetAlphaCutoff();
+                            bool cutoffOvr = inst.IsOverridden(MatField::AlphaCutoff);
+                            if (ImGui::SliderFloat("Alpha Cutoff##acutoff", &cutoff, 0.0f, 1.0f))
+                                material.SetAlphaCutoff(cutoff);
+                            if (cutoffOvr) RevertButton("R##acutoff", [&]() { material.ClearAlphaCutoff(); });
+                        }
+
+                        if (material.GetTransparencyMode() == TransparencyMode::Alpha || material.GetTransparencyMode() == TransparencyMode::DepthPrepass)
+                        {
+                            const char* blendModes[] = { "Mix", "Add", "Subtract", "Multiply" };
+                            int currentBlendMode = static_cast<int>(material.GetBlendMode());
+                            bool blendOvr = inst.IsOverridden(MatField::BlendMode);
+                            if (ImGui::Combo("Blend Mode##bmode", &currentBlendMode, blendModes, 4))
+                                material.SetBlendMode(static_cast<BlendMode>(currentBlendMode));
+                            if (blendOvr) RevertButton("R##bmode", [&]() { material.ClearBlendMode(); });
+                        }
+
+                        const char* cullModes[] = { "Back", "Front", "Disabled" };
+                        int currentCullMode = static_cast<int>(material.GetCullMode());
+                        bool cullOvr = inst.IsOverridden(MatField::CullMode);
+                        if (ImGui::Combo("Cull Mode##cmode", &currentCullMode, cullModes, 3))
+                            material.SetCullMode(static_cast<CullMode>(currentCullMode));
+                        if (cullOvr) RevertButton("R##cmode", [&]() { material.ClearCullMode(); });
+
+                        ImGui::Unindent();
+                    }
 
                     if (ImGui::CollapsingHeader("Albedo"))
                     {
@@ -886,7 +932,7 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                         bool dirty = false;
                         if (ImGui::Combo("Min Filter", &minF, minFilterTypes, 4)) { desc.minFilter = static_cast<MinFilter>(minF); dirty = true; }
                         if (ImGui::Combo("Mag Filter", &magF, magFilterTypes, 2)) { desc.magFilter = static_cast<MagFilter>(magF); dirty = true; }
-                        if (ImGui::Combo("Wrap", &wrap, wrapTypes, 5)) { desc.wrap = static_cast<Wrap>(wrap);      dirty = true; }
+                        if (ImGui::Combo("Wrap", &wrap, wrapTypes, 5)) { desc.wrap = static_cast<Wrap>(wrap);     dirty = true; }
                         if (ImGui::Combo("Anisotropy", &aniso, anisoLevels, 5))
                         {
                             constexpr float values[] = { 1.0f, 2.0f, 4.0f, 8.0f, 16.0f };
