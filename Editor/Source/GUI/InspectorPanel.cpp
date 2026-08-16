@@ -13,7 +13,7 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
     Scene& scene = engine->GetActiveScene();
     entt::registry& registry = scene.GetRegistry();
     ImGui::Begin("Inspector", nullptr, ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse);
-      
+
     if (selectedEntity != entt::null)
     {
         if (selectedEntity != entt::null)
@@ -76,7 +76,7 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 
         bool isPrefab = registry.any_of<PrefabComponent>(selectedEntity);
 
-               
+
         // ---------- Transform ----------
         if (registry.any_of<TransformComponent>(selectedEntity))
         {
@@ -128,15 +128,19 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             if (registry.any_of<MeshComponent>(selectedEntity))
             {
                 bool open = ImGui::CollapsingHeader("Mesh");
+                bool isRemoved = false;
 
                 if (ImGui::BeginPopupContextItem("MeshComponentContext"))
                 {
                     if (ImGui::MenuItem("Remove Component"))
+                    {
                         registry.remove<MeshComponent>(selectedEntity);
+                        isRemoved = true;
+                    }
                     ImGui::EndPopup();
                 }
 
-                if (open)
+                if (open && !isRemoved)
                 {
                     ImGui::Indent();
                     MeshComponent& mesh = registry.get<MeshComponent>(selectedEntity);
@@ -170,15 +174,19 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             if (registry.any_of<CameraComponent>(selectedEntity))
             {
                 bool open = ImGui::CollapsingHeader("Camera");
+                bool isRemoved = false;
 
                 if (ImGui::BeginPopupContextItem("CameraComponentContext"))
                 {
                     if (ImGui::MenuItem("Remove Component"))
+                    {
                         registry.remove<CameraComponent>(selectedEntity);
+                        isRemoved = true;
+                    }
                     ImGui::EndPopup();
                 }
 
-                if (open)
+                if (open && !isRemoved)
                 {
                     auto& camComp = registry.get<CameraComponent>(selectedEntity);
                     auto& camera = camComp.camera;
@@ -205,15 +213,19 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             if (registry.any_of<MeshRendererComponent>(selectedEntity))
             {
                 bool open = ImGui::CollapsingHeader("Mesh Renderer");
+                bool isRemoved = false;
 
                 if (ImGui::BeginPopupContextItem("MeshRendererComponentContext"))
                 {
                     if (ImGui::MenuItem("Remove Component"))
+                    {
                         registry.remove<MeshRendererComponent>(selectedEntity);
+                        isRemoved = true;
+                    }
                     ImGui::EndPopup();
                 }
 
-                if (open)
+                if (open && !isRemoved)
                 {
                     ImGui::Indent();
                     MeshRendererComponent& meshRenderer = registry.get<MeshRendererComponent>(selectedEntity);
@@ -233,15 +245,19 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             if (registry.any_of<PointLightComponent>(selectedEntity))
             {
                 bool open = ImGui::CollapsingHeader("Point Light");
+                bool isRemoved = false;
 
                 if (ImGui::BeginPopupContextItem("PointLightComponentContext"))
                 {
                     if (ImGui::MenuItem("Remove Component"))
+                    {
                         registry.remove<PointLightComponent>(selectedEntity);
+                        isRemoved = true;
+                    }
                     ImGui::EndPopup();
                 }
 
-                if (open)
+                if (open && !isRemoved)
                 {
                     auto& pointLightComponent = registry.get<PointLightComponent>(selectedEntity);
                     glm::vec3 lightColor = pointLightComponent.color;
@@ -263,15 +279,19 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             if (registry.any_of<DirectionalLightComponent>(selectedEntity))
             {
                 bool open = ImGui::CollapsingHeader("Directional Light");
+                bool isRemoved = false;
 
                 if (ImGui::BeginPopupContextItem("DirectionalLightComponentContext"))
                 {
                     if (ImGui::MenuItem("Remove Component"))
+                    {
                         registry.remove<DirectionalLightComponent>(selectedEntity);
+                        isRemoved = true;
+                    }
                     ImGui::EndPopup();
                 }
 
-                if (open)
+                if (open && !isRemoved)
                 {
                     auto& directionalLightComponent = registry.get<DirectionalLightComponent>(selectedEntity);
                     glm::vec3 lightColor = directionalLightComponent.color;
@@ -291,15 +311,19 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             if (registry.any_of<RigidbodyComponent>(selectedEntity))
             {
                 bool open = ImGui::CollapsingHeader("Rigidbody");
+                bool isRemoved = false;
 
                 if (ImGui::BeginPopupContextItem("RigidbodyComponentContext"))
                 {
                     if (ImGui::MenuItem("Remove Component"))
+                    {
                         registry.remove<RigidbodyComponent>(selectedEntity);
+                        isRemoved = true;
+                    }
                     ImGui::EndPopup();
                 }
 
-                if (open)
+                if (open && !isRemoved)
                 {
                     auto& rb = registry.get<RigidbodyComponent>(selectedEntity);
 
@@ -385,15 +409,19 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             if (registry.any_of<CharacterBodyComponent>(selectedEntity))
             {
                 bool open = ImGui::CollapsingHeader("CharacterBody");
+                bool isRemoved = false;
 
                 if (ImGui::BeginPopupContextItem("CharacterBodyComponentContext"))
                 {
                     if (ImGui::MenuItem("Remove Component"))
+                    {
                         registry.remove<CharacterBodyComponent>(selectedEntity);
+                        isRemoved = true;
+                    }
                     ImGui::EndPopup();
                 }
 
-                if (open)
+                if (open && !isRemoved)
                 {
                     auto& cb = registry.get<CharacterBodyComponent>(selectedEntity);
 
@@ -454,15 +482,19 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             if (registry.any_of<BoxColliderComponent>(selectedEntity))
             {
                 bool open = ImGui::CollapsingHeader("BoxCollider");
+                bool isRemoved = false;
 
                 if (ImGui::BeginPopupContextItem("BoxColliderComponentContext"))
                 {
                     if (ImGui::MenuItem("Remove Component"))
+                    {
                         registry.remove<BoxColliderComponent>(selectedEntity);
+                        isRemoved = true;
+                    }
                     ImGui::EndPopup();
                 }
 
-                if (open)
+                if (open && !isRemoved)
                 {
                     auto& bc = registry.get<BoxColliderComponent>(selectedEntity);
                     glm::vec3 size = bc.GetSize();
@@ -476,15 +508,19 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             if (registry.any_of<SphereColliderComponent>(selectedEntity))
             {
                 bool open = ImGui::CollapsingHeader("SphereCollider");
+                bool isRemoved = false;
 
                 if (ImGui::BeginPopupContextItem("SphereColliderComponentContext"))
                 {
                     if (ImGui::MenuItem("Remove Component"))
+                    {
                         registry.remove<SphereColliderComponent>(selectedEntity);
+                        isRemoved = true;
+                    }
                     ImGui::EndPopup();
                 }
 
-                if (open)
+                if (open && !isRemoved)
                 {
                     auto& sc = registry.get<SphereColliderComponent>(selectedEntity);
                     float radius = sc.GetRadius();
@@ -498,15 +534,19 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             if (registry.any_of<CapsuleColliderComponent>(selectedEntity))
             {
                 bool open = ImGui::CollapsingHeader("CapsuleCollider");
+                bool isRemoved = false;
 
                 if (ImGui::BeginPopupContextItem("CapsuleColliderComponentContext"))
                 {
                     if (ImGui::MenuItem("Remove Component"))
+                    {
                         registry.remove<CapsuleColliderComponent>(selectedEntity);
+                        isRemoved = true;
+                    }
                     ImGui::EndPopup();
                 }
 
-                if (open)
+                if (open && !isRemoved)
                 {
                     auto& cc = registry.get<CapsuleColliderComponent>(selectedEntity);
                     float halfHeight = cc.GetHalfHeight();
@@ -522,15 +562,19 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             if (registry.any_of<CylinderColliderComponent>(selectedEntity))
             {
                 bool open = ImGui::CollapsingHeader("CylinderCollider");
+                bool isRemoved = false;
 
                 if (ImGui::BeginPopupContextItem("CylinderColliderComponentContext"))
                 {
                     if (ImGui::MenuItem("Remove Component"))
+                    {
                         registry.remove<CylinderColliderComponent>(selectedEntity);
+                        isRemoved = true;
+                    }
                     ImGui::EndPopup();
                 }
 
-                if (open)
+                if (open && !isRemoved)
                 {
                     auto& cc = registry.get<CylinderColliderComponent>(selectedEntity);
                     float halfHeight = cc.GetHalfHeight();
@@ -546,15 +590,19 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             if (registry.any_of<MeshColliderComponent>(selectedEntity))
             {
                 bool open = ImGui::CollapsingHeader("MeshCollider");
+                bool isRemoved = false;
 
                 if (ImGui::BeginPopupContextItem("MeshColliderComponentContext"))
                 {
                     if (ImGui::MenuItem("Remove Component"))
+                    {
                         registry.remove<MeshColliderComponent>(selectedEntity);
+                        isRemoved = true;
+                    }
                     ImGui::EndPopup();
                 }
 
-                if (open)
+                if (open && !isRemoved)
                 {
                     auto& mc = registry.get<MeshColliderComponent>(selectedEntity);
                     int maxTris = mc.GetMaxTrianglesPerLeaf();
@@ -570,15 +618,19 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             if (registry.any_of<ConvexHullColliderComponent>(selectedEntity))
             {
                 bool open = ImGui::CollapsingHeader("ConvexHullCollider");
+                bool isRemoved = false;
 
                 if (ImGui::BeginPopupContextItem("ConvexHullColliderComponentContext"))
                 {
                     if (ImGui::MenuItem("Remove Component"))
+                    {
                         registry.remove<ConvexHullColliderComponent>(selectedEntity);
+                        isRemoved = true;
+                    }
                     ImGui::EndPopup();
                 }
 
-                if (open)
+                if (open && !isRemoved)
                 {
                     auto& chc = registry.get<ConvexHullColliderComponent>(selectedEntity);
                     float maxConvexRadius = chc.GetMaxConvexRadius();
@@ -592,13 +644,17 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             if (registry.any_of<MaterialComponent>(selectedEntity))
             {
                 bool open = ImGui::CollapsingHeader("Material");
+                bool isRemoved = false;
                 if (ImGui::BeginPopupContextItem("MaterialComponentContext"))
                 {
                     if (ImGui::MenuItem("Remove Component"))
+                    {
                         registry.remove<MaterialComponent>(selectedEntity);
+                        isRemoved = true;
+                    }
                     ImGui::EndPopup();
                 }
-                if (open)
+                if (open && !isRemoved)
                 {
                     ImGui::Indent();
                     MaterialComponent& material = registry.get<MaterialComponent>(selectedEntity);
@@ -677,7 +733,7 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                                 }
                                 ImGui::EndDragDropTarget();
                             }
-                                    
+
                             if (overridden)
                             {
                                 ImGui::SameLine();
@@ -892,15 +948,19 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
         if (registry.any_of<ScriptComponent>(selectedEntity))
         {
             bool open = ImGui::CollapsingHeader("Script");
+            bool isRemoved = false;
 
             if (ImGui::BeginPopupContextItem("ScriptComponentContext"))
             {
                 if (ImGui::MenuItem("Remove Component"))
+                {
                     registry.remove<ScriptComponent>(selectedEntity);
+                    isRemoved = true;
+                }
                 ImGui::EndPopup();
             }
 
-            if (open)
+            if (open && !isRemoved)
             {
                 auto& scriptComp = registry.get<ScriptComponent>(selectedEntity);
 
@@ -926,15 +986,19 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
         if (registry.any_of<AudioEmitterComponent>(selectedEntity))
         {
             bool open = ImGui::CollapsingHeader("AudioEmitter");
+            bool isRemoved = false;
 
             if (ImGui::BeginPopupContextItem("AudioEmitterComponent"))
             {
                 if (ImGui::MenuItem("Remove Component"))
+                {
                     registry.remove<AudioEmitterComponent>(selectedEntity);
+                    isRemoved = true;
+                }
                 ImGui::EndPopup();
             }
 
-            if (open)
+            if (open && !isRemoved)
             {
                 auto& emitter = registry.get<AudioEmitterComponent>(selectedEntity);
                 auto& audio = AudioManager::Get();
@@ -949,7 +1013,7 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                         {
                             AssetUUID audioClipUUID = EditorUtils::ReadUUIDFromMeta(pathStr);
                             emitter.audioClipUUID = audioClipUUID;
-                                    
+
                         }
                     }
                     ImGui::EndDragDropTarget();
@@ -962,9 +1026,9 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                 auto& busses = audio.GetBusses();
                 AudioBus* currentBus = audio.GetBus(emitter.busID);
 
-                if (!currentBus) 
+                if (!currentBus)
                 {
-                    audio.SetBus(&emitter, 1); // the bus is no longer valid so assign it to the master bus
+                    audio.SetBus(&emitter, 0); // the bus is no longer valid so assign it to the master bus
                     currentBus = audio.GetBus(emitter.busID);
                 }
 
