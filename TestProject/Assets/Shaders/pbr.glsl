@@ -62,7 +62,6 @@ layout(binding = 3) uniform sampler2D roughnessMap;
 layout(binding = 4) uniform sampler2D aoMap;
 layout(binding = 5) uniform sampler2D heightMap;
 
-
 uniform bool useAlbedoMap;
 uniform bool useNormalMap;
 uniform bool useMetallicMap;
@@ -80,10 +79,12 @@ uniform float heightScale;
 uniform float normalScale;
 uniform float specularIntensity;
 
+// Transparency Settings
+uniform int transparencyMode;
+uniform float alphaCutoff;
+
 uniform vec3 ambientColor;
 uniform float ambientIntensity;
-
-
 
 // Shadows
 layout(binding = 6) uniform sampler2D shadowMap;
@@ -279,7 +280,7 @@ float calculatePointLightShadow(int index, vec3 fragPos, vec3 lightPos, float fa
 
     float diskRadius = blurRadius * (1.0 + (currentDepth / farPlane));
     float shadow = 0.0;
-    const int samples = 8; // Reduced from 16
+    const int samples = 8;
     
     for (int i = 0; i < samples; ++i) {
         vec3 sampleDir = fragToLight + vec3(poissonDisk[i] * diskRadius, 0.0);
@@ -302,13 +303,27 @@ void main()
 
     vec2 mappedTexCoords = parallaxOcclusionMapping(TexCoords, viewDirTS);
 
-    // Early alpha test
-    vec4 albedoTex = useAlbedoMap ? texture(albedoMap, mappedTexCoords) : vec4(albedoColor, 1.0);
-    albedoTex *= vec4(albedoColor, 1.0);
-    if(albedoTex.a < 0.2) discard;
+    // Albedo & Alpha Calculation
+    vec4 albedoTex = useAlbedoMap ? texture(albedoMap, mappedTexCoords) : vec4(1.0);
+    vec4 fullAlbedo = albedoTex * vec4(albedoColor,1.0);
+    vec3 albedo = fullAlbedo.rgb;
+    float alpha = fullAlbedo.a;
+
+    // Transparency Check
+    if (transparencyMode == 0) // Opaque
+    {
+        alpha = 1.0;
+    }
+    else if (transparencyMode == 2) // AlphaScissor
+    {
+        if (alpha < alphaCutoff)
+        {
+            discard;
+        }
+        alpha = 1.0;
+    }
 
     // Material properties
-    vec3 albedo = albedoTex.rgb;
     float metallic = useMetallicMap ? texture(metallicMap, mappedTexCoords).r : metallicValue;
     float roughnessMapValue = useRoughnessMap ? texture(roughnessMap, mappedTexCoords).r : 1.0;
     float roughness = clamp(roughnessValue * roughnessMapValue, 0.0, 1.0);
@@ -345,8 +360,6 @@ void main()
         Lo += (1.0 - shadow) * (kD * albedo / PI + specular) * 
               directionalLight.color * directionalLight.intensity * NdotL;
     }
-
-   
 
     // Point lights
     for(int i = 0; i < pointLightCount; ++i) 
@@ -385,10 +398,7 @@ void main()
 
         vec3 radiance = light.color * light.intensity * attenuation;
         Lo += (1.0 - shadow) * (kD * albedo / PI + specular) * radiance * NdotL;
-       
     }
-
-    
 
     vec3 ambient = vec3(0.0);
 
@@ -423,7 +433,5 @@ void main()
     
     vec3 color = ambient + Lo + emmisiveColor * emmisiveIntensity;
 
-    FragColor = vec4(color, albedoTex.a);
-
-   
+    FragColor = vec4(color, 0.5);
 }

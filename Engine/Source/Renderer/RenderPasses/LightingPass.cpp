@@ -70,14 +70,17 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     auto& commands = frame.opaqueCommands;
     auto& resourceRegistry = frame.registry;
 
-  
+
 
     auto i_DirectionalShadowMap = resourceRegistry.Get("DirectionalShadowMap")->id;
     auto i_PointShadowMap = resourceRegistry.Get("PointShadowMap")->id;
 
     glBindFramebuffer(GL_FRAMEBUFFER, o_ScreenFBO);
 
-    glClear(GL_STENCIL_BUFFER_BIT);
+    glDepthMask(GL_TRUE);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
 
     Shader& shader = ShaderManager::Get("PBR");
@@ -99,7 +102,7 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         shader.setInt("shadowMap", 6);
         glBindTextureUnit(6, i_DirectionalShadowMap);
 
-       
+
     }
 
 
@@ -148,21 +151,16 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     shader.setBool("useIBL", env.Lighting_IBL);
     shader.setVec3("ambientColor", env.Lighting_AmbientColor);
     shader.setFloat("ambientIntensity", env.Lighting_AmbientIntensity);
-        
+
     glBindTextureUnit(8, skybox.GetIrradianceMap());
     glBindTextureUnit(9, skybox.GetPrefilterMap());
     glBindTextureUnit(10, skybox.GetBRDFLUTTexture());
 
-    for (auto& transparentCommand : frame.transparentCommands)
-    {
-        LOG_DEBUG(transparentCommand.distanceToCamera);
-    }
-
     size_t drawCallCounter = 0;
     for (auto& command : commands) {
         if (!ctx.camera->Intersects(command.mesh->worldAABB)) continue;
-        
-         glDisable(GL_STENCIL_TEST);
+
+        glDisable(GL_STENCIL_TEST);
 
         if (!command.mesh->IsDoubleSided())
         {
@@ -175,11 +173,13 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
         auto& material = command.material;
 
+        shader.setInt("transparencyMode", static_cast<int>(material->GetTransparencyMode()));
+        shader.setFloat("alphaCutoff", material->GetAlphaCutoff());
         shader.setVec2("UVScale", material->GetUVScale());
         shader.setVec2("UVOffset", material->GetUVOffset());
         shader.setVec3("albedoColor", material->GetAlbedoColor());
-        shader.setVec3("emmisiveColor", material->GetEmissiveColor()); // shader typo 
-        shader.setFloat("emmisiveIntensity", material->GetEmissiveIntensity()); // shader typo
+        shader.setVec3("emmisiveColor", material->GetEmissiveColor());
+        shader.setFloat("emmisiveIntensity", material->GetEmissiveIntensity());
         shader.setFloat("metallicValue", material->GetMetallic());
         shader.setFloat("roughnessValue", material->GetRoughness());
         shader.setFloat("aoValue", material->GetAO());
@@ -196,25 +196,30 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         { material->IsUsingHeightMap(),    "heightMap",    5, "useHeightMap",    material->GetHeightTexture() }
         } };
 
-        
-        for (const auto& map : maps) 
+
+        for (const auto& map : maps)
         {
             shader.setBool(map.useUniform, map.isUsing);
-            if (map.isUsing)
+            if (map.isUsing && map.texture)
             {
                 shader.setInt(map.uniformName, map.slot);
                 TextureCache::Get().GetOrCreate(map.texture).Bind(map.slot);
                 material->GetSampler().Bind(map.slot);
             }
+            else
+            {
+                glBindSampler(map.slot, 0);
+                glBindTextureUnit(map.slot, 0);
+            }
         }
-      
 
-        
+
+
 
         shader.setMat4("model", command.transform->GetWorldMatrix());
         glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(command.transform->GetWorldMatrix())));
         shader.setMat3("normalMatrix", normalMatrix);
-        
+
         command.mesh->VAO.Bind();
         glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
         drawCallCounter++;
@@ -224,15 +229,8 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         }
     }
     //LOG_DEBUG("Draw calls: {}", drawCallCounter);
-    
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, o_ScreenFBO);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, intermediateFBO);
-    glBlitFramebuffer(
-        0, 0, ctx.viewportWidth, ctx.viewportHeight,
-        0, 0, ctx.viewportWidth, ctx.viewportHeight,
-        GL_COLOR_BUFFER_BIT, GL_NEAREST
-    );
-   
+
+
     resourceRegistry.Register("ScreenTexture", { RenderResourceType::Texture,o_IntermediateColorTex });
     resourceRegistry.Register("ScreenBuffer", { RenderResourceType::Framebuffer,o_ScreenFBO });
     resourceRegistry.Register("IntermediateBuffer", { RenderResourceType::Framebuffer,intermediateFBO });

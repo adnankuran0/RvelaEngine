@@ -57,7 +57,7 @@ void Skybox::InitHDR(const Path& hdrFilePath)
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     GLuint hdrTexture = LoadHDRTexture(hdrFilePath);
     m_Path = hdrFilePath;
-    setupSkybox();  
+    setupSkybox();
     SetupQuad();
 
     skyboxTexture = ConvertEquirectangularToCubemap(hdrTexture);
@@ -77,10 +77,9 @@ void Skybox::Render(const glm::mat4& projection, const glm::mat4& view, GLuint s
     Shader& shader = ShaderManager::Get("Skybox");
 
     glBindFramebuffer(GL_FRAMEBUFFER, screenFBO);
-    glClearColor(0.0, 0.0, 0.0, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
     glDisable(GL_CULL_FACE);
 
     shader.use();
@@ -96,9 +95,8 @@ void Skybox::Render(const glm::mat4& projection, const glm::mat4& view, GLuint s
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
 
-    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
     glEnable(GL_CULL_FACE);
-
 }
 
 
@@ -314,7 +312,7 @@ void Skybox::GeneratePrefilterMap()
 {
     glDisable(GL_CULL_FACE);
 
-    prefilterMaxMipLevels = 8; 
+    prefilterMaxMipLevels = 8;
     glGenTextures(1, &prefilterMap);
     glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap);
 
