@@ -71,7 +71,8 @@ void EntityBufferPass::Init(const RenderContext& ctx, RenderFrame& frame)
 
 void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
-    auto& commands = frame.opaqueCommands;
+    auto& opaqueCommands = frame.opaqueCommands;
+    auto& transparentCommands = frame.transparentCommands;
     auto& resourceRegistry = frame.registry;
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer);
@@ -84,7 +85,8 @@ void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     glDepthMask(GL_TRUE);
-
+    glDisable(GL_BLEND);
+   
     Shader& shader = ShaderManager::Get("EntityBuffer");
     shader.use();
 
@@ -94,27 +96,32 @@ void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     shader.setMat4("view", view);
     shader.setMat4("projection", projection);
 
-    for (auto& command : commands)
-    {
-        if (!ctx.camera->Intersects(command.mesh->worldAABB)) continue;
+    auto RenderCommandList = [&](const auto& commands)
+        {
+            for (const auto& command : commands)
+            {
+                if (!ctx.camera->Intersects(command.mesh->worldAABB)) continue;
 
-        glm::mat4 model = command.transform->GetWorldMatrix();
-        shader.setMat4("model", model);
+                if (command.mesh->IsDoubleSided())
+                    glDisable(GL_CULL_FACE);
+                else
+                    glEnable(GL_CULL_FACE);
 
-      
-        shader.setUInt("u_EntityID", static_cast<uint32_t>(command.entityID));
+                glm::mat4 model = command.transform->GetWorldMatrix();
+                shader.setMat4("model", model);
+                shader.setUInt("u_EntityID", static_cast<uint32_t>(command.entityID));
 
-        command.mesh->VAO.Bind();
-        glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+                command.mesh->VAO.Bind();
+                glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+            }
+        };
 
-    }
+    RenderCommandList(opaqueCommands);
+    RenderCommandList(transparentCommands);
 
-
-    glDepthMask(GL_TRUE);
+    glEnable(GL_CULL_FACE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    resourceRegistry.Register("EntityBuffer", { RenderResourceType::Framebuffer,m_Framebuffer });
-    frame.registry.Register("EntityTexture", { RenderResourceType::Framebuffer,o_EntityTexture });
-
+    resourceRegistry.Register("EntityBuffer", { RenderResourceType::Framebuffer, m_Framebuffer });
+    frame.registry.Register("EntityTexture", { RenderResourceType::Texture, o_EntityTexture });
 }
-

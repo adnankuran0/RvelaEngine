@@ -38,7 +38,8 @@ void SelectedEntityMaskPass::Execute(const RenderContext& ctx, RenderFrame& fram
     if (m_SelectedEntity == entt::null || ctx.scene->GetState() != SceneState::EDIT)
         return;
 
-    auto& commands = frame.opaqueCommands;
+    auto& opaqueCommands = frame.opaqueCommands;
+    auto& transparentCommands = frame.transparentCommands;
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer);
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
@@ -59,22 +60,32 @@ void SelectedEntityMaskPass::Execute(const RenderContext& ctx, RenderFrame& fram
 
     shader.setVec4("u_Color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
-    for (auto& command : commands) {
-        if (command.entityID != m_SelectedEntity)
-            continue;
+    auto RenderMaskList = [&](const auto& commands) {
+        for (auto& command : commands) {
+            if (command.entityID != m_SelectedEntity)
+                continue;
 
-        glm::mat4 model = command.transform->GetWorldMatrix();
-        shader.setMat4("model", model);
+            if (command.mesh->IsDoubleSided())
+                glDisable(GL_CULL_FACE);
+            else
+                glEnable(GL_CULL_FACE);
 
-        command.mesh->VAO.Bind();
-        glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
-    }
+            glm::mat4 model = command.transform->GetWorldMatrix();
+            shader.setMat4("model", model);
 
+            command.mesh->VAO.Bind();
+            glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+        }
+        };
+
+    RenderMaskList(opaqueCommands);
+    RenderMaskList(transparentCommands);
+
+    glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     frame.registry.Register("SelectedEntityMask", { RenderResourceType::Texture, o_MaskTexture });
     frame.registry.Register("SelectedEntityMaskFBO", { RenderResourceType::Framebuffer, m_Framebuffer });
-
 }
