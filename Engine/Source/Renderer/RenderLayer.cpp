@@ -64,17 +64,14 @@ void RenderLayer::CollectRenderCommands(Scene* scene)
 		{
 			m_RenderPipeline->m_RenderFrame.opaqueCommands.push_back(cmd);
 		}
-
-		std::sort(
-			m_RenderPipeline->m_RenderFrame.transparentCommands.begin(),
-			m_RenderPipeline->m_RenderFrame.transparentCommands.end(),
-			[](const RenderCommand& a, const RenderCommand& b) {
-				return a.distanceToCamera > b.distanceToCamera;
-			}
-		);
-		
 	}
-
+	std::sort(
+		m_RenderPipeline->m_RenderFrame.transparentCommands.begin(),
+		m_RenderPipeline->m_RenderFrame.transparentCommands.end(),
+		[](const RenderCommand& a, const RenderCommand& b) {
+			return a.distanceToCamera > b.distanceToCamera;
+		}
+	);
 
 }
 

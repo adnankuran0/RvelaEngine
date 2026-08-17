@@ -1,77 +1,6 @@
 {
     "Entities": [
         {
-            "Material": {
-                "material": "6be6f57a-4297-4fa7-98ba-bff72aa03d6b",
-                "overrides": {
-                    "albedoColor": [
-                        0.0,
-                        0.0,
-                        1.0,
-                        0.6039215922355652
-                    ],
-                    "transparencyMode": 1
-                }
-            },
-            "Mesh": {
-                "mesh": "b6c7f2a2-cce2-4b68-be50-19a8f552e727"
-            },
-            "ParentUUID": 0,
-            "RigidbodyComponent": {
-                "allowSleep": 1,
-                "angularDamping": 0.05000000074505806,
-                "autoCalculateMass": 1,
-                "bodyType": 0,
-                "collisionLayer": 1,
-                "collisionMask": 4294967295,
-                "friction": 0.5,
-                "gravityFactor": 1.0,
-                "isSensor": false,
-                "linearDamping": 0.05000000074505806,
-                "lockRotationX": false,
-                "lockRotationY": false,
-                "lockRotationZ": false,
-                "lockTranslationX": false,
-                "lockTranslationY": false,
-                "lockTranslationZ": false,
-                "mass": 1.0,
-                "maxAngularVelocity": 50.0,
-                "maxLinearVelocity": 500.0,
-                "restitution": 0.0,
-                "useCCD": false
-            },
-            "SphereColliderComponent": {
-                "offset": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "radius": 0.5
-            },
-            "Tag": {
-                "tag": "Sphere"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    -4.284452438354492,
-                    2.0,
-                    -0.5198907852172852
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scale": [
-                    0.800000011920929,
-                    0.800000011920929,
-                    0.800000011920929
-                ]
-            },
-            "UUID": 44
-        },
-        {
             "AudioEmitterComponent": {
                 "attenuationModel": 1,
                 "audioClip": "4a0aefc7-3097-4826-b01e-d603ca9a4b19",
@@ -761,10 +690,15 @@
         },
         {
             "Material": {
-                "material": "9605ea99-bd53-44b8-a5b3-7c392949d227",
+                "material": "6be6f57a-4297-4fa7-98ba-bff72aa03d6b",
                 "overrides": {
-                    "metallic": 1.0,
-                    "roughness": 0.0
+                    "albedoColor": [
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.6039215922355652
+                    ],
+                    "transparencyMode": 1
                 }
             },
             "Mesh": {
@@ -808,9 +742,9 @@
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
-                    8.0,
-                    0.5381255149841309,
-                    0.0
+                    -4.284452438354492,
+                    2.0,
+                    -0.5198907852172852
                 ],
                 "rotation": [
                     0.0,
@@ -818,12 +752,12 @@
                     0.0
                 ],
                 "scale": [
-                    1.5,
-                    1.5,
-                    1.5
+                    0.800000011920929,
+                    0.800000011920929,
+                    0.800000011920929
                 ]
             },
-            "UUID": 42
+            "UUID": 44
         }
     ],
     "Environment": {
