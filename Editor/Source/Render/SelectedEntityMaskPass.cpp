@@ -5,6 +5,7 @@
 #include "Renderer/RenderFrame.h"
 #include "Renderer/Camera.h"
 #include "Scene/Scene.h"
+#include "Renderer/TextureCache.h"
 
 using namespace rv;
 
@@ -74,13 +75,34 @@ void SelectedEntityMaskPass::Execute(const RenderContext& ctx, RenderFrame& fram
             if (command.entityID != m_SelectedEntity)
                 continue;
 
-            ApplyCullMode(command.material->GetCullMode());
+            auto& material = command.material;
+            ApplyCullMode(material->GetCullMode());
 
             glm::mat4 model = command.transform->GetWorldMatrix();
             shader.setMat4("model", model);
 
+            shader.setInt("transparencyMode", static_cast<int>(material->GetTransparencyMode()));
+            shader.setFloat("alphaCutoff", material->GetAlphaCutoff());
+            shader.setVec4("albedoColor", material->GetAlbedoColor());
+            shader.setVec2("UVScale", material->GetUVScale());
+            shader.setVec2("UVOffset", material->GetUVOffset());
+
+            bool useAlb = material->IsUsingAlbedoMap() && material->GetAlbedoTexture();
+            shader.setBool("useAlbedoMap", useAlb);
+            if (useAlb) {
+                shader.setInt("albedoMap", 0);
+                TextureCache::Get().GetOrCreate(material->GetAlbedoTexture()).Bind(0);
+                material->GetSampler().Bind(0);
+            }
+            else {
+                glBindSampler(0, 0);
+                glBindTextureUnit(0, 0);
+            }
+
             command.mesh->VAO.Bind();
             glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+
+            if (useAlb) glBindSampler(0, 0);
         }
         };
 

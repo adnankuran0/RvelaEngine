@@ -1,6 +1,77 @@
 {
     "Entities": [
         {
+            "Material": {
+                "material": "6be6f57a-4297-4fa7-98ba-bff72aa03d6b",
+                "overrides": {
+                    "albedoColor": [
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.6039215922355652
+                    ],
+                    "transparencyMode": 1
+                }
+            },
+            "Mesh": {
+                "mesh": "b6c7f2a2-cce2-4b68-be50-19a8f552e727"
+            },
+            "ParentUUID": 0,
+            "RigidbodyComponent": {
+                "allowSleep": 1,
+                "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
+                "bodyType": 0,
+                "collisionLayer": 1,
+                "collisionMask": 4294967295,
+                "friction": 0.5,
+                "gravityFactor": 1.0,
+                "isSensor": false,
+                "linearDamping": 0.05000000074505806,
+                "lockRotationX": false,
+                "lockRotationY": false,
+                "lockRotationZ": false,
+                "lockTranslationX": false,
+                "lockTranslationY": false,
+                "lockTranslationZ": false,
+                "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
+                "restitution": 0.0,
+                "useCCD": false
+            },
+            "SphereColliderComponent": {
+                "offset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "radius": 0.5
+            },
+            "Tag": {
+                "tag": "Sphere"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    -4.284452438354492,
+                    2.0,
+                    -0.5198907852172852
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    0.800000011920929,
+                    0.800000011920929,
+                    0.800000011920929
+                ]
+            },
+            "UUID": 44
+        },
+        {
             "AudioEmitterComponent": {
                 "attenuationModel": 1,
                 "audioClip": "4a0aefc7-3097-4826-b01e-d603ca9a4b19",
@@ -150,7 +221,8 @@
                     1.0,
                     1.0
                 ],
-                "intensity": 5.0
+                "intensity": 5.0,
+                "reverseCullFace": false
             },
             "ParentUUID": 0,
             "Tag": {
@@ -615,8 +687,8 @@
                 "overrides": {
                     "albedoColor": [
                         1.0,
-                        1.0,
-                        1.0,
+                        0.0,
+                        0.0,
                         0.3333333432674408
                     ],
                     "alphaCutoff": 0.4740000069141388,
@@ -644,12 +716,114 @@
                     0.0
                 ],
                 "scale": [
-                    0.48000001907348633,
-                    0.48000001907348633,
-                    0.48000001907348633
+                    0.6960000395774841,
+                    0.6960000395774841,
+                    0.6960000395774841
                 ]
             },
             "UUID": 14
+        },
+        {
+            "Material": {
+                "material": "4edc5c72-bb2a-4b70-becd-d4fc337dfdf0",
+                "overrides": {
+                    "albedoTex": "843640e9-bdbf-4d7e-b444-ddcd5e2d800d",
+                    "cullMode": 2,
+                    "transparencyMode": 2
+                }
+            },
+            "Mesh": {
+                "mesh": "077f6760-e8d5-44b4-895c-5d88be2db952"
+            },
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": "Plane"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    1.1519979238510132,
+                    2.9132637977600098
+                ],
+                "rotation": [
+                    89.87882232666016,
+                    89.98021697998047,
+                    -0.12859873473644257
+                ],
+                "scale": [
+                    0.6599999666213989,
+                    0.6599999666213989,
+                    0.6599998474121094
+                ]
+            },
+            "UUID": 14
+        },
+        {
+            "Material": {
+                "material": "9605ea99-bd53-44b8-a5b3-7c392949d227",
+                "overrides": {
+                    "metallic": 1.0,
+                    "roughness": 0.0
+                }
+            },
+            "Mesh": {
+                "mesh": "b6c7f2a2-cce2-4b68-be50-19a8f552e727"
+            },
+            "ParentUUID": 0,
+            "RigidbodyComponent": {
+                "allowSleep": 1,
+                "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
+                "bodyType": 0,
+                "collisionLayer": 1,
+                "collisionMask": 4294967295,
+                "friction": 0.5,
+                "gravityFactor": 1.0,
+                "isSensor": false,
+                "linearDamping": 0.05000000074505806,
+                "lockRotationX": false,
+                "lockRotationY": false,
+                "lockRotationZ": false,
+                "lockTranslationX": false,
+                "lockTranslationY": false,
+                "lockTranslationZ": false,
+                "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
+                "restitution": 0.0,
+                "useCCD": false
+            },
+            "SphereColliderComponent": {
+                "offset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "radius": 0.5
+            },
+            "Tag": {
+                "tag": "Sphere"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    8.0,
+                    0.5381255149841309,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.5,
+                    1.5,
+                    1.5
+                ]
+            },
+            "UUID": 42
         }
     ],
     "Environment": {

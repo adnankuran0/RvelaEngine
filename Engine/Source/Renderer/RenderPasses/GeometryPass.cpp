@@ -2,7 +2,7 @@
 #include "GeometryPass.h"
 #include "Renderer/Camera.h"
 #include "Renderer/RenderContext.h"
-#include <Renderer/RenderFrame.h>
+#include "Renderer/RenderFrame.h"
 #include "Renderer/ShaderManager.h"
 #include "Renderer/TextureCache.h"
 
@@ -113,39 +113,63 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         geometryShader.setVec2("UVScale", material->GetUVScale());
         geometryShader.setVec2("UVOffset", material->GetUVOffset());
 
-        if (material->IsUsingRoughnessMap())
+        geometryShader.setInt("transparencyMode", static_cast<int>(material->GetTransparencyMode()));
+        geometryShader.setFloat("alphaCutoff", material->GetAlphaCutoff());
+        geometryShader.setVec4("albedoColor", material->GetAlbedoColor());
+
+        // Alpha scissor
+        bool useAlb = material->IsUsingAlbedoMap() && material->GetAlbedoTexture();
+        geometryShader.setBool("useAlbedoMap", useAlb);
+        if (useAlb)
         {
-            Ref<TextureAsset> roughnessTexture = material->GetRoughnessTexture();
-            geometryShader.setBool("useRoughnessMap", true);
-            geometryShader.setInt("roughnessMap", 0);
-            TextureCache::Get().GetOrCreate(roughnessTexture).Bind(0);
+            geometryShader.setInt("albedoMap", 0);
+            TextureCache::Get().GetOrCreate(material->GetAlbedoTexture()).Bind(0);
             material->GetSampler().Bind(0);
+        }
+        else
+        {
+            glBindSampler(0, 0);
+            glBindTextureUnit(0, 0);
+        }
+
+        // Roughness (Slot 1)
+        if (material->IsUsingRoughnessMap() && material->GetRoughnessTexture())
+        {
+            geometryShader.setBool("useRoughnessMap", true);
+            geometryShader.setInt("roughnessMap", 1);
+            TextureCache::Get().GetOrCreate(material->GetRoughnessTexture()).Bind(1);
+            material->GetSampler().Bind(1);
         }
         else
         {
             geometryShader.setBool("useRoughnessMap", false);
             geometryShader.setFloat("roughness", material->GetRoughness());
+            glBindSampler(1, 0);
+            glBindTextureUnit(1, 0);
         }
 
-        if (material->IsUsingMetallicMap())
+        // Metallic (Slot 2)
+        if (material->IsUsingMetallicMap() && material->GetMetallicTexture())
         {
-            Ref<TextureAsset> metallicTexture = material->GetMetallicTexture();
             geometryShader.setBool("useMetallicMap", true);
-            geometryShader.setInt("metallicMap", 1);
-            TextureCache::Get().GetOrCreate(metallicTexture).Bind(1);
-            material->GetSampler().Bind(1);
+            geometryShader.setInt("metallicMap", 2);
+            TextureCache::Get().GetOrCreate(material->GetMetallicTexture()).Bind(2);
+            material->GetSampler().Bind(2);
         }
         else
         {
             geometryShader.setBool("useMetallicMap", false);
             geometryShader.setFloat("metallic", material->GetMetallic());
+            glBindSampler(2, 0);
+            glBindTextureUnit(2, 0);
         }
 
         command.mesh->VAO.Bind();
         glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
 
-        material->GetSampler().Unbind(0);
-        material->GetSampler().Unbind(1);
+        glBindSampler(0, 0);
+        glBindSampler(1, 0);
+        glBindSampler(2, 0);
     }
 
     glEnable(GL_CULL_FACE);

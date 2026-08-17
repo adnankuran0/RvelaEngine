@@ -1,8 +1,9 @@
 ﻿#include "rvelapch.h"
 #include "ShadowPass.h"
 #include "Renderer/RenderContext.h"
-#include <Renderer/RenderFrame.h>
+#include "Renderer/RenderFrame.h"
 #include "Renderer/ShaderManager.h"
+#include "Renderer/TextureCache.h"
 
 using namespace rv;
 
@@ -113,7 +114,8 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
             if (!ctx.camera->Intersects(ctx.directionalLight->lightSpace, command.mesh->worldAABB)) continue;
             if (!command.mesh->IsCastShadow()) continue;
 
-            CullMode mode = command.material->GetCullMode();
+            auto& material = command.material;
+            CullMode mode = material->GetCullMode();
             if (mode == CullMode::Disabled) {
                 glDisable(GL_CULL_FACE);
             }
@@ -125,9 +127,29 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
                     glCullFace(mode == CullMode::Back ? GL_BACK : GL_FRONT);
             }
 
+            shadowShader.setInt("transparencyMode", static_cast<int>(material->GetTransparencyMode()));
+            shadowShader.setFloat("alphaCutoff", material->GetAlphaCutoff());
+            shadowShader.setVec4("albedoColor", material->GetAlbedoColor());
+            shadowShader.setVec2("UVScale", material->GetUVScale());
+            shadowShader.setVec2("UVOffset", material->GetUVOffset());
+
+            bool useAlb = material->IsUsingAlbedoMap() && material->GetAlbedoTexture();
+            shadowShader.setBool("useAlbedoMap", useAlb);
+            if (useAlb) {
+                shadowShader.setInt("albedoMap", 0);
+                TextureCache::Get().GetOrCreate(material->GetAlbedoTexture()).Bind(0);
+                material->GetSampler().Bind(0);
+            }
+            else {
+                glBindSampler(0, 0);
+                glBindTextureUnit(0, 0);
+            }
+
             shadowShader.setMat4("model", command.transform->GetWorldMatrix());
             command.mesh->VAO.Bind();
             glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+
+            if (useAlb) glBindSampler(0, 0);
         }
 
         glEnable(GL_CULL_FACE);
@@ -172,13 +194,32 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
         {
             if (!command.mesh->IsCastShadow()) continue;
 
-            CullMode mode = command.material->GetCullMode();
+            auto& material = command.material;
+            CullMode mode = material->GetCullMode();
             if (mode == CullMode::Disabled) {
                 glDisable(GL_CULL_FACE);
             }
             else {
                 glEnable(GL_CULL_FACE);
                 glCullFace(mode == CullMode::Back ? GL_BACK : GL_FRONT);
+            }
+
+            pointShadowShader.setInt("transparencyMode", static_cast<int>(material->GetTransparencyMode()));
+            pointShadowShader.setFloat("alphaCutoff", material->GetAlphaCutoff());
+            pointShadowShader.setVec4("albedoColor", material->GetAlbedoColor());
+            pointShadowShader.setVec2("UVScale", material->GetUVScale());
+            pointShadowShader.setVec2("UVOffset", material->GetUVOffset());
+
+            bool useAlb = material->IsUsingAlbedoMap() && material->GetAlbedoTexture();
+            pointShadowShader.setBool("useAlbedoMap", useAlb);
+            if (useAlb) {
+                pointShadowShader.setInt("albedoMap", 0);
+                TextureCache::Get().GetOrCreate(material->GetAlbedoTexture()).Bind(0);
+                material->GetSampler().Bind(0);
+            }
+            else {
+                glBindSampler(0, 0);
+                glBindTextureUnit(0, 0);
             }
 
             pointShadowShader.setMat4("model", command.transform->GetWorldMatrix());
@@ -198,6 +239,8 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
                     0
                 );
             }
+
+            if (useAlb) glBindSampler(0, 0);
         }
     }
 

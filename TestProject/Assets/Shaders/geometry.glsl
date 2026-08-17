@@ -36,15 +36,30 @@ layout(location = 0) out vec3 gNormal;
 layout(location = 1) out float gRoughness;
 layout(location = 2) out float gMetallic;
 
+layout(binding = 0) uniform sampler2D albedoMap;
+layout(binding = 1) uniform sampler2D roughnessMap;
+layout(binding = 2) uniform sampler2D metallicMap;
+
+uniform bool useAlbedoMap;
 uniform bool useRoughnessMap;
 uniform bool useMetallicMap;
-uniform sampler2D roughnessMap;
-uniform sampler2D metallicMap;
+
+uniform vec4 albedoColor;
 uniform float roughness;
 uniform float metallic;
 
+uniform int transparencyMode;
+uniform float alphaCutoff;
+
 void main()
 {
+    if (transparencyMode == 2) // alpha scissor
+    {
+        float alpha = (useAlbedoMap ? texture(albedoMap, TexCoords).a : 1.0) * albedoColor.a;
+        if (alpha < alphaCutoff)
+            discard;
+    }
+
     gNormal = normalize(Normal);
     gRoughness = useRoughnessMap ? texture(roughnessMap, TexCoords).r : roughness;
     gMetallic = useMetallicMap ? texture(metallicMap, TexCoords).r : metallic;
