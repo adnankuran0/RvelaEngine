@@ -75,20 +75,20 @@ std::string Path::GetExtension() const
 
 Path Path::GetParentPath() const
 {
-	return Path(m_VirtualPath.parent_path(), true);
+	return Path(m_VirtualPath.parent_path().lexically_normal(), true);
 }
 
 Path Path::operator/(const std::string& subPath) const
 {
-	return Path(m_VirtualPath / subPath, true);
+	return Path((m_VirtualPath / std::filesystem::path(subPath)).lexically_normal(), true);
 }
 
 Path Path::operator/(const Path& other) const
 {
-	return Path(m_VirtualPath / other.m_VirtualPath, true);
+	return Path((m_VirtualPath / other.m_VirtualPath).lexically_normal(), true);
 }
 
 Path Path::operator/(const std::filesystem::path& subPath) const
 {
-	return Path(m_VirtualPath / subPath, true);
+	return Path((m_VirtualPath / subPath).lexically_normal(), true);
 }

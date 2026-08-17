@@ -5,6 +5,8 @@ layout(location = 1) in vec3 aNormal;
 layout(location = 2) in vec3 aTangent;
 layout(location = 3) in vec2 aTexCoords;
 
+#include "Common/Billboard.glsl"
+
 out vec3 FragPos;
 out vec3 Normal;
 out vec2 TexCoords;
@@ -40,53 +42,11 @@ void main()
     }
     else
     {
-        vec3 scale = vec3(
-            length(vec3(model[0][0], model[0][1], model[0][2])),
-            length(vec3(model[1][0], model[1][1], model[1][2])),
-            length(vec3(model[2][0], model[2][1], model[2][2]))
-        );
-
-        vec3 objectCenter = model[3].xyz;
-
-        if (billboardMode == 1) 
-        {
-            vec3 camRight = vec3(view[0][0], view[1][0], view[2][0]);
-            vec3 camUp    = vec3(view[0][1], view[1][1], view[2][1]);
-            vec3 camDir   = vec3(view[0][2], view[1][2], view[2][2]);
-
-            vec3 worldVertexPos = objectCenter 
-                + (camRight * (aPos.x * scale.x)) 
-                + (camUp    * (aPos.y * scale.y))
-                + (camDir   * (aPos.z * scale.z));
-
-            worldPos = vec4(worldVertexPos, 1.0);
-
-            N = camDir;
-            T = camRight;
-            B = camUp;
-        }
-        else // y billboard
-        {
-            vec3 toCam = camPos - objectCenter;
-            toCam.y = 0.0;
-
-            float len = length(toCam);
-            vec3 forward = len > 0.0001 ? toCam / len : vec3(0.0, 0.0, 1.0);
-
-            vec3 worldUp = vec3(0.0, 1.0, 0.0);
-            vec3 right = normalize(cross(worldUp, forward));
-
-            vec3 worldVertexPos = objectCenter 
-                + (right   * (aPos.x * scale.x)) 
-                + (worldUp * (aPos.y * scale.y))
-                + (forward * (aPos.z * scale.z));
-
-            worldPos = vec4(worldVertexPos, 1.0);
-
-            N = forward;
-            T = right;
-            B = worldUp;
-        }
+        BillboardTransform bb = CalculateBillboard(billboardMode, model, view, aPos, camPos);
+        worldPos = bb.worldPos;
+        N = bb.normal;
+        T = bb.tangent;
+        B = bb.bitangent;
     }
 
     FragPos = worldPos.xyz;
@@ -110,7 +70,10 @@ in vec4 FragPosLightSpace;
 in vec3 Tangent;
 in vec3 Bitangent;
 
-// Material parameters
+#include "Common/Constants.glsl"
+#include "Common/PBR.glsl"
+#include "Common/Shadows.glsl"
+
 layout(binding = 0) uniform sampler2D albedoMap;
 layout(binding = 1) uniform sampler2D normalMap;
 layout(binding = 2) uniform sampler2D metallicMap;
@@ -135,23 +98,19 @@ uniform float heightScale;
 uniform float normalScale;
 uniform float specularIntensity;
 
-// Transparency Settings
 uniform int transparencyMode;
 uniform float alphaCutoff;
 
 uniform vec3 ambientColor;
 uniform float ambientIntensity;
 
-// Shading
-uniform int shadingMode; // 0 = Lit, 1 = Unshaded
+uniform int shadingMode;
 uniform bool receiveShadows;
 
-// Shadows
 layout(binding = 6) uniform sampler2D shadowMap;
 layout(binding = 7) uniform samplerCubeArray pointShadowMap;
 uniform mat4 lightSpaceMatrix;
 
-// IBL
 layout(binding = 8) uniform samplerCube irradianceMap;
 layout(binding = 9) uniform samplerCube prefilterMap;
 layout(binding = 10) uniform sampler2D brdfLUT;
@@ -159,7 +118,6 @@ layout(binding = 10) uniform sampler2D brdfLUT;
 uniform bool useIBL;
 uniform float iblIntensity;
 
-// Lights
 #define MAX_POINT_LIGHTS 20
 #define MAX_DIRECTIONAL_LIGHTS 1
 
@@ -188,22 +146,7 @@ struct DirectionalLight {
 uniform DirectionalLight directionalLight;
 uniform bool hasDirectionalLight;
 
-// Camera
 uniform vec3 camPos;
-
-const float PI = 3.14159265359;
-const vec2 poissonDisk[16] = vec2[](
-    vec2(-0.94201624, -0.39906216), vec2(0.94558609, -0.76890725),
-    vec2(-0.094184101, -0.92938870), vec2(0.34495938, 0.29387760),
-    vec2(-0.91588581, 0.45771432), vec2(-0.81544232, -0.87912464),
-    vec2(-0.38277543, 0.27676845), vec2(0.97484398, 0.75648379),
-    vec2(0.44323325, -0.97511554), vec2(0.53742981, -0.47373420),
-    vec2(-0.26496911, -0.41893023), vec2(0.79197514, 0.19090188),
-    vec2(-0.24188840, 0.99706507), vec2(-0.81409955, 0.91437590),
-    vec2(0.19984126, 0.78641367), vec2(0.14383161, -0.14100790)
-);
-
-
 
 vec2 parallaxOcclusionMapping(vec2 texCoords, vec3 viewDirTS)
 {
@@ -263,100 +206,10 @@ vec3 getNormalFromMap(vec2 texCoords)
     return result / rLen;
 }
 
-// PBR functions
-float DistributionGGX(vec3 N, vec3 H, float roughness) {
-    float a = max(roughness, 0.04);
-    float a2 = a * a;
-    float NdotH = max(dot(N, H), 0.0);
-    float NdotH2 = NdotH * NdotH;
-    float denom = NdotH2 * (a2 - 1.0) + 1.0;
-    denom = PI * denom * denom;
-    return a2 / max(denom, 0.0001);
-}
-
-float GeometrySchlickGGX(float NdotV, float roughness) {
-    float r = roughness + 1.0;
-    float k = (r * r) / 8.0;
-    return NdotV / (NdotV * (1.0 - k) + k);
-}
-
-float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
-    float NdotV = max(dot(N, V), 0.0);
-    float NdotL = max(dot(N, L), 0.0);
-    return GeometrySchlickGGX(NdotV, roughness) * GeometrySchlickGGX(NdotL, roughness);
-}
-
-vec3 fresnelSchlick(float cosTheta, vec3 F0) {
-    cosTheta = clamp(cosTheta, 0.0, 1.0);
-    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
-}
-
-vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
-    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
-}
-
-// Shadow calculations
-float calculateDirectionalShadow(vec4 fragPosLightSpace, vec3 normal, vec3 lightDir, float shadowBias, float blurRadius) {
-    
-    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
-    projCoords = projCoords * 0.5 + 0.5;
-
-    if (projCoords.z > 1.0 || any(lessThan(projCoords.xy, vec2(0.0))) || any(greaterThan(projCoords.xy, vec2(1.0))))
-        return 0.0;
-
-    float bias = min(shadowBias * (1.0 - dot(normal, lightDir)), shadowBias);
-    float currentDepth = projCoords.z - bias;
-
-    if (blurRadius <= 0.0) {
-        return step(texture(shadowMap, projCoords.xy).r, currentDepth);
-    }
-
-    vec2 texelSize = blurRadius / textureSize(shadowMap, 0);
-    float shadow = 0.0;
-    const int samples = 2;
-    const int range = samples * 2 + 1;
-    const float weight = 1.0 / float(range * range);
-    
-    for (int x = -samples; x <= samples; ++x) {
-        for (int y = -samples; y <= samples; ++y) {
-            float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
-            shadow += step(pcfDepth, currentDepth) * weight;
-        }
-    }
-    return shadow;
-}
-
-float calculatePointLightShadow(int index, vec3 fragPos, vec3 lightPos, float farPlane, vec3 normal, float shadowBias, float blurRadius) {
-    vec3 fragToLight = fragPos - lightPos;
-    float currentDepth = length(fragToLight);
-
-    if (currentDepth > farPlane) return 0.0;
-
-    float bias = max(shadowBias * (1.0 - dot(normal, normalize(fragToLight))), shadowBias);
-    currentDepth -= bias;
-
-    if (blurRadius <= 0.0) {
-        float closestDepth = texture(pointShadowMap, vec4(fragToLight, index)).r * farPlane;
-        return step(closestDepth, currentDepth);
-    }
-
-    float diskRadius = blurRadius * (1.0 + (currentDepth / farPlane));
-    float shadow = 0.0;
-    const int samples = 8;
-    
-    for (int i = 0; i < samples; ++i) {
-        vec3 sampleDir = fragToLight + vec3(poissonDisk[i] * diskRadius, 0.0);
-        float closestDepth = texture(pointShadowMap, vec4(sampleDir, index)).r * farPlane;
-        shadow += step(closestDepth, currentDepth);
-    }
-    return shadow / float(samples);
-}
-
 void main()
 {
     vec3 viewDir = normalize(camPos - FragPos);
 
-    // Tangent space viewDir
     vec3 T = normalize(Tangent);
     vec3 B = normalize(Bitangent);
     vec3 N = normalize(Normal);
@@ -365,18 +218,16 @@ void main()
 
     vec2 mappedTexCoords = parallaxOcclusionMapping(TexCoords, viewDirTS);
 
-    // Albedo & Alpha Calculation
     vec4 albedoTex = useAlbedoMap ? texture(albedoMap, mappedTexCoords) : vec4(1.0);
     vec4 fullAlbedo = albedoTex * albedoColor;
     vec3 albedo = fullAlbedo.rgb;
     float alpha = fullAlbedo.a;
 
-    // Transparency Check
-    if (transparencyMode == 0) // Opaque
+    if (transparencyMode == 0)
     {
         alpha = 1.0;
     }
-    else if (transparencyMode == 2) // AlphaScissor
+    else if (transparencyMode == 2)
     {
         if (alpha < alphaCutoff)
         {
@@ -392,25 +243,21 @@ void main()
         return; 
     }
 
-    // Material properties
     float metallic = useMetallicMap ? texture(metallicMap, mappedTexCoords).r : metallicValue;
     float roughnessMapValue = useRoughnessMap ? texture(roughnessMap, mappedTexCoords).r : 1.0;
     float roughness = clamp(roughnessValue * roughnessMapValue, 0.0, 1.0);
     float ao = useAOMap ? texture(aoMap, mappedTexCoords).r : aoValue;
 
-    // View direction and normal
     vec3 V = normalize(camPos - FragPos);
     vec3 Nmap = getNormalFromMap(mappedTexCoords);
     vec3 F0 = mix(vec3(0.04), albedo, metallic);
 
     vec3 Lo = vec3(0.0);
 
-    // Directional light
     if(hasDirectionalLight) {
         vec3 L = normalize(-directionalLight.direction);
         vec3 H = normalize(V + L);
         
-        // Cook-Torrance BRDF
         float NDF = DistributionGGX(Nmap, H, roughness);
         float G = GeometrySmith(Nmap, V, L, roughness);
         vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
@@ -424,13 +271,12 @@ void main()
         specular *= specularIntensity;
         float NdotL = max(dot(Nmap, L), 0.0);
         float shadow = (directionalLight.castShadows && receiveShadows) ?   
-            calculateDirectionalShadow(FragPosLightSpace, Nmap, L, directionalLight.shadowBias, directionalLight.blurRadius) : 0.0;
+            calculateDirectionalShadow(shadowMap, FragPosLightSpace, Nmap, L, directionalLight.shadowBias, directionalLight.blurRadius) : 0.0;
 
         Lo += (1.0 - shadow) * (kD * albedo / PI + specular) * 
               directionalLight.color * directionalLight.intensity * NdotL;
     }
 
-    // Point lights
     for(int i = 0; i < pointLightCount; ++i) 
     {
         PointLight light = pointLights[i];
@@ -444,11 +290,9 @@ void main()
         vec3 L = L_vec / distance;
         vec3 H = normalize(V + L);
         
-        // Attenuation 
         float num = clamp(1.0 - (dist2 / radius2) * (dist2 / radius2), 0.0, 1.0);
         float attenuation = (num * num) / (dist2 + 1.0);
         
-        // Cook-Torrance BRDF
         float NDF = DistributionGGX(Nmap, H, roughness);
         float G = GeometrySmith(Nmap, V, L, roughness);
         vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
@@ -463,7 +307,7 @@ void main()
         specular *= specularIntensity;
         float NdotL = max(dot(Nmap, L), 0.0);
         float shadow = (light.castShadows && receiveShadows) ? 
-            calculatePointLightShadow(light.shadowIndex, FragPos, light.position, light.radius, Nmap, light.shadowBias, light.blurRadius) : 0.0;
+            calculatePointLightShadow(pointShadowMap, light.shadowIndex, FragPos, light.position, light.radius, Nmap, light.shadowBias, light.blurRadius) : 0.0;
 
         vec3 radiance = light.color * light.intensity * attenuation;
         Lo += (1.0 - shadow) * (kD * albedo / PI + specular) * radiance * NdotL;

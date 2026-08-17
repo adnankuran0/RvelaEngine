@@ -3,6 +3,8 @@
 layout(location = 0) in vec3 aPos;
 layout(location = 3) in vec2 aTexCoords;
 
+#include "Common/Billboard.glsl"
+
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
@@ -18,55 +20,8 @@ void main()
 {
     TexCoords = aTexCoords * UVScale + UVOffset;
 
-    vec4 worldPos;
-
-    if (billboardMode == 0)
-    {
-        worldPos = model * vec4(aPos, 1.0);
-    }
-    else
-    {
-        vec3 scale = vec3(
-            length(vec3(model[0][0], model[0][1], model[0][2])),
-            length(vec3(model[1][0], model[1][1], model[1][2])),
-            length(vec3(model[2][0], model[2][1], model[2][2]))
-        );
-
-        vec3 objectCenter = model[3].xyz;
-
-        if (billboardMode == 1) // Spherical
-        {
-            vec3 camRight = vec3(view[0][0], view[1][0], view[2][0]);
-            vec3 camUp    = vec3(view[0][1], view[1][1], view[2][1]);
-            vec3 camDir   = vec3(view[0][2], view[1][2], view[2][2]);
-
-            vec3 worldVertexPos = objectCenter 
-                + (camRight * (aPos.x * scale.x)) 
-                + (camUp    * (aPos.y * scale.y))
-                + (camDir   * (aPos.z * scale.z));
-
-            worldPos = vec4(worldVertexPos, 1.0);
-        }
-        else // Cylindrical
-        {
-            vec3 toCam = camPos - objectCenter;
-            toCam.y = 0.0;
-            float len = length(toCam);
-            vec3 forward = len > 0.0001 ? toCam / len : vec3(0.0, 0.0, 1.0);
-
-            vec3 worldUp = vec3(0.0, 1.0, 0.0);
-            vec3 right = normalize(cross(worldUp, forward));
-
-            vec3 worldVertexPos = objectCenter 
-                + (right   * (aPos.x * scale.x)) 
-                + (worldUp * (aPos.y * scale.y))
-                + (forward * (aPos.z * scale.z));
-
-            worldPos = vec4(worldVertexPos, 1.0);
-        }
-    }
-
-    gl_Position = projection * view * worldPos;
+    BillboardTransform bb = CalculateBillboard(billboardMode, model, view, aPos, camPos);
+    gl_Position = projection * view * bb.worldPos;
 }
 
 #shader fragment
@@ -84,7 +39,7 @@ uniform float alphaCutoff;
 
 void main()
 {
-    if (transparencyMode == 2) // alpha scissor
+    if (transparencyMode == 2)
     {
         float alpha = (useAlbedoMap ? texture(albedoMap, TexCoords).a : 1.0) * albedoColor.a;
         if (alpha < alphaCutoff)

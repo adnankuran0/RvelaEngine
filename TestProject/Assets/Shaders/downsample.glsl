@@ -5,10 +5,11 @@ layout (location = 1) in vec2 aTexCoords;
 
 out vec2 TexCoords;
 
+#include "Common/FullscreenQuad.glsl"
+
 void main()
 {
-    TexCoords = aTexCoords;
-    gl_Position = vec4(aPos.xy, 0.0, 1.0);
+    OutputFullscreenQuad(aPos, aTexCoords, TexCoords);
 }
 
 #shader fragment
@@ -17,17 +18,13 @@ void main()
 in vec2 TexCoords;
 out vec4 FragColor;
 
+#include "Common/Sampling.glsl"
+
 layout(binding = 0) uniform sampler2D u_Texture;
 uniform vec2 u_TexelSize;
 
 void main()
 {
-    vec2 ts = u_TexelSize;
-
-    vec3 c0 = texture(u_Texture, TexCoords + vec2(-ts.x, -ts.y)).rgb;
-    vec3 c1 = texture(u_Texture, TexCoords + vec2( ts.x, -ts.y)).rgb;
-    vec3 c2 = texture(u_Texture, TexCoords + vec2(-ts.x,  ts.y)).rgb;
-    vec3 c3 = texture(u_Texture, TexCoords + vec2( ts.x,  ts.y)).rgb;
-
-    FragColor = vec4((c0 + c1 + c2 + c3) * 0.25, 1.0);
+    vec3 color = BoxSample4Tap(u_Texture, TexCoords, u_TexelSize);
+    FragColor = vec4(color, 1.0);
 }

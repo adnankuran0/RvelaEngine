@@ -7,7 +7,8 @@ out vec3 localPos;
 uniform mat4 projection;
 uniform mat4 view;
 
-void main() {
+void main() 
+{
     localPos = aPos;
     gl_Position = projection * view * vec4(aPos, 1.0);
 }
@@ -17,11 +18,12 @@ void main() {
 out vec4 FragColor;
 in vec3 localPos;
 
+#include "Common/Constants.glsl"
+
 uniform samplerCube environmentMap;
 
-const float PI = 3.14159265359;
-
-void main() {
+void main() 
+{
     vec3 normal = normalize(localPos);
     vec3 irradiance = vec3(0.0);
     
@@ -32,8 +34,10 @@ void main() {
     float sampleDelta = 0.025;
     int nrSamples = 0;
     
-    for(float phi = 0.0; phi < 2.0 * PI; phi += sampleDelta) {
-        for(float theta = 0.0; theta < 0.5 * PI; theta += sampleDelta) {
+    for(float phi = 0.0; phi < TWO_PI; phi += sampleDelta) 
+    {
+        for(float theta = 0.0; theta < HALF_PI; theta += sampleDelta) 
+        {
             vec3 tangentSample = vec3(
                 sin(theta) * cos(phi),
                 sin(theta) * sin(phi),

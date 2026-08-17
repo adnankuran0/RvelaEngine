@@ -1,5 +1,5 @@
 #shader vertex
-#version 330 core
+#version 460 core
 layout(location = 0) in vec3 aPosition;
 out vec3 TexCoords;
 
@@ -17,12 +17,11 @@ void main()
 #version 460 core
 
 in vec3 TexCoords;
-
 out vec4 FragColor;
 
 uniform samplerCube skybox;
 
 void main()
 {
-    FragColor = vec4(texture(skybox, TexCoords).rgb,1.0);
+    FragColor = vec4(texture(skybox, TexCoords).rgb, 1.0);
 }

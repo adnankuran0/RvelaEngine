@@ -132,33 +132,42 @@ std::string Shader::ProcessIncludes(const std::string& source, const Path& shade
 
     while (std::getline(stream, line))
     {
-        if (line.find("#include") != std::string::npos)
+        if (!line.empty() && line.back() == '\r')
+            line.pop_back();
+
+        size_t includePos = line.find("#include");
+        if (includePos != std::string::npos)
         {
-            size_t start = line.find_first_of("\"<");
+            size_t start = line.find_first_of("\"<", includePos);
             size_t end = line.find_last_of("\">");
             if (start != std::string::npos && end != std::string::npos && end > start)
             {
                 std::string includeFilename = line.substr(start + 1, end - start - 1);
+
                 Path includePath = shaderPath.GetParentPath() / includeFilename;
-                std::string absPathStr = includePath.GetAbsoluteStr();
 
-                if (includedPaths.find(absPathStr) == includedPaths.end())
+                if (!includePath.Exists())
                 {
-                    includedPaths.insert(absPathStr);
+                    includePath = Path::FromVirtual(std::string("Assets/Shaders/") + includeFilename);
+                }
 
-                    std::ifstream includeFile(includePath.GetAbsolute());
+                std::string canonicalPathStr = std::filesystem::weakly_canonical(includePath.GetAbsolute()).string();
+
+                if (includedPaths.find(canonicalPathStr) == includedPaths.end())
+                {
+                    includedPaths.insert(canonicalPathStr);
+
+                    std::ifstream includeFile(canonicalPathStr);
                     if (includeFile.is_open())
                     {
                         std::stringstream incBuffer;
                         incBuffer << includeFile.rdbuf();
 
-                        result << "// [BEGIN INCLUDE: " << includeFilename << "]\n";
                         result << ProcessIncludes(incBuffer.str(), includePath, includedPaths) << "\n";
-                        result << "// [END INCLUDE: " << includeFilename << "]\n";
                     }
                     else
                     {
-                        LOG_ERROR("Can't open shader include file: {}", absPathStr);
+                        LOG_ERROR("Shader Include dosyasi acilamadi: {}", canonicalPathStr);
                     }
                 }
                 continue;
@@ -169,7 +178,6 @@ std::string Shader::ProcessIncludes(const std::string& source, const Path& shade
 
     return result.str();
 }
-
 bool Shader::CompileInternal(const Path& path, GLuint& outProgram)
 {
     std::ifstream shaderFile(path.GetAbsolute());
