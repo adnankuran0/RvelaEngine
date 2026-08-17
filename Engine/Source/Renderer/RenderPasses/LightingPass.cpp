@@ -38,7 +38,7 @@ void LightingPass::Init(const RenderContext& ctx, RenderFrame& frame)
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         LOG_ERROR("MSAA Framebuffer not complete");
 
-    // Intermediate framebuffer (non-MSAA)
+    // Intermediate framebuffer
     glGenFramebuffers(1, &intermediateFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
 
@@ -54,23 +54,19 @@ void LightingPass::Init(const RenderContext& ctx, RenderFrame& frame)
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    frame.registry.Register("ScreenTexture", { RenderResourceType::Texture,o_IntermediateColorTex });
-    frame.registry.Register("ScreenBuffer", { RenderResourceType::Framebuffer,o_ScreenFBO });
-    frame.registry.Register("IntermediateBuffer", { RenderResourceType::Framebuffer,intermediateFBO });
+    frame.registry.Register("ScreenTexture", { RenderResourceType::Texture, o_IntermediateColorTex });
+    frame.registry.Register("ScreenBuffer", { RenderResourceType::Framebuffer, o_ScreenFBO });
+    frame.registry.Register("IntermediateBuffer", { RenderResourceType::Framebuffer, intermediateFBO });
 }
-
 
 LightingPass::~LightingPass()
 {
-    //TODO: Fill this function
 }
 
 void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
     auto& commands = frame.opaqueCommands;
     auto& resourceRegistry = frame.registry;
-
-
 
     auto i_DirectionalShadowMap = resourceRegistry.Get("DirectionalShadowMap")->id;
     auto i_PointShadowMap = resourceRegistry.Get("PointShadowMap")->id;
@@ -101,10 +97,7 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
         shader.setInt("shadowMap", 6);
         glBindTextureUnit(6, i_DirectionalShadowMap);
-
-
     }
-
 
     GLint maxTextureUnits = 0;
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextureUnits);
@@ -136,8 +129,6 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     shader.setMat4("view", ctx.camera->GetViewMatrix());
     shader.setMat4("projection", ctx.camera->GetProjectionMatrix());
 
-
-
     auto& env = *ctx.environment;
     auto& skybox = env.GetSkybox();
 
@@ -156,22 +147,24 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     glBindTextureUnit(9, skybox.GetPrefilterMap());
     glBindTextureUnit(10, skybox.GetBRDFLUTTexture());
 
+    auto ApplyCullMode = [](CullMode mode) {
+        if (mode == CullMode::Disabled) {
+            glDisable(GL_CULL_FACE);
+        }
+        else {
+            glEnable(GL_CULL_FACE);
+            glCullFace(mode == CullMode::Back ? GL_BACK : GL_FRONT);
+        }
+        };
+
     size_t drawCallCounter = 0;
     for (auto& command : commands) {
         if (!ctx.camera->Intersects(command.mesh->worldAABB)) continue;
 
         glDisable(GL_STENCIL_TEST);
 
-        if (!command.mesh->IsDoubleSided())
-        {
-            glEnable(GL_CULL_FACE);
-        }
-        else
-        {
-            glDisable(GL_CULL_FACE);
-        }
-
         auto& material = command.material;
+        ApplyCullMode(material->GetCullMode());
 
         shader.setInt("transparencyMode", static_cast<int>(material->GetTransparencyMode()));
         shader.setFloat("alphaCutoff", material->GetAlphaCutoff());
@@ -188,14 +181,13 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         shader.setFloat("heightScale", material->GetHeightScale());
 
         std::array<MapInfo, 6> maps = { {
-        { material->IsUsingAlbedoMap(),    "albedoMap",    0, "useAlbedoMap",    material->GetAlbedoTexture() },
-        { material->IsUsingNormalMap(),    "normalMap",    1, "useNormalMap",    material->GetNormalTexture() },
-        { material->IsUsingMetallicMap(),  "metallicMap",  2, "useMetallicMap",  material->GetMetallicTexture() },
-        { material->IsUsingRoughnessMap(), "roughnessMap", 3, "useRoughnessMap", material->GetRoughnessTexture() },
-        { material->IsUsingAOMap(),        "aoMap",        4, "useAOMap",        material->GetAOTexture() },
-        { material->IsUsingHeightMap(),    "heightMap",    5, "useHeightMap",    material->GetHeightTexture() }
+            { material->IsUsingAlbedoMap(),    "albedoMap",    0, "useAlbedoMap",    material->GetAlbedoTexture() },
+            { material->IsUsingNormalMap(),    "normalMap",    1, "useNormalMap",    material->GetNormalTexture() },
+            { material->IsUsingMetallicMap(),  "metallicMap",  2, "useMetallicMap",  material->GetMetallicTexture() },
+            { material->IsUsingRoughnessMap(), "roughnessMap", 3, "useRoughnessMap", material->GetRoughnessTexture() },
+            { material->IsUsingAOMap(),        "aoMap",        4, "useAOMap",        material->GetAOTexture() },
+            { material->IsUsingHeightMap(),    "heightMap",    5, "useHeightMap",    material->GetHeightTexture() }
         } };
-
 
         for (const auto& map : maps)
         {
@@ -213,9 +205,6 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             }
         }
 
-
-
-
         shader.setMat4("model", command.transform->GetWorldMatrix());
         glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(command.transform->GetWorldMatrix())));
         shader.setMat3("normalMatrix", normalMatrix);
@@ -225,14 +214,14 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         drawCallCounter++;
         for (const auto& map : maps)
         {
-            glBindSampler(map.slot, 0); // TODO: Material sorting
+            glBindSampler(map.slot, 0);
         }
     }
-    //LOG_DEBUG("Draw calls: {}", drawCallCounter);
 
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
-    resourceRegistry.Register("ScreenTexture", { RenderResourceType::Texture,o_IntermediateColorTex });
-    resourceRegistry.Register("ScreenBuffer", { RenderResourceType::Framebuffer,o_ScreenFBO });
-    resourceRegistry.Register("IntermediateBuffer", { RenderResourceType::Framebuffer,intermediateFBO });
+    resourceRegistry.Register("ScreenTexture", { RenderResourceType::Texture, o_IntermediateColorTex });
+    resourceRegistry.Register("ScreenBuffer", { RenderResourceType::Framebuffer, o_ScreenFBO });
+    resourceRegistry.Register("IntermediateBuffer", { RenderResourceType::Framebuffer, intermediateFBO });
 }
-

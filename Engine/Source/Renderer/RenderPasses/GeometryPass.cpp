@@ -29,7 +29,6 @@ void GeometryPass::Init(const RenderContext& ctx, RenderFrame& frame)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, o_Depth, 0);
 
-    // GL_R16F
     glGenTextures(1, &o_Roughness);
     glBindTexture(GL_TEXTURE_2D, o_Roughness);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, ctx.viewportWidth, ctx.viewportHeight, 0, GL_RED, GL_FLOAT, NULL);
@@ -37,7 +36,6 @@ void GeometryPass::Init(const RenderContext& ctx, RenderFrame& frame)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, o_Roughness, 0);
 
-    // GL_R16F
     glGenTextures(1, &o_Metallic);
     glBindTexture(GL_TEXTURE_2D, o_Metallic);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, ctx.viewportWidth, ctx.viewportHeight, 0, GL_RED, GL_FLOAT, NULL);
@@ -63,8 +61,6 @@ void GeometryPass::Init(const RenderContext& ctx, RenderFrame& frame)
     frame.registry.Register("MetallicTexture", { RenderResourceType::Texture, o_Metallic });
 }
 
-
-
 GeometryPass::~GeometryPass()
 {
     glDeleteFramebuffers(1, &gBuffer);
@@ -77,7 +73,7 @@ GeometryPass::~GeometryPass()
 void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
     auto& commands = frame.opaqueCommands;
-    auto& resourceRegisty = frame.registry;
+    auto& resourceRegistry = frame.registry;
 
     Shader& geometryShader = ShaderManager::Get("Geometry");
 
@@ -93,10 +89,22 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     geometryShader.setMat4("view", view);
     geometryShader.setMat4("projection", projection);
 
+    auto ApplyCullMode = [](CullMode mode) {
+        if (mode == CullMode::Disabled) {
+            glDisable(GL_CULL_FACE);
+        }
+        else {
+            glEnable(GL_CULL_FACE);
+            glCullFace(mode == CullMode::Back ? GL_BACK : GL_FRONT);
+        }
+        };
+
     for (auto& command : commands) {
         if (!ctx.camera->Intersects(command.mesh->worldAABB)) continue;
 
         auto& material = command.material;
+        ApplyCullMode(material->GetCullMode());
+
         glm::mat4 model = command.transform->GetWorldMatrix();
 
         geometryShader.setMat4("model", model);
@@ -112,7 +120,6 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             geometryShader.setInt("roughnessMap", 0);
             TextureCache::Get().GetOrCreate(roughnessTexture).Bind(0);
             material->GetSampler().Bind(0);
-
         }
         else
         {
@@ -127,7 +134,6 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             geometryShader.setInt("metallicMap", 1);
             TextureCache::Get().GetOrCreate(metallicTexture).Bind(1);
             material->GetSampler().Bind(1);
-
         }
         else
         {
@@ -135,18 +141,18 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             geometryShader.setFloat("metallic", material->GetMetallic());
         }
 
-
         command.mesh->VAO.Bind();
         glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
-        
+
         material->GetSampler().Unbind(0);
         material->GetSampler().Unbind(1);
     }
 
-    resourceRegisty.Register("DepthTexture",{ RenderResourceType::Texture, o_Depth });
-    resourceRegisty.Register("NormalTexture",{ RenderResourceType::Texture, o_Normal });
-    resourceRegisty.Register("RoughnessTexture",{ RenderResourceType::Texture, o_Roughness });
-    resourceRegisty.Register("MetallicTexture",{ RenderResourceType::Texture, o_Metallic });
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
+    resourceRegistry.Register("DepthTexture", { RenderResourceType::Texture, o_Depth });
+    resourceRegistry.Register("NormalTexture", { RenderResourceType::Texture, o_Normal });
+    resourceRegistry.Register("RoughnessTexture", { RenderResourceType::Texture, o_Roughness });
+    resourceRegistry.Register("MetallicTexture", { RenderResourceType::Texture, o_Metallic });
 }
-

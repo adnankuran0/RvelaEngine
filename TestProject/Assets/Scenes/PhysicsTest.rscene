@@ -345,7 +345,9 @@
                     "UVScale": [
                         1.0,
                         1.0
-                    ]
+                    ],
+                    "cullMode": 0,
+                    "transparencyMode": 0
                 }
             },
             "Mesh": {
@@ -382,7 +384,7 @@
                 "lockScaleRatio": false,
                 "position": [
                     3.4213333129882813,
-                    1.0,
+                    1.0026873350143433,
                     0.0
                 ],
                 "rotation": [
@@ -617,6 +619,7 @@
                         1.0,
                         0.3333333432674408
                     ],
+                    "alphaCutoff": 0.4740000069141388,
                     "cullMode": 0,
                     "transparencyMode": 1
                 }

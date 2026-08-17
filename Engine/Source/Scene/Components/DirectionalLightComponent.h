@@ -17,7 +17,7 @@ public:
     float shadowBias = 0.001f;
     float blurRadius = 0.5f;
     bool castShadows = true;
-    bool reverseCullFace = true;
+    bool reverseCullFace = false;
 
     json Serialize() const;
     void Deserialize(const json& j);

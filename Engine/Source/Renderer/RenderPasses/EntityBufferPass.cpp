@@ -64,10 +64,9 @@ void EntityBufferPass::Init(const RenderContext& ctx, RenderFrame& frame)
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    frame.registry.Register("EntityBuffer", { RenderResourceType::Framebuffer,m_Framebuffer });
-    frame.registry.Register("EntityTexture", { RenderResourceType::Framebuffer,o_EntityTexture });
+    frame.registry.Register("EntityBuffer", { RenderResourceType::Framebuffer, m_Framebuffer });
+    frame.registry.Register("EntityTexture", { RenderResourceType::Texture, o_EntityTexture });
 }
-
 
 void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
@@ -86,7 +85,7 @@ void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     glDepthFunc(GL_LESS);
     glDepthMask(GL_TRUE);
     glDisable(GL_BLEND);
-   
+
     Shader& shader = ShaderManager::Get("EntityBuffer");
     shader.use();
 
@@ -96,16 +95,23 @@ void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     shader.setMat4("view", view);
     shader.setMat4("projection", projection);
 
+    auto ApplyCullMode = [](CullMode mode) {
+        if (mode == CullMode::Disabled) {
+            glDisable(GL_CULL_FACE);
+        }
+        else {
+            glEnable(GL_CULL_FACE);
+            glCullFace(mode == CullMode::Back ? GL_BACK : GL_FRONT);
+        }
+        };
+
     auto RenderCommandList = [&](const auto& commands)
         {
             for (const auto& command : commands)
             {
                 if (!ctx.camera->Intersects(command.mesh->worldAABB)) continue;
 
-                if (command.mesh->IsDoubleSided())
-                    glDisable(GL_CULL_FACE);
-                else
-                    glEnable(GL_CULL_FACE);
+                ApplyCullMode(command.material->GetCullMode());
 
                 glm::mat4 model = command.transform->GetWorldMatrix();
                 shader.setMat4("model", model);
@@ -120,6 +126,7 @@ void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     RenderCommandList(transparentCommands);
 
     glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     resourceRegistry.Register("EntityBuffer", { RenderResourceType::Framebuffer, m_Framebuffer });

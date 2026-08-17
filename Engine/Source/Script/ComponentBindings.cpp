@@ -69,10 +69,6 @@ void LuaBindings::RegisterComponents(sol::state& lua)
         "castShadow", sol::property(
             &rv::MeshRendererComponent::IsCastShadow,
             &rv::MeshRendererComponent::SetCastShadow
-        ),
-        "doubleSided", sol::property(
-            &rv::MeshRendererComponent::IsDoubleSided,
-            &rv::MeshRendererComponent::SetDoubleSided
         )
     );
 

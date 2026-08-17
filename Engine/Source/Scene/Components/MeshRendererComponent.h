@@ -40,12 +40,8 @@ public:
 
     inline bool IsCastShadow() const noexcept { return castShadow; }
     inline void SetCastShadow(bool isCastsShadow) noexcept { castShadow = isCastsShadow; }
-
-    inline bool IsDoubleSided() const noexcept { return isDoubleSided; }
-    inline void SetDoubleSided(bool isDoubleSided) noexcept { this->isDoubleSided = isDoubleSided; }
  private:
     bool castShadow = true;
-    bool isDoubleSided = false;
 };
 
 }

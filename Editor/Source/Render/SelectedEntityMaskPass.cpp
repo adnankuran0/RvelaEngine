@@ -33,7 +33,6 @@ void SelectedEntityMaskPass::Init(const RenderContext& ctx, RenderFrame& frame) 
     frame.registry.Register("SelectedEntityMaskFBO", { RenderResourceType::Framebuffer, m_Framebuffer });
 }
 
-
 void SelectedEntityMaskPass::Execute(const RenderContext& ctx, RenderFrame& frame) {
     if (m_SelectedEntity == entt::null || ctx.scene->GetState() != SceneState::EDIT)
         return;
@@ -60,15 +59,22 @@ void SelectedEntityMaskPass::Execute(const RenderContext& ctx, RenderFrame& fram
 
     shader.setVec4("u_Color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
+    auto ApplyCullMode = [](CullMode mode) {
+        if (mode == CullMode::Disabled) {
+            glDisable(GL_CULL_FACE);
+        }
+        else {
+            glEnable(GL_CULL_FACE);
+            glCullFace(mode == CullMode::Back ? GL_BACK : GL_FRONT);
+        }
+        };
+
     auto RenderMaskList = [&](const auto& commands) {
         for (auto& command : commands) {
             if (command.entityID != m_SelectedEntity)
                 continue;
 
-            if (command.mesh->IsDoubleSided())
-                glDisable(GL_CULL_FACE);
-            else
-                glEnable(GL_CULL_FACE);
+            ApplyCullMode(command.material->GetCullMode());
 
             glm::mat4 model = command.transform->GetWorldMatrix();
             shader.setMat4("model", model);
@@ -82,6 +88,7 @@ void SelectedEntityMaskPass::Execute(const RenderContext& ctx, RenderFrame& fram
     RenderMaskList(transparentCommands);
 
     glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

@@ -158,8 +158,6 @@ void SerializeBin_MeshRendererComp(const MeshRendererComponent& comp, std::vecto
 
 	uint8_t castShadow = comp.IsCastShadow() ? 1 : 0;
 	WriteToBuffer(tempOut, castShadow);
-	uint8_t doubleSided = comp.IsDoubleSided() ? 1 : 0;
-	WriteToBuffer(tempOut, doubleSided);
 
 	size_t payloadSize = tempOut.size();
 	ComponentHeader header;
@@ -175,7 +173,6 @@ void DeserializeBin_MeshRendererComp(const std::byte*& cursor, MeshRendererCompo
 	ReadFromBuffer(cursor, doubleSided);
 
 	comp.SetCastShadow(castShadow != 0);
-	comp.SetDoubleSided(doubleSided != 0);
 }
 
 void SerializeBin_PointLightComp(const PointLightComponent& comp, std::vector<std::byte>& out)

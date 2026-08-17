@@ -8,7 +8,6 @@ using namespace rv;
 
 void ShadowPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
-    
     InitDirectionalShadowMap();
     InitPointShadowMap();
 
@@ -88,11 +87,9 @@ void ShadowPass::InitPointShadowMap()
 
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
-
 }
 
-void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFrame& 
-frame)
+void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFrame& frame)
 {
     auto& commands = frame.opaqueCommands;
 
@@ -110,29 +107,33 @@ frame)
         glEnable(GL_POLYGON_OFFSET_FILL);
         glPolygonOffset(1.0f, 2.0f);
 
-        glEnable(GL_CULL_FACE);
-        if (ctx.directionalLight->reverseCullFace)
-        {
-            glCullFace(GL_BACK);
-        }
-        else
-        {
-            glCullFace(GL_FRONT);
-        }
+        bool reverseCull = ctx.directionalLight->reverseCullFace;
 
         for (auto& command : commands) {
-            if (!ctx.camera->Intersects(ctx.directionalLight->lightSpace,command.mesh->worldAABB)) continue;
+            if (!ctx.camera->Intersects(ctx.directionalLight->lightSpace, command.mesh->worldAABB)) continue;
             if (!command.mesh->IsCastShadow()) continue;
+
+            CullMode mode = command.material->GetCullMode();
+            if (mode == CullMode::Disabled) {
+                glDisable(GL_CULL_FACE);
+            }
+            else {
+                glEnable(GL_CULL_FACE);
+                if (reverseCull)
+                    glCullFace(mode == CullMode::Back ? GL_FRONT : GL_BACK);
+                else
+                    glCullFace(mode == CullMode::Back ? GL_BACK : GL_FRONT);
+            }
 
             shadowShader.setMat4("model", command.transform->GetWorldMatrix());
             command.mesh->VAO.Bind();
             glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
         }
 
+        glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
         glDisable(GL_POLYGON_OFFSET_FILL);
     }
-
 }
 
 void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& frame)
@@ -145,7 +146,6 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
     glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, o_PointShadowMap, 0);
     glClear(GL_DEPTH_BUFFER_BIT);
     glViewport(0, 0, POINT_SHADOW_WIDTH, POINT_SHADOW_HEIGHT);
-    glDisable(GL_CULL_FACE);
 
     for (auto& light : ctx.pointLights)
     {
@@ -168,20 +168,27 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
         pointShadowShader.setVec3("lightPos", lightPos);
         pointShadowShader.setInt("baseLayer", light.shadowIndex * 6);
 
-        for (auto& command : commands) 
+        for (auto& command : commands)
         {
-            // TODO: skip if the mesh is outside of the light's radius
+            if (!command.mesh->IsCastShadow()) continue;
+
+            CullMode mode = command.material->GetCullMode();
+            if (mode == CullMode::Disabled) {
+                glDisable(GL_CULL_FACE);
+            }
+            else {
+                glEnable(GL_CULL_FACE);
+                glCullFace(mode == CullMode::Back ? GL_BACK : GL_FRONT);
+            }
 
             pointShadowShader.setMat4("model", command.transform->GetWorldMatrix());
             command.mesh->VAO.Bind();
 
-            for (unsigned int face = 0; face < 6; ++face) 
+            for (unsigned int face = 0; face < 6; ++face)
             {
                 if (!ctx.camera->Intersects(shadowTransforms[face], command.mesh->worldAABB)) continue;
-                if (!command.mesh->IsCastShadow()) continue;
-                // Set the current face's matrix
+
                 pointShadowShader.setMat4("shadowMatrix", shadowTransforms[face]);
-                // Set the current face layer
                 pointShadowShader.setInt("currentFace", face);
 
                 glDrawElements(
@@ -195,12 +202,12 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
     }
 
     glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
 }
 
 ShadowPass::~ShadowPass()
 {
-    //TODO: Fill this function
 }
 
 void ShadowPass::Execute(const RenderContext& ctx, RenderFrame& frame)
@@ -209,10 +216,9 @@ void ShadowPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     auto& resourceRegistry = frame.registry;
 
-    RenderDirectionalShadowMap(ctx,frame);
+    RenderDirectionalShadowMap(ctx, frame);
     RenderPointShadowMap(ctx, frame);
 
     resourceRegistry.Register("DirectionalShadowMap", { RenderResourceType::Texture, o_DirectionalShadowMap });
     resourceRegistry.Register("PointShadowMap", { RenderResourceType::Texture, o_PointShadowMap });
-
 }
