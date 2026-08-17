@@ -86,6 +86,10 @@ uniform float alphaCutoff;
 uniform vec3 ambientColor;
 uniform float ambientIntensity;
 
+// Shading
+uniform int shadingMode; // 0 = Lit, 1 = Unshaded
+uniform bool receiveShadows;
+
 // Shadows
 layout(binding = 6) uniform sampler2D shadowMap;
 layout(binding = 7) uniform samplerCubeArray pointShadowMap;
@@ -323,6 +327,13 @@ void main()
         alpha = 1.0;
     }
 
+    if (shadingMode == 1) 
+    {
+        vec3 unshadedColor = albedo + (emmisiveColor * emmisiveIntensity);
+        FragColor = vec4(unshadedColor, alpha);
+        return; 
+    }
+
     // Material properties
     float metallic = useMetallicMap ? texture(metallicMap, mappedTexCoords).r : metallicValue;
     float roughnessMapValue = useRoughnessMap ? texture(roughnessMap, mappedTexCoords).r : 1.0;
@@ -354,7 +365,7 @@ void main()
         vec3 specular = numerator / denominator;
         specular *= specularIntensity;
         float NdotL = max(dot(Nmap, L), 0.0);
-        float shadow = directionalLight.castShadows ?   
+        float shadow = (directionalLight.castShadows && receiveShadows) ?   
             calculateDirectionalShadow(FragPosLightSpace, Nmap, L, directionalLight.shadowBias, directionalLight.blurRadius) : 0.0;
 
         Lo += (1.0 - shadow) * (kD * albedo / PI + specular) * 
@@ -393,7 +404,7 @@ void main()
         vec3 specular = numerator / denominator;
         specular *= specularIntensity;
         float NdotL = max(dot(Nmap, L), 0.0);
-        float shadow = light.castShadows ? 
+        float shadow = (light.castShadows && receiveShadows) ? 
             calculatePointLightShadow(light.shadowIndex, FragPos, light.position, light.radius, Nmap, light.shadowBias, light.blurRadius) : 0.0;
 
         vec3 radiance = light.color * light.intensity * attenuation;

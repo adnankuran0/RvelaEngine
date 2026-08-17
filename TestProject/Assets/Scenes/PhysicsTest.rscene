@@ -271,7 +271,10 @@
                 ]
             },
             "Material": {
-                "material": "117abcf2-653c-4baa-b1ef-78ccd02c4fa6"
+                "material": "117abcf2-653c-4baa-b1ef-78ccd02c4fa6",
+                "overrides": {
+                    "receiveShadows": true
+                }
             },
             "Mesh": {
                 "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
@@ -621,7 +624,9 @@
                         0.3333333432674408
                     ],
                     "alphaCutoff": 0.4740000069141388,
-                    "cullMode": 0,
+                    "cullMode": 2,
+                    "receiveShadows": true,
+                    "shadingMode": 1,
                     "transparencyMode": 1
                 }
             },
@@ -658,6 +663,7 @@
                 "overrides": {
                     "albedoTex": "843640e9-bdbf-4d7e-b444-ddcd5e2d800d",
                     "cullMode": 2,
+                    "shadingMode": 1,
                     "transparencyMode": 2
                 }
             },
@@ -698,6 +704,8 @@
                         1.0,
                         0.6039215922355652
                     ],
+                    "cullMode": 2,
+                    "shadingMode": 1,
                     "transparencyMode": 1
                 }
             },

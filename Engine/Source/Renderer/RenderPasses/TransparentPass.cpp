@@ -150,9 +150,10 @@ void TransparentPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             ApplyCullMode(material->GetCullMode());
             ApplyBlendMode(material->GetBlendMode());
 
+            shader.setInt("shadingMode", static_cast<int>(material->GetShadingMode()));
+            shader.setBool("receiveShadows", material->GetReceiveShadows());
             shader.setInt("transparencyMode", static_cast<int>(material->GetTransparencyMode()));
             shader.setFloat("alphaCutoff", material->GetAlphaCutoff());
-
             shader.setVec2("UVScale", material->GetUVScale());
             shader.setVec2("UVOffset", material->GetUVOffset());
             shader.setVec4("albedoColor", material->GetAlbedoColor());

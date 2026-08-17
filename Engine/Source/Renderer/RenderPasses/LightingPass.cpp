@@ -166,6 +166,8 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         auto& material = command.material;
         ApplyCullMode(material->GetCullMode());
 
+        shader.setInt("shadingMode", static_cast<int>(material->GetShadingMode()));
+        shader.setBool("receiveShadows", material->GetReceiveShadows());
         shader.setInt("transparencyMode", static_cast<int>(material->GetTransparencyMode()));
         shader.setFloat("alphaCutoff", material->GetAlphaCutoff());
         shader.setVec2("UVScale", material->GetUVScale());
