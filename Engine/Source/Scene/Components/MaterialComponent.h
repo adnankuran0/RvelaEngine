@@ -21,8 +21,8 @@ public:
     void SetMaterial(const AssetUUID& uuid) { Load(uuid); }
     void Reload() { Load(m_MaterialUUID); }
 
-    glm::vec3 GetAlbedoColor() const { return m_Instance.GetAlbedoColor(); }
-    void SetAlbedoColor(const glm::vec3& v) { m_Instance.SetAlbedoColor(v); }
+    glm::vec4 GetAlbedoColor() const { return m_Instance.GetAlbedoColor(); }
+    void SetAlbedoColor(const glm::vec4& v) { m_Instance.SetAlbedoColor(v); }
     void ClearAlbedoColor() { m_Instance.ClearAlbedoColor(); }
 
     glm::vec3 GetEmissiveColor() const { return m_Instance.GetEmissiveColor(); }

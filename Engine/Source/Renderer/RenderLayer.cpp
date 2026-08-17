@@ -32,8 +32,6 @@ void RenderLayer::OnRender()
 
 void RenderLayer::CollectRenderCommands(Scene* scene)
 {
-	//m_RenderPipeline->m_RenderFrame.opaqueCommands.clear();
-	//m_RenderPipeline->m_RenderFrame.transparentCommands.clear();
 
 	Camera* camera = Engine::Get()->GetCamera();
 	glm::vec3 camPos = camera->Position;

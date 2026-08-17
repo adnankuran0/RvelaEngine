@@ -69,7 +69,7 @@ uniform bool useRoughnessMap;
 uniform bool useAOMap;
 uniform bool useHeightMap;
 
-uniform vec3 albedoColor;
+uniform vec4 albedoColor;
 uniform vec3 emmisiveColor;
 uniform float emmisiveIntensity;
 uniform float metallicValue;
@@ -305,7 +305,7 @@ void main()
 
     // Albedo & Alpha Calculation
     vec4 albedoTex = useAlbedoMap ? texture(albedoMap, mappedTexCoords) : vec4(1.0);
-    vec4 fullAlbedo = albedoTex * vec4(albedoColor,1.0);
+    vec4 fullAlbedo = albedoTex * albedoColor;
     vec3 albedo = fullAlbedo.rgb;
     float alpha = fullAlbedo.a;
 
@@ -433,5 +433,5 @@ void main()
     
     vec3 color = ambient + Lo + emmisiveColor * emmisiveIntensity;
 
-    FragColor = vec4(color, 0.5);
+    FragColor = vec4(color, alpha);
 }

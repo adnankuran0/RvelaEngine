@@ -80,7 +80,10 @@ Ref<Asset> MaterialLoader::Load(
     }
 
     if (j.contains("albedoColor"))
-        asset->albedoColor = { j["albedoColor"][0], j["albedoColor"][1], j["albedoColor"][2] };
+    {
+        auto& col = j["albedoColor"];
+        asset->albedoColor = { col[0], col[1], col[2], col.size() > 3 ? col[3].get<float>() : 1.0f };
+    }
     if (j.contains("emissiveColor"))
         asset->emissiveColor = { j["emissiveColor"][0], j["emissiveColor"][1], j["emissiveColor"][2] };
 

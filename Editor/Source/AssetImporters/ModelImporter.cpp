@@ -293,7 +293,8 @@ void ModelImporter::ExtractMaterials(
         ai_real   value;
 
         // Albedo
-        if (aiMat->GetTexture(aiTextureType_DIFFUSE, 0, &texPath) == AI_SUCCESS)
+        if (aiMat->GetTexture(aiTextureType_DIFFUSE, 0, &texPath) == AI_SUCCESS ||
+            aiMat->GetTexture(aiTextureType_BASE_COLOR, 0, &texPath) == AI_SUCCESS)
         {
             auto resolved = ResolveRelativePath(texPath.C_Str(), modelPath).string();
             if (result.textureUUIDs.contains(resolved))
@@ -301,13 +302,23 @@ void ModelImporter::ExtractMaterials(
                 asset->albedoTextureUUID = result.textureUUIDs.at(resolved);
                 asset->useAlbedoMap = true;
             }
+            asset->albedoColor = glm::vec4(1.0f);
         }
         else
         {
+            aiColor4D aiColor(1.0f, 1.0f, 1.0f, 1.0f);
             if (aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_DIFFUSE, &aiColor) == AI_SUCCESS)
-                asset->albedoColor = { aiColor.r, aiColor.g, aiColor.b };
+            {
+                asset->albedoColor = glm::vec4(aiColor.r, aiColor.g, aiColor.b, aiColor.a);
+            }
             else if (aiGetMaterialColor(aiMat, AI_MATKEY_BASE_COLOR, &aiColor) == AI_SUCCESS)
-                asset->albedoColor = { aiColor.r, aiColor.g, aiColor.b };
+            {
+                asset->albedoColor = glm::vec4(aiColor.r, aiColor.g, aiColor.b, aiColor.a);
+            }
+            else
+            {
+                asset->albedoColor = glm::vec4(1.0f);
+            }
         }
 
         // Normal

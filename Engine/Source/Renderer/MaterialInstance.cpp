@@ -20,7 +20,7 @@ json MaterialInstance::SerializeOverrides() const
     json j;
 
     if (IsOverridden(MatField::AlbedoColor))
-        j["albedoColor"] = { m_AlbedoColor.r, m_AlbedoColor.g, m_AlbedoColor.b };
+        j["albedoColor"] = { m_AlbedoColor.r, m_AlbedoColor.g, m_AlbedoColor.b, m_AlbedoColor.a };
     if (IsOverridden(MatField::EmissiveColor))
         j["emissiveColor"] = { m_EmissiveColor.r, m_EmissiveColor.g, m_EmissiveColor.b };
     if (IsOverridden(MatField::EmissiveIntensity))
@@ -71,9 +71,9 @@ void MaterialInstance::DeserializeOverrides(const json& j)
 {
     auto& mgr = AssetManager::Get();
 
-    if (j.contains("albedoColor"))
-    {
-        m_AlbedoColor = { j["albedoColor"][0], j["albedoColor"][1], j["albedoColor"][2] };
+    if (j.contains("albedoColor")) {
+        auto& col = j["albedoColor"];
+        m_AlbedoColor = { col[0], col[1], col[2], col.size() > 3 ? col[3].get<float>() : 1.0f };
         SetOverride(MatField::AlbedoColor);
     }
     if (j.contains("emissiveColor"))

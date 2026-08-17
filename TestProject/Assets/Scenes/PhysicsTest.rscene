@@ -548,6 +548,7 @@
                     "albedoColor": [
                         1.0,
                         1.0,
+                        1.0,
                         1.0
                     ],
                     "ao": 1.0,
@@ -605,6 +606,47 @@
                 ]
             },
             "UUID": 12
+        },
+        {
+            "Material": {
+                "material": "7751df2c-ec30-4b89-8dfa-238de37d7e79",
+                "overrides": {
+                    "albedoColor": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        0.3333333432674408
+                    ],
+                    "cullMode": 0,
+                    "transparencyMode": 1
+                }
+            },
+            "Mesh": {
+                "mesh": "b6c7f2a2-cce2-4b68-be50-19a8f552e727"
+            },
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": "Sphere"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    -4.317482948303223,
+                    2.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    0.48000001907348633,
+                    0.48000001907348633,
+                    0.48000001907348633
+                ]
+            },
+            "UUID": 14
         }
     ],
     "Environment": {

@@ -58,7 +58,7 @@ public:
     void SetAOTexture(Ref<TextureAsset> tex) { m_AOTex = tex; m_UseAOMap = static_cast<bool>(tex); SetOverride(MatField::AOTex); }
     void SetHeightTexture(Ref<TextureAsset> tex) { m_HeightTex = tex; m_UseHeightMap = static_cast<bool>(tex); SetOverride(MatField::HeightTex); }
 
-    void SetAlbedoColor(const glm::vec3& v) { m_AlbedoColor = v; SetOverride(MatField::AlbedoColor); }
+    void SetAlbedoColor(const glm::vec4& v) { m_AlbedoColor = v; SetOverride(MatField::AlbedoColor); }
     void SetEmissiveColor(const glm::vec3& v) { m_EmissiveColor = v; SetOverride(MatField::EmissiveColor); }
     void SetEmissiveIntensity(float v) { m_EmissiveIntensity = v; SetOverride(MatField::EmissiveIntensity); }
     void SetMetallic(float v) { m_Metallic = v; SetOverride(MatField::Metallic); }
@@ -75,7 +75,7 @@ public:
     void SetCullMode(CullMode mode) { m_CullMode = mode; SetOverride(MatField::CullMode); }
     void SetAlphaCutoff(float v) { m_AlphaCutoff = v; SetOverride(MatField::AlphaCutoff); }
 
-    glm::vec3 GetAlbedoColor() const { return IsOverridden(MatField::AlbedoColor) ? m_AlbedoColor : (m_SourceAsset ? m_SourceAsset->albedoColor : m_AlbedoColor); }
+    glm::vec4 GetAlbedoColor() const { return IsOverridden(MatField::AlbedoColor) ? m_AlbedoColor : (m_SourceAsset ? m_SourceAsset->albedoColor : m_AlbedoColor); }
     glm::vec3 GetEmissiveColor() const { return IsOverridden(MatField::EmissiveColor) ? m_EmissiveColor : (m_SourceAsset ? m_SourceAsset->emissiveColor : m_EmissiveColor); }
     float GetEmissiveIntensity() const { return IsOverridden(MatField::EmissiveIntensity) ? m_EmissiveIntensity : (m_SourceAsset ? m_SourceAsset->emissiveIntensity : m_EmissiveIntensity); }
     float GetMetallic() const { return IsOverridden(MatField::Metallic) ? m_Metallic : (m_SourceAsset ? m_SourceAsset->metallic : m_Metallic); }
@@ -157,7 +157,7 @@ private:
     Ref<TextureAsset> m_CachedAOTex;
     Ref<TextureAsset> m_CachedHeightTex;
 
-    glm::vec3 m_AlbedoColor = glm::vec3(1.0f);
+    glm::vec4 m_AlbedoColor = glm::vec4(1.0f);
     glm::vec3 m_EmissiveColor = glm::vec3(0.0f);
     float m_EmissiveIntensity = 0.0f;
     float m_Metallic = 0.0f;

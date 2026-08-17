@@ -796,12 +796,12 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                         TextureSlot("Albedo Slot", "alb", usingMap, texOvr,
                             [&](AssetUUID uuid) { material.SetAlbedoTexture(uuid); },
                             [&]() { material.ClearAlbedoTexture(); });
-                        glm::vec3 c = material.GetAlbedoColor();
-                        float col[3] = { c.r, c.g, c.b };
+                        glm::vec4 c = material.GetAlbedoColor();
+                        float col[4] = { c.r, c.g, c.b, c.a };
                         ImGui::Text("Albedo Color");
                         ImGui::SameLine();
-                        if (ImGui::ColorEdit3("##albedocol", col))
-                            material.SetAlbedoColor({ col[0], col[1], col[2] });
+                        if (ImGui::ColorEdit4("##albedocol", col))
+                            material.SetAlbedoColor({ col[0], col[1], col[2], col[3]});
                         if (colorOvr)
                             RevertButton("R##albcol", [&]() { material.ClearAlbedoColor(); });
                         ImGui::Unindent();

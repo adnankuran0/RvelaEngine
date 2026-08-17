@@ -40,7 +40,7 @@ public:
         if (asset->useAlbedoMap)
             j["albedoTexture"] = asset->albedoTextureUUID.ToString();
 
-        j["albedoColor"] = { asset->albedoColor.r, asset->albedoColor.g, asset->albedoColor.b };
+        j["albedoColor"] = { asset->albedoColor.r, asset->albedoColor.g, asset->albedoColor.b, asset->albedoColor.a };
 
         j["useNormalMap"] = asset->useNormalMap;
         if (asset->useNormalMap) j["normalTexture"] = asset->normalTextureUUID.ToString();
@@ -106,10 +106,9 @@ public:
         if (j.contains("albedoTexture"))
             asset->albedoTextureUUID = AssetUUID::FromString(j["albedoTexture"].get<std::string>());
 
-        if (j.contains("albedoColor"))
-        {
+        if (j.contains("albedoColor")) {
             auto col = j["albedoColor"];
-            asset->albedoColor = glm::vec3(col[0], col[1], col[2]);
+            asset->albedoColor = glm::vec4(col[0], col[1], col[2], col.size() > 3 ? col[3].get<float>() : 1.0f);
         }
 
         asset->useNormalMap = j.value("useNormalMap", false);
