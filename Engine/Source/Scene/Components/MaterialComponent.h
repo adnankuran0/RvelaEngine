@@ -89,6 +89,10 @@ public:
     void SetReceiveShadows(bool v) { m_Instance.SetReceiveShadows(v); }
     void ClearReceiveShadows() { m_Instance.ClearReceiveShadows(); }
 
+    BillboardMode GetBillboardMode() const { return m_Instance.GetBillboardMode(); }
+    void SetBillboardMode(BillboardMode mode) { m_Instance.SetBillboardMode(mode); }
+    void ClearBillboardMode() { m_Instance.ClearBillboardMode(); }
+
     bool IsUsingAlbedoMap() const { return m_Instance.UsesAlbedoMap(); }
     bool IsUsingNormalMap() const { return m_Instance.UsesNormalMap(); }
     bool IsUsingMetallicMap() const { return m_Instance.UsesMetallicMap(); }

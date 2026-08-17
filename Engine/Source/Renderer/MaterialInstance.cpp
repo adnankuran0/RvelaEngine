@@ -56,6 +56,9 @@ json MaterialInstance::SerializeOverrides() const
     if (IsOverridden(MatField::AlphaCutoff))
         j["alphaCutoff"] = m_AlphaCutoff;
 
+    if (IsOverridden(MatField::BillboardMode))
+        j["billboardMode"] = m_BillboardMode;
+
     if (IsOverridden(MatField::AlbedoTex))
         j["albedoTex"] = m_AlbedoTex ? m_AlbedoTex->GetUUID().ToString() : "";
     if (IsOverridden(MatField::NormalTex))
@@ -151,6 +154,12 @@ void MaterialInstance::DeserializeOverrides(const json& j)
     {
         m_AlphaCutoff = j["alphaCutoff"].get<float>();
         SetOverride(MatField::AlphaCutoff);
+    }
+
+    if (j.contains("billboardMode"))
+    {
+        m_BillboardMode = static_cast<BillboardMode>(j["billboardMode"].get<int>());
+        SetOverride(MatField::BillboardMode);
     }
 
     if (j.contains("shadingMode")) {

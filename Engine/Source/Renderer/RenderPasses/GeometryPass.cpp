@@ -88,6 +88,7 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     geometryShader.setMat4("view", view);
     geometryShader.setMat4("projection", projection);
+    geometryShader.setVec3("camPos", ctx.camera->Position);
 
     auto ApplyCullMode = [](CullMode mode) {
         if (mode == CullMode::Disabled) {
@@ -114,6 +115,7 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         geometryShader.setVec2("UVOffset", material->GetUVOffset());
 
         geometryShader.setInt("transparencyMode", static_cast<int>(material->GetTransparencyMode()));
+        geometryShader.setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
         geometryShader.setFloat("alphaCutoff", material->GetAlphaCutoff());
         geometryShader.setVec4("albedoColor", material->GetAlbedoColor());
 

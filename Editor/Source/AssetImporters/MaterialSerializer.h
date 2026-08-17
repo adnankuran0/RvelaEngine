@@ -39,6 +39,8 @@ public:
         j["cullMode"] = static_cast<int>(asset->cullMode);
         j["alphaCutoff"] = asset->alphaCutoff;
 
+        j["billboardMode"] = asset->billboardMode;
+
         j["useAlbedoMap"] = asset->useAlbedoMap;
         if (asset->useAlbedoMap)
             j["albedoTexture"] = asset->albedoTextureUUID.ToString();
@@ -108,6 +110,9 @@ public:
             asset->cullMode = static_cast<CullMode>(j["cullMode"].get<int>());
         if (j.contains("alphaCutoff"))
             asset->alphaCutoff = j["alphaCutoff"].get<float>();
+
+        if (j.contains("billboardMode"))
+            asset->billboardMode = static_cast<BillboardMode>(j["billboardMode"].get<int>());
 
         asset->useAlbedoMap = j.value("useAlbedoMap", false);
         if (j.contains("albedoTexture"))

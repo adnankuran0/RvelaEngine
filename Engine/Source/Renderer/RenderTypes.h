@@ -32,4 +32,11 @@ enum class CullMode : uint8_t
     Disabled
 };
 
+enum class BillboardMode : uint8_t
+{
+    Disabled = 0,
+    Spherical,
+    Cylindrical
+};
+
 }

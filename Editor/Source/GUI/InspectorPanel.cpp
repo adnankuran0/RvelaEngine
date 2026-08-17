@@ -652,7 +652,6 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                 }
                 if (open && !isRemoved)
                 {
-                    ImGui::Indent();
                     MaterialComponent& material = registry.get<MaterialComponent>(selectedEntity);
                     const MaterialInstance& inst = material.GetInstance();
 
@@ -968,16 +967,38 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                         ImGui::Unindent();
                     }
 
-                    glm::vec2 uvOffset = material.GetUVOffset();
-                    glm::vec2 uvScale = material.GetUVScale();
-                    bool uvOffOvr = inst.IsOverridden(MatField::UVOffset);
-                    bool uvSclOvr = inst.IsOverridden(MatField::UVScale);
-                    if (ImGui::DragFloat2("UV Offset##uvoff", &uvOffset[0], 0.05f)) material.SetUVOffset(uvOffset);
-                    if (uvOffOvr) RevertButton("R##uvoff", [&]() { material.ClearUVOffset(); });
-                    if (ImGui::DragFloat2("UV Scale##uvscl", &uvScale[0], 0.05f)) material.SetUVScale(uvScale);
-                    if (uvSclOvr) RevertButton("R##uvscl", [&]() { material.ClearUVScale(); });
+                    if (ImGui::CollapsingHeader("Billboard##billboardhdr"))
+                    {
+                        ImGui::Indent();
 
-                    ImGui::Unindent();
+                        const char* billboardModes[] = { "Disabled", "Spherical", "Cylindrical"};
+                        int currentBillboardMode = static_cast<int>(material.GetBillboardMode());
+                        bool billboardOvr = inst.IsOverridden(MatField::BillboardMode);
+
+                        if (ImGui::Combo("Billboard Mode##bmode", &currentBillboardMode, billboardModes, 3))
+                            material.SetBillboardMode(static_cast<BillboardMode>(currentBillboardMode));
+
+                        if (billboardOvr)
+                            RevertButton("R##bmode", [&]() { material.ClearBillboardMode(); });
+
+                        ImGui::Unindent();
+                    }
+
+                    if (ImGui::CollapsingHeader("UV##uvhdr"))
+                    {
+                        ImGui::Indent();
+
+                        glm::vec2 uvOffset = material.GetUVOffset();
+                        glm::vec2 uvScale = material.GetUVScale();
+                        bool uvOffOvr = inst.IsOverridden(MatField::UVOffset);
+                        bool uvSclOvr = inst.IsOverridden(MatField::UVScale);
+                        if (ImGui::DragFloat2("UV Offset##uvoff", &uvOffset[0], 0.05f)) material.SetUVOffset(uvOffset);
+                        if (uvOffOvr) RevertButton("R##uvoff", [&]() { material.ClearUVOffset(); });
+                        if (ImGui::DragFloat2("UV Scale##uvscl", &uvScale[0], 0.05f)) material.SetUVScale(uvScale);
+                        if (uvSclOvr) RevertButton("R##uvscl", [&]() { material.ClearUVScale(); });
+
+                        ImGui::Unindent();
+                    }
                 }
             }
         } // !isPrefab

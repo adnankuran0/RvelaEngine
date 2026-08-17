@@ -35,6 +35,7 @@ enum class MatField : uint8_t {
     AlphaCutoff,
     ShadingMode,
     ReceiveShadows,
+    BillboardMode,
     COUNT
 };
 
@@ -77,6 +78,8 @@ public:
     void SetCullMode(CullMode mode) { m_CullMode = mode; SetOverride(MatField::CullMode); }
     void SetAlphaCutoff(float v) { m_AlphaCutoff = v; SetOverride(MatField::AlphaCutoff); }
 
+    void SetBillboardMode(BillboardMode mode) { m_BillboardMode = mode; SetOverride(MatField::BillboardMode); }
+
     void SetShadingMode(ShadingMode mode) { m_ShadingMode = mode; SetOverride(MatField::ShadingMode); }
     void SetReceiveShadows(bool v) { m_ReceiveShadows = v; SetOverride(MatField::ReceiveShadows); }
 
@@ -96,6 +99,8 @@ public:
     BlendMode GetBlendMode() const { return IsOverridden(MatField::BlendMode) ? m_BlendMode : (m_SourceAsset ? m_SourceAsset->blendMode : m_BlendMode); }
     CullMode GetCullMode() const { return IsOverridden(MatField::CullMode) ? m_CullMode : (m_SourceAsset ? m_SourceAsset->cullMode : m_CullMode); }
     float GetAlphaCutoff() const { return IsOverridden(MatField::AlphaCutoff) ? m_AlphaCutoff : (m_SourceAsset ? m_SourceAsset->alphaCutoff : m_AlphaCutoff); }
+
+    BillboardMode GetBillboardMode() const { return IsOverridden(MatField::BillboardMode) ? m_BillboardMode : (m_SourceAsset ? m_SourceAsset->billboardMode : m_BillboardMode); }
 
     ShadingMode GetShadingMode() const { return IsOverridden(MatField::ShadingMode) ? m_ShadingMode : (m_SourceAsset ? m_SourceAsset->shadingMode : m_ShadingMode); }
     bool GetReceiveShadows() const { return IsOverridden(MatField::ReceiveShadows) ? m_ReceiveShadows : (m_SourceAsset ? m_SourceAsset->receiveShadows : m_ReceiveShadows); }
@@ -129,6 +134,8 @@ public:
     void ClearBlendMode() { ClearOverride(MatField::BlendMode); }
     void ClearCullMode() { ClearOverride(MatField::CullMode); }
     void ClearAlphaCutoff() { ClearOverride(MatField::AlphaCutoff); }
+
+    void ClearBillboardMode() { ClearOverride(MatField::BillboardMode); }
 
     void ClearShadingMode() { ClearOverride(MatField::ShadingMode); }
     void ClearReceiveShadows() { ClearOverride(MatField::ReceiveShadows); }
@@ -184,6 +191,8 @@ private:
     BlendMode m_BlendMode = BlendMode::Mix;
     CullMode m_CullMode = CullMode::Back;
     float m_AlphaCutoff = 0.5f;
+
+    BillboardMode m_BillboardMode = BillboardMode::Disabled;
 
     ShadingMode m_ShadingMode = ShadingMode::Lit;
     bool m_ReceiveShadows = true;

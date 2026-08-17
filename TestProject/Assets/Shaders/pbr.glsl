@@ -20,28 +20,84 @@ uniform vec2 UVScale;
 uniform vec2 UVOffset;
 
 uniform mat4 lightSpaceMatrix;
-uniform mat3 normalMatrix; 
+uniform mat3 normalMatrix;
+
+uniform int billboardMode;
+uniform vec3 camPos;
 
 void main()
 {
-    vec4 worldPos = model * vec4(aPos, 1.0);
+    vec4 worldPos;
+    vec3 N, T, B;
+
+    if (billboardMode == 0)
+    {
+        worldPos = model * vec4(aPos, 1.0);
+        N = normalize(normalMatrix * aNormal);
+        T = normalize(mat3(model) * aTangent);
+        T = normalize(T - dot(T, N) * N);
+        B = cross(N, T);
+    }
+    else
+    {
+        vec3 scale = vec3(
+            length(vec3(model[0][0], model[0][1], model[0][2])),
+            length(vec3(model[1][0], model[1][1], model[1][2])),
+            length(vec3(model[2][0], model[2][1], model[2][2]))
+        );
+
+        vec3 objectCenter = model[3].xyz;
+
+        if (billboardMode == 1) 
+        {
+            vec3 camRight = vec3(view[0][0], view[1][0], view[2][0]);
+            vec3 camUp    = vec3(view[0][1], view[1][1], view[2][1]);
+            vec3 camDir   = vec3(view[0][2], view[1][2], view[2][2]);
+
+            vec3 worldVertexPos = objectCenter 
+                + (camRight * (aPos.x * scale.x)) 
+                + (camUp    * (aPos.y * scale.y))
+                + (camDir   * (aPos.z * scale.z));
+
+            worldPos = vec4(worldVertexPos, 1.0);
+
+            N = camDir;
+            T = camRight;
+            B = camUp;
+        }
+        else // y billboard
+        {
+            vec3 toCam = camPos - objectCenter;
+            toCam.y = 0.0;
+
+            float len = length(toCam);
+            vec3 forward = len > 0.0001 ? toCam / len : vec3(0.0, 0.0, 1.0);
+
+            vec3 worldUp = vec3(0.0, 1.0, 0.0);
+            vec3 right = normalize(cross(worldUp, forward));
+
+            vec3 worldVertexPos = objectCenter 
+                + (right   * (aPos.x * scale.x)) 
+                + (worldUp * (aPos.y * scale.y))
+                + (forward * (aPos.z * scale.z));
+
+            worldPos = vec4(worldVertexPos, 1.0);
+
+            N = forward;
+            T = right;
+            B = worldUp;
+        }
+    }
+
     FragPos = worldPos.xyz;
+    Normal = N;
+    Tangent = T;
+    Bitangent = B;
 
-    Normal = normalMatrix * aNormal;
-
-    gl_Position = projection * view * worldPos;
     TexCoords = aTexCoords * UVScale + UVOffset;
     FragPosLightSpace = lightSpaceMatrix * worldPos;
 
-    vec3 T = normalize(mat3(model) * aTangent);
-    vec3 N = normalize(Normal);
-    
-    T = normalize(T - dot(T, N) * N);
-    
-    vec3 B = cross(N, T);
-    
-    Tangent = T;
-    Bitangent = B;
+    gl_Position = projection * view * worldPos;
 }
 
 #shader fragment

@@ -52,6 +52,9 @@ Ref<Asset> MaterialLoader::Load(
     if (j.contains("alphaCutoff"))
         asset->alphaCutoff = j["alphaCutoff"].get<float>();
 
+    if (j.contains("billboardMode"))
+        asset->billboardMode = static_cast<BillboardMode>(j["billboardMode"].get<int>());
+
     if (j.contains("albedoTexture"))
     {
         asset->albedoTextureUUID = AssetUUID::FromString(j["albedoTexture"]);

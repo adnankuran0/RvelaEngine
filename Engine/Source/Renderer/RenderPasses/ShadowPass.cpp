@@ -98,7 +98,8 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
     {
         Shader& shadowShader = ShaderManager::Get("DirectionalShadow");
         shadowShader.use();
-
+        shadowShader.setMat4("cameraView", ctx.camera->GetViewMatrix());
+        shadowShader.setVec3("camPos", ctx.camera->Position);
         shadowShader.setMat4("lightSpaceMatrix", ctx.directionalLight->lightSpace);
 
         glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
@@ -132,6 +133,8 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
             shadowShader.setVec4("albedoColor", material->GetAlbedoColor());
             shadowShader.setVec2("UVScale", material->GetUVScale());
             shadowShader.setVec2("UVOffset", material->GetUVOffset());
+            shadowShader.setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
+            
 
             bool useAlb = material->IsUsingAlbedoMap() && material->GetAlbedoTexture();
             shadowShader.setBool("useAlbedoMap", useAlb);
@@ -164,10 +167,15 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
 
     Shader& pointShadowShader = ShaderManager::Get("PointShadow");
     pointShadowShader.use();
+    pointShadowShader.setMat4("cameraView", ctx.camera->GetViewMatrix());
+    pointShadowShader.setVec3("camPos", ctx.camera->Position);
+
     glBindFramebuffer(GL_FRAMEBUFFER, pointFBO);
     glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, o_PointShadowMap, 0);
     glClear(GL_DEPTH_BUFFER_BIT);
     glViewport(0, 0, POINT_SHADOW_WIDTH, POINT_SHADOW_HEIGHT);
+
+
 
     for (auto& light : ctx.pointLights)
     {
@@ -209,6 +217,7 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
             pointShadowShader.setVec4("albedoColor", material->GetAlbedoColor());
             pointShadowShader.setVec2("UVScale", material->GetUVScale());
             pointShadowShader.setVec2("UVOffset", material->GetUVOffset());
+            pointShadowShader.setInt("billboardMode", static_cast<int>(command.material->GetBillboardMode()));
 
             bool useAlb = material->IsUsingAlbedoMap() && material->GetAlbedoTexture();
             pointShadowShader.setBool("useAlbedoMap", useAlb);

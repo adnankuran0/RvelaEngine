@@ -95,6 +95,7 @@ void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     shader.setMat4("view", view);
     shader.setMat4("projection", projection);
+    shader.setVec3("camPos", ctx.camera->Position);
 
     auto ApplyCullMode = [](CullMode mode) {
         if (mode == CullMode::Disabled) {
@@ -120,6 +121,7 @@ void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
                 shader.setUInt("u_EntityID", static_cast<uint32_t>(command.entityID));
 
                 shader.setInt("transparencyMode", static_cast<int>(material->GetTransparencyMode()));
+                shader.setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
                 shader.setFloat("alphaCutoff", material->GetAlphaCutoff());
                 shader.setVec4("albedoColor", material->GetAlbedoColor());
                 shader.setVec2("UVScale", material->GetUVScale());

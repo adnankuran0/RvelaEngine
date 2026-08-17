@@ -57,7 +57,7 @@ void SelectedEntityMaskPass::Execute(const RenderContext& ctx, RenderFrame& fram
     glm::mat4 view = ctx.camera->GetViewMatrix();
     shader.setMat4("projection", projection);
     shader.setMat4("view", view);
-
+    shader.setVec3("camPos", ctx.camera->Position);
     shader.setVec4("u_Color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
     auto ApplyCullMode = [](CullMode mode) {
@@ -82,6 +82,7 @@ void SelectedEntityMaskPass::Execute(const RenderContext& ctx, RenderFrame& fram
             shader.setMat4("model", model);
 
             shader.setInt("transparencyMode", static_cast<int>(material->GetTransparencyMode()));
+            shader.setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
             shader.setFloat("alphaCutoff", material->GetAlphaCutoff());
             shader.setVec4("albedoColor", material->GetAlbedoColor());
             shader.setVec2("UVScale", material->GetUVScale());
