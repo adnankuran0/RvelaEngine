@@ -19,6 +19,7 @@ public:
 
 	std::filesystem::path GetVirtual() const;
 	std::filesystem::path GetAbsolute() const;
+	Path GetParentPath() const;
 
 	inline std::string GetAbsoluteStr() const
 	{
@@ -38,6 +39,9 @@ public:
 
 	bool operator==(const Path& other) const;
 	bool operator!=(const Path& other) const;
+	Path operator/(const std::string& subPath) const;
+	Path operator/(const Path& other) const;
+	Path operator/(const std::filesystem::path& subPath) const;
 
 private:
 	std::filesystem::path m_VirtualPath;

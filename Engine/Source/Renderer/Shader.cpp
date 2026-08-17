@@ -124,18 +124,67 @@ GLint Shader::GetUniformLocation(const std::string& name) const {
     return location;
 }
 
+std::string Shader::ProcessIncludes(const std::string& source, const Path& shaderPath, std::unordered_set<std::string>& includedPaths)
+{
+    std::istringstream stream(source);
+    std::stringstream result;
+    std::string line;
+
+    while (std::getline(stream, line))
+    {
+        if (line.find("#include") != std::string::npos)
+        {
+            size_t start = line.find_first_of("\"<");
+            size_t end = line.find_last_of("\">");
+            if (start != std::string::npos && end != std::string::npos && end > start)
+            {
+                std::string includeFilename = line.substr(start + 1, end - start - 1);
+                Path includePath = shaderPath.GetParentPath() / includeFilename;
+                std::string absPathStr = includePath.GetAbsoluteStr();
+
+                if (includedPaths.find(absPathStr) == includedPaths.end())
+                {
+                    includedPaths.insert(absPathStr);
+
+                    std::ifstream includeFile(includePath.GetAbsolute());
+                    if (includeFile.is_open())
+                    {
+                        std::stringstream incBuffer;
+                        incBuffer << includeFile.rdbuf();
+
+                        result << "// [BEGIN INCLUDE: " << includeFilename << "]\n";
+                        result << ProcessIncludes(incBuffer.str(), includePath, includedPaths) << "\n";
+                        result << "// [END INCLUDE: " << includeFilename << "]\n";
+                    }
+                    else
+                    {
+                        LOG_ERROR("Can't open shader include file: {}", absPathStr);
+                    }
+                }
+                continue;
+            }
+        }
+        result << line << "\n";
+    }
+
+    return result.str();
+}
+
 bool Shader::CompileInternal(const Path& path, GLuint& outProgram)
 {
     std::ifstream shaderFile(path.GetAbsolute());
     if (!shaderFile.is_open())
     {
-        LOG_ERROR("ERROR::SHADER::FILE_NOT_OPENED");
+        LOG_ERROR("ERROR::SHADER::FILE_NOT_OPENED: {}", path.GetAbsolute().string());
         return false;
     }
 
     std::stringstream buffer;
     buffer << shaderFile.rdbuf();
-    std::string source = buffer.str();
+
+    std::unordered_set<std::string> includedPaths;
+    includedPaths.insert(path.GetAbsoluteStr());
+    std::string source = ProcessIncludes(buffer.str(), path, includedPaths);
 
     std::unordered_map<std::string, std::string> shaderSources;
     std::string currentType;
@@ -157,6 +206,7 @@ bool Shader::CompileInternal(const Path& path, GLuint& outProgram)
 
             currentType = line.substr(line.find("#shader") + 7);
             currentType.erase(0, currentType.find_first_not_of(" \t"));
+            currentType.erase(currentType.find_last_not_of(" \t\r\n") + 1);
         }
         else
         {
@@ -173,10 +223,10 @@ bool Shader::CompileInternal(const Path& path, GLuint& outProgram)
     {
         GLenum shaderType = 0;
 
-        if (type == "vertex") shaderType = GL_VERTEX_SHADER;
+        if (type == "vertex")        shaderType = GL_VERTEX_SHADER;
         else if (type == "fragment") shaderType = GL_FRAGMENT_SHADER;
         else if (type == "geometry") shaderType = GL_GEOMETRY_SHADER;
-        else if (type == "compute") shaderType = GL_COMPUTE_SHADER;
+        else if (type == "compute")  shaderType = GL_COMPUTE_SHADER;
         else
         {
             LOG_ERROR("ERROR::SHADER::UNKNOWN_SHADER_TYPE: {}", type);

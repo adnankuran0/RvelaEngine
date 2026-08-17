@@ -203,6 +203,8 @@ const vec2 poissonDisk[16] = vec2[](
     vec2(0.19984126, 0.78641367), vec2(0.14383161, -0.14100790)
 );
 
+
+
 vec2 parallaxOcclusionMapping(vec2 texCoords, vec3 viewDirTS)
 {
     if(!useHeightMap) return texCoords;

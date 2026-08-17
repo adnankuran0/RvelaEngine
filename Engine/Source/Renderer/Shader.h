@@ -67,6 +67,7 @@ private:
     Path m_Path;
     bool checkCompileErrors(unsigned int shader, std::string type);
     bool CompileInternal(const Path& path, GLuint& outProgram);
+    static std::string ProcessIncludes(const std::string& source, const Path& shaderPath, std::unordered_set<std::string>& includedPaths);
     mutable std::unordered_map<std::string, GLint> uniformLocationCache;
 };
 
