@@ -81,6 +81,14 @@ public:
     void SetAlphaCutoff(float v) { m_Instance.SetAlphaCutoff(v); }
     void ClearAlphaCutoff() { m_Instance.ClearAlphaCutoff(); }
 
+    ShadingMode GetShadingMode() const { return m_Instance.GetShadingMode(); }
+    void SetShadingMode(ShadingMode mode) { m_Instance.SetShadingMode(mode); }
+    void ClearShadingMode() { m_Instance.ClearShadingMode(); }
+
+    bool GetReceiveShadows() const { return m_Instance.GetReceiveShadows(); }
+    void SetReceiveShadows(bool v) { m_Instance.SetReceiveShadows(v); }
+    void ClearReceiveShadows() { m_Instance.ClearReceiveShadows(); }
+
     bool IsUsingAlbedoMap() const { return m_Instance.UsesAlbedoMap(); }
     bool IsUsingNormalMap() const { return m_Instance.UsesNormalMap(); }
     bool IsUsingMetallicMap() const { return m_Instance.UsesMetallicMap(); }

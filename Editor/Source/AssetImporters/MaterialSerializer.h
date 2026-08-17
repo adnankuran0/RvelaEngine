@@ -31,6 +31,9 @@ public:
     {
         json j;
 
+        j["shadingMode"] = static_cast<int>(asset->shadingMode);
+        j["receiveShadows"] = asset->receiveShadows;
+
         j["transparencyMode"] = static_cast<int>(asset->transparencyMode);
         j["blendMode"] = static_cast<int>(asset->blendMode);
         j["cullMode"] = static_cast<int>(asset->cullMode);
@@ -92,6 +95,10 @@ public:
 
         json j;
         file >> j;
+
+        if (j.contains("shadingMode"))
+            asset->shadingMode = static_cast<ShadingMode>(j["shadingMode"].get<int>());
+        asset->receiveShadows = j.value("receiveShadows", true);
 
         if (j.contains("transparencyMode"))
             asset->transparencyMode = static_cast<TransparencyMode>(j["transparencyMode"].get<int>());

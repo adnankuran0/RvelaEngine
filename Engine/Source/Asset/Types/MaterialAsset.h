@@ -19,6 +19,9 @@ public:
     AssetUUID aoTextureUUID;
     AssetUUID heightTextureUUID;
 
+    ShadingMode shadingMode = ShadingMode::Lit;
+    bool receiveShadows = true;
+
     TransparencyMode transparencyMode = TransparencyMode::Opaque;
     BlendMode blendMode = BlendMode::Mix;
     CullMode cullMode = CullMode::Back;

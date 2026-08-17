@@ -233,10 +233,6 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                     if (ImGui::Checkbox("Cast Shadow", &isCastShadow))
                         meshRenderer.SetCastShadow(isCastShadow);
 
-                    bool isDoubleSided = meshRenderer.IsDoubleSided();
-                    if (ImGui::Checkbox("Double Sided", &isDoubleSided))
-                        meshRenderer.SetDoubleSided(isDoubleSided);
-
                     ImGui::Unindent();
                 }
             }
@@ -783,6 +779,35 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                         if (ImGui::Combo("Cull Mode##cmode", &currentCullMode, cullModes, 3))
                             material.SetCullMode(static_cast<CullMode>(currentCullMode));
                         if (cullOvr) RevertButton("R##cmode", [&]() { material.ClearCullMode(); });
+
+                        ImGui::Unindent();
+                    }
+
+                    if (ImGui::CollapsingHeader("Shading##shadinghdr"))
+                    {
+                        ImGui::Indent();
+
+                        const char* shadingModes[] = { "Lit", "Unshaded" };
+                        int currentShadingMode = static_cast<int>(material.GetShadingMode());
+                        bool shadingOvr = inst.IsOverridden(MatField::ShadingMode);
+
+                        if (ImGui::Combo("Shading Mode##smode", &currentShadingMode, shadingModes, 2))
+                            material.SetShadingMode(static_cast<ShadingMode>(currentShadingMode));
+
+                        if (shadingOvr)
+                            RevertButton("R##smode", [&]() { material.ClearShadingMode(); });
+
+                        if (material.GetShadingMode() == ShadingMode::Lit)
+                        {
+                            bool receiveShadows = material.GetReceiveShadows();
+                            bool shadowsOvr = inst.IsOverridden(MatField::ReceiveShadows);
+
+                            if (ImGui::Checkbox("Receive Shadows##rshadows", &receiveShadows))
+                                material.SetReceiveShadows(receiveShadows);
+
+                            if (shadowsOvr)
+                                RevertButton("R##rshadows", [&]() { material.ClearReceiveShadows(); });
+                        }
 
                         ImGui::Unindent();
                     }

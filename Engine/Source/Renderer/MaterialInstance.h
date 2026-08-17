@@ -33,6 +33,8 @@ enum class MatField : uint8_t {
     BlendMode,
     CullMode,
     AlphaCutoff,
+    ShadingMode,
+    ReceiveShadows,
     COUNT
 };
 
@@ -75,6 +77,9 @@ public:
     void SetCullMode(CullMode mode) { m_CullMode = mode; SetOverride(MatField::CullMode); }
     void SetAlphaCutoff(float v) { m_AlphaCutoff = v; SetOverride(MatField::AlphaCutoff); }
 
+    void SetShadingMode(ShadingMode mode) { m_ShadingMode = mode; SetOverride(MatField::ShadingMode); }
+    void SetReceiveShadows(bool v) { m_ReceiveShadows = v; SetOverride(MatField::ReceiveShadows); }
+
     glm::vec4 GetAlbedoColor() const { return IsOverridden(MatField::AlbedoColor) ? m_AlbedoColor : (m_SourceAsset ? m_SourceAsset->albedoColor : m_AlbedoColor); }
     glm::vec3 GetEmissiveColor() const { return IsOverridden(MatField::EmissiveColor) ? m_EmissiveColor : (m_SourceAsset ? m_SourceAsset->emissiveColor : m_EmissiveColor); }
     float GetEmissiveIntensity() const { return IsOverridden(MatField::EmissiveIntensity) ? m_EmissiveIntensity : (m_SourceAsset ? m_SourceAsset->emissiveIntensity : m_EmissiveIntensity); }
@@ -91,6 +96,9 @@ public:
     BlendMode GetBlendMode() const { return IsOverridden(MatField::BlendMode) ? m_BlendMode : (m_SourceAsset ? m_SourceAsset->blendMode : m_BlendMode); }
     CullMode GetCullMode() const { return IsOverridden(MatField::CullMode) ? m_CullMode : (m_SourceAsset ? m_SourceAsset->cullMode : m_CullMode); }
     float GetAlphaCutoff() const { return IsOverridden(MatField::AlphaCutoff) ? m_AlphaCutoff : (m_SourceAsset ? m_SourceAsset->alphaCutoff : m_AlphaCutoff); }
+
+    ShadingMode GetShadingMode() const { return IsOverridden(MatField::ShadingMode) ? m_ShadingMode : (m_SourceAsset ? m_SourceAsset->shadingMode : m_ShadingMode); }
+    bool GetReceiveShadows() const { return IsOverridden(MatField::ReceiveShadows) ? m_ReceiveShadows : (m_SourceAsset ? m_SourceAsset->receiveShadows : m_ReceiveShadows); }
 
     bool UsesAlbedoMap() const { return IsOverridden(MatField::AlbedoTex) ? m_UseAlbedoMap : (m_SourceAsset ? m_SourceAsset->useAlbedoMap : false); }
     bool UsesNormalMap() const { return IsOverridden(MatField::NormalTex) ? m_UseNormalMap : (m_SourceAsset ? m_SourceAsset->useNormalMap : false); }
@@ -121,6 +129,9 @@ public:
     void ClearBlendMode() { ClearOverride(MatField::BlendMode); }
     void ClearCullMode() { ClearOverride(MatField::CullMode); }
     void ClearAlphaCutoff() { ClearOverride(MatField::AlphaCutoff); }
+
+    void ClearShadingMode() { ClearOverride(MatField::ShadingMode); }
+    void ClearReceiveShadows() { ClearOverride(MatField::ReceiveShadows); }
 
     Sampler& GetSampler() { return m_Sampler; }
     const Sampler& GetSampler() const { return m_Sampler; }
@@ -173,6 +184,9 @@ private:
     BlendMode m_BlendMode = BlendMode::Mix;
     CullMode m_CullMode = CullMode::Back;
     float m_AlphaCutoff = 0.5f;
+
+    ShadingMode m_ShadingMode = ShadingMode::Lit;
+    bool m_ReceiveShadows = true;
 
     bool m_UseAlbedoMap = false;
     bool m_UseNormalMap = false;

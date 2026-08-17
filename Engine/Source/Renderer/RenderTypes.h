@@ -3,6 +3,12 @@
 
 namespace rv {
 
+enum class ShadingMode : uint8_t
+{
+    Lit = 0,
+    Unshaded
+};
+
 enum class TransparencyMode : uint8_t
 {
     Opaque = 0,

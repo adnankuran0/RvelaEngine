@@ -39,6 +39,10 @@ Ref<Asset> MaterialLoader::Load(
 
     auto asset = CreateRef<MaterialAsset>(meta.uuid);
 
+    if (j.contains("shadingMode"))
+        asset->shadingMode = static_cast<ShadingMode>(j["shadingMode"].get<int>());
+    asset->receiveShadows = j.value("receiveShadows", true);
+
     if (j.contains("transparencyMode"))
         asset->transparencyMode = static_cast<TransparencyMode>(j["transparencyMode"].get<int>());
     if (j.contains("blendMode"))

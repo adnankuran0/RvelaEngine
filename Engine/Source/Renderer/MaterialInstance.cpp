@@ -42,6 +42,11 @@ json MaterialInstance::SerializeOverrides() const
     if (IsOverridden(MatField::UVOffset))
         j["UVOffset"] = { m_UVOffset.x, m_UVOffset.y };
 
+    if (IsOverridden(MatField::ShadingMode))
+        j["shadingMode"] = static_cast<int>(m_ShadingMode);
+    if (IsOverridden(MatField::ReceiveShadows))
+        j["receiveShadows"] = m_ReceiveShadows;
+
     if (IsOverridden(MatField::TransparencyMode))
         j["transparencyMode"] = static_cast<int>(m_TransparencyMode);
     if (IsOverridden(MatField::BlendMode))
@@ -146,6 +151,15 @@ void MaterialInstance::DeserializeOverrides(const json& j)
     {
         m_AlphaCutoff = j["alphaCutoff"].get<float>();
         SetOverride(MatField::AlphaCutoff);
+    }
+
+    if (j.contains("shadingMode")) {
+        m_ShadingMode = static_cast<ShadingMode>(j["shadingMode"].get<int>());
+        SetOverride(MatField::ShadingMode);
+    }
+    if (j.contains("receiveShadows")) {
+        m_ReceiveShadows = j["receiveShadows"].get<bool>();
+        SetOverride(MatField::ReceiveShadows);
     }
 
     auto loadTex = [&](const char* key, Ref<TextureAsset>& target, bool& useFlag, MatField field)
