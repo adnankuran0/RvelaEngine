@@ -12,7 +12,7 @@ void DebugRenderer::Init()
 	m_LineVBO.Bind();
 
 	BufferLayout layout;
-	layout.BindVertexBuffer(m_LineVAO.getID());
+	layout.BindVertexBuffer(m_LineVBO.getID());
 	layout.Push<float>(3);
 	layout.Push<float>(4);
 	
@@ -72,7 +72,6 @@ void DebugRenderer::EndFrame(const glm::mat4& mvp)
 	Shader& shader = ShaderManager::Get("Line");
 
 	shader.use();
-	shader.setMat4("uMVP",mvp);
 
 	glDrawArrays(GL_LINES, 0, m_LineVertices.size());
 
