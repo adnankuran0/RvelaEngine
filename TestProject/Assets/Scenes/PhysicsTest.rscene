@@ -709,7 +709,7 @@
                     "cullMode": 2,
                     "receiveShadows": true,
                     "specular": 0.0,
-                    "transparencyMode": 1
+                    "transparencyMode": 2
                 }
             },
             "Mesh": {
@@ -722,19 +722,19 @@
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
-                    0.0,
+                    2.1648170948028564,
                     1.0,
                     3.0
                 ],
                 "rotation": [
                     0.0,
-                    -0.0,
+                    -46.36188507080078,
                     0.0
                 ],
                 "scale": [
+                    0.9999979734420776,
                     1.0,
-                    1.0,
-                    1.0
+                    0.9999979734420776
                 ]
             },
             "UUID": 30

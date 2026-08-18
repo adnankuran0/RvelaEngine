@@ -34,15 +34,15 @@ void main()
         N = normalize(normalMatrix * aNormal);
         T = normalize(mat3(model) * aTangent);
         T = normalize(T - dot(T, N) * N);
-        B = cross(N, T);
+        B = normalize(cross(N, T));
     }
     else
     {
         BillboardTransform bb = CalculateBillboard(billboardMode, model, view, aPos, camPos);
         worldPos = bb.worldPos;
-        N = bb.normal;
-        T = bb.tangent;
-        B = bb.bitangent;
+        N = normalize(bb.normal);
+        T = normalize(bb.tangent);
+        B = normalize(bb.bitangent);
     }
 
     FragPos = worldPos.xyz;
@@ -146,9 +146,9 @@ vec2 parallaxOcclusionMapping(vec2 texCoords, vec3 viewDirTS)
     return mix(currentTexCoords, prevTexCoords, weight);
 }
 
-vec3 getNormalFromMap(vec2 texCoords) 
+vec3 getNormalFromMap(vec2 texCoords, vec3 N, vec3 T, vec3 B) 
 {
-    if (!useNormalMap) return normalize(Normal);
+    if (!useNormalMap) return N;
     
     vec2 rg = texture(normalMap, texCoords).rg * 2.0 - 1.0;
     float b = sqrt(max(0.0, 1.0 - dot(rg, rg)));
@@ -157,20 +157,10 @@ vec3 getNormalFromMap(vec2 texCoords)
     tangentNormal.xy *= normalScale;
     
     float tnLen = length(tangentNormal);
-    if (tnLen < 0.001) return normalize(Normal);
+    if (tnLen < 0.001) return N;
     tangentNormal /= tnLen;
     
-    vec3 N = normalize(Normal);
-    vec3 T = normalize(Tangent);
-    T = normalize(T - dot(T, N) * N);
-    vec3 B = cross(N, T);
-    
-    mat3 TBN = mat3(T, B, N);
-    vec3 result = TBN * tangentNormal;
-    
-    float rLen = length(result);
-    if (rLen < 0.001) return N;
-    return result / rLen;
+    return normalize(mat3(T, B, N) * tangentNormal);
 }
 
 void main()
@@ -178,8 +168,17 @@ void main()
     vec3 viewDir = normalize(camPos - FragPos);
 
     vec3 T = normalize(Tangent);
-    vec3 B = normalize(Bitangent);
     vec3 N = normalize(Normal);
+
+    if (!gl_FrontFacing)
+    {
+        N = -N;
+        T = -T;
+    }
+
+    T = normalize(T - dot(T, N) * N);
+    vec3 B = normalize(cross(N, T));
+
     mat3 TBN = mat3(T, B, N);
     vec3 viewDirTS = transpose(TBN) * viewDir;
 
@@ -208,12 +207,11 @@ void main()
     float ao = useAOMap ? texture(aoMap, mappedTexCoords).r : aoValue;
 
     vec3 V = normalize(camPos - FragPos);
-    vec3 Nmap = getNormalFromMap(mappedTexCoords);
+    vec3 Nmap = getNormalFromMap(mappedTexCoords, N, T, B);
     vec3 F0 = mix(vec3(0.04), albedo, metallic);
 
     vec3 Lo = vec3(0.0);
 
-    // Directional Light
     if (hasDirectionalLight == 1) {
         vec3 L = normalize(-directionalLight.direction.xyz);
         vec3 H = normalize(V + L);
@@ -240,7 +238,6 @@ void main()
         Lo += (1.0 - shadow) * (kD * albedo / PI + specular) * lightColor * lightIntensity * NdotL;
     }
 
-    // Point Lights
     for (int i = 0; i < pointLightCount; ++i) 
     {
         PointLight light = pointLights[i];
@@ -277,7 +274,6 @@ void main()
         Lo += (1.0 - shadow) * (kD * albedo / PI + specular) * radiance * NdotL;
     }
 
-    // Ambient / IBL
     vec3 ambient = vec3(0.0);
     if (useIBL) {
         vec3 R = normalize(reflect(-V, Nmap));
