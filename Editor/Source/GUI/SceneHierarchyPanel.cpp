@@ -15,6 +15,7 @@ static Entity LoadPrimitive(Scene& scene, const std::string& primitiveMeshName)
         {"Cube", {"Cube", AssetUUID::FromString("55dee74b-34c1-4aac-80c9-627b95a8cf58")}},
         {"Sphere", {"Sphere", AssetUUID::FromString("b6c7f2a2-cce2-4b68-be50-19a8f552e727")}},
         {"Cylinder", {"Cylinder", AssetUUID::FromString("2c4d9b01-fea1-4eec-b741-bb054229ba61")}},
+        {"Quad", {"Quad", AssetUUID::FromString("1d2596bb-18d3-41a6-9848-a8a584870ce3")}},
         {"Cone", {"Cone", AssetUUID::FromString("92ffc5c9-9f6f-4332-ad83-e1d03b046a53")}},
         {"Capsule", {"Capsule", AssetUUID::FromString("62345031-f93b-40f4-aa76-18c59801997d")}},
         {"Plane", {"Plane", AssetUUID::FromString("077f6760-e8d5-44b4-895c-5d88be2db952")}},
@@ -177,6 +178,8 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                 selectedEntity = LoadPrimitive(scene, "Sphere");
             if (ImGui::MenuItem("Cylinder"))
                 selectedEntity = LoadPrimitive(scene, "Cylinder");
+            if (ImGui::MenuItem("Quad"))
+                selectedEntity = LoadPrimitive(scene, "Quad");
             if (ImGui::MenuItem("Cone"))
                 selectedEntity = LoadPrimitive(scene, "Cone");
             if (ImGui::MenuItem("Capsule"))
