@@ -1,45 +1,79 @@
 ﻿#include "MixerPanel.h"
 #include "ImGui/imgui.h"
+#include "ImGui/imgui_internal.h"
 #include "glm/glm.hpp"
 #include "Audio/AudioManager.h"
 #include "Audio/AudioBus.h"
+#include <algorithm>
+#include <cstdio>
+#include <cstring>
+#include <string>
 
 namespace rv {
 
     void MixerPanel::Draw()
     {
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10.0f, 10.0f));
         ImGui::Begin("Audio Mixer");
 
-        if (ImGui::Button(" + Add Bus "))
+        float availWidth = ImGui::GetContentRegionAvail().x;
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.17f, 0.17f, 0.23f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.55f, 0.50f, 0.72f, 0.8f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.68f, 0.62f, 0.88f, 1.0f));
+
+        if (ImGui::Button("+ Add Bus", ImVec2(120.0f, 26.0f)))
         {
             AudioManager::Get().CreateBus();
         }
+        ImGui::PopStyleColor(3);
 
-        ImGui::Separator();
-
-        ImGui::BeginChild("MixerStrips", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
-
+        ImGui::SameLine();
+        ImGui::AlignTextToFramePadding();
         auto& busses = AudioManager::Get().GetBusses();
+
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::Spacing();
+
+        ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.08f, 0.08f, 0.12f, 0.6f));
+        ImGui::BeginChild("MixerStrips", ImVec2(0.0f, 0.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
+        ImGui::PopStyleColor();
+
         uint32_t busToDelete = 0;
 
-        for (const auto& bus : busses)
-        {
-            uint32_t busID = bus->GetID();
+        const float stripWidth = 92.0f;
+        const float faderWidth = 24.0f;
 
+        float availableHeight = ImGui::GetContentRegionAvail().y;
+        float faderHeight = std::clamp(availableHeight - 145.0f, 120.0f, 380.0f);
+
+        for (size_t i = 0; i < busses.size(); ++i)
+        {
+            const auto& bus = busses[i];
+            uint32_t busID = bus->GetID();
             bool isMaster = (busID == 0);
 
             ImGui::PushID(busID);
-            ImGui::BeginGroup();
 
-            const float stripWidth = 70.0f;
+            ImVec4 cardBg = isMaster ? ImVec4(0.17f, 0.17f, 0.25f, 0.95f) : ImVec4(0.13f, 0.13f, 0.18f, 0.90f);
+            ImVec4 cardBorder = isMaster ? ImVec4(0.62f, 0.56f, 0.80f, 0.60f) : ImVec4(0.25f, 0.25f, 0.35f, 0.35f);
+
+            ImGui::PushStyleColor(ImGuiCol_ChildBg, cardBg);
+            ImGui::PushStyleColor(ImGuiCol_Border, cardBorder);
+            ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 6.0f);
+            ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1.0f);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(6.0f, 8.0f));
+
+            std::string stripChildId = "Strip_" + std::to_string(busID);
+            ImGui::BeginChild(stripChildId.c_str(), ImVec2(stripWidth, availableHeight - 10.0f), true, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
             if (m_RenamingBusID == busID)
             {
-                ImGui::SetNextItemWidth(stripWidth);
+                ImGui::SetNextItemWidth(-FLT_MIN);
                 ImGui::SetKeyboardFocusHere();
                 if (ImGui::InputText("##rename", m_RenameBuffer, sizeof(m_RenameBuffer), ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll))
                 {
-                    if (strlen(m_RenameBuffer) > 0)
+                    if (std::strlen(m_RenameBuffer) > 0)
                         bus->SetName(m_RenameBuffer);
                     m_RenamingBusID = UINT32_MAX;
                 }
@@ -51,20 +85,24 @@ namespace rv {
             else
             {
                 std::string name = bus->GetName();
-                std::string displayName = name.length() > 9 ? name.substr(0, 8) + "." : name;
+                float textWidth = ImGui::CalcTextSize(name.c_str()).x;
+                float contentWidth = ImGui::GetContentRegionAvail().x;
 
-                float textWidth = ImGui::CalcTextSize(displayName.c_str()).x;
-                ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (stripWidth - textWidth) * 0.5f);
+                if (textWidth < contentWidth)
+                    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (contentWidth - textWidth) * 0.5f);
 
                 if (isMaster)
-                    ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.2f, 1.0f), "%s", displayName.c_str());
+                    ImGui::TextColored(ImVec4(0.72f, 0.65f, 0.95f, 1.0f), "%s", name.c_str());
                 else
-                    ImGui::Text("%s", displayName.c_str());
+                    ImGui::TextUnformatted(name.c_str());
 
-                if (!isMaster && ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+                if (ImGui::IsItemHovered())
                 {
-                    m_RenamingBusID = busID;
-                    strncpy_s(m_RenameBuffer, sizeof(m_RenameBuffer), name.c_str(), _TRUNCATE);
+                    if (!isMaster && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+                    {
+                        m_RenamingBusID = busID;
+                        strncpy_s(m_RenameBuffer, sizeof(m_RenameBuffer), name.c_str(), _TRUNCATE);
+                    }
                 }
             }
 
@@ -83,29 +121,56 @@ namespace rv {
             }
 
             ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
 
-            float vol = AudioManager::Get().GetBusVolume(bus->GetID());
+            float vol = AudioManager::Get().GetBusVolume(busID);
 
-            const float sliderWidth = 20.0f;
-            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (stripWidth - sliderWidth) * 0.5f);
+            float curContentWidth = ImGui::GetContentRegionAvail().x;
+            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (curContentWidth - faderWidth) * 0.5f);
 
-            if (ImGui::VSliderFloat("##vol", ImVec2(sliderWidth, 180.0f), &vol, 0.0f, 2.0f, ""))
+            ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.09f, 0.09f, 0.13f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(0.12f, 0.12f, 0.17f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(0.12f, 0.12f, 0.17f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(0.62f, 0.56f, 0.80f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImVec4(0.68f, 0.62f, 0.88f, 1.0f));
+            ImGui::PushStyleVar(ImGuiStyleVar_GrabRounding, 4.0f);
+            ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.0f);
+
+            if (ImGui::VSliderFloat("##vol", ImVec2(faderWidth, faderHeight), &vol, 0.0f, 2.0f, ""))
             {
                 AudioManager::Get().SetBusVolume(busID, vol);
             }
 
-            char volText[16];
-            snprintf(volText, sizeof(volText), "%.2f", vol);
-            float volTextWidth = ImGui::CalcTextSize(volText).x;
-            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (stripWidth - volTextWidth) * 0.5f);
-            ImGui::TextDisabled("%s", volText);
+            if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+            {
+                vol = 1.0f;
+                AudioManager::Get().SetBusVolume(busID, vol);
+            }
 
+            ImGui::PopStyleVar(2);
+            ImGui::PopStyleColor(5);
+
+            ImGui::Spacing();
+
+            char volText[16];
+            std::snprintf(volText, sizeof(volText), "%.2f", vol);
+            float volTextWidth = ImGui::CalcTextSize(volText).x;
+            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (curContentWidth - volTextWidth) * 0.5f);
+
+            if (vol > 1.0f)
+                ImGui::TextColored(ImVec4(0.95f, 0.40f, 0.40f, 1.0f), "%s", volText);
+            else if (vol == 0.0f)
+                ImGui::TextDisabled("MUTE");
+            else
+                ImGui::TextDisabled("%s", volText);
+
+            ImGui::Spacing();
+            ImGui::Separator();
             ImGui::Spacing();
 
             if (!isMaster)
             {
-                ImGui::PushItemWidth(stripWidth); 
-
                 uint32_t parentID = bus->GetParentBusID();
                 std::string parentName = "Master";
 
@@ -118,9 +183,8 @@ namespace rv {
                     }
                 }
 
-                std::string displayParentName = parentName.length() > 7 ? parentName.substr(0, 6) + "." : parentName;
-
-                if (ImGui::BeginCombo("##ParentBus", displayParentName.c_str()))
+                ImGui::SetNextItemWidth(-FLT_MIN);
+                if (ImGui::BeginCombo("##ParentBus", parentName.c_str(), ImGuiComboFlags_None))
                 {
                     for (const auto& pBus : busses)
                     {
@@ -137,22 +201,28 @@ namespace rv {
                     }
                     ImGui::EndCombo();
                 }
-                ImGui::PopItemWidth();
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Routing to: %s", parentName.c_str());
             }
             else
             {
-                std::string outText = "Output";
-                float outTextWidth = ImGui::CalcTextSize(outText.c_str()).x;
-                ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (stripWidth - outTextWidth) * 0.5f);
-                ImGui::TextDisabled("%s", outText.c_str());
+                const char* outText = "OUTPUT";
+                float outTextWidth = ImGui::CalcTextSize(outText).x;
+                ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (curContentWidth - outTextWidth) * 0.5f);
+                ImGui::TextColored(ImVec4(0.55f, 0.57f, 0.70f, 0.8f), "%s", outText);
             }
 
-            ImGui::EndGroup();
+            ImGui::EndChild();
 
-            ImGui::SameLine();
-            ImGui::Dummy(ImVec2(10.0f, 0.0f));
-            ImGui::SameLine();
+            ImGui::PopStyleVar(3);
+            ImGui::PopStyleColor(2);
+
             ImGui::PopID();
+
+            if (i + 1 < busses.size())
+            {
+                ImGui::SameLine(0, 8.0f);
+            }
         }
 
         if (busToDelete != 0)
@@ -164,6 +234,7 @@ namespace rv {
 
         ImGui::EndChild();
         ImGui::End();
+        ImGui::PopStyleVar();
     }
 
 } // namespace rv

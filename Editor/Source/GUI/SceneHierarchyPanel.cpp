@@ -1,9 +1,14 @@
 ﻿#include "SceneHierarchyPanel.h"
 #include "ImGui/imgui.h"
+#include "ImGui/imgui_internal.h"
 #include <ImGui/tinyfiledialogs.h>
 #include "AssetImporters/PrefabImporter.h"
 #include "Core/Engine.h"
 #include "Scene/Entity.h"
+#include <algorithm>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 using namespace rv;
 
@@ -26,7 +31,7 @@ static Entity LoadPrimitive(Scene& scene, const std::string& primitiveMeshName)
     if (it == map.end()) return Entity{};
     const auto& cfg = it->second;
     Entity root = scene.CreateEntity(cfg.name);
-    
+
     Ref<MeshAsset> m = AssetManager::Get().GetAsset<MeshAsset>(cfg.uuid);
     if (!m)
     {
@@ -46,8 +51,8 @@ static Entity LoadPrimitive(Scene& scene, const std::string& primitiveMeshName)
         root.AddComponent<CapsuleColliderComponent>();
     else if (primitiveMeshName == "Cylinder")
         root.AddComponent<CylinderColliderComponent>();
-    else 
-        root.AddComponent<ConvexHullColliderComponent>(); 
+    else
+        root.AddComponent<ConvexHullColliderComponent>();
 
     scene.SetParent(root.GetHandle(), scene.GetRootEntity());
     return root;
@@ -57,12 +62,20 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 {
     Scene& scene = engine->GetActiveScene();
     entt::entity rootEntity = scene.GetRootEntity();
-
-
     entt::registry& registry = scene.GetRegistry();
+
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.0f, 8.0f));
     ImGui::Begin("Scene Hierarchy", nullptr, ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse);
 
-    auto rootEntities = scene.GetRootEntities();
+    static char searchFilter[128] = "";
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.17f, 0.17f, 0.23f, 1.0f));
+    ImGui::SetNextItemWidth(-FLT_MIN);
+    ImGui::InputTextWithHint("##HierarchySearch", "Search Entities...", searchFilter, sizeof(searchFilter));
+    ImGui::PopStyleColor();
+
+    ImGui::Spacing();
+    ImGui::Separator();
+    ImGui::Spacing();
 
     auto getChildren = [&registry](entt::entity parent) {
         std::vector<entt::entity> children;
@@ -74,13 +87,38 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
         return children;
         };
 
+    auto matchesFilter = [&](entt::entity entity, auto& self) -> bool {
+        if (searchFilter[0] == '\0') return true;
+        auto& tagComp = scene.GetComponent<TagComponent>(entity);
+        std::string nameLower = tagComp.tag;
+        std::string filterLower = searchFilter;
+        auto toLower = [](std::string& s) {
+            std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::tolower(c); });
+            };
+        toLower(nameLower);
+        toLower(filterLower);
+        if (nameLower.find(filterLower) != std::string::npos) return true;
+
+        for (auto child : getChildren(entity)) {
+            if (self(child, self)) return true;
+        }
+        return false;
+        };
+
+    ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.20f, 0.20f, 0.27f, 0.8f));
+    ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.55f, 0.50f, 0.72f, 0.6f));
+    ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.62f, 0.56f, 0.80f, 0.9f));
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4.0f, 2.0f));
 
     std::function<void(entt::entity)> DrawEntityNode = [&](entt::entity entity)
         {
-            bool isRoot = (entity == rootEntity);
+            if (searchFilter[0] != '\0' && !matchesFilter(entity, matchesFilter))
+                return;
 
+            bool isRoot = (entity == rootEntity);
             auto children = getChildren(entity);
-            ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
+
+            ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 
             if (isRoot)
             {
@@ -100,18 +138,27 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 
             bool isPrefab = scene.HasComponent<PrefabComponent>(entity);
             if (isPrefab)
-                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.75f, 1.0f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.62f, 0.56f, 0.80f, 1.0f));
 
-            bool nodeOpen = ImGui::TreeNodeEx(nodeId.c_str(), flags);
+            bool nodeOpen = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tagComponent.tag.c_str());
 
             if (isPrefab)
                 ImGui::PopStyleColor();
 
-            if (!isRoot && ImGui::IsItemClicked())
+            if (!isRoot && (ImGui::IsItemClicked(ImGuiMouseButton_Left) || ImGui::IsItemClicked(ImGuiMouseButton_Right)))
                 selectedEntity = entity;
 
             if (!isRoot && ImGui::BeginPopupContextItem())
             {
+                selectedEntity = entity;
+
+                if (ImGui::MenuItem("Create Child Entity"))
+                {
+                    entt::entity child = scene.CreateEntity("New Entity");
+                    scene.SetParent(child, entity);
+                    selectedEntity = child;
+                }
+
                 if (ImGui::MenuItem("Delete Entity"))
                 {
                     scene.QueueDestroyEntity(entity);
@@ -121,7 +168,7 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                 ImGui::EndPopup();
             }
 
-            if (!isRoot && ImGui::BeginDragDropSource())
+            if (!isRoot && ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
             {
                 entt::entity e = entity;
                 ImGui::SetDragDropPayload("ENTITY_DRAG", &e, sizeof(entt::entity));
@@ -160,12 +207,17 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
         DrawEntityNode(entity);
     }
 
+    ImGui::PopStyleVar();
+    ImGui::PopStyleColor(3);
 
-    if (ImGui::BeginPopupContextWindow()) {
+    if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowHovered())
+        selectedEntity = entt::null;
+
+    if (ImGui::BeginPopupContextWindow(nullptr, ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems)) {
         if (ImGui::MenuItem("Create Entity")) {
             selectedEntity = scene.CreateEntity("New Entity");
         }
-        
+
         if (ImGui::MenuItem("Camera")) {
             selectedEntity = scene.CreateEntity("Camera");
             scene.AddComponent<CameraComponent>(selectedEntity);
@@ -218,9 +270,11 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             ImGui::EndMenu();
         }
 
-        if (ImGui::MenuItem("Save as prefab"))
+        if (selectedEntity != entt::null && registry.valid(selectedEntity))
         {
-            if (selectedEntity != entt::null)
+            ImGui::Separator();
+
+            if (ImGui::MenuItem("Save as prefab"))
             {
                 const char* filterPatterns[] = { "*.rprefab" };
                 const char* filePath = tinyfd_saveFileDialog(
@@ -230,8 +284,8 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                 {
                     std::filesystem::path prefabPath = filePath;
 
-                    AssetRegistry& registry = AssetManager::Get().GetRegistry();
-                    AssetMeta meta = registry.GetOrCreateMeta(prefabPath);
+                    AssetRegistry& reg = AssetManager::Get().GetRegistry();
+                    AssetMeta meta = reg.GetOrCreateMeta(prefabPath);
 
                     Ref<PrefabAsset> prefab = PrefabImporter::CreatePrefabAsset(
                         prefabPath, meta.uuid, scene, selectedEntity);
@@ -239,35 +293,34 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                     if (prefab)
                     {
                         meta.importerID = "PrefabImporter";
-                        registry.SaveMeta(prefabPath, meta);
-                        registry.Scan(registry.GetAssetDir());
+                        reg.SaveMeta(prefabPath, meta);
+                        reg.Scan(reg.GetAssetDir());
                         LOG_INFO("Prefab saved: {}", prefabPath.string());
                     }
                 }
             }
-        }
 
-        if (scene.HasComponent<PrefabComponent>(selectedEntity))
-        {
-            if (ImGui::MenuItem("Make local"))
+            if (scene.HasComponent<PrefabComponent>(selectedEntity))
             {
-                scene.RemoveComponent<PrefabComponent>(selectedEntity);
+                if (ImGui::MenuItem("Make local"))
+                {
+                    scene.RemoveComponent<PrefabComponent>(selectedEntity);
+                }
             }
-        }
 
-        if (ImGui::MenuItem("Detach from parent")) {
+            if (ImGui::MenuItem("Detach from parent")) {
+                scene.RemoveParent(selectedEntity);
+            }
 
-            scene.RemoveParent(selectedEntity);
-        }
-
-        if (ImGui::MenuItem("Delete Entity")) {
-
-            scene.DestroyEntity(selectedEntity);
-            selectedEntity = entt::null;
+            if (ImGui::MenuItem("Delete Entity")) {
+                scene.DestroyEntity(selectedEntity);
+                selectedEntity = entt::null;
+            }
         }
 
         ImGui::EndPopup();
     }
 
     ImGui::End();
+    ImGui::PopStyleVar();
 }

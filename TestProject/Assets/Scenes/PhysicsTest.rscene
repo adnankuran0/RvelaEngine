@@ -692,7 +692,7 @@
             "AudioEmitterComponent": {
                 "attenuationModel": 1,
                 "audioClip": "4a0aefc7-3097-4826-b01e-d603ca9a4b19",
-                "busID": 1,
+                "busID": 0,
                 "doppler": true,
                 "dopplerFactor": 1.0,
                 "loop": false,
@@ -756,14 +756,14 @@
                     -2.191044950450305e-05
                 ],
                 "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
+                    -23.768400192260742,
+                    28.361736297607422,
+                    -2.4255868993350305e-06
                 ],
                 "scale": [
-                    1.0,
-                    1.0,
-                    1.0
+                    0.9999997019767761,
+                    0.9999996423721313,
+                    0.9999996423721313
                 ]
             },
             "UUID": 22
@@ -774,7 +774,7 @@
         "Bloom_Intensity": 1.0,
         "Bloom_Knee": 0.0,
         "Bloom_Treshold": 1.0,
-        "HDRPath": "Assets\\Textures\\skybox\\bryanston_park_sunrise_1k.hdr",
+        "HDRPath": "Assets\\Textures\\skybox\\environment2.hdr",
         "Lighting_AmbientColor": [
             1.0,
             1.0,

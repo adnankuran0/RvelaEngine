@@ -68,8 +68,6 @@ void Engine::Update()
 	{
 		layer->OnUpdate();
 	}
-
-	LOG_DEBUG(Time::GetFPS());
 }
 
 void Engine::FixedUpdate()
