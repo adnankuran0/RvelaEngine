@@ -84,8 +84,6 @@ void Skybox::Render(const glm::mat4& projection, const glm::mat4& view, GLuint s
 
     shader.use();
     glm::mat4 viewNoTranslation = glm::mat4(glm::mat3(view));
-    shader.setMat4("view", viewNoTranslation);
-    shader.setMat4("projection", projection);
 
     glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);

@@ -5,6 +5,7 @@
 #include "Renderer/RenderFrame.h"
 #include "Renderer/Camera.h"
 #include "Scene/Scene.h"
+#include "Renderer/ShaderManager.h"
 #include "Renderer/TextureCache.h"
 
 using namespace rv;
@@ -53,11 +54,6 @@ void SelectedEntityMaskPass::Execute(const RenderContext& ctx, RenderFrame& fram
     Shader& shader = ShaderManager::Get("Mask");
     shader.use();
 
-    glm::mat4 projection = ctx.camera->GetProjectionMatrix();
-    glm::mat4 view = ctx.camera->GetViewMatrix();
-    shader.setMat4("projection", projection);
-    shader.setMat4("view", view);
-    shader.setVec3("camPos", ctx.camera->Position);
     shader.setVec4("u_Color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
     auto ApplyCullMode = [](CullMode mode) {

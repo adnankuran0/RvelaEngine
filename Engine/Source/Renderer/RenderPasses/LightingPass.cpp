@@ -82,58 +82,17 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     Shader& shader = ShaderManager::Get("PBR");
     shader.use();
 
-    bool hasDirLight = ctx.directionalLight.has_value();
-    shader.setBool("hasDirectionalLight", hasDirLight);
-    if (hasDirLight) {
-        const auto& dirLight = ctx.directionalLight.value();
-        shader.setVec3("directionalLight.direction", dirLight.direction);
-        shader.setVec3("directionalLight.color", dirLight.color);
-        shader.setFloat("directionalLight.intensity", dirLight.intensity);
-        shader.setBool("directionalLight.castShadows", dirLight.castShadows);
-        shader.setFloat("directionalLight.shadowBias", dirLight.shadowBias);
-        shader.setFloat("directionalLight.blurRadius", dirLight.blurRadius);
-
-        shader.setMat4("lightSpaceMatrix", ctx.directionalLight->lightSpace);
-
-        shader.setInt("shadowMap", 6);
-        glBindTextureUnit(6, i_DirectionalShadowMap);
-    }
-
-    GLint maxTextureUnits = 0;
-    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextureUnits);
-
-    static constexpr int RESERVED_SLOTS = 7;
-    int maxPointLights = std::max(0, maxTextureUnits - RESERVED_SLOTS);
-    int pointLightCount = std::min(static_cast<int>(ctx.pointLights.size()), maxPointLights);
-
-    for (int i = 0; i < pointLightCount; ++i) {
-        const auto& light = ctx.pointLights[i];
-        std::string base = "pointLights[" + std::to_string(i) + "]";
-        shader.setVec3(base + ".position", light.position);
-        shader.setVec3(base + ".color", light.color);
-        shader.setFloat(base + ".intensity", light.intensity);
-        shader.setFloat(base + ".radius", light.radius);
-        shader.setFloat(base + ".falloff", light.falloff);
-        shader.setInt(base + ".shadowIndex", light.shadowIndex);
-        shader.setFloat(base + ".blurRadius", light.blurRadius);
-        shader.setFloat(base + ".shadowBias", light.shadowBias);
-        shader.setBool(base + ".castShadows", light.castShadows);
-    }
-
+    constexpr int DIR_SHADOW_MAP_SLOT = 6;
     constexpr int POINT_SHADOW_MAP_SLOT = 7;
+
+    shader.setInt("shadowMap", DIR_SHADOW_MAP_SLOT);
+    glBindTextureUnit(DIR_SHADOW_MAP_SLOT, i_DirectionalShadowMap);
+
     shader.setInt("pointShadowMap", POINT_SHADOW_MAP_SLOT);
     glBindTextureUnit(POINT_SHADOW_MAP_SLOT, i_PointShadowMap);
 
-    shader.setInt("pointLightCount", pointLightCount);
-    shader.setVec3("camPos", ctx.camera->Position);
-    shader.setMat4("view", ctx.camera->GetViewMatrix());
-    shader.setMat4("projection", ctx.camera->GetProjectionMatrix());
-
     auto& env = *ctx.environment;
     auto& skybox = env.GetSkybox();
-
-    glBindTextureUnit(6, i_DirectionalShadowMap);
-    glBindTextureUnit(7, i_PointShadowMap);
 
     shader.setInt("irradianceMap", 8);
     shader.setInt("prefilterMap", 9);

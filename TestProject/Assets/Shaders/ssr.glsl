@@ -16,6 +16,7 @@ void main()
 layout(location = 0) in vec2 TexCoord;
 layout(location = 0) out vec4 FragColor;
 
+#include "Common/Camera.glsl"
 #include "Common/Depth.glsl"
 
 layout(binding = 0) uniform sampler2D uDepthTexture;
@@ -24,16 +25,6 @@ layout(binding = 2) uniform sampler2D uMetallicTexture;
 layout(binding = 3) uniform sampler2D uRoughnessTexture;
 layout(binding = 4) uniform sampler2D uScreenTexture;
 layout(binding = 5) uniform samplerCube uSkybox;
-
-uniform mat4 uViewMatrix;
-uniform mat4 uProjectionMatrix;
-uniform mat4 uInverseProjectionMatrix;
-uniform mat4 uInverseViewMatrix;
-
-uniform vec2 uFullResolution;
-uniform vec3 uCameraPos;
-uniform float near;
-uniform float far;
 
 const int MAX_STEPS = 20;
 const int BINARY_SEARCH_STEPS = 5;
@@ -44,7 +35,7 @@ const float MIN_RAY_STEP = 0.01;
 const float RAY_HIT_THRESHOLD = 0.01;
 
 vec3 projectToScreen(vec3 worldPos) {
-    vec4 clipPos = uProjectionMatrix * (uViewMatrix * vec4(worldPos, 1.0));
+    vec4 clipPos = projection * (view * vec4(worldPos, 1.0));
     vec3 ndcPos = clipPos.xyz / clipPos.w;
     return vec3(ndcPos.xy * 0.5 + 0.5, ndcPos.z * 0.5 + 0.5);
 }
@@ -68,7 +59,7 @@ vec3 rayMarch(vec3 rayStart, vec3 rayDir, float roughness, out bool hit)
         if (any(lessThan(screenPos.xy, vec2(0.0)))) break;
         if (any(greaterThan(screenPos.xy, vec2(1.0)))) break;
         
-        vec3 toCurrent = currentPos - uCameraPos;
+        vec3 toCurrent = currentPos - camPos;
         distSq = dot(toCurrent, toCurrent);
         if (distSq > maxDistSq) break;
         
@@ -76,11 +67,11 @@ vec3 rayMarch(vec3 rayStart, vec3 rayDir, float roughness, out bool hit)
         if (sampledDepth > 0.999) continue;
         
         float rayDepth = sqrt(distSq);
-        vec3 sampledViewPos = ReconstructViewPos(screenPos.xy, sampledDepth, uInverseProjectionMatrix);
-        vec4 sampledWorldPosTemp = uInverseViewMatrix * vec4(sampledViewPos, 1.0);
+        vec3 sampledViewPos = ReconstructViewPos(screenPos.xy, sampledDepth, invProjection);
+        vec4 sampledWorldPosTemp = invView * vec4(sampledViewPos, 1.0);
         vec3 sampledWorldPos = sampledWorldPosTemp.xyz / sampledWorldPosTemp.w;
         
-        float surfaceDepth = distance(uCameraPos, sampledWorldPos);
+        float surfaceDepth = distance(camPos, sampledWorldPos);
         if (rayDepth > surfaceDepth + DEPTH_BIAS) 
         {
             vec3 hitPos = currentPos - stepVec;
@@ -95,12 +86,12 @@ vec3 rayMarch(vec3 rayStart, vec3 rayDir, float roughness, out bool hit)
                     
                     float refinedDepth = texture(uDepthTexture, refinedScreenPos.xy).r;
                     if (refinedDepth < 0.999) {
-                        vec3 refinedSampledViewPos = ReconstructViewPos(refinedScreenPos.xy, refinedDepth, uInverseProjectionMatrix);
-                        vec4 refinedSampledWorldPosTemp = uInverseViewMatrix * vec4(refinedSampledViewPos, 1.0);
+                        vec3 refinedSampledViewPos = ReconstructViewPos(refinedScreenPos.xy, refinedDepth, invProjection);
+                        vec4 refinedSampledWorldPosTemp = invView * vec4(refinedSampledViewPos, 1.0);
                         vec3 refinedSampledWorldPos = refinedSampledWorldPosTemp.xyz / refinedSampledWorldPosTemp.w;
                         
-                        float refinedRayDepth = distance(uCameraPos, hitPos);
-                        float refinedSurfaceDepth = distance(uCameraPos, refinedSampledWorldPos);
+                        float refinedRayDepth = distance(camPos, hitPos);
+                        float refinedSurfaceDepth = distance(camPos, refinedSampledWorldPos);
                         
                         if (abs(refinedRayDepth - refinedSurfaceDepth) < RAY_HIT_THRESHOLD) break;
                         
@@ -124,7 +115,7 @@ vec3 rayMarch(vec3 rayStart, vec3 rayDir, float roughness, out bool hit)
 }
 
 void main() {
-    vec2 halfResUV = gl_FragCoord.xy / (uFullResolution * 0.5);
+    vec2 halfResUV = gl_FragCoord.xy / (windowSize * 0.5);
     vec2 texCoord = halfResUV;
     
     float depth = texture(uDepthTexture, texCoord).r;
@@ -143,12 +134,12 @@ void main() {
         return;
     }
     
-    vec3 viewPos = ReconstructViewPos(texCoord, depth, uInverseProjectionMatrix);
-    vec4 worldPosTemp = uInverseViewMatrix * vec4(viewPos, 1.0);
+    vec3 viewPos = ReconstructViewPos(texCoord, depth, invProjection);
+    vec4 worldPosTemp = invView * vec4(viewPos, 1.0);
     vec3 worldPos = worldPosTemp.xyz / worldPosTemp.w;
     
-    vec3 viewDir = normalize(worldPos - uCameraPos);
-    vec3 worldNormal = mat3(uInverseViewMatrix) * normal;
+    vec3 viewDir = normalize(worldPos - camPos);
+    vec3 worldNormal = mat3(invView) * normal;
     vec3 reflectionDir = reflect(viewDir, normalize(worldNormal));
     
     float roughnessJitter = roughness * roughness * 0.2;
@@ -179,7 +170,7 @@ void main() {
         float reflectionStrength = fresnelFactor * roughnessAtt * mix(0.3, 1.0, metallic) * fadeFactor;
         
         if (roughness > 0.2) {
-            vec2 texelSize = 1.0 / uFullResolution;
+            vec2 texelSize = 1.0 / windowSize;
 
             vec3 c0 = texture(uScreenTexture, hitScreenPos.xy).rgb;
             vec3 c1 = texture(uScreenTexture, hitScreenPos.xy + vec2(texelSize.x, 0)).rgb;

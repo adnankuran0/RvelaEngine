@@ -167,7 +167,7 @@ std::string Shader::ProcessIncludes(const std::string& source, const Path& shade
                     }
                     else
                     {
-                        LOG_ERROR("Shader Include dosyasi acilamadi: {}", canonicalPathStr);
+                        LOG_ERROR("Can't open shader include file: {}", canonicalPathStr);
                     }
                 }
                 continue;
@@ -178,6 +178,7 @@ std::string Shader::ProcessIncludes(const std::string& source, const Path& shade
 
     return result.str();
 }
+
 bool Shader::CompileInternal(const Path& path, GLuint& outProgram)
 {
     std::ifstream shaderFile(path.GetAbsolute());
@@ -190,15 +191,11 @@ bool Shader::CompileInternal(const Path& path, GLuint& outProgram)
     std::stringstream buffer;
     buffer << shaderFile.rdbuf();
 
-    std::unordered_set<std::string> includedPaths;
-    includedPaths.insert(path.GetAbsoluteStr());
-    std::string source = ProcessIncludes(buffer.str(), path, includedPaths);
-
-    std::unordered_map<std::string, std::string> shaderSources;
+    std::unordered_map<std::string, std::string> rawShaderSources;
     std::string currentType;
     std::stringstream currentSource;
 
-    std::istringstream stream(source);
+    std::istringstream stream(buffer.str());
     std::string line;
 
     while (std::getline(stream, line))
@@ -207,7 +204,7 @@ bool Shader::CompileInternal(const Path& path, GLuint& outProgram)
         {
             if (!currentType.empty())
             {
-                shaderSources[currentType] = currentSource.str();
+                rawShaderSources[currentType] = currentSource.str();
                 currentSource.str("");
                 currentSource.clear();
             }
@@ -223,12 +220,16 @@ bool Shader::CompileInternal(const Path& path, GLuint& outProgram)
     }
 
     if (!currentType.empty())
-        shaderSources[currentType] = currentSource.str();
+        rawShaderSources[currentType] = currentSource.str();
 
     std::vector<GLuint> compiledShaders;
 
-    for (const auto& [type, src] : shaderSources)
+    for (const auto& [type, rawSrc] : rawShaderSources)
     {
+        std::unordered_set<std::string> includedPaths;
+        includedPaths.insert(path.GetAbsoluteStr());
+        std::string src = ProcessIncludes(rawSrc, path, includedPaths);
+
         GLenum shaderType = 0;
 
         if (type == "vertex")        shaderType = GL_VERTEX_SHADER;
@@ -278,4 +279,3 @@ bool Shader::CompileInternal(const Path& path, GLuint& outProgram)
     outProgram = program;
     return true;
 }
-

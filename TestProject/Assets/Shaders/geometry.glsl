@@ -6,17 +6,14 @@ layout(location = 2) in vec3 aTangent;
 layout(location = 3) in vec3 aBitangent;
 layout(location = 4) in vec2 aTexCoords;
 
+#include "Common/Camera.glsl"
 #include "Common/Billboard.glsl"
 
 uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
 uniform mat3 normalMatrix;
 uniform vec2 UVScale;
 uniform vec2 UVOffset;
-
 uniform int billboardMode;
-uniform vec3 camPos;
 
 out vec3 FragPos;
 out vec3 Normal;

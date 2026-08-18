@@ -90,13 +90,6 @@ void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     Shader& shader = ShaderManager::Get("EntityBuffer");
     shader.use();
 
-    glm::mat4 projection = ctx.camera->GetProjectionMatrix();
-    glm::mat4 view = ctx.camera->GetViewMatrix();
-
-    shader.setMat4("view", view);
-    shader.setMat4("projection", projection);
-    shader.setVec3("camPos", ctx.camera->Position);
-
     auto ApplyCullMode = [](CullMode mode) {
         if (mode == CullMode::Disabled) {
             glDisable(GL_CULL_FACE);

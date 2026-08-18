@@ -3,7 +3,7 @@
 #include "RenderPass.h"
 #include "RenderCommand.h"
 #include "RenderFrame.h"
-
+#include "UniformBuffer.h"
 
 namespace rv {
 
@@ -32,6 +32,8 @@ public:
 	[[nodiscard]] inline GLuint GetEntityBuffer() noexcept { return m_RenderFrame.registry.Get("EntityBuffer")->id; }
 
 private:
+	void UpdateUBOs(const RenderContext& ctx);
+
 	friend class RenderLayer;
 
 	RenderFrame m_RenderFrame;
@@ -41,7 +43,8 @@ private:
 	std::vector<PassEntry> m_RenderPasses;
 	RenderPassHandle m_NextID = 1;
 
-
+	std::unique_ptr<UniformBuffer> m_CameraUBO;
+	std::unique_ptr<UniformBuffer> m_LightUBO;
 };
 
 }

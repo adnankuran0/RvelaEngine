@@ -7,6 +7,7 @@
 layout (location = 0) in vec3 aPos;
 layout (location = 3) in vec2 aTexCoords;
 
+#include "Common/Camera.glsl"
 #include "Common/Billboard.glsl"
 
 uniform mat4 model;
@@ -15,10 +16,7 @@ uniform int baseLayer;
 uniform int currentFace;    
 uniform vec2 UVScale;
 uniform vec2 UVOffset;
-
 uniform int billboardMode;
-uniform mat4 cameraView;
-uniform vec3 camPos;
 
 out vec4 FragPos;
 out vec2 TexCoords;
@@ -27,7 +25,7 @@ void main()
 {
     TexCoords = aTexCoords * UVScale + UVOffset;
 
-    BillboardTransform bb = CalculateBillboard(billboardMode, model, cameraView, aPos, camPos);
+    BillboardTransform bb = CalculateBillboard(billboardMode, model, view, aPos, camPos);
 
     FragPos = bb.worldPos;
     gl_Position = shadowMatrix * FragPos;

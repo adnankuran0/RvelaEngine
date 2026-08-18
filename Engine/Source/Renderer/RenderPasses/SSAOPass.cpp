@@ -4,16 +4,13 @@
 #include "Renderer/RenderContext.h"
 #include "Scene/Environment.h"
 #include "Renderer/Renderer.h"
+#include "Renderer/ShaderManager.h"
 
 using namespace rv;
-
 
 constexpr int KERNEL_SIZE = 32;
 constexpr int NOISE_SIZE = 16;
 constexpr GLenum SSAO_TEXTURE_FORMAT = GL_R16F;
-constexpr float NEAR_PLANE = 0.1f;
-constexpr float FAR_PLANE = 100.0f;
-
 
 void SSAOPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
@@ -23,7 +20,7 @@ void SSAOPass::Init(const RenderContext& ctx, RenderFrame& frame)
     int h = (int)(ctx.viewportHeight / 2.0f);
 
     glCreateTextures(GL_TEXTURE_2D, 1, &o_SsaoTexture);
-    glTextureStorage2D(o_SsaoTexture, 1, SSAO_TEXTURE_FORMAT,w ,h);
+    glTextureStorage2D(o_SsaoTexture, 1, SSAO_TEXTURE_FORMAT, w, h);
     glTextureParameteri(o_SsaoTexture, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTextureParameteri(o_SsaoTexture, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
@@ -35,7 +32,7 @@ void SSAOPass::Init(const RenderContext& ctx, RenderFrame& frame)
     GenerateSampleKernel();
     GenerateNoiseTexture();
 
-    frame.registry.Register("SSAOTexture", { RenderResourceType::Texture,o_SsaoTexture });
+    frame.registry.Register("SSAOTexture", { RenderResourceType::Texture, o_SsaoTexture });
 }
 
 SSAOPass::~SSAOPass()
@@ -45,7 +42,8 @@ SSAOPass::~SSAOPass()
     glDeleteFramebuffers(1, &ssaoFBO);
 }
 
-void SSAOPass::Execute(const RenderContext& ctx, RenderFrame& frame){
+void SSAOPass::Execute(const RenderContext& ctx, RenderFrame& frame)
+{
     if (!ctx.environment->SSAO) return;
 
     auto i_Normal = frame.registry.Get("NormalTexture")->id;
@@ -54,19 +52,11 @@ void SSAOPass::Execute(const RenderContext& ctx, RenderFrame& frame){
 
     Shader& ssaoShader = ShaderManager::Get("SSAO");
 
-    const glm::mat4& projection = ctx.camera->GetProjectionMatrix();
-    const glm::mat4 invProjection = glm::inverse(projection);
-
     glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
     glViewport(0, 0, ctx.viewportWidth / 2, ctx.viewportHeight / 2);
     glClear(GL_COLOR_BUFFER_BIT);
 
     ssaoShader.use();
-    ssaoShader.setMat4("projection", projection);
-    ssaoShader.setMat4("invProjection", invProjection);
-    ssaoShader.setVec2("windowSize", glm::vec2(ctx.viewportWidth / 2, ctx.viewportHeight / 2));
-    ssaoShader.setFloat("near", NEAR_PLANE);
-    ssaoShader.setFloat("far", FAR_PLANE);
     ssaoShader.setFloat("radius", env.SSAO_Radius);
     ssaoShader.setFloat("bias", env.SSAO_Bias);
     ssaoShader.setFloat("intensity", env.SSAO_Intensity);
@@ -86,15 +76,14 @@ void SSAOPass::Execute(const RenderContext& ctx, RenderFrame& frame){
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
 
-    frame.registry.Register("SSAOTexture", { RenderResourceType::Texture,o_SsaoTexture });
-
+    frame.registry.Register("SSAOTexture", { RenderResourceType::Texture, o_SsaoTexture });
 }
 
 void SSAOPass::GenerateSampleKernel()
 {
     std::uniform_real_distribution<float> randomFloats(0.0f, 1.0f);
     std::default_random_engine generator;
-    kernel->reserve(KERNEL_SIZE); 
+    kernel->reserve(KERNEL_SIZE);
 
     for (unsigned int i = 0; i < KERNEL_SIZE; ++i)
     {

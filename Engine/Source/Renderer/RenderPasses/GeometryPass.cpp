@@ -83,13 +83,6 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     geometryShader.use();
 
-    glm::mat4 projection = ctx.camera->GetProjectionMatrix();
-    glm::mat4 view = ctx.camera->GetViewMatrix();
-
-    geometryShader.setMat4("view", view);
-    geometryShader.setMat4("projection", projection);
-    geometryShader.setVec3("camPos", ctx.camera->Position);
-
     auto ApplyCullMode = [](CullMode mode) {
         if (mode == CullMode::Disabled) {
             glDisable(GL_CULL_FACE);
@@ -109,7 +102,7 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         glm::mat4 model = command.transform->GetWorldMatrix();
 
         geometryShader.setMat4("model", model);
-        glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(view * model)));
+        glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(model)));
         geometryShader.setMat3("normalMatrix", normalMatrix);
         geometryShader.setVec2("UVScale", material->GetUVScale());
         geometryShader.setVec2("UVOffset", material->GetUVOffset());

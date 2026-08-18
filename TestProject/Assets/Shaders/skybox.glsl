@@ -3,13 +3,13 @@
 layout(location = 0) in vec3 aPosition;
 out vec3 TexCoords;
 
-uniform mat4 projection;
-uniform mat4 view;
+#include "Common/Camera.glsl"
 
 void main()
 {
     TexCoords = aPosition; 
-    vec4 pos = projection * view * vec4(aPosition, 1.0);
+    mat4 viewNoTranslation = mat4(mat3(view));
+    vec4 pos = projection * viewNoTranslation * vec4(aPosition, 1.0);
     gl_Position = pos.xyww;
 }
 
@@ -19,7 +19,7 @@ void main()
 in vec3 TexCoords;
 out vec4 FragColor;
 
-uniform samplerCube skybox;
+layout(binding = 0) uniform samplerCube skybox;
 
 void main()
 {

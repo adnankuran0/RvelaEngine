@@ -5,9 +5,9 @@
 #include "Renderer/RenderContext.h"
 #include "Scene/Environment.h"
 #include "Renderer/Renderer.h"
+#include "Renderer/ShaderManager.h"
 
 using namespace rv;
-
 
 void SSRPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
@@ -20,7 +20,7 @@ void SSRPass::Init(const RenderContext& ctx, RenderFrame& frame)
     int w = (int)(ctx.viewportWidth / 2.0f);
     int h = (int)(ctx.viewportHeight / 2.0f);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, w,h, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, w, h, 0, GL_RGBA, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, o_SsrTexture, 0);
@@ -30,12 +30,13 @@ void SSRPass::Init(const RenderContext& ctx, RenderFrame& frame)
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    frame.registry.Register("SSRTexture", { RenderResourceType::Texture,o_SsrTexture });
+    frame.registry.Register("SSRTexture", { RenderResourceType::Texture, o_SsrTexture });
 }
 
 SSRPass::~SSRPass()
 {
-    //TODO: Fill this function
+    glDeleteTextures(1, &o_SsrTexture);
+    glDeleteFramebuffers(1, &ssrFBO);
 }
 
 void SSRPass::Execute(const RenderContext& ctx, RenderFrame& frame)
@@ -57,39 +58,18 @@ void SSRPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     ssrShader.use();
 
-    glm::mat4 viewMatrix = ctx.camera->GetViewMatrix();
-    glm::mat4 projectionMatrix = ctx.camera->GetProjectionMatrix();
-
-    ssrShader.setMat4("uViewMatrix", viewMatrix);
-    ssrShader.setMat4("uProjectionMatrix", projectionMatrix);
-    ssrShader.setMat4("uInverseProjectionMatrix", glm::inverse(projectionMatrix));
-    ssrShader.setMat4("uInverseViewMatrix", glm::inverse(viewMatrix));
-
-    ssrShader.setFloat("near", 0.1f);
-    ssrShader.setFloat("far", 100.0f);
-    ssrShader.setFloat("uTime", (float)Time::GetCurrentTime());
-    ssrShader.setVec3("uCameraPos", ctx.camera->Position);
-    ssrShader.setFloat("uMaxRayDistance", 100.0f);
-    ssrShader.setVec2("uFullResolution",
-        glm::vec2(ctx.viewportWidth, ctx.viewportHeight));
-
-
     glBindTextureUnit(0, i_Depth);
-    ssrShader.setInt("uDepthTexture", 0);
-
     glBindTextureUnit(1, i_Normal);
-    ssrShader.setInt("uNormalTexture", 1);
-
     glBindTextureUnit(2, i_Roughness);
-    ssrShader.setInt("uRoughnessTexture", 2);
-
     glBindTextureUnit(3, i_Metallic);
-    ssrShader.setInt("uMetallicTexture", 3);
-
     glBindTextureUnit(4, i_Screen);
-    ssrShader.setInt("uScreenTexture", 4);
-
     glBindTextureUnit(5, i_Skybox);
+
+    ssrShader.setInt("uDepthTexture", 0);
+    ssrShader.setInt("uNormalTexture", 1);
+    ssrShader.setInt("uRoughnessTexture", 2);
+    ssrShader.setInt("uMetallicTexture", 3);
+    ssrShader.setInt("uScreenTexture", 4);
     ssrShader.setInt("uSkybox", 5);
 
     Renderer::DrawFullScreenQuad();
@@ -99,6 +79,5 @@ void SSRPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
 
-    frame.registry.Register("SSRTexture", { RenderResourceType::Texture,o_SsrTexture });
-
+    frame.registry.Register("SSRTexture", { RenderResourceType::Texture, o_SsrTexture });
 }

@@ -3,16 +3,13 @@
 layout(location = 0) in vec3 aPos;
 layout(location = 3) in vec2 aTexCoords;
 
+#include "Common/Camera.glsl"
 #include "Common/Billboard.glsl"
 
 uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
 uniform vec2 UVScale;
 uniform vec2 UVOffset;
-
 uniform int billboardMode;
-uniform vec3 camPos;
 
 out vec2 TexCoords;
 

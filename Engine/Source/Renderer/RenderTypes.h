@@ -39,4 +39,43 @@ enum class BillboardMode : uint8_t
     Cylindrical
 };
 
+struct CameraUBOData
+{
+    glm::mat4 view;
+    glm::mat4 projection;
+    glm::mat4 invView;
+    glm::mat4 invProjection;
+    glm::vec3 camPos;
+    float padding0;
+    glm::vec2 windowSize;
+    float nearPlane;
+    float farPlane;
+};
+
+struct PointLightUBOData {
+    glm::vec4 position;
+    glm::vec4 colorIntensity;
+    float radius;
+    float shadowBias;
+    float blurRadius;
+    int shadowIndex;
+};
+
+struct DirectionalLightUBOData {
+    glm::vec4 direction;
+    glm::vec4 colorIntensity;
+    float shadowBias;
+    float blurRadius;
+    glm::vec2 padding;
+};
+
+struct LightUBOData {
+    DirectionalLightUBOData dirLight;
+    PointLightUBOData pointLights[20];
+    glm::mat4 lightSpaceMatrix;
+    int pointLightCount;
+    int hasDirLight;
+    glm::vec2 padding;
+};
+
 }

@@ -17,20 +17,16 @@ void main()
 out float FragColor;
 in vec2 TexCoords;
 
+#include "Common/Camera.glsl"
 #include "Common/Depth.glsl"
 
 layout(binding = 0) uniform sampler2D gNormal;
 layout(binding = 1) uniform sampler2D gDepth;
 layout(binding = 2) uniform sampler2D texNoise;
-uniform mat4 projection;
-uniform mat4 invProjection; 
-uniform vec2 windowSize;
-uniform vec3 samples[32];
 
+uniform vec3 samples[32];
 const float invSamples = 1.0 / 32.0;
 
-uniform float near;
-uniform float far;
 uniform float radius = 1.0;      
 uniform float bias = 0.025;
 uniform float intensity = 1.0;
@@ -40,7 +36,8 @@ void main()
     float depth = texture(gDepth, TexCoords).r;
     vec3 fragPos = ReconstructViewPos(TexCoords, depth, invProjection);
     vec3 normal = normalize(texture(gNormal, TexCoords).rgb);
-    vec2 noiseScale = windowSize * 0.25;
+
+    vec2 noiseScale = (windowSize * 0.5) * 0.25;
     vec3 randomVec = normalize(texture(texNoise, TexCoords * noiseScale).xyz);
     
     vec3 tangent = normalize(randomVec - normal * dot(randomVec, normal));

@@ -4,29 +4,53 @@
 using namespace rv;
 
 UniformBuffer::UniformBuffer(GLsizeiptr size, unsigned int bindingPoint)
+    : m_Binding(bindingPoint)
 {
-	glGenBuffers(1, &m_ID);
-	glBindBuffer(GL_UNIFORM_BUFFER, m_ID);
-	glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_STATIC_DRAW);
-	glBindBufferRange(GL_UNIFORM_BUFFER, bindingPoint, m_ID, 0, size);
-}
-
-void UniformBuffer::Bind()
-{
-	glBindBuffer(GL_UNIFORM_BUFFER, m_ID);
-}
-
-void UniformBuffer::Unbind()
-{
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-}
-
-void UniformBuffer::SetData(GLintptr offset, GLsizeiptr size, const void* data)
-{
-	glBufferSubData(GL_UNIFORM_BUFFER, offset, size, data);
+    glCreateBuffers(1, &m_ID);
+    glNamedBufferData(m_ID, size, nullptr, GL_DYNAMIC_DRAW);
+    glBindBufferRange(GL_UNIFORM_BUFFER, bindingPoint, m_ID, 0, size);
 }
 
 UniformBuffer::~UniformBuffer()
 {
-	glDeleteBuffers(1, &m_ID);
+    if (m_ID != 0)
+    {
+        glDeleteBuffers(1, &m_ID);
+        m_ID = 0;
+    }
+}
+
+UniformBuffer::UniformBuffer(UniformBuffer&& other) noexcept
+    : m_ID(other.m_ID), m_Binding(other.m_Binding)
+{
+    other.m_ID = 0;
+}
+
+UniformBuffer& UniformBuffer::operator=(UniformBuffer&& other) noexcept
+{
+    if (this != &other)
+    {
+        if (m_ID != 0)
+            glDeleteBuffers(1, &m_ID);
+
+        m_ID = other.m_ID;
+        m_Binding = other.m_Binding;
+        other.m_ID = 0;
+    }
+    return *this;
+}
+
+void UniformBuffer::SetData(GLintptr offset, GLsizeiptr size, const void* data)
+{
+    glNamedBufferSubData(m_ID, offset, size, data);
+}
+
+void UniformBuffer::Bind() const
+{
+    glBindBuffer(GL_UNIFORM_BUFFER, m_ID);
+}
+
+void UniformBuffer::Unbind() const
+{
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }

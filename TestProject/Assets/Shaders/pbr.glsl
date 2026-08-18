@@ -5,6 +5,8 @@ layout(location = 1) in vec3 aNormal;
 layout(location = 2) in vec3 aTangent;
 layout(location = 3) in vec2 aTexCoords;
 
+#include "Common/Camera.glsl"
+#include "Common/Lights.glsl"
 #include "Common/Billboard.glsl"
 
 out vec3 FragPos;
@@ -15,17 +17,11 @@ out vec3 Tangent;
 out vec3 Bitangent;
 
 uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
-
 uniform vec2 UVScale;
 uniform vec2 UVOffset;
-
-uniform mat4 lightSpaceMatrix;
 uniform mat3 normalMatrix;
 
 uniform int billboardMode;
-uniform vec3 camPos;
 
 void main()
 {
@@ -70,6 +66,8 @@ in vec4 FragPosLightSpace;
 in vec3 Tangent;
 in vec3 Bitangent;
 
+#include "Common/Camera.glsl"
+#include "Common/Lights.glsl"
 #include "Common/Constants.glsl"
 #include "Common/PBR.glsl"
 #include "Common/Shadows.glsl"
@@ -109,7 +107,6 @@ uniform bool receiveShadows;
 
 layout(binding = 6) uniform sampler2D shadowMap;
 layout(binding = 7) uniform samplerCubeArray pointShadowMap;
-uniform mat4 lightSpaceMatrix;
 
 layout(binding = 8) uniform samplerCube irradianceMap;
 layout(binding = 9) uniform samplerCube prefilterMap;
@@ -118,43 +115,13 @@ layout(binding = 10) uniform sampler2D brdfLUT;
 uniform bool useIBL;
 uniform float iblIntensity;
 
-#define MAX_POINT_LIGHTS 20
-#define MAX_DIRECTIONAL_LIGHTS 1
-
-struct PointLight {
-    vec3 position;
-    vec3 color;
-    float intensity;
-    float radius;
-    float falloff;
-    bool castShadows;
-    float shadowBias;
-    float blurRadius;
-    int shadowIndex;
-};
-uniform PointLight pointLights[MAX_POINT_LIGHTS];
-uniform int pointLightCount;
-
-struct DirectionalLight {
-    vec3 direction;
-    vec3 color;
-    float intensity;
-    bool castShadows;
-    float shadowBias;
-    float blurRadius;
-};
-uniform DirectionalLight directionalLight;
-uniform bool hasDirectionalLight;
-
-uniform vec3 camPos;
-
 vec2 parallaxOcclusionMapping(vec2 texCoords, vec3 viewDirTS)
 {
-    if(!useHeightMap) return texCoords;
+    if (!useHeightMap) return texCoords;
 
     const float minLayers = 8.0;
     const float maxLayers = 32.0;
-    float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0,0.0,1.0), viewDirTS)));
+    float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDirTS)));
 
     float layerDepth = 1.0 / numLayers;
     float currentLayerDepth = 0.0;
@@ -164,7 +131,7 @@ vec2 parallaxOcclusionMapping(vec2 texCoords, vec3 viewDirTS)
     vec2 currentTexCoords = texCoords;
     float currentDepthMapValue = texture(heightMap, currentTexCoords).r;
 
-    while(currentLayerDepth < currentDepthMapValue)
+    while (currentLayerDepth < currentDepthMapValue)
     {
         currentTexCoords -= deltaTexCoords;
         currentLayerDepth += layerDepth;
@@ -223,21 +190,13 @@ void main()
     vec3 albedo = fullAlbedo.rgb;
     float alpha = fullAlbedo.a;
 
-    if (transparencyMode == 0)
-    {
-        alpha = 1.0;
-    }
-    else if (transparencyMode == 2)
-    {
-        if (alpha < alphaCutoff)
-        {
-            discard;
-        }
+    if (transparencyMode == 0) alpha = 1.0;
+    else if (transparencyMode == 2) {
+        if (alpha < alphaCutoff) discard;
         alpha = 1.0;
     }
 
-    if (shadingMode == 1) 
-    {
+    if (shadingMode == 1) {
         vec3 unshadedColor = albedo + (emmisiveColor * emmisiveIntensity);
         FragColor = vec4(unshadedColor, alpha);
         return; 
@@ -254,8 +213,9 @@ void main()
 
     vec3 Lo = vec3(0.0);
 
-    if(hasDirectionalLight) {
-        vec3 L = normalize(-directionalLight.direction);
+    // Directional Light
+    if (hasDirectionalLight == 1) {
+        vec3 L = normalize(-directionalLight.direction.xyz);
         vec3 H = normalize(V + L);
         
         float NDF = DistributionGGX(Nmap, H, roughness);
@@ -267,24 +227,28 @@ void main()
 
         vec3 numerator = NDF * G * F;
         float denominator = 4.0 * max(dot(Nmap, V), 0.0) * max(dot(Nmap, L), 0.0) + 0.0001;
-        vec3 specular = numerator / denominator;
-        specular *= specularIntensity;
+        vec3 specular = (numerator / denominator) * specularIntensity;
         float NdotL = max(dot(Nmap, L), 0.0);
-        float shadow = (directionalLight.castShadows && receiveShadows) ?   
+        
+        bool castShadows = directionalLight.direction.w > 0.5;
+        float shadow = (castShadows && receiveShadows) ?   
             calculateDirectionalShadow(shadowMap, FragPosLightSpace, Nmap, L, directionalLight.shadowBias, directionalLight.blurRadius) : 0.0;
 
-        Lo += (1.0 - shadow) * (kD * albedo / PI + specular) * 
-              directionalLight.color * directionalLight.intensity * NdotL;
+        vec3 lightColor = directionalLight.colorIntensity.rgb;
+        float lightIntensity = directionalLight.colorIntensity.a;
+
+        Lo += (1.0 - shadow) * (kD * albedo / PI + specular) * lightColor * lightIntensity * NdotL;
     }
 
-    for(int i = 0; i < pointLightCount; ++i) 
+    // Point Lights
+    for (int i = 0; i < pointLightCount; ++i) 
     {
         PointLight light = pointLights[i];
-        vec3 L_vec = light.position - FragPos;
+        vec3 L_vec = light.position.xyz - FragPos;
         float dist2 = dot(L_vec, L_vec);
         float radius2 = light.radius * light.radius;
         
-        if(dist2 > radius2) continue;
+        if (dist2 > radius2) continue;
         
         float distance = sqrt(dist2);
         vec3 L = L_vec / distance;
@@ -302,49 +266,38 @@ void main()
 
         vec3 numerator = NDF * G * F;
         float denominator = 4.0 * max(dot(Nmap, V), 0.0) * max(dot(Nmap, L), 0.0) + 0.0001;
-       
-        vec3 specular = numerator / denominator;
-        specular *= specularIntensity;
+        vec3 specular = (numerator / denominator) * specularIntensity;
         float NdotL = max(dot(Nmap, L), 0.0);
-        float shadow = (light.castShadows && receiveShadows) ? 
-            calculatePointLightShadow(pointShadowMap, light.shadowIndex, FragPos, light.position, light.radius, Nmap, light.shadowBias, light.blurRadius) : 0.0;
+        
+        bool castShadows = light.shadowIndex >= 0;
+        float shadow = (castShadows && receiveShadows) ? 
+            calculatePointLightShadow(pointShadowMap, light.shadowIndex, FragPos, light.position.xyz, light.radius, Nmap, light.shadowBias, light.blurRadius) : 0.0;
 
-        vec3 radiance = light.color * light.intensity * attenuation;
+        vec3 radiance = light.colorIntensity.rgb * light.colorIntensity.a * attenuation;
         Lo += (1.0 - shadow) * (kD * albedo / PI + specular) * radiance * NdotL;
     }
 
+    // Ambient / IBL
     vec3 ambient = vec3(0.0);
-
-    if(useIBL)
-    {
+    if (useIBL) {
         vec3 R = normalize(reflect(-V, Nmap));
-        
         float NdotV = max(dot(Nmap, V), 0.0);
         vec3 F = fresnelSchlick(NdotV, F0);
-        
         vec3 kS = F;
-        vec3 kD = vec3(1.0) - kS;
-        kD *= 1.0 - metallic; 
+        vec3 kD = (vec3(1.0) - kS) * (1.0 - metallic); 
 
         vec3 irradiance = texture(irradianceMap, Nmap).rgb;
         vec3 diffuse = irradiance * albedo;
 
-        const float MAX_REFLECTION_LOD = 4.0;
-        float lod = roughness * MAX_REFLECTION_LOD;
+        float lod = roughness * 4.0;
         vec3 prefilteredColor = textureLod(prefilterMap, R, lod).rgb;
-        
         vec2 brdf = texture(brdfLUT, vec2(NdotV, roughness)).rg;
         
-        vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
-        specular *= specularIntensity;
+        vec3 specular = prefilteredColor * (F * brdf.x + brdf.y) * specularIntensity;
         ambient = (kD * diffuse + specular) * ao * iblIntensity;
-    }
-    else
-    {
+    } else {
         ambient = ambientColor * ambientIntensity * albedo * ao;
     }
     
-    vec3 color = ambient + Lo + emmisiveColor * emmisiveIntensity;
-
-    FragColor = vec4(color, alpha);
+    FragColor = vec4(ambient + Lo + emmisiveColor * emmisiveIntensity, alpha);
 }
