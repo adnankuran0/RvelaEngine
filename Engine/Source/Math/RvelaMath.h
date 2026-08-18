@@ -8,6 +8,12 @@
 
 namespace rv::math {
 
+static inline float RandomFloat(float min, float max)
+{
+    if (min >= max) return min;
+    return min + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (max - min)));
+}
+
 static inline JPH::Vec3 ToJoltVec3(const glm::vec3& v) 
 {
     return JPH::Vec3(v.x, v.y, v.z);

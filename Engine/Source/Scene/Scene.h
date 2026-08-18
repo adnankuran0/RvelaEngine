@@ -11,6 +11,7 @@
 #include "Environment.h"
 #include "Physics/PhysicsSystem.h"
 #include "Audio/AudioSystem.h"
+#include "ParticleSystem.h"
 
 namespace rv {
 
@@ -164,6 +165,8 @@ private:
     entt::registry m_Registry;
     PhysicsSystem m_PhysicsSystem;
     AudioSystem m_AudioSystem;
+    ParticleSystem m_ParticleSystem;
+
     Environment m_Environment;
 };
 
