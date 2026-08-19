@@ -44,6 +44,10 @@ void ParticlePass::Execute(const RenderContext& ctx, RenderFrame& frame)
     Shader& shader = ShaderManager::Get("Particle");
     shader.use();
 
+    auto& env = *ctx.environment;
+    shader.setVec3("ambientColor", env.Lighting_AmbientColor);
+    shader.setFloat("ambientIntensity", env.Lighting_AmbientIntensity);
+
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_FALSE);
     glEnable(GL_BLEND);
@@ -94,7 +98,8 @@ void ParticlePass::Execute(const RenderContext& ctx, RenderFrame& frame)
         shader.setVec2("UVScale", material->GetUVScale());
         shader.setVec2("UVOffset", material->GetUVOffset());
 
-        shader.setInt("billboardMode", 1);
+        shader.setInt("shadingMode", static_cast<int>(material->GetShadingMode()));
+        shader.setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
         shader.setInt("instanceOffset", cmd.instanceOffset);
 
         if (material->IsUsingAlbedoMap() && material->GetAlbedoTexture()) {
