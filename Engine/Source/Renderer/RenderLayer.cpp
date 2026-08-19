@@ -36,7 +36,7 @@ void RenderLayer::CollectRenderCommands(Scene* scene)
 	Camera* camera = Engine::Get()->GetCamera();
 	glm::vec3 camPos = camera->Position;
 
-	auto view = scene->GetRegistry().view<TransformComponent, MeshComponent ,MeshRendererComponent, MaterialComponent>();
+	auto view = scene->GetRegistry().view<TransformComponent, MeshComponent, MeshRendererComponent, MaterialComponent> (entt::exclude<ParticleEmitterComponent>);
 	for (auto entity : view)
 	{
 		MeshComponent& meshComp = scene->GetComponent<MeshComponent>(entity);
