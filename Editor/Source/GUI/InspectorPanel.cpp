@@ -1252,6 +1252,13 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 						UI::PropertyLabel("Angular Vel Max");
 						ImGui::DragFloat("##AngVelMax", &emitter.angularVelocityMax, 0.1f, emitter.angularVelocityMin, 1000.0f, "%.2f");
 
+						UI::PropertyLabel("Rotation Min");
+						ImGui::DragFloat("##RotationMin", &emitter.rotationMin, 0.5f, -3600.0f, emitter.rotationMax, "%.1f deg");
+
+						UI::PropertyLabel("Rotation Max");
+						ImGui::DragFloat("##RotationMax", &emitter.rotationMax, 0.5f, emitter.rotationMin, 3600.0f, "%.1f deg");
+
+
 						UI::PropertyLabel("Linear Accel Min");
 						ImGui::DragFloat("##LinAccelMin", &emitter.linearAccelMin, 0.1f, -1000.0f, emitter.linearAccelMax, "%.2f");
 

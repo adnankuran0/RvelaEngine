@@ -5,7 +5,7 @@
 #include <glm/gtx/quaternion.hpp>
 #include "Math/RvelaMath.h"
 
-namespace rv {
+using namespace rv;
 
 // TODO: move to rv::math
 static float RandomFloat(float min, float max)
@@ -113,116 +113,12 @@ void ParticleSystem::UpdateEmitter(entt::entity entity, ParticleEmitterComponent
 
 	float effectiveDt = dt * emitter.speedScale;
 
-	for (uint32_t i = 0; i < pool.activeCount; )
-	{
-		pool.currentLife[i] += effectiveDt;
+	UpdateParticles(emitter,pool,effectiveDt);
+	
+	UpdateSpawning(emitter, transform, pool, effectiveDt);
 
-		if (pool.currentLife[i] >= pool.maxLife[i])
-		{
-			pool.SwapAndPop(i);
-			continue;
-		}
-
-		pool.velocity[i] += (pool.acceleration[i] + emitter.gravity) * effectiveDt;
-		pool.velocity[i] *= glm::clamp(1.0f - pool.damping[i] * effectiveDt, 0.0f, 1.0f);
-		pool.position[i] += pool.velocity[i] * effectiveDt;
-		pool.rotation[i] += pool.rotationSpeed[i] * effectiveDt;
-
-		++i;
-	}
-
-	// Spawning
-	if (emitter.emitting && !emitter.isFinished)
-	{
-		emitter.timeElapsed += effectiveDt;
-
-		float cycleLength = std::max(emitter.lifetime, 0.0001f);
-
-		emitter.emissionTimer += effectiveDt;
-
-		bool cycleCompleted = false;
-		if (!emitter.oneShot)
-		{
-			while (emitter.emissionTimer >= cycleLength)
-			{
-				emitter.emissionTimer -= cycleLength;
-				emitter.cycleSpawnCount = 0;
-			}
-		}
-		else if (emitter.emissionTimer >= cycleLength)
-		{
-			emitter.emissionTimer = cycleLength;
-			cycleCompleted = true;
-		}
-
-		float phase = glm::clamp(emitter.emissionTimer / cycleLength, 0.0f, 1.0f);
-
-		float activeWindow = glm::clamp(1.0f - emitter.explosiveness, 0.0001f, 1.0f);
-		float progress = glm::clamp(phase / activeWindow, 0.0f, 1.0f);
-
-		uint32_t targetSpawned = static_cast<uint32_t>(progress * static_cast<float>(emitter.amount));
-
-		if (emitter.randomness > 0.0f && targetSpawned > emitter.cycleSpawnCount)
-		{
-			float jitter = RandomFloat(-emitter.randomness, emitter.randomness) * 0.5f;
-			int32_t jittered = static_cast<int32_t>(targetSpawned) + static_cast<int32_t>(jitter * emitter.amount);
-			targetSpawned = static_cast<uint32_t>(glm::clamp(jittered, 0, static_cast<int32_t>(emitter.amount)));
-		}
-
-		if (targetSpawned > emitter.cycleSpawnCount)
-		{
-			uint32_t spawnCount = targetSpawned - emitter.cycleSpawnCount;
-			emitter.cycleSpawnCount = targetSpawned;
-
-			uint32_t availableSlots = pool.capacity - pool.activeCount;
-			uint32_t toSpawn = std::min(spawnCount, availableSlots);
-			if (toSpawn > 0)
-				SpawnParticles(emitter, pool, transform, toSpawn);
-		}
-
-		if (emitter.oneShot && cycleCompleted)
-			emitter.isFinished = true;
-	}
-
-	if (emitter.oneShot && emitter.isFinished && pool.activeCount == 0)
-	{
-		emitter.emitting = false;
-	}
-
-	// Batching
-	if (pool.activeCount > 0)
-	{
-		ParticleBatch batch;
-		batch.entity = entity;
-		batch.instanceOffset = static_cast<uint32_t>(m_PackedInstanceData.size());
-		batch.instanceCount = pool.activeCount;
-		batch.worldPosition = transform.GetPosition();
-		batch.localCoords = emitter.localCoords;
-		m_Batches.push_back(batch);
-
-		m_PackedInstanceData.reserve(m_PackedInstanceData.size() + pool.activeCount);
-
-		glm::mat4 worldMatrix = emitter.localCoords ? transform.GetWorldMatrix() : glm::mat4(1.0f);
-
-		for (uint32_t i = 0; i < pool.activeCount; ++i)
-		{
-			float t = glm::clamp(pool.currentLife[i] / pool.maxLife[i], 0.0f, 1.0f);
-
-			float currentScale = glm::mix(pool.startScale[i], pool.endScale[i], t);
-			glm::vec4 currentColor = glm::mix(pool.startColor[i], pool.endColor[i], t);
-
-			glm::vec3 finalPos = pool.position[i];
-			if (emitter.localCoords)
-				finalPos = glm::vec3(worldMatrix * glm::vec4(finalPos, 1.0f));
-
-			ParticleInstanceData instance;
-			instance.positionAndScale = glm::vec4(finalPos, currentScale);
-			instance.color = currentColor;
-			instance.rotationAndCustom = glm::vec4(pool.rotation[i], 0.0f, 0.0f, 0.0f);
-
-			m_PackedInstanceData.push_back(instance);
-		}
-	}
+	BuildParticleBatch(entity,emitter,pool,transform);
+	
 }
 
 void ParticleSystem::SpawnParticles(ParticleEmitterComponent& emitter, EmitterParticlePool& pool, const TransformComponent& transform, uint32_t count)
@@ -306,4 +202,121 @@ glm::vec3 ParticleSystem::CalculateInitialVelocity(const ParticleEmitterComponen
 	return finalDir * speed;
 }
 
+void ParticleSystem::BuildParticleBatch(entt::entity entity, ParticleEmitterComponent& emitter, EmitterParticlePool& pool, const TransformComponent& transform)
+{
+	if (pool.activeCount > 0)
+	{
+		ParticleBatch batch;
+		batch.entity = entity;
+		batch.instanceOffset = static_cast<uint32_t>(m_PackedInstanceData.size());
+		batch.instanceCount = pool.activeCount;
+		batch.worldPosition = transform.GetPosition();
+		batch.localCoords = emitter.localCoords;
+		m_Batches.push_back(batch);
+
+		m_PackedInstanceData.reserve(m_PackedInstanceData.size() + pool.activeCount);
+
+		glm::mat4 worldMatrix = emitter.localCoords ? transform.GetWorldMatrix() : glm::mat4(1.0f);
+
+		for (uint32_t i = 0; i < pool.activeCount; ++i)
+		{
+			float t = glm::clamp(pool.currentLife[i] / pool.maxLife[i], 0.0f, 1.0f);
+
+			float currentScale = glm::mix(pool.startScale[i], pool.endScale[i], t);
+			glm::vec4 currentColor = glm::mix(pool.startColor[i], pool.endColor[i], t);
+
+			glm::vec3 finalPos = pool.position[i];
+			if (emitter.localCoords)
+				finalPos = glm::vec3(worldMatrix * glm::vec4(finalPos, 1.0f));
+
+			ParticleInstanceData instance;
+			instance.positionAndScale = glm::vec4(finalPos, currentScale);
+			instance.color = currentColor;
+			instance.rotationAndCustom = glm::vec4(pool.rotation[i], 0.0f, 0.0f, 0.0f);
+
+			m_PackedInstanceData.push_back(instance);
+		}
+	}
+}
+
+void ParticleSystem::UpdateSpawning(ParticleEmitterComponent& emitter, const TransformComponent& transform ,EmitterParticlePool& pool, float effectiveDt)
+{
+	if (emitter.emitting && !emitter.isFinished)
+	{
+		emitter.timeElapsed += effectiveDt;
+
+		float cycleLength = std::max(emitter.lifetime, 0.0001f);
+
+		emitter.emissionTimer += effectiveDt;
+
+		bool cycleCompleted = false;
+		if (!emitter.oneShot)
+		{
+			while (emitter.emissionTimer >= cycleLength)
+			{
+				emitter.emissionTimer -= cycleLength;
+				emitter.cycleSpawnCount = 0;
+			}
+		}
+		else if (emitter.emissionTimer >= cycleLength)
+		{
+			emitter.emissionTimer = cycleLength;
+			cycleCompleted = true;
+		}
+
+		float phase = glm::clamp(emitter.emissionTimer / cycleLength, 0.0f, 1.0f);
+
+		float activeWindow = glm::clamp(1.0f - emitter.explosiveness, 0.0001f, 1.0f);
+		float progress = glm::clamp(phase / activeWindow, 0.0f, 1.0f);
+
+		uint32_t targetSpawned = static_cast<uint32_t>(progress * static_cast<float>(emitter.amount));
+
+		if (emitter.randomness > 0.0f && targetSpawned > emitter.cycleSpawnCount)
+		{
+			float jitter = RandomFloat(-emitter.randomness, emitter.randomness) * 0.5f;
+			int32_t jittered = static_cast<int32_t>(targetSpawned) + static_cast<int32_t>(jitter * emitter.amount);
+			targetSpawned = static_cast<uint32_t>(glm::clamp(jittered, 0, static_cast<int32_t>(emitter.amount)));
+		}
+
+		if (targetSpawned > emitter.cycleSpawnCount)
+		{
+			uint32_t spawnCount = targetSpawned - emitter.cycleSpawnCount;
+			emitter.cycleSpawnCount = targetSpawned;
+
+			uint32_t availableSlots = pool.capacity - pool.activeCount;
+			uint32_t toSpawn = std::min(spawnCount, availableSlots);
+			if (toSpawn > 0)
+				SpawnParticles(emitter, pool, transform, toSpawn);
+		}
+
+		if (emitter.oneShot && cycleCompleted)
+			emitter.isFinished = true;
+	}
+
+	if (emitter.oneShot && emitter.isFinished && pool.activeCount == 0)
+	{
+		emitter.emitting = false;
+	}
+
+}
+
+void ParticleSystem::UpdateParticles(ParticleEmitterComponent& emitter, EmitterParticlePool& pool, float effectiveDt)
+{
+	for (uint32_t i = 0; i < pool.activeCount; )
+	{
+		pool.currentLife[i] += effectiveDt;
+
+		if (pool.currentLife[i] >= pool.maxLife[i])
+		{
+			pool.SwapAndPop(i);
+			continue;
+		}
+
+		pool.velocity[i] += (pool.acceleration[i] + emitter.gravity) * effectiveDt;
+		pool.velocity[i] *= glm::clamp(1.0f - pool.damping[i] * effectiveDt, 0.0f, 1.0f);
+		pool.position[i] += pool.velocity[i] * effectiveDt;
+		pool.rotation[i] += pool.rotationSpeed[i] * effectiveDt;
+
+		++i;
+	}
 }

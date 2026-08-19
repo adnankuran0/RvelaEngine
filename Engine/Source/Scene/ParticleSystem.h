@@ -72,7 +72,9 @@ private:
 	void SpawnParticles(ParticleEmitterComponent& emitter, EmitterParticlePool& pool, const TransformComponent& transform, uint32_t count);
 	glm::vec3 CalculateSpawnPosition(const ParticleEmitterComponent& emitter, const TransformComponent& transform);
 	glm::vec3 CalculateInitialVelocity(const ParticleEmitterComponent& emitter, const TransformComponent& transform);
-
+	void BuildParticleBatch(entt::entity entity, ParticleEmitterComponent& emitter, EmitterParticlePool& pool,const TransformComponent& transform);
+	void UpdateSpawning(ParticleEmitterComponent& emitter, const TransformComponent& transform, EmitterParticlePool& pool, float effectiveDt);
+	void UpdateParticles(ParticleEmitterComponent& emitter, EmitterParticlePool& pool, float effectiveDt);
 
 private:
 	Scene& m_Scene;
