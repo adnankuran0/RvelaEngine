@@ -6,6 +6,17 @@
 
 namespace rv {
 
+struct ParticleRenderCommand {
+    MeshRendererComponent* mesh;
+    MaterialComponent* material;
+    uint32_t instanceOffset;
+    uint32_t instanceCount;
+    bool localCoords;
+    glm::vec3 worldPosition;
+    float distanceToCamera;
+    int indexCount;
+};
+
 struct RenderCommand
 {
 public:

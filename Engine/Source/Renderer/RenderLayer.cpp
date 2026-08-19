@@ -73,5 +73,42 @@ void RenderLayer::CollectRenderCommands(Scene* scene)
 		}
 	);
 
+	const auto& particleBatches = scene->GetParticleSystem().GetBatches();
+	for (const auto& batch : particleBatches)
+	{
+		if (scene->GetRegistry().all_of<MeshComponent, MeshRendererComponent, MaterialComponent>(batch.entity))
+		{
+			MeshComponent& meshComp = scene->GetComponent<MeshComponent>(batch.entity);
+			MeshRendererComponent& meshRendererComp = scene->GetComponent<MeshRendererComponent>(batch.entity);
+			MaterialComponent& matComp = scene->GetComponent<MaterialComponent>(batch.entity);
+
+			if (meshComp.IsDirty())
+			{
+				scene->GetComponent<MeshRendererComponent>(batch.entity).RecreateFromMesh(meshComp.GetMesh());
+				meshComp.SetDirty(false);
+			}
+
+			ParticleRenderCommand cmd;
+			cmd.mesh = &meshRendererComp;
+			cmd.material = &matComp;
+			cmd.instanceOffset = batch.instanceOffset;
+			cmd.instanceCount = batch.instanceCount;
+			cmd.localCoords = batch.localCoords;
+			cmd.worldPosition = batch.worldPosition;
+			cmd.indexCount = meshComp.GetMesh()->GetIndexCount();
+			cmd.distanceToCamera = glm::length2(camPos - batch.worldPosition);
+
+			m_RenderPipeline->m_RenderFrame.particleCommands.push_back(cmd);
+		}
+	}
+
+	std::sort(
+		m_RenderPipeline->m_RenderFrame.particleCommands.begin(),
+		m_RenderPipeline->m_RenderFrame.particleCommands.end(),
+		[](const ParticleRenderCommand& a, const ParticleRenderCommand& b) {
+			return a.distanceToCamera > b.distanceToCamera;
+		}
+	);
+
 }
 

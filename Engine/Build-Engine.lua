@@ -88,4 +88,4 @@ project "RvelaEngine"
        symbols "Off"
 
     filter "files:../Vendor/GLAD/src/gl.c"
-        flags { "NoPCH" }
+        enablepch "Off"

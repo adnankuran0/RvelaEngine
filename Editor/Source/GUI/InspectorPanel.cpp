@@ -1150,12 +1150,26 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 			}
 		});
 
-		DrawComponent<ParticleEmitterComponent>("Particle Emitter", registry, selectedEntity, [](ParticleEmitterComponent& emitter)
+		DrawComponent<ParticleEmitterComponent>("Particle Emitter", registry, selectedEntity, [&](ParticleEmitterComponent& emitter)
 			{
 				if (UI::BeginPropertyTable("ParticleEmitterGeneralTable"))
 				{
 					UI::PropertyLabel("Emitting");
-					ImGui::Checkbox("##Emitting", &emitter.emitting);
+					bool emitting = emitter.emitting;
+					if (ImGui::Checkbox("##Emitting", &emitting))
+					{
+						if (emitting)
+						{
+							if (emitter.oneShot && emitter.isFinished)
+								scene.GetParticleSystem().ResetEmitter(selectedEntity);
+							else
+								emitter.emitting = true;
+						}
+						else
+						{
+							emitter.emitting = false;
+						}
+					}
 
 					UI::PropertyLabel("Amount");
 					int amount = static_cast<int>(emitter.amount);

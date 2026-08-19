@@ -63,6 +63,21 @@ void ParticleSystem::Reset()
 	m_Batches.clear();
 }
 
+void ParticleSystem::ResetEmitter(entt::entity entity)
+{
+	auto it = m_Pools.find(entity);
+	if (it != m_Pools.end())
+		it->second.activeCount = 0;
+
+	if (auto* emitter = m_Scene.GetRegistry().try_get<ParticleEmitterComponent>(entity))
+	{
+		emitter->isFinished = false;
+		emitter->timeElapsed = 0.0f;
+		emitter->emissionTimer = 0.0f;
+		emitter->emitting = true;
+	}
+}
+
 void ParticleSystem::Update(float dt)
 {
 	entt::registry& registry = m_Scene.GetRegistry();
@@ -150,6 +165,11 @@ void ParticleSystem::UpdateEmitter(entt::entity entity, ParticleEmitterComponent
 		}
 	}
 
+	if (emitter.oneShot && emitter.isFinished && pool.activeCount == 0)
+	{
+		emitter.emitting = false;
+	}
+
 	// Batching
 	if (pool.activeCount > 0)
 	{
@@ -209,7 +229,7 @@ void ParticleSystem::SpawnParticles(ParticleEmitterComponent& emitter, EmitterPa
 		pool.startScale[idx] = RandomFloat(emitter.scaleMin, emitter.scaleMax);
 		pool.endScale[idx] = emitter.scaleEnd;
 
-		pool.rotation[idx] = glm::radians(RandomFloat(0.0f, 360.0f));
+		pool.rotation[idx] = 0.0f; // TODO: min max rot
 		pool.rotationSpeed[idx] = glm::radians(RandomFloat(emitter.angularVelocityMin, emitter.angularVelocityMax));
 
 		pool.startColor[idx] = emitter.startColor;

@@ -15,6 +15,7 @@
 #include "Renderer/RenderPasses/EntityBufferPass.h"
 #include "Renderer/RenderPasses/DebugPass.h"
 #include "Renderer/RenderPasses/TransparentPass.h"
+#include "Renderer/RenderPasses/ParticlePass.h"
 
 using namespace rv;
 
@@ -29,6 +30,7 @@ RenderPipeline::RenderPipeline()
 	PushRenderPass(std::make_unique<LightingPass>());
 	PushRenderPass(std::make_unique<SkyboxPass>());
 	PushRenderPass(std::make_unique<TransparentPass>());
+	PushRenderPass(std::make_unique<ParticlePass>());
 	PushRenderPass(std::make_unique<SSAOPass>());
 	PushRenderPass(std::make_unique<SSRPass>());
 	PushRenderPass(std::make_unique<BrightPass>());

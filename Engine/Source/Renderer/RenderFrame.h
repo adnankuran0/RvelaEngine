@@ -10,6 +10,7 @@ struct RenderFrame
 public:
     std::vector<RenderCommand> opaqueCommands;
     std::vector<RenderCommand> transparentCommands;
+    std::vector<ParticleRenderCommand> particleCommands;
     RenderResourceRegistry registry;
 
 private:
@@ -18,6 +19,7 @@ private:
     {
         opaqueCommands.clear();
         transparentCommands.clear();
+        particleCommands.clear();
         //registry.Clear();
     }
 };

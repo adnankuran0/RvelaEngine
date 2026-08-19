@@ -135,6 +135,8 @@ public:
     inline ScriptSystem& GetScriptSystem() noexcept { return m_ScriptSystem; }
     inline LightSystem& GetLightSystem() noexcept { return m_LightSystem; }
     inline PhysicsSystem& GetPhysicsSystem() noexcept { return m_PhysicsSystem; }
+    inline AudioSystem& GetAudioSystem() noexcept { return m_AudioSystem; }
+    inline ParticleSystem& GetParticleSystem() noexcept { return m_ParticleSystem; }
     inline Environment& GetEnvironment() noexcept { return m_Environment; }
 
 
