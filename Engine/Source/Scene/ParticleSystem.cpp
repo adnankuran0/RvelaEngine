@@ -74,6 +74,7 @@ void ParticleSystem::ResetEmitter(entt::entity entity)
 		emitter->isFinished = false;
 		emitter->timeElapsed = 0.0f;
 		emitter->emissionTimer = 0.0f;
+		emitter->cycleSpawnCount = 0;
 		emitter->emitting = true;
 	}
 }
@@ -135,34 +136,52 @@ void ParticleSystem::UpdateEmitter(entt::entity entity, ParticleEmitterComponent
 	{
 		emitter.timeElapsed += effectiveDt;
 
-		if (emitter.oneShot)
+		float cycleLength = std::max(emitter.lifetime, 0.0001f);
+
+		emitter.emissionTimer += effectiveDt;
+
+		bool cycleCompleted = false;
+		if (!emitter.oneShot)
 		{
-			uint32_t toSpawn = emitter.amount - pool.activeCount;
+			while (emitter.emissionTimer >= cycleLength)
+			{
+				emitter.emissionTimer -= cycleLength;
+				emitter.cycleSpawnCount = 0;
+			}
+		}
+		else if (emitter.emissionTimer >= cycleLength)
+		{
+			emitter.emissionTimer = cycleLength;
+			cycleCompleted = true;
+		}
+
+		float phase = glm::clamp(emitter.emissionTimer / cycleLength, 0.0f, 1.0f);
+
+		float activeWindow = glm::clamp(1.0f - emitter.explosiveness, 0.0001f, 1.0f);
+		float progress = glm::clamp(phase / activeWindow, 0.0f, 1.0f);
+
+		uint32_t targetSpawned = static_cast<uint32_t>(progress * static_cast<float>(emitter.amount));
+
+		if (emitter.randomness > 0.0f && targetSpawned > emitter.cycleSpawnCount)
+		{
+			float jitter = RandomFloat(-emitter.randomness, emitter.randomness) * 0.5f;
+			int32_t jittered = static_cast<int32_t>(targetSpawned) + static_cast<int32_t>(jitter * emitter.amount);
+			targetSpawned = static_cast<uint32_t>(glm::clamp(jittered, 0, static_cast<int32_t>(emitter.amount)));
+		}
+
+		if (targetSpawned > emitter.cycleSpawnCount)
+		{
+			uint32_t spawnCount = targetSpawned - emitter.cycleSpawnCount;
+			emitter.cycleSpawnCount = targetSpawned;
+
+			uint32_t availableSlots = pool.capacity - pool.activeCount;
+			uint32_t toSpawn = std::min(spawnCount, availableSlots);
 			if (toSpawn > 0)
 				SpawnParticles(emitter, pool, transform, toSpawn);
+		}
 
+		if (emitter.oneShot && cycleCompleted)
 			emitter.isFinished = true;
-		}
-		else
-		{
-			float spawnInterval = (emitter.amount > 0 && emitter.lifetime > 0.0f) ? (emitter.lifetime / static_cast<float>(emitter.amount)) : 0.1f;
-			emitter.emissionTimer += effectiveDt;
-
-			uint32_t spawnCount = 0;
-			while (emitter.emissionTimer >= spawnInterval)
-			{
-				emitter.emissionTimer -= spawnInterval;
-				++spawnCount;
-			}
-
-			if (spawnCount > 0)
-			{
-				uint32_t availableSlots = pool.capacity - pool.activeCount;
-				uint32_t toSpawn = std::min(spawnCount, availableSlots);
-				if (toSpawn > 0)
-					SpawnParticles(emitter, pool, transform, toSpawn);
-			}
-		}
 	}
 
 	if (emitter.oneShot && emitter.isFinished && pool.activeCount == 0)
@@ -229,7 +248,7 @@ void ParticleSystem::SpawnParticles(ParticleEmitterComponent& emitter, EmitterPa
 		pool.startScale[idx] = RandomFloat(emitter.scaleMin, emitter.scaleMax);
 		pool.endScale[idx] = emitter.scaleEnd;
 
-		pool.rotation[idx] = 0.0f; // TODO: min max rot
+		pool.rotation[idx] = glm::radians(RandomFloat(emitter.rotationMin, emitter.rotationMax));
 		pool.rotationSpeed[idx] = glm::radians(RandomFloat(emitter.angularVelocityMin, emitter.angularVelocityMax));
 
 		pool.startColor[idx] = emitter.startColor;

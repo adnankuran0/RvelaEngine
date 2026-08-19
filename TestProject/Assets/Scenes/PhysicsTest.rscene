@@ -870,8 +870,8 @@
         }
     ],
     "Environment": {
-        "Bloom": true,
-        "Bloom_Intensity": 1.0,
+        "Bloom": false,
+        "Bloom_Intensity": 0.0,
         "Bloom_Knee": 0.0,
         "Bloom_Treshold": 1.0,
         "HDRPath": "Assets\\Textures\\skybox\\environment2.hdr",

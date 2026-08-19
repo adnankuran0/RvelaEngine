@@ -6,7 +6,6 @@ using namespace rv;
 json ParticleEmitterComponent::Serialize() const
 {
 	json j;
-
 	j["emitting"] = emitting;
 	j["amount"] = amount;
 
@@ -35,6 +34,8 @@ json ParticleEmitterComponent::Serialize() const
 	j["linearVelocityMax"] = linearVelocityMax;
 	j["angularVelocityMin"] = angularVelocityMin;
 	j["angularVelocityMax"] = angularVelocityMax;
+	j["rotationMin"] = rotationMin;
+	j["rotationMax"] = rotationMax;
 
 	// Acceleration
 	j["linearAccelMin"] = linearAccelMin;
@@ -98,6 +99,8 @@ void ParticleEmitterComponent::Deserialize(const json& j)
 	linearVelocityMax = j.value("linearVelocityMax", 0.0f);
 	angularVelocityMin = j.value("angularVelocityMin", 0.0f);
 	angularVelocityMax = j.value("angularVelocityMax", 0.0f);
+	rotationMin = j.value("rotationMin", 0.0f);
+	rotationMax = j.value("rotationMax", 0.0f);
 
 	// Acceleration
 	linearAccelMin = j.value("linearAccelMin", 0.0f);
@@ -127,5 +130,6 @@ void ParticleEmitterComponent::Deserialize(const json& j)
 	// Reset runtime
 	timeElapsed = 0.0f;
 	emissionTimer = 0.0f;
+	cycleSpawnCount = 0;
 	isFinished = false;
 }

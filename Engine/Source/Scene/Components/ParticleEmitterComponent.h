@@ -44,6 +44,8 @@ struct ParticleEmitterComponent
 	float linearVelocityMax = 0.0f;
 	float angularVelocityMin = 0.0f;
 	float angularVelocityMax = 0.0f;
+	float rotationMin = 0.0f;
+	float rotationMax = 0.0f;
 
 	// Acceleration
 	float linearAccelMin = 0.0f;
@@ -65,6 +67,7 @@ struct ParticleEmitterComponent
 	// Runtime
 	float timeElapsed = 0.0f;
 	float emissionTimer = 0.0f;
+	uint32_t cycleSpawnCount = 0;
 	bool isFinished = false;
 
 	json Serialize() const;
