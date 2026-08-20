@@ -118,4 +118,52 @@ void LuaBindings::RegisterComponents(sol::state& lua)
             &rv::MaterialComponent::SetUVOffset
         )
     );
+
+    lua.new_enum<rv::ParticleEmitterShape>("ParticleEmitterShape", {
+        { "Point", rv::ParticleEmitterShape::Point },
+        { "Sphere", rv::ParticleEmitterShape::Sphere },
+        { "SphereSurface", rv::ParticleEmitterShape::SphereSurface },
+        { "Box", rv::ParticleEmitterShape::Box}
+        });
+
+    lua.new_usertype<rv::ParticleEmitterComponent>("ParticleEmitterComponent",
+        "emitting", &rv::ParticleEmitterComponent::emitting,
+        "amount", &rv::ParticleEmitterComponent::amount,
+
+        "lifetime", & rv::ParticleEmitterComponent::lifetime,
+        "oneShot", & rv::ParticleEmitterComponent::oneShot,
+        "speedScale", & rv::ParticleEmitterComponent::speedScale,
+        "explosiveness", & rv::ParticleEmitterComponent::explosiveness,
+        "randomness", & rv::ParticleEmitterComponent::randomness,
+        "lifetimeRandomness", & rv::ParticleEmitterComponent::lifetimeRandomness,
+
+        "localCoords", & rv::ParticleEmitterComponent::localCoords,
+
+        "emitterShape", & rv::ParticleEmitterComponent::emitterShape,
+        "shapeDimensions", & rv::ParticleEmitterComponent::shapeDimensions,
+
+        "direction", & rv::ParticleEmitterComponent::direction,
+        "spread", & rv::ParticleEmitterComponent::spread,
+        "gravity", & rv::ParticleEmitterComponent::gravity,
+
+        "linearVelocityMin", & rv::ParticleEmitterComponent::linearVelocityMin,
+        "linearVelocityMax", & rv::ParticleEmitterComponent::linearVelocityMax,
+        "angularVelocityMin", & rv::ParticleEmitterComponent::angularVelocityMin,
+        "angularVelocityMax", & rv::ParticleEmitterComponent::angularVelocityMax,
+        "rotationMin", & rv::ParticleEmitterComponent::rotationMin,
+        "rotationMax", & rv::ParticleEmitterComponent::rotationMax,
+
+        "linearAccelMin", & rv::ParticleEmitterComponent::linearAccelMin,
+        "linearAccelMax", & rv::ParticleEmitterComponent::linearAccelMax,
+
+        "dampingMin", & rv::ParticleEmitterComponent::dampingMin,
+        "dampingMax", & rv::ParticleEmitterComponent::dampingMax,
+
+        "scaleMin", & rv::ParticleEmitterComponent::scaleMin,
+        "scaleMax", & rv::ParticleEmitterComponent::scaleMax,
+        "scaleEnd", & rv::ParticleEmitterComponent::scaleEnd,
+
+        "startColor", & rv::ParticleEmitterComponent::startColor,
+        "endColor", & rv::ParticleEmitterComponent::endColor
+    );
 }
