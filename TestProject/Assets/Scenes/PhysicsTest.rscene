@@ -960,11 +960,77 @@
                 ]
             },
             "UUID": 18
+        },
+        {
+            "Material": {
+                "material": "9eeffd75-444c-4265-a461-0785fce1c868",
+                "overrides": {
+                    "metallic": 1.0,
+                    "roughness": 0.0
+                }
+            },
+            "Mesh": {
+                "mesh": "b6c7f2a2-cce2-4b68-be50-19a8f552e727"
+            },
+            "ParentUUID": 0,
+            "RigidbodyComponent": {
+                "allowSleep": 1,
+                "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
+                "bodyType": 0,
+                "collisionLayer": 1,
+                "collisionMask": 4294967295,
+                "friction": 0.5,
+                "gravityFactor": 1.0,
+                "isSensor": false,
+                "linearDamping": 0.05000000074505806,
+                "lockRotationX": false,
+                "lockRotationY": false,
+                "lockRotationZ": false,
+                "lockTranslationX": false,
+                "lockTranslationY": false,
+                "lockTranslationZ": false,
+                "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
+                "restitution": 0.0,
+                "useCCD": false
+            },
+            "SphereColliderComponent": {
+                "offset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "radius": 0.5
+            },
+            "Tag": {
+                "tag": "Sphere"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    6.0,
+                    0.35851120948791504,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 70
         }
     ],
     "Environment": {
         "Bloom": true,
-        "Bloom_Intensity": 0.10700000077486038,
+        "Bloom_Intensity": 1.0,
         "Bloom_Knee": 0.0,
         "Bloom_Treshold": 1.0,
         "HDRPath": "Assets\\Textures\\skybox\\environment2.hdr",
@@ -975,7 +1041,7 @@
         ],
         "Lighting_AmbientIntensity": 0.5,
         "Lighting_IBL": true,
-        "Lighting_IBLIntensity": 0.5,
+        "Lighting_IBLIntensity": 0.10000000149011612,
         "PostProcess_ChromaticStrength": 0.009999999776482582,
         "PostProcess_Exposure": 1.0,
         "PostProcess_VignetteIntensity": 0.25,

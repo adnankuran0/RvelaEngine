@@ -47,7 +47,8 @@ float calculatePointLightShadow(samplerCubeArray pointShadowMap, int index, vec3
 
     if (currentDepth > farPlane) return 0.0;
 
-    float bias = max(shadowBias * (1.0 - dot(normal, normalize(fragToLight))), shadowBias);
+    vec3 L = normalize(lightPos - fragPos);
+    float bias = max(shadowBias * (1.0 - dot(normal, L)), shadowBias * 0.05); 
     currentDepth -= bias;
 
     if (blurRadius <= 0.0) {

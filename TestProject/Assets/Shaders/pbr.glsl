@@ -297,7 +297,7 @@ void main()
     if (useIBL) {
         vec3 R = normalize(reflect(-V, Nmap));
         float NdotV = max(dot(Nmap, V), 0.0);
-        vec3 F = fresnelSchlick(NdotV, F0);
+        vec3 F = fresnelSchlickRoughness(NdotV, F0, roughness);
         vec3 kS = F;
         vec3 kD = (vec3(1.0) - kS) * (1.0 - metallic); 
 

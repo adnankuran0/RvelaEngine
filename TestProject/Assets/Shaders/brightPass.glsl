@@ -28,10 +28,13 @@ void main()
     vec3 color = texture(hdrTexture, TexCoords).rgb;
     float br = Luminance(color);
 
-    float soft = clamp((br - threshold + knee) / (2.0 * knee), 0.0, 1.0);
-    float contrib = max(br - threshold, 0.0) + soft * knee;
+    float soft = clamp((br - threshold + knee) / (2.0 * knee + 0.0001), 0.0, 1.0);
+    float contrib = max(br - threshold, 0.0) + soft * soft * knee;
 
-    vec4 finalColor = vec4(color * (contrib / max(br, 1e-5)), 1.0);
+    vec3 extracted = color * (contrib / max(br, 1e-4));
 
-    FragColor = finalColor;
+    float lum = Luminance(extracted);
+    extracted *= 1.0 / (1.0 + lum);
+
+    FragColor = vec4(extracted, 1.0);
 }
