@@ -10,64 +10,23 @@ using namespace rv;
 
 void GeometryPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
-    glGenFramebuffers(1, &gBuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
-
-    glGenTextures(1, &o_Normal);
-    glBindTexture(GL_TEXTURE_2D, o_Normal);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, ctx.viewportWidth, ctx.viewportHeight, 0, GL_RGB, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, o_Normal, 0);
-
-    glGenTextures(1, &o_Depth);
-    glBindTexture(GL_TEXTURE_2D, o_Depth);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, ctx.viewportWidth, ctx.viewportHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, o_Depth, 0);
-
-    glGenTextures(1, &o_Roughness);
-    glBindTexture(GL_TEXTURE_2D, o_Roughness);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, ctx.viewportWidth, ctx.viewportHeight, 0, GL_RED, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, o_Roughness, 0);
-
-    glGenTextures(1, &o_Metallic);
-    glBindTexture(GL_TEXTURE_2D, o_Metallic);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, ctx.viewportWidth, ctx.viewportHeight, 0, GL_RED, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, o_Metallic, 0);
-
-    GLuint attachments[3] = {
-        GL_COLOR_ATTACHMENT0, // normal
-        GL_COLOR_ATTACHMENT1, // roughness
-        GL_COLOR_ATTACHMENT2  // metallic
+    FramebufferDesc desc;
+    desc.width = ctx.viewportWidth;
+    desc.height = ctx.viewportHeight;
+    desc.colorAttachments = {
+        { FramebufferTextureFormat::RGB16F, FramebufferFilterMode::Nearest }, // Normal
+        { FramebufferTextureFormat::R8,     FramebufferFilterMode::Nearest }, // Roughness
+        { FramebufferTextureFormat::R8,     FramebufferFilterMode::Nearest }, // Metallic
     };
-    glDrawBuffers(3, attachments);
+    desc.hasDepth = true;
+    desc.depthAttachment = { FramebufferTextureFormat::Depth32F };
 
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        LOG_WARN("Geometry framebuffer not complete!");
+    m_GBuffer = Framebuffer(desc);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    frame.registry.Register("DepthTexture", { RenderResourceType::Texture, o_Depth });
-    frame.registry.Register("NormalTexture", { RenderResourceType::Texture, o_Normal });
-    frame.registry.Register("RoughnessTexture", { RenderResourceType::Texture, o_Roughness });
-    frame.registry.Register("MetallicTexture", { RenderResourceType::Texture, o_Metallic });
-}
-
-GeometryPass::~GeometryPass()
-{
-    glDeleteFramebuffers(1, &gBuffer);
-    glDeleteTextures(1, &o_Normal);
-    glDeleteTextures(1, &o_Depth);
-    glDeleteTextures(1, &o_Roughness);
-    glDeleteTextures(1, &o_Metallic);
+    frame.registry.Register("DepthTexture", { RenderResourceType::Texture, m_GBuffer.GetDepthAttachment() });
+    frame.registry.Register("NormalTexture", { RenderResourceType::Texture, m_GBuffer.GetColorAttachment(0) });
+    frame.registry.Register("RoughnessTexture", { RenderResourceType::Texture, m_GBuffer.GetColorAttachment(1) });
+    frame.registry.Register("MetallicTexture", { RenderResourceType::Texture, m_GBuffer.GetColorAttachment(2) });
 }
 
 void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
@@ -77,8 +36,7 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     Shader& geometryShader = ShaderManager::Get("Geometry");
 
-    glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
-    glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
+    m_GBuffer.BindViewport();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     geometryShader.use();
@@ -170,8 +128,4 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
-    resourceRegistry.Register("DepthTexture", { RenderResourceType::Texture, o_Depth });
-    resourceRegistry.Register("NormalTexture", { RenderResourceType::Texture, o_Normal });
-    resourceRegistry.Register("RoughnessTexture", { RenderResourceType::Texture, o_Roughness });
-    resourceRegistry.Register("MetallicTexture", { RenderResourceType::Texture, o_Metallic });
 }

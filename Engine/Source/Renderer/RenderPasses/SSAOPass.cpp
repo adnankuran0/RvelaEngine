@@ -10,36 +10,28 @@ using namespace rv;
 
 constexpr int KERNEL_SIZE = 32;
 constexpr int NOISE_SIZE = 16;
-constexpr GLenum SSAO_TEXTURE_FORMAT = GL_R16F;
 
 void SSAOPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
-    glCreateFramebuffers(1, &ssaoFBO);
+    FramebufferDesc desc;
+    desc.width = ctx.viewportWidth / 2;
+    desc.height = ctx.viewportHeight / 2;
+    desc.colorAttachments = {
+        { FramebufferTextureFormat::R16F, FramebufferFilterMode::Nearest }
+    };
+    desc.hasDepth = false;
 
-    int w = (int)(ctx.viewportWidth / 2.0f);
-    int h = (int)(ctx.viewportHeight / 2.0f);
-
-    glCreateTextures(GL_TEXTURE_2D, 1, &o_SsaoTexture);
-    glTextureStorage2D(o_SsaoTexture, 1, SSAO_TEXTURE_FORMAT, w, h);
-    glTextureParameteri(o_SsaoTexture, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTextureParameteri(o_SsaoTexture, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    glNamedFramebufferTexture(ssaoFBO, GL_COLOR_ATTACHMENT0, o_SsaoTexture, 0);
-
-    if (glCheckNamedFramebufferStatus(ssaoFBO, GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        LOG_ERROR("SSAO framebuffer not complete");
+    m_Framebuffer = Framebuffer(desc);
 
     GenerateSampleKernel();
     GenerateNoiseTexture();
 
-    frame.registry.Register("SSAOTexture", { RenderResourceType::Texture, o_SsaoTexture });
+    frame.registry.Register("SSAOTexture", { RenderResourceType::Texture, m_Framebuffer.GetColorAttachment(0) });
 }
 
 SSAOPass::~SSAOPass()
 {
-    glDeleteTextures(1, &o_SsaoTexture);
     glDeleteTextures(1, &noiseTexture);
-    glDeleteFramebuffers(1, &ssaoFBO);
 }
 
 void SSAOPass::Execute(const RenderContext& ctx, RenderFrame& frame)
@@ -52,8 +44,7 @@ void SSAOPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     Shader& ssaoShader = ShaderManager::Get("SSAO");
 
-    glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
-    glViewport(0, 0, ctx.viewportWidth / 2, ctx.viewportHeight / 2);
+    m_Framebuffer.BindViewport();
     glClear(GL_COLOR_BUFFER_BIT);
 
     ssaoShader.use();
@@ -70,20 +61,18 @@ void SSAOPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     ssaoShader.setInt("texNoise", 2);
 
     for (unsigned int i = 0; i < KERNEL_SIZE; ++i)
-        ssaoShader.setVec3("samples[" + std::to_string(i) + "]", kernel->at(i));
+        ssaoShader.setVec3("samples[" + std::to_string(i) + "]", kernel.at(i));
 
     Renderer::DrawFullScreenQuad();
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    Framebuffer::BindDefault();
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
-
-    frame.registry.Register("SSAOTexture", { RenderResourceType::Texture, o_SsaoTexture });
 }
 
 void SSAOPass::GenerateSampleKernel()
 {
     std::uniform_real_distribution<float> randomFloats(0.0f, 1.0f);
     std::default_random_engine generator;
-    kernel->reserve(KERNEL_SIZE);
+    kernel.reserve(KERNEL_SIZE);
 
     for (unsigned int i = 0; i < KERNEL_SIZE; ++i)
     {
@@ -99,7 +88,7 @@ void SSAOPass::GenerateSampleKernel()
         scale = glm::mix(0.1f, 1.0f, scale * scale);
         sample *= scale;
 
-        kernel->push_back(sample);
+        kernel.push_back(sample);
     }
 }
 

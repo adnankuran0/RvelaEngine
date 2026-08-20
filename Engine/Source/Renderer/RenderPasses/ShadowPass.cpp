@@ -9,48 +9,23 @@ using namespace rv;
 
 void ShadowPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
-    InitDirectionalShadowMap();
+    FramebufferDesc desc;
+    desc.width = SHADOW_WIDTH;
+    desc.height = SHADOW_HEIGHT;
+    desc.hasDepth = true;
+    desc.depthAttachment = {
+        FramebufferTextureFormat::Depth16,
+        FramebufferFilterMode::Linear,
+        FramebufferWrapMode::ClampToBorder,
+        true
+    };
+
+    m_DirectionalShadowFramebuffer = Framebuffer(desc);
+
     InitPointShadowMap();
 
-    frame.registry.Register("DirectionalShadowMap", { RenderResourceType::Texture, o_DirectionalShadowMap });
+    frame.registry.Register("DirectionalShadowMap", { RenderResourceType::Texture, m_DirectionalShadowFramebuffer.GetDepthAttachment() });
     frame.registry.Register("PointShadowMap", { RenderResourceType::Texture, o_PointShadowMap });
-}
-
-void ShadowPass::InitDirectionalShadowMap()
-{
-    glGenFramebuffers(1, &fbo);
-
-    glGenTextures(1, &o_DirectionalShadowMap);
-    glBindTexture(GL_TEXTURE_2D, o_DirectionalShadowMap);
-    glTexImage2D(
-        GL_TEXTURE_2D,
-        0,
-        GL_DEPTH_COMPONENT16,
-        SHADOW_WIDTH,
-        SHADOW_HEIGHT,
-        0,
-        GL_DEPTH_COMPONENT,
-        GL_FLOAT,
-        nullptr
-    );
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-
-    float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, o_DirectionalShadowMap, 0);
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
-
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        LOG_ERROR("Shadow framebuffer not complete!");
 }
 
 void ShadowPass::InitPointShadowMap()
@@ -99,8 +74,7 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
         Shader& shadowShader = ShaderManager::Get("DirectionalShadow");
         shadowShader.use();
 
-        glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+        m_DirectionalShadowFramebuffer.BindViewport();
         glClear(GL_DEPTH_BUFFER_BIT);
 
         glEnable(GL_POLYGON_OFFSET_FILL);
@@ -252,17 +226,14 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
 
 ShadowPass::~ShadowPass()
 {
+    glDeleteTextures(1, &o_PointShadowMap);
+    glDeleteFramebuffers(1, &pointFBO);
 }
 
 void ShadowPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
     if (frame.opaqueCommands.empty()) return;
 
-    auto& resourceRegistry = frame.registry;
-
     RenderDirectionalShadowMap(ctx, frame);
     RenderPointShadowMap(ctx, frame);
-
-    resourceRegistry.Register("DirectionalShadowMap", { RenderResourceType::Texture, o_DirectionalShadowMap });
-    resourceRegistry.Register("PointShadowMap", { RenderResourceType::Texture, o_PointShadowMap });
 }

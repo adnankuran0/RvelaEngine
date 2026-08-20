@@ -2,108 +2,58 @@
 #include "BloomPass.h"
 #include "Scene/Components.h"
 #include "Renderer/Camera.h"
-#include <array>
-#include <algorithm>
 #include "Renderer/Renderer.h"
 #include "Renderer/RenderContext.h"
+#include "Renderer/ShaderManager.h"
 #include "Scene/Environment.h"
+#include <algorithm>
 
 using namespace rv;
 
 void BloomPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
+    m_DownsampleFBOs.clear();
+    m_DownsampleFBOs.reserve(s_MipLevels);
 
-    downsampleFBOs.resize(mipLevels);
-    downsampleTextures.resize(mipLevels);
-    upsampleFBOs.resize(mipLevels);
-    upsampleTextures.resize(mipLevels);
-
-    for (int i = 0; i < mipLevels; ++i)
+    for (int i = 0; i < s_MipLevels; ++i)
     {
-        int w = std::max((unsigned int)1, ctx.viewportWidth >> i);
-        int h = std::max((unsigned int)1, ctx.viewportHeight >> i);
+        uint32_t w = std::max(1u, ctx.viewportWidth >> i);
+        uint32_t h = std::max(1u, ctx.viewportHeight >> i);
 
-        GLuint texDown, fboDown, texUp, fboUp;
+        FramebufferDesc desc;
+        desc.width = w;
+        desc.height = h;
+        desc.hasDepth = false;
+        desc.colorAttachments = {
+            { FramebufferTextureFormat::RGB16F, FramebufferFilterMode::Linear, FramebufferWrapMode::ClampToEdge }
+        };
 
-        glGenTextures(1, &texDown);
-        glBindTexture(GL_TEXTURE_2D, texDown);
-        glTexImage2D(
-            GL_TEXTURE_2D,
-            0,
-            GL_R11F_G11F_B10F,
-            w,
-            h,
-            0,
-            GL_RGB,
-            GL_UNSIGNED_INT_10F_11F_11F_REV,
-            nullptr
-        );
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-        glGenFramebuffers(1, &fboDown);
-        glBindFramebuffer(GL_FRAMEBUFFER, fboDown);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texDown, 0);
-        glBindFramebuffer(GL_FRAMEBUFFER, fboDown);
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        {
-            LOG_ERROR("Downsample framebuffer incomplete at mip level {}" ,i);
-        }
-
-        glGenTextures(1, &texUp);
-        glBindTexture(GL_TEXTURE_2D, texUp);
-        glTexImage2D(
-            GL_TEXTURE_2D,
-            0,
-            GL_R11F_G11F_B10F,
-            w,
-            h,
-            0,
-            GL_RGB,
-            GL_UNSIGNED_INT_10F_11F_11F_REV,
-            nullptr
-        );
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-        glGenFramebuffers(1, &fboUp);
-        glBindFramebuffer(GL_FRAMEBUFFER, fboUp);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texUp, 0);
-
-        downsampleTextures[i] = texDown;
-        downsampleFBOs[i] = fboDown;
-        upsampleTextures[i] = texUp;
-        upsampleFBOs[i] = fboUp;
+        m_DownsampleFBOs.emplace_back(desc);
     }
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    frame.registry.Register("BloomTexture", { RenderResourceType::Texture,o_BlurredTexture });
+    frame.registry.Register("BloomTexture", { RenderResourceType::Texture, m_DownsampleFBOs[0].GetColorAttachment(0) });
 }
 
 void BloomPass::Downsample(const RenderContext& ctx, RenderFrame& frame)
 {
     auto i_BrightTexture = frame.registry.Get("BrightTexture")->id;
-
     Shader& downsampleShader = ShaderManager::Get("Downsample");
-    for (int i = 0; i < mipLevels; ++i)
+
+    downsampleShader.use();
+    downsampleShader.setInt("u_Texture", 0);
+
+    for (int i = 0; i < s_MipLevels; ++i)
     {
-        glBindFramebuffer(GL_FRAMEBUFFER, downsampleFBOs[i]);
-        int w = std::max(1, (int)ctx.viewportWidth  >> i);
-        int h = std::max(1, (int)ctx.viewportHeight >> i);
-        glViewport(0, 0, w, h);
-        downsampleShader.use();
-        downsampleShader.setInt("u_Texture", 0);
+        m_DownsampleFBOs[i].BindViewport();
+
+        int w = std::max(1, static_cast<int>(ctx.viewportWidth >> i));
+        int h = std::max(1, static_cast<int>(ctx.viewportHeight >> i));
         downsampleShader.setVec2("u_TexelSize", glm::vec2(1.0f / w, 1.0f / h));
 
         if (i == 0)
             glBindTextureUnit(0, i_BrightTexture);
         else
-            glBindTextureUnit(0, downsampleTextures[i - 1]);
+            glBindTextureUnit(0, m_DownsampleFBOs[i - 1].GetColorAttachment(0));
 
         Renderer::DrawFullScreenQuad();
     }
@@ -113,43 +63,42 @@ void BloomPass::Upsample(const RenderContext& ctx, RenderFrame& frame)
 {
     Shader& upsampleShader = ShaderManager::Get("Upsample");
     upsampleShader.use();
+    upsampleShader.setInt("u_LowMip", 0);
+    upsampleShader.setInt("u_BaseMip", 1);
 
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
 
-    for (int i = mipLevels - 2; i >= 0; --i)
+    for (int i = s_MipLevels - 2; i >= 0; --i)
     {
-        glBindFramebuffer(GL_FRAMEBUFFER, downsampleFBOs[i]);
+        m_DownsampleFBOs[i].BindViewport();
 
-        int w = std::max(1, (int)ctx.viewportWidth >> i);
-        int h = std::max(1, (int)ctx.viewportHeight >> i);
-        glViewport(0, 0, w, h);
-
-        upsampleShader.setInt("u_LowMip", 0);
-        upsampleShader.setInt("u_BaseMip", 1);
-
-        glBindTextureUnit(0, downsampleTextures[i + 1]); 
-        glBindTextureUnit(1, downsampleTextures[i]);     
+        glBindTextureUnit(0, m_DownsampleFBOs[i + 1].GetColorAttachment(0));
+        glBindTextureUnit(1, m_DownsampleFBOs[i].GetColorAttachment(0));
 
         Renderer::DrawFullScreenQuad();
     }
-}
-
-BloomPass::~BloomPass()
-{
-    //TODO: Fill this function
 }
 
 void BloomPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
     if (!ctx.environment->Bloom) return;
 
-    Downsample(ctx, frame);
+    if (!m_DownsampleFBOs.empty() &&
+        (m_DownsampleFBOs[0].GetWidth() != ctx.viewportWidth || m_DownsampleFBOs[0].GetHeight() != ctx.viewportHeight))
+    {
+        for (int i = 0; i < s_MipLevels; ++i)
+        {
+            uint32_t w = std::max(1u, ctx.viewportWidth >> i);
+            uint32_t h = std::max(1u, ctx.viewportHeight >> i);
+            m_DownsampleFBOs[i].Resize(w, h);
+        }
+        frame.registry.Register("BloomTexture", { RenderResourceType::Texture, m_DownsampleFBOs[0].GetColorAttachment(0) });
+    }
 
+    Downsample(ctx, frame);
     Upsample(ctx, frame);
 
-    o_BlurredTexture = downsampleTextures[0];
-
-    frame.registry.Register("BloomTexture", { RenderResourceType::Texture,o_BlurredTexture });
-
+    Framebuffer::BindDefault();
+    glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
 }

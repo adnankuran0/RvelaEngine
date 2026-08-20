@@ -10,73 +10,28 @@ using namespace rv;
 
 void EntityBufferPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
-    glGenFramebuffers(1, &m_Framebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer);
+    FramebufferDesc desc;
+    desc.width = ctx.viewportWidth;
+    desc.height = ctx.viewportHeight;
+    desc.colorAttachments = {
+        { FramebufferTextureFormat::R32UI, FramebufferFilterMode::Nearest }
+    };
+    desc.hasDepth = true;
+    desc.depthAsRenderbuffer = true;
+    desc.depthAttachment = { FramebufferTextureFormat::Depth24 };
 
-    glGenTextures(1, &o_EntityTexture);
-    glBindTexture(GL_TEXTURE_2D, o_EntityTexture);
+    m_Framebuffer = Framebuffer(desc);
 
-    glTexImage2D(
-        GL_TEXTURE_2D,
-        0,
-        GL_R32UI,
-        ctx.viewportWidth,
-        ctx.viewportHeight,
-        0,
-        GL_RED_INTEGER,
-        GL_UNSIGNED_INT,
-        nullptr
-    );
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    glFramebufferTexture2D(
-        GL_FRAMEBUFFER,
-        GL_COLOR_ATTACHMENT0,
-        GL_TEXTURE_2D,
-        o_EntityTexture,
-        0
-    );
-
-    glGenRenderbuffers(1, &m_Renderbuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, m_Renderbuffer);
-    glRenderbufferStorage(
-        GL_RENDERBUFFER,
-        GL_DEPTH_COMPONENT24,
-        ctx.viewportWidth,
-        ctx.viewportHeight
-    );
-
-    glFramebufferRenderbuffer(
-        GL_FRAMEBUFFER,
-        GL_DEPTH_ATTACHMENT,
-        GL_RENDERBUFFER,
-        m_Renderbuffer
-    );
-
-    GLenum buffers[1] = { GL_COLOR_ATTACHMENT0 };
-    glDrawBuffers(1, buffers);
-
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-    {
-        LOG_ERROR("EntityBuffer FBO not complete");
-    }
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    frame.registry.Register("EntityBuffer", { RenderResourceType::Framebuffer, m_Framebuffer });
-    frame.registry.Register("EntityTexture", { RenderResourceType::Texture, o_EntityTexture });
+    frame.registry.Register("EntityBuffer", { RenderResourceType::Framebuffer, m_Framebuffer.GetID() });
+    frame.registry.Register("EntityTexture", { RenderResourceType::Texture, m_Framebuffer.GetColorAttachment(0) });
 }
 
 void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
     auto& opaqueCommands = frame.opaqueCommands;
     auto& transparentCommands = frame.transparentCommands;
-    auto& resourceRegistry = frame.registry;
 
-    glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer);
-    glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
+    m_Framebuffer.BindViewport();
 
     GLuint clearValue = 0;
     glClearBufferuiv(GL_COLOR, 0, &clearValue);
@@ -144,8 +99,5 @@ void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    resourceRegistry.Register("EntityBuffer", { RenderResourceType::Framebuffer, m_Framebuffer });
-    frame.registry.Register("EntityTexture", { RenderResourceType::Texture, o_EntityTexture });
+    Framebuffer::BindDefault();
 }

@@ -22,45 +22,32 @@ struct MapInfo {
 void LightingPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
     // MSAA framebuffer
-    glGenFramebuffers(1, &o_ScreenFBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, o_ScreenFBO);
+    FramebufferDesc screenDesc;
+    screenDesc.width = ctx.viewportWidth;
+    screenDesc.height = ctx.viewportHeight;
+    screenDesc.samples = 2;
+    screenDesc.colorAttachments = {
+        { FramebufferTextureFormat::RGBA16F }
+    };
+    screenDesc.hasDepth = true;
+    screenDesc.depthAttachment = { FramebufferTextureFormat::Depth24Stencil8 };
 
-    glGenTextures(1, &screenColorTex);
-    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, screenColorTex);
-    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 2, GL_RGBA16F, ctx.viewportWidth, ctx.viewportHeight, GL_TRUE);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, screenColorTex, 0);
-
-    glGenRenderbuffers(1, &screenRBO);
-    glBindRenderbuffer(GL_RENDERBUFFER, screenRBO);
-    glRenderbufferStorageMultisample(GL_RENDERBUFFER, 2, GL_DEPTH24_STENCIL8, ctx.viewportWidth, ctx.viewportHeight);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, screenRBO);
-
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        LOG_ERROR("MSAA Framebuffer not complete");
+    m_ScreenFramebuffer = Framebuffer(screenDesc);
 
     // Intermediate framebuffer
-    glGenFramebuffers(1, &intermediateFBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
+    FramebufferDesc intermediateDesc;
+    intermediateDesc.width = ctx.viewportWidth;
+    intermediateDesc.height = ctx.viewportHeight;
+    intermediateDesc.colorAttachments = {
+        { FramebufferTextureFormat::RGBA16F, FramebufferFilterMode::Linear }
+    };
+    intermediateDesc.hasDepth = false;
 
-    glGenTextures(1, &o_IntermediateColorTex);
-    glBindTexture(GL_TEXTURE_2D, o_IntermediateColorTex);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, ctx.viewportWidth, ctx.viewportHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, o_IntermediateColorTex, 0);
+    m_IntermediateFramebuffer = Framebuffer(intermediateDesc);
 
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        LOG_ERROR("Intermediate Framebuffer not complete");
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    frame.registry.Register("ScreenTexture", { RenderResourceType::Texture, o_IntermediateColorTex });
-    frame.registry.Register("ScreenBuffer", { RenderResourceType::Framebuffer, o_ScreenFBO });
-    frame.registry.Register("IntermediateBuffer", { RenderResourceType::Framebuffer, intermediateFBO });
-}
-
-LightingPass::~LightingPass()
-{
+    frame.registry.Register("ScreenTexture", { RenderResourceType::Texture, m_IntermediateFramebuffer.GetColorAttachment(0) });
+    frame.registry.Register("ScreenBuffer", { RenderResourceType::Framebuffer, m_ScreenFramebuffer.GetID() });
+    frame.registry.Register("IntermediateBuffer", { RenderResourceType::Framebuffer, m_IntermediateFramebuffer.GetID() });
 }
 
 void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
@@ -72,13 +59,11 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     auto i_PointShadowMap = resourceRegistry.Get("PointShadowMap")->id;
     auto i_SSAO = resourceRegistry.Get("SSAOTexture")->id;
 
-    glBindFramebuffer(GL_FRAMEBUFFER, o_ScreenFBO);
+    m_ScreenFramebuffer.BindViewport();
 
     glDepthMask(GL_TRUE);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-    glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
 
     Shader& shader = ShaderManager::Get("PBR");
     shader.use();
@@ -187,8 +172,4 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
-
-    resourceRegistry.Register("ScreenTexture", { RenderResourceType::Texture, o_IntermediateColorTex });
-    resourceRegistry.Register("ScreenBuffer", { RenderResourceType::Framebuffer, o_ScreenFBO });
-    resourceRegistry.Register("IntermediateBuffer", { RenderResourceType::Framebuffer, intermediateFBO });
 }

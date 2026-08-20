@@ -1,70 +1,66 @@
 ﻿#include "rvelapch.h"
 #include "CompositePass.h"
 #include "Renderer/RenderContext.h"
+#include "Renderer/ShaderManager.h"
 #include "Scene/Environment.h"
 #include "Renderer/Renderer.h"
 
 using namespace rv;
 
-
 void CompositePass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
-	glGenFramebuffers(1, &m_Framebuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer);
+    FramebufferDesc desc;
+    desc.width = ctx.viewportWidth;
+    desc.height = ctx.viewportHeight;
+    desc.hasDepth = false;
+    desc.colorAttachments = {
+        { FramebufferTextureFormat::RGBA16F, FramebufferFilterMode::Linear, FramebufferWrapMode::ClampToEdge }
+    };
 
-	glGenTextures(1, &o_FinalTexture);
-	glBindTexture(GL_TEXTURE_2D, o_FinalTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, ctx.viewportWidth, ctx.viewportHeight,
-		0, GL_RGBA, GL_FLOAT, nullptr);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    m_Framebuffer = Framebuffer(desc);
 
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, o_FinalTexture, 0);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	frame.registry.Register("FinalTexture", { RenderResourceType::Texture,o_FinalTexture });
-	frame.registry.Register("FinalFramebuffer",
-		{ RenderResourceType::Framebuffer, m_Framebuffer });
+    frame.registry.Register("FinalTexture", { RenderResourceType::Texture, m_Framebuffer.GetColorAttachment(0) });
+    frame.registry.Register("FinalFramebuffer", { RenderResourceType::Framebuffer, m_Framebuffer.GetID() });
 }
 
 void CompositePass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
-	auto& env = *ctx.environment;
+    if (m_Framebuffer.GetWidth() != ctx.viewportWidth || m_Framebuffer.GetHeight() != ctx.viewportHeight)
+    {
+        m_Framebuffer.Resize(ctx.viewportWidth, ctx.viewportHeight);
+        frame.registry.Register("FinalTexture", { RenderResourceType::Texture, m_Framebuffer.GetColorAttachment(0) });
+        frame.registry.Register("FinalFramebuffer", { RenderResourceType::Framebuffer, m_Framebuffer.GetID() });
+    }
 
-	auto i_ScreenTexture = frame.registry.Get("ScreenTexture")->id;
-	auto i_BloomBlurTexture = frame.registry.Get("BloomTexture")->id;
-	auto i_SsrTexture = frame.registry.Get("SSRTexture")->id;
+    auto& env = *ctx.environment;
 
-	glDisable(GL_DEPTH_TEST);
-	Shader& compositeShader = ShaderManager::Get("Composite");
-	glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer);
-	glClear(GL_COLOR_BUFFER_BIT);
+    auto i_ScreenTexture = frame.registry.Get("ScreenTexture")->id;
+    auto i_BloomBlurTexture = frame.registry.Get("BloomTexture")->id;
+    auto i_SsrTexture = frame.registry.Get("SSRTexture")->id;
 
+    glDisable(GL_DEPTH_TEST);
 
-	compositeShader.use();
-	compositeShader.setFloat("exposure", env.PostProcess_Exposure);
-	compositeShader.setFloat("bloomIntensity", env.Bloom_Intensity);
-	compositeShader.setFloat("vignetteIntensity", env.PostProcess_VignetteIntensity);
-	compositeShader.setFloat("vignetteSmoothness", env.PostProcess_VignetteSmoothness);
-	compositeShader.setFloat("chromaticStrength", env.PostProcess_ChromaticStrength);
+    m_Framebuffer.BindViewport();
+    glClear(GL_COLOR_BUFFER_BIT);
 
-	compositeShader.setInt("screenTexture", 0);
-	compositeShader.setInt("bloomTexture", 1);
-	compositeShader.setInt("ssrTexture", 2);
+    Shader& compositeShader = ShaderManager::Get("Composite");
+    compositeShader.use();
+    compositeShader.setFloat("exposure", env.PostProcess_Exposure);
+    compositeShader.setFloat("bloomIntensity", env.Bloom_Intensity);
+    compositeShader.setFloat("vignetteIntensity", env.PostProcess_VignetteIntensity);
+    compositeShader.setFloat("vignetteSmoothness", env.PostProcess_VignetteSmoothness);
+    compositeShader.setFloat("chromaticStrength", env.PostProcess_ChromaticStrength);
 
-	glBindTextureUnit(0, i_ScreenTexture);
-	glBindTextureUnit(1, i_BloomBlurTexture);
-	glBindTextureUnit(2, i_SsrTexture);
+    compositeShader.setInt("screenTexture", 0);
+    compositeShader.setInt("bloomTexture", 1);
+    compositeShader.setInt("ssrTexture", 2);
 
-	Renderer::DrawFullScreenQuad();
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glEnable(GL_DEPTH_TEST);
+    glBindTextureUnit(0, i_ScreenTexture);
+    glBindTextureUnit(1, i_BloomBlurTexture);
+    glBindTextureUnit(2, i_SsrTexture);
 
-	frame.registry.Register("FinalTexture", { RenderResourceType::Texture,o_FinalTexture });
-	frame.registry.Register("FinalFramebuffer",
-		{ RenderResourceType::Framebuffer, m_Framebuffer });
+    Renderer::DrawFullScreenQuad();
+
+    glEnable(GL_DEPTH_TEST);
+    Framebuffer::BindDefault();
 }
-

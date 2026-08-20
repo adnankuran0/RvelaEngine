@@ -1,20 +1,19 @@
 #pragma once
-#include "../RenderPass.h"
-#include <Renderer/RenderFrame.h>
+#include "Renderer/RenderPass.h"
+#include "Renderer/RenderFrame.h"
+#include "Renderer/Framebuffer.h"
 
 namespace rv {
 
 class CompositePass : public RenderPass
 {
 public:
-
-    ~CompositePass() {}
+    ~CompositePass() override = default;
     void Init(const RenderContext& ctx, RenderFrame& frame) override;
-	void Execute(const RenderContext& ctx, RenderFrame& frame) override;
+    void Execute(const RenderContext& ctx, RenderFrame& frame) override;
 
 private:
-    GLuint m_Framebuffer = 0;       
-    GLuint o_FinalTexture = 0;      
+    Framebuffer m_Framebuffer;
 };
 
 }

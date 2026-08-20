@@ -1,28 +1,25 @@
 #pragma once
-#include "../RenderPass.h"
-#include <Renderer/RenderFrame.h>
+#include "Renderer/RenderPass.h"
+#include "Renderer/RenderFrame.h"
+#include "Renderer/Framebuffer.h"
+#include <vector>
 
 namespace rv {
 
 class BloomPass : public RenderPass
 {
 public:
-    ~BloomPass();
+    ~BloomPass() override = default;
     void Init(const RenderContext& ctx, RenderFrame& frame) override;
     void Execute(const RenderContext& ctx, RenderFrame& frame) override;
-    
 
 private:
     void Downsample(const RenderContext& ctx, RenderFrame& frame);
     void Upsample(const RenderContext& ctx, RenderFrame& frame);
 
-    GLuint o_BlurredTexture = 0;
-    std::vector<GLuint> downsampleFBOs;
-    std::vector<GLuint> downsampleTextures;
-
-    std::vector<GLuint> upsampleFBOs;
-    std::vector<GLuint> upsampleTextures;
-    const int mipLevels = 8;
+private:
+    std::vector<Framebuffer> m_DownsampleFBOs;
+    static constexpr int s_MipLevels = 8;
 };
 
 }
