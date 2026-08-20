@@ -73,6 +73,5 @@ To get the project up and running, you'll need to follow the setup instructions 
 
 ## Roadmap (TODO)
 
-- Particle system  
 - Animation system  
 - Ingame UI  
