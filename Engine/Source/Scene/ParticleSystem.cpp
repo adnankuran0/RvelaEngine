@@ -81,6 +81,8 @@ void ParticleSystem::ResetEmitter(entt::entity entity)
 
 void ParticleSystem::Update(float dt)
 {
+	//TODO: AABB frustum culling
+
 	entt::registry& registry = m_Scene.GetRegistry();
 
 	// remove unused pools

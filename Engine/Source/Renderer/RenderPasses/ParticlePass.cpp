@@ -9,6 +9,8 @@
 #include "Scene/Environment.h"
 #include "Scene/ParticleSystem.h"
 #include "Scene/Scene.h"
+#include <algorithm>
+#include <glm/gtx/norm.hpp>
 
 namespace rv {
 
@@ -38,6 +40,24 @@ void ParticlePass::Execute(const RenderContext& ctx, RenderFrame& frame)
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
 
     auto& packedData = ctx.scene->GetParticleSystem().GetPackedInstanceBuffer();
+
+    // Particle sorting (mix mode only)
+    glm::vec3 camPos = ctx.camera->Position;
+    for (const auto& cmd : pCommands)
+    {
+        if (cmd.instanceCount <= 1) continue;
+        if (cmd.material->GetBlendMode() != BlendMode::Mix) continue;
+
+        auto begin = packedData.begin() + cmd.instanceOffset;
+        auto end = begin + cmd.instanceCount;
+
+        std::sort(begin, end, [&camPos](const ParticleInstanceData& a, const ParticleInstanceData& b) {
+            float da = glm::length2(glm::vec3(a.positionAndScale) - camPos);
+            float db = glm::length2(glm::vec3(b.positionAndScale) - camPos);
+            return da > db;
+            });
+    }
+
     glNamedBufferData(m_InstanceSSBO, packedData.size() * sizeof(ParticleInstanceData), packedData.data(), GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_InstanceSSBO);
 

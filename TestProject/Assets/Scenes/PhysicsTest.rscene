@@ -2,11 +2,12 @@
     "Entities": [
         {
             "Material": {
-                "material": "ff347f05-8793-455a-b2b5-935ab8376790",
+                "material": "8cda0cf7-d943-42c2-a40a-1abf53a6b251",
                 "overrides": {
-                    "albedoTex": "d4bb3fc3-349c-4d10-909f-51d8b7b065f8",
+                    "albedoTex": "4d072ff5-378a-4fe2-8b2c-b797dc43aa2a",
                     "billboardMode": 2,
-                    "blendMode": 1,
+                    "blendMode": 0,
+                    "shadingMode": 0,
                     "transparencyMode": 1
                 }
             },
@@ -21,16 +22,16 @@
                 "dampingMax": 0.0,
                 "dampingMin": 0.0,
                 "direction": [
-                    0.0,
                     1.0,
+                    0.0,
                     0.0
                 ],
                 "emitterShape": 1,
                 "emitting": true,
                 "endColor": [
-                    1.0,
-                    0.0,
-                    0.0,
+                    0.13899612426757813,
+                    0.13899612426757813,
+                    0.13899612426757813,
                     0.0
                 ],
                 "explosiveness": 0.0,
@@ -39,46 +40,43 @@
                     0.0,
                     0.0
                 ],
-                "lifetime": 0.5099999904632568,
-                "lifetimeRandomness": 0.7200000286102295,
-                "linearAccelMax": 1.0,
+                "lifetime": 2.0,
+                "lifetimeRandomness": 0.6700000166893005,
+                "linearAccelMax": 180.0,
                 "linearAccelMin": 0.0,
-                "linearVelocityMax": 2.0,
-                "linearVelocityMin": 1.0,
+                "linearVelocityMax": 0.0,
+                "linearVelocityMin": 0.0,
                 "localCoords": false,
                 "oneShot": false,
-                "randomness": 0.0,
-                "rotationMax": 0.0,
+                "randomness": 0.20999999344348907,
+                "rotationMax": 360.0,
                 "rotationMin": 0.0,
-                "scaleEnd": 0.0,
-                "scaleMax": 0.25,
-                "scaleMin": 0.10000000149011612,
+                "scaleEnd": 2.0,
+                "scaleMax": 0.0,
+                "scaleMin": 0.0,
                 "shapeDimensions": [
-                    0.05000000074505806,
+                    1.5,
                     1.0,
                     1.0
                 ],
-                "speedScale": 1.0,
-                "spread": 7.699999809265137,
+                "speedScale": 0.3499999940395355,
+                "spread": 0.0,
                 "startColor": [
-                    1.0,
-                    0.20098096132278442,
-                    0.04633206129074097,
+                    0.4864864945411682,
+                    0.4864864945411682,
+                    0.4864864945411682,
                     1.0
                 ]
             },
-            "ScriptComponent": {
-                "scriptAssetUUID": "9187b747-d063-4585-8995-513956dde3aa"
-            },
             "Tag": {
-                "tag": "Fire"
+                "tag": "Smoke"
             },
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
-                    -2.462019920349121,
-                    1.5800000429153442,
-                    0.0
+                    9.95008659362793,
+                    2.543682813644409,
+                    0.4194246530532837
                 ],
                 "rotation": [
                     0.0,
@@ -91,184 +89,170 @@
                     1.0
                 ]
             },
-            "UUID": 18
+            "UUID": 20
         },
         {
-            "AudioEmitterComponent": {
-                "attenuationModel": 1,
-                "audioClip": "4a0aefc7-3097-4826-b01e-d603ca9a4b19",
-                "busID": 0,
-                "doppler": true,
-                "dopplerFactor": 1.0,
-                "loop": false,
-                "maxDistance": 100.0,
-                "minDistance": 1.0,
-                "pitch": 1.0,
-                "playOnCreate": true,
-                "rolloff": 1.0,
-                "spatial": false,
-                "volume": 1.0
-            },
-            "ConvexHullColliderComponent": {
-                "maxConvexRadius": 0.0,
-                "offset": [
-                    0.0,
-                    0.0,
-                    0.0
-                ]
-            },
             "Material": {
-                "material": "82e248a8-0e79-4d85-ab0e-9583f4b2b54d"
+                "material": "f61ceb99-1c6f-4183-9dc3-b56106f5acb3",
+                "overrides": {
+                    "albedoTex": "843640e9-bdbf-4d7e-b444-ddcd5e2d800d",
+                    "cullMode": 2,
+                    "receiveShadows": true,
+                    "specular": 0.0,
+                    "transparencyMode": 2
+                }
             },
             "Mesh": {
-                "mesh": "2a7b6688-8d79-4fd9-9ed1-21381e0ffb11"
+                "mesh": "1d2596bb-18d3-41a6-9848-a8a584870ce3"
             },
             "ParentUUID": 0,
-            "RigidbodyComponent": {
-                "allowSleep": 1,
-                "angularDamping": 0.05000000074505806,
-                "autoCalculateMass": 0,
-                "bodyType": 2,
-                "collisionLayer": 1,
-                "collisionMask": 4294967295,
-                "friction": 0.5,
-                "gravityFactor": 1.0,
-                "isSensor": false,
-                "linearDamping": 0.05000000074505806,
-                "lockRotationX": false,
-                "lockRotationY": false,
-                "lockRotationZ": false,
-                "lockTranslationX": false,
-                "lockTranslationY": false,
-                "lockTranslationZ": false,
-                "mass": 30.0,
-                "maxAngularVelocity": 50.0,
-                "maxLinearVelocity": 500.0,
-                "restitution": 0.0,
-                "useCCD": false
-            },
-            "ScriptComponent": {
-                "scriptAssetUUID": "926f6050-edf7-412d-af17-4407b6719930"
-            },
             "Tag": {
-                "tag": "mid_century_lounge_chair"
+                "tag": "Quad"
             },
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
-                    4.310460567474365,
-                    3.2082808017730713,
-                    -2.191044950450305e-05
+                    0.0,
+                    1.0,
+                    3.0
                 ],
                 "rotation": [
-                    -23.768400192260742,
-                    28.361736297607422,
-                    -2.4255868993350305e-06
+                    180.0,
+                    89.9720230102539,
+                    180.0
                 ],
                 "scale": [
-                    0.9999997019767761,
-                    0.9999996423721313,
-                    0.9999996423721313
+                    1.0000022649765015,
+                    1.0,
+                    1.0000022649765015
                 ]
             },
-            "UUID": 22
+            "UUID": 87
         },
         {
-            "ConvexHullColliderComponent": {
-                "maxConvexRadius": 0.0,
-                "offset": [
-                    0.0,
-                    0.0,
-                    0.0
-                ]
-            },
             "Material": {
-                "material": "f93d7599-ebd5-4dab-af6c-06858b61612f"
+                "material": "9f302e14-647b-4ccb-9b2a-2745be9474a2",
+                "overrides": {
+                    "albedoTex": "843640e9-bdbf-4d7e-b444-ddcd5e2d800d",
+                    "billboardMode": 0,
+                    "cullMode": 2,
+                    "receiveShadows": true,
+                    "specular": 0.0,
+                    "transparencyMode": 2
+                }
             },
             "Mesh": {
-                "mesh": "1b8e0e23-21b6-4020-9f6e-d3fd22f35ca6"
+                "mesh": "1d2596bb-18d3-41a6-9848-a8a584870ce3"
             },
             "ParentUUID": 0,
-            "RigidbodyComponent": {
-                "allowSleep": 1,
-                "angularDamping": 0.05000000074505806,
-                "autoCalculateMass": 0,
-                "bodyType": 2,
-                "collisionLayer": 1,
-                "collisionMask": 4294967295,
-                "friction": 0.5,
-                "gravityFactor": 1.0,
-                "isSensor": false,
-                "linearDamping": 0.05000000074505806,
-                "lockRotationX": false,
-                "lockRotationY": false,
-                "lockRotationZ": false,
-                "lockTranslationX": false,
-                "lockTranslationY": false,
-                "lockTranslationZ": false,
-                "mass": 50.0,
-                "maxAngularVelocity": 50.0,
-                "maxLinearVelocity": 500.0,
-                "restitution": 0.0,
-                "useCCD": false
-            },
             "Tag": {
-                "tag": "utility_box_02"
+                "tag": "Quad"
             },
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
-                    0.0,
-                    4.0,
-                    -1.5698566436767578
+                    0.034416183829307556,
+                    1.0,
+                    3.0
                 ],
                 "rotation": [
-                    -89.9802017211914,
                     0.0,
+                    -0.027961365878582,
                     0.0
                 ],
                 "scale": [
+                    0.999998927116394,
                     1.0,
-                    0.9999991655349731,
-                    0.9999991655349731
+                    0.999998927116394
                 ]
             },
-            "UUID": 10
+            "UUID": 30
         },
         {
-            "DirectionalLight": {
-                "castShadows": true,
-                "color": [
-                    1.0,
-                    1.0,
-                    1.0
-                ],
-                "intensity": 5.0,
-                "reverseCullFace": false
+            "Material": {
+                "material": "6be6f57a-4297-4fa7-98ba-bff72aa03d6b",
+                "overrides": {
+                    "albedoColor": [
+                        0.0,
+                        0.0,
+                        1.0,
+                        0.6039215922355652
+                    ],
+                    "cullMode": 2,
+                    "shadingMode": 1,
+                    "transparencyMode": 1
+                }
+            },
+            "Mesh": {
+                "mesh": "b6c7f2a2-cce2-4b68-be50-19a8f552e727"
             },
             "ParentUUID": 0,
             "Tag": {
-                "tag": "DirectionalLight"
+                "tag": "Sphere"
             },
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
+                    -4.284452438354492,
+                    2.0,
+                    -0.5198907852172852
+                ],
+                "rotation": [
                     0.0,
-                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    0.800000011920929,
+                    0.800000011920929,
+                    0.800000011920929
+                ]
+            },
+            "UUID": 44
+        },
+        {
+            "Material": {
+                "material": "7751df2c-ec30-4b89-8dfa-238de37d7e79",
+                "overrides": {
+                    "albedoColor": [
+                        1.0,
+                        0.0,
+                        0.0,
+                        0.3333333432674408
+                    ],
+                    "alphaCutoff": 0.4740000069141388,
+                    "cullMode": 2,
+                    "receiveShadows": true,
+                    "shadingMode": 1,
+                    "transparencyMode": 1
+                }
+            },
+            "Mesh": {
+                "mesh": "b6c7f2a2-cce2-4b68-be50-19a8f552e727"
+            },
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": "Sphere"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    -4.317482948303223,
+                    2.0,
                     0.0
                 ],
                 "rotation": [
-                    -45.93019104003906,
-                    60.79782485961914,
-                    4.400891304016113
+                    0.0,
+                    -0.0,
+                    0.0
                 ],
                 "scale": [
-                    0.9999998211860657,
-                    0.9999992251396179,
-                    0.9999997615814209
+                    0.6960000395774841,
+                    0.6960000395774841,
+                    0.6960000395774841
                 ]
             },
-            "UUID": 10
+            "UUID": 14
         },
         {
             "BoxColliderComponent": {
@@ -284,20 +268,18 @@
                 ]
             },
             "Material": {
-                "material": "ee3dde12-6263-4f11-bb1d-812b3e196ab7",
+                "material": "1d3e6ca6-0cc0-4c85-ae73-36db93d0aee4",
                 "overrides": {
-                    "UVScale": [
-                        12.300000190734863,
-                        5.650000095367432
+                    "albedoColor": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
                     ],
-                    "albedoTex": "e1f28315-9413-41d9-b4cd-df85a38bde35",
-                    "aoTex": "ab64387c-0f46-4540-a8be-33e82968d6ef",
-                    "heightScale": 0.05299999937415123,
-                    "heightTex": "181510e0-9bd5-4fab-a453-f9c0420708e3",
+                    "ao": 1.0,
+                    "heightScale": 0.00800000037997961,
                     "normalScale": 1.0,
-                    "normalTex": "980c6850-59d2-4024-9fbc-d3889eb142eb",
-                    "roughness": 1.0,
-                    "roughnessTex": "4dbaeb94-bcf2-42d5-8036-6e11bdcb81ac"
+                    "roughness": 0.6690000295639038
                 }
             },
             "Mesh": {
@@ -333,19 +315,228 @@
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
-                    -5.309327125549316,
-                    3.0,
+                    10.0,
+                    0.0,
                     0.0
                 ],
                 "rotation": [
-                    -89.99198150634766,
                     0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    10.0,
+                    1.0,
+                    10.0
+                ]
+            },
+            "UUID": 12
+        },
+        {
+            "AudioEmitterComponent": {
+                "attenuationModel": 1,
+                "audioClip": "e7dc7a60-7295-4655-85f4-34ce2a2975d9",
+                "busID": 1,
+                "doppler": true,
+                "dopplerFactor": 1.0,
+                "loop": false,
+                "maxDistance": 100.0,
+                "minDistance": 1.0,
+                "pitch": 1.0,
+                "playOnCreate": false,
+                "rolloff": 1.0,
+                "spatial": false,
+                "volume": 2.0
+            },
+            "CapsuleColliderComponent": {
+                "halfHeight": 0.5,
+                "offset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "radius": 0.5
+            },
+            "CharacterBodyComponent": {
+                "collisionLayer": 1,
+                "collisionMask": 4294967295,
+                "mass": 70.0,
+                "maxSlopeAngle": 50.0,
+                "maxStrength": 100.0,
+                "predictiveContactDistance": 0.10000000149011612,
+                "shapeOffset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ]
+            },
+            "Material": {
+                "material": "6f565b83-e131-46f0-9aad-316fee6b6ff2"
+            },
+            "Mesh": {
+                "mesh": "62345031-f93b-40f4-aa76-18c59801997d"
+            },
+            "ParentUUID": 0,
+            "ScriptComponent": {
+                "scriptAssetUUID": "b3326755-edfb-4522-ada1-080110d5fba5"
+            },
+            "Tag": {
+                "tag": "Character"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    1.5707449913024902,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
                     0.0
                 ],
                 "scale": [
                     1.0,
-                    9.997673988342285,
-                    5.102389335632324
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 27
+        },
+        {
+            "ParentUUID": 27,
+            "ScriptComponent": {
+                "scriptAssetUUID": "bc183720-0ea6-40c0-adb4-6438019b61d8"
+            },
+            "Tag": {
+                "tag": "CameraHolder"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.5102748870849609,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 28
+        },
+        {
+            "CameraComponent": {
+                "farClip": 1000.0,
+                "fov": 90.0,
+                "isActive": true,
+                "nearClip": 0.10000000149011612,
+                "projectionType": 0
+            },
+            "ParentUUID": 28,
+            "Tag": {
+                "tag": "Camera"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    5.008954758523032e-06,
+                    3.1876907087280415e-06,
+                    -5.0089888645743486e-06
+                ],
+                "scale": [
+                    0.9999953508377075,
+                    1.0,
+                    0.9999934434890747
+                ]
+            },
+            "UUID": 29
+        },
+        {
+            "BoxColliderComponent": {
+                "offset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    0.5,
+                    0.5,
+                    0.5
+                ]
+            },
+            "Material": {
+                "material": "117abcf2-653c-4baa-b1ef-78ccd02c4fa6",
+                "overrides": {
+                    "UVOffset": [
+                        0.12800000607967377,
+                        0.0
+                    ],
+                    "UVScale": [
+                        1.0,
+                        1.0
+                    ],
+                    "cullMode": 0,
+                    "transparencyMode": 0
+                }
+            },
+            "Mesh": {
+                "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
+            },
+            "ParentUUID": 0,
+            "RigidbodyComponent": {
+                "allowSleep": 1,
+                "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
+                "bodyType": 0,
+                "collisionLayer": 1,
+                "collisionMask": 4294967295,
+                "friction": 0.5,
+                "gravityFactor": 1.0,
+                "isSensor": false,
+                "linearDamping": 0.05000000074505806,
+                "lockRotationX": false,
+                "lockRotationY": false,
+                "lockRotationZ": false,
+                "lockTranslationX": false,
+                "lockTranslationY": false,
+                "lockTranslationZ": false,
+                "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
+                "restitution": 0.0,
+                "useCCD": false
+            },
+            "Tag": {
+                "tag": "Cube"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    3.4213333129882813,
+                    1.0026873350143433,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
                 ]
             },
             "UUID": 9
@@ -434,18 +625,20 @@
                 ]
             },
             "Material": {
-                "material": "117abcf2-653c-4baa-b1ef-78ccd02c4fa6",
+                "material": "ee3dde12-6263-4f11-bb1d-812b3e196ab7",
                 "overrides": {
-                    "UVOffset": [
-                        0.12800000607967377,
-                        0.0
-                    ],
                     "UVScale": [
-                        1.0,
-                        1.0
+                        12.300000190734863,
+                        5.650000095367432
                     ],
-                    "cullMode": 0,
-                    "transparencyMode": 0
+                    "albedoTex": "e1f28315-9413-41d9-b4cd-df85a38bde35",
+                    "aoTex": "ab64387c-0f46-4540-a8be-33e82968d6ef",
+                    "heightScale": 0.05299999937415123,
+                    "heightTex": "181510e0-9bd5-4fab-a453-f9c0420708e3",
+                    "normalScale": 1.0,
+                    "normalTex": "980c6850-59d2-4024-9fbc-d3889eb142eb",
+                    "roughness": 1.0,
+                    "roughnessTex": "4dbaeb94-bcf2-42d5-8036-6e11bdcb81ac"
                 }
             },
             "Mesh": {
@@ -481,139 +674,278 @@
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
-                    3.4213333129882813,
-                    1.0026873350143433,
+                    -5.309327125549316,
+                    3.0,
                     0.0
                 ],
                 "rotation": [
+                    -89.99198150634766,
                     0.0,
-                    -0.0,
                     0.0
                 ],
                 "scale": [
                     1.0,
-                    1.0,
-                    1.0
+                    9.997673988342285,
+                    5.102389335632324
                 ]
             },
             "UUID": 9
         },
         {
-            "CameraComponent": {
-                "farClip": 1000.0,
-                "fov": 90.0,
-                "isActive": true,
-                "nearClip": 0.10000000149011612,
-                "projectionType": 0
-            },
-            "ParentUUID": 28,
-            "Tag": {
-                "tag": "Camera"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "rotation": [
-                    5.008954758523032e-06,
-                    3.1876907087280415e-06,
-                    -5.0089888645743486e-06
-                ],
-                "scale": [
-                    0.9999953508377075,
-                    1.0,
-                    0.9999934434890747
-                ]
-            },
-            "UUID": 29
-        },
-        {
-            "ParentUUID": 27,
-            "ScriptComponent": {
-                "scriptAssetUUID": "bc183720-0ea6-40c0-adb4-6438019b61d8"
-            },
-            "Tag": {
-                "tag": "CameraHolder"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    0.0,
-                    0.5102748870849609,
-                    0.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scale": [
+            "DirectionalLight": {
+                "castShadows": true,
+                "color": [
                     1.0,
                     1.0,
                     1.0
+                ],
+                "intensity": 5.0,
+                "reverseCullFace": false
+            },
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": "DirectionalLight"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    -45.93019104003906,
+                    60.79782485961914,
+                    4.400891304016113
+                ],
+                "scale": [
+                    0.9999998211860657,
+                    0.9999992251396179,
+                    0.9999997615814209
                 ]
             },
-            "UUID": 28
+            "UUID": 10
+        },
+        {
+            "ConvexHullColliderComponent": {
+                "maxConvexRadius": 0.0,
+                "offset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ]
+            },
+            "Material": {
+                "material": "f93d7599-ebd5-4dab-af6c-06858b61612f"
+            },
+            "Mesh": {
+                "mesh": "1b8e0e23-21b6-4020-9f6e-d3fd22f35ca6"
+            },
+            "ParentUUID": 0,
+            "RigidbodyComponent": {
+                "allowSleep": 1,
+                "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 0,
+                "bodyType": 2,
+                "collisionLayer": 1,
+                "collisionMask": 4294967295,
+                "friction": 0.5,
+                "gravityFactor": 1.0,
+                "isSensor": false,
+                "linearDamping": 0.05000000074505806,
+                "lockRotationX": false,
+                "lockRotationY": false,
+                "lockRotationZ": false,
+                "lockTranslationX": false,
+                "lockTranslationY": false,
+                "lockTranslationZ": false,
+                "mass": 50.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
+                "restitution": 0.0,
+                "useCCD": false
+            },
+            "Tag": {
+                "tag": "utility_box_02"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    4.0,
+                    -1.5698566436767578
+                ],
+                "rotation": [
+                    -89.9802017211914,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    0.9999991655349731,
+                    0.9999991655349731
+                ]
+            },
+            "UUID": 10
         },
         {
             "AudioEmitterComponent": {
                 "attenuationModel": 1,
-                "audioClip": "e7dc7a60-7295-4655-85f4-34ce2a2975d9",
-                "busID": 1,
+                "audioClip": "4a0aefc7-3097-4826-b01e-d603ca9a4b19",
+                "busID": 0,
                 "doppler": true,
                 "dopplerFactor": 1.0,
                 "loop": false,
                 "maxDistance": 100.0,
                 "minDistance": 1.0,
                 "pitch": 1.0,
-                "playOnCreate": false,
+                "playOnCreate": true,
                 "rolloff": 1.0,
                 "spatial": false,
-                "volume": 2.0
+                "volume": 1.0
             },
-            "CapsuleColliderComponent": {
-                "halfHeight": 0.5,
+            "ConvexHullColliderComponent": {
+                "maxConvexRadius": 0.0,
                 "offset": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "radius": 0.5
-            },
-            "CharacterBodyComponent": {
-                "collisionLayer": 1,
-                "collisionMask": 4294967295,
-                "mass": 70.0,
-                "maxSlopeAngle": 50.0,
-                "maxStrength": 100.0,
-                "predictiveContactDistance": 0.10000000149011612,
-                "shapeOffset": [
                     0.0,
                     0.0,
                     0.0
                 ]
             },
             "Material": {
-                "material": "6f565b83-e131-46f0-9aad-316fee6b6ff2"
+                "material": "82e248a8-0e79-4d85-ab0e-9583f4b2b54d"
             },
             "Mesh": {
-                "mesh": "62345031-f93b-40f4-aa76-18c59801997d"
+                "mesh": "2a7b6688-8d79-4fd9-9ed1-21381e0ffb11"
             },
             "ParentUUID": 0,
+            "RigidbodyComponent": {
+                "allowSleep": 1,
+                "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 0,
+                "bodyType": 2,
+                "collisionLayer": 1,
+                "collisionMask": 4294967295,
+                "friction": 0.5,
+                "gravityFactor": 1.0,
+                "isSensor": false,
+                "linearDamping": 0.05000000074505806,
+                "lockRotationX": false,
+                "lockRotationY": false,
+                "lockRotationZ": false,
+                "lockTranslationX": false,
+                "lockTranslationY": false,
+                "lockTranslationZ": false,
+                "mass": 30.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
+                "restitution": 0.0,
+                "useCCD": false
+            },
             "ScriptComponent": {
-                "scriptAssetUUID": "b3326755-edfb-4522-ada1-080110d5fba5"
+                "scriptAssetUUID": "926f6050-edf7-412d-af17-4407b6719930"
             },
             "Tag": {
-                "tag": "Character"
+                "tag": "mid_century_lounge_chair"
             },
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
+                    4.310460567474365,
+                    3.2082808017730713,
+                    -2.191044950450305e-05
+                ],
+                "rotation": [
+                    -23.768400192260742,
+                    28.361736297607422,
+                    -2.4255868993350305e-06
+                ],
+                "scale": [
+                    0.9999997019767761,
+                    0.9999996423721313,
+                    0.9999996423721313
+                ]
+            },
+            "UUID": 22
+        },
+        {
+            "Material": {
+                "material": "ff347f05-8793-455a-b2b5-935ab8376790",
+                "overrides": {
+                    "albedoTex": "d4bb3fc3-349c-4d10-909f-51d8b7b065f8",
+                    "billboardMode": 2,
+                    "blendMode": 1,
+                    "transparencyMode": 1
+                }
+            },
+            "Mesh": {
+                "mesh": "1d2596bb-18d3-41a6-9848-a8a584870ce3"
+            },
+            "ParentUUID": 0,
+            "ParticleEmitterComponent": {
+                "amount": 750,
+                "angularVelocityMax": 0.0,
+                "angularVelocityMin": 0.0,
+                "dampingMax": 0.0,
+                "dampingMin": 0.0,
+                "direction": [
                     0.0,
-                    1.5707449913024902,
+                    1.0,
+                    0.0
+                ],
+                "emitterShape": 1,
+                "emitting": true,
+                "endColor": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "explosiveness": 0.0,
+                "gravity": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "lifetime": 0.5099999904632568,
+                "lifetimeRandomness": 0.7200000286102295,
+                "linearAccelMax": 1.0,
+                "linearAccelMin": 0.0,
+                "linearVelocityMax": 2.0,
+                "linearVelocityMin": 1.0,
+                "localCoords": false,
+                "oneShot": false,
+                "randomness": 0.0,
+                "rotationMax": 0.0,
+                "rotationMin": 0.0,
+                "scaleEnd": 0.0,
+                "scaleMax": 0.25,
+                "scaleMin": 0.10000000149011612,
+                "shapeDimensions": [
+                    0.05000000074505806,
+                    1.0,
+                    1.0
+                ],
+                "speedScale": 1.0,
+                "spread": 7.699999809265137,
+                "startColor": [
+                    1.0,
+                    0.20098096132278442,
+                    0.04633206129074097,
+                    1.0
+                ]
+            },
+            "ScriptComponent": {
+                "scriptAssetUUID": "9187b747-d063-4585-8995-513956dde3aa"
+            },
+            "Tag": {
+                "tag": "Fire"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    -2.462019920349121,
+                    1.5800000429153442,
                     0.0
                 ],
                 "rotation": [
@@ -627,253 +959,12 @@
                     1.0
                 ]
             },
-            "UUID": 27
-        },
-        {
-            "BoxColliderComponent": {
-                "offset": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "size": [
-                    0.5,
-                    0.5,
-                    0.5
-                ]
-            },
-            "Material": {
-                "material": "1d3e6ca6-0cc0-4c85-ae73-36db93d0aee4",
-                "overrides": {
-                    "albedoColor": [
-                        1.0,
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "ao": 1.0,
-                    "heightScale": 0.00800000037997961,
-                    "normalScale": 1.0,
-                    "roughness": 0.6690000295639038
-                }
-            },
-            "Mesh": {
-                "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
-            },
-            "ParentUUID": 0,
-            "RigidbodyComponent": {
-                "allowSleep": 1,
-                "angularDamping": 0.05000000074505806,
-                "autoCalculateMass": 1,
-                "bodyType": 0,
-                "collisionLayer": 1,
-                "collisionMask": 4294967295,
-                "friction": 0.5,
-                "gravityFactor": 1.0,
-                "isSensor": false,
-                "linearDamping": 0.05000000074505806,
-                "lockRotationX": false,
-                "lockRotationY": false,
-                "lockRotationZ": false,
-                "lockTranslationX": false,
-                "lockTranslationY": false,
-                "lockTranslationZ": false,
-                "mass": 1.0,
-                "maxAngularVelocity": 50.0,
-                "maxLinearVelocity": 500.0,
-                "restitution": 0.0,
-                "useCCD": false
-            },
-            "Tag": {
-                "tag": "Cube"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    10.0,
-                    0.0,
-                    0.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scale": [
-                    10.0,
-                    1.0,
-                    10.0
-                ]
-            },
-            "UUID": 12
-        },
-        {
-            "Material": {
-                "material": "7751df2c-ec30-4b89-8dfa-238de37d7e79",
-                "overrides": {
-                    "albedoColor": [
-                        1.0,
-                        0.0,
-                        0.0,
-                        0.3333333432674408
-                    ],
-                    "alphaCutoff": 0.4740000069141388,
-                    "cullMode": 2,
-                    "receiveShadows": true,
-                    "shadingMode": 1,
-                    "transparencyMode": 1
-                }
-            },
-            "Mesh": {
-                "mesh": "b6c7f2a2-cce2-4b68-be50-19a8f552e727"
-            },
-            "ParentUUID": 0,
-            "Tag": {
-                "tag": "Sphere"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    -4.317482948303223,
-                    2.0,
-                    0.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scale": [
-                    0.6960000395774841,
-                    0.6960000395774841,
-                    0.6960000395774841
-                ]
-            },
-            "UUID": 14
-        },
-        {
-            "Material": {
-                "material": "6be6f57a-4297-4fa7-98ba-bff72aa03d6b",
-                "overrides": {
-                    "albedoColor": [
-                        0.0,
-                        0.0,
-                        1.0,
-                        0.6039215922355652
-                    ],
-                    "cullMode": 2,
-                    "shadingMode": 1,
-                    "transparencyMode": 1
-                }
-            },
-            "Mesh": {
-                "mesh": "b6c7f2a2-cce2-4b68-be50-19a8f552e727"
-            },
-            "ParentUUID": 0,
-            "Tag": {
-                "tag": "Sphere"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    -4.284452438354492,
-                    2.0,
-                    -0.5198907852172852
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scale": [
-                    0.800000011920929,
-                    0.800000011920929,
-                    0.800000011920929
-                ]
-            },
-            "UUID": 44
-        },
-        {
-            "Material": {
-                "material": "9f302e14-647b-4ccb-9b2a-2745be9474a2",
-                "overrides": {
-                    "albedoTex": "843640e9-bdbf-4d7e-b444-ddcd5e2d800d",
-                    "billboardMode": 0,
-                    "cullMode": 2,
-                    "receiveShadows": true,
-                    "specular": 0.0,
-                    "transparencyMode": 2
-                }
-            },
-            "Mesh": {
-                "mesh": "1d2596bb-18d3-41a6-9848-a8a584870ce3"
-            },
-            "ParentUUID": 0,
-            "Tag": {
-                "tag": "Quad"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    0.034416183829307556,
-                    1.0,
-                    3.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.027961365878582,
-                    0.0
-                ],
-                "scale": [
-                    0.999998927116394,
-                    1.0,
-                    0.999998927116394
-                ]
-            },
-            "UUID": 30
-        },
-        {
-            "Material": {
-                "material": "f61ceb99-1c6f-4183-9dc3-b56106f5acb3",
-                "overrides": {
-                    "albedoTex": "843640e9-bdbf-4d7e-b444-ddcd5e2d800d",
-                    "cullMode": 2,
-                    "receiveShadows": true,
-                    "specular": 0.0,
-                    "transparencyMode": 2
-                }
-            },
-            "Mesh": {
-                "mesh": "1d2596bb-18d3-41a6-9848-a8a584870ce3"
-            },
-            "ParentUUID": 0,
-            "Tag": {
-                "tag": "Quad"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    0.0,
-                    1.0,
-                    3.0
-                ],
-                "rotation": [
-                    180.0,
-                    89.9720230102539,
-                    180.0
-                ],
-                "scale": [
-                    1.0000022649765015,
-                    1.0,
-                    1.0000022649765015
-                ]
-            },
-            "UUID": 87
+            "UUID": 18
         }
     ],
     "Environment": {
         "Bloom": true,
-        "Bloom_Intensity": 0.10000000149011612,
+        "Bloom_Intensity": 1.0,
         "Bloom_Knee": 0.0,
         "Bloom_Treshold": 1.0,
         "HDRPath": "Assets\\Textures\\skybox\\environment2.hdr",

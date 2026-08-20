@@ -1,0 +1,13 @@
+{
+    "dependencies": [],
+    "importerID": "TextureImporter",
+    "importerSettings": {
+        "compress": true,
+        "generateMips": false,
+        "maxSize": 4096,
+        "sRGB": false
+    },
+    "lastWriteTime": 13431655312,
+    "subAssets": [],
+    "uuid": "4d072ff5-378a-4fe2-8b2c-b797dc43aa2a"
+}

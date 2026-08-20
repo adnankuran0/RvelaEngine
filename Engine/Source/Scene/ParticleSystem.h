@@ -61,7 +61,7 @@ public:
 
 	void Update(float dt);
 
-	const std::vector<ParticleInstanceData>& GetPackedInstanceBuffer() const { return m_PackedInstanceData; }
+	std::vector<ParticleInstanceData>& GetPackedInstanceBuffer() { return m_PackedInstanceData; }
 	const std::vector<ParticleBatch>& GetBatches() const { return m_Batches; }
 
 	void Reset();

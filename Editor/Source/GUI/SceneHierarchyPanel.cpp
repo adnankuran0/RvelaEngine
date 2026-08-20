@@ -223,6 +223,21 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             scene.AddComponent<CameraComponent>(selectedEntity);
         }
 
+        if (ImGui::MenuItem("Particle Emitter")) {
+            Entity emitterEntity = LoadPrimitive(scene, "Quad");
+            if (emitterEntity)
+            {
+                if(emitterEntity.HasComponent<RigidbodyComponent>())
+                    emitterEntity.RemoveComponent<RigidbodyComponent>();
+                if (emitterEntity.HasComponent<ConvexHullColliderComponent>())
+                    emitterEntity.RemoveComponent<ConvexHullColliderComponent>();
+
+                emitterEntity.GetComponent<TagComponent>().tag = "Particle Emitter";
+                emitterEntity.AddComponent<ParticleEmitterComponent>();
+                selectedEntity = emitterEntity ? emitterEntity.GetHandle() : entt::null;
+            }
+        }
+
         if (ImGui::BeginMenu("Primitives")) {
             if (ImGui::MenuItem("Cube"))
                 selectedEntity = LoadPrimitive(scene, "Cube");

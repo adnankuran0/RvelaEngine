@@ -74,11 +74,18 @@ void main()
         vec3 finalUp    = right * sinRot + up * cosRot;
 
         vertexPos = instPos + (finalRight * aPos.x + finalUp * aPos.y + look * aPos.z) * scale;
-        N = look; // Normal de sadece yatay eksende bakar
+        N = look;
     }
     else // Disabled
     {
-        vertexPos = instPos + (aPos * scale);
+        float cosRot = cos(rot);
+        float sinRot = sin(rot);
+        vec3 rotatedPos = vec3(
+            aPos.x * cosRot - aPos.y * sinRot,
+            aPos.x * sinRot + aPos.y * cosRot,
+            aPos.z
+        );
+        vertexPos = instPos + (rotatedPos * scale);
     }
 
     FragPos = vertexPos;
