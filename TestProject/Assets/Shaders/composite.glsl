@@ -21,8 +21,7 @@ in vec2 TexCoords;
 
 layout(binding = 0) uniform sampler2D screenTexture;
 layout(binding = 1) uniform sampler2D bloomTexture;
-layout(binding = 2) uniform sampler2D aoTexture;
-layout(binding = 3) uniform sampler2D ssrTexture;
+layout(binding = 2) uniform sampler2D ssrTexture;
 
 uniform float bloomIntensity;
 uniform float exposure;
@@ -36,23 +35,13 @@ void main()
     vec3 bloomColor = texture(bloomTexture, TexCoords).rgb;
     vec4 ssrSample  = texture(ssrTexture,  TexCoords);
 
-    float blurredAO = 0.0;
-    for (int x = -1; x <= 1; ++x)
-        for (int y = -1; y <= 1; ++y)
-            blurredAO += texture(aoTexture, TexCoords + vec2(x, y) / textureSize(aoTexture, 0)).r;
-    float ao = blurredAO / 9.0;
-
-    vec3 ambient = hdrColor * 0.1;
-    hdrColor -= ambient * (1.0 - ao) * 10.0;
-    hdrColor  = max(hdrColor, vec3(0.0));
-
     hdrColor = mix(hdrColor, hdrColor + ssrSample.rgb, ssrSample.a);
 
     vec3 combined = hdrColor + bloomColor * bloomIntensity;
 
     combined    = vec3(1.0) - exp(-combined * exposure);
     vec3 mapped = ACESFilm(combined);
-    
+
     mapped = LinearToSRGB(mapped);
 
     mapped *= Vignette(TexCoords, vignetteIntensity, vignetteSmoothness);

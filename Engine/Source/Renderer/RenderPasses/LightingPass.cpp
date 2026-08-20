@@ -70,6 +70,7 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     auto i_DirectionalShadowMap = resourceRegistry.Get("DirectionalShadowMap")->id;
     auto i_PointShadowMap = resourceRegistry.Get("PointShadowMap")->id;
+    auto i_SSAO = resourceRegistry.Get("SSAOTexture")->id;
 
     glBindFramebuffer(GL_FRAMEBUFFER, o_ScreenFBO);
 
@@ -84,6 +85,7 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     constexpr int DIR_SHADOW_MAP_SLOT = 6;
     constexpr int POINT_SHADOW_MAP_SLOT = 7;
+    constexpr int SSAO_SLOT = 11;
 
     shader.setInt("shadowMap", DIR_SHADOW_MAP_SLOT);
     glBindTextureUnit(DIR_SHADOW_MAP_SLOT, i_DirectionalShadowMap);
@@ -105,6 +107,9 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     glBindTextureUnit(8, skybox.GetIrradianceMap());
     glBindTextureUnit(9, skybox.GetPrefilterMap());
     glBindTextureUnit(10, skybox.GetBRDFLUTTexture());
+    shader.setBool("useSSAO", ctx.environment->SSAO);
+    shader.setInt("ssaoTexture", SSAO_SLOT);
+    glBindTextureUnit(SSAO_SLOT, i_SSAO);
 
     auto ApplyCullMode = [](CullMode mode) {
         if (mode == CullMode::Disabled) {

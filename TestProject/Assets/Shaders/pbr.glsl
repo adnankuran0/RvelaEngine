@@ -112,6 +112,9 @@ layout(binding = 8) uniform samplerCube irradianceMap;
 layout(binding = 9) uniform samplerCube prefilterMap;
 layout(binding = 10) uniform sampler2D brdfLUT;
 
+layout(binding = 11) uniform sampler2D ssaoTexture;
+uniform bool useSSAO;
+
 uniform bool useIBL;
 uniform float iblIntensity;
 
@@ -163,6 +166,21 @@ vec3 getNormalFromMap(vec2 texCoords, vec3 N, vec3 T, vec3 B)
     return normalize(mat3(T, B, N) * tangentNormal);
 }
 
+float sampleSSAO()
+{
+    if (!useSSAO) return 1.0;
+
+    vec2 screenUV = gl_FragCoord.xy / windowSize;
+    vec2 texelSize = 1.0 / vec2(textureSize(ssaoTexture, 0));
+
+    float result = 0.0;
+    for (int x = -1; x <= 1; ++x)
+        for (int y = -1; y <= 1; ++y)
+            result += texture(ssaoTexture, screenUV + vec2(x, y) * texelSize).r;
+
+    return result / 9.0;
+}
+
 void main()
 {
     vec3 viewDir = normalize(camPos - FragPos);
@@ -204,7 +222,8 @@ void main()
     float metallic = useMetallicMap ? texture(metallicMap, mappedTexCoords).r : metallicValue;
     float roughnessMapValue = useRoughnessMap ? texture(roughnessMap, mappedTexCoords).r : 1.0;
     float roughness = clamp(roughnessValue * roughnessMapValue, 0.0, 1.0);
-    float ao = useAOMap ? texture(aoMap, mappedTexCoords).r : aoValue;
+    float materialAO = useAOMap ? texture(aoMap, mappedTexCoords).r : aoValue;
+    float ao = materialAO * sampleSSAO();
 
     vec3 V = normalize(camPos - FragPos);
     vec3 Nmap = getNormalFromMap(mappedTexCoords, N, T, B);

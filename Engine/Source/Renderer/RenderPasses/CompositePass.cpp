@@ -36,7 +36,6 @@ void CompositePass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
 	auto i_ScreenTexture = frame.registry.Get("ScreenTexture")->id;
 	auto i_BloomBlurTexture = frame.registry.Get("BloomTexture")->id;
-	auto i_AoTexture = frame.registry.Get("SSAOTexture")->id;
 	auto i_SsrTexture = frame.registry.Get("SSRTexture")->id;
 
 	glDisable(GL_DEPTH_TEST);
@@ -54,13 +53,11 @@ void CompositePass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
 	compositeShader.setInt("screenTexture", 0);
 	compositeShader.setInt("bloomTexture", 1);
-	compositeShader.setInt("aoTexture", 2);
-	compositeShader.setInt("ssrTexture", 3);
+	compositeShader.setInt("ssrTexture", 2);
 
 	glBindTextureUnit(0, i_ScreenTexture);
 	glBindTextureUnit(1, i_BloomBlurTexture);
-	glBindTextureUnit(2, i_AoTexture);
-	glBindTextureUnit(3, i_SsrTexture);
+	glBindTextureUnit(2, i_SsrTexture);
 
 	Renderer::DrawFullScreenQuad();
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
