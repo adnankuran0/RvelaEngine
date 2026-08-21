@@ -1,12 +1,12 @@
 #include "Style.h"
 #include <imgui.h>
-
+#include "Utils/FileUtils.h"
 
 void rv::SetStyle()
 {
     ImGuiIO& io = ImGui::GetIO();
     io.Fonts->AddFontFromFileTTF(
-        "C:\\RvelaEngine\\Resources\\Editor\\roboto.ttf", 16.0f
+        EDITOR_PATH("Fonts\\roboto.ttf").GetAbsoluteStr().c_str(), 16.0f
     );
 
     ImGuiStyle& style = ImGui::GetStyle();

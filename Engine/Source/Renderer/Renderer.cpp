@@ -23,26 +23,26 @@ Renderer::~Renderer()
 void Renderer::Init(GLFWwindow* window)
 {
     Renderer::activeWindow = window;
-    ShaderManager::Add(Shader("Geometry",VRT_PATH("Assets\\Shaders\\geometry.glsl")));
-    ShaderManager::Add(Shader("PointShadow",VRT_PATH("Assets\\Shaders\\pointShadow.glsl")));
-    ShaderManager::Add(Shader("DirectionalShadow",VRT_PATH("Assets\\Shaders\\directionalShadow.glsl")));
-    ShaderManager::Add(Shader("Skybox",VRT_PATH("Assets\\Shaders\\skybox.glsl")));
-    ShaderManager::Add(Shader("PBR",VRT_PATH("Assets\\Shaders\\pbr.glsl")));
-    ShaderManager::Add(Shader("Bright",VRT_PATH("Assets\\Shaders\\brightPass.glsl")));
-    ShaderManager::Add(Shader("Downsample",VRT_PATH("Assets\\Shaders\\downsample.glsl")));
-    ShaderManager::Add(Shader("Upsample",VRT_PATH("Assets\\Shaders\\upsample.glsl")));
-    ShaderManager::Add(Shader("SSAO",VRT_PATH("Assets\\Shaders\\ssao.glsl")));
-    ShaderManager::Add(Shader("SSR",VRT_PATH("Assets\\Shaders\\ssr.glsl")));
-    ShaderManager::Add(Shader("Composite",VRT_PATH("Assets\\Shaders\\composite.glsl")));
-    ShaderManager::Add(Shader("Outline",VRT_PATH("Assets\\Shaders\\outline.glsl")));
-    ShaderManager::Add(Shader("ToCubemap",VRT_PATH("Assets\\Shaders\\equirectangularToCubemap.glsl")));
-    ShaderManager::Add(Shader("EntityBuffer",VRT_PATH("Assets\\Shaders\\entityBuffer.glsl")));
-    ShaderManager::Add(Shader("Mask",VRT_PATH("Assets\\Shaders\\mask.glsl")));
-    ShaderManager::Add(Shader("Irradiance",VRT_PATH("Assets\\Shaders\\irradiance.glsl")));
-    ShaderManager::Add(Shader("Prefilter",VRT_PATH("Assets\\Shaders\\prefilter.glsl")));
-    ShaderManager::Add(Shader("BRDF",VRT_PATH("Assets\\Shaders\\brdf.glsl")));
-    ShaderManager::Add(Shader("Line",VRT_PATH("Assets\\Shaders\\line.glsl")));
-    ShaderManager::Add(Shader("Particle",VRT_PATH("Assets\\Shaders\\particle.glsl")));
+    ShaderManager::Add(Shader("Geometry",ENGINE_PATH("Shaders\\geometry.glsl")));
+    ShaderManager::Add(Shader("PointShadow",ENGINE_PATH("Shaders\\pointShadow.glsl")));
+    ShaderManager::Add(Shader("DirectionalShadow",ENGINE_PATH("Shaders\\directionalShadow.glsl")));
+    ShaderManager::Add(Shader("Skybox",ENGINE_PATH("Shaders\\skybox.glsl")));
+    ShaderManager::Add(Shader("PBR",ENGINE_PATH("Shaders\\pbr.glsl")));
+    ShaderManager::Add(Shader("Bright",ENGINE_PATH("Shaders\\brightPass.glsl")));
+    ShaderManager::Add(Shader("Downsample",ENGINE_PATH("Shaders\\downsample.glsl")));
+    ShaderManager::Add(Shader("Upsample",ENGINE_PATH("Shaders\\upsample.glsl")));
+    ShaderManager::Add(Shader("SSAO",ENGINE_PATH("Shaders\\ssao.glsl")));
+    ShaderManager::Add(Shader("SSR",ENGINE_PATH("Shaders\\ssr.glsl")));
+    ShaderManager::Add(Shader("Composite",ENGINE_PATH("Shaders\\composite.glsl")));
+    ShaderManager::Add(Shader("Outline",ENGINE_PATH("Shaders\\outline.glsl")));
+    ShaderManager::Add(Shader("ToCubemap",ENGINE_PATH("Shaders\\equirectangularToCubemap.glsl")));
+    ShaderManager::Add(Shader("EntityBuffer",ENGINE_PATH("Shaders\\entityBuffer.glsl")));
+    ShaderManager::Add(Shader("Mask",ENGINE_PATH("Shaders\\mask.glsl")));
+    ShaderManager::Add(Shader("Irradiance",ENGINE_PATH("Shaders\\irradiance.glsl")));
+    ShaderManager::Add(Shader("Prefilter",ENGINE_PATH("Shaders\\prefilter.glsl")));
+    ShaderManager::Add(Shader("BRDF",ENGINE_PATH("Shaders\\brdf.glsl")));
+    ShaderManager::Add(Shader("Line",ENGINE_PATH("Shaders\\line.glsl")));
+    ShaderManager::Add(Shader("Particle",ENGINE_PATH("Shaders\\particle.glsl")));
 
     m_ScreenQuad.Init();
 

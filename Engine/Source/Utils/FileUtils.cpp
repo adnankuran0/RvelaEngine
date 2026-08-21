@@ -2,39 +2,36 @@
 #include "FileUtils.h"
 #include "ProjectManager.h"
 #include "Core/Engine.h"
-
 using namespace rv;
 
-Path::Path(const std::filesystem::path& path, bool isVirual)
+std::filesystem::path Path::s_EngineResourcesPath;
+std::filesystem::path Path::s_EditorResourcesPath;
+
+Path::Path(const std::filesystem::path& path, bool isVirual, PathOrigin origin)
+	: m_Origin(origin)
 {
 	if (isVirual)
-	{
 		m_VirtualPath = path;
-	}
 	else
-	{
 		m_VirtualPath = std::filesystem::relative(path, Engine::Get()->GetProjectManager().GetProjectPath());
-	}
 }
 
-Path Path::FromVirtual(const std::string& virtualPath)
-{
-	return Path(virtualPath, true);
-}
+Path Path::FromVirtual(const std::string& virtualPath) { return Path(virtualPath, true, PathOrigin::Project); }
+Path Path::FromAbsolute(const std::string& absolutePath) { return Path(absolutePath, false, PathOrigin::Project); }
+Path Path::FromEngineResource(const std::string& p) { return Path(p, true, PathOrigin::EngineResource); }
+Path Path::FromEditorResource(const std::string& p) { return Path(p, true, PathOrigin::EditorResource); }
 
-Path Path::FromAbsolute(const std::string& absolutePath)
-{
-	return Path(absolutePath, false);
-}
-
-std::filesystem::path Path::GetVirtual() const
-{
-	return m_VirtualPath;
-}
+void Path::SetEngineResourcesPath(const std::filesystem::path& path) { s_EngineResourcesPath = path; }
+void Path::SetEditorResourcesPath(const std::filesystem::path& path) { s_EditorResourcesPath = path; }
 
 std::filesystem::path Path::GetAbsolute() const
 {
-	return Engine::Get()->GetProjectManager().GetProjectPath() / m_VirtualPath;
+	switch (m_Origin)
+	{
+	case PathOrigin::EngineResource: return s_EngineResourcesPath / m_VirtualPath;
+	case PathOrigin::EditorResource: return s_EditorResourcesPath / m_VirtualPath;
+	default:                         return Engine::Get()->GetProjectManager().GetProjectPath() / m_VirtualPath;
+	}
 }
 
 std::string Path::String() const
@@ -73,22 +70,24 @@ std::string Path::GetExtension() const
 	return m_VirtualPath.extension().string();
 }
 
+std::filesystem::path Path::GetVirtual() const
+{
+	return m_VirtualPath;
+}
+
 Path Path::GetParentPath() const
 {
-	return Path(m_VirtualPath.parent_path().lexically_normal(), true);
+	return Path(m_VirtualPath.parent_path().lexically_normal(), true, m_Origin);
 }
-
 Path Path::operator/(const std::string& subPath) const
 {
-	return Path((m_VirtualPath / std::filesystem::path(subPath)).lexically_normal(), true);
+	return Path((m_VirtualPath / std::filesystem::path(subPath)).lexically_normal(), true, m_Origin);
 }
-
 Path Path::operator/(const Path& other) const
 {
-	return Path((m_VirtualPath / other.m_VirtualPath).lexically_normal(), true);
+	return Path((m_VirtualPath / other.m_VirtualPath).lexically_normal(), true, m_Origin);
 }
-
 Path Path::operator/(const std::filesystem::path& subPath) const
 {
-	return Path((m_VirtualPath / subPath).lexically_normal(), true);
+	return Path((m_VirtualPath / subPath).lexically_normal(), true, m_Origin);
 }

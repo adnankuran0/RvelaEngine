@@ -20,8 +20,11 @@ Engine::Engine()
 {
 	RvelaLog::Init("log.txt");
 
+	Path::SetEngineResourcesPath(std::filesystem::path(RVELA_ROOT_DIR) / "Resources" / "Engine");
+	Path::SetEditorResourcesPath(std::filesystem::path(RVELA_ROOT_DIR) / "Resources" / "Editor");
+
 	m_Window.Init();
-	m_ProjectManager.LoadProject("C:\\RvelaEngine\\TestProject\\TestProject.rproj");
+	m_ProjectManager.LoadProject(EDITOR_PATH("TestProject\\TestProject.rproj").GetAbsoluteStr());
 	m_AssetRegistry.Scan(ProjectManager::GetProjectPath() / "Assets");
 	AssetManager& assetManager = AssetManager::Get();
 	assetManager.Init(m_AssetRegistry);

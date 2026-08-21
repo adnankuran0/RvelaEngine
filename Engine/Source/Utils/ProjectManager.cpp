@@ -40,7 +40,18 @@ bool ProjectManager::LoadProject(const std::string& projectFilePath)
 	auto project = std::make_shared<Project>();
 	Serializer::LoadFromFile(*project, projectFilePath);
 	m_ActiveProject = project;
-	m_ProjectFolderPath = project->projectFolderPath;
+
+	if (!std::filesystem::exists(project->projectFolderPath))
+	{
+		// Project folder moved, write new path
+		project->projectFolderPath = std::filesystem::path(projectFilePath).parent_path(); // <-- düzeltme
+		m_ProjectFolderPath = project->projectFolderPath;
+		SaveActiveProject();
+	}
+	else
+	{
+		m_ProjectFolderPath = project->projectFolderPath;
+	}
 	return true;
 }
 

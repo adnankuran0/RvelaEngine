@@ -8,6 +8,7 @@
 #include "Event/KeyEvents.h"
 #include "Event/MouseEvents.h"
 #include "Event/WindowEvents.h"
+#include "Utils/FileUtils.h"
 
 using namespace rv;
 
@@ -56,7 +57,7 @@ void Window::Init()
     }
 
     GLFWimage images[1];
-    images[0].pixels = stbi_load("C:\\RvelaEngine\\Resources\\Editor\\icon.png", &images[0].width, &images[0].height, 0, 4);
+    images[0].pixels = stbi_load(EDITOR_PATH("icon.png").GetAbsoluteStr().c_str(), &images[0].width, &images[0].height, 0, 4);
     if (images[0].pixels)
     {
         glfwSetWindowIcon(m_Window, 1, images);

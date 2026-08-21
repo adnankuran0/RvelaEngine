@@ -5,17 +5,29 @@
 #extension GL_NV_viewport_array2 : enable
 
 layout (location = 0) in vec3 aPos;
+layout (location = 3) in vec2 aTexCoords;
+
+#include "Common/Camera.glsl"
+#include "Common/Billboard.glsl"
 
 uniform mat4 model;
 uniform mat4 shadowMatrix;  
 uniform int baseLayer;
 uniform int currentFace;    
+uniform vec2 UVScale;
+uniform vec2 UVOffset;
+uniform int billboardMode;
 
 out vec4 FragPos;
+out vec2 TexCoords;
 
 void main()
 {
-    FragPos = model * vec4(aPos, 1.0);
+    TexCoords = aTexCoords * UVScale + UVOffset;
+
+    BillboardTransform bb = CalculateBillboard(billboardMode, model, view, aPos, camPos);
+
+    FragPos = bb.worldPos;
     gl_Position = shadowMatrix * FragPos;
     gl_Layer = baseLayer + currentFace;
 }
@@ -23,17 +35,26 @@ void main()
 #shader fragment
 #version 460 core 
 in vec4 FragPos;
+in vec2 TexCoords;
+
+layout(binding = 0) uniform sampler2D albedoMap;
+uniform bool useAlbedoMap;
+uniform vec4 albedoColor;
+uniform int transparencyMode;
+uniform float alphaCutoff;
 
 uniform vec3 lightPos;
 uniform float far_plane;
 
 void main()
 {
+    if (transparencyMode == 2) {
+        float alpha = (useAlbedoMap ? texture(albedoMap, TexCoords).a : 1.0) * albedoColor.a;
+        if (alpha < alphaCutoff)
+            discard;
+    }
+
     float lightDistance = length(FragPos.xyz - lightPos);
-    
-    // map to [0;1] range by dividing by far_plane
     lightDistance = lightDistance / far_plane;
-    
-    // write this as modified depth
     gl_FragDepth = lightDistance;
 }

@@ -468,19 +468,19 @@ static void DrawItemContextMenu(const std::filesystem::path& itemPath, AssetImpo
 AssetBrowserPanel::AssetBrowserPanel()
 {
     folderIcon.Init();
-    folderIcon.GenerateFromImage("C:\\RvelaEngine\\Resources\\Editor\\Icons\\folder.png");
+    folderIcon.GenerateFromImage(EDITOR_PATH("Icons\\folder.png").GetAbsoluteStr());
     materialIcon.Init();
-    materialIcon.GenerateFromImage("C:\\RvelaEngine\\Resources\\Editor\\Icons\\material.png");
+    materialIcon.GenerateFromImage(EDITOR_PATH("Icons\\material.png").GetAbsoluteStr());
     sceneIcon.Init();
-    sceneIcon.GenerateFromImage("C:\\RvelaEngine\\Resources\\Editor\\Icons\\scene.png");
+    sceneIcon.GenerateFromImage(EDITOR_PATH("Icons\\scene.png").GetAbsoluteStr());
     scriptIcon.Init();
-    scriptIcon.GenerateFromImage("C:\\RvelaEngine\\Resources\\Editor\\Icons\\script.png");
+    scriptIcon.GenerateFromImage(EDITOR_PATH("Icons\\script.png").GetAbsoluteStr());
     textureIcon.Init();
-    textureIcon.GenerateFromImage("C:\\RvelaEngine\\Resources\\Editor\\Icons\\texture.png");
+    textureIcon.GenerateFromImage(EDITOR_PATH("Icons\\texture.png").GetAbsoluteStr());
     prefabIcon.Init();
-    prefabIcon.GenerateFromImage("C:\\RvelaEngine\\Resources\\Editor\\Icons\\prefab.png");
+    prefabIcon.GenerateFromImage(EDITOR_PATH("Icons\\prefab.png").GetAbsoluteStr());
     meshIcon.Init();
-    meshIcon.GenerateFromImage("C:\\RvelaEngine\\Resources\\Editor\\Icons\\mesh.png");
+    meshIcon.GenerateFromImage(EDITOR_PATH("Icons\\mesh.png").GetAbsoluteStr());
 }
 
 

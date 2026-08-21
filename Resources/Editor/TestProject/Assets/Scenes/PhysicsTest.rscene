@@ -873,7 +873,7 @@
                 "material": "ff347f05-8793-455a-b2b5-935ab8376790",
                 "overrides": {
                     "albedoTex": "d4bb3fc3-349c-4d10-909f-51d8b7b065f8",
-                    "billboardMode": 2,
+                    "billboardMode": 1,
                     "blendMode": 1,
                     "transparencyMode": 1
                 }
@@ -883,7 +883,7 @@
             },
             "ParentUUID": 0,
             "ParticleEmitterComponent": {
-                "amount": 750,
+                "amount": 500,
                 "angularVelocityMax": 0.0,
                 "angularVelocityMin": 0.0,
                 "dampingMax": 0.0,
@@ -944,7 +944,7 @@
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
-                    -2.462019920349121,
+                    -2.1310696601867676,
                     1.5800000429153442,
                     0.0
                 ],
@@ -1041,7 +1041,7 @@
         ],
         "Lighting_AmbientIntensity": 0.5,
         "Lighting_IBL": true,
-        "Lighting_IBLIntensity": 0.10000000149011612,
+        "Lighting_IBLIntensity": 0.20000000298023224,
         "PostProcess_ChromaticStrength": 0.009999999776482582,
         "PostProcess_Exposure": 1.0,
         "PostProcess_VignetteIntensity": 0.25,

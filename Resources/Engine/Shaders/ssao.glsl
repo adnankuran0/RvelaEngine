@@ -17,40 +17,27 @@ void main()
 out float FragColor;
 in vec2 TexCoords;
 
+#include "Common/Camera.glsl"
+#include "Common/Depth.glsl"
+
 layout(binding = 0) uniform sampler2D gNormal;
 layout(binding = 1) uniform sampler2D gDepth;
 layout(binding = 2) uniform sampler2D texNoise;
-uniform mat4 projection;
-uniform mat4 invProjection; 
-uniform vec2 windowSize;
-uniform vec3 samples[64];
 
-const float radius = 0.5;      
-const float bias = 0.025;
-const float intensity = 1.0;
-const float invSamples = 1.0 / 64.0;
+uniform vec3 samples[32];
+const float invSamples = 1.0 / 32.0;
 
-uniform float near;
-uniform float far;
-
-vec3 getViewPos(vec2 uv)
-{
-    float depthValue = texture(gDepth, uv).r;
-    vec4 ndc = vec4(
-        uv.s * 2.0 - 1.0,
-        uv.t * 2.0 - 1.0,
-        depthValue * 2.0 - 1.0,
-        1.0
-    );
-    vec4 viewPos = invProjection * ndc;
-    return viewPos.xyz / viewPos.w;
-}
+uniform float radius = 1.0;      
+uniform float bias = 0.025;
+uniform float intensity = 1.0;
 
 void main()
 {
-    vec3 fragPos = getViewPos(TexCoords);
+    float depth = texture(gDepth, TexCoords).r;
+    vec3 fragPos = ReconstructViewPos(TexCoords, depth, invProjection);
     vec3 normal = normalize(texture(gNormal, TexCoords).rgb);
-    vec2 noiseScale = windowSize * 0.25;
+
+    vec2 noiseScale = (windowSize * 0.5) * 0.25;
     vec3 randomVec = normalize(texture(texNoise, TexCoords * noiseScale).xyz);
     
     vec3 tangent = normalize(randomVec - normal * dot(randomVec, normal));
@@ -58,7 +45,7 @@ void main()
     mat3 TBN = mat3(tangent, bitangent, normal);
     
     float occlusion = 0.0;
-    for(int i = 0; i < 64; ++i)
+    for(int i = 0; i < 32; ++i)
     {
         vec3 samplePos = fragPos + (TBN * samples[i]) * radius;
         
@@ -66,7 +53,8 @@ void main()
         vec3 projCoords = clipPos.xyz / clipPos.w;
         vec2 sampleUV = projCoords.xy * 0.5 + 0.5;
 
-        float sampleDepth = getViewPos(sampleUV).z;
+        float sampleDepthVal = texture(gDepth, sampleUV).r;
+        float sampleDepth = ReconstructViewPos(sampleUV, sampleDepthVal, invProjection).z;
         float rangeCheck = smoothstep(0.0, 1.0, radius / abs(fragPos.z - sampleDepth));
 
         occlusion += (sampleDepth >= samplePos.z + bias) ? rangeCheck : 0.0;

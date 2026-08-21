@@ -6,7 +6,8 @@ workspace "Rvela"
 
    -- Workspace-wide build options for MSVC
    filter "system:windows"
-      buildoptions { "/EHsc", "/Zc:preprocessor", "/Zc:__cplusplus" }
+   buildoptions { "/EHsc", "/Zc:preprocessor", "/Zc:__cplusplus" }
+   defines { 'RVELA_ROOT_DIR="' .. _MAIN_SCRIPT_DIR:gsub('\\', '/') .. '"' }
 
 OutputDir = "%{cfg.system}-%{cfg.architecture}/%{cfg.buildcfg}"
 
