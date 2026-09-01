@@ -1303,6 +1303,76 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 				}
 			});
 
+			DrawComponent<AnimatorComponent>("Animator", registry, selectedEntity, [](AnimatorComponent& animator)
+				{
+					std::string clipPath = animator.currentClip ? animator.currentClip->name : "";
+					UI::DrawFullWidthAssetDropSlot("Animation Clip Slot", clipPath, [&](const std::string& pathStr)
+						{
+							if (pathStr.ends_with(".ranim") || pathStr.ends_with(".anim"))
+							{
+								LOG_INFO("Dropped Animation Clip: {}", pathStr);
+							}
+						});
+
+					ImGui::Spacing();
+
+					if (UI::BeginPropertyTable("AnimatorTable"))
+					{
+						UI::PropertyLabel("Controls");
+						float playbackBtnWidth = (ImGui::GetContentRegionAvail().x - (2.0f * 4.0f)) / 3.0f;
+
+						if (animator.isPlaying)
+						{
+							if (ImGui::Button("Pause", ImVec2(playbackBtnWidth, 22))) animator.Pause();
+						}
+						else
+						{
+							if (ImGui::Button("Play", ImVec2(playbackBtnWidth, 22))) animator.Play();
+						}
+
+						ImGui::SameLine(0, 4.0f);
+						if (ImGui::Button("Stop", ImVec2(playbackBtnWidth, 22))) animator.Stop();
+
+						ImGui::SameLine(0, 4.0f);
+						if (ImGui::Button("Restart", ImVec2(playbackBtnWidth, 22)))
+						{
+							animator.currentTime = 0.0f;
+							animator.Play();
+						}
+
+						UI::PropertyLabel("Timeline");
+						float duration = animator.currentClip ? animator.currentClip->duration : 0.0f;
+						if (duration > 0.0f)
+						{
+							ImGui::SliderFloat("##TimeScrubber", &animator.currentTime, 0.0f, duration, "%.2f s");
+						}
+						else
+						{
+							ImGui::TextDisabled("0.00 / 0.00 s");
+						}
+
+						UI::PropertyLabel("Speed");
+						ImGui::DragFloat("##PlaybackSpeed", &animator.playbackSpeed, 0.05f, -10.0f, 10.0f, "%.2fx");
+
+						UI::PropertyLabel("Loop");
+						ImGui::Checkbox("##LoopAnim", &animator.isLooping);
+
+						if (animator.currentClip)
+						{
+							UI::PropertyLabel("Duration");
+							ImGui::Text("%.2f seconds", animator.currentClip->duration);
+
+							UI::PropertyLabel("Keyframes");
+							size_t posKeys = animator.currentClip->positionTrack.keyframes.size();
+							size_t rotKeys = animator.currentClip->rotationTrack.keyframes.size();
+							size_t sclKeys = animator.currentClip->scaleTrack.keyframes.size();
+							ImGui::Text("P: %zu | R: %zu | S: %zu", posKeys, rotKeys, sclKeys);
+						}
+
+						UI::EndPropertyTable();
+					}
+				});
+
 	ImGui::Spacing();
 	ImGui::Separator();
 	ImGui::Spacing();
@@ -1337,6 +1407,7 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 		DrawAddComponentEntry<ConvexHullColliderComponent>("Convex Hull Collider", filterBuf, registry, selectedEntity);
 		DrawAddComponentEntry<AudioEmitterComponent>("Audio Emitter", filterBuf, registry, selectedEntity);
 		DrawAddComponentEntry<ParticleEmitterComponent>("Particle Emitter", filterBuf, registry, selectedEntity);
+		DrawAddComponentEntry<AnimatorComponent>("Animator", filterBuf, registry, selectedEntity);
 
 		if (!ImGui::IsPopupOpen("AddComponentPopup"))
 			filterBuf[0] = '\0';

@@ -165,6 +165,9 @@ json SceneSerializer::SerializeEntity(Scene& scene, entt::entity e)
     if (scene.HasComponent<ParticleEmitterComponent>(e))
         j["ParticleEmitterComponent"] = scene.GetComponent<ParticleEmitterComponent>(e).Serialize();
 
+    if (scene.HasComponent<AnimatorComponent>(e))
+        j["AnimatorComponent"] = scene.GetComponent<AnimatorComponent>(e).Serialize();
+
     return j;
 }
 
@@ -243,6 +246,9 @@ void SceneSerializer::DeserializeEntity(
 
     if (entityJson.contains("ParticleEmitterComponent"))
         scene.AddComponent<ParticleEmitterComponent>(handle).Deserialize(entityJson["ParticleEmitterComponent"]);
+
+    if (entityJson.contains("AnimatorComponent"))
+        scene.AddComponent<AnimatorComponent>(handle).Deserialize(entityJson["AnimatorComponent"]);
 }
 
 void SceneSerializer::CollectChildrenRecursively(Scene& scene, entt::entity e, std::unordered_set<entt::entity>& out)

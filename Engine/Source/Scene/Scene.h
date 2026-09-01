@@ -12,6 +12,7 @@
 #include "Physics/PhysicsSystem.h"
 #include "Audio/AudioSystem.h"
 #include "ParticleSystem.h"
+#include "Animation/AnimationSystem.h"
 
 namespace rv {
 
@@ -168,6 +169,7 @@ private:
     PhysicsSystem m_PhysicsSystem;
     AudioSystem m_AudioSystem;
     ParticleSystem m_ParticleSystem;
+    AnimationSystem m_AnimationSystem;
 
     Environment m_Environment;
 };

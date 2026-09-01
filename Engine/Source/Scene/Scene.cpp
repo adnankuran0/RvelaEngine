@@ -19,7 +19,8 @@ m_LightSystem(*this),
 m_TransformSystem(*this),
 m_PhysicsSystem(*this),
 m_AudioSystem(*this),
-m_ParticleSystem(*this)
+m_ParticleSystem(*this),
+m_AnimationSystem(*this)
 {
     m_ScenePath = "";
     m_SceneName = sceneName;
@@ -159,6 +160,7 @@ void Scene::Update()
     m_CameraSystem.Update();
     m_AudioSystem.Update();
     m_ParticleSystem.Update(Time::GetDeltaTime());
+    m_AnimationSystem.Update();
 }
 void Scene::FixedUpdate() 
 {                
