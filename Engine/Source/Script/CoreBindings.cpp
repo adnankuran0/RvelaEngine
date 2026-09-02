@@ -31,6 +31,7 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             else if (type == "RigidbodyComponent") return e.HasComponent<RigidbodyComponent>();
             else if (type == "CharacterBodyComponent") return e.HasComponent<CharacterBodyComponent>();
             else if (type == "AudioEmitterComponent") return e.HasComponent<AudioEmitterComponent>();
+            else if (type == "AnimatorComponent") return e.HasComponent<AnimatorComponent>();
             return false;
         },
         "GetComponent", [&](Entity& e, const std::string& type) -> sol::object {
@@ -61,6 +62,9 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             else if (type == "AudioEmitterComponent") {
                 return sol::make_object(lua, std::ref(e.GetComponent<AudioEmitterComponent>()));
             }
+            else if (type == "AnimatorComponent") {
+                return sol::make_object(lua, std::ref(e.GetComponent<AnimatorComponent>()));
+            }
             return sol::make_object(lua, sol::nil);
         },
         "AddComponent", [&](Entity& e, const std::string& typeName) -> sol::object {
@@ -76,6 +80,8 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
                 return sol::make_object(lua, &e.AddComponent<RigidbodyComponent>());
             else if (typeName == "AudioEmitterComponent")
                 return sol::make_object(lua, &e.AddComponent<AudioEmitterComponent>());
+            else if (typeName == "AnimatorComponent")
+                return sol::make_object(lua, &e.AddComponent<AnimatorComponent>());
             return sol::nil;
         }
     );

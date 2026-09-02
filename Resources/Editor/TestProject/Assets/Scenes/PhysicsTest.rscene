@@ -1094,6 +1094,106 @@
                 ]
             },
             "UUID": 87
+        },
+        {
+            "AnimatorComponent": {
+                "autoplay": false,
+                "currentClipName": "Grow",
+                "libraryUUID": "e9055c46-2323-46c1-af22-7631ad52876e",
+                "playbackSpeed": 1.0
+            },
+            "BoxColliderComponent": {
+                "offset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    0.5,
+                    0.5,
+                    0.5
+                ]
+            },
+            "Material": {
+                "material": "0c976ee6-f15d-4ac3-994b-cf8bac9c608e"
+            },
+            "Mesh": {
+                "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
+            },
+            "ParentUUID": 0,
+            "RigidbodyComponent": {
+                "allowSleep": 1,
+                "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
+                "bodyType": 0,
+                "collisionLayer": 1,
+                "collisionMask": 4294967295,
+                "friction": 0.5,
+                "gravityFactor": 1.0,
+                "isSensor": false,
+                "linearDamping": 0.05000000074505806,
+                "lockRotationX": false,
+                "lockRotationY": false,
+                "lockRotationZ": false,
+                "lockTranslationX": false,
+                "lockTranslationY": false,
+                "lockTranslationZ": false,
+                "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
+                "restitution": 0.0,
+                "useCCD": false
+            },
+            "ScriptComponent": {
+                "scriptAssetUUID": "89a68d71-d2cb-430c-9e62-b847634cef72"
+            },
+            "Tag": {
+                "tag": "Cube"
+            },
+            "Transform": {
+                "lockScaleRatio": true,
+                "position": [
+                    9.58004379272461,
+                    1.9744240045547485,
+                    -3.653118133544922
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    2.0,
+                    2.0,
+                    2.0
+                ]
+            },
+            "UUID": 21
+        },
+        {
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": "New Entity"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    13.69149112701416,
+                    1.9568198919296265,
+                    -2.929816722869873
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 22
         }
     ],
     "Environment": {
