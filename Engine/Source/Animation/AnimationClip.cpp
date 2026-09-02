@@ -4,7 +4,7 @@
 using namespace rv::Animation;
 
 AnimationClip::AnimationClip(const std::string& clipName)
-    : name(clipName), duration(0.0f), isLooping(false) {
+    : name(clipName), duration(0.0f) {
     positionTrack.targetProperty = "Position";
     rotationTrack.targetProperty = "Rotation";
     scaleTrack.targetProperty = "Scale";

@@ -9,16 +9,14 @@ using json = nlohmann::json;
 
 struct AnimatorComponent
 {
-
     std::shared_ptr<Animation::AnimationClip> currentClip = nullptr;
     float currentTime = 0.0f;
     float playbackSpeed = 1.0f;
     bool isPlaying = true;
-    bool isLooping = true;
 
     AnimatorComponent();
     AnimatorComponent(std::shared_ptr<Animation::AnimationClip> clip)
-        : currentClip(clip), isLooping(clip ? clip->isLooping : true) {
+        : currentClip(clip){
     }
 
     void Play() { isPlaying = true; }
@@ -29,7 +27,6 @@ struct AnimatorComponent
     {
         currentClip = clip;
         currentTime = 0.0f;
-        if (clip) isLooping = clip->isLooping;
     }
 
     json Serialize() const;

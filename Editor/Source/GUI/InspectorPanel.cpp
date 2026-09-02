@@ -1303,7 +1303,7 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 				}
 			});
 
-			DrawComponent<AnimatorComponent>("Animator", registry, selectedEntity, [](AnimatorComponent& animator)
+			DrawComponent<AnimatorComponent>("Animator", registry, selectedEntity, [&](AnimatorComponent& animator)
 				{
 					std::string clipPath = animator.currentClip ? animator.currentClip->name : "";
 					UI::DrawFullWidthAssetDropSlot("Animation Clip Slot", clipPath, [&](const std::string& pathStr)
@@ -1323,18 +1323,18 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 
 						if (animator.isPlaying)
 						{
-							if (ImGui::Button("Pause", ImVec2(playbackBtnWidth, 22))) animator.Pause();
+							if (ImGui::Button("Pause", ImVec2(playbackBtnWidth, 22.0f))) animator.Pause();
 						}
 						else
 						{
-							if (ImGui::Button("Play", ImVec2(playbackBtnWidth, 22))) animator.Play();
+							if (ImGui::Button("Play", ImVec2(playbackBtnWidth, 22.0f))) animator.Play();
 						}
 
 						ImGui::SameLine(0, 4.0f);
-						if (ImGui::Button("Stop", ImVec2(playbackBtnWidth, 22))) animator.Stop();
+						if (ImGui::Button("Stop", ImVec2(playbackBtnWidth, 22.0f))) animator.Stop();
 
 						ImGui::SameLine(0, 4.0f);
-						if (ImGui::Button("Restart", ImVec2(playbackBtnWidth, 22)))
+						if (ImGui::Button("Restart", ImVec2(playbackBtnWidth, 22.0f)))
 						{
 							animator.currentTime = 0.0f;
 							animator.Play();
@@ -1344,7 +1344,23 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 						float duration = animator.currentClip ? animator.currentClip->duration : 0.0f;
 						if (duration > 0.0f)
 						{
-							ImGui::SliderFloat("##TimeScrubber", &animator.currentTime, 0.0f, duration, "%.2f s");
+							if (ImGui::SliderFloat("##TimeScrubber", &animator.currentTime, 0.0f, duration, "%.2f s"))
+							{
+								if (registry.any_of<TransformComponent>(selectedEntity))
+								{
+									auto& transform = registry.get<TransformComponent>(selectedEntity);
+									const auto& clip = animator.currentClip;
+
+									if (!clip->positionTrack.keyframes.empty())
+										transform.SetPosition(clip->positionTrack.Sample(animator.currentTime));
+									if (!clip->rotationTrack.keyframes.empty())
+										transform.SetRotation(clip->rotationTrack.Sample(animator.currentTime));
+									if (!clip->scaleTrack.keyframes.empty())
+										transform.SetScale(clip->scaleTrack.Sample(animator.currentTime));
+
+									transform.SetDirty();
+								}
+							}
 						}
 						else
 						{
@@ -1354,13 +1370,18 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 						UI::PropertyLabel("Speed");
 						ImGui::DragFloat("##PlaybackSpeed", &animator.playbackSpeed, 0.05f, -10.0f, 10.0f, "%.2fx");
 
-						UI::PropertyLabel("Loop");
-						ImGui::Checkbox("##LoopAnim", &animator.isLooping);
-
 						if (animator.currentClip)
 						{
+							UI::PropertyLabel("Loop Mode");
+							const char* loopModes[] = { "Once", "Linear", "PingPong" };
+							int currentLoopMode = static_cast<int>(animator.currentClip->loopMode);
+							if (ImGui::Combo("##LoopModeCombo", &currentLoopMode, loopModes, 3))
+							{
+								animator.currentClip->loopMode = static_cast<Animation::LoopMode>(currentLoopMode);
+							}
+
 							UI::PropertyLabel("Duration");
-							ImGui::Text("%.2f seconds", animator.currentClip->duration);
+							ImGui::Text("%.2f seconds", duration);
 
 							UI::PropertyLabel("Keyframes");
 							size_t posKeys = animator.currentClip->positionTrack.keyframes.size();

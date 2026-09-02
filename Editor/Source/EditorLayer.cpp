@@ -171,6 +171,8 @@ void EditorLayer::Render()
 
     m_MixerPanel.Draw();
 
+    m_AnimatorPanel.Draw(m_Engine, m_SelectedEntity);
+
     m_Viewport.Draw(m_Engine, m_SelectedEntity);
 
     ImGui::Render();

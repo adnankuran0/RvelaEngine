@@ -4,17 +4,17 @@
 
 namespace rv {
 
-    class MixerPanel
-    {
-    public:
-        MixerPanel() = default;
-        ~MixerPanel() = default;
+class MixerPanel
+{
+public:
+    MixerPanel() = default;
+    ~MixerPanel() = default;
 
-        void Draw();
+    void Draw();
 
-    private:
-        uint32_t m_RenamingBusID = UINT32_MAX;
-        char m_RenameBuffer[256] = "";
-    };
+private:
+    uint32_t m_RenamingBusID = UINT32_MAX;
+    char m_RenameBuffer[256] = "";
+};
 
 } // namespace rv

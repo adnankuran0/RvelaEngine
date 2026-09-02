@@ -3,55 +3,72 @@
 #include "Scene/Components/AnimatorComponent.h"
 #include "Scene/Components/TransformComponent.h"
 #include "Scene/Scene.h"
+#include "Core/Time.h"
 
 namespace rv {
 
-    void AnimationSystem::Update()
+void AnimationSystem::Update()
+{
+    auto view = m_Scene.GetRegistry().view<AnimatorComponent, TransformComponent>();
+
+    for (auto entity : view)
     {
-        auto view = m_Scene.GetRegistry().view<AnimatorComponent, TransformComponent>();
-        for (auto entity : view)
+        auto& animator = view.get<AnimatorComponent>(entity);
+        auto& transform = view.get<TransformComponent>(entity);
+
+        if (!animator.isPlaying || !animator.currentClip || animator.currentClip->duration <= 0.0f)
+            continue;
+
+        animator.currentTime += Time::GetDeltaTime() * animator.playbackSpeed;
+
+        float duration = animator.currentClip->duration;
+        Animation::LoopMode loopMode = animator.currentClip->loopMode;
+        float sampleTime = animator.currentTime;
+
+        if (loopMode == Animation::LoopMode::LINEAR)
         {
-            AnimatorComponent& animator = m_Scene.GetComponent<AnimatorComponent>(entity);
-            TransformComponent& transform = m_Scene.GetComponent<TransformComponent>(entity);
+            animator.currentTime = std::fmod(animator.currentTime, duration);
+            if (animator.currentTime < 0.0f)
+                animator.currentTime += duration;
 
-            if (!animator.isPlaying || !animator.currentClip || animator.currentClip->duration <= 0.0f)
-                continue;
+            sampleTime = animator.currentTime;
+        }
+        else if (loopMode == Animation::LoopMode::PINGPONG)
+        {
+            sampleTime = Animation::PingPong(animator.currentTime, duration);
+        }
+        else //NONE
+        {
+            animator.currentTime = std::clamp(animator.currentTime, 0.0f, duration);
+            sampleTime = animator.currentTime;
 
-            animator.currentTime += Time::GetDeltaTime() * animator.playbackSpeed;
-
-            if (animator.isLooping)
+            if (animator.currentTime >= duration || (animator.playbackSpeed < 0.0f && animator.currentTime <= 0.0f))
             {
-                animator.currentTime = std::fmod(animator.currentTime, animator.currentClip->duration);
-                if (animator.currentTime < 0.0f)
-                    animator.currentTime += animator.currentClip->duration;
-            }
-            else
-            {
-                animator.currentTime = std::clamp(animator.currentTime, 0.0f, animator.currentClip->duration);
-                if (animator.currentTime >= animator.currentClip->duration)
-                {
-                    animator.isPlaying = false;
-                }
-            }
-
-            const auto& clip = animator.currentClip;
-
-            if (!clip->positionTrack.keyframes.empty())
-            {
-                transform.SetPosition(clip->positionTrack.Sample(animator.currentTime));
-            }
-
-            if (!clip->rotationTrack.keyframes.empty())
-            {
-                glm::quat sampledRot = clip->rotationTrack.Sample(animator.currentTime);
-                transform.SetRotation(sampledRot);
-            }
-
-            if (!clip->scaleTrack.keyframes.empty())
-            {
-                transform.SetScale(clip->scaleTrack.Sample(animator.currentTime));
+                animator.isPlaying = false;
             }
         }
+
+        const auto& clip = animator.currentClip;
+
+        if (!clip->positionTrack.keyframes.empty())
+        {
+            transform.SetPosition(clip->positionTrack.Sample(sampleTime));
+            transform.SetDirty();
+        }
+
+        if (!clip->rotationTrack.keyframes.empty())
+        {
+            glm::quat sampledRot = clip->rotationTrack.Sample(sampleTime);
+            transform.SetRotation(sampledRot);
+            transform.SetDirty();
+        }
+
+        if (!clip->scaleTrack.keyframes.empty())
+        {
+            transform.SetScale(clip->scaleTrack.Sample(sampleTime));
+            transform.SetDirty();
+        }
     }
+}
 
 }

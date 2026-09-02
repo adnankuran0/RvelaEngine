@@ -13,6 +13,7 @@
 #include "GUI/AssetBrowserPanel.h"
 #include "GUI/MixerPanel.h"
 #include "GUI/EnvironmentPanel.h"
+#include "GUI/AnimatorPanel.h"
 #include <Renderer/RenderPipeline.h>
 
 namespace rv {
@@ -50,6 +51,7 @@ private:
     EnvironmentPanel m_EnvironmentPanel;
     AssetBrowserPanel m_AssetBrowserPanel;
     MixerPanel m_MixerPanel;
+    AnimatorPanel m_AnimatorPanel;
     Viewport m_Viewport;
 
     RenderPassHandle m_OutlinePass;
