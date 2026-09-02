@@ -1305,12 +1305,16 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 
 			DrawComponent<AnimatorComponent>("Animator", registry, selectedEntity, [&](AnimatorComponent& animator)
 				{
-					std::string clipPath = animator.currentClip ? animator.currentClip->name : "";
-					UI::DrawFullWidthAssetDropSlot("Animation Clip Slot", clipPath, [&](const std::string& pathStr)
+
+					UI::DrawFullWidthAssetDropSlot("Animation Library", "Animation Library", [&](const std::string& pathStr)
 						{
-							if (pathStr.ends_with(".ranim") || pathStr.ends_with(".anim"))
+							if (pathStr.ends_with(".ranimlib"))
 							{
-								LOG_INFO("Dropped Animation Clip: {}", pathStr);
+								AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
+								if (uuid.IsValid())
+								{
+									animator.SetLibrary(uuid);
+								}
 							}
 						});
 
@@ -1318,77 +1322,30 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 
 					if (UI::BeginPropertyTable("AnimatorTable"))
 					{
-						UI::PropertyLabel("Controls");
-						float playbackBtnWidth = (ImGui::GetContentRegionAvail().x - (2.0f * 4.0f)) / 3.0f;
-
-						if (animator.isPlaying)
+						if (animator.library && !animator.library->GetClips().empty())
 						{
-							if (ImGui::Button("Pause", ImVec2(playbackBtnWidth, 22.0f))) animator.Pause();
-						}
-						else
-						{
-							if (ImGui::Button("Play", ImVec2(playbackBtnWidth, 22.0f))) animator.Play();
-						}
-
-						ImGui::SameLine(0, 4.0f);
-						if (ImGui::Button("Stop", ImVec2(playbackBtnWidth, 22.0f))) animator.Stop();
-
-						ImGui::SameLine(0, 4.0f);
-						if (ImGui::Button("Restart", ImVec2(playbackBtnWidth, 22.0f)))
-						{
-							animator.currentTime = 0.0f;
-							animator.Play();
-						}
-
-						UI::PropertyLabel("Timeline");
-						float duration = animator.currentClip ? animator.currentClip->duration : 0.0f;
-						if (duration > 0.0f)
-						{
-							if (ImGui::SliderFloat("##TimeScrubber", &animator.currentTime, 0.0f, duration, "%.2f s"))
+							UI::PropertyLabel("Active Clip");
+							if (ImGui::BeginCombo("##ActiveClipCombo", animator.currentClipName.c_str()))
 							{
-								if (registry.any_of<TransformComponent>(selectedEntity))
+								for (const auto& [name, clip] : animator.library->GetClips())
 								{
-									auto& transform = registry.get<TransformComponent>(selectedEntity);
-									const auto& clip = animator.currentClip;
-
-									if (!clip->positionTrack.keyframes.empty())
-										transform.SetPosition(clip->positionTrack.Sample(animator.currentTime));
-									if (!clip->rotationTrack.keyframes.empty())
-										transform.SetRotation(clip->rotationTrack.Sample(animator.currentTime));
-									if (!clip->scaleTrack.keyframes.empty())
-										transform.SetScale(clip->scaleTrack.Sample(animator.currentTime));
-
-									transform.SetDirty();
+									bool isSelected = (animator.currentClipName == name);
+									if (ImGui::Selectable(name.c_str(), isSelected))
+									{
+										animator.SetClip(name);
+									}
+									if (isSelected)
+										ImGui::SetItemDefaultFocus();
 								}
+								ImGui::EndCombo();
 							}
-						}
-						else
-						{
-							ImGui::TextDisabled("0.00 / 0.00 s");
 						}
 
 						UI::PropertyLabel("Speed");
 						ImGui::DragFloat("##PlaybackSpeed", &animator.playbackSpeed, 0.05f, -10.0f, 10.0f, "%.2fx");
 
-						if (animator.currentClip)
-						{
-							UI::PropertyLabel("Loop Mode");
-							const char* loopModes[] = { "Once", "Linear", "PingPong" };
-							int currentLoopMode = static_cast<int>(animator.currentClip->loopMode);
-							if (ImGui::Combo("##LoopModeCombo", &currentLoopMode, loopModes, 3))
-							{
-								animator.currentClip->loopMode = static_cast<Animation::LoopMode>(currentLoopMode);
-							}
-
-							UI::PropertyLabel("Duration");
-							ImGui::Text("%.2f seconds", duration);
-
-							UI::PropertyLabel("Keyframes");
-							size_t posKeys = animator.currentClip->positionTrack.keyframes.size();
-							size_t rotKeys = animator.currentClip->rotationTrack.keyframes.size();
-							size_t sclKeys = animator.currentClip->scaleTrack.keyframes.size();
-							ImGui::Text("P: %zu | R: %zu | S: %zu", posKeys, rotKeys, sclKeys);
-						}
+						UI::PropertyLabel("Autoplay");
+						ImGui::Checkbox("##AutoPlay", &animator.autoplay);
 
 						UI::EndPropertyTable();
 					}

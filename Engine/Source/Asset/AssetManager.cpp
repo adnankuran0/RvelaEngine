@@ -8,6 +8,7 @@
 #include "Asset/Loaders/TextureLoader.h"
 #include "Asset/Loaders/ScriptLoader.h"
 #include "Asset/Loaders/AudioClipLoader.h"
+#include "Asset/Loaders/AnimationLibraryLoader.h"
 #include "Utils/ProjectManager.h"
 
 using namespace rv;
@@ -23,6 +24,7 @@ void AssetManager::Init(AssetRegistry& registry)
     RegisterLoader(std::make_unique<ScriptLoader>());
     RegisterLoader(std::make_unique<ScriptLoader>());
     RegisterLoader(std::make_unique<AudioClipLoader>());
+    RegisterLoader(std::make_unique<AnimationLibraryLoader>());
     m_Registry->Scan(ProjectManager::GetProjectPath() / "Assets");
 }
 

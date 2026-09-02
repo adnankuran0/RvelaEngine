@@ -22,6 +22,7 @@ private:
 	Texture textureIcon;
 	Texture meshIcon;
 	Texture prefabIcon;
+	Texture animlibIcon;
 };
 
 }

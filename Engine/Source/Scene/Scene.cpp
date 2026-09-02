@@ -54,6 +54,7 @@ void Scene::OnStart()
     m_PhysicsSystem.OnStart();
     m_ScriptSystem.OnStart();
     m_AudioSystem.OnStart();
+    m_AnimationSystem.OnStart();
 }
 
 void Scene::OnUpdate(float dt)

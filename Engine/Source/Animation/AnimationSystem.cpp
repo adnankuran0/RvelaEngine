@@ -7,6 +7,17 @@
 
 namespace rv {
 
+void AnimationSystem::OnStart()
+{
+    auto view = m_Scene.GetRegistry().view<AnimatorComponent>();
+    for (auto entity : view)
+    {
+        auto& animator = view.get<AnimatorComponent>(entity);
+        if (animator.autoplay)
+            animator.Play();
+    }
+}
+
 void AnimationSystem::Update()
 {
     auto view = m_Scene.GetRegistry().view<AnimatorComponent, TransformComponent>();

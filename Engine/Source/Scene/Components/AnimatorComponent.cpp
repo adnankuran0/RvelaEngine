@@ -1,35 +1,77 @@
 #include "rvelapch.h"
 #include "AnimatorComponent.h"
+#include "Asset/AssetManager.h"
 
 using namespace rv;
 
-// TODO: delete this constructor, it is for just testing
-AnimatorComponent::AnimatorComponent() 
+void AnimatorComponent::SetLibrary(AssetUUID uuid)
 {
-	auto bounceClip = std::make_shared<Animation::AnimationClip>("BounceAndRotate");
-	bounceClip->positionTrack.AddKeyframe(0.0f, glm::vec3(0.0f, 0.0f, 0.0f));
-	bounceClip->positionTrack.AddKeyframe(1.0f, glm::vec3(0.0f, 3.0f, 0.0f));
-	bounceClip->positionTrack.AddKeyframe(2.0f, glm::vec3(0.0f, 0.0f, 0.0f));
+    libraryUUID = uuid;
+    if (!uuid.IsValid())
+    {
+        library = nullptr;
+        currentClip = nullptr;
+        currentClipName = "";
+        return;
+    }
 
-	glm::quat rotStart = glm::angleAxis(0.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-	glm::quat rotEnd = glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    library = AssetManager::Get().GetAsset<AnimationLibraryAsset>(uuid);
+    if (library && !library->GetClips().empty())
+    {
+        if (!currentClipName.empty() && library->HasClip(currentClipName))
+        {
+            SetClip(currentClipName);
+        }
+        else
+        {
+            SetClip(library->GetClips().begin()->first);
+        }
+    }
+    else
+    {
+        currentClip = nullptr;
+        currentClipName = "";
+    }
+}
 
-	bounceClip->rotationTrack.AddKeyframe(0.0f, rotStart);
-	bounceClip->rotationTrack.AddKeyframe(2.0f, rotEnd);
-	bounceClip->RecalculateDuration();
+void AnimatorComponent::SetClip(const std::string& clipName)
+{
+    if (!library) return;
 
-	SetClip(bounceClip);
-	Play();
+    auto clip = library->GetClip(clipName);
+    if (clip)
+    {
+        currentClip = clip;
+        currentClipName = clipName;
+        currentTime = 0.0f;
+    }
 }
 
 json AnimatorComponent::Serialize() const
 {
-	json j;
-	return j;
-   //TODO
+    json j;
+    j["libraryUUID"] = libraryUUID.ToString();
+    j["currentClipName"] = currentClipName;
+    j["playbackSpeed"] = playbackSpeed;
+    j["autoplay"] = autoplay;
+    return j;
 }
 
 void AnimatorComponent::Deserialize(const json& j)
 {
-	//TODO
+    if (j.contains("libraryUUID"))
+    {
+        std::string uuidStr = j["libraryUUID"];
+        SetLibrary(AssetUUID::FromString(uuidStr));
+    }
+    if (j.contains("currentClipName"))
+    {
+        std::string clipName = j["currentClipName"];
+        SetClip(clipName);
+    }
+    if (j.contains("autoplay"))
+    {
+        autoplay = j["autoplay"];
+    }
+    playbackSpeed = j.value("playbackSpeed", 1.0f);
 }

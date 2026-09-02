@@ -11,6 +11,7 @@
 #include "Core/Engine.h"
 #include "Scene/Entity.h"
 #include "AssetImporters/MaterialSerializer.h"
+#include "AssetImporters/AnimationLibrarySerializer.h"
 #include <AssetImporters/TextureImporter.h>
 #include <AssetImporters/ModelImporter.h>
 
@@ -361,6 +362,17 @@ static void DrawBackgroundContextMenu(Engine* engine, const std::filesystem::pat
                 s_NeedsRefresh = true;
             }
 
+            if (ImGui::MenuItem("AnimationLibrary"))
+            {
+                auto newPath = currentDir / "NewAnimationLibrary.ranimlib";
+                int i = 1;
+                while (std::filesystem::exists(newPath))
+                    newPath = currentDir / ("NewAnimationLibrary" + std::to_string(i++) + ".ranimlib");
+                AnimationLibrarySerializer::CreateNew(newPath, assetReg);
+                assetReg.Scan(assetReg.GetAssetDir());
+                s_NeedsRefresh = true;
+            }
+
             if (ImGui::MenuItem("Scene"))
             {
                 auto newPath = currentDir / "NewScene.rscene";
@@ -479,6 +491,8 @@ AssetBrowserPanel::AssetBrowserPanel()
     textureIcon.GenerateFromImage(EDITOR_PATH("Icons\\texture.png").GetAbsoluteStr());
     prefabIcon.Init();
     prefabIcon.GenerateFromImage(EDITOR_PATH("Icons\\prefab.png").GetAbsoluteStr());
+    animlibIcon.Init();
+    animlibIcon.GenerateFromImage(EDITOR_PATH("Icons\\animlib.png").GetAbsoluteStr());
     meshIcon.Init();
     meshIcon.GenerateFromImage(EDITOR_PATH("Icons\\mesh.png").GetAbsoluteStr());
 }
@@ -600,6 +614,7 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
             extension == ".jpg" || extension == ".tga") icon = textureIcon.GetID();
         else if (extension == ".rmat") icon = materialIcon.GetID();
         else if (extension == ".rmesh") icon = meshIcon.GetID();
+        else if (extension == ".ranimlib") icon = animlibIcon.GetID();
         else icon = scriptIcon.GetID();
 
         ImGui::ImageButton(filename.c_str(), icon, ImVec2(thumbnailSize, thumbnailSize));

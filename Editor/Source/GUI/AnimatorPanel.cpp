@@ -5,6 +5,9 @@
 #include "Core/Engine.h"
 #include "Scene/Components/AnimatorComponent.h"
 #include "Scene/Components/TransformComponent.h"
+#include "AssetImporters/AnimationLibrarySerializer.h"
+#include "Asset/AssetManager.h"
+#include "EditorUtils.h"
 #include <algorithm>
 #include <cmath>
 #include <vector>
@@ -54,8 +57,7 @@ namespace rv {
         int frameMin = 0;
 
         AnimationSequenceAdapter(std::shared_ptr<Animation::AnimationClip> c, AnimatorComponent* anim, entt::registry* reg, entt::entity ent)
-            : clip(c), animator(anim), registry(reg), entity(ent) {
-        }
+            : clip(c), animator(anim), registry(reg), entity(ent) {}
 
         virtual int GetFrameMin() const override { return frameMin; }
         virtual int GetFrameMax() const override
@@ -118,147 +120,147 @@ namespace rv {
             ImGuiIO& io = ImGui::GetIO();
 
             auto drawAndHandleKeyframes = [&](auto& track, ImU32 outlineColor, int trackIdx)
-                {
-                    int hoveredIndex = -1;
-                    float size = 5.0f;
+            {
+                int hoveredIndex = -1;
+                float size = 5.0f;
 
-                    for (size_t i = 0; i < track.keyframes.size(); ++i)
+                for (size_t i = 0; i < track.keyframes.size(); ++i)
+                {
+                    float x = TimeToX(track.keyframes[i].time, rc);
+                    float y = rc.Min.y + rc.GetHeight() * 0.5f;
+
+                    ImRect kfRect(x - size * 1.5f, y - size * 1.5f, x + size * 1.5f, y + size * 1.5f);
+                    bool hovered = kfRect.Contains(io.MousePos);
+                    if (hovered) hoveredIndex = static_cast<int>(i);
+
+                    if (g_IsBoxSelecting) {
+                        ImRect boxRect(ImMin(g_BoxSelectStart, io.MousePos), ImMax(g_BoxSelectStart, io.MousePos));
+                        if (boxRect.Contains(ImVec2(x, y)) && !IsSelected(trackIdx, static_cast<int>(i))) {
+                            g_SelectedKeys.push_back({ trackIdx, (int)i });
+                        }
+                    }
+
+                    bool selected = IsSelected(trackIdx, static_cast<int>(i));
+                    ImU32 fillColor = IM_COL32(255, 255, 255, 255);
+
+                    if (selected) fillColor = IM_COL32(0, 255, 255, 255);
+                    else if (hovered) fillColor = IM_COL32(255, 255, 150, 255);
+
+                    ImVec2 p1(x, y - size), p2(x + size, y), p3(x, y + size), p4(x - size, y);
+                    draw_list->AddQuadFilled(p1, p2, p3, p4, fillColor);
+                    draw_list->AddQuad(p1, p2, p3, p4, outlineColor, 1.5f);
+                }
+
+                if (g_IsDragging)
+                {
+                    float dragDelta = XToTime(io.MousePos.x, rc) - g_DragStartMouseTime;
+
+                    for (const auto& ghost : g_DragGhosts)
                     {
-                        float x = TimeToX(track.keyframes[i].time, rc);
+                        if (ghost.track != trackIdx) continue;
+
+                        float newTime = std::clamp(ghost.origTime + dragDelta, 0.0f, clip->duration);
+                        float x = TimeToX(newTime, rc);
                         float y = rc.Min.y + rc.GetHeight() * 0.5f;
 
-                        ImRect kfRect(x - size * 1.5f, y - size * 1.5f, x + size * 1.5f, y + size * 1.5f);
-                        bool hovered = kfRect.Contains(io.MousePos);
-                        if (hovered) hoveredIndex = static_cast<int>(i);
-
-                        if (g_IsBoxSelecting) {
-                            ImRect boxRect(ImMin(g_BoxSelectStart, io.MousePos), ImMax(g_BoxSelectStart, io.MousePos));
-                            if (boxRect.Contains(ImVec2(x, y)) && !IsSelected(trackIdx, static_cast<int>(i))) {
-                                g_SelectedKeys.push_back({ trackIdx, (int)i });
-                            }
-                        }
-
-                        bool selected = IsSelected(trackIdx, static_cast<int>(i));
-                        ImU32 fillColor = IM_COL32(255, 255, 255, 255);
-
-                        if (selected) fillColor = IM_COL32(0, 255, 255, 255); // Cyan
-                        else if (hovered) fillColor = IM_COL32(255, 255, 150, 255); // Hover
-
                         ImVec2 p1(x, y - size), p2(x + size, y), p3(x, y + size), p4(x - size, y);
-                        draw_list->AddQuadFilled(p1, p2, p3, p4, fillColor);
-                        draw_list->AddQuad(p1, p2, p3, p4, outlineColor, 1.5f);
+                        draw_list->AddQuadFilled(p1, p2, p3, p4, IM_COL32(255, 200, 50, 255));
+                        draw_list->AddQuad(p1, p2, p3, p4, IM_COL32(255, 255, 255, 200), 1.5f);
                     }
+                }
 
-                    if (g_IsDragging)
+                if (rc.Contains(io.MousePos) && !g_IsDragging)
+                {
+                    if (io.MouseClicked[0])
                     {
-                        float dragDelta = XToTime(io.MousePos.x, rc) - g_DragStartMouseTime;
-
-                        for (const auto& ghost : g_DragGhosts)
+                        if (hoveredIndex != -1)
                         {
-                            if (ghost.track != trackIdx) continue;
-
-                            float newTime = std::clamp(ghost.origTime + dragDelta, 0.0f, clip->duration);
-                            float x = TimeToX(newTime, rc);
-                            float y = rc.Min.y + rc.GetHeight() * 0.5f;
-
-                            ImVec2 p1(x, y - size), p2(x + size, y), p3(x, y + size), p4(x - size, y);
-                            draw_list->AddQuadFilled(p1, p2, p3, p4, IM_COL32(255, 200, 50, 255));
-                            draw_list->AddQuad(p1, p2, p3, p4, IM_COL32(255, 255, 255, 200), 1.5f);
-                        }
-                    }
-
-                    if (rc.Contains(io.MousePos) && !g_IsDragging)
-                    {
-                        if (io.MouseClicked[0])
-                        {
-                            if (hoveredIndex != -1)
+                            if (io.KeyShift || io.KeyCtrl)
                             {
-                                if (io.KeyShift || io.KeyCtrl)
-                                {
-                                    if (IsSelected(trackIdx, hoveredIndex)) {
-                                        g_SelectedKeys.erase(std::remove(g_SelectedKeys.begin(), g_SelectedKeys.end(), KeyRef{ trackIdx, hoveredIndex }), g_SelectedKeys.end());
-                                    }
-                                    else {
-                                        g_SelectedKeys.push_back({ trackIdx, hoveredIndex });
-                                    }
+                                if (IsSelected(trackIdx, hoveredIndex)) {
+                                    g_SelectedKeys.erase(std::remove(g_SelectedKeys.begin(), g_SelectedKeys.end(), KeyRef{ trackIdx, hoveredIndex }), g_SelectedKeys.end());
                                 }
-                                else
-                                {
-                                    if (!IsSelected(trackIdx, hoveredIndex)) {
-                                        g_SelectedKeys.clear();
-                                        g_SelectedKeys.push_back({ trackIdx, hoveredIndex });
-                                    }
+                                else {
+                                    g_SelectedKeys.push_back({ trackIdx, hoveredIndex });
                                 }
                             }
                             else
                             {
-                                if (!io.KeyShift && !io.KeyCtrl) g_SelectedKeys.clear();
-                                g_IsBoxSelecting = true;
-                                g_BoxSelectStart = io.MousePos;
+                                if (!IsSelected(trackIdx, hoveredIndex)) {
+                                    g_SelectedKeys.clear();
+                                    g_SelectedKeys.push_back({ trackIdx, hoveredIndex });
+                                }
                             }
                         }
-
-                        if (io.MouseDownDuration[0] > 0.05f && hoveredIndex != -1 && !g_IsBoxSelecting)
+                        else
                         {
-                            if (IsSelected(trackIdx, hoveredIndex))
-                            {
-                                g_IsDragging = true;
-                                g_DragStartMouseTime = XToTime(io.MousePos.x, rc);
-                                g_DragGhosts.clear();
-
-                                auto extractGhosts = [&](auto& trk, int tIdx, auto assignFunc) {
-                                    std::vector<int> toErase;
-                                    for (auto& sk : g_SelectedKeys) {
-                                        if (sk.track == tIdx) {
-                                            DragGhost g; g.track = tIdx; g.origTime = trk.keyframes[sk.index].time;
-                                            assignFunc(g, trk.keyframes[sk.index].value);
-                                            g_DragGhosts.push_back(g);
-                                            toErase.push_back(sk.index);
-                                        }
-                                    }
-                                    std::sort(toErase.rbegin(), toErase.rend());
-                                    for (int idx : toErase) trk.keyframes.erase(trk.keyframes.begin() + idx);
-                                    };
-
-                                extractGhosts(clip->positionTrack, 0, [](DragGhost& g, const glm::vec3& val) { g.v3 = val; });
-                                extractGhosts(clip->rotationTrack, 1, [](DragGhost& g, const glm::quat& val) { g.q = val; });
-                                extractGhosts(clip->scaleTrack, 2, [](DragGhost& g, const glm::vec3& val) { g.v3 = val; });
-
-                                g_SelectedKeys.clear();
-                            }
+                            if (!io.KeyShift && !io.KeyCtrl) g_SelectedKeys.clear();
+                            g_IsBoxSelecting = true;
+                            g_BoxSelectStart = io.MousePos;
                         }
                     }
 
-                    if (g_IsDragging && io.MouseReleased[0])
+                    if (io.MouseDownDuration[0] > 0.05f && hoveredIndex != -1 && !g_IsBoxSelecting)
                     {
-                        float dragDelta = XToTime(io.MousePos.x, rc) - g_DragStartMouseTime;
-
-                        for (const auto& ghost : g_DragGhosts)
+                        if (IsSelected(trackIdx, hoveredIndex))
                         {
-                            float newTime = std::clamp(ghost.origTime + dragDelta, 0.0f, clip->duration);
+                            g_IsDragging = true;
+                            g_DragStartMouseTime = XToTime(io.MousePos.x, rc);
+                            g_DragGhosts.clear();
 
-                            if (ghost.track == 0) clip->positionTrack.AddKeyframe(newTime, ghost.v3);
-                            if (ghost.track == 1) clip->rotationTrack.AddKeyframe(newTime, ghost.q);
-                            if (ghost.track == 2) clip->scaleTrack.AddKeyframe(newTime, ghost.v3);
-
-                            auto reselect = [&](const auto& trk) {
-                                for (int i = 0; i < trk.keyframes.size(); i++) {
-                                    if (std::abs(trk.keyframes[i].time - newTime) < 0.001f) {
-                                        g_SelectedKeys.push_back({ ghost.track, i });
-                                        break;
+                            auto extractGhosts = [&](auto& trk, int tIdx, auto assignFunc) {
+                                std::vector<int> toErase;
+                                for (auto& sk : g_SelectedKeys) {
+                                    if (sk.track == tIdx) {
+                                        DragGhost g; g.track = tIdx; g.origTime = trk.keyframes[sk.index].time;
+                                        assignFunc(g, trk.keyframes[sk.index].value);
+                                        g_DragGhosts.push_back(g);
+                                        toErase.push_back(sk.index);
                                     }
                                 }
-                                };
+                                std::sort(toErase.rbegin(), toErase.rend());
+                                for (int idx : toErase) trk.keyframes.erase(trk.keyframes.begin() + idx);
+                            };
 
-                            if (ghost.track == 0) reselect(clip->positionTrack);
-                            if (ghost.track == 1) reselect(clip->rotationTrack);
-                            if (ghost.track == 2) reselect(clip->scaleTrack);
+                            extractGhosts(clip->positionTrack, 0, [](DragGhost& g, const glm::vec3& val) { g.v3 = val; });
+                            extractGhosts(clip->rotationTrack, 1, [](DragGhost& g, const glm::quat& val) { g.q = val; });
+                            extractGhosts(clip->scaleTrack, 2, [](DragGhost& g, const glm::vec3& val) { g.v3 = val; });
+
+                            g_SelectedKeys.clear();
                         }
-
-                        g_DragGhosts.clear();
-                        g_IsDragging = false;
                     }
-                };
+                }
+
+                if (g_IsDragging && io.MouseReleased[0])
+                {
+                    float dragDelta = XToTime(io.MousePos.x, rc) - g_DragStartMouseTime;
+
+                    for (const auto& ghost : g_DragGhosts)
+                    {
+                        float newTime = std::clamp(ghost.origTime + dragDelta, 0.0f, clip->duration);
+
+                        if (ghost.track == 0) clip->positionTrack.AddKeyframe(newTime, ghost.v3);
+                        if (ghost.track == 1) clip->rotationTrack.AddKeyframe(newTime, ghost.q);
+                        if (ghost.track == 2) clip->scaleTrack.AddKeyframe(newTime, ghost.v3);
+
+                        auto reselect = [&](const auto& trk) {
+                            for (int i = 0; i < trk.keyframes.size(); i++) {
+                                if (std::abs(trk.keyframes[i].time - newTime) < 0.001f) {
+                                    g_SelectedKeys.push_back({ ghost.track, i });
+                                    break;
+                                }
+                            }
+                        };
+
+                        if (ghost.track == 0) reselect(clip->positionTrack);
+                        if (ghost.track == 1) reselect(clip->rotationTrack);
+                        if (ghost.track == 2) reselect(clip->scaleTrack);
+                    }
+
+                    g_DragGhosts.clear();
+                    g_IsDragging = false;
+                }
+            };
 
             if (index == 0) drawAndHandleKeyframes(clip->positionTrack, IM_COL32(255, 50, 50, 255), 0);
             if (index == 1) drawAndHandleKeyframes(clip->rotationTrack, IM_COL32(50, 255, 50, 255), 1);
@@ -270,41 +272,167 @@ namespace rv {
 
     void AnimatorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
     {
-        ImGui::Begin("Animator / Sequencer");
+        ImGui::Begin("Animator");
 
         auto& registry = engine->GetActiveScene().GetRegistry();
 
         if (selectedEntity == entt::null || !registry.valid(selectedEntity))
         {
-            ImGui::TextDisabled("Select an entity to animate.");
+            ImVec2 size = ImGui::GetContentRegionAvail();
+            ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (size.y * 0.45f));
+            const char* msg = "Select an entity to animate.";
+            float textWidth = ImGui::CalcTextSize(msg).x;
+            ImGui::SetCursorPosX((size.x - textWidth) * 0.5f);
+            ImGui::TextDisabled("%s", msg);
             ImGui::End();
             return;
         }
 
         if (!registry.any_of<AnimatorComponent>(selectedEntity))
         {
-            ImGui::TextDisabled("Selected entity does not have an AnimatorComponent.");
-            if (ImGui::Button("Add Animator")) registry.emplace<AnimatorComponent>(selectedEntity);
+            ImVec2 size = ImGui::GetContentRegionAvail();
+            ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (size.y * 0.4f));
+            const char* msg = "Selected entity does not have an AnimatorComponent.";
+            float textWidth = ImGui::CalcTextSize(msg).x;
+            ImGui::SetCursorPosX((size.x - textWidth) * 0.5f);
+            ImGui::TextDisabled("%s", msg);
+
+            ImGui::Spacing();
+            ImGui::SetCursorPosX((size.x - 140.0f) * 0.5f);
+            if (ImGui::Button("Add Animator", ImVec2(140.0f, 26.0f)))
+                registry.emplace<AnimatorComponent>(selectedEntity);
+
             ImGui::End();
             return;
         }
 
         auto& animator = registry.get<AnimatorComponent>(selectedEntity);
-        if (!animator.currentClip)
+
+        if (!animator.library || !animator.libraryUUID.IsValid())
         {
-            ImGui::TextDisabled("No Animation Clip assigned.");
-            if (ImGui::Button("Create Empty Clip")) {
-                animator.currentClip = std::make_shared<Animation::AnimationClip>("New Sequence");
-                animator.currentClip->duration = 2.0f;
+            ImVec2 size = ImGui::GetContentRegionAvail();
+            ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (size.y * 0.35f));
+
+            const char* msg = "No Animation Library assigned to this entity.";
+            float textWidth = ImGui::CalcTextSize(msg).x;
+            ImGui::SetCursorPosX((size.x - textWidth) * 0.5f);
+            ImGui::TextDisabled("%s", msg);
+
+            const char* subMsg = "Assign an Animation Library in the Inspector or drop one below:";
+            float subTextWidth = ImGui::CalcTextSize(subMsg).x;
+            ImGui::SetCursorPosX((size.x - subTextWidth) * 0.5f);
+            ImGui::TextDisabled("%s", subMsg);
+
+            ImGui::Spacing();
+            float dropSlotWidth = 320.0f;
+            ImGui::SetCursorPosX((size.x - dropSlotWidth) * 0.5f);
+            ImGui::Button("Drop .ranimlib asset here", ImVec2(dropSlotWidth, 32.0f));
+
+            if (ImGui::BeginDragDropTarget())
+            {
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
+                {
+                    std::string pathStr((const char*)payload->Data);
+                    if (pathStr.ends_with(".ranimlib"))
+                    {
+                        AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
+                        if (uuid.IsValid())
+                        {
+                            animator.SetLibrary(uuid);
+                        }
+                    }
+                }
+                ImGui::EndDragDropTarget();
             }
+
             ImGui::End();
             return;
+        }
+
+        if (animator.library->GetClips().empty())
+        {
+            ImVec2 size = ImGui::GetContentRegionAvail();
+            ImGui::SetCursorPosY(ImGui::GetCursorPosY() + (size.y * 0.4f));
+
+            const char* msg = "Animation Library contains no clips.";
+            float textWidth = ImGui::CalcTextSize(msg).x;
+            ImGui::SetCursorPosX((size.x - textWidth) * 0.5f);
+            ImGui::TextDisabled("%s", msg);
+
+            ImGui::Spacing();
+            ImGui::SetCursorPosX((size.x - 140.0f) * 0.5f);
+            if (ImGui::Button("Create Default Clip", ImVec2(140.0f, 26.0f)))
+            {
+                auto firstClip = std::make_shared<Animation::AnimationClip>("Default");
+                firstClip->duration = 2.0f;
+                animator.library->AddClip(firstClip);
+                animator.SetClip("Default");
+            }
+
+            ImGui::End();
+            return;
+        }
+
+        if (!animator.currentClip)
+        {
+            animator.SetClip(animator.library->GetClips().begin()->first);
         }
 
         auto& clip = animator.currentClip;
         ImGuiIO& io = ImGui::GetIO();
 
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(6, 4));
+
+        if (ImGui::Button("Save Lib"))
+        {
+            auto path = AssetManager::Get().GetRegistry().GetPath(animator.libraryUUID);
+            if (!path.empty())
+            {
+                AnimationLibrarySerializer::Save(animator.library, path);
+            }
+        }
+        ImGui::SameLine();
+
+        ImGui::SetNextItemWidth(140.0f);
+        std::string comboPreview = animator.currentClipName.empty() ? (clip ? clip->name : "Select Clip") : animator.currentClipName;
+        if (ImGui::BeginCombo("##ClipSelector", comboPreview.c_str()))
+        {
+            for (const auto& [name, c] : animator.library->GetClips())
+            {
+                bool isSelected = (animator.currentClipName == name);
+                if (ImGui::Selectable(name.c_str(), isSelected))
+                {
+                    animator.SetClip(name);
+                    g_SelectedKeys.clear();
+                }
+                if (isSelected) ImGui::SetItemDefaultFocus();
+            }
+            ImGui::EndCombo();
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("+ Clip"))
+            ImGui::OpenPopup("NewClipModal");
+
+        if (ImGui::BeginPopup("NewClipModal"))
+        {
+            static char newClipNameBuf[64] = "NewClip";
+            ImGui::InputText("Clip Name", newClipNameBuf, sizeof(newClipNameBuf));
+            if (ImGui::Button("Create", ImVec2(100, 0)))
+            {
+                auto newClip = std::make_shared<Animation::AnimationClip>(newClipNameBuf);
+                newClip->duration = 2.0f;
+                animator.library->AddClip(newClip);
+                animator.SetClip(newClipNameBuf);
+                g_SelectedKeys.clear();
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
+        }
+
+        ImGui::SameLine();
+        ImGui::TextDisabled("|");
+        ImGui::SameLine();
 
         if (ImGui::Button(animator.isPlaying ? "|| Pause" : "> Play")) {
             if (animator.isPlaying) animator.Pause();
@@ -315,41 +443,84 @@ namespace rv {
             animator.Stop();
             animator.currentTime = 0.0f;
         }
-        ImGui::SameLine(); ImGui::TextDisabled(" | "); ImGui::SameLine();
 
-        ImGui::SetNextItemWidth(100.0f);
+        ImGui::SameLine();
+        ImGui::TextDisabled("|");
+        ImGui::SameLine();
+
+        ImGui::SetNextItemWidth(95.0f);
         const char* loopModes[] = { "None", "Linear", "PingPong" };
         int currentLoop = static_cast<int>(clip->loopMode);
-        if (ImGui::Combo("Loop Mode", &currentLoop, loopModes, 3)) clip->loopMode = static_cast<Animation::LoopMode>(currentLoop);
+        if (ImGui::Combo("##LoopMode", &currentLoop, loopModes, 3))
+            clip->loopMode = static_cast<Animation::LoopMode>(currentLoop);
 
-        ImGui::SameLine(); ImGui::TextDisabled(" | "); ImGui::SameLine();
+        ImGui::SameLine();
+        ImGui::TextDisabled("|");
+        ImGui::SameLine();
 
-        ImGui::SetNextItemWidth(80.0f);
-        if (ImGui::DragFloat("Duration", &clip->duration, 0.1f, 0.1f, 100.0f, "%.2fs"))
+        ImGui::SetNextItemWidth(65.0f);
+        if (ImGui::DragFloat("##Duration", &clip->duration, 0.1f, 0.1f, 100.0f, "%.2fs"))
             clip->duration = std::max(0.1f, clip->duration);
 
         ImGui::PopStyleVar();
         ImGui::Separator();
 
-        ImGui::TextDisabled("Record Keyframes at %.2fs:", animator.currentTime);
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(5, 0));
+
+        ImGui::AlignTextToFramePadding();
+        ImGui::TextDisabled("Record (%.2fs):", animator.currentTime);
+        ImGui::SameLine();
+
         if (registry.any_of<TransformComponent>(selectedEntity))
         {
             auto& tc = registry.get<TransformComponent>(selectedEntity);
 
-            auto recordAction = [&](const char* label, auto& track, auto value) {
-                if (ImGui::Button(label)) {
-                    track.AddKeyframe(animator.currentTime, value);
-                    if (animator.currentTime > clip->duration) clip->duration = animator.currentTime;
-                    clip->RecalculateDuration();
-                }
-                };
+            auto RecordPos = [&]() {
+                clip->positionTrack.AddKeyframe(animator.currentTime, tc.GetPosition());
+                if (animator.currentTime > clip->duration) clip->duration = animator.currentTime;
+                clip->RecalculateDuration();
+            };
+            auto RecordRot = [&]() {
+                clip->rotationTrack.AddKeyframe(animator.currentTime, tc.GetRotation());
+                if (animator.currentTime > clip->duration) clip->duration = animator.currentTime;
+                clip->RecalculateDuration();
+            };
+            auto RecordScale = [&]() {
+                clip->scaleTrack.AddKeyframe(animator.currentTime, tc.GetScale());
+                if (animator.currentTime > clip->duration) clip->duration = animator.currentTime;
+                clip->RecalculateDuration();
+            };
 
-            recordAction("+ Pos Key", clip->positionTrack, tc.GetPosition());
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.25f, 0.50f, 0.85f, 0.8f));
+            if (ImGui::Button("Key All (K)")) {
+                RecordPos(); RecordRot(); RecordScale();
+            }
+            ImGui::PopStyleColor();
+            if (ImGui::IsItemHovered()) ImGui::SetTooltip("Record Position, Rotation and Scale keyframes (Hotkey: K)");
+
             ImGui::SameLine();
-            recordAction("+ Rot Key", clip->rotationTrack, tc.GetRotation());
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.75f, 0.20f, 0.20f, 0.7f));
+            if (ImGui::Button("+ Pos")) RecordPos();
+            ImGui::PopStyleColor();
+
             ImGui::SameLine();
-            recordAction("+ Scale Key", clip->scaleTrack, tc.GetScale());
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.20f, 0.70f, 0.20f, 0.7f));
+            if (ImGui::Button("+ Rot")) RecordRot();
+            ImGui::PopStyleColor();
+
+            ImGui::SameLine();
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.20f, 0.45f, 0.85f, 0.7f));
+            if (ImGui::Button("+ Scale")) RecordScale();
+            ImGui::PopStyleColor();
+
+            if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) && ImGui::IsKeyPressed(ImGuiKey_K))
+            {
+                RecordPos(); RecordRot(); RecordScale();
+            }
         }
+
+        ImGui::PopStyleVar(2);
         ImGui::Separator();
 
         if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows))
@@ -361,7 +532,7 @@ namespace rv {
                     for (auto& sk : g_SelectedKeys) if (sk.track == tIdx) toErase.push_back(sk.index);
                     std::sort(toErase.rbegin(), toErase.rend());
                     for (int idx : toErase) trk.keyframes.erase(trk.keyframes.begin() + idx);
-                    };
+                };
                 deleteFromTrack(clip->positionTrack, 0);
                 deleteFromTrack(clip->rotationTrack, 1);
                 deleteFromTrack(clip->scaleTrack, 2);
@@ -371,14 +542,13 @@ namespace rv {
             if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_C) && !g_SelectedKeys.empty())
             {
                 g_Clipboard.clear();
-
                 float minTime = FLT_MAX;
                 auto checkMin = [&](auto& trk, int tIdx) {
                     for (auto& sk : g_SelectedKeys) {
                         if (sk.track == tIdx && trk.keyframes[sk.index].time < minTime)
                             minTime = trk.keyframes[sk.index].time;
                     }
-                    };
+                };
                 checkMin(clip->positionTrack, 0); checkMin(clip->rotationTrack, 1); checkMin(clip->scaleTrack, 2);
 
                 auto copyToBoard = [&](auto& trk, int tIdx, auto assignFunc) {
@@ -389,7 +559,7 @@ namespace rv {
                             g_Clipboard.push_back(ck);
                         }
                     }
-                    };
+                };
                 copyToBoard(clip->positionTrack, 0, [](ClipboardKey& ck, const glm::vec3& val) { ck.v3 = val; });
                 copyToBoard(clip->rotationTrack, 1, [](ClipboardKey& ck, const glm::quat& val) { ck.q = val; });
                 copyToBoard(clip->scaleTrack, 2, [](ClipboardKey& ck, const glm::vec3& val) { ck.v3 = val; });

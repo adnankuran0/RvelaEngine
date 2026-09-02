@@ -13,14 +13,14 @@ Ref<Asset> AudioClipLoader::Load(const std::filesystem::path& assetPath, const A
     ma_decoder decoder;
     if (ma_decoder_init_file(assetPath.string().c_str(), &config, &decoder) != MA_SUCCESS)
     {
-        LOG_ERROR("Audio clip acilamadi: {}", assetPath.string());
+        LOG_ERROR("Audio clip cant opened: {}", assetPath.string());
         return nullptr;
     }
 
     ma_uint64 frameCount = 0;
     if (ma_decoder_get_length_in_pcm_frames(&decoder, &frameCount) != MA_SUCCESS || frameCount == 0)
     {
-        LOG_ERROR("Audio clip uzunlugu okunamadi: {}", assetPath.string());
+        LOG_ERROR("Cant read audio clip length: {}", assetPath.string());
         ma_decoder_uninit(&decoder);
         return nullptr;
     }
@@ -34,7 +34,7 @@ Ref<Asset> AudioClipLoader::Load(const std::filesystem::path& assetPath, const A
 
     if (result != MA_SUCCESS || framesRead == 0)
     {
-        LOG_ERROR("Audio clip decode edilemedi: {}", assetPath.string());
+        LOG_ERROR("Cant decode audio clip: {}", assetPath.string());
         return nullptr;
     }
 

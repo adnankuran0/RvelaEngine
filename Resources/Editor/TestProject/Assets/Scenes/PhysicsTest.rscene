@@ -1,24 +1,25 @@
 {
     "Entities": [
         {
-            "AnimatorComponent": null,
-            "BoxColliderComponent": {
+            "AnimatorComponent": {
+                "autoplay": true,
+                "currentClipName": "UpAndDown",
+                "libraryUUID": "e9055c46-2323-46c1-af22-7631ad52876e",
+                "playbackSpeed": 1.0
+            },
+            "ConvexHullColliderComponent": {
+                "maxConvexRadius": 0.0,
                 "offset": [
                     0.0,
                     0.0,
                     0.0
-                ],
-                "size": [
-                    0.5,
-                    0.5,
-                    0.5
                 ]
             },
             "Material": {
-                "material": "6d77d5e1-81d7-4480-b700-60f6e32d45b1"
+                "material": "54134d8a-8529-49b2-9297-902ef7096b44"
             },
             "Mesh": {
-                "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
+                "mesh": "d5b8e68a-8170-4b1a-b439-62ae98d391f8"
             },
             "ParentUUID": 0,
             "RigidbodyComponent": {
@@ -38,34 +39,125 @@
                 "lockTranslationX": false,
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
-                "mass": 1000.0,
+                "mass": 1.0,
                 "maxAngularVelocity": 50.0,
                 "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
                 "useCCD": false
             },
             "Tag": {
-                "tag": "Cube"
+                "tag": "Monkey"
             },
             "Transform": {
-                "lockScaleRatio": true,
+                "lockScaleRatio": false,
                 "position": [
                     0.0,
-                    0.8342589139938354,
+                    0.0,
                     0.0
                 ],
                 "rotation": [
-                    180.0,
-                    -25.027772903442383,
-                    180.0
+                    0.0,
+                    -0.0,
+                    0.0
                 ],
                 "scale": [
-                    1.5260891914367676,
-                    1.5260944366455078,
-                    1.5260807275772095
+                    1.0,
+                    1.0,
+                    1.0
                 ]
             },
             "UUID": 21
+        },
+        {
+            "Material": {
+                "material": "8cda0cf7-d943-42c2-a40a-1abf53a6b251",
+                "overrides": {
+                    "albedoTex": "4d072ff5-378a-4fe2-8b2c-b797dc43aa2a",
+                    "billboardMode": 2,
+                    "blendMode": 0,
+                    "shadingMode": 0,
+                    "transparencyMode": 1
+                }
+            },
+            "Mesh": {
+                "mesh": "1d2596bb-18d3-41a6-9848-a8a584870ce3"
+            },
+            "ParentUUID": 0,
+            "ParticleEmitterComponent": {
+                "amount": 500,
+                "angularVelocityMax": 0.0,
+                "angularVelocityMin": 0.0,
+                "dampingMax": 0.0,
+                "dampingMin": 0.0,
+                "direction": [
+                    1.0,
+                    0.0,
+                    0.0
+                ],
+                "emitterShape": 1,
+                "emitting": true,
+                "endColor": [
+                    0.13899612426757813,
+                    0.13899612426757813,
+                    0.13899612426757813,
+                    0.0
+                ],
+                "explosiveness": 0.0,
+                "gravity": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "lifetime": 2.0,
+                "lifetimeRandomness": 0.6700000166893005,
+                "linearAccelMax": 180.0,
+                "linearAccelMin": 0.0,
+                "linearVelocityMax": 0.0,
+                "linearVelocityMin": 0.0,
+                "localCoords": false,
+                "oneShot": false,
+                "randomness": 0.20999999344348907,
+                "rotationMax": 360.0,
+                "rotationMin": 0.0,
+                "scaleEnd": 2.0,
+                "scaleMax": 0.0,
+                "scaleMin": 0.0,
+                "shapeDimensions": [
+                    1.5,
+                    1.0,
+                    1.0
+                ],
+                "speedScale": 0.3499999940395355,
+                "spread": 0.0,
+                "startColor": [
+                    0.4864864945411682,
+                    0.4864864945411682,
+                    0.4864864945411682,
+                    1.0
+                ]
+            },
+            "Tag": {
+                "tag": "Smoke"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    9.95008659362793,
+                    2.543682813644409,
+                    0.4194246530532837
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 20
         },
         {
             "Material": {
@@ -1002,97 +1094,6 @@
                 ]
             },
             "UUID": 87
-        },
-        {
-            "Material": {
-                "material": "8cda0cf7-d943-42c2-a40a-1abf53a6b251",
-                "overrides": {
-                    "albedoTex": "4d072ff5-378a-4fe2-8b2c-b797dc43aa2a",
-                    "billboardMode": 2,
-                    "blendMode": 0,
-                    "shadingMode": 0,
-                    "transparencyMode": 1
-                }
-            },
-            "Mesh": {
-                "mesh": "1d2596bb-18d3-41a6-9848-a8a584870ce3"
-            },
-            "ParentUUID": 0,
-            "ParticleEmitterComponent": {
-                "amount": 500,
-                "angularVelocityMax": 0.0,
-                "angularVelocityMin": 0.0,
-                "dampingMax": 0.0,
-                "dampingMin": 0.0,
-                "direction": [
-                    1.0,
-                    0.0,
-                    0.0
-                ],
-                "emitterShape": 1,
-                "emitting": true,
-                "endColor": [
-                    0.13899612426757813,
-                    0.13899612426757813,
-                    0.13899612426757813,
-                    0.0
-                ],
-                "explosiveness": 0.0,
-                "gravity": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "lifetime": 2.0,
-                "lifetimeRandomness": 0.6700000166893005,
-                "linearAccelMax": 180.0,
-                "linearAccelMin": 0.0,
-                "linearVelocityMax": 0.0,
-                "linearVelocityMin": 0.0,
-                "localCoords": false,
-                "oneShot": false,
-                "randomness": 0.20999999344348907,
-                "rotationMax": 360.0,
-                "rotationMin": 0.0,
-                "scaleEnd": 2.0,
-                "scaleMax": 0.0,
-                "scaleMin": 0.0,
-                "shapeDimensions": [
-                    1.5,
-                    1.0,
-                    1.0
-                ],
-                "speedScale": 0.3499999940395355,
-                "spread": 0.0,
-                "startColor": [
-                    0.4864864945411682,
-                    0.4864864945411682,
-                    0.4864864945411682,
-                    1.0
-                ]
-            },
-            "Tag": {
-                "tag": "Smoke"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    9.95008659362793,
-                    2.543682813644409,
-                    0.4194246530532837
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scale": [
-                    1.0,
-                    1.0,
-                    1.0
-                ]
-            },
-            "UUID": 20
         }
     ],
     "Environment": {
