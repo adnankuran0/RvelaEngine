@@ -6,6 +6,7 @@
 #include <fstream>
 
 namespace rv {
+
 class AnimationLibrarySerializer
 {
 public:
@@ -41,26 +42,35 @@ public:
             // Position
             tracksJson["position"] = nlohmann::json::array();
             for (const auto& kf : clip->positionTrack.keyframes)
+            {
                 tracksJson["position"].push_back({
                     { "time", kf.time },
+                    { "ease", static_cast<int>(kf.ease) },
                     { "value", { { "x", kf.value.x }, { "y", kf.value.y }, { "z", kf.value.z } } }
                     });
+            }
 
             // Rotation
             tracksJson["rotation"] = nlohmann::json::array();
             for (const auto& kf : clip->rotationTrack.keyframes)
+            {
                 tracksJson["rotation"].push_back({
                     { "time", kf.time },
+                    { "ease", static_cast<int>(kf.ease) },
                     { "value", { { "w", kf.value.w }, { "x", kf.value.x }, { "y", kf.value.y }, { "z", kf.value.z } } }
                     });
+            }
 
             // Scale
             tracksJson["scale"] = nlohmann::json::array();
             for (const auto& kf : clip->scaleTrack.keyframes)
+            {
                 tracksJson["scale"].push_back({
                     { "time", kf.time },
+                    { "ease", static_cast<int>(kf.ease) },
                     { "value", { { "x", kf.value.x }, { "y", kf.value.y }, { "z", kf.value.z } } }
                     });
+            }
 
             clipJson["tracks"] = tracksJson;
             root["clips"].push_back(clipJson);

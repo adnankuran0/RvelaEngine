@@ -162,6 +162,7 @@ void Scene::Update()
     m_AudioSystem.Update();
     m_ParticleSystem.Update(Time::GetDeltaTime());
     m_AnimationSystem.Update();
+
 }
 void Scene::FixedUpdate() 
 {                

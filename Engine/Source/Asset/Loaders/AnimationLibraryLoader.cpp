@@ -1,6 +1,7 @@
 #include "rvelapch.h"
 #include "AnimationLibraryLoader.h"
 #include "Asset/Types/AnimationLibraryAsset.h"
+#include "Animation/EaseType.h"
 #include "Core/Log.h"
 #include "json.hpp"
 #include <fstream>
@@ -70,8 +71,9 @@ Ref<Asset> AnimationLibraryLoader::Load(const std::filesystem::path& assetPath, 
                 for (const auto& kf : tracksJson["position"])
                 {
                     float time = kf.value("time", 0.0f);
+                    auto ease = static_cast<Animation::EaseType>(kf.value("ease", 0));
                     glm::vec3 val = ParseVec3(kf["value"]);
-                    clip->positionTrack.AddKeyframe(time, val);
+                    clip->positionTrack.AddKeyframe(time, val, ease);
                 }
             }
 
@@ -81,8 +83,9 @@ Ref<Asset> AnimationLibraryLoader::Load(const std::filesystem::path& assetPath, 
                 for (const auto& kf : tracksJson["rotation"])
                 {
                     float time = kf.value("time", 0.0f);
+                    auto ease = static_cast<Animation::EaseType>(kf.value("ease", 0));
                     glm::quat val = ParseQuat(kf["value"]);
-                    clip->rotationTrack.AddKeyframe(time, val);
+                    clip->rotationTrack.AddKeyframe(time, val, ease);
                 }
             }
 
@@ -92,8 +95,9 @@ Ref<Asset> AnimationLibraryLoader::Load(const std::filesystem::path& assetPath, 
                 for (const auto& kf : tracksJson["scale"])
                 {
                     float time = kf.value("time", 0.0f);
+                    auto ease = static_cast<Animation::EaseType>(kf.value("ease", 0));
                     glm::vec3 val = ParseVec3(kf["value"]);
-                    clip->scaleTrack.AddKeyframe(time, val);
+                    clip->scaleTrack.AddKeyframe(time, val, ease);
                 }
             }
         }

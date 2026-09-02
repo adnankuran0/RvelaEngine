@@ -48,7 +48,12 @@ PhysicsSystem::PhysicsSystem(Scene& scene) :
 void PhysicsSystem::Step(float dt)
 {
 	BuildBodies();
+
+	if (m_Scene.GetState() == SceneState::PLAY)
+		SyncBodiesFromTransforms();
+
 	UpdateCharacters(dt);
+
 	m_PhysicsSystem.Update(dt, cCollisionSteps, &m_TempAllocator, &m_JobSystem);
 
 	SyncTransforms();
@@ -256,21 +261,26 @@ void PhysicsSystem::BuildCharacterBodies()
 
 void PhysicsSystem::SyncBodiesFromTransforms()
 {
+	bool isPlayMode = m_Scene.GetState() == SceneState::PLAY;
+
 	auto rbView = m_Scene.GetRegistry().view<RigidbodyComponent, TransformComponent>();
 	for (auto e : rbView)
 	{
 		auto& rb = m_Scene.GetComponent<RigidbodyComponent>(e);
 		if (rb.RuntimeBodyID.IsInvalid()) continue;
 
+		if (isPlayMode && rb.bodyType == Physics::MotionType::DYNAMIC)
+			continue;
+
 		auto& transform = m_Scene.GetComponent<TransformComponent>(e);
-		// TODO: fix dirty check
-		// if (!transform.IsDirty()) continue; 
+
+		// if (isPlayMode && !transform.IsDirty()) continue; 
 
 		BodyInterface().SetPositionAndRotation(
 			rb.RuntimeBodyID,
 			math::ToJoltRVec3(transform.GetWorldPosition()),
 			math::ToJoltQuat(transform.GetWorldRotation()),
-			JPH::EActivation::DontActivate
+			JPH::EActivation::Activate
 		);
 	}
 
@@ -281,8 +291,8 @@ void PhysicsSystem::SyncBodiesFromTransforms()
 		if (!cb.character) continue;
 
 		auto& transform = m_Scene.GetComponent<TransformComponent>(e);
-		// TODO: fix dirty check
-		// if (!transform.IsDirty()) continue;
+
+		// if (isPlayMode && !transform.IsDirty()) continue;
 
 		cb.character->SetPosition(math::ToJoltRVec3(transform.GetWorldPosition()));
 		cb.character->SetRotation(math::ToJoltQuat(transform.GetWorldRotation()));
