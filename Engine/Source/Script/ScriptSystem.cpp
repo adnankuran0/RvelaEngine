@@ -178,6 +178,7 @@ void ScriptSystem::BindLuaScript(ScriptComponent& sc, entt::entity e)
     sc.OnCollisionEnter = sc.luaInstance["OnCollisionEnter"];
     sc.OnCollisionStay = sc.luaInstance["OnCollisionStay"];
     sc.OnCollisionExit = sc.luaInstance["OnCollisionExit"];
+    sc.OnAnimationEvent = sc.luaInstance["OnAnimationEvent"];
 }
 
 void ScriptSystem::DispatchCollisionEvents()

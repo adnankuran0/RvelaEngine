@@ -2,8 +2,10 @@
 #include "Animation/AnimationSystem.h"
 #include "Scene/Components/AnimatorComponent.h"
 #include "Scene/Components/TransformComponent.h"
+#include "Scene/Components/ScriptComponent.h"
 #include "Scene/Scene.h"
 #include "Core/Time.h"
+#include <cmath>
 
 namespace rv {
 
@@ -30,36 +32,78 @@ void AnimationSystem::Update()
         if (!animator.isPlaying || !animator.currentClip || animator.currentClip->duration <= 0.0f)
             continue;
 
-        animator.currentTime += Time::GetDeltaTime() * animator.playbackSpeed;
+        const auto& clip = animator.currentClip;
+        float duration = clip->duration;
+        float dt = Time::GetDeltaTime() * animator.playbackSpeed;
 
-        float duration = animator.currentClip->duration;
-        Animation::LoopMode loopMode = animator.currentClip->loopMode;
-        float sampleTime = animator.currentTime;
+        float prevTime = animator.currentTime;
+        animator.currentTime += dt;
+        float currTime = animator.currentTime;
+
+        Animation::LoopMode loopMode = clip->loopMode;
+        bool looped = false;
 
         if (loopMode == Animation::LoopMode::LINEAR)
         {
-            animator.currentTime = std::fmod(animator.currentTime, duration);
-            if (animator.currentTime < 0.0f)
-                animator.currentTime += duration;
-
-            sampleTime = animator.currentTime;
+            if (animator.currentTime >= duration)
+            {
+                looped = true;
+                animator.currentTime = std::fmod(animator.currentTime, duration);
+            }
+            else if (animator.currentTime < 0.0f)
+            {
+                looped = true;
+                animator.currentTime = duration + std::fmod(animator.currentTime, duration);
+            }
         }
         else if (loopMode == Animation::LoopMode::PINGPONG)
         {
-            sampleTime = Animation::PingPong(animator.currentTime, duration);
+            animator.currentTime = Animation::PingPong(animator.currentTime, duration);
         }
-        else //NONE
+        else // NONE
         {
-            animator.currentTime = std::clamp(animator.currentTime, 0.0f, duration);
-            sampleTime = animator.currentTime;
-
             if (animator.currentTime >= duration || (animator.playbackSpeed < 0.0f && animator.currentTime <= 0.0f))
             {
+                animator.currentTime = std::clamp(animator.currentTime, 0.0f, duration);
                 animator.isPlaying = false;
             }
         }
 
-        const auto& clip = animator.currentClip;
+        if (!clip->eventTrack.empty() && m_Scene.GetRegistry().any_of<ScriptComponent>(entity))
+        {
+            auto& sc = m_Scene.GetRegistry().get<ScriptComponent>(entity);
+            if (sc.luaInstance.valid() && sc.OnAnimationEvent.valid())
+            {
+                for (const auto& ev : clip->eventTrack)
+                {
+                    bool triggered = false;
+
+                    if (!looped)
+                    {
+                        if (dt >= 0.0f)
+                            triggered = (ev.time > prevTime && ev.time <= currTime);
+                        else
+                            triggered = (ev.time < prevTime && ev.time >= currTime);
+                    }
+                    else
+                    {
+                        triggered = (ev.time > prevTime || ev.time <= animator.currentTime);
+                    }
+
+                    if (triggered)
+                    {
+                        sol::protected_function_result result = sc.OnAnimationEvent(sc.luaInstance, ev.name, ev.parameter);
+                        if (!result.valid())
+                        {
+                            sol::error err = result;
+                            LOG_ERROR("Lua OnAnimationEvent error: {}", err.what());
+                        }
+                    }
+                }
+            }
+        }
+
+        float sampleTime = animator.currentTime;
 
         if (!clip->positionTrack.keyframes.empty())
         {

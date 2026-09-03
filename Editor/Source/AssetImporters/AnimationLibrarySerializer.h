@@ -36,6 +36,18 @@ public:
             clipJson["duration"] = clip->duration;
             clipJson["loop_mode"] = static_cast<int>(clip->loopMode);
 
+            // Events
+            nlohmann::json eventsJson = nlohmann::json::array();
+            for (const auto& ev : clip->eventTrack)
+            {
+                eventsJson.push_back({
+                    { "time", ev.time },
+                    { "name", ev.name },
+                    { "parameter", ev.parameter }
+                    });
+            }
+            clipJson["events"] = eventsJson;
+
             // Tracks
             nlohmann::json tracksJson;
 

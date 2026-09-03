@@ -22,3 +22,10 @@ void AnimationClip::RecalculateDuration() {
         duration = std::max(duration, scaleTrack.keyframes.back().time);
     }
 }
+
+void AnimationClip::AddEvent(float time, const std::string& name, const std::string& parameter)
+{
+    auto it = std::lower_bound(eventTrack.begin(), eventTrack.end(), time,
+        [](const AnimationEvent& ev, float t) { return ev.time < t; });
+    eventTrack.insert(it, AnimationEvent(time, name, parameter));
+}

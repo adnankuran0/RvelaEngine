@@ -2,6 +2,7 @@
     "clips": [
         {
             "duration": 2.0,
+            "events": [],
             "loop_mode": 1,
             "name": "UpAndDown",
             "tracks": {
@@ -99,6 +100,7 @@
         },
         {
             "duration": 2.0,
+            "events": [],
             "loop_mode": 1,
             "name": "LeftAndRight",
             "tracks": {
@@ -196,7 +198,14 @@
         },
         {
             "duration": 1.0,
-            "loop_mode": 0,
+            "events": [
+                {
+                    "name": "PlaySound",
+                    "parameter": "",
+                    "time": 0.3333333432674408
+                }
+            ],
+            "loop_mode": 1,
             "name": "Grow",
             "tracks": {
                 "position": [

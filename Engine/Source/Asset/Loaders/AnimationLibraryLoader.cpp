@@ -61,6 +61,17 @@ Ref<Asset> AnimationLibraryLoader::Load(const std::filesystem::path& assetPath, 
         clip->duration = clipJson.value("duration", 0.0f);
         clip->loopMode = static_cast<Animation::LoopMode>(clipJson.value("loop_mode", 0));
 
+        if (clipJson.contains("events") && clipJson["events"].is_array())
+        {
+            for (const auto& evJson : clipJson["events"])
+            {
+                float time = evJson.value("time", 0.0f);
+                std::string name = evJson.value("name", "");
+                std::string param = evJson.value("parameter", "");
+                clip->AddEvent(time, name, param);
+            }
+        }
+
         if (clipJson.contains("tracks"))
         {
             const auto& tracksJson = clipJson["tracks"];
