@@ -29,21 +29,24 @@ void AudioSystem::Update()
     for (auto e : view)
     {
         auto [emitter, transform] = view.get<AudioEmitterComponent, TransformComponent>(e);
-
-
         am.SyncState(&emitter);
-        if (!am.IsPlaying(&emitter) && !am.IsPaused(&emitter))
+
+        PlaybackState state = am.GetPlaybackState(&emitter);
+
+        if (state == PlaybackState::Finished)
+        {
+            m_EventQueue.push_back({ e, Audio::EventType::FINISHED, emitter.audioClipUUID });
+            am.DestroyInstance(&emitter);
+        }
+        else if (state == PlaybackState::Stopped)
         {
             am.DestroyInstance(&emitter);
-            // TODO: audio finished event
         }
 
         if (emitter.spatial)
         {
             glm::vec3 worldPos = transform.GetWorldPosition();
-
             am.SetPosition(&emitter, worldPos);
-
             if (emitter.doppler)
             {
                 if (emitter.prevPosValid)

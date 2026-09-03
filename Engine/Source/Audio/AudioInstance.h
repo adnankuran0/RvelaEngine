@@ -8,7 +8,8 @@ enum class PlaybackState
 {
     Stopped,
     Playing,
-    Paused
+    Paused,
+    Finished
 };
 
 struct AudioInstance

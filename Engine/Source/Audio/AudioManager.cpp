@@ -544,6 +544,13 @@ float rv::AudioManager::GetBusVolume(uint32_t busID)
     return ma_sound_group_get_volume(bus->GetGroup());
 }
 
+PlaybackState AudioManager::GetPlaybackState(AudioEmitterComponent* comp) const
+{
+    if (const auto* inst = GetInstance(comp))
+        return inst->state;
+    return PlaybackState::Stopped;
+}
+
 void AudioManager::SyncState(AudioEmitterComponent* comp)
 {
     if (auto* inst = GetInstance(comp))
@@ -551,7 +558,7 @@ void AudioManager::SyncState(AudioEmitterComponent* comp)
         if (inst->state == PlaybackState::Playing &&
             ma_sound_at_end(&inst->sound) == MA_TRUE)
         {
-            inst->state = PlaybackState::Stopped;
+            inst->state = PlaybackState::Finished;
         }
     }
 }

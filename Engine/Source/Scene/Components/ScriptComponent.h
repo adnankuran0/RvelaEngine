@@ -26,8 +26,10 @@ struct ScriptComponent
 
     sol::function OnAnimationEvent;
     sol::function OnAnimationStarted;
-    sol::function OnAnimationEnded;
+    sol::function OnAnimationFinished;
     sol::function OnAnimationLooped;
+
+    sol::function OnAudioFinished;
 
     json Serialize() const;
     void Deserialize(const json& j);

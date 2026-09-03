@@ -10,7 +10,7 @@ enum class EventType
     TRIGGERED,
     STARTED,
     LOOPED,
-    ENDED
+    FINISHED
 };
 
 struct AnimationEvent

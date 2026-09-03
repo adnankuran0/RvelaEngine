@@ -1,10 +1,11 @@
 #pragma once
 #include <vector>
 #include "entt/entt.h"
+#include "AudioEvent.h"
 
 namespace rv {
 
-class Scene; // forward declaration
+class Scene;
 
 class AudioSystem
 {
@@ -14,14 +15,17 @@ public:
     void OnStart();
     void Update();
 
+    std::vector<Audio::AudioDispatchEvent> FlushEvents()
+    {
+        return std::move(m_EventQueue);
+    }
 
 private:
     void BindCallbacks();
-
     void OnAudioEmitterDestructed(entt::registry& reg, entt::entity e);
 
+    std::vector<Audio::AudioDispatchEvent> m_EventQueue;
     Scene& m_Scene;
-
 };
 
 }

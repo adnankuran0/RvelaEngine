@@ -15,6 +15,58 @@ ScriptSystem::ScriptSystem(Scene& scene) : m_Scene(scene)
     m_ScriptEngine.Init();
 }
 
+void ScriptSystem::BindLuaScript(ScriptComponent& sc, entt::entity e)
+{
+    auto scriptAsset = AssetManager::Get().GetAsset<ScriptAsset>(sc.scriptAssetUUID);
+    if (!scriptAsset || !scriptAsset->IsValid())
+    {
+        LOG_ERROR("ScriptAsset not found or invalid, UUID: {}", sc.scriptAssetUUID.ToString());
+        return;
+    }
+
+    sc.luaState = &m_ScriptEngine.GetState();
+
+    sol::load_result script = sc.luaState->load(
+        scriptAsset->GetSource(),
+        scriptAsset->GetScriptName()
+    );
+
+    if (!script.valid())
+    {
+        sol::error err = script;
+        LOG_ERROR("Lua load error [{}]: {}", scriptAsset->GetScriptName(), err.what());
+        return;
+    }
+
+    sol::protected_function func = script;
+    sol::protected_function_result result = func();
+    if (!result.valid())
+    {
+        sol::error err = result;
+        LOG_ERROR("Lua exec error [{}]: {}", scriptAsset->GetScriptName(), err.what());
+        return;
+    }
+
+    sc.luaInstance = result;
+    sc.luaInstance["entity"] = Entity(e, &m_Scene);
+    sc.luaInstance["scene"] = &m_Scene;
+    sc.luaInstance["physics"] = &m_Scene.GetPhysicsSystem().GetPhysicsWorld();
+
+    sc.OnCreate = sc.luaInstance["OnCreate"];
+    sc.OnUpdate = sc.luaInstance["OnUpdate"];
+    sc.OnFixedUpdate = sc.luaInstance["OnFixedUpdate"];
+    sc.OnLateUpdate = sc.luaInstance["OnLateUpdate"];
+    sc.OnDestroy = sc.luaInstance["OnDestroy"];
+    sc.OnCollisionEnter = sc.luaInstance["OnCollisionEnter"];
+    sc.OnCollisionStay = sc.luaInstance["OnCollisionStay"];
+    sc.OnCollisionExit = sc.luaInstance["OnCollisionExit"];
+    sc.OnAnimationEvent = sc.luaInstance["OnAnimationEvent"];
+    sc.OnAnimationStarted = sc.luaInstance["OnAnimationStarted"];
+    sc.OnAnimationFinished = sc.luaInstance["OnAnimationFinished"];
+    sc.OnAnimationLooped = sc.luaInstance["OnAnimationLooped"];
+    sc.OnAudioFinished = sc.luaInstance["OnAudioFinished"];
+}
+
 void ScriptSystem::OnStart()
 {
     auto view = m_Scene.GetRegistry().view<ScriptComponent>();
@@ -38,6 +90,7 @@ void ScriptSystem::OnUpdate(float dt)
 {
     DispatchCollisionEvents();
     DispatchAnimationEvents();
+    DispatchAudioEvents();
 
     auto view = m_Scene.GetRegistry().view<ScriptComponent>();
 
@@ -134,56 +187,7 @@ void ScriptSystem::OnStop()
 
 }
 
-void ScriptSystem::BindLuaScript(ScriptComponent& sc, entt::entity e)
-{
-    auto scriptAsset = AssetManager::Get().GetAsset<ScriptAsset>(sc.scriptAssetUUID);
-    if (!scriptAsset || !scriptAsset->IsValid())
-    {
-        LOG_ERROR("ScriptAsset not found or invalid, UUID: {}", sc.scriptAssetUUID.ToString());
-        return;
-    }
 
-    sc.luaState = &m_ScriptEngine.GetState();
-
-    sol::load_result script = sc.luaState->load(
-        scriptAsset->GetSource(),
-        scriptAsset->GetScriptName()
-    );
-
-    if (!script.valid())
-    {
-        sol::error err = script;
-        LOG_ERROR("Lua load error [{}]: {}", scriptAsset->GetScriptName(), err.what());
-        return;
-    }
-
-    sol::protected_function func = script;
-    sol::protected_function_result result = func();
-    if (!result.valid())
-    {
-        sol::error err = result;
-        LOG_ERROR("Lua exec error [{}]: {}", scriptAsset->GetScriptName(), err.what());
-        return;
-    }
-
-    sc.luaInstance = result;
-    sc.luaInstance["entity"] = Entity(e, &m_Scene);
-    sc.luaInstance["scene"] = &m_Scene;
-    sc.luaInstance["physics"] = &m_Scene.GetPhysicsSystem().GetPhysicsWorld();
-
-    sc.OnCreate = sc.luaInstance["OnCreate"];
-    sc.OnUpdate = sc.luaInstance["OnUpdate"];
-    sc.OnFixedUpdate = sc.luaInstance["OnFixedUpdate"];
-    sc.OnLateUpdate = sc.luaInstance["OnLateUpdate"];
-    sc.OnDestroy = sc.luaInstance["OnDestroy"];
-    sc.OnCollisionEnter = sc.luaInstance["OnCollisionEnter"];
-    sc.OnCollisionStay = sc.luaInstance["OnCollisionStay"];
-    sc.OnCollisionExit = sc.luaInstance["OnCollisionExit"];
-    sc.OnAnimationEvent = sc.luaInstance["OnAnimationEvent"];
-    sc.OnAnimationStarted = sc.luaInstance["OnAnimationStarted"];
-    sc.OnAnimationEnded = sc.luaInstance["OnAnimationEnded"];
-    sc.OnAnimationLooped = sc.luaInstance["OnAnimationLooped"];
-}
 
 void ScriptSystem::DispatchCollisionEvents()
 {
@@ -266,9 +270,9 @@ void ScriptSystem::DispatchAnimationEvents()
                 result = sc->OnAnimationLooped(sc->luaInstance, ev.clipName);
             break;
 
-        case Animation::EventType::ENDED:
-            if (sc->OnAnimationEnded.valid())
-                result = sc->OnAnimationEnded(sc->luaInstance, ev.clipName);
+        case Animation::EventType::FINISHED:
+            if (sc->OnAnimationFinished.valid())
+                result = sc->OnAnimationFinished(sc->luaInstance, ev.clipName);
             break;
 
         case Animation::EventType::TRIGGERED:
@@ -285,4 +289,29 @@ void ScriptSystem::DispatchAnimationEvents()
     }
 }
 
+void ScriptSystem::DispatchAudioEvents()
+{
+    auto events = m_Scene.GetAudioSystem().FlushEvents();
+    auto& reg = m_Scene.GetRegistry();
+
+    for (const auto& ev : events)
+    {
+        if (!reg.valid(ev.entity))
+            continue;
+
+        ScriptComponent* sc = reg.try_get<ScriptComponent>(ev.entity);
+        if (!sc || !sc->luaInstance.valid())
+            continue;
+
+        if (ev.type == Audio::EventType::FINISHED && sc->OnAudioFinished.valid())
+        {
+            sol::protected_function_result result = sc->OnAudioFinished(sc->luaInstance);
+            if (!result.valid())
+            {
+                sol::error err = result;
+                LOG_ERROR("Lua OnAudioFinished error: {}", err.what());
+            }
+        }
+    }
+}
 

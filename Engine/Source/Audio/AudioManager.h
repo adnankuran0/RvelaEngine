@@ -71,7 +71,9 @@ public:
     json SaveBusLayout();
     void LoadBusLayout(const std::string& jsonStr);
 
+    PlaybackState GetPlaybackState(AudioEmitterComponent* comp) const;
     void SyncState(AudioEmitterComponent* comp);
+
     void Update(Camera* camera);
 
 private:

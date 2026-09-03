@@ -133,7 +133,7 @@ void AnimationSystem::Update()
 
         if (animationJustEnded)
         {
-            m_EventQueue.push_back({ entity, Animation::EventType::ENDED, animator.currentClipName, "", "" });
+            m_EventQueue.push_back({ entity, Animation::EventType::FINISHED, animator.currentClipName, "", "" });
         }
 
         float sampleTime = animator.currentTime;
