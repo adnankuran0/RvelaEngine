@@ -17,8 +17,14 @@ namespace rv {
 
 static const float SEQUENCE_FPS = 60.0f;
 
+static int g_TimeMode = 0;
+static int g_SnapFrames = 1;
+static float g_SnapSeconds = 0.1f;
+static bool g_SnapKeyframes = false;
+static bool g_SnapCursor = false;
+
 struct SelectedKey {
-    int track;      // 0: Events, 1: Pos, 2: Rot, 3: Scale
+    int track;
     float time;
     bool operator==(const SelectedKey& o) const {
         return track == o.track && std::abs(time - o.time) < 0.001f;
@@ -82,7 +88,7 @@ struct AnimationSequenceAdapter : public ImSequencer::SequenceInterface
         return maxF > 60 ? maxF : 60;
     }
 
-    virtual int GetItemCount() const override { return 4; } // Events, Pos, Rot, Scale
+    virtual int GetItemCount() const override { return 4; }
     virtual int GetItemTypeCount() const override { return 0; }
     virtual const char* GetItemTypeName(int typeIndex) const override { return ""; }
     virtual const char* GetItemLabel(int index) const override {
@@ -102,10 +108,10 @@ struct AnimationSequenceAdapter : public ImSequencer::SequenceInterface
         if (end) *end = &e;
         if (type) *type = 0;
         if (color) {
-            if (index == 0) *color = 0xFF33AAEE; // Events
-            if (index == 1) *color = 0xFF444499; // Pos
-            if (index == 2) *color = 0xFF449944; // Rot
-            if (index == 3) *color = 0xFF994444; // Scale
+            if (index == 0) *color = 0xFF33AAEE;
+            if (index == 1) *color = 0xFF444499;
+            if (index == 2) *color = 0xFF449944;
+            if (index == 3) *color = 0xFF994444;
         }
     }
 
@@ -183,10 +189,15 @@ struct AnimationSequenceAdapter : public ImSequencer::SequenceInterface
             if (g_IsDragging)
             {
                 float dragDelta = XToTime(io.MousePos.x, rc) - g_DragStartMouseTime;
+                float step = (g_TimeMode == 0) ? ((float)g_SnapFrames / SEQUENCE_FPS) : g_SnapSeconds;
+
                 for (const auto& ghost : g_DragGhosts)
                 {
                     if (ghost.track != 0) continue;
-                    float newTime = std::clamp(ghost.origTime + dragDelta, 0.0f, clip->duration);
+                    float newTime = ghost.origTime + dragDelta;
+                    if (g_SnapKeyframes && step > 0.0f) newTime = std::round(newTime / step) * step;
+                    newTime = std::clamp(newTime, 0.0f, clip->duration);
+
                     float x = TimeToX(newTime, rc);
                     float y = rc.Min.y + rc.GetHeight() * 0.5f;
 
@@ -327,12 +338,16 @@ struct AnimationSequenceAdapter : public ImSequencer::SequenceInterface
                     if (g_IsDragging)
                     {
                         float dragDelta = XToTime(io.MousePos.x, rc) - g_DragStartMouseTime;
+                        float step = (g_TimeMode == 0) ? ((float)g_SnapFrames / SEQUENCE_FPS) : g_SnapSeconds;
 
                         for (const auto& ghost : g_DragGhosts)
                         {
                             if (ghost.track != trackIdx) continue;
 
-                            float newTime = std::clamp(ghost.origTime + dragDelta, 0.0f, clip->duration);
+                            float newTime = ghost.origTime + dragDelta;
+                            if (g_SnapKeyframes && step > 0.0f) newTime = std::round(newTime / step) * step;
+                            newTime = std::clamp(newTime, 0.0f, clip->duration);
+
                             float x = TimeToX(newTime, rc);
                             float y = rc.Min.y + rc.GetHeight() * 0.5f;
 
@@ -435,10 +450,13 @@ struct AnimationSequenceAdapter : public ImSequencer::SequenceInterface
         if (g_IsDragging && io.MouseReleased[0])
         {
             float dragDelta = XToTime(io.MousePos.x, rc) - g_DragStartMouseTime;
+            float step = (g_TimeMode == 0) ? ((float)g_SnapFrames / SEQUENCE_FPS) : g_SnapSeconds;
 
             for (const auto& ghost : g_DragGhosts)
             {
-                float newTime = std::clamp(ghost.origTime + dragDelta, 0.0f, clip->duration);
+                float newTime = ghost.origTime + dragDelta;
+                if (g_SnapKeyframes && step > 0.0f) newTime = std::round(newTime / step) * step;
+                newTime = std::clamp(newTime, 0.0f, clip->duration);
 
                 if (ghost.track == 0) clip->AddEvent(newTime, ghost.eventName, ghost.eventParam);
                 else if (ghost.track == 1) clip->positionTrack.AddKeyframe(newTime, ghost.v3, ghost.ease);
@@ -649,6 +667,95 @@ void AnimatorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
     }
 
     ImGui::SameLine();
+    if (ImGui::Button("Edit Clip") && clip)
+        ImGui::OpenPopup("EditClipPopup");
+
+    if (ImGui::BeginPopup("EditClipPopup"))
+    {
+        ImGui::TextDisabled("Rename Clip");
+        static char renameBuf[64] = "";
+        static std::string lastEditingClip = "";
+
+        if (lastEditingClip != animator.currentClipName) {
+            snprintf(renameBuf, sizeof(renameBuf), "%s", animator.currentClipName.c_str());
+            lastEditingClip = animator.currentClipName;
+        }
+
+        ImGui::InputText("##RenameClip", renameBuf, sizeof(renameBuf));
+        ImGui::SameLine();
+        if (ImGui::Button("Apply"))
+        {
+            std::string newName = renameBuf;
+            if (!newName.empty() && newName != animator.currentClipName)
+            {
+                std::string oldName = animator.currentClipName;
+
+                clip->name = newName;
+                animator.library->AddClip(clip);
+
+                auto& clipsMap = const_cast<std::unordered_map<std::string, std::shared_ptr<Animation::AnimationClip>>&>(animator.library->GetClips());
+                clipsMap.erase(oldName);
+
+                animator.SetClip(newName);
+                lastEditingClip = newName;
+                ImGui::CloseCurrentPopup();
+            }
+        }
+
+        ImGui::Separator();
+
+        ImGui::TextDisabled("Duplicate Clip");
+        if (ImGui::Button("Duplicate", ImVec2(ImGui::GetContentRegionAvail().x, 0)))
+        {
+            std::string dupName = animator.currentClipName + "_Copy";
+            int counter = 1;
+            while (animator.library->GetClips().find(dupName) != animator.library->GetClips().end())
+            {
+                dupName = animator.currentClipName + "_Copy" + std::to_string(counter++);
+            }
+
+            auto duplicatedClip = std::make_shared<Animation::AnimationClip>(*clip);
+            duplicatedClip->name = dupName;
+
+            animator.library->AddClip(duplicatedClip);
+            animator.SetClip(dupName);
+
+            g_SelectedKeys.clear();
+            ApplyCurrentTimeToTransform();
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::Separator();
+
+        ImGui::TextDisabled("Delete Clip");
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.75f, 0.20f, 0.20f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.85f, 0.30f, 0.30f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.65f, 0.15f, 0.15f, 1.0f));
+        if (ImGui::Button("Delete", ImVec2(ImGui::GetContentRegionAvail().x, 0)))
+        {
+            auto& clipsMap = const_cast<std::unordered_map<std::string, std::shared_ptr<Animation::AnimationClip>>&>(animator.library->GetClips());
+            clipsMap.erase(animator.currentClipName);
+
+            if (clipsMap.empty())
+            {
+                animator.currentClip = nullptr;
+                animator.currentClipName = "";
+            }
+            else
+            {
+                animator.SetClip(clipsMap.begin()->first);
+            }
+
+            g_SelectedKeys.clear();
+            ApplyCurrentTimeToTransform();
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::PopStyleColor(3);
+
+        ImGui::EndPopup();
+    }
+
+    ImGui::SameLine();
     ImGui::TextDisabled("|");
     ImGui::SameLine();
 
@@ -681,9 +788,51 @@ void AnimatorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
     ImGui::TextDisabled("|");
     ImGui::SameLine();
 
+    ImGui::AlignTextToFramePadding();
+    ImGui::TextUnformatted("Duration:");
+    ImGui::SameLine();
+
     ImGui::SetNextItemWidth(65.0f);
     if (ImGui::DragFloat("##Duration", &clip->duration, 0.1f, 0.1f, 100.0f, "%.2fs"))
         clip->duration = std::max(0.1f, clip->duration);
+
+    float snapBlockWidth = 430.0f;
+    float currentPosX = ImGui::GetCursorPosX();
+    float targetPosX = ImGui::GetWindowContentRegionMax().x - snapBlockWidth - 5.0f;
+    if (targetPosX > currentPosX)
+        ImGui::SameLine(targetPosX);
+    else
+        ImGui::SameLine();
+
+    ImGui::AlignTextToFramePadding();
+    ImGui::TextUnformatted("Display:");
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(80.0f);
+    ImGui::Combo("##TimeMode", &g_TimeMode, "Frames\0Seconds\0");
+
+    ImGui::SameLine();
+    ImGui::TextDisabled("|");
+    ImGui::SameLine();
+
+    ImGui::AlignTextToFramePadding();
+    ImGui::TextUnformatted("Snap:");
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(60.0f);
+    if (g_TimeMode == 0) {
+        if (g_SnapFrames < 1) g_SnapFrames = 1;
+        ImGui::DragInt("##SnapFrames", &g_SnapFrames, 1.0f, 1, 120, "%d f");
+    }
+    else {
+        ImGui::DragFloat("##SnapSeconds", &g_SnapSeconds, 0.01f, 0.01f, 10.0f, "%.2fs");
+    }
+
+    ImGui::SameLine();
+    ImGui::Checkbox("Keyframes##SnapKF", &g_SnapKeyframes);
+    if (ImGui::IsItemHovered()) ImGui::SetTooltip("Snap keyframes while dragging");
+
+    ImGui::SameLine();
+    ImGui::Checkbox("Cursor##SnapCur", &g_SnapCursor);
+    if (ImGui::IsItemHovered()) ImGui::SetTooltip("Snap timeline cursor while scrubbing");
 
     ImGui::PopStyleVar();
     ImGui::Separator();
@@ -692,11 +841,30 @@ void AnimatorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(5, 0));
 
     ImGui::AlignTextToFramePadding();
-    ImGui::TextDisabled("Record (%.2fs):", animator.currentTime);
+    if (g_TimeMode == 0)
+        ImGui::TextDisabled("%d f", (int)std::round(animator.currentTime * SEQUENCE_FPS));
+    else
+        ImGui::TextDisabled("%.2fs", animator.currentTime);
+
     ImGui::SameLine();
+    ImGui::TextDisabled("|");
+    ImGui::SameLine();
+
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.85f, 0.65f, 0.05f, 0.85f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.78f, 0.15f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.75f, 0.55f, 0.0f, 1.0f));
+    if (ImGui::Button("+ Event"))
+    {
+        clip->AddEvent(animator.currentTime, "NewEvent", "");
+        g_SelectedKeys.clear();
+        g_SelectedKeys.push_back({ 0, animator.currentTime });
+    }
+    ImGui::PopStyleColor(3);
+    if (ImGui::IsItemHovered()) ImGui::SetTooltip("Add Animation Event at current playhead time");
 
     if (registry.any_of<TransformComponent>(selectedEntity))
     {
+        ImGui::SameLine();
         auto& tc = registry.get<TransformComponent>(selectedEntity);
 
         auto RecordPos = [&]() {
@@ -742,19 +910,6 @@ void AnimatorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             RecordPos(); RecordRot(); RecordScale();
         }
     }
-
-    ImGui::SameLine();
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.85f, 0.65f, 0.05f, 0.85f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.0f, 0.78f, 0.15f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.75f, 0.55f, 0.0f, 1.0f));
-    if (ImGui::Button("+ Event"))
-    {
-        clip->AddEvent(animator.currentTime, "NewEvent", "");
-        g_SelectedKeys.clear();
-        g_SelectedKeys.push_back({ 0, animator.currentTime }); // Events = track 0
-    }
-    ImGui::PopStyleColor(3);
-    if (ImGui::IsItemHovered()) ImGui::SetTooltip("Add Animation Event at current playhead time");
 
     bool hasTransformSelection = false;
     for (const auto& sk : g_SelectedKeys) {
@@ -809,7 +964,7 @@ void AnimatorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
         }
     }
 
-    if (g_SelectedKeys.size() == 1 && g_SelectedKeys[0].track == 0) // Events = 0
+    if (g_SelectedKeys.size() == 1 && g_SelectedKeys[0].track == 0)
     {
         float selectedEventTime = g_SelectedKeys[0].time;
         Animation::AnimationEvent* selectedEv = nullptr;
@@ -833,8 +988,7 @@ void AnimatorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             ImGui::SameLine();
 
             char nameBuf[64];
-            strncpy(nameBuf, selectedEv->name.c_str(), sizeof(nameBuf));
-            nameBuf[sizeof(nameBuf) - 1] = '\0';
+            snprintf(nameBuf, sizeof(nameBuf), "%s", selectedEv->name.c_str());
             ImGui::SetNextItemWidth(110.0f);
             if (ImGui::InputText("##QuickEvName", nameBuf, sizeof(nameBuf)))
             {
@@ -847,8 +1001,7 @@ void AnimatorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             ImGui::SameLine();
 
             char paramBuf[64];
-            strncpy(paramBuf, selectedEv->parameter.c_str(), sizeof(paramBuf));
-            paramBuf[sizeof(paramBuf) - 1] = '\0';
+            snprintf(paramBuf, sizeof(paramBuf), "%s", selectedEv->parameter.c_str());
             ImGui::SetNextItemWidth(100.0f);
             if (ImGui::InputText("##QuickEvParam", paramBuf, sizeof(paramBuf)))
             {
@@ -889,14 +1042,12 @@ void AnimatorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                 if (std::abs(ev.time - selTime) < 0.001f)
                 {
                     char nameBuf[64];
-                    strncpy(nameBuf, ev.name.c_str(), sizeof(nameBuf));
-                    nameBuf[sizeof(nameBuf) - 1] = '\0';
+                    snprintf(nameBuf, sizeof(nameBuf), "%s", ev.name.c_str());
                     if (ImGui::InputText("Function Name", nameBuf, sizeof(nameBuf)))
                         ev.name = nameBuf;
 
                     char paramBuf[128];
-                    strncpy(paramBuf, ev.parameter.c_str(), sizeof(paramBuf));
-                    paramBuf[sizeof(paramBuf) - 1] = '\0';
+                    snprintf(paramBuf, sizeof(paramBuf), "%s", ev.parameter.c_str());
                     if (ImGui::InputText("Parameter", paramBuf, sizeof(paramBuf)))
                         ev.parameter = paramBuf;
 
@@ -1040,7 +1191,16 @@ void AnimatorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 
     if (currentFrame != oldFrame && !g_IsDragging)
     {
-        animator.currentTime = static_cast<float>(currentFrame) / SEQUENCE_FPS;
+        float newTime = static_cast<float>(currentFrame) / SEQUENCE_FPS;
+        if (g_SnapCursor)
+        {
+            float step = (g_TimeMode == 0) ? ((float)g_SnapFrames / SEQUENCE_FPS) : g_SnapSeconds;
+            if (step > 0.0f)
+                newTime = std::round(newTime / step) * step;
+            newTime = std::clamp(newTime, 0.0f, clip->duration);
+            currentFrame = static_cast<int>(newTime * SEQUENCE_FPS);
+        }
+        animator.currentTime = newTime;
         animator.Pause();
         ApplyCurrentTimeToTransform();
     }

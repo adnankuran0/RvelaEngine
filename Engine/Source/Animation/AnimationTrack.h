@@ -17,7 +17,8 @@ struct AnimationTrack
     InterpolationType interpolation = InterpolationType::LINEAR;
     std::vector<Keyframe<T>> keyframes;
 
-    void AddKeyframe(float time, const T& value, EaseType ease = EaseType::LINEAR) {
+    void AddKeyframe(float time, const T& value, EaseType ease = EaseType::LINEAR)
+    {
         auto it = std::lower_bound(keyframes.begin(), keyframes.end(), time,
             [](const Keyframe<T>& kf, float t) { return kf.time < t; });
 
@@ -30,7 +31,8 @@ struct AnimationTrack
         }
     }
 
-    T Sample(float time) const {
+    T Sample(float time) const
+    {
         if (keyframes.empty()) return T{};
         if (keyframes.size() == 1) return keyframes.front().value;
 
