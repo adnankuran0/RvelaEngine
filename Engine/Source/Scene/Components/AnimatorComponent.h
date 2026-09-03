@@ -14,20 +14,21 @@ using json = nlohmann::json;
 struct AnimatorComponent
 {
     AssetUUID libraryUUID;
-    std::string currentClipName = "";
-
-    Ref<AnimationLibraryAsset> library;
     std::shared_ptr<Animation::AnimationClip> currentClip = nullptr;
-
-    float currentTime = 0.0f;
+    std::string currentClipName = "";
     float playbackSpeed = 1.0f;
     bool autoplay = false;
+
+    //runtime
+    Ref<AnimationLibraryAsset> library;
+    float currentTime = 0.0f;
     bool isPlaying = false;
+    bool isStarted = false;
 
     AnimatorComponent() = default;
     AnimatorComponent(AssetUUID libUUID) { SetLibrary(libUUID); }
 
-    void Play() { isPlaying = true; }
+    void Play() { isPlaying = true; isStarted = false; }
     void Pause() { isPlaying = false; }
     void Stop() { isPlaying = false; currentTime = 0.0f; }
 

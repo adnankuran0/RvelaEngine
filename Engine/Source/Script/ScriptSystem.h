@@ -28,6 +28,7 @@ public:
 
 private:
 	void DispatchCollisionEvents();
+	void DispatchAnimationEvents();
 	Physics::CollisionInfo BuildCollisionInfo(const Physics::Collision& collision, entt::entity otherEntity);
 	
 	ScriptEngine m_ScriptEngine;

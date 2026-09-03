@@ -1,8 +1,17 @@
 #pragma once
 #include <string>
+#include "entt/entt.h"
 
 namespace rv::Animation
 {
+
+enum class EventType
+{
+    TRIGGERED,
+    STARTED,
+    LOOPED,
+    ENDED
+};
 
 struct AnimationEvent
 {
@@ -10,12 +19,16 @@ struct AnimationEvent
     std::string name;
     std::string parameter;
 
-    AnimationEvent() = default;
-    AnimationEvent(float t, const std::string& n, const std::string& p = "")
-        : time(t), name(n), parameter(p) {
-    }
-
     bool operator<(const AnimationEvent& o) const { return time < o.time; }
+};
+
+struct AnimationDispatchEvent
+{
+    entt::entity entity{ entt::null };
+    EventType type{ EventType::TRIGGERED };
+    std::string clipName;
+    std::string eventName;
+    std::string parameter;
 };
 
 }

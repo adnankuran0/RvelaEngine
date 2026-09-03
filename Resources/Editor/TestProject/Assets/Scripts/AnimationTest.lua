@@ -10,10 +10,26 @@ function AnimationTest:OnUpdate(dt)
     end
 end
 
+
 function AnimationTest:OnAnimationEvent(eventName, parameter)
     if eventName == "PlaySound" then
         print("ta daa")
     end
+end
+
+function AnimationTest:OnAnimationStarted(clipName)
+    print("Anim started: " .. clipName)
+end
+
+function AnimationTest:OnAnimationEnded(clipName)
+    print("Anim ended: " .. clipName)
+    if clipName == "Grow" then
+        self.scene:DestroyEntity(self.entity)
+    end
+end
+
+function AnimationTest:OnAnimationLooped(clipName)
+    print("Anim looped: " .. clipName)
 end
 
 return AnimationTest

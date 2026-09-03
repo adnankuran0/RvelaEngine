@@ -25,6 +25,9 @@ struct ScriptComponent
     sol::function OnCollisionExit;
 
     sol::function OnAnimationEvent;
+    sol::function OnAnimationStarted;
+    sol::function OnAnimationEnded;
+    sol::function OnAnimationLooped;
 
     json Serialize() const;
     void Deserialize(const json& j);

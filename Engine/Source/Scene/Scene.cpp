@@ -146,43 +146,49 @@ void Scene::QueueDestroyEntity(entt::entity entity)
         m_pendingDestroys.push_back(entity);
 }
 
-void Scene::Update() 
-{                
+void Scene::Update()
+{
+    m_isUpdating = true;
 
     if (m_State == SceneState::PLAY)
     {
-        m_isUpdating = true;
         OnUpdate(Time::GetDeltaTime());
-        m_isUpdating = false;
-        FlushDestroyQueue();
     }
+
     m_TransformSystem.Update();
-    m_PhysicsSystem.Update(); 
+    m_PhysicsSystem.Update();
     m_CameraSystem.Update();
     m_AudioSystem.Update();
     m_ParticleSystem.Update(Time::GetDeltaTime());
     m_AnimationSystem.Update();
 
+    m_isUpdating = false;
+    FlushDestroyQueue();
 }
-void Scene::FixedUpdate() 
-{                
+void Scene::FixedUpdate()
+{
+    m_isUpdating = true;
+
     if (m_State == SceneState::PLAY)
     {
-        m_isUpdating = true;
         OnFixedUpdate(Time::GetFixedDeltaTime());
-        m_isUpdating = false;
-        FlushDestroyQueue(); 
     }
+
+    m_isUpdating = false;
+    FlushDestroyQueue();
 }
-void Scene::LateUpdate() 
-{              
+
+void Scene::LateUpdate()
+{
+    m_isUpdating = true;
+
     if (m_State == SceneState::PLAY)
     {
-        m_isUpdating = true;
         OnLateUpdate(Time::GetDeltaTime());
-        m_isUpdating = false;
-        FlushDestroyQueue(); 
     }
+
+    m_isUpdating = false;
+    FlushDestroyQueue();
 }
 
 entt::registry& Scene::GetRegistry() { return m_Registry; }
@@ -199,7 +205,6 @@ Entity rv::Scene::GetEntityByName(const std::string& name)
 
     return Entity{};
 }
-
 
 
 void Scene::SetParent(entt::entity child, entt::entity parent)

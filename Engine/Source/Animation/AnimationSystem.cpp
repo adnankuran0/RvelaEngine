@@ -23,9 +23,13 @@ void AnimationSystem::OnStart()
 void AnimationSystem::Update()
 {
     auto view = m_Scene.GetRegistry().view<AnimatorComponent, TransformComponent>();
+    auto& reg = m_Scene.GetRegistry();
 
     for (auto entity : view)
     {
+        if (!reg.valid(entity))
+            continue;
+
         auto& animator = view.get<AnimatorComponent>(entity);
         auto& transform = view.get<TransformComponent>(entity);
 
@@ -36,12 +40,19 @@ void AnimationSystem::Update()
         float duration = clip->duration;
         float dt = Time::GetDeltaTime() * animator.playbackSpeed;
 
+        if (!animator.isStarted)
+        {
+            animator.isStarted = true;
+            m_EventQueue.push_back({ entity, Animation::EventType::STARTED, animator.currentClipName, "", "" });
+        }
+
         float prevTime = animator.currentTime;
         animator.currentTime += dt;
         float currTime = animator.currentTime;
 
         Animation::LoopMode loopMode = clip->loopMode;
         bool looped = false;
+        bool animationJustEnded = false;
 
         if (loopMode == Animation::LoopMode::LINEAR)
         {
@@ -58,7 +69,20 @@ void AnimationSystem::Update()
         }
         else if (loopMode == Animation::LoopMode::PINGPONG)
         {
-            animator.currentTime = Animation::PingPong(animator.currentTime, duration);
+            if (animator.playbackSpeed > 0.0f && animator.currentTime >= duration)
+            {
+                animator.currentTime = duration - (animator.currentTime - duration);
+                animator.playbackSpeed = -animator.playbackSpeed;
+                looped = true;
+            }
+            else if (animator.playbackSpeed < 0.0f && animator.currentTime <= 0.0f)
+            {
+                animator.currentTime = -animator.currentTime;
+                animator.playbackSpeed = -animator.playbackSpeed;
+                looped = true;
+            }
+
+            animator.currentTime = std::clamp(animator.currentTime, 0.0f, duration);
         }
         else // NONE
         {
@@ -66,12 +90,18 @@ void AnimationSystem::Update()
             {
                 animator.currentTime = std::clamp(animator.currentTime, 0.0f, duration);
                 animator.isPlaying = false;
+                animationJustEnded = true;
             }
         }
 
-        if (!clip->eventTrack.empty() && m_Scene.GetRegistry().any_of<ScriptComponent>(entity))
+        if (looped)
         {
-            auto& sc = m_Scene.GetRegistry().get<ScriptComponent>(entity);
+            m_EventQueue.push_back({ entity, Animation::EventType::LOOPED, animator.currentClipName, "", "" });
+        }
+
+        if (!clip->eventTrack.empty() && reg.any_of<ScriptComponent>(entity))
+        {
+            auto& sc = reg.get<ScriptComponent>(entity);
             if (sc.luaInstance.valid() && sc.OnAnimationEvent.valid())
             {
                 for (const auto& ev : clip->eventTrack)
@@ -92,15 +122,18 @@ void AnimationSystem::Update()
 
                     if (triggered)
                     {
-                        sol::protected_function_result result = sc.OnAnimationEvent(sc.luaInstance, ev.name, ev.parameter);
-                        if (!result.valid())
-                        {
-                            sol::error err = result;
-                            LOG_ERROR("Lua OnAnimationEvent error: {}", err.what());
-                        }
+                        m_EventQueue.push_back({ entity, Animation::EventType::TRIGGERED, animator.currentClipName, ev.name, ev.parameter });
                     }
                 }
             }
+        }
+
+        if (!reg.valid(entity))
+            continue;
+
+        if (animationJustEnded)
+        {
+            m_EventQueue.push_back({ entity, Animation::EventType::ENDED, animator.currentClipName, "", "" });
         }
 
         float sampleTime = animator.currentTime;

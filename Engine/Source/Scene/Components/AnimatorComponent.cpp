@@ -45,6 +45,8 @@ void AnimatorComponent::SetClip(const std::string& clipName)
         currentClipName = clipName;
         currentTime = 0.0f;
     }
+
+    isStarted = false;
 }
 
 json AnimatorComponent::Serialize() const

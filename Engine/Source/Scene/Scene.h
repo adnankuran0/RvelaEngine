@@ -138,6 +138,7 @@ public:
     inline PhysicsSystem& GetPhysicsSystem() noexcept { return m_PhysicsSystem; }
     inline AudioSystem& GetAudioSystem() noexcept { return m_AudioSystem; }
     inline ParticleSystem& GetParticleSystem() noexcept { return m_ParticleSystem; }
+    inline AnimationSystem& GetAnimationSystem() noexcept { return m_AnimationSystem; }
     inline Environment& GetEnvironment() noexcept { return m_Environment; }
 
 
