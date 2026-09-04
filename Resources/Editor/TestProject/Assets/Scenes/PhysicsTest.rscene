@@ -143,6 +143,9 @@
                 "projectionType": 0
             },
             "ParentUUID": 28,
+            "ScriptComponent": {
+                "scriptAssetUUID": "bafc3142-3be3-4e45-a482-e6a0a7c30d00"
+            },
             "Tag": {
                 "tag": "Camera"
             },
@@ -848,7 +851,7 @@
                 "scaleMax": 0.0,
                 "scaleMin": 0.0,
                 "shapeDimensions": [
-                    1.5,
+                    0.75,
                     1.0,
                     1.0
                 ],
@@ -1030,7 +1033,7 @@
         {
             "AnimatorComponent": {
                 "autoplay": false,
-                "currentClipName": "UpAndDown",
+                "currentClipName": "Grow",
                 "libraryUUID": "e9055c46-2323-46c1-af22-7631ad52876e",
                 "playbackSpeed": 1.0
             },
@@ -1047,7 +1050,16 @@
                 ]
             },
             "Material": {
-                "material": "0c976ee6-f15d-4ac3-994b-cf8bac9c608e"
+                "material": "0c976ee6-f15d-4ac3-994b-cf8bac9c608e",
+                "overrides": {
+                    "albedoColor": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ],
+                    "transparencyMode": 1
+                }
             },
             "Mesh": {
                 "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
@@ -1101,6 +1113,131 @@
                 ]
             },
             "UUID": 21
+        },
+        {
+            "AnimatorComponent": {
+                "autoplay": false,
+                "currentClipName": "DoorOpen",
+                "libraryUUID": "8eb7a1ab-1b17-4310-a11e-89da20fe0e40",
+                "playbackSpeed": 1.0
+            },
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": "Door"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    12.64704418182373,
+                    0.5,
+                    3.4898152351379395
+                ],
+                "rotation": [
+                    180.0,
+                    -89.98021697998047,
+                    180.0
+                ],
+                "scale": [
+                    0.9999950528144836,
+                    1.0,
+                    0.9999945759773254
+                ]
+            },
+            "UUID": 5
+        },
+        {
+            "ParentUUID": 5,
+            "Tag": {
+                "tag": "DoorPivot"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    0.9999930262565613,
+                    1.0,
+                    0.9999929666519165
+                ]
+            },
+            "UUID": 3
+        },
+        {
+            "BoxColliderComponent": {
+                "offset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    0.5,
+                    0.5,
+                    0.5
+                ]
+            },
+            "Material": {
+                "material": "90fe146c-1349-4ed7-86bf-545d3b223029"
+            },
+            "Mesh": {
+                "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
+            },
+            "ParentUUID": 3,
+            "RigidbodyComponent": {
+                "allowSleep": 1,
+                "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
+                "bodyType": 0,
+                "collisionLayer": 1,
+                "collisionMask": 4294967295,
+                "friction": 0.5,
+                "gravityFactor": 1.0,
+                "isSensor": false,
+                "linearDamping": 0.05000000074505806,
+                "lockRotationX": false,
+                "lockRotationY": false,
+                "lockRotationZ": false,
+                "lockTranslationX": false,
+                "lockTranslationY": false,
+                "lockTranslationZ": false,
+                "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
+                "restitution": 0.0,
+                "useCCD": false
+            },
+            "ScriptComponent": {
+                "scriptAssetUUID": "c820e8b6-be0a-4277-92f5-4bc2e0b37628"
+            },
+            "Tag": {
+                "tag": "DoorMesh"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    -0.5,
+                    1.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    2.0,
+                    0.10000000149011612
+                ]
+            },
+            "UUID": 4
         }
     ],
     "Environment": {

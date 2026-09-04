@@ -281,7 +281,7 @@ void ScriptSystem::DispatchAnimationEvents()
             break;
         }
 
-        if (result.valid() && !result.valid())
+        if (!result.valid())
         {
             sol::error err = result;
             LOG_ERROR("Lua Animation Event error: {}", err.what());

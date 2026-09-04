@@ -1,0 +1,84 @@
+{
+    "clips": [
+        {
+            "duration": 0.5,
+            "events": [],
+            "loop_mode": 0,
+            "name": "DoorOpen",
+            "property_tracks": [
+                {
+                    "keyframes": [
+                        {
+                            "ease": 3,
+                            "time": 0.0,
+                            "value": {
+                                "w": 1.0,
+                                "x": 0.0,
+                                "y": 0.0,
+                                "z": 0.0
+                            }
+                        },
+                        {
+                            "ease": 3,
+                            "time": 0.5,
+                            "value": {
+                                "w": 0.7071067690849304,
+                                "x": 0.0,
+                                "y": 0.7071067690849304,
+                                "z": 0.0
+                            }
+                        }
+                    ],
+                    "property_name": "TransformComponent.rotation",
+                    "target_path": "DoorPivot",
+                    "type": 3
+                }
+            ],
+            "tracks": {
+                "position": [],
+                "rotation": [],
+                "scale": []
+            }
+        },
+        {
+            "duration": 0.5,
+            "events": [],
+            "loop_mode": 0,
+            "name": "DoorClose",
+            "property_tracks": [
+                {
+                    "keyframes": [
+                        {
+                            "ease": 3,
+                            "time": 0.0,
+                            "value": {
+                                "w": 0.7071067690849304,
+                                "x": 0.0,
+                                "y": 0.7071067690849304,
+                                "z": 0.0
+                            }
+                        },
+                        {
+                            "ease": 0,
+                            "time": 0.5,
+                            "value": {
+                                "w": 1.0,
+                                "x": 0.0,
+                                "y": 0.0,
+                                "z": 0.0
+                            }
+                        }
+                    ],
+                    "property_name": "TransformComponent.rotation",
+                    "target_path": "DoorPivot",
+                    "type": 3
+                }
+            ],
+            "tracks": {
+                "position": [],
+                "rotation": [],
+                "scale": []
+            }
+        }
+    ]
+}

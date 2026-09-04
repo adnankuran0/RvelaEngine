@@ -27,13 +27,13 @@ public:
 	}
 
 	template<typename T>
-	T& GetComponent()
+	T& GetComponent() const
 	{
 		return m_Scene->GetRegistry().get<T>(m_EntityHandle);
 	}
 
 	template<typename T>
-	bool HasComponent()
+	bool HasComponent() const
 	{
 		return m_Scene->GetRegistry().try_get<T>(m_EntityHandle) != nullptr;
 	}
@@ -57,7 +57,17 @@ public:
 	void SetName(const std::string& name) { GetComponent<TagComponent>().tag = name; }
 	const entt::entity GetHandle() { return m_EntityHandle; }
 	void SetParent(const Entity& parent) { m_Scene->SetParent(m_EntityHandle, parent); }
+	Entity GetParent(const Entity& child)
+	{
+		
+		auto parentHandle = m_Scene->GetParent(child);
+		if (parentHandle != entt::null && m_Scene->GetRegistry().valid(parentHandle))
+		{
+			return Entity(parentHandle, m_Scene);
+		}
 
+		return Entity{};
+	}
 
 	bool operator==(const Entity& other) const
 	{

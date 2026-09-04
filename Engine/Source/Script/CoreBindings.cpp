@@ -22,6 +22,13 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
                 self.SetParent(Entity{ entt::null, nullptr });
             }
         },
+        "GetParent", [](Entity& self) -> sol::optional<Entity> {
+            Entity parent = self.GetParent(self);
+            if (parent) {
+                return parent;
+            }
+            return sol::nullopt;
+        },
         "GetScriptType", [](Entity& e) -> std::string {
             if (!e.HasComponent<ScriptComponent>()) return "";
             auto& sc = e.GetComponent<ScriptComponent>();
