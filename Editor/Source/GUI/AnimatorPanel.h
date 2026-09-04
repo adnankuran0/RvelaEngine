@@ -1,5 +1,7 @@
 #pragma once
-#include "entt/entt.h"
+
+#include "AnimationSequenceAdapter.h"
+#include <entt/entt.h>
 #include <memory>
 
 namespace rv {
@@ -12,10 +14,10 @@ public:
     void Draw(Engine* engine, entt::entity& selectedEntity);
 
 private:
+    SequencerContext m_SeqContext;
     int m_CurrentFrame = 0;
     int m_FirstFrame = 0;
     bool m_Expanded = true;
-    int m_SelectedEntry = -1;
 };
 
 }

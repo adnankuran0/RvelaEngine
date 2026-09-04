@@ -48,6 +48,19 @@ inline float ApplyEase(float t, EaseType ease)
     return t;
 }
 
+inline bool Interpolate(bool a, bool b, float t, InterpolationType type)
+{
+    return (t >= 1.0f) ? b : a;
+}
+
+inline float Interpolate(float a, float b, float t, InterpolationType type)
+{
+    if (type == InterpolationType::STEP)
+        return (t >= 1.0f) ? b : a;
+
+    return std::lerp(a, b, t);
+}
+
 inline glm::vec3 Interpolate(const glm::vec3& a, const glm::vec3& b, float alpha, InterpolationType type)
 {
     if (type == InterpolationType::STEP) return a;
@@ -61,6 +74,14 @@ inline glm::quat Interpolate(const glm::quat& a, const glm::quat& b, float alpha
         return glm::slerp(a, b, alpha);
     }
     return glm::normalize(glm::lerp(a, b, alpha));
+}
+
+inline glm::vec4 Interpolate(const glm::vec4& a, const glm::vec4& b, float t, InterpolationType type)
+{
+    if (type == InterpolationType::STEP)
+        return (t >= 1.0f) ? b : a;
+
+    return glm::mix(a, b, t);
 }
 
 inline float PingPong(float value, float length)

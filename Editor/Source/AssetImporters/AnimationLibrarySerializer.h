@@ -1,6 +1,7 @@
 #pragma once
 #include "Asset/Types/AnimationLibraryAsset.h"
 #include "Asset/AssetRegistry.h"
+#include "Animation/IPropertyTrack.h"
 #include "Core/Ref.h"
 #include "json.hpp"
 #include <fstream>
@@ -10,9 +11,7 @@ namespace rv {
 class AnimationLibrarySerializer
 {
 public:
-    static Ref<AnimationLibraryAsset> CreateNew(
-        const std::filesystem::path& path,
-        AssetRegistry& registry)
+    static Ref<AnimationLibraryAsset> CreateNew(const std::filesystem::path& path, AssetRegistry& registry)
     {
         AssetMeta meta = registry.GetOrCreateMeta(path);
         auto asset = CreateRef<AnimationLibraryAsset>(meta.uuid);
@@ -48,10 +47,8 @@ public:
             }
             clipJson["events"] = eventsJson;
 
-            // Tracks
+            //Tracks
             nlohmann::json tracksJson;
-
-            // Position
             tracksJson["position"] = nlohmann::json::array();
             for (const auto& kf : clip->positionTrack.keyframes)
             {
@@ -62,7 +59,6 @@ public:
                     });
             }
 
-            // Rotation
             tracksJson["rotation"] = nlohmann::json::array();
             for (const auto& kf : clip->rotationTrack.keyframes)
             {
@@ -73,7 +69,6 @@ public:
                     });
             }
 
-            // Scale
             tracksJson["scale"] = nlohmann::json::array();
             for (const auto& kf : clip->scaleTrack.keyframes)
             {
@@ -83,8 +78,51 @@ public:
                     { "value", { { "x", kf.value.x }, { "y", kf.value.y }, { "z", kf.value.z } } }
                     });
             }
-
             clipJson["tracks"] = tracksJson;
+
+            nlohmann::json propTracksJson = nlohmann::json::array();
+            for (const auto& propTrack : clip->propertyTracks)
+            {
+                nlohmann::json pJson;
+                pJson["target_path"] = propTrack->targetPath;
+                pJson["property_name"] = propTrack->propertyName;
+                pJson["type"] = static_cast<int>(propTrack->GetType());
+
+                nlohmann::json pKeys = nlohmann::json::array();
+
+                if (propTrack->GetType() == Animation::PropertyType::Float) {
+                    auto tTrack = std::static_pointer_cast<Animation::TypedPropertyTrack<float>>(propTrack);
+                    for (const auto& kf : tTrack->track.keyframes) {
+                        pKeys.push_back({ { "time", kf.time }, { "ease", static_cast<int>(kf.ease) }, { "value", kf.value } });
+                    }
+                }
+                else if (propTrack->GetType() == Animation::PropertyType::Vec3) {
+                    auto tTrack = std::static_pointer_cast<Animation::TypedPropertyTrack<glm::vec3>>(propTrack);
+                    for (const auto& kf : tTrack->track.keyframes) {
+                        pKeys.push_back({ { "time", kf.time }, { "ease", static_cast<int>(kf.ease) },
+                            { "value", { { "x", kf.value.x }, { "y", kf.value.y }, { "z", kf.value.z } } } });
+                    }
+                }
+                else if (propTrack->GetType() == Animation::PropertyType::Vec4) {
+                    auto tTrack = std::static_pointer_cast<Animation::TypedPropertyTrack<glm::vec4>>(propTrack);
+                    for (const auto& kf : tTrack->track.keyframes) {
+                        pKeys.push_back({ { "time", kf.time }, { "ease", static_cast<int>(kf.ease) },
+                            { "value", { { "x", kf.value.x }, { "y", kf.value.y }, { "z", kf.value.z }, { "w", kf.value.w } } } });
+                    }
+                }
+                else if (propTrack->GetType() == Animation::PropertyType::Quat) {
+                    auto tTrack = std::static_pointer_cast<Animation::TypedPropertyTrack<glm::quat>>(propTrack);
+                    for (const auto& kf : tTrack->track.keyframes) {
+                        pKeys.push_back({ { "time", kf.time }, { "ease", static_cast<int>(kf.ease) },
+                            { "value", { { "w", kf.value.w }, { "x", kf.value.x }, { "y", kf.value.y }, { "z", kf.value.z } } } });
+                    }
+                }
+
+                pJson["keyframes"] = pKeys;
+                propTracksJson.push_back(pJson);
+            }
+            clipJson["property_tracks"] = propTracksJson;
+
             root["clips"].push_back(clipJson);
         }
 

@@ -5,6 +5,7 @@
             "events": [],
             "loop_mode": 1,
             "name": "LeftAndRight",
+            "property_tracks": [],
             "tracks": {
                 "position": [
                     {
@@ -103,6 +104,7 @@
             "events": [],
             "loop_mode": 1,
             "name": "UpAndDown",
+            "property_tracks": [],
             "tracks": {
                 "position": [
                     {
@@ -207,6 +209,108 @@
             ],
             "loop_mode": 0,
             "name": "Grow",
+            "property_tracks": [
+                {
+                    "keyframes": [
+                        {
+                            "ease": 0,
+                            "time": 0.0,
+                            "value": 0.0
+                        },
+                        {
+                            "ease": 0,
+                            "time": 0.4998634159564972,
+                            "value": 100.0
+                        },
+                        {
+                            "ease": 0,
+                            "time": 1.0,
+                            "value": 0.0
+                        }
+                    ],
+                    "property_name": "PointLightComponent.intensity",
+                    "target_path": "",
+                    "type": 0
+                },
+                {
+                    "keyframes": [
+                        {
+                            "ease": 0,
+                            "time": 0.0,
+                            "value": {
+                                "x": 1.0,
+                                "y": 1.0,
+                                "z": 1.0
+                            }
+                        },
+                        {
+                            "ease": 0,
+                            "time": 0.4998634159564972,
+                            "value": {
+                                "x": 1.0,
+                                "y": 0.0,
+                                "z": 0.0
+                            }
+                        },
+                        {
+                            "ease": 0,
+                            "time": 1.0,
+                            "value": {
+                                "x": 1.0,
+                                "y": 1.0,
+                                "z": 0.0
+                            }
+                        }
+                    ],
+                    "property_name": "PointLightComponent.color",
+                    "target_path": "",
+                    "type": 1
+                },
+                {
+                    "keyframes": [
+                        {
+                            "ease": 0,
+                            "time": 0.0,
+                            "value": {
+                                "w": 1.0,
+                                "x": 0.0,
+                                "y": 0.0,
+                                "z": 0.0
+                            }
+                        },
+                        {
+                            "ease": 0,
+                            "time": 1.0,
+                            "value": {
+                                "w": 0.0,
+                                "x": 0.0,
+                                "y": 0.0,
+                                "z": 0.0
+                            }
+                        }
+                    ],
+                    "property_name": "MaterialComponent.albedoColor",
+                    "target_path": "",
+                    "type": 2
+                },
+                {
+                    "keyframes": [
+                        {
+                            "ease": 0,
+                            "time": 0.0,
+                            "value": 1.0
+                        },
+                        {
+                            "ease": 0,
+                            "time": 1.0,
+                            "value": 40.0
+                        }
+                    ],
+                    "property_name": "PointLightComponent.radius",
+                    "target_path": "",
+                    "type": 0
+                }
+            ],
             "tracks": {
                 "position": [
                     {
