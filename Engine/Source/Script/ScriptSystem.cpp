@@ -182,7 +182,7 @@ void ScriptSystem::OnStop()
     {
         auto& mc = mcView.get<MaterialComponent>(entity);
         mc.Reload();
-
+        //TODO: WTF IS THIS?
     }
 
 }

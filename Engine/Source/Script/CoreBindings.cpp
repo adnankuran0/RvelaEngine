@@ -2,6 +2,7 @@
 #include "CoreBindings.h"
 #include "sol/sol.hpp"
 #include "Scene/Entity.h"
+#include "ComponentHandle.h"
 #include <vector>
 
 using namespace rv;
@@ -81,50 +82,50 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
         },
         "GetComponent", [&](Entity& e, const std::string& type) -> sol::object {
             if (type == "TransformComponent") {
-                return sol::make_object(lua, std::ref(e.GetComponent<TransformComponent>()));
+                return sol::make_object(lua, ComponentHandle<TransformComponent>{ e });
             }
             else if (type == "CameraComponent") {
-                return sol::make_object(lua, std::ref(e.GetComponent<CameraComponent>()));
+                return sol::make_object(lua, ComponentHandle<CameraComponent>{ e });
             }
             else if (type == "DirectionalLightComponent") {
-                return sol::make_object(lua, std::ref(e.GetComponent<DirectionalLightComponent>()));
+                return sol::make_object(lua, ComponentHandle<DirectionalLightComponent>{ e });
             }
             else if (type == "PointLightComponent") {
-                return sol::make_object(lua, std::ref(e.GetComponent<PointLightComponent>()));
+                return sol::make_object(lua, ComponentHandle<PointLightComponent>{ e });
             }
             else if (type == "MeshRendererComponent") {
-                return sol::make_object(lua, std::ref(e.GetComponent<MeshRendererComponent>()));
+                return sol::make_object(lua, ComponentHandle<MeshRendererComponent>{ e });
             }
             else if (type == "MaterialComponent") {
-                return sol::make_object(lua, std::ref(e.GetComponent<MaterialComponent>()));
+                return sol::make_object(lua, ComponentHandle<MaterialComponent>{ e });
             }
             else if (type == "RigidbodyComponent") {
-                return sol::make_object(lua, std::ref(e.GetComponent<RigidbodyComponent>()));
+                return sol::make_object(lua, ComponentHandle<RigidbodyComponent>{ e });
             }
             else if (type == "CharacterBodyComponent") {
-                return sol::make_object(lua, std::ref(e.GetComponent<CharacterBodyComponent>()));
+                return sol::make_object(lua, ComponentHandle<CharacterBodyComponent>{ e });
             }
             else if (type == "AudioEmitterComponent") {
-                return sol::make_object(lua, std::ref(e.GetComponent<AudioEmitterComponent>()));
+                return sol::make_object(lua, ComponentHandle<AudioEmitterComponent>{ e });
             }
             else if (type == "AnimatorComponent") {
-                return sol::make_object(lua, std::ref(e.GetComponent<AnimatorComponent>()));
+                return sol::make_object(lua, ComponentHandle<AnimatorComponent>{ e });
             }
             return sol::make_object(lua, sol::nil);
         },
         "AddComponent", [&](Entity& e, const std::string& typeName) -> sol::object {
             if (typeName == "PointLightComponent")
-                return sol::make_object(lua, std::ref(e.AddComponent<PointLightComponent>()));
+                return sol::make_object(lua, ComponentHandle<PointLightComponent>{ e });
             else if (typeName == "DirectionalLightComponent")
-                return sol::make_object(lua, std::ref(e.AddComponent<DirectionalLightComponent>()));
+                return sol::make_object(lua, ComponentHandle<DirectionalLightComponent>{ e });
             else if (typeName == "CameraComponent")
-                return sol::make_object(lua, std::ref(e.AddComponent<CameraComponent>()));
+                return sol::make_object(lua, ComponentHandle<CameraComponent>{ e });
             else if (typeName == "RigidbodyComponent")
-                return sol::make_object(lua, std::ref(e.AddComponent<RigidbodyComponent>()));
+                return sol::make_object(lua, ComponentHandle<RigidbodyComponent>{ e });
             else if (typeName == "AudioEmitterComponent")
-                return sol::make_object(lua, std::ref(e.AddComponent<AudioEmitterComponent>()));
+                return sol::make_object(lua, ComponentHandle<AudioEmitterComponent>{ e });
             else if (typeName == "AnimatorComponent")
-                return sol::make_object(lua, std::ref(e.AddComponent<AnimatorComponent>()));
+                return sol::make_object(lua, ComponentHandle<AnimatorComponent>{ e });
             return sol::nil;
         }
     );

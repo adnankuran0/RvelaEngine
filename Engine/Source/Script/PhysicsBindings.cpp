@@ -7,8 +7,13 @@
 #include "Physics/CollisionInfo.h"
 #include "Scene/Entity.h"
 #include "Core/Engine.h"
+#include "ComponentHandle.h"
+
+using RigidbodyHandle = rv::ComponentHandle<rv::RigidbodyComponent>;
+using CharacterBodyHandle = rv::ComponentHandle<rv::CharacterBodyComponent>;
 
 using namespace rv::Physics;
+
 
 void rv::LuaBindings::RegisterPhysicsAPI(sol::state& lua)
 {
@@ -38,89 +43,95 @@ void rv::LuaBindings::RegisterPhysicsAPI(sol::state& lua)
         return Engine::Get()->GetActiveScene().GetPhysicsSystem().GetPhysicsWorld();
         };
 
-    lua.new_usertype<RigidbodyComponent>("RigidbodyComponent",
+    lua.new_usertype<RigidbodyHandle>("RigidbodyComponent",
+        "IsValid", &RigidbodyHandle::IsValid,
         "motionType", sol::property(
-            [=](RigidbodyComponent& c) { return GetPW().GetMotionType(&c); },
-            [=](RigidbodyComponent& c, MotionType type) { GetPW().SetMotionType(&c, type); }
+            [=](RigidbodyHandle& h) { return h.Get() ? GetPW().GetMotionType(h.Get()) : MotionType::STATIC; },
+            [=](RigidbodyHandle& h, MotionType type) { if (auto* c = h.Get()) GetPW().SetMotionType(c, type); }
         ),
-        "velocity", sol::property( 
-            [=](RigidbodyComponent& c) { return GetPW().GetLinearVelocity(&c); },
-            [=](RigidbodyComponent& c, const glm::vec3& v) { GetPW().SetLinearVelocity(&c, v); }
+        "velocity", sol::property(
+            [=](RigidbodyHandle& h) { return h.Get() ? GetPW().GetLinearVelocity(h.Get()) : glm::vec3(0.0f); },
+            [=](RigidbodyHandle& h, const glm::vec3& v) { if (auto* c = h.Get()) GetPW().SetLinearVelocity(c, v); }
         ),
         "maxVelocity", sol::property(
-            [=](RigidbodyComponent& c) { return GetPW().GetMaxLinearVelocity(&c); },
-            [=](RigidbodyComponent& c, float max) { GetPW().SetMaxLinearVelocity(&c, max); }
+            [=](RigidbodyHandle& h) { return h.Get() ? GetPW().GetMaxLinearVelocity(h.Get()) : 0.0f; },
+            [=](RigidbodyHandle& h, float max) { if (auto* c = h.Get()) GetPW().SetMaxLinearVelocity(c, max); }
         ),
         "angularVelocity", sol::property(
-            [=](RigidbodyComponent& c) { return GetPW().GetAngularVelocity(&c); },
-            [=](RigidbodyComponent& c, const glm::vec3& v) { GetPW().SetAngularVelocity(&c, v); }
+            [=](RigidbodyHandle& h) { return h.Get() ? GetPW().GetAngularVelocity(h.Get()) : glm::vec3(0.0f); },
+            [=](RigidbodyHandle& h, const glm::vec3& v) { if (auto* c = h.Get()) GetPW().SetAngularVelocity(c, v); }
         ),
         "maxAngularVelocity", sol::property(
-            [=](RigidbodyComponent& c) { return GetPW().GetMaxAngularVelocity(&c); },
-            [=](RigidbodyComponent& c, float max) { GetPW().SetMaxAngularVelocity(&c, max); }
+            [=](RigidbodyHandle& h) { return h.Get() ? GetPW().GetMaxAngularVelocity(h.Get()) : 0.0f; },
+            [=](RigidbodyHandle& h, float max) { if (auto* c = h.Get()) GetPW().SetMaxAngularVelocity(c, max); }
         ),
         "friction", sol::property(
-            [=](RigidbodyComponent& c) { return GetPW().GetFriction(&c); },
-            [=](RigidbodyComponent& c, float f) { GetPW().SetFriction(&c, f); }
+            [=](RigidbodyHandle& h) { return h.Get() ? GetPW().GetFriction(h.Get()) : 0.0f; },
+            [=](RigidbodyHandle& h, float f) { if (auto* c = h.Get()) GetPW().SetFriction(c, f); }
         ),
         "gravityFactor", sol::property(
-            [=](RigidbodyComponent& c) { return GetPW().GetGravityFactor(&c); },
-            [=](RigidbodyComponent& c, float g) { GetPW().SetGravityFactor(&c, g); }
+            [=](RigidbodyHandle& h) { return h.Get() ? GetPW().GetGravityFactor(h.Get()) : 0.0f; },
+            [=](RigidbodyHandle& h, float g) { if (auto* c = h.Get()) GetPW().SetGravityFactor(c, g); }
         ),
         "restitution", sol::property(
-            [=](RigidbodyComponent& c) { return GetPW().GetRestitution(&c); },
-            [=](RigidbodyComponent& c, float r) { GetPW().SetRestitution(&c, r); }
+            [=](RigidbodyHandle& h) { return h.Get() ? GetPW().GetRestitution(h.Get()) : 0.0f; },
+            [=](RigidbodyHandle& h, float r) { if (auto* c = h.Get()) GetPW().SetRestitution(c, r); }
         ),
         "isSensor", sol::property(
-            [=](RigidbodyComponent& c) { return GetPW().IsSensor(&c); },
-            [=](RigidbodyComponent& c, bool sensor) { GetPW().SetIsSensor(&c, sensor); }
+            [=](RigidbodyHandle& h) { return h.Get() ? GetPW().IsSensor(h.Get()) : false; },
+            [=](RigidbodyHandle& h, bool sensor) { if (auto* c = h.Get()) GetPW().SetIsSensor(c, sensor); }
         ),
-        "centerOfMass", sol::property([=](RigidbodyComponent& c) { return GetPW().GetCenterOfMassPosition(&c); }),
+        "centerOfMass", sol::property([=](RigidbodyHandle& h) { return h.Get() ? GetPW().GetCenterOfMassPosition(h.Get()) : glm::vec3(0.0f); }),
 
-        // write only (??)
-        "position", sol::property([=](RigidbodyComponent& c, const glm::vec3& p) { GetPW().SetPosition(&c, p); }),
-        "rotation", sol::property([=](RigidbodyComponent& c, const glm::quat& r) { GetPW().SetRotation(&c, r); }),
+        "position", sol::property(
+            [](RigidbodyHandle& h) { return h.Get() && h.entity.HasComponent<TransformComponent>() ? h.entity.GetComponent<TransformComponent>().GetPosition() : glm::vec3(0.0f); },
+            [=](RigidbodyHandle& h, const glm::vec3& p) { if (auto* c = h.Get()) GetPW().SetPosition(c, p); }
+        ),
+        "rotation", sol::property(
+            [](RigidbodyHandle& h) { return h.Get() && h.entity.HasComponent<TransformComponent>() ? h.entity.GetComponent<TransformComponent>().GetRotation() : glm::quat(); },
+            [=](RigidbodyHandle& h, const glm::quat& r) { if (auto* c = h.Get()) GetPW().SetRotation(c, r); }
+        ),
 
-        "MoveKinematic", [=](RigidbodyComponent& c, const glm::vec3& p, const glm::quat& r, float dt) { GetPW().MoveKinematic(&c, p, r, dt); },
-        "AddForce", [=](RigidbodyComponent& c, const glm::vec3& f) { GetPW().AddForce(&c, f); },
-        "AddImpulse", [=](RigidbodyComponent& c, const glm::vec3& i) { GetPW().AddImpulse(&c, i); },
-        "AddTorque", [=](RigidbodyComponent& c, const glm::vec3& t) { GetPW().AddTorque(&c, t); },
-        "AddAngularImpulse", [=](RigidbodyComponent& c, const glm::vec3& i) { GetPW().AddAngularImpulse(&c, i); },
-        "AddLinearVelocity", [=](RigidbodyComponent& c, const glm::vec3& v) { GetPW().AddLinearVelocity(&c, v); }
+        "MoveKinematic", [=](RigidbodyHandle& h, const glm::vec3& p, const glm::quat& r, float dt) { if (auto* c = h.Get()) GetPW().MoveKinematic(c, p, r, dt); },
+        "AddForce", [=](RigidbodyHandle& h, const glm::vec3& f) { if (auto* c = h.Get()) GetPW().AddForce(c, f); },
+        "AddImpulse", [=](RigidbodyHandle& h, const glm::vec3& i) { if (auto* c = h.Get()) GetPW().AddImpulse(c, i); },
+        "AddTorque", [=](RigidbodyHandle& h, const glm::vec3& t) { if (auto* c = h.Get()) GetPW().AddTorque(c, t); },
+        "AddAngularImpulse", [=](RigidbodyHandle& h, const glm::vec3& i) { if (auto* c = h.Get()) GetPW().AddAngularImpulse(c, i); },
+        "AddLinearVelocity", [=](RigidbodyHandle& h, const glm::vec3& v) { if (auto* c = h.Get()) GetPW().AddLinearVelocity(c, v); }
     );
 
 
-    lua.new_usertype<CharacterBodyComponent>("CharacterBodyComponent",
+    lua.new_usertype<CharacterBodyHandle>("CharacterBodyComponent",
+        "IsValid", &CharacterBodyHandle::IsValid,
         "position", sol::property(
-            [=](CharacterBodyComponent& c) { return GetPW().GetCharacterPosition(&c); },
-            [=](CharacterBodyComponent& c, const glm::vec3& p) { GetPW().SetCharacterPosition(&c, p); }
+            [=](CharacterBodyHandle& h) { return h.Get() ? GetPW().GetCharacterPosition(h.Get()) : glm::vec3(0.0f); },
+            [=](CharacterBodyHandle& h, const glm::vec3& p) { if (auto* c = h.Get()) GetPW().SetCharacterPosition(c, p); }
         ),
         "rotation", sol::property(
-            [=](CharacterBodyComponent& c) { return GetPW().GetCharacterRotation(&c); },
-            [=](CharacterBodyComponent& c, const glm::quat& r) { GetPW().SetCharacterRotation(&c, r); }
+            [=](CharacterBodyHandle& h) { return h.Get() ? GetPW().GetCharacterRotation(h.Get()) : glm::quat(); },
+            [=](CharacterBodyHandle& h, const glm::quat& r) { if (auto* c = h.Get()) GetPW().SetCharacterRotation(c, r); }
         ),
         "velocity", sol::property(
-            [=](CharacterBodyComponent& c) { return GetPW().GetCharacterLinearVelocity(&c); },
-            [=](CharacterBodyComponent& c, const glm::vec3& v) { GetPW().SetCharacterLinearVelocity(&c, v); }
+            [=](CharacterBodyHandle& h) { return h.Get() ? GetPW().GetCharacterLinearVelocity(h.Get()) : glm::vec3(0.0f); },
+            [=](CharacterBodyHandle& h, const glm::vec3& v) { if (auto* c = h.Get()) GetPW().SetCharacterLinearVelocity(c, v); }
         ),
         "up", sol::property(
-            [=](CharacterBodyComponent& c) { return GetPW().GetCharacterUp(&c); },
-            [=](CharacterBodyComponent& c, const glm::vec3& up) { GetPW().SetCharacterUp(&c, up); }
+            [=](CharacterBodyHandle& h) { return h.Get() ? GetPW().GetCharacterUp(h.Get()) : glm::vec3(0.0f); },
+            [=](CharacterBodyHandle& h, const glm::vec3& up) { if (auto* c = h.Get()) GetPW().SetCharacterUp(c, up); }
         ),
         "maxSlopeAngle", sol::property(
-            [=](CharacterBodyComponent& c) { return GetPW().GetCharacterMaxSlopeAngle(&c); },
-            [=](CharacterBodyComponent& c, float angle) { GetPW().SetCharacterMaxSlopeAngle(&c, angle); }
+            [=](CharacterBodyHandle& h) { return h.Get() ? GetPW().GetCharacterMaxSlopeAngle(h.Get()) : 0.0f; },
+            [=](CharacterBodyHandle& h, float angle) { if (auto* c = h.Get()) GetPW().SetCharacterMaxSlopeAngle(c, angle); }
         ),
 
-        // read only
-        "isGrounded", sol::property([=](CharacterBodyComponent& c) { return GetPW().IsCharacterGrounded(&c); }),
-        "isOnSteepGround", sol::property([=](CharacterBodyComponent& c) { return GetPW().IsCharacterOnSteepGround(&c); }),
-        "isInAir", sol::property([=](CharacterBodyComponent& c) { return GetPW().IsCharacterInAir(&c); }),
-        "isNotSupported", sol::property([=](CharacterBodyComponent& c) { return GetPW().IsCharacterNotSupported(&c); }),
-        "centerOfMass", sol::property([=](CharacterBodyComponent& c) { return GetPW().GetCharacterCenterOfMassPosition(&c); }),
-        "groundNormal", sol::property([=](CharacterBodyComponent& c) { return GetPW().GetCharacterGroundNormal(&c); }),
-        "groundVelocity", sol::property([=](CharacterBodyComponent& c) { return GetPW().GetCharacterGroundVelocity(&c); }),
-        "groundPosition", sol::property([=](CharacterBodyComponent& c) { return GetPW().GetCharacterGroundPosition(&c); })
+        "isGrounded", sol::property([=](CharacterBodyHandle& h) { return h.Get() ? GetPW().IsCharacterGrounded(h.Get()) : false; }),
+        "isOnSteepGround", sol::property([=](CharacterBodyHandle& h) { return h.Get() ? GetPW().IsCharacterOnSteepGround(h.Get()) : false; }),
+        "isInAir", sol::property([=](CharacterBodyHandle& h) { return h.Get() ? GetPW().IsCharacterInAir(h.Get()) : false; }),
+        "isNotSupported", sol::property([=](CharacterBodyHandle& h) { return h.Get() ? GetPW().IsCharacterNotSupported(h.Get()) : false; }),
+        "centerOfMass", sol::property([=](CharacterBodyHandle& h) { return h.Get() ? GetPW().GetCharacterCenterOfMassPosition(h.Get()) : glm::vec3(0.0f); }),
+        "groundNormal", sol::property([=](CharacterBodyHandle& h) { return h.Get() ? GetPW().GetCharacterGroundNormal(h.Get()) : glm::vec3(0.0f); }),
+        "groundVelocity", sol::property([=](CharacterBodyHandle& h) { return h.Get() ? GetPW().GetCharacterGroundVelocity(h.Get()) : glm::vec3(0.0f); }),
+        "groundPosition", sol::property([=](CharacterBodyHandle& h) { return h.Get() ? GetPW().GetCharacterGroundPosition(h.Get()) : glm::vec3(0.0f); })
     );
 
 

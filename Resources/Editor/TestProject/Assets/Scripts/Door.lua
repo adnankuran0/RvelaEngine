@@ -9,8 +9,6 @@ function Door:OnCreate()
 end
 
 function Door:interact()
-    print(self.animator.isPlaying)
-
     if not self.animator or self.animator.isPlaying then
         return
     end

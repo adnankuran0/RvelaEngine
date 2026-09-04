@@ -6,8 +6,11 @@
 #include "Scene/Components/AudioEmitterComponent.h"
 #include "Asset/AssetManager.h"
 #include "Asset/Types/AudioClipAsset.h"
+#include "ComponentHandle.h"
 
 using namespace rv;
+
+using AudioEmitterHandle = ComponentHandle<AudioEmitterComponent>;
 
 void rv::LuaBindings::RegisterAudioAPI(sol::state& lua)
 {
@@ -18,62 +21,68 @@ void rv::LuaBindings::RegisterAudioAPI(sol::state& lua)
         { "Exponential", AttenuationModel::Exponential }
         });
 
-    lua.new_usertype<AudioEmitterComponent>("AudioEmitterComponent",
+    lua.new_usertype<AudioEmitterHandle>("AudioEmitterComponent",
+        "IsValid", &AudioEmitterHandle::IsValid,
+
         "volume", sol::property(
-            [](AudioEmitterComponent& c) { return c.volume; },
-            [](AudioEmitterComponent& c, float v) { AudioManager::Get().SetVolume(&c, v); }),
+            [](AudioEmitterHandle& h) { return h.Get() ? h.Get()->volume : 0.0f; },
+            [](AudioEmitterHandle& h, float v) { if (auto* c = h.Get()) AudioManager::Get().SetVolume(c, v); }),
 
         "pitch", sol::property(
-            [](AudioEmitterComponent& c) { return c.pitch; },
-            [](AudioEmitterComponent& c, float p) { AudioManager::Get().SetPitch(&c, p); }),
+            [](AudioEmitterHandle& h) { return h.Get() ? h.Get()->pitch : 1.0f; },
+            [](AudioEmitterHandle& h, float p) { if (auto* c = h.Get()) AudioManager::Get().SetPitch(c, p); }),
 
         "loop", sol::property(
-            [](AudioEmitterComponent& c) { return c.loop; },
-            [](AudioEmitterComponent& c, bool l) { AudioManager::Get().SetLoop(&c, l); }),
+            [](AudioEmitterHandle& h) { return h.Get() ? h.Get()->loop : false; },
+            [](AudioEmitterHandle& h, bool l) { if (auto* c = h.Get()) AudioManager::Get().SetLoop(c, l); }),
 
         "spatial", sol::property(
-            [](AudioEmitterComponent& c) { return c.spatial; },
-            [](AudioEmitterComponent& c, bool s) { AudioManager::Get().SetSpatial(&c, s); }),
+            [](AudioEmitterHandle& h) { return h.Get() ? h.Get()->spatial : false; },
+            [](AudioEmitterHandle& h, bool s) { if (auto* c = h.Get()) AudioManager::Get().SetSpatial(c, s); }),
 
         "attenuationModel", sol::property(
-            [](AudioEmitterComponent& c) { return c.attenuationModel; },
-            [](AudioEmitterComponent& c, AttenuationModel m) { AudioManager::Get().SetAttenuationModel(&c, m); }),
+            [](AudioEmitterHandle& h) { return h.Get() ? h.Get()->attenuationModel : AttenuationModel::None; },
+            [](AudioEmitterHandle& h, AttenuationModel m) { if (auto* c = h.Get()) AudioManager::Get().SetAttenuationModel(c, m); }),
 
         "minDistance", sol::property(
-            [](AudioEmitterComponent& c) { return c.minDistance; },
-            [](AudioEmitterComponent& c, float d) { AudioManager::Get().SetMinDistance(&c, d); }),
+            [](AudioEmitterHandle& h) { return h.Get() ? h.Get()->minDistance : 0.0f; },
+            [](AudioEmitterHandle& h, float d) { if (auto* c = h.Get()) AudioManager::Get().SetMinDistance(c, d); }),
 
         "maxDistance", sol::property(
-            [](AudioEmitterComponent& c) { return c.maxDistance; },
-            [](AudioEmitterComponent& c, float d) { AudioManager::Get().SetMaxDistance(&c, d); }),
+            [](AudioEmitterHandle& h) { return h.Get() ? h.Get()->maxDistance : 0.0f; },
+            [](AudioEmitterHandle& h, float d) { if (auto* c = h.Get()) AudioManager::Get().SetMaxDistance(c, d); }),
 
         "rolloff", sol::property(
-            [](AudioEmitterComponent& c) { return c.rolloff; },
-            [](AudioEmitterComponent& c, float r) { AudioManager::Get().SetRolloff(&c, r); }),
+            [](AudioEmitterHandle& h) { return h.Get() ? h.Get()->rolloff : 0.0f; },
+            [](AudioEmitterHandle& h, float r) { if (auto* c = h.Get()) AudioManager::Get().SetRolloff(c, r); }),
 
         "dopplerFactor", sol::property(
-            [](AudioEmitterComponent& c) { return c.dopplerFactor; },
-            [](AudioEmitterComponent& c, float f) { AudioManager::Get().SetDopplerFactor(&c, f); }),
+            [](AudioEmitterHandle& h) { return h.Get() ? h.Get()->dopplerFactor : 0.0f; },
+            [](AudioEmitterHandle& h, float f) { if (auto* c = h.Get()) AudioManager::Get().SetDopplerFactor(c, f); }),
 
         "busID", sol::property(
-            [](AudioEmitterComponent& c) { return c.busID; },
-            [](AudioEmitterComponent& c, uint32_t id) { AudioManager::Get().SetBus(&c, id); }),
+            [](AudioEmitterHandle& h) { return h.Get() ? h.Get()->busID : 0; },
+            [](AudioEmitterHandle& h, uint32_t id) { if (auto* c = h.Get()) AudioManager::Get().SetBus(c, id); }),
 
-        "playOnCreate", &AudioEmitterComponent::playOnCreate,
+        "playOnCreate", sol::property(
+            [](AudioEmitterHandle& h) { return h.Get() ? h.Get()->playOnCreate : false; },
+            [](AudioEmitterHandle& h, bool b) { if (auto* c = h.Get()) c->playOnCreate = b; }),
 
-        "Play", [](AudioEmitterComponent& c) { AudioManager::Get().Play(&c); },
-        "Stop", [](AudioEmitterComponent& c) { AudioManager::Get().Stop(&c); },
-        "Pause", [](AudioEmitterComponent& c) { AudioManager::Get().Pause(&c); },
-        "Resume", [](AudioEmitterComponent& c) { AudioManager::Get().Resume(&c); },
+        "Play", [](AudioEmitterHandle& h) { if (auto* c = h.Get()) AudioManager::Get().Play(c); },
+        "Stop", [](AudioEmitterHandle& h) { if (auto* c = h.Get()) AudioManager::Get().Stop(c); },
+        "Pause", [](AudioEmitterHandle& h) { if (auto* c = h.Get()) AudioManager::Get().Pause(c); },
+        "Resume", [](AudioEmitterHandle& h) { if (auto* c = h.Get()) AudioManager::Get().Resume(c); },
 
-        "IsPlaying", [](AudioEmitterComponent& c) { return AudioManager::Get().IsPlaying(&c); },
-        "IsPaused", [](AudioEmitterComponent& c) { return AudioManager::Get().IsPaused(&c); },
+        "IsPlaying", [](AudioEmitterHandle& h) { return h.Get() ? AudioManager::Get().IsPlaying(h.Get()) : false; },
+        "IsPaused", [](AudioEmitterHandle& h) { return h.Get() ? AudioManager::Get().IsPaused(h.Get()) : false; },
 
-        "Seek", [](AudioEmitterComponent& c, float seconds) { AudioManager::Get().Seek(&c, seconds); },
-        "GetPlaybackPosition", [](AudioEmitterComponent& c) { return AudioManager::Get().GetPlaybackPosition(&c); },
+        "Seek", [](AudioEmitterHandle& h, float seconds) { if (auto* c = h.Get()) AudioManager::Get().Seek(c, seconds); },
+        "GetPlaybackPosition", [](AudioEmitterHandle& h) { return h.Get() ? AudioManager::Get().GetPlaybackPosition(h.Get()) : 0.0f; },
 
-        "SetClip", [](AudioEmitterComponent& c, const AssetUUID& uuid) {
-            AudioManager::Get().SetClip(&c, AssetManager::Get().GetAsset<AudioClipAsset>(uuid));
+        "SetClip", [](AudioEmitterHandle& h, const AssetUUID& uuid) {
+            if (auto* c = h.Get()) {
+                AudioManager::Get().SetClip(c, AssetManager::Get().GetAsset<AudioClipAsset>(uuid));
+            }
         }
     );
 
@@ -81,7 +90,5 @@ void rv::LuaBindings::RegisterAudioAPI(sol::state& lua)
     audio.set_function("SetBusVolume", [](uint32_t busID, float volume) { AudioManager::Get().SetBusVolume(busID, volume); });
     audio.set_function("GetBusVolume", [](uint32_t busID) { AudioManager::Get().GetBusVolume(busID); });
     audio.set_function("GetBusID", [](const std::string& name) { return AudioManager::Get().GetBusID(name); });
-    //audio.set_function("CreateBus", []() -> uint32_t { return AudioManager::Get().CreateBus()->GetID(); });
-    //audio.set_function("DestroyBus", [](uint32_t busID) { return AudioManager::Get().DestroyBus(busID); });
     audio.set_function("SetParentBus", [](uint32_t busID, uint32_t parentID) { return AudioManager::Get().SetParentBus(busID, parentID); });
 }
