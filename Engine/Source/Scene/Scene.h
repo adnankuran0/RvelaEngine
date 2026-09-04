@@ -111,6 +111,7 @@ public:
     void SetSelectedEntity(entt::entity selectedEntity) { this->selectedEntity = selectedEntity; }
     entt::entity GetSelectedEntity() { return selectedEntity; }
 
+    void MoveChildOrder(entt::entity source, entt::entity target, bool insertBefore);
     [[nodiscard]] inline std::vector<entt::entity> GetRootEntities() noexcept
     {
         std::vector<entt::entity> roots;

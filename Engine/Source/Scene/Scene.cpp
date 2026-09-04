@@ -304,23 +304,31 @@ void Scene::SetParent(entt::entity child, entt::entity parent)
 }
 void Scene::SetParentKeepLocal(entt::entity child, entt::entity parent)
 {
+    if (child == entt::null || !m_Registry.valid(child)) return;
+    if (child == parent) return;
+
     auto& childTree = GetComponent<SceneTreeComponent>(child);
+    EntityUUID childUUID = GetComponent<UUIDComponent>(child).uuid;
 
     if (childTree.parent != entt::null && m_Registry.valid(childTree.parent))
     {
         auto& oldParentTree = GetComponent<SceneTreeComponent>(childTree.parent);
         std::erase(oldParentTree.children, child);
+        std::erase(oldParentTree.childrenUUIDs, childUUID);
     }
 
     childTree.parent = parent;
+    childTree.parentUUID = (parent != entt::null && m_Registry.valid(parent))
+        ? GetComponent<UUIDComponent>(parent).uuid
+        : 0;
 
-    if (parent != entt::null)
+    if (parent != entt::null && m_Registry.valid(parent))
     {
         auto& parentTree = GetComponent<SceneTreeComponent>(parent);
-        if (std::find(parentTree.children.begin(), parentTree.children.end(), child)
-            == parentTree.children.end())
+        if (std::find(parentTree.children.begin(), parentTree.children.end(), child) == parentTree.children.end())
         {
             parentTree.children.push_back(child);
+            parentTree.childrenUUIDs.push_back(childUUID);
         }
     }
 }
@@ -477,4 +485,54 @@ unsigned int Scene::CountEntitiesRecursively(entt::entity& rootEntity)
     }
 
     return count;
+}
+
+void Scene::MoveChildOrder(entt::entity source, entt::entity target, bool insertBefore)
+{
+    if (source == entt::null || target == entt::null || source == target) return;
+    if (!m_Registry.valid(source) || !m_Registry.valid(target)) return;
+
+    auto& sourceTree = GetComponent<SceneTreeComponent>(source);
+    auto& targetTree = GetComponent<SceneTreeComponent>(target);
+
+    entt::entity targetParent = targetTree.parent != entt::null ? targetTree.parent : m_RootEntity;
+    if (sourceTree.parent != targetParent)
+    {
+        SetParent(source, targetParent);
+    }
+
+    auto& parentTree = GetComponent<SceneTreeComponent>(targetParent);
+    auto& children = parentTree.children;
+    auto& childrenUUIDs = parentTree.childrenUUIDs;
+
+    EntityUUID sourceUUID = GetComponent<UUIDComponent>(source).uuid;
+
+    std::erase(children, source);
+    std::erase(childrenUUIDs, sourceUUID);
+
+    auto it = std::find(children.begin(), children.end(), target);
+    if (it != children.end())
+    {
+        size_t index = std::distance(children.begin(), it);
+        if (!insertBefore)
+        {
+            index++;
+        }
+
+        if (index >= children.size())
+        {
+            children.push_back(source);
+            childrenUUIDs.push_back(sourceUUID);
+        }
+        else
+        {
+            children.insert(children.begin() + index, source);
+            childrenUUIDs.insert(childrenUUIDs.begin() + index, sourceUUID);
+        }
+    }
+    else
+    {
+        children.push_back(source);
+        childrenUUIDs.push_back(sourceUUID);
+    }
 }

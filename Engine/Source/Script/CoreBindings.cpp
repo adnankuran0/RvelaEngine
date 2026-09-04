@@ -2,6 +2,7 @@
 #include "CoreBindings.h"
 #include "sol/sol.hpp"
 #include "Scene/Entity.h"
+#include <vector>
 
 using namespace rv;
 
@@ -20,6 +21,43 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             else {
                 self.SetParent(Entity{ entt::null, nullptr });
             }
+        },
+        "GetScriptType", [](Entity& e) -> std::string {
+            if (!e.HasComponent<ScriptComponent>()) return "";
+            auto& sc = e.GetComponent<ScriptComponent>();
+            if (sc.luaInstance.valid() && sc.luaInstance["className"].valid()) {
+                return sc.luaInstance["className"];
+            }
+            return "";
+        },
+        "HasMethod", [](Entity& e, const std::string& methodName) -> bool {
+            if (!e.HasComponent<ScriptComponent>()) return false;
+            auto& sc = e.GetComponent<ScriptComponent>();
+            return sc.luaInstance.valid() && sc.luaInstance[methodName].valid();
+        },
+        "CallMethod", [](Entity& e, const std::string& methodName, sol::variadic_args va) -> sol::object {
+            if (!e.HasComponent<ScriptComponent>()) return sol::nil;
+            auto& sc = e.GetComponent<ScriptComponent>();
+
+            if (sc.luaInstance.valid() && sc.luaInstance[methodName].valid()) {
+                sol::protected_function func = sc.luaInstance[methodName];
+
+                std::vector<sol::object> args;
+                for (auto arg : va) {
+                    args.push_back(arg.get<sol::object>());
+                }
+
+                sol::protected_function_result result = func(sc.luaInstance, sol::as_args(args));
+
+                if (result.valid()) {
+                    return result;
+                }
+                else {
+                    sol::error err = result;
+                    LOG_ERROR("Lua CallMethod error [{}]: {}", methodName, err.what());
+                }
+            }
+            return sol::nil;
         },
         "HasComponent", [&](Entity& e, const std::string& type) {
             if (type == "TransformComponent") return e.HasComponent<TransformComponent>();
@@ -69,22 +107,18 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
         },
         "AddComponent", [&](Entity& e, const std::string& typeName) -> sol::object {
             if (typeName == "PointLightComponent")
-                return sol::make_object(lua, &e.AddComponent<PointLightComponent>());
+                return sol::make_object(lua, std::ref(e.AddComponent<PointLightComponent>()));
             else if (typeName == "DirectionalLightComponent")
-                return sol::make_object(lua, &e.AddComponent<DirectionalLightComponent>());
-            else if (typeName == "PointLightComponent")
-                return sol::make_object(lua, &e.AddComponent<PointLightComponent>());
+                return sol::make_object(lua, std::ref(e.AddComponent<DirectionalLightComponent>()));
             else if (typeName == "CameraComponent")
-                return sol::make_object(lua, &e.AddComponent<CameraComponent>());
+                return sol::make_object(lua, std::ref(e.AddComponent<CameraComponent>()));
             else if (typeName == "RigidbodyComponent")
-                return sol::make_object(lua, &e.AddComponent<RigidbodyComponent>());
+                return sol::make_object(lua, std::ref(e.AddComponent<RigidbodyComponent>()));
             else if (typeName == "AudioEmitterComponent")
-                return sol::make_object(lua, &e.AddComponent<AudioEmitterComponent>());
+                return sol::make_object(lua, std::ref(e.AddComponent<AudioEmitterComponent>()));
             else if (typeName == "AnimatorComponent")
-                return sol::make_object(lua, &e.AddComponent<AnimatorComponent>());
+                return sol::make_object(lua, std::ref(e.AddComponent<AnimatorComponent>()));
             return sol::nil;
         }
     );
-
-   
 }

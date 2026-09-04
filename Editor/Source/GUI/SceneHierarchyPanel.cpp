@@ -77,14 +77,12 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
     ImGui::Separator();
     ImGui::Spacing();
 
-    auto getChildren = [&registry](entt::entity parent) {
-        std::vector<entt::entity> children;
-        registry.view<SceneTreeComponent>().each([&](entt::entity e, SceneTreeComponent& stc) {
-            if (stc.parent == parent) {
-                children.push_back(e);
-            }
-            });
-        return children;
+    auto getChildren = [&scene, &registry](entt::entity parent) -> const std::vector<entt::entity>&{
+        static const std::vector<entt::entity> empty;
+        if (parent != entt::null && registry.valid(parent) && scene.HasComponent<SceneTreeComponent>(parent)) {
+            return scene.GetComponent<SceneTreeComponent>(parent).children;
+        }
+        return empty;
         };
 
     auto matchesFilter = [&](entt::entity entity, auto& self) -> bool {
@@ -105,6 +103,14 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
         return false;
         };
 
+    auto isDescendantOf = [&](entt::entity childCandidate, entt::entity parentCandidate, auto& self) -> bool {
+        if (childCandidate == parentCandidate) return true;
+        for (auto subChild : getChildren(childCandidate)) {
+            if (self(subChild, parentCandidate, self)) return true;
+        }
+        return false;
+        };
+
     ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.20f, 0.20f, 0.27f, 0.8f));
     ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.55f, 0.50f, 0.72f, 0.6f));
     ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.62f, 0.56f, 0.80f, 0.9f));
@@ -112,11 +118,13 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 
     std::function<void(entt::entity)> DrawEntityNode = [&](entt::entity entity)
         {
+            if (!registry.valid(entity)) return;
+
             if (searchFilter[0] != '\0' && !matchesFilter(entity, matchesFilter))
                 return;
 
             bool isRoot = (entity == rootEntity);
-            auto children = getChildren(entity);
+            const auto& children = getChildren(entity);
 
             ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 
@@ -159,6 +167,42 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                     selectedEntity = child;
                 }
 
+                if (ImGui::MenuItem("Save as prefab"))
+                {
+                    const char* filterPatterns[] = { "*.rprefab" };
+                    const char* filePath = tinyfd_saveFileDialog("Create prefab as", "prefab.rprefab", 1, filterPatterns, NULL);
+                    if (filePath)
+                    {
+                        std::filesystem::path prefabPath = filePath;
+                        AssetRegistry& reg = AssetManager::Get().GetRegistry();
+                        AssetMeta meta = reg.GetOrCreateMeta(prefabPath);
+
+                        Ref<PrefabAsset> prefab = PrefabImporter::CreatePrefabAsset(prefabPath, meta.uuid, scene, selectedEntity);
+                        if (prefab)
+                        {
+                            meta.importerID = "PrefabImporter";
+                            reg.SaveMeta(prefabPath, meta);
+                            reg.Scan(reg.GetAssetDir());
+                            LOG_INFO("Prefab saved: {}", prefabPath.string());
+                        }
+                    }
+                }
+
+                if (scene.HasComponent<PrefabComponent>(selectedEntity))
+                {
+                    if (ImGui::MenuItem("Make local"))
+                    {
+                        scene.RemoveComponent<PrefabComponent>(selectedEntity);
+                    }
+                }
+
+                if (ImGui::MenuItem("Detach from parent"))
+                {
+                    scene.RemoveParent(selectedEntity);
+                }
+
+                ImGui::Separator();
+
                 if (ImGui::MenuItem("Delete Entity"))
                 {
                     scene.QueueDestroyEntity(entity);
@@ -178,23 +222,68 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 
             if (!isRoot && ImGui::BeginDragDropTarget())
             {
-                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY_DRAG"))
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY_DRAG", ImGuiDragDropFlags_AcceptBeforeDelivery | ImGuiDragDropFlags_AcceptNoDrawDefaultRect))
                 {
-                    entt::entity child = *(entt::entity*)payload->Data;
-                    if (child != entity)
-                        scene.SetParent(child, entity);
+                    ImVec2 itemMin = ImGui::GetItemRectMin();
+                    ImVec2 itemMax = ImGui::GetItemRectMax();
+                    float itemHeight = itemMax.y - itemMin.y;
+                    float mousePosY = ImGui::GetMousePos().y;
+
+                    float topBorder = itemMin.y + (itemHeight * 0.25f);
+                    float bottomBorder = itemMax.y - (itemHeight * 0.25f);
+
+                    ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+                    if (mousePosY < topBorder)
+                    {
+                        drawList->AddLine(ImVec2(itemMin.x, itemMin.y), ImVec2(itemMax.x, itemMin.y), IM_COL32(255, 204, 0, 255), 2.0f);
+                        if (payload->IsDelivery())
+                        {
+                            entt::entity dragged = *(entt::entity*)payload->Data;
+                            if (dragged != entity && !isDescendantOf(dragged, entity, isDescendantOf))
+                            {
+                                scene.MoveChildOrder(dragged, entity, true);
+                            }
+                        }
+                    }
+                    else if (mousePosY > bottomBorder)
+                    {
+                        drawList->AddLine(ImVec2(itemMin.x, itemMax.y), ImVec2(itemMax.x, itemMax.y), IM_COL32(255, 204, 0, 255), 2.0f);
+                        if (payload->IsDelivery())
+                        {
+                            entt::entity dragged = *(entt::entity*)payload->Data;
+                            if (dragged != entity && !isDescendantOf(dragged, entity, isDescendantOf))
+                            {
+                                scene.MoveChildOrder(dragged, entity, false);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        drawList->AddRect(itemMin, itemMax, IM_COL32(0, 180, 255, 255), 0.0f, 0, 1.5f);
+                        if (payload->IsDelivery())
+                        {
+                            entt::entity dragged = *(entt::entity*)payload->Data;
+                            if (dragged != entity && !isDescendantOf(dragged, entity, isDescendantOf))
+                            {
+                                scene.SetParent(dragged, entity);
+                            }
+                        }
+                    }
                 }
                 ImGui::EndDragDropTarget();
             }
 
             if (isRoot)
             {
-                for (auto child : children)
+                auto childrenCopy = children;
+                for (auto child : childrenCopy)
                     DrawEntityNode(child);
             }
             else if (nodeOpen)
             {
-                for (auto child : children)
+                auto childrenCopy = children;
+                for (auto child : childrenCopy)
                     DrawEntityNode(child);
 
                 ImGui::TreePop();
@@ -210,24 +299,41 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
     ImGui::PopStyleVar();
     ImGui::PopStyleColor(3);
 
-    if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowHovered())
+    if (ImGui::BeginDragDropTargetCustom(ImGui::GetCurrentWindow()->Rect(), ImGui::GetID("SceneHierarchyEmptyDrop")))
+    {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY_DRAG"))
+        {
+            entt::entity dragged = *(entt::entity*)payload->Data;
+            if (dragged != entt::null && registry.valid(dragged))
+            {
+                scene.SetParent(dragged, rootEntity);
+            }
+        }
+        ImGui::EndDragDropTarget();
+    }
+
+    if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowHovered() && !ImGui::IsAnyItemHovered())
         selectedEntity = entt::null;
 
-    if (ImGui::BeginPopupContextWindow(nullptr, ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems)) {
-        if (ImGui::MenuItem("Create Entity")) {
+    if (ImGui::BeginPopupContextWindow(nullptr, ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems))
+    {
+        if (ImGui::MenuItem("Create Entity"))
+        {
             selectedEntity = scene.CreateEntity("New Entity");
         }
 
-        if (ImGui::MenuItem("Camera")) {
+        if (ImGui::MenuItem("Camera"))
+        {
             selectedEntity = scene.CreateEntity("Camera");
             scene.AddComponent<CameraComponent>(selectedEntity);
         }
 
-        if (ImGui::MenuItem("Particle Emitter")) {
+        if (ImGui::MenuItem("Particle Emitter"))
+        {
             Entity emitterEntity = LoadPrimitive(scene, "Quad");
             if (emitterEntity)
             {
-                if(emitterEntity.HasComponent<RigidbodyComponent>())
+                if (emitterEntity.HasComponent<RigidbodyComponent>())
                     emitterEntity.RemoveComponent<RigidbodyComponent>();
                 if (emitterEntity.HasComponent<ConvexHullColliderComponent>())
                     emitterEntity.RemoveComponent<ConvexHullColliderComponent>();
@@ -238,30 +344,22 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             }
         }
 
-        if (ImGui::BeginMenu("Primitives")) {
-            if (ImGui::MenuItem("Cube"))
-                selectedEntity = LoadPrimitive(scene, "Cube");
-            if (ImGui::MenuItem("Sphere"))
-                selectedEntity = LoadPrimitive(scene, "Sphere");
-            if (ImGui::MenuItem("Cylinder"))
-                selectedEntity = LoadPrimitive(scene, "Cylinder");
-            if (ImGui::MenuItem("Quad"))
-                selectedEntity = LoadPrimitive(scene, "Quad");
-            if (ImGui::MenuItem("Cone"))
-                selectedEntity = LoadPrimitive(scene, "Cone");
-            if (ImGui::MenuItem("Capsule"))
-                selectedEntity = LoadPrimitive(scene, "Capsule");
-            if (ImGui::MenuItem("Torus"))
-                selectedEntity = LoadPrimitive(scene, "Torus");
-            if (ImGui::MenuItem("Plane"))
-                selectedEntity = LoadPrimitive(scene, "Plane");
-            if (ImGui::MenuItem("Monkey"))
-                selectedEntity = LoadPrimitive(scene, "Monkey");
-
+        if (ImGui::BeginMenu("Primitives"))
+        {
+            if (ImGui::MenuItem("Cube")) selectedEntity = LoadPrimitive(scene, "Cube");
+            if (ImGui::MenuItem("Sphere")) selectedEntity = LoadPrimitive(scene, "Sphere");
+            if (ImGui::MenuItem("Cylinder")) selectedEntity = LoadPrimitive(scene, "Cylinder");
+            if (ImGui::MenuItem("Quad")) selectedEntity = LoadPrimitive(scene, "Quad");
+            if (ImGui::MenuItem("Cone")) selectedEntity = LoadPrimitive(scene, "Cone");
+            if (ImGui::MenuItem("Capsule")) selectedEntity = LoadPrimitive(scene, "Capsule");
+            if (ImGui::MenuItem("Torus")) selectedEntity = LoadPrimitive(scene, "Torus");
+            if (ImGui::MenuItem("Plane")) selectedEntity = LoadPrimitive(scene, "Plane");
+            if (ImGui::MenuItem("Monkey")) selectedEntity = LoadPrimitive(scene, "Monkey");
             ImGui::EndMenu();
         }
 
-        if (ImGui::BeginMenu("Lights")) {
+        if (ImGui::BeginMenu("Lights"))
+        {
             if (ImGui::MenuItem("Directional Light"))
             {
                 selectedEntity = scene.CreateEntity("DirectionalLight");
@@ -273,64 +371,7 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                 selectedEntity = scene.CreateEntity("PointLight");
                 scene.AddComponent<PointLightComponent>(selectedEntity);
             }
-            if (ImGui::MenuItem("Spot Light"))
-            {
-
-            }
-            if (ImGui::MenuItem("Area Light"))
-            {
-
-            }
-
             ImGui::EndMenu();
-        }
-
-        if (selectedEntity != entt::null && registry.valid(selectedEntity))
-        {
-            ImGui::Separator();
-
-            if (ImGui::MenuItem("Save as prefab"))
-            {
-                const char* filterPatterns[] = { "*.rprefab" };
-                const char* filePath = tinyfd_saveFileDialog(
-                    "Create prefab as", "prefab.rprefab", 1, filterPatterns, NULL);
-
-                if (filePath)
-                {
-                    std::filesystem::path prefabPath = filePath;
-
-                    AssetRegistry& reg = AssetManager::Get().GetRegistry();
-                    AssetMeta meta = reg.GetOrCreateMeta(prefabPath);
-
-                    Ref<PrefabAsset> prefab = PrefabImporter::CreatePrefabAsset(
-                        prefabPath, meta.uuid, scene, selectedEntity);
-
-                    if (prefab)
-                    {
-                        meta.importerID = "PrefabImporter";
-                        reg.SaveMeta(prefabPath, meta);
-                        reg.Scan(reg.GetAssetDir());
-                        LOG_INFO("Prefab saved: {}", prefabPath.string());
-                    }
-                }
-            }
-
-            if (scene.HasComponent<PrefabComponent>(selectedEntity))
-            {
-                if (ImGui::MenuItem("Make local"))
-                {
-                    scene.RemoveComponent<PrefabComponent>(selectedEntity);
-                }
-            }
-
-            if (ImGui::MenuItem("Detach from parent")) {
-                scene.RemoveParent(selectedEntity);
-            }
-
-            if (ImGui::MenuItem("Delete Entity")) {
-                scene.DestroyEntity(selectedEntity);
-                selectedEntity = entt::null;
-            }
         }
 
         ImGui::EndPopup();

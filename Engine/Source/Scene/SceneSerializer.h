@@ -14,6 +14,7 @@ public:
         std::unordered_map<EntityUUID, entt::entity>& uuidToEntity);
 
 private:
+    void SerializeHierarchyRecursively(Scene& scene, entt::entity current, json& outEntitiesArray, const std::unordered_set<entt::entity>& prefabChildren);
     void CollectChildrenRecursively(Scene& scene,entt::entity e,std::unordered_set<entt::entity>& out);
 };
 

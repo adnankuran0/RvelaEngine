@@ -68,6 +68,12 @@ public:
 	{
 		return !(*this == other);
 	}
+
+	bool operator<(const Entity& other) const {
+		if (m_EntityHandle != other.m_EntityHandle)
+			return m_EntityHandle < other.m_EntityHandle;
+		return m_Scene < other.m_Scene;
+	}
 private:
 	entt::entity m_EntityHandle{ entt::null };
 	Scene* m_Scene = nullptr;
