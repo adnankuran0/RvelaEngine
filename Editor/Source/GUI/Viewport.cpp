@@ -268,6 +268,7 @@ void Viewport::HandleSelection(Engine* engine, ImVec2& displayPos, ImVec2& displ
         else
         {
             selectedEntity = entt::null;
+            engine->GetActiveScene().SetSelectedEntity(entt::null);
         }
     }
 }

@@ -43,6 +43,7 @@ void Renderer::Init(GLFWwindow* window)
     ShaderManager::Add(Shader("BRDF",ENGINE_PATH("Shaders\\brdf.glsl")));
     ShaderManager::Add(Shader("Line",ENGINE_PATH("Shaders\\line.glsl")));
     ShaderManager::Add(Shader("Particle",ENGINE_PATH("Shaders\\particle.glsl")));
+    ShaderManager::Add(Shader("Gizmo",ENGINE_PATH("Shaders\\gizmo.glsl")));
 
     m_ScreenQuad.Init();
 

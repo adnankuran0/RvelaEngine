@@ -7,9 +7,19 @@
         8.0,
         8.0
     ],
+    "albedoColor": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+    ],
     "albedoTexture": "a42bf5d2-8383-4c23-a336-1baf4cf33ab0",
+    "alphaCutoff": 0.5,
     "ao": 1.0,
     "aoTexture": "15accc86-f1e9-48de-9c54-60a648225795",
+    "billboardMode": 0,
+    "blendMode": 0,
+    "cullMode": 0,
     "emissiveColor": [
         0.0,
         0.0,
@@ -21,7 +31,16 @@
     "metallic": 0.0,
     "normalScale": 1.0,
     "normalTexture": "27e53aa2-cbf0-4457-8af9-b76baf182762",
-    "roughness": 0.6240000128746033,
+    "receiveShadows": true,
+    "roughness": 0.6690000295639038,
     "roughnessTexture": "dde966c2-0ef1-4751-b73c-9220a423da5d",
-    "specular": 1.0
+    "shadingMode": 0,
+    "specular": 1.0,
+    "transparencyMode": 0,
+    "useAOMap": true,
+    "useAlbedoMap": true,
+    "useHeightMap": true,
+    "useMetallicMap": false,
+    "useNormalMap": true,
+    "useRoughnessMap": true
 }

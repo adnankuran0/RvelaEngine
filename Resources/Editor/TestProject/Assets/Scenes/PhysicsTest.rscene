@@ -18,19 +18,19 @@
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
-                    0.0,
-                    0.0,
-                    0.0
+                    1.9713985919952393,
+                    1.8441858291625977,
+                    -6.103591294959188e-05
                 ],
                 "rotation": [
-                    -45.93019104003906,
-                    60.79782485961914,
-                    4.400891304016113
+                    -45.930179595947266,
+                    60.79781723022461,
+                    4.400894641876221
                 ],
                 "scale": [
-                    0.9999998211860657,
-                    0.9999992251396179,
-                    0.9999997615814209
+                    0.9999997019767761,
+                    0.9999991655349731,
+                    0.9999996423721313
                 ]
             },
             "UUID": 10
@@ -269,19 +269,7 @@
                 ]
             },
             "Material": {
-                "material": "1d3e6ca6-0cc0-4c85-ae73-36db93d0aee4",
-                "overrides": {
-                    "albedoColor": [
-                        1.0,
-                        1.0,
-                        1.0,
-                        1.0
-                    ],
-                    "ao": 1.0,
-                    "heightScale": 0.00800000037997961,
-                    "normalScale": 1.0,
-                    "roughness": 0.6690000295639038
-                }
+                "material": "1d3e6ca6-0cc0-4c85-ae73-36db93d0aee4"
             },
             "Mesh": {
                 "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
@@ -425,11 +413,7 @@
                 ]
             },
             "Material": {
-                "material": "117abcf2-653c-4baa-b1ef-78ccd02c4fa6",
-                "overrides": {
-                    "billboardMode": 0,
-                    "receiveShadows": true
-                }
+                "material": "117abcf2-653c-4baa-b1ef-78ccd02c4fa6"
             },
             "Mesh": {
                 "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
@@ -502,9 +486,7 @@
                         5.650000095367432
                     ],
                     "albedoTex": "e1f28315-9413-41d9-b4cd-df85a38bde35",
-                    "aoTex": "ab64387c-0f46-4540-a8be-33e82968d6ef",
-                    "heightScale": 0.05299999937415123,
-                    "heightTex": "181510e0-9bd5-4fab-a453-f9c0420708e3",
+                    "heightScale": 1.0,
                     "normalScale": 1.0,
                     "normalTex": "980c6850-59d2-4024-9fbc-d3889eb142eb",
                     "roughness": 1.0,
@@ -704,6 +686,12 @@
             "UUID": 22
         },
         {
+            "AnimatorComponent": {
+                "autoplay": true,
+                "currentClipName": "fire_anim",
+                "libraryUUID": "e9055c46-2323-46c1-af22-7631ad52876e",
+                "playbackSpeed": 0.10000000149011612
+            },
             "Material": {
                 "material": "ff347f05-8793-455a-b2b5-935ab8376790",
                 "overrides": {
@@ -780,9 +768,6 @@
                 "falloff": 2.0,
                 "intensity": 20.0,
                 "radius": 5.0
-            },
-            "ScriptComponent": {
-                "scriptAssetUUID": "9187b747-d063-4585-8995-513956dde3aa"
             },
             "Tag": {
                 "tag": "Fire"
@@ -882,8 +867,8 @@
                 "lockScaleRatio": false,
                 "position": [
                     9.95008659362793,
-                    2.543682813644409,
-                    0.4194246530532837
+                    2.543675184249878,
+                    0.4194208085536957
                 ],
                 "rotation": [
                     0.0,
