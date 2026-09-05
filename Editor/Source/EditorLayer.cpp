@@ -8,6 +8,7 @@
 #include "Renderer/RenderLayer.h"
 #include <Render/OutlinePass.h>
 #include <Render/SelectedEntityMaskPass.h>
+#include <Render/GizmoPass.h>
 #include "Input/Input.h"
 #include "EditorUtils.h"
 #include "AssetImporters/PrefabImporter.h"
@@ -53,6 +54,7 @@ void EditorLayer::OnAttach()
 
     SetStyle();
 
+    m_GizmoPass = m_Engine->GetRenderLayer().PushRenderPass(std::make_unique<GizmoPass>());
     m_SelectedEntityMaskPass = m_Engine->GetRenderLayer().PushRenderPass(std::make_unique<SelectedEntityMaskPass>());
     m_OutlinePass = m_Engine->GetRenderLayer().PushRenderPass(std::make_unique<OutlinePass>());
 

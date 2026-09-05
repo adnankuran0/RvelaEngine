@@ -121,7 +121,7 @@ static void DrawComponent(const std::string& name, entt::registry& registry, ent
 	ImVec2 contentRegion = ImGui::GetContentRegionAvail();
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6.0f, 6.0f));
 
-	ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed |
+	ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_Framed |
 		ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap |
 		ImGuiTreeNodeFlags_FramePadding;
 

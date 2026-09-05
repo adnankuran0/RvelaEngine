@@ -28,6 +28,11 @@ glm::mat4 Camera::GetViewMatrix()
     return glm::lookAt(Position, Position + Front, Up);
 }
 
+float Camera::GetAspectRatio()
+{
+    return width / height;
+}
+
 bool Camera::Intersects(const AABB& AABB)
 {
     return frustum.Intersects(AABB);

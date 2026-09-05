@@ -19,6 +19,7 @@ public:
 
     glm::mat4 GetProjectionMatrix();
     glm::mat4 GetViewMatrix();
+    float GetAspectRatio();
     bool Intersects(const AABB& AABB);
     bool Intersects(const glm::mat4& projView, const AABB& AABB);
     void UpdateFrustum();

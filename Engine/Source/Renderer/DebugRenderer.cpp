@@ -54,6 +54,45 @@ void DebugRenderer::DrawBox(const glm::vec3& min, const glm::vec3& max, const gl
 	DrawLine(glm::vec3(min.x, min.y, max.z), glm::vec3(min.x, max.y, max.z), color);
 }
 
+void DebugRenderer::DrawFrustum(const glm::mat4& invViewProj, const glm::vec4& color)
+{
+	const glm::vec4 ndcCorners[8] = {
+		// Near plane
+		{ -1.0f, -1.0f, -1.0f, 1.0f },
+		{  1.0f, -1.0f, -1.0f, 1.0f },
+		{  1.0f,  1.0f, -1.0f, 1.0f },
+		{ -1.0f,  1.0f, -1.0f, 1.0f },
+		// Far plane
+		{ -1.0f, -1.0f,  1.0f, 1.0f },
+		{  1.0f, -1.0f,  1.0f, 1.0f },
+		{  1.0f,  1.0f,  1.0f, 1.0f },
+		{ -1.0f,  1.0f,  1.0f, 1.0f }
+	};
+
+	glm::vec3 pts[8];
+	for (int i = 0; i < 8; ++i) {
+		glm::vec4 p = invViewProj * ndcCorners[i];
+		pts[i] = glm::vec3(p) / p.w;
+	}
+
+	// Near plane
+	DrawLine(pts[0], pts[1], color);
+	DrawLine(pts[1], pts[2], color);
+	DrawLine(pts[2], pts[3], color);
+	DrawLine(pts[3], pts[0], color);
+
+	// Far plane
+	DrawLine(pts[4], pts[5], color);
+	DrawLine(pts[5], pts[6], color);
+	DrawLine(pts[6], pts[7], color);
+	DrawLine(pts[7], pts[4], color);
+
+	DrawLine(pts[0], pts[4], color);
+	DrawLine(pts[1], pts[5], color);
+	DrawLine(pts[2], pts[6], color);
+	DrawLine(pts[3], pts[7], color);
+}
+
 void DebugRenderer::BeginFrame()
 {
 	m_LineVertices.clear();
@@ -62,18 +101,20 @@ void DebugRenderer::BeginFrame()
 
 void DebugRenderer::EndFrame(const glm::mat4& mvp)
 {
+	if (m_LineVertices.empty())
+		return;
+
 	glLineWidth(2.0f);
 
 	m_LineVAO.Bind();
 	m_LineVBO.Bind();
-
 	m_LineVBO.Data(m_LineVertices.data(), m_LineVertices.size() * sizeof(DebugVertex), true);
-	
+
 	Shader& shader = ShaderManager::Get("Line");
-
 	shader.use();
+	shader.setMat4("u_ViewProjection", mvp);
 
-	glDrawArrays(GL_LINES, 0, m_LineVertices.size());
+	glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(m_LineVertices.size()));
 
 	m_LineVAO.Unbind();
 	m_LineVBO.Unbind();

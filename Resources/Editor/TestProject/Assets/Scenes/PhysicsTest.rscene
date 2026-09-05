@@ -770,6 +770,17 @@
                     1.0
                 ]
             },
+            "PointLight": {
+                "castShadows": false,
+                "color": [
+                    1.0,
+                    0.2969246506690979,
+                    0.08494210243225098
+                ],
+                "falloff": 2.0,
+                "intensity": 20.0,
+                "radius": 5.0
+            },
             "ScriptComponent": {
                 "scriptAssetUUID": "9187b747-d063-4585-8995-513956dde3aa"
             },

@@ -56,8 +56,9 @@ private:
     ConsolePanel m_ConsolePanel;
     Viewport m_Viewport;
 
-    RenderPassHandle m_OutlinePass;
+    RenderPassHandle m_GizmoPass;
     RenderPassHandle m_SelectedEntityMaskPass;
+    RenderPassHandle m_OutlinePass;
 
     std::vector<entt::entity> m_SelectedEntities;
 

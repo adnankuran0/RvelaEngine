@@ -13,7 +13,7 @@ void ConsolePanel::Draw()
         sink.Clear();
 
     ImGui::SameLine();
-    ImGui::Checkbox("Auto-Scroll", &m_AutoScroll);
+    ImGui::Checkbox("AutoScroll", &m_AutoScroll);
 
     ImGui::SameLine();
     ImGui::SetNextItemWidth(150.0f);

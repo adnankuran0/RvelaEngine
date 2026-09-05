@@ -28,6 +28,7 @@ public:
     void DrawLine(const glm::vec3& from, const glm::vec3& to, const glm::vec4& color);
     void DrawTriangle(const glm::vec3& v1,const glm::vec3& v2, const glm::vec3& v3, const glm::vec4& color);
     void DrawBox(const glm::vec3& min, const glm::vec3& max, const glm::vec4& color);
+    void DrawFrustum(const glm::mat4& invViewProj, const glm::vec4& color);
 
     DebugSettings& GetSettings() { return m_Settings; }
 

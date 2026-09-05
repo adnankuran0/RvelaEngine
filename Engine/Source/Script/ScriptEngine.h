@@ -10,6 +10,7 @@ public:
 	sol::state& GetState() { return m_State; }
 
 private:
+	void InitOverrides();
 	sol::state m_State;
 };
 

@@ -10,6 +10,21 @@ void ScriptEngine::Init()
 {
     m_State.open_libraries(sol::lib::base, sol::lib::math, sol::lib::table, sol::lib::string, sol::lib::os);
 
+    InitOverrides();
+
+    LuaBindings::RegisterMath(m_State);
+    LuaBindings::RegisterCoreTypes(m_State);
+    LuaBindings::RegisterComponents(m_State);
+    LuaBindings::RegisterInputAPI(m_State);
+    LuaBindings::RegisterSceneAPI(m_State);
+    LuaBindings::RegisterPhysicsAPI(m_State);
+    LuaBindings::RegisterAudioAPI(m_State);
+    LuaBindings::RegisterAnimationAPI(m_State);
+
+}
+
+void ScriptEngine::InitOverrides()
+{
     m_State["print"] = [](sol::variadic_args va) {
         std::stringstream ss;
         bool first = true;
@@ -31,14 +46,4 @@ void ScriptEngine::Init()
 
         EditorConsoleSink::Get().LogLua(output);
         };
-
-    LuaBindings::RegisterMath(m_State);
-    LuaBindings::RegisterCoreTypes(m_State);
-    LuaBindings::RegisterComponents(m_State);
-    LuaBindings::RegisterInputAPI(m_State);
-    LuaBindings::RegisterSceneAPI(m_State);
-    LuaBindings::RegisterPhysicsAPI(m_State);
-    LuaBindings::RegisterAudioAPI(m_State);
-    LuaBindings::RegisterAnimationAPI(m_State);
-
 }
