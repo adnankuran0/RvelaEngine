@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AnimationSequenceAdapter.h"
+#include "GUI/AnimationSequenceAdapter.h"
 #include <entt/entt.h>
 #include <memory>
 

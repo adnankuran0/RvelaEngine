@@ -4,6 +4,7 @@ project "RvelaEngine"
    cppdialect "C++20"
    targetdir "Binaries/%{cfg.buildcfg}"
    staticruntime "off"
+   warnings "Off"
 
    defines
    {

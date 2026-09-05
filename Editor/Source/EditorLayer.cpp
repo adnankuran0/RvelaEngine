@@ -70,8 +70,8 @@ void EditorLayer::OnDetach()
 
 void EditorLayer::OnUpdate()
 {
-    if(m_Engine->GetActiveScene().GetState() == SceneState::EDIT)
-        m_EditorCamera.Update();
+    if (m_Engine->GetActiveScene().GetState() == SceneState::EDIT)
+            m_EditorCamera.Update();
 
     static_cast<SelectedEntityMaskPass*>(m_Engine->GetRenderLayer().GetRenderPass(m_SelectedEntityMaskPass))->SetSelectedEntity(m_SelectedEntity);
     static_cast<OutlinePass*>(m_Engine->GetRenderLayer().GetRenderPass(m_OutlinePass))->SetSelectedEntity(m_SelectedEntity);
@@ -118,7 +118,6 @@ void EditorLayer::OnEvent(Event& event)
         {
             if (MouseScrolledEvent* scrollEvent = static_cast<MouseScrolledEvent*>(&event))
             {
-                // Adjust sprint speed based on scroll input
                 m_EditorCamera.MovementSpeed += scrollEvent->GetYOffset();
                 m_EditorCamera.MovementSpeed = std::clamp(m_EditorCamera.MovementSpeed, 1.0f, 100.0f);
             }
@@ -172,6 +171,8 @@ void EditorLayer::Render()
     m_MixerPanel.Draw();
 
     m_AnimatorPanel.Draw(m_Engine, m_SelectedEntity);
+
+    m_ConsolePanel.Draw();
 
     m_Viewport.Draw(m_Engine, m_SelectedEntity);
 

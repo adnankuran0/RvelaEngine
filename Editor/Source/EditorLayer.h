@@ -3,17 +3,18 @@
 #include "Core/Layer.h"
 #include "Renderer/EditorCamera.h"
 #include "Asset/AssetImportPipeline.h"
-#include "GUI/SceneHierarchyPanel.h"
 #include "GUI/Style.h"
 #include "GUI/MenuBar.h"
 #include "GUI/ToolBar.h"
 #include "GUI/Dockspace.h"
 #include "GUI/Viewport.h"
-#include "GUI/InspectorPanel.h"
-#include "GUI/AssetBrowserPanel.h"
-#include "GUI/MixerPanel.h"
-#include "GUI/EnvironmentPanel.h"
-#include "GUI/AnimatorPanel.h"
+#include "GUI/Panels/SceneHierarchyPanel.h"
+#include "GUI/Panels/InspectorPanel.h"
+#include "GUI/Panels/AssetBrowserPanel.h"
+#include "GUI/Panels/MixerPanel.h"
+#include "GUI/Panels/EnvironmentPanel.h"
+#include "GUI/Panels/AnimatorPanel.h"
+#include "GUI/Panels/ConsolePanel.h"
 #include <Renderer/RenderPipeline.h>
 
 namespace rv {
@@ -52,6 +53,7 @@ private:
     AssetBrowserPanel m_AssetBrowserPanel;
     MixerPanel m_MixerPanel;
     AnimatorPanel m_AnimatorPanel;
+    ConsolePanel m_ConsolePanel;
     Viewport m_Viewport;
 
     RenderPassHandle m_OutlinePass;

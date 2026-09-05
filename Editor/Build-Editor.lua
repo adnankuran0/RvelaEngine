@@ -4,6 +4,7 @@ project "RvelaEditor"
    cppdialect "C++20"
    targetdir "Binaries/%{cfg.buildcfg}"
    staticruntime "off"
+   warnings "Off"
 
    files { "Source/**.h", "Source/**.cpp","../Vendor/ImGui/*.cpp","../Vendor/ImGui/*.c", "../Vendor/GLAD/src/**.c", }
 
