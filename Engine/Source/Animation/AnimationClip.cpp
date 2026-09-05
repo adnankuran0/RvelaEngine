@@ -10,6 +10,22 @@ AnimationClip::AnimationClip(const std::string& clipName)
     scaleTrack.targetProperty = "Scale";
 }
 
+AnimationClip::AnimationClip(const AnimationClip& other)
+    : name(other.name),
+    duration(other.duration),
+    loopMode(other.loopMode),
+    positionTrack(other.positionTrack),
+    rotationTrack(other.rotationTrack),
+    scaleTrack(other.scaleTrack),
+    eventTrack(other.eventTrack)
+{
+    for (const auto& track : other.propertyTracks) {
+        if (track) {
+            propertyTracks.push_back(track->Clone());
+        }
+    }
+}
+
 void AnimationClip::AddEvent(float time, const std::string& name, const std::string& parameter)
 {
     auto it = std::lower_bound(eventTrack.begin(), eventTrack.end(), time,

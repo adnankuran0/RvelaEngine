@@ -9,7 +9,13 @@
 
 namespace rv::Animation {
 
-    struct AnimationClip {
+    struct AnimationClip 
+    {
+        AnimationClip(const std::string& clipName = "New Animation");
+        AnimationClip(const AnimationClip& other);
+
+        void AddEvent(float time, const std::string& name, const std::string& parameter = "");
+
         std::string name = "New Animation";
         float duration = 0.0f;
         LoopMode loopMode = LoopMode::NONE;
@@ -21,8 +27,6 @@ namespace rv::Animation {
 
         std::vector<std::shared_ptr<IPropertyTrack>> propertyTracks;
 
-        AnimationClip(const std::string& clipName = "New Animation");
-        void AddEvent(float time, const std::string& name, const std::string& parameter = "");
     };
 
 }

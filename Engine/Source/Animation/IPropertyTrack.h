@@ -7,7 +7,8 @@ namespace rv::Animation {
 
     enum class PropertyType { Float, Vec3, Vec4, Quat, Bool };
 
-    class IPropertyTrack {
+    class IPropertyTrack 
+    {
     public:
         std::string targetPath;
         std::string propertyName;
@@ -16,23 +17,36 @@ namespace rv::Animation {
         virtual PropertyType GetType() const = 0;
         virtual float GetLastKeyframeTime() const = 0;
         virtual void Apply(entt::registry& reg, entt::entity targetEntity, float time) = 0;
+        virtual std::shared_ptr<IPropertyTrack> Clone() const = 0;
     };
 
     template<typename T>
-    class TypedPropertyTrack : public IPropertyTrack {
+    class TypedPropertyTrack : public IPropertyTrack 
+    {
     public:
         AnimationTrack<T> track;
 
         PropertyType GetType() const override;
 
-        float GetLastKeyframeTime() const override {
+        float GetLastKeyframeTime() const override 
+        {
             return track.keyframes.empty() ? 0.0f : track.keyframes.back().time;
         }
 
-        void Apply(entt::registry& reg, entt::entity targetEntity, float time) override {
+        void Apply(entt::registry& reg, entt::entity targetEntity, float time) override 
+        {
             if (track.keyframes.empty()) return;
             T sampledValue = track.Sample(time);
             PropertyBindingRegistry::Get().Apply(reg, targetEntity, propertyName, sampledValue);
+        }
+
+        std::shared_ptr<IPropertyTrack> Clone() const override 
+        {
+            auto cloned = std::make_shared<TypedPropertyTrack<T>>();
+            cloned->targetPath = targetPath;
+            cloned->propertyName = propertyName;
+            cloned->track = track;
+            return cloned;
         }
     };
 
