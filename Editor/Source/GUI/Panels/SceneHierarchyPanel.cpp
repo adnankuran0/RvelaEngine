@@ -344,6 +344,13 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             }
         }
 
+
+        if (ImGui::MenuItem("Audio Emitter"))
+        {
+            selectedEntity = scene.CreateEntity("AudioEmitter");
+            scene.AddComponent<AudioEmitterComponent>(selectedEntity);
+        }
+
         if (ImGui::BeginMenu("Primitives"))
         {
             if (ImGui::MenuItem("Cube")) selectedEntity = LoadPrimitive(scene, "Cube");

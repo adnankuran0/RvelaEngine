@@ -2,6 +2,7 @@
 #include "ImGui/imgui.h"
 #include "Core/Engine.h"
 #include "EditorUtils.h"
+#include "Render/IconLibrary.h"
 
 using namespace rv;
 
@@ -25,53 +26,70 @@ void ToolBar::Draw(Engine& engine)
     ImGui::SetNextWindowSize(toolbar_size);
     ImGui::SetNextWindowViewport(viewport->ID);
 
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(5, 2));
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 
     ImGui::Begin("ToolBar", nullptr, toolbar_flags);
     {
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+        ImVec2 button_size(56.0f, 28.0f);
+        ImVec2 icon_size(28.0f, 28.0f);
 
-        ImVec2 button_size(80, 30);
-        float total_buttons_width = 3 * button_size.x + 2 * ImGui::GetStyle().ItemSpacing.x;
+        float spacing = 6.0f;
+        float total_width = (3.0f * button_size.x) + (2.0f * spacing);
 
-        float offset = (toolbar_size.x - total_buttons_width) * 0.5f;
-        if (offset > 0.0f) {
-            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offset);
-        }
+        float offset_x = std::floor((toolbar_size.x - total_width) * 0.5f);
+        float offset_y = std::floor((toolbar_size.y - button_size.y) * 0.5f);
 
-        if (ImGui::Button("Play", button_size)) 
+        ImGui::SetCursorPos(ImVec2(offset_x, offset_y));
+
+        ImTextureID playIcon = (ImTextureID)(intptr_t)IconLibrary::Get().GetIcon(EditorIcon::Play).GetID();
+        ImTextureID pauseIcon = (ImTextureID)(intptr_t)IconLibrary::Get().GetIcon(EditorIcon::Pause).GetID();
+        ImTextureID stopIcon = (ImTextureID)(intptr_t)IconLibrary::Get().GetIcon(EditorIcon::Stop).GetID();
+
+        float pad_x = std::floor((button_size.x - icon_size.x) * 0.5f);
+        float pad_y = std::floor((button_size.y - icon_size.y) * 0.5f);
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(pad_x, pad_y));
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(spacing, 0.0f));
+
+        const ImVec4 tintWhite = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+
+        bool isPlaying = (scene.GetState() == SceneState::PLAY);
+        ImGui::PushStyleColor(ImGuiCol_Button, isPlaying ? ImVec4(0.20f, 0.35f, 0.20f, 1.0f) : ImVec4(0.16f, 0.16f, 0.22f, 1.0f));
+        if (ImGui::ImageButton("##PlayBtn", playIcon, icon_size, ImVec2(0, 0), ImVec2(1, 1), ImVec4(0, 0, 0, 0), tintWhite))
         {
             if ((scene.GetState() == SceneState::EDIT && EditorUtils::SaveScene(engine)) || scene.GetState() == SceneState::PAUSE)
             {
-                //TODO: save and load
                 scene.SetState(SceneState::PLAY);
             }
-                
-
         }
+        ImGui::PopStyleColor();
         ImGui::SameLine();
 
-        if (ImGui::Button("Pause", button_size)) 
+        bool isPaused = (scene.GetState() == SceneState::PAUSE);
+        ImGui::PushStyleColor(ImGuiCol_Button, isPaused ? ImVec4(0.35f, 0.30f, 0.15f, 1.0f) : ImVec4(0.16f, 0.16f, 0.22f, 1.0f));
+        if (ImGui::ImageButton("##PauseBtn", pauseIcon, icon_size, ImVec2(0, 0), ImVec2(1, 1), ImVec4(0, 0, 0, 0), tintWhite))
         {
             if (scene.GetState() == SceneState::PLAY)
                 scene.SetState(SceneState::PAUSE);
         }
+        ImGui::PopStyleColor();
         ImGui::SameLine();
 
-        if (ImGui::Button("Stop", button_size)) 
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.16f, 0.16f, 0.22f, 1.0f));
+        if (ImGui::ImageButton("##StopBtn", stopIcon, icon_size, ImVec2(0, 0), ImVec2(1, 1), ImVec4(0, 0, 0, 0), tintWhite))
         {
             if (scene.GetState() == SceneState::PLAY || scene.GetState() == SceneState::PAUSE)
             {
                 const std::string& scenePath = scene.GetPath();
-
                 engine.GetSceneManager().LoadScene(scenePath);
                 scene.SetState(SceneState::EDIT);
             }
         }
-
         ImGui::PopStyleColor();
+
+        ImGui::PopStyleVar(3);
     }
     ImGui::End();
     ImGui::PopStyleVar(3);
@@ -83,4 +101,3 @@ void ToolBar::Draw(Engine& engine)
     ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, dockspace_height));
     ImGui::SetNextWindowViewport(viewport->ID);
 }
-

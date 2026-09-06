@@ -14,10 +14,10 @@ template<typename T>
 struct AnimationTrack
 {
     std::string targetProperty;
-    InterpolationType interpolation = InterpolationType::LINEAR;
+    InterpolationType interpolation = InterpolationType::Linear;
     std::vector<Keyframe<T>> keyframes;
 
-    void AddKeyframe(float time, const T& value, EaseType ease = EaseType::LINEAR)
+    void AddKeyframe(float time, const T& value, EaseType ease = EaseType::Linear)
     {
         auto it = std::lower_bound(keyframes.begin(), keyframes.end(), time,
             [](const Keyframe<T>& kf, float t) { return kf.time < t; });

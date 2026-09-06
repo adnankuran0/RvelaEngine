@@ -19,6 +19,7 @@
 #include "Event/Event.h"
 #include "Event/MouseEvents.h"
 #include <Event/WindowEvents.h>
+#include <Render/IconLibrary.h>
 
 using namespace rv;
 
@@ -60,6 +61,8 @@ void EditorLayer::OnAttach()
 
     m_AssetImportPipeline.RegisterImporter(std::make_unique<ModelImporter>());
     m_AssetImportPipeline.RegisterImporter(std::make_unique<TextureImporter>());
+
+    IconLibrary::Init();
 
 }
 

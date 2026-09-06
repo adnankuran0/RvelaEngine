@@ -85,7 +85,7 @@ void AnimationSystem::Update()
         if (!animator.isStarted)
         {
             animator.isStarted = true;
-            m_EventQueue.push_back({ entity, Animation::EventType::STARTED, animator.currentClipName, "", "" });
+            m_EventQueue.push_back({ entity, Animation::EventType::Started, animator.currentClipName, "", "" });
         }
 
         float prevTime = animator.currentTime;
@@ -138,7 +138,7 @@ void AnimationSystem::Update()
 
         if (looped)
         {
-            m_EventQueue.push_back({ entity, Animation::EventType::LOOPED, animator.currentClipName, "", "" });
+            m_EventQueue.push_back({ entity, Animation::EventType::Looped, animator.currentClipName, "", "" });
         }
 
         if (!clip->eventTrack.empty() && reg.any_of<ScriptComponent>(entity))
@@ -164,7 +164,7 @@ void AnimationSystem::Update()
 
                     if (triggered)
                     {
-                        m_EventQueue.push_back({ entity, Animation::EventType::TRIGGERED, animator.currentClipName, ev.name, ev.parameter });
+                        m_EventQueue.push_back({ entity, Animation::EventType::Triggered, animator.currentClipName, ev.name, ev.parameter });
                     }
                 }
             }
@@ -175,7 +175,7 @@ void AnimationSystem::Update()
 
         if (animationJustEnded)
         {
-            m_EventQueue.push_back({ entity, Animation::EventType::FINISHED, animator.currentClipName, "", "" });
+            m_EventQueue.push_back({ entity, Animation::EventType::Finished, animator.currentClipName, "", "" });
         }
 
         float sampleTime = animator.currentTime;

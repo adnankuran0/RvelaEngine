@@ -260,22 +260,22 @@ void ScriptSystem::DispatchAnimationEvents()
 
         switch (ev.type)
         {
-        case Animation::EventType::STARTED:
+        case Animation::EventType::Started:
             if (sc->OnAnimationStarted.valid())
                 result = sc->OnAnimationStarted(sc->luaInstance, ev.clipName);
             break;
 
-        case Animation::EventType::LOOPED:
+        case Animation::EventType::Looped:
             if (sc->OnAnimationLooped.valid())
                 result = sc->OnAnimationLooped(sc->luaInstance, ev.clipName);
             break;
 
-        case Animation::EventType::FINISHED:
+        case Animation::EventType::Finished:
             if (sc->OnAnimationFinished.valid())
                 result = sc->OnAnimationFinished(sc->luaInstance, ev.clipName);
             break;
 
-        case Animation::EventType::TRIGGERED:
+        case Animation::EventType::Triggered:
             if (sc->OnAnimationEvent.valid())
                 result = sc->OnAnimationEvent(sc->luaInstance, ev.eventName, ev.parameter);
             break;

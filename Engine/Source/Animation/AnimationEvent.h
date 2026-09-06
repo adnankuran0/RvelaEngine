@@ -7,10 +7,10 @@ namespace rv::Animation
 
 enum class EventType
 {
-    TRIGGERED,
-    STARTED,
-    LOOPED,
-    FINISHED
+    Triggered,
+    Started,
+    Looped,
+    Finished
 };
 
 struct AnimationEvent
@@ -25,7 +25,7 @@ struct AnimationEvent
 struct AnimationDispatchEvent
 {
     entt::entity entity{ entt::null };
-    EventType type{ EventType::TRIGGERED };
+    EventType type{ EventType::Triggered };
     std::string clipName;
     std::string eventName;
     std::string parameter;

@@ -40,13 +40,6 @@ private:
 
     const float m_GizmoScale = 0.05f;
 
-    Texture m_AudioEmitterIcon;
-    Texture m_CameraIcon;
-    Texture m_DirectionalLightIcon;
-    Texture m_PointLightIcon;
-    Texture m_SpotLightIcon;
-    Texture m_ParticleEmitterIcon;
-
     unsigned int m_QuadVAO;
     unsigned int m_QuadVBO;
 

@@ -14,6 +14,7 @@
 #include "AssetImporters/AnimationLibrarySerializer.h"
 #include <AssetImporters/TextureImporter.h>
 #include <AssetImporters/ModelImporter.h>
+#include "Render/IconLibrary.h"
 
 using namespace rv;
 
@@ -477,27 +478,6 @@ static void DrawItemContextMenu(const std::filesystem::path& itemPath, AssetImpo
 }
 
 
-AssetBrowserPanel::AssetBrowserPanel()
-{
-    folderIcon.Init();
-    folderIcon.GenerateFromImage(EDITOR_PATH("Icons\\folder.png").GetAbsoluteStr());
-    materialIcon.Init();
-    materialIcon.GenerateFromImage(EDITOR_PATH("Icons\\material.png").GetAbsoluteStr());
-    sceneIcon.Init();
-    sceneIcon.GenerateFromImage(EDITOR_PATH("Icons\\scene.png").GetAbsoluteStr());
-    scriptIcon.Init();
-    scriptIcon.GenerateFromImage(EDITOR_PATH("Icons\\script.png").GetAbsoluteStr());
-    textureIcon.Init();
-    textureIcon.GenerateFromImage(EDITOR_PATH("Icons\\texture.png").GetAbsoluteStr());
-    prefabIcon.Init();
-    prefabIcon.GenerateFromImage(EDITOR_PATH("Icons\\prefab.png").GetAbsoluteStr());
-    animlibIcon.Init();
-    animlibIcon.GenerateFromImage(EDITOR_PATH("Icons\\animlib.png").GetAbsoluteStr());
-    meshIcon.Init();
-    meshIcon.GenerateFromImage(EDITOR_PATH("Icons\\mesh.png").GetAbsoluteStr());
-}
-
-
 void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDirectory, AssetImportPipeline& importPipeline)
 {
     if (s_CurrentDirectory.empty())
@@ -606,16 +586,18 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
         }
 
         ImTextureID icon;
-        if (extension == ".rscene") icon = sceneIcon.GetID();
-        else if (extension == ".rprefab") icon = prefabIcon.GetID();
-        else if (entry.is_directory()) icon = folderIcon.GetID();
+        if (extension == ".rscene") icon = IconLibrary::Get().GetIcon(EditorIcon::Scene).GetID();
+        else if (extension == ".rprefab") icon = IconLibrary::Get().GetIcon(EditorIcon::Prefab).GetID();
+        else if (entry.is_directory()) icon = IconLibrary::Get().GetIcon(EditorIcon::Folder).GetID();
         else if (extension == ".rtex" ||
             extension == ".png" || extension == ".jpeg" ||
-            extension == ".jpg" || extension == ".tga") icon = textureIcon.GetID();
-        else if (extension == ".rmat") icon = materialIcon.GetID();
-        else if (extension == ".rmesh") icon = meshIcon.GetID();
-        else if (extension == ".ranimlib") icon = animlibIcon.GetID();
-        else icon = scriptIcon.GetID();
+            extension == ".jpg" || extension == ".tga") icon = IconLibrary::Get().GetIcon(EditorIcon::Texture).GetID();
+        else if (extension == ".mp3" ||
+            extension == ".ogg" || extension == ".wav") icon = IconLibrary::Get().GetIcon(EditorIcon::Audio).GetID();
+        else if (extension == ".rmat") icon = IconLibrary::Get().GetIcon(EditorIcon::Material).GetID();
+        else if (extension == ".rmesh") icon = IconLibrary::Get().GetIcon(EditorIcon::Mesh).GetID();
+        else if (extension == ".ranimlib") icon = IconLibrary::Get().GetIcon(EditorIcon::AnimLib).GetID();
+        else icon = IconLibrary::Get().GetIcon(EditorIcon::Script).GetID();
 
         ImGui::ImageButton(filename.c_str(), icon, ImVec2(thumbnailSize, thumbnailSize));
 

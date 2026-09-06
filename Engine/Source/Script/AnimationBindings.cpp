@@ -20,12 +20,12 @@ void rv::LuaBindings::RegisterAnimationAPI(sol::state& lua)
         });
 
     lua.new_enum<EaseType>("EaseType", {
-        { "Linear",    EaseType::LINEAR      },
-        { "EaseIn",    EaseType::EASE_IN     },
-        { "EaseOut",   EaseType::EASE_OUT    },
-        { "EaseInOut", EaseType::EASE_IN_OUT },
-        { "EaseOutIn", EaseType::EASE_OUT_IN },
-        { "Zero",      EaseType::ZERO        }
+        { "Linear",    EaseType::Linear      },
+        { "EaseIn",    EaseType::EaseIn     },
+        { "EaseOut",   EaseType::EaseOut    },
+        { "EaseInOut", EaseType::EaseInOut },
+        { "EaseOutIn", EaseType::EaseOutIn },
+        { "Zero",      EaseType::Zero        }
         });
 
     lua.new_usertype<AnimatorHandle>("AnimatorComponent",

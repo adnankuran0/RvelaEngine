@@ -40,7 +40,7 @@ struct DragGhost {
     glm::vec4 v4{ 0.0f };
     glm::quat q{ 1.0f, 0.0f, 0.0f, 0.0f };
     bool bVal = false;
-    Animation::EaseType ease{ Animation::EaseType::LINEAR };
+    Animation::EaseType ease{ Animation::EaseType::Linear };
     std::string eventName;
     std::string eventParam;
 };
@@ -55,7 +55,7 @@ struct ClipboardKey {
     glm::vec4 v4{ 0.0f };
     glm::quat q{ 1.0f, 0.0f, 0.0f, 0.0f };
     bool bVal = false;
-    Animation::EaseType ease{ Animation::EaseType::LINEAR };
+    Animation::EaseType ease{ Animation::EaseType::Linear };
     std::string eventName;
     std::string eventParam;
 };

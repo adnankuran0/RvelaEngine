@@ -461,7 +461,7 @@ void AnimationSequenceAdapter::DrawTrackKeyframes(TrackType& track, ImU32 outlin
                     else if constexpr (std::is_same_v<ValueType, bool>) initialValue = false;
                 }
 
-                track.AddKeyframe(newTime, initialValue, Animation::EaseType::LINEAR);
+                track.AddKeyframe(newTime, initialValue, Animation::EaseType::Linear);
                 ctx.selectedKeys.clear();
                 ctx.selectedKeys.push_back({ trackIdx, newTime });
             }

@@ -16,7 +16,7 @@
 
 namespace rv {
 
-class Entity; // Forward Declaration
+class Entity;
 
 enum class SceneState
 { 

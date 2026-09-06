@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <cmath>
 #include <map>
+#include "Render/IconLibrary.h"
 
 namespace rv {
 
@@ -391,16 +392,57 @@ void AnimatorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
     ImGui::TextDisabled("|");
     ImGui::SameLine();
 
-    if (ImGui::Button(animator.isPlaying ? "|| Pause" : "> Play")) {
-        if (animator.isPlaying) animator.Pause();
-        else animator.Play();
+    ImTextureID playIcon = (ImTextureID)(intptr_t)IconLibrary::Get().GetIcon(EditorIcon::Play).GetID();
+    ImTextureID pauseIcon = (ImTextureID)(intptr_t)IconLibrary::Get().GetIcon(EditorIcon::Pause).GetID();
+    ImTextureID stopIcon = (ImTextureID)(intptr_t)IconLibrary::Get().GetIcon(EditorIcon::Stop).GetID();
+
+    ImVec2 animBtnSize(46.0f, 22.0f);
+    ImVec2 animIconSize(22.0f, 22.0f);
+    float padX = std::floor((animBtnSize.x - animIconSize.x) * 0.5f);
+    float padY = std::floor((animBtnSize.y - animIconSize.y) * 0.5f);
+
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(padX, padY));
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
+
+    const ImVec4 tintWhite = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+
+    if (animator.isPlaying)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.35f, 0.30f, 0.15f, 1.0f));
+        if (ImGui::ImageButton("##AnimPauseBtn", pauseIcon, animIconSize, ImVec2(0, 0), ImVec2(1, 1), ImVec4(0, 0, 0, 0), tintWhite))
+        {
+            animator.Pause();
+        }
+        ImGui::PopStyleColor();
     }
+    else
+    {
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.18f, 0.18f, 0.24f, 1.0f));
+        if (ImGui::ImageButton("##AnimPlayBtn", playIcon, animIconSize, ImVec2(0, 0), ImVec2(1, 1), ImVec4(0, 0, 0, 0), tintWhite))
+        {
+            animator.Play();
+        }
+        ImGui::PopStyleColor();
+    }
+
+    if (ImGui::IsItemHovered())
+        ImGui::SetTooltip(animator.isPlaying ? "Pause Animation" : "Play Animation");
+
     ImGui::SameLine();
-    if (ImGui::Button("[ ] Stop")) {
+
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.18f, 0.18f, 0.24f, 1.0f));
+    if (ImGui::ImageButton("##AnimStopBtn", stopIcon, animIconSize, ImVec2(0, 0), ImVec2(1, 1), ImVec4(0, 0, 0, 0), tintWhite))
+    {
         animator.Stop();
         animator.currentTime = 0.0f;
         ApplyCurrentTimeToScene();
     }
+    ImGui::PopStyleColor();
+
+    if (ImGui::IsItemHovered())
+        ImGui::SetTooltip("Stop & Rewind to Start");
+
+    ImGui::PopStyleVar(2);
 
     ImGui::SameLine();
     ImGui::TextDisabled("|");
@@ -606,7 +648,7 @@ void AnimatorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
         ImGui::TextUnformatted("Easing:");
         ImGui::SameLine();
 
-        Animation::EaseType currentEase = Animation::EaseType::LINEAR;
+        Animation::EaseType currentEase = Animation::EaseType::Linear;
         for (const auto& sk : m_SeqContext.selectedKeys) {
             if (sk.track >= 1) {
                 auto findCurrentEase = [&](const auto& track) {

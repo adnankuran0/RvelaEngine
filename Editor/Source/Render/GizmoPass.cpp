@@ -7,6 +7,7 @@
 #include "Scene/Scene.h"
 #include "Scene/Components.h"
 #include "Renderer/ShaderManager.h"
+#include "Render/IconLibrary.h"
 
 using namespace rv;
 
@@ -14,28 +15,15 @@ void GizmoPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
     m_CameraFrustumProj = glm::perspective(glm::radians(60.0f), 16.0f / 9.0f, 0.1f, 1.0f);
 
-    m_AudioEmitterIcon.Init();
-    m_AudioEmitterIcon.GenerateFromImage(EDITOR_PATH("Icons\\audioemitter.png").GetAbsoluteStr());
-    m_CameraIcon.Init();
-    m_CameraIcon.GenerateFromImage(EDITOR_PATH("Icons\\camera.png").GetAbsoluteStr());
-    m_DirectionalLightIcon.Init();
-    m_DirectionalLightIcon.GenerateFromImage(EDITOR_PATH("Icons\\directionallight.png").GetAbsoluteStr());
-    m_PointLightIcon.Init();
-    m_PointLightIcon.GenerateFromImage(EDITOR_PATH("Icons\\pointlight.png").GetAbsoluteStr());
-    m_SpotLightIcon.Init();
-    m_SpotLightIcon.GenerateFromImage(EDITOR_PATH("Icons\\spotlight.png").GetAbsoluteStr());
-    m_ParticleEmitterIcon.Init();
-    m_ParticleEmitterIcon.GenerateFromImage(EDITOR_PATH("Icons\\particleemitter.png").GetAbsoluteStr());
-
     static constexpr float quadVertices[] =
     {
-        -1.0f,  1.0f, 0.0f,    0.0f, 1.0f,
-        -1.0f, -1.0f, 0.0f,    0.0f, 0.0f,
-         1.0f, -1.0f, 0.0f,    1.0f, 0.0f,
+       -1.0f,  1.0f, 0.0f,   0.0f, 0.0f,
+       -1.0f, -1.0f, 0.0f,   0.0f, 1.0f,
+        1.0f, -1.0f, 0.0f,   1.0f, 1.0f,
 
-        -1.0f,  1.0f, 0.0f,    0.0f, 1.0f,
-         1.0f, -1.0f, 0.0f,    1.0f, 0.0f,
-         1.0f,  1.0f, 0.0f,    1.0f, 1.0f
+       -1.0f,  1.0f, 0.0f,   0.0f, 0.0f,
+        1.0f, -1.0f, 0.0f,   1.0f, 1.0f,
+        1.0f,  1.0f, 0.0f,   1.0f, 0.0f 
     };
 
     glGenVertexArrays(1, &m_QuadVAO);
@@ -61,16 +49,18 @@ void GizmoPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     DrawEditorIconsVisual(ctx, frame);
     DrawEditorIconsPicking(ctx, frame);
+
+    
 }
 
 GizmoInfo GizmoPass::GetEntityPrimaryIcon(entt::registry& reg, entt::entity e)
 {
-    if (reg.all_of<CameraComponent>(e)) return { m_CameraIcon.GetID(), GizmoPriority::Camera };
-    if (reg.all_of<ParticleEmitterComponent>(e)) return { m_ParticleEmitterIcon.GetID(), GizmoPriority::Particle };
-    if (reg.all_of<DirectionalLightComponent>(e)) return { m_DirectionalLightIcon.GetID(), GizmoPriority::Light };
-    if (reg.all_of<PointLightComponent>(e)) return { m_PointLightIcon.GetID(), GizmoPriority::Light };
-    if (reg.all_of<SpotLightComponent>(e)) return { m_SpotLightIcon.GetID(), GizmoPriority::Light };
-    if (reg.all_of<AudioEmitterComponent>(e)) return { m_AudioEmitterIcon.GetID(), GizmoPriority::Audio };
+    if (reg.all_of<CameraComponent>(e)) return { IconLibrary::Get().GetIcon(EditorIcon::Camera).GetID(), GizmoPriority::Camera};
+    if (reg.all_of<ParticleEmitterComponent>(e)) return { IconLibrary::Get().GetIcon(EditorIcon::ParticleEmitter).GetID(), GizmoPriority::Particle };
+    if (reg.all_of<DirectionalLightComponent>(e)) return { IconLibrary::Get().GetIcon(EditorIcon::DirectionalLight).GetID(), GizmoPriority::Light };
+    if (reg.all_of<PointLightComponent>(e)) return { IconLibrary::Get().GetIcon(EditorIcon::PointLight).GetID(), GizmoPriority::Light };
+    if (reg.all_of<SpotLightComponent>(e)) return { IconLibrary::Get().GetIcon(EditorIcon::SpotLight).GetID(), GizmoPriority::Light };
+    if (reg.all_of<AudioEmitterComponent>(e)) return { IconLibrary::Get().GetIcon(EditorIcon::AudioEmitter).GetID(), GizmoPriority::Audio };
 
     return { 0, GizmoPriority::None };
 }

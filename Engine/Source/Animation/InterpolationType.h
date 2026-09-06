@@ -3,10 +3,11 @@
 namespace rv::Animation
 {
 
-enum class InterpolationType {
-	STEP,
-	LINEAR,
-	CUBIC
+enum class InterpolationType 
+{
+	Step,
+	Linear,
+	Cubic
 };
 
 }
