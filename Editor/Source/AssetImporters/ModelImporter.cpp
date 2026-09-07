@@ -90,12 +90,44 @@ ModelImportResult ModelImporter::ImportModel(
 
     ExtractMeshes(scene, sourcePath, registry, result);
 
+    ExtractSkeleton(scene, sourcePath, registry, result);
+
     MergeAndSaveSubAssets(scene, sourcePath, registry, result);
 
     if (settings.generatePrefab)
         result.prefabUUID = ConstructPrefab(scene, sourcePath, registry, result);
 
     return result;
+}
+
+void ModelImporter::ExtractSkeleton(
+    const aiScene* scene,
+    const std::filesystem::path& modelPath,
+    AssetRegistry& registry,
+    ModelImportResult& result)
+{
+    result.skeletonUUID = m_SkeletonImporter.ImportFromScene(scene, modelPath, registry);
+    if (!result.skeletonUUID.IsValid())
+        return;
+
+    AssetMeta parentMeta = registry.GetOrCreateMeta(modelPath);
+
+    bool exists = false;
+    for (auto& sub : parentMeta.subAssets)
+        if (sub.type == "Skeleton") { exists = true; break; }
+
+    if (!exists)
+    {
+        SubAssetEntry entry;
+        entry.uuid = result.skeletonUUID;
+        entry.name = modelPath.stem().string() + "_Skeleton";
+        entry.type = "Skeleton";
+        entry.index = 0;
+        entry.hasCache = true;
+        parentMeta.subAssets.push_back(entry);
+    }
+
+    registry.SaveMeta(modelPath, parentMeta);
 }
 
 std::string ModelImporter::GetDefaultSettings() const
@@ -477,6 +509,8 @@ AssetUUID ModelImporter::ConstructPrefab(
         meta.dependencies.push_back(uuid);
     for (auto& [idx, uuid] : result.materialUUIDs)
         meta.dependencies.push_back(uuid);
+    if (result.skeletonUUID.IsValid())
+        meta.dependencies.push_back(result.skeletonUUID);
 
     registry.SaveMeta(prefabPath, meta);
     return meta.uuid;

@@ -63,6 +63,9 @@ static inline glm::mat4 FromJoltMat44(const JPH::RMat44& m)
     return result;
 }
 
+void DecomposeToQuat(const glm::mat4& transform,
+    glm::vec3& outScale, glm::quat& outRotation, glm::vec3& outTranslation);
+
 bool RayIntersectsTriangle(const glm::vec3& rayOrigin, const glm::vec3& rayDir,
     const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2,
     float& t);

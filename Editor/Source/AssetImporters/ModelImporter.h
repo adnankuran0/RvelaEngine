@@ -3,6 +3,7 @@
 #include "MeshImporter.h"
 #include "TextureImporter.h"
 #include <Assimp/Importer.hpp>
+#include "SkeletonImporter.h"
 #include <entt/entt.h>
 #include <unordered_map>
 #include <unordered_set>
@@ -20,6 +21,7 @@ class AssetRegistry;
 struct ModelImportResult
 {
     AssetUUID prefabUUID;
+    AssetUUID skeletonUUID;
     std::unordered_map<unsigned int, AssetUUID> meshUUIDs; // meshIndex - uuid
     std::unordered_map<unsigned int, AssetUUID> materialUUIDs; // matIndex - uuid
     std::unordered_map<std::string, AssetUUID>  textureUUIDs; // path - uuid
@@ -89,6 +91,12 @@ private:
         AssetRegistry& registry,
         ModelImportResult& result);
 
+    void ExtractSkeleton(
+        const aiScene* scene,
+        const std::filesystem::path& modelPath,
+        AssetRegistry& registry,
+        ModelImportResult& result);
+
     AssetUUID ConstructPrefab(
         const aiScene* scene,
         const std::filesystem::path& modelPath,
@@ -127,6 +135,7 @@ private:
 
     MeshImporter m_MeshImporter;
     TextureImporter m_TextureImporter;
+    SkeletonImporter m_SkeletonImporter;
 
     Assimp::Importer m_Importer;
 };

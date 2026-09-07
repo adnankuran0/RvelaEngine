@@ -23,6 +23,7 @@
                     "albedoColor": [
                         1.0,
                         1.0,
+                        1.0,
                         1.0
                     ],
                     "albedoTex": "d81cf13d-e7a6-4036-97c7-f7bbece45f9d",
@@ -100,8 +101,8 @@
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
-                    0.0,
-                    2.0544304847717285,
+                    0.469146728515625,
+                    1.9203743934631348,
                     0.0
                 ],
                 "rotation": [
@@ -131,7 +132,15 @@
                 ]
             },
             "Material": {
-                "material": "dbdc1ee9-fff0-402b-8bfc-b017f3649a74"
+                "material": "dbdc1ee9-fff0-402b-8bfc-b017f3649a74",
+                "overrides": {
+                    "albedoColor": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ]
+                }
             },
             "Mesh": {
                 "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
@@ -232,8 +241,8 @@
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
-                    -0.9510524272918701,
-                    0.753307580947876,
+                    -0.8084895610809326,
+                    2.0185816287994385,
                     -0.3178258538246155
                 ],
                 "rotation": [
@@ -268,7 +277,8 @@
                     "albedoColor": [
                         0.0,
                         0.0,
-                        0.0
+                        0.0,
+                        1.0
                     ]
                 }
             },
@@ -384,7 +394,8 @@
                     "albedoColor": [
                         0.0,
                         0.0,
-                        0.0
+                        0.0,
+                        1.0
                     ]
                 }
             },
@@ -429,7 +440,15 @@
                 ]
             },
             "Material": {
-                "material": "4fc3c40d-04bf-4f9e-9731-a8db939018d3"
+                "material": "4fc3c40d-04bf-4f9e-9731-a8db939018d3",
+                "overrides": {
+                    "albedoColor": [
+                        0.0,
+                        0.0,
+                        0.0,
+                        1.0
+                    ]
+                }
             },
             "Mesh": {
                 "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
@@ -505,7 +524,7 @@
                 "position": [
                     0.0,
                     0.653349757194519,
-                    0.0
+                    0.24168938398361206
                 ],
                 "rotation": [
                     0.0,
@@ -565,8 +584,8 @@
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
-                    -0.022527068853378296,
-                    1.192398190498352,
+                    0.09322604537010193,
+                    2.0317535400390625,
                     0.681556761264801
                 ],
                 "rotation": [
@@ -652,11 +671,11 @@
         "Bloom_Treshold": 1.0,
         "HDRPath": "Assets\\Textures\\skybox\\environment.hdr",
         "Lighting_AmbientColor": [
-            0.0,
-            0.0,
-            0.0
+            0.1428571343421936,
+            0.1428571343421936,
+            0.1428571343421936
         ],
-        "Lighting_AmbientIntensity": 0.0,
+        "Lighting_AmbientIntensity": 0.10000000149011612,
         "Lighting_IBL": false,
         "Lighting_IBLIntensity": 0.5,
         "PostProcess_ChromaticStrength": 0.009999999776482582,

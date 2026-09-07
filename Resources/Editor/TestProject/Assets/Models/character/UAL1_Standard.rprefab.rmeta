@@ -1,0 +1,15 @@
+{
+    "dependencies": [
+        "c62012cd-cd27-4f2d-816f-5c53d34e3631",
+        "0a06cbf3-dbff-4901-bebc-0cd96d647fc6",
+        "399fd549-6f30-4a2e-8130-bf540b7cc7a0",
+        "0e63477d-247c-4b9d-bc07-81edb2332918",
+        "9e1c36e7-c1a7-4a8c-afcb-c1fdc367fcf8",
+        "e0ac8da6-b45e-4b58-abd9-c05080b78825"
+    ],
+    "importerID": "PrefabImporter",
+    "importerSettings": {},
+    "lastWriteTime": 0,
+    "subAssets": [],
+    "uuid": "56b332d0-6d5b-471e-ae4e-6357ea10caec"
+}

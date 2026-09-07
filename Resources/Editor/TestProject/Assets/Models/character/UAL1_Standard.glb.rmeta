@@ -1,0 +1,59 @@
+{
+    "dependencies": [],
+    "importerID": "ModelImporter",
+    "importerSettings": {
+        "generatePrefab": true,
+        "importMaterials": true,
+        "importNormals": true,
+        "importTangents": true,
+        "importTextures": true,
+        "importUVs": true,
+        "scale": 1.0
+    },
+    "lastWriteTime": 13426121024,
+    "subAssets": [
+        {
+            "hasCache": false,
+            "index": 0,
+            "name": "UAL1_Standard_Mat0",
+            "type": "Material",
+            "uuid": "399fd549-6f30-4a2e-8130-bf540b7cc7a0"
+        },
+        {
+            "hasCache": false,
+            "index": 1,
+            "name": "UAL1_Standard_Mat1",
+            "type": "Material",
+            "uuid": "0e63477d-247c-4b9d-bc07-81edb2332918"
+        },
+        {
+            "hasCache": false,
+            "index": 2,
+            "name": "UAL1_Standard_Mat2",
+            "type": "Material",
+            "uuid": "9e1c36e7-c1a7-4a8c-afcb-c1fdc367fcf8"
+        },
+        {
+            "hasCache": true,
+            "index": 0,
+            "name": "Mannequin-0",
+            "type": "Mesh",
+            "uuid": "c62012cd-cd27-4f2d-816f-5c53d34e3631"
+        },
+        {
+            "hasCache": true,
+            "index": 1,
+            "name": "Mannequin-1",
+            "type": "Mesh",
+            "uuid": "0a06cbf3-dbff-4901-bebc-0cd96d647fc6"
+        },
+        {
+            "hasCache": true,
+            "index": 0,
+            "name": "UAL1_Standard_Skeleton",
+            "type": "Skeleton",
+            "uuid": "e0ac8da6-b45e-4b58-abd9-c05080b78825"
+        }
+    ],
+    "uuid": "fe7bdf18-967c-4797-a95c-0d298055a0cc"
+}
