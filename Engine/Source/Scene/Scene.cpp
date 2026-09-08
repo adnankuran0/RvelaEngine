@@ -401,6 +401,13 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
             e.AddComponent<MeshRendererComponent>(comp.GetMesh());
         }
 
+        if (entityJson.contains("SkeletalMeshComponent"))
+        {
+            auto& comp = e.AddComponent<SkeletalMeshComponent>();
+            comp.Deserialize(entityJson["SkeletalMeshComponent"]);
+            e.AddComponent<SkeletalMeshRendererComponent>(comp.GetMesh());
+        }
+
         if (entityJson.contains("PointLight"))
             e.AddComponent<PointLightComponent>().Deserialize(entityJson["PointLight"]);
 
@@ -436,6 +443,12 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
 
         if (entityJson.contains("ScriptComponent"))
             e.AddComponent<ScriptComponent>().Deserialize(entityJson["ScriptComponent"]);
+
+        if (entityJson.contains("AnimatorComponent"))
+            e.AddComponent<AnimatorComponent>().Deserialize(entityJson["AnimatorComponent"]);
+
+        if (entityJson.contains("SkeletonComponent"))
+            e.AddComponent<SkeletonComponent>().Deserialize(entityJson["SkeletonComponent"]);
 
         if (entityJson.contains("ParentUUID"))
             e.GetComponent<SceneTreeComponent>().parentUUID = entityJson["ParentUUID"];

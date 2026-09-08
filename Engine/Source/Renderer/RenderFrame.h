@@ -9,7 +9,9 @@ struct RenderFrame
 {
 public:
     std::vector<RenderCommand> opaqueCommands;
+    std::vector<SkeletalRenderCommand> skeletalOpaqueCommands;
     std::vector<RenderCommand> transparentCommands;
+    std::vector<SkeletalRenderCommand> skeletalTransparentCommands;
     std::vector<ParticleRenderCommand> particleCommands;
     RenderResourceRegistry registry;
 

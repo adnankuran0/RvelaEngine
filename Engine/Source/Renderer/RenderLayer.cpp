@@ -49,10 +49,11 @@ void RenderLayer::CollectRenderCommands(Scene* scene)
 		TransformComponent& transform = scene->GetComponent<TransformComponent>(entity);
 		MaterialComponent& matComp = scene->GetComponent<MaterialComponent>(entity);
 
-		RenderCommand cmd(scene->GetComponent<TransformComponent>(entity),
-			scene->GetComponent<MeshRendererComponent>(entity),
-			scene->GetComponent<MaterialComponent>(entity),
-			entity);
+		RenderCommand cmd;
+		cmd.transform = &scene->GetComponent<TransformComponent>(entity);
+		cmd.mesh = &scene->GetComponent<MeshRendererComponent>(entity);
+		cmd.material = &scene->GetComponent<MaterialComponent>(entity);
+		cmd.entityID = entity;
 
 		if (matComp.GetTransparencyMode() == TransparencyMode::Alpha)
 		{

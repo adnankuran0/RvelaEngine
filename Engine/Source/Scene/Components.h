@@ -20,6 +20,7 @@
 #include "Scene/Components/ParticleEmitterComponent.h"
 #include "Scene/Components/AnimatorComponent.h"
 #include "Scene/Components/SkeletalMeshComponent.h"
+#include "Scene/Components/SkeletalMeshRendererComponent.h"
 #include "Scene/Components/SkeletonComponent.h"
 
 namespace rv {
@@ -51,7 +52,9 @@ enum class ComponentType
 	ParticleEmitterComponent,
 	AnimatorComponent,
 	SkeletalMeshComponent,
-	SkeletonComponent
+	SkeletalMeshMeshRenderer,
+	SkeletonComponent,
+
 };
 
 }

@@ -6,6 +6,13 @@
 #include "Asset/Types/MaterialAsset.h"
 #include "Scene/Scene.h"
 #include "Scene/Entity.h"
+#include "Scene/Components/TransformComponent.h"
+#include "Scene/Components/MeshComponent.h"
+#include "Scene/Components/MeshRendererComponent.h"
+#include "Scene/Components/MaterialComponent.h"
+#include "Scene/Components/SkeletonComponent.h"
+#include "Scene/Components/SkeletalMeshComponent.h"
+#include "Scene/Components/SkeletalMeshRendererComponent.h"
 #include "Core/Log.h"
 #include "Math/RvelaMath.h"
 #include <Assimp/scene.h>
@@ -62,6 +69,7 @@ std::filesystem::path ModelImporter::GetCachePath(
     prefabPath.replace_extension(".rprefab");
     return prefabPath;
 }
+
 bool ModelImporter::Import(const std::filesystem::path& sourcePath,
     const std::filesystem::path& outCachePath,
     const std::string& settingsJson)
@@ -138,7 +146,7 @@ void ModelImporter::ExtractSkeleton(
 }
 
 std::string ModelImporter::GetDefaultSettings() const
-{ 
+{
     ModelImportSettings s;
 
     json j;
@@ -220,9 +228,9 @@ const aiScene* ModelImporter::LoadScene(
 
     unsigned int flags =
         aiProcess_Triangulate |
-        aiProcess_GenUVCoords |          
+        aiProcess_GenUVCoords |
         aiProcess_TransformUVCoords |
-        aiProcess_CalcTangentSpace |     
+        aiProcess_CalcTangentSpace |
         aiProcess_JoinIdenticalVertices |
         aiProcess_ImproveCacheLocality |
         aiProcess_GenBoundingBoxes;
@@ -338,7 +346,6 @@ void ModelImporter::ExtractMaterials(
         auto asset = CreateRef<MaterialAsset>(meta.uuid);
 
         aiString  texPath;
-        aiColor4D aiColor;
         ai_real   value;
 
         // Albedo
@@ -512,8 +519,26 @@ AssetUUID ModelImporter::ConstructPrefab(
     const ModelImportResult& result)
 {
     Scene prefabScene;
-    entt::entity rootEntity = ProcessNode(
-        scene->mRootNode, scene, entt::null, prefabScene, result);
+
+    std::unordered_set<std::string> boneNames;
+    for (auto& [boneName, _] : result.boneNameToIndex)
+    {
+        boneNames.insert(boneName);
+    }
+
+    std::string rootName = modelPath.stem().string();
+    entt::entity rootEntity = prefabScene.CreateEntity(rootName).GetHandle();
+
+    if (result.skeletonUUID.IsValid())
+    {
+        prefabScene.AddComponent<SkeletonComponent>(rootEntity, result.skeletonUUID);
+    }
+
+    for (unsigned int i = 0; i < scene->mRootNode->mNumChildren; ++i)
+    {
+        ProcessNode(scene->mRootNode->mChildren[i], scene, rootEntity, prefabScene, result, boneNames);
+    }
+
     prefabScene.GetTransformSystem().Update();
 
     auto prefabPath = modelPath;
@@ -540,8 +565,6 @@ AssetUUID ModelImporter::ConstructPrefab(
         meta.dependencies.push_back(result.animLibUUID);
 
     registry.SaveMeta(prefabPath, meta);
-
-    registry.SaveMeta(prefabPath, meta);
     return meta.uuid;
 }
 
@@ -550,11 +573,17 @@ entt::entity ModelImporter::ProcessNode(
     const aiScene* modelScene,
     entt::entity parent,
     Scene& scene,
-    const ModelImportResult& result)
+    const ModelImportResult& result,
+    const std::unordered_set<std::string>& boneNames)
 {
     std::string nodeName = node->mName.C_Str();
-    entt::entity e = scene.CreateEntity(nodeName).GetHandle();
 
+    if (boneNames.contains(nodeName) && node->mNumMeshes == 0)
+    {
+        return entt::null;
+    }
+
+    entt::entity e = scene.CreateEntity(nodeName).GetHandle();
     SetTransformForEntity(node, scene, e);
 
     if (parent != entt::null)
@@ -568,8 +597,7 @@ entt::entity ModelImporter::ProcessNode(
     {
         for (unsigned int i = 0; i < node->mNumMeshes; i++)
         {
-            entt::entity child = scene.CreateEntity(
-                nodeName + "_" + std::to_string(i)).GetHandle();
+            entt::entity child = scene.CreateEntity(nodeName + "_" + std::to_string(i)).GetHandle();
             SetTransformForEntity(node, scene, child);
             AttachMeshToEntity(i, node, modelScene, scene, child, result);
             scene.SetParent(child, e);
@@ -577,7 +605,9 @@ entt::entity ModelImporter::ProcessNode(
     }
 
     for (unsigned int i = 0; i < node->mNumChildren; i++)
-        ProcessNode(node->mChildren[i], modelScene, e, scene, result);
+    {
+        ProcessNode(node->mChildren[i], modelScene, e, scene, result, boneNames);
+    }
 
     return e;
 }
@@ -593,28 +623,28 @@ void ModelImporter::AttachMeshToEntity(
     unsigned int globalMeshIndex = node->mMeshes[meshIndex];
     aiMesh* mesh = modelScene->mMeshes[globalMeshIndex];
 
-    if (mesh->mNumBones > 0)
+    AssetUUID matUUID;
+    auto matIt = result.materialUUIDs.find(mesh->mMaterialIndex);
+    if (matIt != result.materialUUIDs.end())
+        matUUID = matIt->second;
+
+    auto skelMeshIt = result.skeletalMeshUUIDs.find(globalMeshIndex);
+    if (skelMeshIt != result.skeletalMeshUUIDs.end())
     {
-        LOG_INFO("Skeletal mesh '{}' found, will be attached to entity with SkeletalMeshComponent", mesh->mName.C_Str());
+        scene.AddComponent<SkeletalMeshComponent>(e, skelMeshIt->second);
+        if (matUUID.IsValid())
+            scene.AddComponent<MaterialComponent>(e, matUUID);
         return;
     }
 
     auto meshIt = result.meshUUIDs.find(globalMeshIndex);
-    if (meshIt == result.meshUUIDs.end())
+    if (meshIt != result.meshUUIDs.end())
     {
-        LOG_WARN("Mesh UUID not found for index: {}", globalMeshIndex);
+        scene.AddComponent<MeshComponent>(e, meshIt->second);
+        if (matUUID.IsValid())
+            scene.AddComponent<MaterialComponent>(e, matUUID);
         return;
     }
-
-    auto matIt = result.materialUUIDs.find(mesh->mMaterialIndex);
-    if (matIt == result.materialUUIDs.end())
-    {
-        LOG_WARN("Material UUID not found for index: {}", mesh->mMaterialIndex);
-        return;
-    }
-
-    scene.AddComponent<MeshComponent>(e, meshIt->second);
-    scene.AddComponent<MaterialComponent>(e, matIt->second);
 }
 
 void ModelImporter::SetTransformForEntity(

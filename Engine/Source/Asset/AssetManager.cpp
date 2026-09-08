@@ -9,6 +9,8 @@
 #include "Asset/Loaders/ScriptLoader.h"
 #include "Asset/Loaders/AudioClipLoader.h"
 #include "Asset/Loaders/AnimationLibraryLoader.h"
+#include "Asset/Loaders/SkeletalMeshLoader.h"
+#include "Asset/Loaders/SkeletonLoader.h"
 #include "Utils/ProjectManager.h"
 
 using namespace rv;
@@ -22,9 +24,10 @@ void AssetManager::Init(AssetRegistry& registry)
     RegisterLoader(std::make_unique<SceneLoader>());
     RegisterLoader(std::make_unique<TextureLoader>());
     RegisterLoader(std::make_unique<ScriptLoader>());
-    RegisterLoader(std::make_unique<ScriptLoader>());
     RegisterLoader(std::make_unique<AudioClipLoader>());
     RegisterLoader(std::make_unique<AnimationLibraryLoader>());
+    RegisterLoader(std::make_unique<SkeletalMeshLoader>());
+    RegisterLoader(std::make_unique<SkeletonLoader>());
     m_Registry->Scan(ProjectManager::GetProjectPath() / "Assets");
 }
 

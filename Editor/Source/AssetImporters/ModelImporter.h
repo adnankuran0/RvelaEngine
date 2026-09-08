@@ -25,10 +25,10 @@ struct ModelImportResult
     AssetUUID prefabUUID;
     AssetUUID skeletonUUID;
     AssetUUID animLibUUID;
-    std::unordered_map<unsigned int, AssetUUID> meshUUIDs; // meshIndex - uuid
-    std::unordered_map<unsigned int, AssetUUID> materialUUIDs; // matIndex - uuid
-    std::unordered_map<std::string, AssetUUID>  textureUUIDs; // path - uuid
-    std::unordered_map<unsigned int, AssetUUID> skeletalMeshUUIDs;
+    std::unordered_map<unsigned int, AssetUUID> meshUUIDs;         // meshIndex - uuid
+    std::unordered_map<unsigned int, AssetUUID> materialUUIDs;     // matIndex - uuid
+    std::unordered_map<std::string, AssetUUID>  textureUUIDs;      // path - uuid
+    std::unordered_map<unsigned int, AssetUUID> skeletalMeshUUIDs; // meshIndex - uuid
     std::unordered_map<std::string, int32_t>    boneNameToIndex;
     bool IsValid() const { return prefabUUID.IsValid(); }
 };
@@ -112,7 +112,8 @@ private:
         const aiScene* modelScene,
         entt::entity parent,
         Scene& scene,
-        const ModelImportResult& result);
+        const ModelImportResult& result,
+        const std::unordered_set<std::string>& boneNames);
 
     void AttachMeshToEntity(
         unsigned int meshIndex,
@@ -126,11 +127,13 @@ private:
         aiNode* node,
         Scene& scene,
         entt::entity e);
+
     void MergeAndSaveSubAssets(
         const aiScene* scene,
         const std::filesystem::path& modelPath,
         AssetRegistry& registry,
         const ModelImportResult& result);
+
     std::filesystem::path ResolveRelativePath(
         const std::string& texPath,
         const std::filesystem::path& modelPath) const;

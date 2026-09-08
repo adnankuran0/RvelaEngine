@@ -279,6 +279,89 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 					});
 			});
 
+		DrawComponent<SkeletalMeshComponent>("Skeletal Mesh", registry, selectedEntity, [](SkeletalMeshComponent& mesh)
+			{
+				UI::DrawFullWidthAssetDropSlot("Skeletal mesh Slot", "", [&](const std::string& pathStr)
+					{
+						if (pathStr.ends_with(".obj") || pathStr.ends_with(".fbx") || pathStr.ends_with(".gltf") || pathStr.ends_with(".glb") || pathStr.ends_with(".rskmesh"))
+						{
+							AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
+							if (uuid.IsValid()) mesh.SetMesh(uuid);
+							else LOG_ERROR("Could not find UUID for mesh: {}", pathStr);
+						}
+					});
+			});
+
+		DrawComponent<SkeletonComponent>("Skeleton", registry, selectedEntity, [&](SkeletonComponent& skelComp)
+			{
+				std::string currentAssetName = "None (Drop .rskeleton)";
+				if (skelComp.GetSkeletonID().IsValid())
+				{
+					auto path = AssetManager::Get().GetRegistry().GetPath(skelComp.GetSkeletonID());
+					currentAssetName = path.empty() ? skelComp.GetSkeletonID().ToString() : path.filename().string();
+				}
+
+				UI::DrawFullWidthAssetDropSlot("Skeleton Asset Slot", currentAssetName, [&](const std::string& pathStr)
+					{
+						if (pathStr.ends_with(".rskeleton") || pathStr.ends_with(".fbx"))
+						{
+							AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
+							if (uuid.IsValid()) skelComp.SetSkeleton(uuid);
+							else LOG_ERROR("Could not find UUID for skeleton: {}", pathStr);
+						}
+					});
+
+				auto skelAsset = skelComp.GetSkeleton();
+				if (skelAsset && skelAsset->IsValid())
+				{
+					ImGui::Spacing();
+					if (UI::BeginPropertyTable("SkeletonInfoTable"))
+					{
+						UI::PropertyLabel("Bone Count");
+						ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%u bones", skelAsset->GetBoneCount());
+
+						UI::PropertyLabel("Runtime State");
+						if (skelComp.isInitialized)
+							ImGui::TextColored(ImVec4(0.3f, 0.9f, 0.3f, 1.0f), "Initialized (Active)");
+						else
+							ImGui::TextColored(ImVec4(0.9f, 0.4f, 0.2f, 1.0f), "Not Initialized");
+
+						UI::PropertyLabel("Skinning Palette");
+						ImGui::Text("%zu / 100 matrices", skelComp.skinningPalette.size());
+
+						UI::EndPropertyTable();
+					}
+
+					ImGui::Spacing();
+					if (ImGui::Button("Reset to Bind Pose", ImVec2(-FLT_MIN, 24.0f)))
+					{
+						skelComp.InitFromAsset();
+					}
+
+					if (ImGui::CollapsingHeader("Bone Hierarchy"))
+					{
+						ImGui::BeginChild("BoneTreeRegion", ImVec2(-FLT_MIN, 180.0f), true);
+
+						uint32_t count = skelAsset->GetBoneCount();
+						for (uint32_t i = 0; i < count; ++i)
+						{
+							int32_t parent = skelAsset->GetParentIndex(i);
+							std::string boneName = skelAsset->GetBoneName(i);
+
+							ImGui::Bullet();
+							ImGui::Text("[%02u] %s", i, boneName.c_str());
+							ImGui::SameLine();
+							if (parent == -1)
+								ImGui::TextDisabled("(Root)");
+							else
+								ImGui::TextDisabled("-> Parent: [%02d]", parent);
+						}
+
+						ImGui::EndChild();
+					}
+				}
+			});
+
 		DrawComponent<CameraComponent>("Camera", registry, selectedEntity, [](CameraComponent& camComp)
 			{
 				if (UI::BeginPropertyTable("CameraTable"))
@@ -323,6 +406,19 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 					bool isCastShadow = meshRenderer.IsCastShadow();
 					if (ImGui::Checkbox("##CastShadow", &isCastShadow))
 						meshRenderer.SetCastShadow(isCastShadow);
+
+					UI::EndPropertyTable();
+				}
+			});
+
+		DrawComponent<SkeletalMeshRendererComponent>("Skeletal Mesh Renderer", registry, selectedEntity, [](SkeletalMeshRendererComponent& skeletalMeshRenderer)
+			{
+				if (UI::BeginPropertyTable("MeshRendererTable"))
+				{
+					UI::PropertyLabel("Cast Shadows");
+					bool isCastShadow = skeletalMeshRenderer.IsCastShadow();
+					if (ImGui::Checkbox("##CastShadow", &isCastShadow))
+						skeletalMeshRenderer.SetCastShadow(isCastShadow);
 
 					UI::EndPropertyTable();
 				}
@@ -1373,6 +1469,8 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 		DrawAddComponentEntry<MaterialComponent>("Material", filterBuf, registry, selectedEntity, AssetUUID::FromString("ee3dde12-6263-4f11-bb1d-812b3e196ab7"));
 		DrawAddComponentEntry<MeshComponent>("Mesh", filterBuf, registry, selectedEntity);
 		DrawAddComponentEntry<MeshRendererComponent>("Mesh Renderer", filterBuf, registry, selectedEntity);
+		DrawAddComponentEntry<SkeletalMeshComponent>("Skeletal Mesh", filterBuf, registry, selectedEntity);
+		DrawAddComponentEntry<SkeletalMeshRendererComponent>("Skeletal Mesh Renderer", filterBuf, registry, selectedEntity);
 		DrawAddComponentEntry<PointLightComponent>("Point Light", filterBuf, registry, selectedEntity);
 		DrawAddComponentEntry<DirectionalLightComponent>("Directional Light", filterBuf, registry, selectedEntity);
 		DrawAddComponentEntry<RigidbodyComponent>("Rigidbody", filterBuf, registry, selectedEntity);
