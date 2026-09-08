@@ -7,6 +7,7 @@
 namespace rv {
 
 class Scene;
+struct SkeletonComponent;
 
 class AnimationSystem
 {
@@ -14,6 +15,7 @@ public:
     AnimationSystem(Scene& scene) : m_Scene(scene) {}
     void OnStart();
     void Update();
+
     std::vector<Animation::AnimationDispatchEvent> FlushEvents()
     {
         return std::move(m_EventQueue);
@@ -21,6 +23,8 @@ public:
 
 private:
     entt::entity ResolveAnimPath(entt::entity root, const std::string& path);
+
+    void UpdateSkeletonBones(SkeletonComponent& skel);
 
     std::vector<Animation::AnimationDispatchEvent> m_EventQueue;
     Scene& m_Scene;
