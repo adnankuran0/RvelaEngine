@@ -14,7 +14,11 @@ class SkeletonAsset;
 class SkeletonImporter
 {
 public:
-    AssetUUID ImportFromScene(const aiScene* scene, const std::filesystem::path& modelPath, AssetRegistry& registry);
+    AssetUUID ImportFromScene(
+        const aiScene* scene,
+        const std::filesystem::path& modelPath,
+        AssetRegistry& registry,
+        std::unordered_map<std::string, int32_t>* outBoneNameToIndex = nullptr);
 
 private:
     struct BoneSource { aiMatrix4x4 offsetMatrix; };

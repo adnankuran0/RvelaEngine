@@ -4,6 +4,7 @@
 #include "TextureImporter.h"
 #include <Assimp/Importer.hpp>
 #include "SkeletonImporter.h"
+#include "SkeletalMeshImporter.h"
 #include <entt/entt.h>
 #include <unordered_map>
 #include <unordered_set>
@@ -25,6 +26,8 @@ struct ModelImportResult
     std::unordered_map<unsigned int, AssetUUID> meshUUIDs; // meshIndex - uuid
     std::unordered_map<unsigned int, AssetUUID> materialUUIDs; // matIndex - uuid
     std::unordered_map<std::string, AssetUUID>  textureUUIDs; // path - uuid
+    std::unordered_map<unsigned int, AssetUUID> skeletalMeshUUIDs;
+    std::unordered_map<std::string, int32_t>    oneNameToIndex;
 
     bool IsValid() const { return prefabUUID.IsValid(); }
 };
@@ -134,6 +137,7 @@ private:
     static std::string SanitizeFilename(const std::string& name);
 
     MeshImporter m_MeshImporter;
+    SkeletalMeshImporter m_SkeletalMeshImporter;
     TextureImporter m_TextureImporter;
     SkeletonImporter m_SkeletonImporter;
 

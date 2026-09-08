@@ -88,9 +88,9 @@ ModelImportResult ModelImporter::ImportModel(
     if (settings.importMaterials)
         ExtractMaterials(scene, sourcePath, registry, result);
 
-    ExtractMeshes(scene, sourcePath, registry, result);
-
     ExtractSkeleton(scene, sourcePath, registry, result);
+
+    ExtractMeshes(scene, sourcePath, registry, result);
 
     MergeAndSaveSubAssets(scene, sourcePath, registry, result);
 
@@ -106,7 +106,9 @@ void ModelImporter::ExtractSkeleton(
     AssetRegistry& registry,
     ModelImportResult& result)
 {
-    result.skeletonUUID = m_SkeletonImporter.ImportFromScene(scene, modelPath, registry);
+    result.skeletonUUID = m_SkeletonImporter.ImportFromScene(
+        scene, modelPath, registry, &result.boneNameToIndex);
+
     if (!result.skeletonUUID.IsValid())
         return;
 
@@ -447,37 +449,43 @@ void ModelImporter::ExtractMeshes(
 {
     m_MeshImporter.ImportFromScene(scene, modelPath, registry, result.meshUUIDs);
 
+    if (!result.boneNameToIndex.empty())
+    {
+        m_SkeletalMeshImporter.ImportFromScene(
+            scene, modelPath, registry, result.boneNameToIndex, result.skeletalMeshUUIDs);
+    }
+
     AssetMeta parentMeta = registry.GetOrCreateMeta(modelPath);
 
-    for (auto& [meshIndex, meshUUID] : result.meshUUIDs)
-    {
-        SubAssetEntry* existing = nullptr;
-        for (auto& sub : parentMeta.subAssets)
+    auto ensureMeshSub = [&](const std::string& type, unsigned int meshIndex, AssetUUID uuid, bool hasCache)
         {
-            if (sub.type == "Mesh" && sub.index == meshIndex)
-            {
-                existing = &sub;
-                break;
-            }
-        }
+            SubAssetEntry* existing = nullptr;
+            for (auto& sub : parentMeta.subAssets)
+                if (sub.type == type && sub.index == meshIndex) { existing = &sub; break; }
 
-        if (existing)
-        {
-            existing->uuid = meshUUID;
-        }
-        else
-        {
-            SubAssetEntry entry;
-            entry.uuid = meshUUID;
-            entry.name = scene->mMeshes[meshIndex]->mName.C_Str();
-            if (entry.name.empty())
-                entry.name = modelPath.stem().string() + "_Mesh" + std::to_string(meshIndex);
-            entry.type = "Mesh";
-            entry.index = meshIndex;
-            entry.hasCache = true;
-            parentMeta.subAssets.push_back(entry);
-        }
-    }
+            if (existing)
+            {
+                existing->uuid = uuid;
+            }
+            else
+            {
+                SubAssetEntry entry;
+                entry.uuid = uuid;
+                entry.name = scene->mMeshes[meshIndex]->mName.C_Str();
+                if (entry.name.empty())
+                    entry.name = modelPath.stem().string() + "_" + type + std::to_string(meshIndex);
+                entry.type = type;
+                entry.index = meshIndex;
+                entry.hasCache = hasCache;
+                parentMeta.subAssets.push_back(entry);
+            }
+        };
+
+    for (auto& [meshIndex, meshUUID] : result.meshUUIDs)
+        ensureMeshSub("Mesh", meshIndex, meshUUID, true);
+
+    for (auto& [meshIndex, meshUUID] : result.skeletalMeshUUIDs)
+        ensureMeshSub("SkeletalMesh", meshIndex, meshUUID, true);
 
     registry.SaveMeta(modelPath, parentMeta);
 }
@@ -506,6 +514,8 @@ AssetUUID ModelImporter::ConstructPrefab(
     meta.importerID = "PrefabImporter";
     meta.dependencies.clear();
     for (auto& [idx, uuid] : result.meshUUIDs)
+        meta.dependencies.push_back(uuid);
+    for (auto& [idx, uuid] : result.skeletalMeshUUIDs)
         meta.dependencies.push_back(uuid);
     for (auto& [idx, uuid] : result.materialUUIDs)
         meta.dependencies.push_back(uuid);
@@ -563,6 +573,12 @@ void ModelImporter::AttachMeshToEntity(
 {
     unsigned int globalMeshIndex = node->mMeshes[meshIndex];
     aiMesh* mesh = modelScene->mMeshes[globalMeshIndex];
+
+    if (mesh->mNumBones > 0)
+    {
+        LOG_INFO("Skeletal mesh '{}' found, will be attached to entity with SkeletalMeshComponent", mesh->mName.C_Str());
+        return;
+    }
 
     auto meshIt = result.meshUUIDs.find(globalMeshIndex);
     if (meshIt == result.meshUUIDs.end())

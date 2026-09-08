@@ -82,6 +82,8 @@ bool MeshImporter::ImportFromScene(
     for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
     {
         aiMesh* mesh = scene->mMeshes[i];
+        if (mesh->mNumBones > 0) continue;
+
         std::string meshName = mesh->mName.C_Str();
         if (meshName.empty()) meshName = "Mesh_" + std::to_string(i);
 

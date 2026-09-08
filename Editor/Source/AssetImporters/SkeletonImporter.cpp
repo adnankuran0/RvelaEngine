@@ -76,7 +76,7 @@ void SkeletonImporter::BuildHierarchy(const aiNode* node, int32_t parentIndex, c
     }
 }
 
-AssetUUID SkeletonImporter::ImportFromScene(const aiScene* scene, const std::filesystem::path& modelPath, AssetRegistry& registry)
+AssetUUID SkeletonImporter::ImportFromScene(const aiScene* scene, const std::filesystem::path& modelPath, AssetRegistry& registry, std::unordered_map<std::string, int32_t>* outBoneNameToIndex)
 {
     std::unordered_map<std::string, BoneSource> boneSources;
     CollectBoneSources(scene, boneSources);
@@ -102,5 +102,9 @@ AssetUUID SkeletonImporter::ImportFromScene(const aiScene* scene, const std::fil
         return AssetUUID::Invalid();
 
     registry.SaveMeta(skeletonPath, meta);
+
+    if (outBoneNameToIndex)
+        *outBoneNameToIndex = asset->m_BoneNameToIndex; // asset hala friend uzerinden erisilebilir
+
     return meta.uuid;
 }
