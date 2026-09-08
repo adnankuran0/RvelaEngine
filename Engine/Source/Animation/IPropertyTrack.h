@@ -5,7 +5,7 @@
 
 namespace rv::Animation {
 
-enum class PropertyType { Float, Vec3, Vec4, Quat, Bool };
+enum class PropertyType { Float, Vec3, Vec4, Quat, Bool, BoneVec3, BoneQuat };
 
 class IPropertyTrack 
 {

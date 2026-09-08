@@ -90,8 +90,13 @@ ModelImportResult ModelImporter::ImportModel(
 
     ExtractSkeleton(scene, sourcePath, registry, result);
 
-    ExtractMeshes(scene, sourcePath, registry, result);
+    if (scene->mNumAnimations > 0 && result.skeletonUUID.IsValid())
+    {
+        result.animLibUUID = m_AnimationImporter.ImportFromScene(
+            scene, sourcePath, registry, result.boneNameToIndex);
+    }
 
+    ExtractMeshes(scene, sourcePath, registry, result);
     MergeAndSaveSubAssets(scene, sourcePath, registry, result);
 
     if (settings.generatePrefab)
@@ -191,6 +196,16 @@ void ModelImporter::MergeAndSaveSubAssets(
         ensureSubAsset(entry);
     }
 
+    if (result.animLibUUID.IsValid())
+    {
+        SubAssetEntry entry;
+        entry.uuid = result.animLibUUID;
+        entry.name = modelPath.stem().string() + "_AnimLib";
+        entry.type = "AnimationLib";
+        entry.index = 0;
+        entry.hasCache = false;
+        ensureSubAsset(entry);
+    }
 
     registry.SaveMeta(modelPath, parentMeta);
 }
@@ -521,6 +536,10 @@ AssetUUID ModelImporter::ConstructPrefab(
         meta.dependencies.push_back(uuid);
     if (result.skeletonUUID.IsValid())
         meta.dependencies.push_back(result.skeletonUUID);
+    if (result.animLibUUID.IsValid())
+        meta.dependencies.push_back(result.animLibUUID);
+
+    registry.SaveMeta(prefabPath, meta);
 
     registry.SaveMeta(prefabPath, meta);
     return meta.uuid;

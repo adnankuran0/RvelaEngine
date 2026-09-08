@@ -5,6 +5,7 @@
 #include <Assimp/Importer.hpp>
 #include "SkeletonImporter.h"
 #include "SkeletalMeshImporter.h"
+#include "AnimationImporter.h"
 #include <entt/entt.h>
 #include <unordered_map>
 #include <unordered_set>
@@ -23,12 +24,12 @@ struct ModelImportResult
 {
     AssetUUID prefabUUID;
     AssetUUID skeletonUUID;
+    AssetUUID animLibUUID;
     std::unordered_map<unsigned int, AssetUUID> meshUUIDs; // meshIndex - uuid
     std::unordered_map<unsigned int, AssetUUID> materialUUIDs; // matIndex - uuid
     std::unordered_map<std::string, AssetUUID>  textureUUIDs; // path - uuid
     std::unordered_map<unsigned int, AssetUUID> skeletalMeshUUIDs;
-    std::unordered_map<std::string, int32_t>    oneNameToIndex;
-
+    std::unordered_map<std::string, int32_t>    boneNameToIndex;
     bool IsValid() const { return prefabUUID.IsValid(); }
 };
 
@@ -140,6 +141,7 @@ private:
     SkeletalMeshImporter m_SkeletalMeshImporter;
     TextureImporter m_TextureImporter;
     SkeletonImporter m_SkeletonImporter;
+    AnimationImporter m_AnimationImporter;
 
     Assimp::Importer m_Importer;
 };

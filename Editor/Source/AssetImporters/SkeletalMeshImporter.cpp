@@ -60,7 +60,6 @@ std::vector<SkeletalVertex> SkeletalMeshImporter::ProcessVertices(
         if (it == boneNameToIndex.end())
         {
             LOG_WARN("Skeletal mesh '{}': bone '{}' was not found in the skeleton, skipping", mesh->mName.C_Str(), name);
-                mesh->mName.C_Str(), name);
             continue;
         }
         int32_t boneIndex = it->second;
