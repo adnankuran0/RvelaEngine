@@ -92,7 +92,7 @@ Entity Scene::CreateEntityRaw()
 
 Entity Scene::CreateEntity(const std::string& name) {
     Entity entity = CreateEntityRaw();
-    entity.GetComponent<UUIDComponent>().uuid = EntityUUIDGenerator::Generate();
+    entity.GetComponent<UUIDComponent>().uuid = EntityUUIDGenerator::GeneratePersistent();
     entity.AddComponent<TagComponent>(name);
     SetParent(entity, m_RootEntity);
     m_EntityMap[entity.GetUUID()] = (entt::entity)entity;
@@ -376,7 +376,7 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
 
         EntityUUID oldUUID = entityJson.contains("UUID") ? entityJson["UUID"].get<EntityUUID>() : 0;
 
-        EntityUUID newUUID = EntityUUIDGenerator::Generate();
+        EntityUUID newUUID = EntityUUIDGenerator::GeneratePersistent();
         e.GetComponent<UUIDComponent>().uuid = newUUID;
         m_EntityMap[newUUID] = handle;
 

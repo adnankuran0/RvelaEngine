@@ -20,7 +20,9 @@ private:
     void Reset()
     {
         opaqueCommands.clear();
+        skeletalOpaqueCommands.clear();
         transparentCommands.clear();
+        skeletalTransparentCommands.clear();
         particleCommands.clear();
         //registry.Clear();
     }

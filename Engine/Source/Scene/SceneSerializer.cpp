@@ -101,7 +101,7 @@ void SceneSerializer::LoadScene(Scene& scene, const std::string& path)
         return;
 
     std::unordered_map<EntityUUID, entt::entity> uuidToEntity;
-    std::vector<entt::entity> loadedEntities; // JSON sýrasýný korumak için
+    std::vector<entt::entity> loadedEntities;
     std::unordered_set<entt::entity> prefabInstances;
 
     entt::entity rootHandle = scene.GetRootEntity();
@@ -124,6 +124,9 @@ void SceneSerializer::LoadScene(Scene& scene, const std::string& path)
                 uuidToEntity[savedUUID] = instance.GetHandle();
                 scene.GetUUIDEntityMap()[savedUUID] = instance.GetHandle();
             }
+
+            scene.GetComponent<SceneTreeComponent>(instance).parentUUID =
+                entityJson.contains("ParentUUID") ? entityJson["ParentUUID"].get<EntityUUID>() : 0;
 
             prefabInstances.insert(instance.GetHandle());
             loadedEntities.push_back(instance.GetHandle());
@@ -206,7 +209,11 @@ void SceneSerializer::LoadScene(Scene& scene, const std::string& path)
             scene.AddComponent<AnimatorComponent>(handle).Deserialize(entityJson["AnimatorComponent"]);
 
         if (entityJson.contains("SkeletalMeshComponent"))
-            scene.AddComponent<SkeletalMeshComponent>(handle).Deserialize(entityJson["SkeletalMeshComponent"]);
+        {
+            auto& comp = scene.AddComponent<SkeletalMeshComponent>(handle);
+            comp.Deserialize(entityJson["SkeletalMeshComponent"]);
+            scene.AddComponent<SkeletalMeshRendererComponent>(handle, comp.GetMesh());
+        }
 
         if (entityJson.contains("SkeletonComponent"))
             scene.AddComponent<SkeletonComponent>(handle).Deserialize(entityJson["SkeletonComponent"]);
@@ -217,7 +224,6 @@ void SceneSerializer::LoadScene(Scene& scene, const std::string& path)
     for (entt::entity entity : loadedEntities)
     {
         if (entity == rootHandle) continue;
-        if (prefabInstances.count(entity)) continue;
 
         auto& tree = scene.GetComponent<SceneTreeComponent>(entity);
         if (tree.parentUUID != 0 && uuidToEntity.find(tree.parentUUID) != uuidToEntity.end())
@@ -235,11 +241,20 @@ json SceneSerializer::SerializeEntity(Scene& scene, entt::entity e)
 {
     json j;
 
-    if (scene.HasComponent<PrefabComponent>(e))
+    if(scene.HasComponent<PrefabComponent>(e))
     {
         j["Prefab"] = scene.GetComponent<PrefabComponent>(e).Serialize();
         j["Transform"] = scene.GetComponent<TransformComponent>(e).Serialize();
         j["UUID"] = scene.GetComponent<UUIDComponent>(e).Serialize();
+
+        if (scene.HasComponent<SceneTreeComponent>(e))
+        {
+            entt::entity parent = scene.GetComponent<SceneTreeComponent>(e).parent;
+            j["ParentUUID"] = (parent != entt::null && parent != scene.GetRootEntity())
+                ? scene.GetComponent<UUIDComponent>(parent).uuid
+                : 0;
+        }
+
         return j;
     }
 

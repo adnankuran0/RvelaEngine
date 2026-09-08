@@ -41,6 +41,8 @@ void SelectedEntityMaskPass::Execute(const RenderContext& ctx, RenderFrame& fram
 
     auto& opaqueCommands = frame.opaqueCommands;
     auto& transparentCommands = frame.transparentCommands;
+    auto& skeletalOpaqueCommands = frame.skeletalOpaqueCommands;
+    auto& skeletalTransparentCommands = frame.skeletalTransparentCommands;
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer);
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
@@ -50,11 +52,6 @@ void SelectedEntityMaskPass::Execute(const RenderContext& ctx, RenderFrame& fram
 
     glDisable(GL_DEPTH_TEST);
     glDepthMask(GL_FALSE);
-
-    Shader& shader = ShaderManager::Get("Mask");
-    shader.use();
-
-    shader.setVec4("u_Color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
     auto ApplyCullMode = [](CullMode mode) {
         if (mode == CullMode::Disabled) {
@@ -66,45 +63,99 @@ void SelectedEntityMaskPass::Execute(const RenderContext& ctx, RenderFrame& fram
         }
         };
 
-    auto RenderMaskList = [&](const auto& commands) {
-        for (auto& command : commands) {
-            if (command.entityID != m_SelectedEntity)
-                continue;
+    auto BindMaterial = [](Shader& shader, MaterialComponent* material) {
+        shader.setInt("transparencyMode", static_cast<int>(material->GetTransparencyMode()));
+        shader.setFloat("alphaCutoff", material->GetAlphaCutoff());
+        shader.setVec4("albedoColor", material->GetAlbedoColor());
+        shader.setVec2("UVScale", material->GetUVScale());
+        shader.setVec2("UVOffset", material->GetUVOffset());
 
-            auto& material = command.material;
-            ApplyCullMode(material->GetCullMode());
-
-            glm::mat4 model = command.transform->GetWorldMatrix();
-            shader.setMat4("model", model);
-
-            shader.setInt("transparencyMode", static_cast<int>(material->GetTransparencyMode()));
-            shader.setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
-            shader.setFloat("alphaCutoff", material->GetAlphaCutoff());
-            shader.setVec4("albedoColor", material->GetAlbedoColor());
-            shader.setVec2("UVScale", material->GetUVScale());
-            shader.setVec2("UVOffset", material->GetUVOffset());
-
-            bool useAlb = material->IsUsingAlbedoMap() && material->GetAlbedoTexture();
-            shader.setBool("useAlbedoMap", useAlb);
-            if (useAlb) {
-                shader.setInt("albedoMap", 0);
-                TextureCache::Get().GetOrCreate(material->GetAlbedoTexture()).Bind(0);
-                material->GetSampler().Bind(0);
-            }
-            else {
-                glBindSampler(0, 0);
-                glBindTextureUnit(0, 0);
-            }
-
-            command.mesh->VAO.Bind();
-            glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
-
-            if (useAlb) glBindSampler(0, 0);
+        bool useAlb = material->IsUsingAlbedoMap() && material->GetAlbedoTexture();
+        shader.setBool("useAlbedoMap", useAlb);
+        if (useAlb) {
+            shader.setInt("albedoMap", 0);
+            TextureCache::Get().GetOrCreate(material->GetAlbedoTexture()).Bind(0);
+            material->GetSampler().Bind(0);
         }
+        else {
+            glBindSampler(0, 0);
+            glBindTextureUnit(0, 0);
+        }
+        return useAlb;
         };
 
-    RenderMaskList(opaqueCommands);
-    RenderMaskList(transparentCommands);
+    {
+        Shader& shader = ShaderManager::Get("Mask");
+        shader.use();
+        shader.setVec4("u_Color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+
+        auto RenderMaskList = [&](const auto& commands) {
+            for (auto& command : commands) {
+                if (command.entityID != m_SelectedEntity)
+                    continue;
+
+                auto& material = command.material;
+                ApplyCullMode(material->GetCullMode());
+
+                glm::mat4 model = command.transform->GetWorldMatrix();
+                shader.setMat4("model", model);
+                shader.setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
+
+                bool useAlb = BindMaterial(shader, material);
+
+                command.mesh->VAO.Bind();
+                glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+
+                if (useAlb) glBindSampler(0, 0);
+            }
+            };
+
+        RenderMaskList(opaqueCommands);
+        RenderMaskList(transparentCommands);
+    }
+
+    if (!skeletalOpaqueCommands.empty() || !skeletalTransparentCommands.empty())
+    {
+        Shader& skeletalShader = ShaderManager::Get("Mask_Skeletal");
+        skeletalShader.use();
+        skeletalShader.setVec4("u_Color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+
+        GLint boneLoc = glGetUniformLocation(skeletalShader.ID, "u_BoneMatrices");
+
+        auto RenderSkeletalMaskList = [&](const auto& commands) {
+            for (auto& command : commands) {
+                if (command.entityID != m_SelectedEntity)
+                    continue;
+                if (!command.mesh || command.mesh->indexCount == 0) continue;
+
+                auto& material = command.material;
+                ApplyCullMode(material->GetCullMode());
+
+                glm::mat4 model = command.transform->GetWorldMatrix();
+                skeletalShader.setMat4("model", model);
+
+                if (boneLoc != -1 && command.skeleton && !command.skeleton->skinningPalette.empty())
+                {
+                    glUniformMatrix4fv(
+                        boneLoc,
+                        static_cast<GLsizei>(command.skeleton->skinningPalette.size()),
+                        GL_FALSE,
+                        glm::value_ptr(command.skeleton->skinningPalette[0])
+                    );
+                }
+
+                bool useAlb = BindMaterial(skeletalShader, material);
+
+                command.mesh->VAO.Bind();
+                glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+
+                if (useAlb) glBindSampler(0, 0);
+            }
+            };
+
+        RenderSkeletalMaskList(skeletalOpaqueCommands);
+        RenderSkeletalMaskList(skeletalTransparentCommands);
+    }
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);

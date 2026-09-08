@@ -1,0 +1,66 @@
+{
+    "dependencies": [],
+    "importerID": "ModelImporter",
+    "importerSettings": {
+        "generatePrefab": true,
+        "importMaterials": true,
+        "importNormals": true,
+        "importTangents": true,
+        "importTextures": true,
+        "importUVs": true,
+        "scale": 1.0
+    },
+    "lastWriteTime": 13426121024,
+    "subAssets": [
+        {
+            "hasCache": false,
+            "index": 0,
+            "name": "UAL1_Standard_Mat0",
+            "type": "Material",
+            "uuid": "731201d1-4fef-460f-925d-82ad78443def"
+        },
+        {
+            "hasCache": false,
+            "index": 1,
+            "name": "UAL1_Standard_Mat1",
+            "type": "Material",
+            "uuid": "72374bff-5961-4ab6-b03b-bccedc430430"
+        },
+        {
+            "hasCache": false,
+            "index": 2,
+            "name": "UAL1_Standard_Mat2",
+            "type": "Material",
+            "uuid": "7dcff462-0638-44d8-8a64-55decba755c6"
+        },
+        {
+            "hasCache": false,
+            "index": 0,
+            "name": "UAL1_Standard_Skeleton",
+            "type": "Skeleton",
+            "uuid": "07f6acb2-5ad3-4147-8551-458883c8bfc9"
+        },
+        {
+            "hasCache": true,
+            "index": 0,
+            "name": "Mannequin-0",
+            "type": "SkeletalMesh",
+            "uuid": "788ce859-dc53-4b71-b7ee-0018b5e05dd9"
+        },
+        {
+            "hasCache": true,
+            "index": 1,
+            "name": "Mannequin-1",
+            "type": "SkeletalMesh",
+            "uuid": "7cb0f2f3-a7fa-47bc-8b14-f76e6a5bc77b"
+        },
+        {
+            "hasCache": false,
+            "index": 0,
+            "name": "UAL1_Standard_AnimLib",
+            "type": "AnimationLib",
+            "uuid": "064411d0-68f6-4198-89cb-511ef790210c"
+        }
+    ],
+    "uuid": "e522197e-a130-46a8-803e-b3b614e1bb30"
+}

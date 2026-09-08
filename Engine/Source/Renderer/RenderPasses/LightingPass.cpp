@@ -8,6 +8,7 @@
 #include "Scene/Environment.h"
 #include "Renderer/ShaderManager.h"
 #include "Renderer/TextureCache.h"
+#include <glm/gtc/type_ptr.hpp>
 
 using namespace rv;
 
@@ -52,7 +53,8 @@ void LightingPass::Init(const RenderContext& ctx, RenderFrame& frame)
 
 void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
-    auto& commands = frame.opaqueCommands;
+    auto& staticCommands = frame.opaqueCommands;
+    auto& skeletalCommands = frame.skeletalOpaqueCommands;
     auto& resourceRegistry = frame.registry;
 
     auto i_DirectionalShadowMap = resourceRegistry.Get("DirectionalShadowMap")->id;
@@ -65,36 +67,38 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-    Shader& shader = ShaderManager::Get("PBR");
-    shader.use();
-
     constexpr int DIR_SHADOW_MAP_SLOT = 6;
     constexpr int POINT_SHADOW_MAP_SLOT = 7;
     constexpr int SSAO_SLOT = 11;
 
-    shader.setInt("shadowMap", DIR_SHADOW_MAP_SLOT);
-    glBindTextureUnit(DIR_SHADOW_MAP_SLOT, i_DirectionalShadowMap);
-
-    shader.setInt("pointShadowMap", POINT_SHADOW_MAP_SLOT);
-    glBindTextureUnit(POINT_SHADOW_MAP_SLOT, i_PointShadowMap);
-
     auto& env = *ctx.environment;
     auto& skybox = env.GetSkybox();
 
-    shader.setInt("irradianceMap", 8);
-    shader.setInt("prefilterMap", 9);
-    shader.setInt("brdfLUT", 10);
-    shader.setFloat("iblIntensity", env.Lighting_IBLIntensity);
-    shader.setBool("useIBL", env.Lighting_IBL);
-    shader.setVec3("ambientColor", env.Lighting_AmbientColor);
-    shader.setFloat("ambientIntensity", env.Lighting_AmbientIntensity);
+    auto BindGlobalTexturesAndUniforms = [&](Shader& shader) {
+        shader.use();
 
-    glBindTextureUnit(8, skybox.GetIrradianceMap());
-    glBindTextureUnit(9, skybox.GetPrefilterMap());
-    glBindTextureUnit(10, skybox.GetBRDFLUTTexture());
-    shader.setBool("useSSAO", ctx.environment->SSAO);
-    shader.setInt("ssaoTexture", SSAO_SLOT);
-    glBindTextureUnit(SSAO_SLOT, i_SSAO);
+        shader.setInt("shadowMap", DIR_SHADOW_MAP_SLOT);
+        glBindTextureUnit(DIR_SHADOW_MAP_SLOT, i_DirectionalShadowMap);
+
+        shader.setInt("pointShadowMap", POINT_SHADOW_MAP_SLOT);
+        glBindTextureUnit(POINT_SHADOW_MAP_SLOT, i_PointShadowMap);
+
+        shader.setInt("irradianceMap", 8);
+        shader.setInt("prefilterMap", 9);
+        shader.setInt("brdfLUT", 10);
+        shader.setFloat("iblIntensity", env.Lighting_IBLIntensity);
+        shader.setBool("useIBL", env.Lighting_IBL);
+        shader.setVec3("ambientColor", env.Lighting_AmbientColor);
+        shader.setFloat("ambientIntensity", env.Lighting_AmbientIntensity);
+
+        glBindTextureUnit(8, skybox.GetIrradianceMap());
+        glBindTextureUnit(9, skybox.GetPrefilterMap());
+        glBindTextureUnit(10, skybox.GetBRDFLUTTexture());
+
+        shader.setBool("useSSAO", ctx.environment->SSAO);
+        shader.setInt("ssaoTexture", SSAO_SLOT);
+        glBindTextureUnit(SSAO_SLOT, i_SSAO);
+        };
 
     auto ApplyCullMode = [](CullMode mode) {
         if (mode == CullMode::Disabled) {
@@ -106,15 +110,7 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         }
         };
 
-    size_t drawCallCounter = 0;
-    for (auto& command : commands) {
-        if (!ctx.camera->Intersects(command.mesh->worldAABB)) continue;
-
-        glDisable(GL_STENCIL_TEST);
-
-        auto& material = command.material;
-        ApplyCullMode(material->GetCullMode());
-
+    auto SetupMaterial = [](Shader& shader, MaterialComponent* material) {
         shader.setInt("shadingMode", static_cast<int>(material->GetShadingMode()));
         shader.setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
         shader.setBool("receiveShadows", material->GetReceiveShadows());
@@ -156,17 +152,73 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
                 glBindTextureUnit(map.slot, 0);
             }
         }
+        };
 
-        shader.setMat4("model", command.transform->GetWorldMatrix());
-        glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(command.transform->GetWorldMatrix())));
-        shader.setMat3("normalMatrix", normalMatrix);
+    auto CleanupMaterialSamplers = []() {
+        for (int slot = 0; slot < 6; ++slot)
+            glBindSampler(slot, 0);
+        };
 
-        command.mesh->VAO.Bind();
-        glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
-        drawCallCounter++;
-        for (const auto& map : maps)
+    if (!staticCommands.empty())
+    {
+        Shader& staticShader = ShaderManager::Get("PBR");
+        BindGlobalTexturesAndUniforms(staticShader);
+
+        for (auto& command : staticCommands)
         {
-            glBindSampler(map.slot, 0);
+            if (!ctx.camera->Intersects(command.mesh->worldAABB)) continue;
+
+            glDisable(GL_STENCIL_TEST);
+            ApplyCullMode(command.material->GetCullMode());
+
+            SetupMaterial(staticShader, command.material);
+
+            staticShader.setMat4("model", command.transform->GetWorldMatrix());
+            glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(command.transform->GetWorldMatrix())));
+            staticShader.setMat3("normalMatrix", normalMatrix);
+
+            command.mesh->VAO.Bind();
+            glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+
+            CleanupMaterialSamplers();
+        }
+    }
+
+    if (!skeletalCommands.empty())
+    {
+        Shader& skeletalShader = ShaderManager::Get("PBR_Skeletal");
+        BindGlobalTexturesAndUniforms(skeletalShader);
+
+        GLint boneLoc = glGetUniformLocation(skeletalShader.ID, "u_BoneMatrices");
+
+        for (auto& command : skeletalCommands)
+        {
+            if (!command.mesh || command.mesh->indexCount == 0) continue;
+            //if (!ctx.camera->Intersects(command.mesh->worldAABB)) continue; TODO: sswwwwwwwwwwwwwwwwwwwww
+
+            glDisable(GL_STENCIL_TEST);
+            ApplyCullMode(command.material->GetCullMode());
+
+            SetupMaterial(skeletalShader, command.material);
+
+            skeletalShader.setMat4("model", command.transform->GetWorldMatrix());
+            glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(command.transform->GetWorldMatrix())));
+            skeletalShader.setMat3("normalMatrix", normalMatrix);
+
+            if (boneLoc != -1 && command.skeleton && !command.skeleton->skinningPalette.empty())
+            {
+                glUniformMatrix4fv(
+                    boneLoc,
+                    static_cast<GLsizei>(command.skeleton->skinningPalette.size()),
+                    GL_FALSE,
+                    glm::value_ptr(command.skeleton->skinningPalette[0])
+                );
+            }
+
+            command.mesh->VAO.Bind();
+            glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+
+            CleanupMaterialSamplers();
         }
     }
 

@@ -31,15 +31,12 @@ void GeometryPass::Init(const RenderContext& ctx, RenderFrame& frame)
 
 void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
-    auto& commands = frame.opaqueCommands;
+    auto& staticCommands = frame.opaqueCommands;
+    auto& skeletalCommands = frame.skeletalOpaqueCommands;
     auto& resourceRegistry = frame.registry;
-
-    Shader& geometryShader = ShaderManager::Get("Geometry");
 
     m_GBuffer.BindViewport();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    geometryShader.use();
 
     auto ApplyCullMode = [](CullMode mode) {
         if (mode == CullMode::Disabled) {
@@ -51,31 +48,18 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         }
         };
 
-    for (auto& command : commands) {
-        if (!ctx.camera->Intersects(command.mesh->worldAABB)) continue;
+    auto BindMaterialGBuffer = [](Shader& shader, MaterialComponent* material) {
+        shader.setVec2("UVScale", material->GetUVScale());
+        shader.setVec2("UVOffset", material->GetUVOffset());
+        shader.setInt("transparencyMode", static_cast<int>(material->GetTransparencyMode()));
+        shader.setFloat("alphaCutoff", material->GetAlphaCutoff());
+        shader.setVec4("albedoColor", material->GetAlbedoColor());
 
-        auto& material = command.material;
-        ApplyCullMode(material->GetCullMode());
-
-        glm::mat4 model = command.transform->GetWorldMatrix();
-
-        geometryShader.setMat4("model", model);
-        glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(model)));
-        geometryShader.setMat3("normalMatrix", normalMatrix);
-        geometryShader.setVec2("UVScale", material->GetUVScale());
-        geometryShader.setVec2("UVOffset", material->GetUVOffset());
-
-        geometryShader.setInt("transparencyMode", static_cast<int>(material->GetTransparencyMode()));
-        geometryShader.setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
-        geometryShader.setFloat("alphaCutoff", material->GetAlphaCutoff());
-        geometryShader.setVec4("albedoColor", material->GetAlbedoColor());
-
-        // Alpha scissor
         bool useAlb = material->IsUsingAlbedoMap() && material->GetAlbedoTexture();
-        geometryShader.setBool("useAlbedoMap", useAlb);
+        shader.setBool("useAlbedoMap", useAlb);
         if (useAlb)
         {
-            geometryShader.setInt("albedoMap", 0);
+            shader.setInt("albedoMap", 0);
             TextureCache::Get().GetOrCreate(material->GetAlbedoTexture()).Bind(0);
             material->GetSampler().Bind(0);
         }
@@ -85,47 +69,106 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             glBindTextureUnit(0, 0);
         }
 
-        // Roughness (Slot 1)
         if (material->IsUsingRoughnessMap() && material->GetRoughnessTexture())
         {
-            geometryShader.setBool("useRoughnessMap", true);
-            geometryShader.setInt("roughnessMap", 1);
+            shader.setBool("useRoughnessMap", true);
+            shader.setInt("roughnessMap", 1);
             TextureCache::Get().GetOrCreate(material->GetRoughnessTexture()).Bind(1);
             material->GetSampler().Bind(1);
         }
         else
         {
-            geometryShader.setBool("useRoughnessMap", false);
-            geometryShader.setFloat("roughness", material->GetRoughness());
+            shader.setBool("useRoughnessMap", false);
+            shader.setFloat("roughness", material->GetRoughness());
             glBindSampler(1, 0);
             glBindTextureUnit(1, 0);
         }
 
-        // Metallic (Slot 2)
         if (material->IsUsingMetallicMap() && material->GetMetallicTexture())
         {
-            geometryShader.setBool("useMetallicMap", true);
-            geometryShader.setInt("metallicMap", 2);
+            shader.setBool("useMetallicMap", true);
+            shader.setInt("metallicMap", 2);
             TextureCache::Get().GetOrCreate(material->GetMetallicTexture()).Bind(2);
             material->GetSampler().Bind(2);
         }
         else
         {
-            geometryShader.setBool("useMetallicMap", false);
-            geometryShader.setFloat("metallic", material->GetMetallic());
+            shader.setBool("useMetallicMap", false);
+            shader.setFloat("metallic", material->GetMetallic());
             glBindSampler(2, 0);
             glBindTextureUnit(2, 0);
         }
+        };
 
-        command.mesh->VAO.Bind();
-        glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
-
+    auto CleanupSamplers = []() {
         glBindSampler(0, 0);
         glBindSampler(1, 0);
         glBindSampler(2, 0);
+        };
+
+    if (!staticCommands.empty())
+    {
+        Shader& geometryShader = ShaderManager::Get("Geometry");
+        geometryShader.use();
+
+        for (auto& command : staticCommands) {
+            if (!ctx.camera->Intersects(command.mesh->worldAABB)) continue;
+
+            auto& material = command.material;
+            ApplyCullMode(material->GetCullMode());
+
+            glm::mat4 model = command.transform->GetWorldMatrix();
+            geometryShader.setMat4("model", model);
+            glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(model)));
+            geometryShader.setMat3("normalMatrix", normalMatrix);
+
+            BindMaterialGBuffer(geometryShader, material);
+
+            command.mesh->VAO.Bind();
+            glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+
+            CleanupSamplers();
+        }
+    }
+
+    if (!skeletalCommands.empty())
+    {
+        Shader& skeletalGeometryShader = ShaderManager::Get("Geometry_Skeletal");
+        skeletalGeometryShader.use();
+
+        GLint boneLoc = glGetUniformLocation(skeletalGeometryShader.ID, "u_BoneMatrices");
+
+        for (auto& command : skeletalCommands) {
+            if (!command.mesh || command.mesh->indexCount == 0) continue;
+            // if (!ctx.camera->Intersects(command.mesh->worldAABB)) continue;
+
+            auto& material = command.material;
+            ApplyCullMode(material->GetCullMode());
+
+            glm::mat4 model = command.transform->GetWorldMatrix();
+            skeletalGeometryShader.setMat4("model", model);
+            glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(model)));
+            skeletalGeometryShader.setMat3("normalMatrix", normalMatrix);
+
+            if (boneLoc != -1 && command.skeleton && !command.skeleton->skinningPalette.empty())
+            {
+                glUniformMatrix4fv(
+                    boneLoc,
+                    static_cast<GLsizei>(command.skeleton->skinningPalette.size()),
+                    GL_FALSE,
+                    glm::value_ptr(command.skeleton->skinningPalette[0])
+                );
+            }
+
+            BindMaterialGBuffer(skeletalGeometryShader, material);
+
+            command.mesh->VAO.Bind();
+            glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+
+            CleanupSamplers();
+        }
     }
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
-
 }

@@ -138,7 +138,7 @@ void ModelImporter::ExtractSkeleton(
         entry.name = modelPath.stem().string() + "_Skeleton";
         entry.type = "Skeleton";
         entry.index = 0;
-        entry.hasCache = true;
+        entry.hasCache = false;
         parentMeta.subAssets.push_back(entry);
     }
 
@@ -532,6 +532,11 @@ AssetUUID ModelImporter::ConstructPrefab(
     if (result.skeletonUUID.IsValid())
     {
         prefabScene.AddComponent<SkeletonComponent>(rootEntity, result.skeletonUUID);
+    }
+
+    if (result.animLibUUID.IsValid())
+    {
+        prefabScene.AddComponent<AnimatorComponent>(rootEntity, result.animLibUUID);
     }
 
     for (unsigned int i = 0; i < scene->mRootNode->mNumChildren; ++i)

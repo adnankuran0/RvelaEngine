@@ -95,7 +95,7 @@ void AssetRegistry::Scan(const std::filesystem::path& assetDir)
             auto cachePath = entry.path();
             auto ext = cachePath.extension().string();
 
-            if (ext != ".rmesh" && ext != ".rtex" && ext != ".rprefab" && ext != ".rmat")
+            if (ext != ".rmesh" && ext != ".rskmesh" && ext != ".rtex" && ext != ".rprefab" && ext != ".rmat" )
                 continue;
 
             auto uuid = AssetUUID::FromString(cachePath.stem().string());

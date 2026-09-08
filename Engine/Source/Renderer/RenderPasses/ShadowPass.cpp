@@ -68,12 +68,10 @@ void ShadowPass::InitPointShadowMap()
 void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFrame& frame)
 {
     auto& commands = frame.opaqueCommands;
+    auto& skeletalCommands = frame.skeletalOpaqueCommands;
 
     if (ctx.directionalLight && ctx.directionalLight->castShadows)
     {
-        Shader& shadowShader = ShaderManager::Get("DirectionalShadow");
-        shadowShader.use();
-
         m_DirectionalShadowFramebuffer.BindViewport();
         glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -82,12 +80,7 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
 
         bool reverseCull = ctx.directionalLight->reverseCullFace;
 
-        for (auto& command : commands) {
-            if (!ctx.camera->Intersects(ctx.directionalLight->lightSpace, command.mesh->worldAABB)) continue;
-            if (!command.mesh->IsCastShadow()) continue;
-
-            auto& material = command.material;
-            CullMode mode = material->GetCullMode();
+        auto ApplyCull = [&](CullMode mode) {
             if (mode == CullMode::Disabled) {
                 glDisable(GL_CULL_FACE);
             }
@@ -98,18 +91,19 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
                 else
                     glCullFace(mode == CullMode::Back ? GL_BACK : GL_FRONT);
             }
+            };
 
-            shadowShader.setInt("transparencyMode", static_cast<int>(material->GetTransparencyMode()));
-            shadowShader.setFloat("alphaCutoff", material->GetAlphaCutoff());
-            shadowShader.setVec4("albedoColor", material->GetAlbedoColor());
-            shadowShader.setVec2("UVScale", material->GetUVScale());
-            shadowShader.setVec2("UVOffset", material->GetUVOffset());
-            shadowShader.setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
+        auto BindMaterial = [](Shader& shader, MaterialComponent* material) {
+            shader.setInt("transparencyMode", static_cast<int>(material->GetTransparencyMode()));
+            shader.setFloat("alphaCutoff", material->GetAlphaCutoff());
+            shader.setVec4("albedoColor", material->GetAlbedoColor());
+            shader.setVec2("UVScale", material->GetUVScale());
+            shader.setVec2("UVOffset", material->GetUVOffset());
 
             bool useAlb = material->IsUsingAlbedoMap() && material->GetAlbedoTexture();
-            shadowShader.setBool("useAlbedoMap", useAlb);
+            shader.setBool("useAlbedoMap", useAlb);
             if (useAlb) {
-                shadowShader.setInt("albedoMap", 0);
+                shader.setInt("albedoMap", 0);
                 TextureCache::Get().GetOrCreate(material->GetAlbedoTexture()).Bind(0);
                 material->GetSampler().Bind(0);
             }
@@ -117,12 +111,66 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
                 glBindSampler(0, 0);
                 glBindTextureUnit(0, 0);
             }
+            return useAlb;
+            };
 
-            shadowShader.setMat4("model", command.transform->GetWorldMatrix());
-            command.mesh->VAO.Bind();
-            glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+        if (!commands.empty())
+        {
+            Shader& shadowShader = ShaderManager::Get("DirectionalShadow");
+            shadowShader.use();
+            shadowShader.setInt("billboardMode", 0);
 
-            if (useAlb) glBindSampler(0, 0);
+            for (auto& command : commands) {
+                if (!ctx.camera->Intersects(ctx.directionalLight->lightSpace, command.mesh->worldAABB)) continue;
+                if (!command.mesh->IsCastShadow()) continue;
+
+                auto& material = command.material;
+                ApplyCull(material->GetCullMode());
+                shadowShader.setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
+
+                bool useAlb = BindMaterial(shadowShader, material);
+
+                shadowShader.setMat4("model", command.transform->GetWorldMatrix());
+                command.mesh->VAO.Bind();
+                glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+
+                if (useAlb) glBindSampler(0, 0);
+            }
+        }
+
+        if (!skeletalCommands.empty())
+        {
+            Shader& skeletalShadowShader = ShaderManager::Get("DirectionalShadow_Skeletal");
+            skeletalShadowShader.use();
+
+            GLint boneLoc = glGetUniformLocation(skeletalShadowShader.ID, "u_BoneMatrices");
+
+            for (auto& command : skeletalCommands) {
+                if (!command.mesh || command.mesh->indexCount == 0) continue;
+                if (!command.mesh->IsCastShadow()) continue;
+
+                auto& material = command.material;
+                ApplyCull(material->GetCullMode());
+
+                bool useAlb = BindMaterial(skeletalShadowShader, material);
+
+                skeletalShadowShader.setMat4("model", command.transform->GetWorldMatrix());
+
+                if (boneLoc != -1 && command.skeleton && !command.skeleton->skinningPalette.empty())
+                {
+                    glUniformMatrix4fv(
+                        boneLoc,
+                        static_cast<GLsizei>(command.skeleton->skinningPalette.size()),
+                        GL_FALSE,
+                        glm::value_ptr(command.skeleton->skinningPalette[0])
+                    );
+                }
+
+                command.mesh->VAO.Bind();
+                glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+
+                if (useAlb) glBindSampler(0, 0);
+            }
         }
 
         glEnable(GL_CULL_FACE);
@@ -134,14 +182,36 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
 void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& frame)
 {
     auto& commands = frame.opaqueCommands;
-
-    Shader& pointShadowShader = ShaderManager::Get("PointShadow");
-    pointShadowShader.use();
+    auto& skeletalCommands = frame.skeletalOpaqueCommands;
 
     glBindFramebuffer(GL_FRAMEBUFFER, pointFBO);
     glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, o_PointShadowMap, 0);
     glClear(GL_DEPTH_BUFFER_BIT);
     glViewport(0, 0, POINT_SHADOW_WIDTH, POINT_SHADOW_HEIGHT);
+
+    Shader& pointShadowShader = ShaderManager::Get("PointShadow");
+    Shader& skeletalPointShadowShader = ShaderManager::Get("PointShadow_Skeletal");
+
+    auto BindMaterial = [](Shader& shader, MaterialComponent* material) {
+        shader.setInt("transparencyMode", static_cast<int>(material->GetTransparencyMode()));
+        shader.setFloat("alphaCutoff", material->GetAlphaCutoff());
+        shader.setVec4("albedoColor", material->GetAlbedoColor());
+        shader.setVec2("UVScale", material->GetUVScale());
+        shader.setVec2("UVOffset", material->GetUVOffset());
+
+        bool useAlb = material->IsUsingAlbedoMap() && material->GetAlbedoTexture();
+        shader.setBool("useAlbedoMap", useAlb);
+        if (useAlb) {
+            shader.setInt("albedoMap", 0);
+            TextureCache::Get().GetOrCreate(material->GetAlbedoTexture()).Bind(0);
+            material->GetSampler().Bind(0);
+        }
+        else {
+            glBindSampler(0, 0);
+            glBindTextureUnit(0, 0);
+        }
+        return useAlb;
+        };
 
     for (auto& light : ctx.pointLights)
     {
@@ -160,62 +230,84 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
         shadowTransforms[4] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
         shadowTransforms[5] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
 
-        pointShadowShader.setFloat("far_plane", far_plane);
-        pointShadowShader.setVec3("lightPos", lightPos);
-        pointShadowShader.setInt("baseLayer", light.shadowIndex * 6);
-
-        for (auto& command : commands)
+        if (!commands.empty())
         {
-            if (!command.mesh->IsCastShadow()) continue;
+            pointShadowShader.use();
+            pointShadowShader.setFloat("far_plane", far_plane);
+            pointShadowShader.setVec3("lightPos", lightPos);
+            pointShadowShader.setInt("baseLayer", light.shadowIndex * 6);
 
-            auto& material = command.material;
-            CullMode mode = material->GetCullMode();
-            if (mode == CullMode::Disabled) {
-                glDisable(GL_CULL_FACE);
-            }
-            else {
-                glEnable(GL_CULL_FACE);
-                glCullFace(mode == CullMode::Back ? GL_BACK : GL_FRONT);
-            }
-
-            pointShadowShader.setInt("transparencyMode", static_cast<int>(material->GetTransparencyMode()));
-            pointShadowShader.setFloat("alphaCutoff", material->GetAlphaCutoff());
-            pointShadowShader.setVec4("albedoColor", material->GetAlbedoColor());
-            pointShadowShader.setVec2("UVScale", material->GetUVScale());
-            pointShadowShader.setVec2("UVOffset", material->GetUVOffset());
-            pointShadowShader.setInt("billboardMode", static_cast<int>(command.material->GetBillboardMode()));
-
-            bool useAlb = material->IsUsingAlbedoMap() && material->GetAlbedoTexture();
-            pointShadowShader.setBool("useAlbedoMap", useAlb);
-            if (useAlb) {
-                pointShadowShader.setInt("albedoMap", 0);
-                TextureCache::Get().GetOrCreate(material->GetAlbedoTexture()).Bind(0);
-                material->GetSampler().Bind(0);
-            }
-            else {
-                glBindSampler(0, 0);
-                glBindTextureUnit(0, 0);
-            }
-
-            pointShadowShader.setMat4("model", command.transform->GetWorldMatrix());
-            command.mesh->VAO.Bind();
-
-            for (unsigned int face = 0; face < 6; ++face)
+            for (auto& command : commands)
             {
-                if (!ctx.camera->Intersects(shadowTransforms[face], command.mesh->worldAABB)) continue;
+                if (!command.mesh->IsCastShadow()) continue;
 
-                pointShadowShader.setMat4("shadowMatrix", shadowTransforms[face]);
-                pointShadowShader.setInt("currentFace", face);
+                auto& material = command.material;
+                CullMode mode = material->GetCullMode();
+                if (mode == CullMode::Disabled) glDisable(GL_CULL_FACE);
+                else { glEnable(GL_CULL_FACE); glCullFace(mode == CullMode::Back ? GL_BACK : GL_FRONT); }
 
-                glDrawElements(
-                    GL_TRIANGLES,
-                    command.mesh->indexCount,
-                    GL_UNSIGNED_INT,
-                    0
-                );
+                pointShadowShader.setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
+                bool useAlb = BindMaterial(pointShadowShader, material);
+
+                pointShadowShader.setMat4("model", command.transform->GetWorldMatrix());
+                command.mesh->VAO.Bind();
+
+                for (unsigned int face = 0; face < 6; ++face)
+                {
+                    if (!ctx.camera->Intersects(shadowTransforms[face], command.mesh->worldAABB)) continue;
+                    pointShadowShader.setMat4("shadowMatrix", shadowTransforms[face]);
+                    pointShadowShader.setInt("currentFace", face);
+                    glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+                }
+
+                if (useAlb) glBindSampler(0, 0);
             }
+        }
 
-            if (useAlb) glBindSampler(0, 0);
+        if (!skeletalCommands.empty())
+        {
+            skeletalPointShadowShader.use();
+            skeletalPointShadowShader.setFloat("far_plane", far_plane);
+            skeletalPointShadowShader.setVec3("lightPos", lightPos);
+            skeletalPointShadowShader.setInt("baseLayer", light.shadowIndex * 6);
+
+            GLint boneLoc = glGetUniformLocation(skeletalPointShadowShader.ID, "u_BoneMatrices");
+
+            for (auto& command : skeletalCommands)
+            {
+                if (!command.mesh || command.mesh->indexCount == 0) continue;
+                if (!command.mesh->IsCastShadow()) continue;
+
+                auto& material = command.material;
+                CullMode mode = material->GetCullMode();
+                if (mode == CullMode::Disabled) glDisable(GL_CULL_FACE);
+                else { glEnable(GL_CULL_FACE); glCullFace(mode == CullMode::Back ? GL_BACK : GL_FRONT); }
+
+                bool useAlb = BindMaterial(skeletalPointShadowShader, material);
+
+                skeletalPointShadowShader.setMat4("model", command.transform->GetWorldMatrix());
+
+                if (boneLoc != -1 && command.skeleton && !command.skeleton->skinningPalette.empty())
+                {
+                    glUniformMatrix4fv(
+                        boneLoc,
+                        static_cast<GLsizei>(command.skeleton->skinningPalette.size()),
+                        GL_FALSE,
+                        glm::value_ptr(command.skeleton->skinningPalette[0])
+                    );
+                }
+
+                command.mesh->VAO.Bind();
+
+                for (unsigned int face = 0; face < 6; ++face)
+                {
+                    skeletalPointShadowShader.setMat4("shadowMatrix", shadowTransforms[face]);
+                    skeletalPointShadowShader.setInt("currentFace", face);
+                    glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+                }
+
+                if (useAlb) glBindSampler(0, 0);
+            }
         }
     }
 
@@ -224,16 +316,17 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
 }
 
+void ShadowPass::Execute(const RenderContext& ctx, RenderFrame& frame)
+{
+    if (frame.opaqueCommands.empty() && frame.skeletalOpaqueCommands.empty()) return;
+
+    RenderDirectionalShadowMap(ctx, frame);
+    RenderPointShadowMap(ctx, frame);
+}
+
 ShadowPass::~ShadowPass()
 {
     glDeleteTextures(1, &o_PointShadowMap);
     glDeleteFramebuffers(1, &pointFBO);
 }
 
-void ShadowPass::Execute(const RenderContext& ctx, RenderFrame& frame)
-{
-    if (frame.opaqueCommands.empty()) return;
-
-    RenderDirectionalShadowMap(ctx, frame);
-    RenderPointShadowMap(ctx, frame);
-}
