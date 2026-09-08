@@ -19,6 +19,8 @@
 #include "Scene/Components/AudioEmitterComponent.h"
 #include "Scene/Components/ParticleEmitterComponent.h"
 #include "Scene/Components/AnimatorComponent.h"
+#include "Scene/Components/SkeletalMeshComponent.h"
+#include "Scene/Components/SkeletonComponent.h"
 
 namespace rv {
 
@@ -47,7 +49,9 @@ enum class ComponentType
 	ConvexHullCollider,
 	AudioEmitterComponent,
 	ParticleEmitterComponent,
-	AnimatorComponent
+	AnimatorComponent,
+	SkeletalMeshComponent,
+	SkeletonComponent
 };
 
 }

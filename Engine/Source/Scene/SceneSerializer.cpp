@@ -205,6 +205,12 @@ void SceneSerializer::LoadScene(Scene& scene, const std::string& path)
         if (entityJson.contains("AnimatorComponent"))
             scene.AddComponent<AnimatorComponent>(handle).Deserialize(entityJson["AnimatorComponent"]);
 
+        if (entityJson.contains("SkeletalMeshComponent"))
+            scene.AddComponent<SkeletalMeshComponent>(handle).Deserialize(entityJson["SkeletalMeshComponent"]);
+
+        if (entityJson.contains("SkeletonComponent"))
+            scene.AddComponent<SkeletonComponent>(handle).Deserialize(entityJson["SkeletonComponent"]);
+
         loadedEntities.push_back(handle);
     }
 
@@ -306,6 +312,12 @@ json SceneSerializer::SerializeEntity(Scene& scene, entt::entity e)
 
     if (scene.HasComponent<AnimatorComponent>(e))
         j["AnimatorComponent"] = scene.GetComponent<AnimatorComponent>(e).Serialize();
+
+    if (scene.HasComponent<SkeletalMeshComponent>(e))
+        j["SkeletalMeshComponent"] = scene.GetComponent<SkeletalMeshComponent>(e).Serialize();
+
+    if (scene.HasComponent<SkeletonComponent>(e))
+        j["SkeletonComponent"] = scene.GetComponent<SkeletonComponent>(e).Serialize();
 
     return j;
 }
