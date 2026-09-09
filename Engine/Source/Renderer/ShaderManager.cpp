@@ -27,7 +27,8 @@ void ShaderManager::Reload(const std::string& name)
         if (shader.GetName() == name)
         {
             if (!shader.Recompile())
-                LOG_WARN("Shader reload failed. Keeping old program.");
+                LOG_WARN("Shader reload failed for '{}'. Keeping old program.", name);
+            return;
         }
     }
 

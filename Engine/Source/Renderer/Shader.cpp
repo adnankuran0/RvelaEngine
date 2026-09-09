@@ -4,9 +4,9 @@
 
 using namespace rv;
 
-Shader::Shader(const std::string& name, const Path& shaderPath)
+Shader::Shader(const std::string& name, const Path& shaderPath, const std::vector<std::string>& enabledDefines)
 {
-    Init(name,shaderPath);
+    Init(name, shaderPath, enabledDefines);
 }
 
 Shader::Shader(Shader&& other) noexcept
@@ -14,6 +14,8 @@ Shader::Shader(Shader&& other) noexcept
     ID = other.ID;
     m_Name = std::move(other.m_Name);
     m_Path = std::move(other.m_Path);
+    m_ActiveDefines = std::move(other.m_ActiveDefines);
+    m_DiscoveredDefines = std::move(other.m_DiscoveredDefines);
     uniformLocationCache = std::move(other.uniformLocationCache);
 
     other.ID = 0;
@@ -28,6 +30,8 @@ Shader& Shader::operator=(Shader&& other) noexcept
         ID = other.ID;
         m_Name = std::move(other.m_Name);
         m_Path = std::move(other.m_Path);
+        m_ActiveDefines = std::move(other.m_ActiveDefines);
+        m_DiscoveredDefines = std::move(other.m_DiscoveredDefines);
         uniformLocationCache = std::move(other.uniformLocationCache);
 
         other.ID = 0;
@@ -35,10 +39,11 @@ Shader& Shader::operator=(Shader&& other) noexcept
     return *this;
 }
 
-bool Shader::Init(const std::string& name, const Path& shaderPath)
+bool Shader::Init(const std::string& name, const Path& shaderPath, const std::vector<std::string>& enabledDefines)
 {
     m_Path = shaderPath;
     m_Name = name;
+    m_ActiveDefines = std::unordered_set<std::string>(enabledDefines.begin(), enabledDefines.end());
 
     GLuint program = 0;
     if (!CompileInternal(shaderPath, program))
@@ -68,11 +73,12 @@ void Shader::dispatch(unsigned int x, unsigned int y, unsigned int z) const
     glDispatchCompute(x, y, z);
 }
 
-void Shader::wait() const {
+void Shader::wait() const
+{
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 }
 
-bool Shader::checkCompileErrors(unsigned int shader, const std::string type)
+bool Shader::checkCompileErrors(unsigned int shader, const std::string& type)
 {
     int success;
     char infoLog[1024];
@@ -83,7 +89,7 @@ bool Shader::checkCompileErrors(unsigned int shader, const std::string type)
         if (!success)
         {
             glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-            LOG_ERROR("ERROR::SHADER_COMPILATION_ERROR of type: {} \n {}" ,type , infoLog);
+            LOG_ERROR("ERROR::SHADER_COMPILATION_ERROR of type: {} \n {}", type, infoLog);
             return false;
         }
     }
@@ -114,7 +120,8 @@ bool Shader::Recompile()
     return true;
 }
 
-GLint Shader::GetUniformLocation(const std::string& name) const {
+GLint Shader::GetUniformLocation(const std::string& name) const
+{
     auto it = uniformLocationCache.find(name);
     if (it != uniformLocationCache.end())
         return it->second;
@@ -179,6 +186,100 @@ std::string Shader::ProcessIncludes(const std::string& source, const Path& shade
     return result.str();
 }
 
+void Shader::ParseDefines(const std::string& source)
+{
+    std::istringstream stream(source);
+    std::string line;
+
+    while (std::getline(stream, line))
+    {
+        size_t commentPos = line.find("//");
+        if (commentPos != std::string::npos)
+            line = line.substr(0, commentPos);
+
+        size_t ifdefPos = line.find("#ifdef");
+        size_t ifndefPos = line.find("#ifndef");
+        size_t targetPos = std::string::npos;
+        size_t offset = 0;
+
+        if (ifdefPos != std::string::npos)
+        {
+            targetPos = ifdefPos;
+            offset = 6;
+        }
+        else if (ifndefPos != std::string::npos)
+        {
+            targetPos = ifndefPos;
+            offset = 7;
+        }
+
+        if (targetPos != std::string::npos)
+        {
+            std::string def = line.substr(targetPos + offset);
+            size_t first = def.find_first_not_of(" \t\r\n");
+            size_t last = def.find_last_not_of(" \t\r\n");
+            if (first != std::string::npos && last != std::string::npos)
+            {
+                std::string defineName = def.substr(first, (last - first + 1));
+                if (defineName.rfind("GL_", 0) != 0)
+                {
+                    m_DiscoveredDefines.insert(defineName);
+                }
+            }
+        }
+    }
+}
+
+std::string Shader::InjectActiveDefines(const std::string& source) const
+{
+    if (m_ActiveDefines.empty())
+        return source;
+
+    std::stringstream defStream;
+    for (const auto& def : m_ActiveDefines)
+    {
+        defStream << "#define " << def << "\n";
+    }
+
+    std::string injectStr = defStream.str();
+    size_t versionPos = source.find("#version");
+
+    if (versionPos != std::string::npos)
+    {
+        size_t nextLine = source.find('\n', versionPos);
+        if (nextLine != std::string::npos)
+        {
+            std::string result = source;
+            result.insert(nextLine + 1, injectStr);
+            return result;
+        }
+    }
+
+    return injectStr + source;
+}
+
+void Shader::EnableDefine(const std::string& define)
+{
+    if (m_ActiveDefines.find(define) == m_ActiveDefines.end())
+    {
+        m_ActiveDefines.insert(define);
+        Recompile();
+    }
+}
+
+void Shader::DisableDefine(const std::string& define)
+{
+    if (m_ActiveDefines.erase(define) > 0)
+    {
+        Recompile();
+    }
+}
+
+bool Shader::IsDefineEnabled(const std::string& define) const
+{
+    return m_ActiveDefines.find(define) != m_ActiveDefines.end();
+}
+
 bool Shader::CompileInternal(const Path& path, GLuint& outProgram)
 {
     std::ifstream shaderFile(path.GetAbsolute());
@@ -226,12 +327,15 @@ bool Shader::CompileInternal(const Path& path, GLuint& outProgram)
 
     for (const auto& [type, rawSrc] : rawShaderSources)
     {
+        std::string src = InjectActiveDefines(rawSrc);
+
         std::unordered_set<std::string> includedPaths;
         includedPaths.insert(path.GetAbsoluteStr());
-        std::string src = ProcessIncludes(rawSrc, path, includedPaths);
+        src = ProcessIncludes(src, path, includedPaths);
+
+        ParseDefines(src);
 
         GLenum shaderType = 0;
-
         if (type == "vertex")        shaderType = GL_VERTEX_SHADER;
         else if (type == "fragment") shaderType = GL_FRAGMENT_SHADER;
         else if (type == "geometry") shaderType = GL_GEOMETRY_SHADER;

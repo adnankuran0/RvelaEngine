@@ -12,7 +12,7 @@ class Shader
 {
 public:
     unsigned int ID;
-    Shader(const std::string& name, const Path& shaderPath);
+    Shader(const std::string& name, const Path& shaderPath, const std::vector<std::string>& enabledDefines = {});
     Shader() = default;
     Shader(const Shader&) = delete;
     Shader& operator=(const Shader&) = delete;
@@ -21,9 +21,14 @@ public:
     Shader& operator=(Shader&& other) noexcept;
     ~Shader() { Destroy(); }
 
-    bool Init(const std::string& name, const Path& shaderPath);
+    bool Init(const std::string& name, const Path& shaderPath, const std::vector<std::string>& enabledDefines = {});
     bool Recompile();
     void Destroy();
+
+    void EnableDefine(const std::string& define);
+    void DisableDefine(const std::string& define);
+    bool IsDefineEnabled(const std::string& define) const;
+    const std::unordered_set<std::string>& GetDiscoveredDefines() const { return m_DiscoveredDefines; }
 
     void use();
     void dispatch(unsigned int x, unsigned int y = 1, unsigned int z = 1) const;
@@ -65,8 +70,12 @@ public:
 private:
     std::string m_Name;
     Path m_Path;
-    bool checkCompileErrors(unsigned int shader, std::string type);
+    std::unordered_set<std::string> m_DiscoveredDefines;
+    std::unordered_set<std::string> m_ActiveDefines;
+    bool checkCompileErrors(unsigned int shader, const std::string& type);
     bool CompileInternal(const Path& path, GLuint& outProgram);
+    void ParseDefines(const std::string& source);
+    std::string InjectActiveDefines(const std::string& source) const;
     static std::string ProcessIncludes(const std::string& source, const Path& shaderPath, std::unordered_set<std::string>& includedPaths);
     mutable std::unordered_map<std::string, GLint> uniformLocationCache;
 };

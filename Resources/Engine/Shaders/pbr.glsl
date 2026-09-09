@@ -1,9 +1,18 @@
 #shader vertex
 #version 460 core
+
 layout(location = 0) in vec3 aPos;
 layout(location = 1) in vec3 aNormal;
 layout(location = 2) in vec3 aTangent;
 layout(location = 3) in vec2 aTexCoords;
+
+#ifdef SKELETAL
+layout(location = 4) in uvec4 aBoneIDs;
+layout(location = 5) in vec4 aWeights;
+
+const int MAX_BONES = 100;
+uniform mat4 u_BoneMatrices[MAX_BONES];
+#endif
 
 #include "Common/Camera.glsl"
 #include "Common/Lights.glsl"
@@ -28,6 +37,24 @@ void main()
     vec4 worldPos;
     vec3 N, T, B;
 
+#ifdef SKELETAL
+    mat4 skinMatrix = 
+        u_BoneMatrices[aBoneIDs[0]] * aWeights[0] +
+        u_BoneMatrices[aBoneIDs[1]] * aWeights[1] +
+        u_BoneMatrices[aBoneIDs[2]] * aWeights[2] +
+        u_BoneMatrices[aBoneIDs[3]] * aWeights[3];
+
+    vec4 localPos     = skinMatrix * vec4(aPos, 1.0);
+    mat3 skinMatrixIT = mat3(skinMatrix);
+    vec3 localNormal  = skinMatrixIT * aNormal;
+    vec3 localTangent = skinMatrixIT * aTangent;
+
+    worldPos = model * localPos;
+    N = normalize(normalMatrix * localNormal);
+    T = normalize(mat3(model) * localTangent);
+    T = normalize(T - dot(T, N) * N);
+    B = normalize(cross(N, T));
+#else
     if (billboardMode == 0)
     {
         worldPos = model * vec4(aPos, 1.0);
@@ -44,6 +71,7 @@ void main()
         T = normalize(bb.tangent);
         B = normalize(bb.bitangent);
     }
+#endif
 
     FragPos = worldPos.xyz;
     Normal = N;

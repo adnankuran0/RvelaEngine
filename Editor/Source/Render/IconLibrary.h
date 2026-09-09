@@ -26,7 +26,9 @@ enum class EditorIcon
 	Audio,
 	Play,
 	Pause,
-	Stop
+	Stop,
+	Skeleton,
+	Skinned
 };
 
 class IconLibrary

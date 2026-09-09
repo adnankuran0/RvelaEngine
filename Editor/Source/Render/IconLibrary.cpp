@@ -40,6 +40,8 @@ void IconLibrary::Init()
     lib.LoadIcon(EditorIcon::Play, "Icons\\play.png");
     lib.LoadIcon(EditorIcon::Pause, "Icons\\pause.png");
     lib.LoadIcon(EditorIcon::Stop, "Icons\\stop.png");
+    lib.LoadIcon(EditorIcon::Skeleton, "Icons\\skeleton.png");
+    lib.LoadIcon(EditorIcon::Skinned, "Icons\\skinned.png");
 
 }
 

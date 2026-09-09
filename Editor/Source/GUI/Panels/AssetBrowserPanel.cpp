@@ -597,6 +597,8 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
         else if (extension == ".rmat") icon = IconLibrary::Get().GetIcon(EditorIcon::Material).GetID();
         else if (extension == ".rmesh") icon = IconLibrary::Get().GetIcon(EditorIcon::Mesh).GetID();
         else if (extension == ".ranimlib") icon = IconLibrary::Get().GetIcon(EditorIcon::AnimLib).GetID();
+        else if (extension == ".rskmesh") icon = IconLibrary::Get().GetIcon(EditorIcon::Skinned).GetID();
+        else if (extension == ".rskeleton") icon = IconLibrary::Get().GetIcon(EditorIcon::Skeleton).GetID();
         else icon = IconLibrary::Get().GetIcon(EditorIcon::Script).GetID();
 
         ImGui::ImageButton(filename.c_str(), icon, ImVec2(thumbnailSize, thumbnailSize));
