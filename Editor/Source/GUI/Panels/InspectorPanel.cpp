@@ -1423,7 +1423,17 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 							UI::PropertyLabel("Active Clip");
 							if (ImGui::BeginCombo("##ActiveClipCombo", animator.currentClipName.c_str()))
 							{
-								for (const auto& [name, clip] : animator.library->GetClips())
+								const auto& clips = animator.library->GetClips();
+
+								std::vector<std::string> sortedNames;
+								sortedNames.reserve(clips.size());
+								for (const auto& [name, clip] : clips)
+								{
+									sortedNames.push_back(name);
+								}
+								std::sort(sortedNames.begin(), sortedNames.end());
+
+								for (const auto& name : sortedNames)
 								{
 									bool isSelected = (animator.currentClipName == name);
 									if (ImGui::Selectable(name.c_str(), isSelected))

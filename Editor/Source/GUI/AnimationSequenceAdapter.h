@@ -169,6 +169,8 @@ struct AnimationSequenceAdapter : public ImSequencer::SequenceInterface
     float XToTime(float x, const ImRect& rc) const;
 
 private:
+    std::vector<size_t> m_VisiblePropertyTrackIndices;
+    void RebuildVisibleTracks();
     void SetupDragMode(float clickedTime);
     void DrawEventTrack(ImDrawList* draw_list, const ImRect& rc);
 

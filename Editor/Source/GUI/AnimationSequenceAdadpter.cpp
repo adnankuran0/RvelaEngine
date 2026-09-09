@@ -44,6 +44,7 @@ AnimationSequenceAdapter::AnimationSequenceAdapter(std::shared_ptr<Animation::An
     SequencerContext& context)
     : clip(c), animator(anim), registry(reg), entity(ent), ctx(context)
 {
+    RebuildVisibleTracks();
 }
 
 int AnimationSequenceAdapter::GetFrameMax() const
@@ -54,7 +55,7 @@ int AnimationSequenceAdapter::GetFrameMax() const
 
 int AnimationSequenceAdapter::GetItemCount() const
 {
-    return 4 + static_cast<int>(clip->propertyTracks.size());
+    return 4 + static_cast<int>(m_VisiblePropertyTrackIndices.size());
 }
 
 const char* AnimationSequenceAdapter::GetItemLabel(int index) const
@@ -64,23 +65,25 @@ const char* AnimationSequenceAdapter::GetItemLabel(int index) const
     if (index == 2) return "Rotation";
     if (index == 3) return "Scale";
 
-    size_t propIdx = index - 4;
-    if (propIdx < clip->propertyTracks.size()) {
-        if (itemLabels.size() <= propIdx)
-            itemLabels.resize(clip->propertyTracks.size());
+    size_t visibleIdx = index - 4;
+    if (visibleIdx < m_VisiblePropertyTrackIndices.size()) {
+        size_t propIdx = m_VisiblePropertyTrackIndices[visibleIdx];
+
+        if (itemLabels.size() <= visibleIdx)
+            itemLabels.resize(m_VisiblePropertyTrackIndices.size());
 
         const auto& track = clip->propertyTracks[propIdx];
         size_t dotPos = track->propertyName.find('.');
         std::string shortProp = (dotPos != std::string::npos) ? track->propertyName.substr(dotPos + 1) : track->propertyName;
 
         if (track->targetPath.empty()) {
-            itemLabels[propIdx] = shortProp;
+            itemLabels[visibleIdx] = shortProp;
         }
         else {
-            itemLabels[propIdx] = track->targetPath + " - " + shortProp;
+            itemLabels[visibleIdx] = track->targetPath + " - " + shortProp;
         }
 
-        return itemLabels[propIdx].c_str();
+        return itemLabels[visibleIdx].c_str();
     }
     return "";
 }
@@ -180,9 +183,11 @@ void AnimationSequenceAdapter::CustomDrawCompact(int index, ImDrawList* draw_lis
         DrawTrackKeyframes(clip->scaleTrack, IM_COL32(50, 100, 255, 255), 3, draw_list, rc);
     }
     else {
-        size_t propIdx = index - 4;
-        if (propIdx < clip->propertyTracks.size()) {
+        size_t visibleIdx = index - 4;
+        if (visibleIdx < m_VisiblePropertyTrackIndices.size()) {
+            size_t propIdx = m_VisiblePropertyTrackIndices[visibleIdx];
             auto pTrack = clip->propertyTracks[propIdx];
+
             if (pTrack->GetType() == Animation::PropertyType::Float) {
                 auto t = std::static_pointer_cast<Animation::TypedPropertyTrack<float>>(pTrack);
                 DrawTrackKeyframes(t->track, IM_COL32(220, 140, 40, 255), index, draw_list, rc);
@@ -409,56 +414,51 @@ void AnimationSequenceAdapter::DrawTrackKeyframes(TrackType& track, ImU32 outlin
             if (hoveredIndex == -1) {
                 float newTime = std::clamp(XToTime(io.MousePos.x, rc), 0.0f, clip->duration);
                 using ValueType = std::decay_t<decltype(track.Sample(0.0f))>;
+
                 ValueType initialValue{};
-                bool valueFetched = false;
+                if constexpr (std::is_same_v<ValueType, glm::vec3>) initialValue = (trackIdx == 3) ? glm::vec3(1.0f) : glm::vec3(0.0f);
+                else if constexpr (std::is_same_v<ValueType, glm::vec4>) initialValue = glm::vec4(1.0f);
+                else if constexpr (std::is_same_v<ValueType, glm::quat>) initialValue = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+                else if constexpr (std::is_same_v<ValueType, float>) initialValue = 0.0f;
+                else if constexpr (std::is_same_v<ValueType, bool>) initialValue = false;
 
                 if (!track.keyframes.empty()) {
                     initialValue = track.Sample(newTime);
-                    valueFetched = true;
                 }
                 else {
-                    if constexpr (std::is_same_v<ValueType, glm::vec3>) {
-                        if (trackIdx == 1 && registry->any_of<TransformComponent>(entity)) {
-                            initialValue = registry->get<TransformComponent>(entity).GetPosition();
-                            valueFetched = true;
-                        }
-                        else if (trackIdx == 3 && registry->any_of<TransformComponent>(entity)) {
-                            initialValue = registry->get<TransformComponent>(entity).GetScale();
-                            valueFetched = true;
+                    if (trackIdx == 1) {
+                        if constexpr (std::is_same_v<ValueType, glm::vec3>) {
+                            if (registry->any_of<TransformComponent>(entity))
+                                initialValue = registry->get<TransformComponent>(entity).GetPosition();
                         }
                     }
-                    else if constexpr (std::is_same_v<ValueType, glm::quat>) {
-                        if (trackIdx == 2 && registry->any_of<TransformComponent>(entity)) {
-                            initialValue = registry->get<TransformComponent>(entity).GetRotation();
-                            valueFetched = true;
+                    else if (trackIdx == 2) {
+                        if constexpr (std::is_same_v<ValueType, glm::quat>) {
+                            if (registry->any_of<TransformComponent>(entity))
+                                initialValue = registry->get<TransformComponent>(entity).GetRotation();
                         }
                     }
-
-                    if (!valueFetched && trackIdx >= 4) {
-                        size_t pIdx = trackIdx - 4;
-                        if (pIdx < clip->propertyTracks.size()) {
+                    else if (trackIdx == 3) {
+                        if constexpr (std::is_same_v<ValueType, glm::vec3>) {
+                            if (registry->any_of<TransformComponent>(entity))
+                                initialValue = registry->get<TransformComponent>(entity).GetScale();
+                        }
+                    }
+                    else if (trackIdx >= 4) {
+                        size_t visibleIdx = trackIdx - 4;
+                        if (visibleIdx < m_VisiblePropertyTrackIndices.size()) {
+                            size_t pIdx = m_VisiblePropertyTrackIndices[visibleIdx];
                             auto pTrack = clip->propertyTracks[pIdx];
                             entt::entity target = ResolvePathStatic(*registry, entity, pTrack->targetPath);
+
                             if (target != entt::null && registry->valid(target)) {
-                                if (pTrack->propertyName == "PointLightComponent.intensity" && registry->any_of<PointLightComponent>(target)) {
-                                    if constexpr (std::is_same_v<ValueType, float>) { initialValue = registry->get<PointLightComponent>(target).intensity; valueFetched = true; }
-                                }
-                                else if (pTrack->propertyName == "PointLightComponent.color" && registry->any_of<PointLightComponent>(target)) {
-                                    if constexpr (std::is_same_v<ValueType, glm::vec3>) { initialValue = registry->get<PointLightComponent>(target).color; valueFetched = true; }
-                                }
-                                else if (pTrack->propertyName == "PointLightComponent.radius" && registry->any_of<PointLightComponent>(target)) {
-                                    if constexpr (std::is_same_v<ValueType, float>) { initialValue = registry->get<PointLightComponent>(target).radius; valueFetched = true; }
-                                }
+                                Animation::PropertyBindingRegistry::Get().Init();
+                                auto& regBinding = Animation::PropertyBindingRegistry::Get();
+
+                                initialValue = regBinding.GetCurrentValue<ValueType>(*registry, target, pTrack->propertyName, initialValue);
                             }
                         }
                     }
-                }
-
-                if (!valueFetched) {
-                    if constexpr (std::is_same_v<ValueType, glm::vec3>) initialValue = (trackIdx == 3) ? glm::vec3(1.0f) : glm::vec3(0.0f);
-                    else if constexpr (std::is_same_v<ValueType, glm::quat>) initialValue = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
-                    else if constexpr (std::is_same_v<ValueType, float>) initialValue = 0.0f;
-                    else if constexpr (std::is_same_v<ValueType, bool>) initialValue = false;
                 }
 
                 track.AddKeyframe(newTime, initialValue, Animation::EaseType::Linear);
@@ -524,9 +524,11 @@ void AnimationSequenceAdapter::DrawTrackKeyframes(TrackType& track, ImU32 outlin
                 extractGhosts(clip->rotationTrack, 2, [](DragGhost& g, const glm::quat& val) { g.q = val; });
                 extractGhosts(clip->scaleTrack, 3, [](DragGhost& g, const glm::vec3& val) { g.v3 = val; });
 
-                for (size_t p = 0; p < clip->propertyTracks.size(); ++p) {
-                    int pTrackIdx = 4 + static_cast<int>(p);
-                    auto pTrack = clip->propertyTracks[p];
+                for (size_t v = 0; v < m_VisiblePropertyTrackIndices.size(); ++v) {
+                    int pTrackIdx = 4 + static_cast<int>(v);
+                    size_t pIdx = m_VisiblePropertyTrackIndices[v];
+                    auto pTrack = clip->propertyTracks[pIdx];
+
                     if (pTrack->GetType() == Animation::PropertyType::Float) {
                         auto t = std::static_pointer_cast<Animation::TypedPropertyTrack<float>>(pTrack);
                         extractGhosts(t->track, pTrackIdx, [](DragGhost& g, float val) { g.fVal = val; });
@@ -549,6 +551,19 @@ void AnimationSequenceAdapter::DrawTrackKeyframes(TrackType& track, ImU32 outlin
                     }
                 }
             }
+        }
+    }
+}
+
+void AnimationSequenceAdapter::RebuildVisibleTracks()
+{
+    m_VisiblePropertyTrackIndices.clear();
+    if (!clip) return;
+
+    for (size_t i = 0; i < clip->propertyTracks.size(); ++i) {
+        auto type = clip->propertyTracks[i]->GetType();
+        if (type != Animation::PropertyType::BoneVec3 && type != Animation::PropertyType::BoneQuat) {
+            m_VisiblePropertyTrackIndices.push_back(i);
         }
     }
 }

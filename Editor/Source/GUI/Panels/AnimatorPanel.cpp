@@ -32,6 +32,19 @@ static void CollectSubtreePaths(entt::registry& reg, entt::entity current, const
     }
 }
 
+static std::vector<std::shared_ptr<Animation::IPropertyTrack>> GetVisiblePropertyTracks(const std::shared_ptr<Animation::AnimationClip>& clip)
+{
+    std::vector<std::shared_ptr<Animation::IPropertyTrack>> visible;
+    if (!clip) return visible;
+    for (const auto& track : clip->propertyTracks) {
+        auto type = track->GetType();
+        if (type != Animation::PropertyType::BoneVec3 && type != Animation::PropertyType::BoneQuat) {
+            visible.push_back(track);
+        }
+    }
+    return visible;
+}
+
 void AnimatorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 {
     ImGui::Begin("Animator");
@@ -132,10 +145,15 @@ void AnimatorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
     }
 
     if (!animator.currentClip) {
-        animator.SetClip(animator.library->GetClips().begin()->first);
+        auto it = std::min_element(animator.library->GetClips().begin(), animator.library->GetClips().end(),
+            [](const auto& a, const auto& b) { return a.first < b.first; });
+        if (it != animator.library->GetClips().end()) {
+            animator.SetClip(it->first);
+        }
     }
 
     auto& clip = animator.currentClip;
+    auto visibleTracks = GetVisiblePropertyTracks(clip);
     ImGuiIO& io = ImGui::GetIO();
 
     auto ApplyCurrentTimeToScene = [&]() {
@@ -169,7 +187,16 @@ void AnimatorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
     ImGui::SetNextItemWidth(140.0f);
     std::string comboPreview = animator.currentClipName.empty() ? (clip ? clip->name : "Select Clip") : animator.currentClipName;
     if (ImGui::BeginCombo("##ClipSelector", comboPreview.c_str())) {
-        for (const auto& [name, c] : animator.library->GetClips()) {
+        const auto& clips = animator.library->GetClips();
+
+        std::vector<std::string> sortedClipNames;
+        sortedClipNames.reserve(clips.size());
+        for (const auto& [name, _] : clips) {
+            sortedClipNames.push_back(name);
+        }
+        std::sort(sortedClipNames.begin(), sortedClipNames.end());
+
+        for (const auto& name : sortedClipNames) {
             bool isSelected = (animator.currentClipName == name);
             if (ImGui::Selectable(name.c_str(), isSelected)) {
                 animator.SetClip(name);
@@ -366,12 +393,14 @@ void AnimatorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
     }
 
     ImGui::SameLine();
-    bool canDeleteTrack = (m_SeqContext.selectedTrack >= 4 && clip && (m_SeqContext.selectedTrack - 4) < clip->propertyTracks.size());
+    bool canDeleteTrack = (m_SeqContext.selectedTrack >= 4 && clip && (m_SeqContext.selectedTrack - 4) < visibleTracks.size());
 
     if (!canDeleteTrack) ImGui::BeginDisabled();
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.75f, 0.20f, 0.20f, 0.8f));
     if (ImGui::Button("- Track")) {
-        clip->propertyTracks.erase(clip->propertyTracks.begin() + (m_SeqContext.selectedTrack - 4));
+        auto trackToDelete = visibleTracks[m_SeqContext.selectedTrack - 4];
+
+        clip->propertyTracks.erase(std::remove(clip->propertyTracks.begin(), clip->propertyTracks.end(), trackToDelete), clip->propertyTracks.end());
 
         m_SeqContext.selectedKeys.erase(std::remove_if(m_SeqContext.selectedKeys.begin(), m_SeqContext.selectedKeys.end(),
             [&](const SelectedKey& sk) { return sk.track == m_SeqContext.selectedTrack; }),
@@ -621,8 +650,8 @@ void AnimatorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             else if (sk.track == 3) applyToTrack(clip->scaleTrack);
             else if (sk.track >= 4) {
                 size_t propIdx = sk.track - 4;
-                if (propIdx < clip->propertyTracks.size()) {
-                    auto pTrack = clip->propertyTracks[propIdx];
+                if (propIdx < visibleTracks.size()) {
+                    auto pTrack = visibleTracks[propIdx];
                     if (pTrack->GetType() == Animation::PropertyType::Float) applyToTrack(std::static_pointer_cast<Animation::TypedPropertyTrack<float>>(pTrack)->track);
                     else if (pTrack->GetType() == Animation::PropertyType::Vec3) applyToTrack(std::static_pointer_cast<Animation::TypedPropertyTrack<glm::vec3>>(pTrack)->track);
                     else if (pTrack->GetType() == Animation::PropertyType::Vec4) applyToTrack(std::static_pointer_cast<Animation::TypedPropertyTrack<glm::vec4>>(pTrack)->track);
@@ -665,8 +694,8 @@ void AnimatorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                 else if (sk.track == 3) findCurrentEase(clip->scaleTrack);
                 else {
                     size_t propIdx = sk.track - 4;
-                    if (propIdx < clip->propertyTracks.size()) {
-                        auto pTrack = clip->propertyTracks[propIdx];
+                    if (propIdx < visibleTracks.size()) {
+                        auto pTrack = visibleTracks[propIdx];
                         if (pTrack->GetType() == Animation::PropertyType::Float) findCurrentEase(std::static_pointer_cast<Animation::TypedPropertyTrack<float>>(pTrack)->track);
                         else if (pTrack->GetType() == Animation::PropertyType::Vec3) findCurrentEase(std::static_pointer_cast<Animation::TypedPropertyTrack<glm::vec3>>(pTrack)->track);
                         else if (pTrack->GetType() == Animation::PropertyType::Vec4) findCurrentEase(std::static_pointer_cast<Animation::TypedPropertyTrack<glm::vec4>>(pTrack)->track);
@@ -735,8 +764,8 @@ void AnimatorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                 else if (sk.track == 3) applyValueEdit(clip->scaleTrack);
                 else {
                     size_t pIdx = sk.track - 4;
-                    if (pIdx < clip->propertyTracks.size()) {
-                        auto pt = clip->propertyTracks[pIdx];
+                    if (pIdx < visibleTracks.size()) {
+                        auto pt = visibleTracks[pIdx];
                         if (pt->GetType() == Animation::PropertyType::Float) applyValueEdit(std::static_pointer_cast<Animation::TypedPropertyTrack<float>>(pt)->track);
                         else if (pt->GetType() == Animation::PropertyType::Vec3) applyValueEdit(std::static_pointer_cast<Animation::TypedPropertyTrack<glm::vec3>>(pt)->track);
                         else if (pt->GetType() == Animation::PropertyType::Vec4) applyValueEdit(std::static_pointer_cast<Animation::TypedPropertyTrack<glm::vec4>>(pt)->track);
@@ -858,9 +887,9 @@ void AnimatorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             deleteFromTrack(clip->rotationTrack, 2);
             deleteFromTrack(clip->scaleTrack, 3);
 
-            for (size_t p = 0; p < clip->propertyTracks.size(); ++p) {
+            for (size_t p = 0; p < visibleTracks.size(); ++p) {
                 int pTrackIdx = 4 + static_cast<int>(p);
-                auto pTrack = clip->propertyTracks[p];
+                auto pTrack = visibleTracks[p];
                 if (pTrack->GetType() == Animation::PropertyType::Float) {
                     auto t = std::static_pointer_cast<Animation::TypedPropertyTrack<float>>(pTrack);
                     deleteFromTrack(t->track, pTrackIdx);
@@ -927,9 +956,9 @@ void AnimatorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             copyToBoard(clip->rotationTrack, 2, [](ClipboardKey& ck, const glm::quat& val) { ck.q = val; });
             copyToBoard(clip->scaleTrack, 3, [](ClipboardKey& ck, const glm::vec3& val) { ck.v3 = val; });
 
-            for (size_t p = 0; p < clip->propertyTracks.size(); ++p) {
+            for (size_t p = 0; p < visibleTracks.size(); ++p) {
                 int pTrackIdx = 4 + static_cast<int>(p);
-                auto pTrack = clip->propertyTracks[p];
+                auto pTrack = visibleTracks[p];
                 if (pTrack->GetType() == Animation::PropertyType::Float) {
                     auto t = std::static_pointer_cast<Animation::TypedPropertyTrack<float>>(pTrack);
                     copyToBoard(t->track, pTrackIdx, [](ClipboardKey& ck, float val) { ck.fVal = val; });
@@ -981,27 +1010,22 @@ void AnimatorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                 else if (ck.track == 3) clip->scaleTrack.AddKeyframe(t, ck.v3, ck.ease);
                 else {
                     size_t propIdx = ck.track - 4;
-                    if (propIdx < clip->propertyTracks.size()) {
-                        auto pTrack = clip->propertyTracks[propIdx];
+                    if (propIdx < visibleTracks.size()) {
+                        auto pTrack = visibleTracks[propIdx];
                         if (pTrack->GetType() == Animation::PropertyType::Float) {
-                            auto trk = std::static_pointer_cast<Animation::TypedPropertyTrack<float>>(pTrack);
-                            trk->track.AddKeyframe(t, ck.fVal, ck.ease);
+                            std::static_pointer_cast<Animation::TypedPropertyTrack<float>>(pTrack)->track.AddKeyframe(t, ck.fVal, ck.ease);
                         }
                         else if (pTrack->GetType() == Animation::PropertyType::Vec3) {
-                            auto trk = std::static_pointer_cast<Animation::TypedPropertyTrack<glm::vec3>>(pTrack);
-                            trk->track.AddKeyframe(t, ck.v3, ck.ease);
+                            std::static_pointer_cast<Animation::TypedPropertyTrack<glm::vec3>>(pTrack)->track.AddKeyframe(t, ck.v3, ck.ease);
                         }
                         else if (pTrack->GetType() == Animation::PropertyType::Vec4) {
-                            auto trk = std::static_pointer_cast<Animation::TypedPropertyTrack<glm::vec4>>(pTrack);
-                            trk->track.AddKeyframe(t, ck.v4, ck.ease);
+                            std::static_pointer_cast<Animation::TypedPropertyTrack<glm::vec4>>(pTrack)->track.AddKeyframe(t, ck.v4, ck.ease);
                         }
                         else if (pTrack->GetType() == Animation::PropertyType::Quat) {
-                            auto trk = std::static_pointer_cast<Animation::TypedPropertyTrack<glm::quat>>(pTrack);
-                            trk->track.AddKeyframe(t, ck.q, ck.ease);
+                            std::static_pointer_cast<Animation::TypedPropertyTrack<glm::quat>>(pTrack)->track.AddKeyframe(t, ck.q, ck.ease);
                         }
                         else if (pTrack->GetType() == Animation::PropertyType::Bool) {
-                            auto trk = std::static_pointer_cast<Animation::TypedPropertyTrack<bool>>(pTrack);
-                            trk->track.AddKeyframe(t, ck.bVal, ck.ease);
+                            std::static_pointer_cast<Animation::TypedPropertyTrack<bool>>(pTrack)->track.AddKeyframe(t, ck.bVal, ck.ease);
                         }
                     }
                 }
@@ -1084,8 +1108,8 @@ void AnimatorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                 else if (ghost.track == 3) eraseOldKey(clip->scaleTrack, 3, ghost.origTime);
                 else {
                     size_t propIdx = ghost.track - 4;
-                    if (propIdx < clip->propertyTracks.size()) {
-                        auto pTrack = clip->propertyTracks[propIdx];
+                    if (propIdx < visibleTracks.size()) {
+                        auto pTrack = visibleTracks[propIdx];
                         if (pTrack->GetType() == Animation::PropertyType::Float) eraseOldKey(std::static_pointer_cast<Animation::TypedPropertyTrack<float>>(pTrack)->track, ghost.track, ghost.origTime);
                         else if (pTrack->GetType() == Animation::PropertyType::Vec3) eraseOldKey(std::static_pointer_cast<Animation::TypedPropertyTrack<glm::vec3>>(pTrack)->track, ghost.track, ghost.origTime);
                         else if (pTrack->GetType() == Animation::PropertyType::Vec4) eraseOldKey(std::static_pointer_cast<Animation::TypedPropertyTrack<glm::vec4>>(pTrack)->track, ghost.track, ghost.origTime);
@@ -1105,8 +1129,8 @@ void AnimatorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                 else if (ghost.track == 3) clip->scaleTrack.AddKeyframe(newTime, ghost.v3, ghost.ease);
                 else {
                     size_t propIdx = ghost.track - 4;
-                    if (propIdx < clip->propertyTracks.size()) {
-                        auto pTrack = clip->propertyTracks[propIdx];
+                    if (propIdx < visibleTracks.size()) {
+                        auto pTrack = visibleTracks[propIdx];
                         if (pTrack->GetType() == Animation::PropertyType::Float) {
                             std::static_pointer_cast<Animation::TypedPropertyTrack<float>>(pTrack)->track.AddKeyframe(newTime, ghost.fVal, ghost.ease);
                         }
@@ -1142,5 +1166,4 @@ void AnimatorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 
     ImGui::End();
 }
-
 }

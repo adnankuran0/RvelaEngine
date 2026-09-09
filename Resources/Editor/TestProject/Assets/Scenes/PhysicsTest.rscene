@@ -1300,7 +1300,7 @@
         {
             "AnimatorComponent": {
                 "autoplay": true,
-                "currentClipName": "Walk_Loop",
+                "currentClipName": "Sprint_Loop",
                 "libraryUUID": "064411d0-68f6-4198-89cb-511ef790210c",
                 "playbackSpeed": 1.0
             },
