@@ -1,0 +1,68 @@
+{
+    "Entities": [
+        {
+            "AnimatorComponent": {
+                "autoplay": false,
+                "currentClipName": "finger_gun_broken",
+                "libraryUUID": "64e761cb-f722-4192-962e-3f7865e79c84",
+                "playbackSpeed": 1.0
+            },
+            "SkeletonComponent": {
+                "skeleton": "24446ef4-6e1d-44a3-bd3d-52fa55884da5"
+            },
+            "Tag": {
+                "tag": "arms_rig"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 16940790231528804001
+        },
+        {
+            "Material": {
+                "material": "0c838948-6309-4a6d-8adf-c4a3138cfc10"
+            },
+            "ParentUUID": 16940790231528804001,
+            "SkeletalMeshComponent": {
+                "skeletalMesh": "36029c80-1ece-4cad-82a1-28273260beda"
+            },
+            "Tag": {
+                "tag": "ArmsMesh"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 7007562944392620324
+        }
+    ]
+}

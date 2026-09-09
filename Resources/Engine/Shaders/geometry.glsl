@@ -1,19 +1,31 @@
 #shader vertex
 #version 460 core
+
 layout(location = 0) in vec3 aPos;
 layout(location = 1) in vec3 aNormal;
 layout(location = 2) in vec3 aTangent;
+
+#ifdef SKELETAL
+layout(location = 3) in vec2 aTexCoords;
+layout(location = 4) in uvec4 aBoneIDs;
+layout(location = 5) in vec4 aWeights;
+
+const int MAX_BONES = 100;
+uniform mat4 u_BoneMatrices[MAX_BONES];
+#else
 layout(location = 3) in vec3 aBitangent;
 layout(location = 4) in vec2 aTexCoords;
 
-#include "Common/Camera.glsl"
 #include "Common/Billboard.glsl"
+uniform int billboardMode;
+#endif
+
+#include "Common/Camera.glsl"
 
 uniform mat4 model;
 uniform mat3 normalMatrix;
 uniform vec2 UVScale;
 uniform vec2 UVOffset;
-uniform int billboardMode;
 
 out vec3 FragPos;
 out vec3 Normal;
@@ -24,6 +36,26 @@ void main()
     vec4 worldPos;
     vec3 calculatedViewNormal;
 
+#ifdef SKELETAL
+    mat4 skinMatrix = mat4(0.0);
+    float totalWeight = 0.0;
+
+    for (int i = 0; i < 4; ++i)
+    {
+        if (aWeights[i] <= 0.0) continue;
+        skinMatrix += u_BoneMatrices[aBoneIDs[i]] * aWeights[i];
+        totalWeight += aWeights[i];
+    }
+
+    if (totalWeight <= 0.0001)
+        skinMatrix = mat4(1.0);
+
+    vec4 skinnedPos = skinMatrix * vec4(aPos, 1.0);
+    vec3 skinnedNormal = mat3(skinMatrix) * aNormal;
+
+    worldPos = model * skinnedPos;
+    calculatedViewNormal = mat3(view) * (normalMatrix * skinnedNormal);
+#else
     if (billboardMode == 0)
     {
         worldPos = model * vec4(aPos, 1.0);
@@ -43,6 +75,7 @@ void main()
             calculatedViewNormal = mat3(view) * bb.normal;
         }
     }
+#endif
 
     FragPos = vec3(view * worldPos);
     Normal = calculatedViewNormal;

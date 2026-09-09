@@ -1,0 +1,42 @@
+{
+    "UVOffset": [
+        0.0,
+        0.0
+    ],
+    "UVScale": [
+        1.0,
+        1.0
+    ],
+    "albedoColor": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+    ],
+    "albedoTexture": "ecc14b23-b73b-4cf5-8da8-f94ce954c893",
+    "alphaCutoff": 0.5,
+    "ao": 1.0,
+    "billboardMode": 0,
+    "blendMode": 0,
+    "cullMode": 0,
+    "emissiveColor": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "emissiveIntensity": 0.0,
+    "heightScale": 0.10000000149011612,
+    "metallic": 0.0,
+    "normalScale": 1.0,
+    "receiveShadows": true,
+    "roughness": 1.0,
+    "shadingMode": 0,
+    "specular": 1.0,
+    "transparencyMode": 0,
+    "useAOMap": false,
+    "useAlbedoMap": true,
+    "useHeightMap": false,
+    "useMetallicMap": false,
+    "useNormalMap": false,
+    "useRoughnessMap": false
+}

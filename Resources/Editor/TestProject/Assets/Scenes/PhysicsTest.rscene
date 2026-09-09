@@ -23,14 +23,14 @@
                     -6.103591294959188e-05
                 ],
                 "rotation": [
-                    -45.930179595947266,
-                    60.79781723022461,
-                    4.400894641876221
+                    -39.69085693359375,
+                    60.7983283996582,
+                    4.400930881500244
                 ],
                 "scale": [
-                    0.9999997019767761,
-                    0.9999991655349731,
-                    0.9999996423721313
+                    0.9999997615814209,
+                    0.9999998807907104,
+                    0.9999998807907104
                 ]
             },
             "UUID": 10
@@ -75,9 +75,6 @@
             },
             "Material": {
                 "material": "6f565b83-e131-46f0-9aad-316fee6b6ff2"
-            },
-            "Mesh": {
-                "mesh": "62345031-f93b-40f4-aa76-18c59801997d"
             },
             "ParentUUID": 0,
             "ScriptComponent": {
@@ -168,6 +165,71 @@
                 ]
             },
             "UUID": 29
+        },
+        {
+            "AnimatorComponent": {
+                "autoplay": true,
+                "currentClipName": "relax",
+                "libraryUUID": "64e761cb-f722-4192-962e-3f7865e79c84",
+                "playbackSpeed": 1.0
+            },
+            "ParentUUID": 29,
+            "SkeletonComponent": {
+                "skeleton": "24446ef4-6e1d-44a3-bd3d-52fa55884da5"
+            },
+            "Tag": {
+                "tag": "arms_rig"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    1.547431907056307e-07,
+                    -1.7316066026687622,
+                    -0.06146897003054619
+                ],
+                "rotation": [
+                    180.0,
+                    -1.0245376870443579e-05,
+                    180.0
+                ],
+                "scale": [
+                    0.9999937415122986,
+                    1.0,
+                    0.9999957084655762
+                ]
+            },
+            "UUID": 10655293225911428349
+        },
+        {
+            "Material": {
+                "material": "0c838948-6309-4a6d-8adf-c4a3138cfc10"
+            },
+            "ParentUUID": 10655293225911428349,
+            "SkeletalMeshComponent": {
+                "skeletalMesh": "36029c80-1ece-4cad-82a1-28273260beda"
+            },
+            "Tag": {
+                "tag": "ArmsMesh"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 3793135824877590733
         },
         {
             "Material": {
@@ -1362,15 +1424,15 @@
         "Bloom_Intensity": 1.0,
         "Bloom_Knee": 0.0,
         "Bloom_Treshold": 1.0,
-        "HDRPath": "Assets\\Textures\\skybox\\environment2.hdr",
+        "HDRPath": "Assets\\Textures\\skybox\\environment.hdr",
         "Lighting_AmbientColor": [
             1.0,
             1.0,
             1.0
         ],
-        "Lighting_AmbientIntensity": 0.5,
+        "Lighting_AmbientIntensity": 0.0,
         "Lighting_IBL": true,
-        "Lighting_IBLIntensity": 0.20000000298023224,
+        "Lighting_IBLIntensity": 0.30000001192092896,
         "PostProcess_ChromaticStrength": 0.009999999776482582,
         "PostProcess_Exposure": 1.0,
         "PostProcess_VignetteIntensity": 0.25,

@@ -1,0 +1,52 @@
+{
+    "dependencies": [],
+    "importerID": "ModelImporter",
+    "importerSettings": {
+        "generatePrefab": true,
+        "importMaterials": true,
+        "importNormals": true,
+        "importTangents": true,
+        "importTextures": true,
+        "importUVs": true,
+        "scale": 1.0
+    },
+    "lastWriteTime": 13424844979,
+    "subAssets": [
+        {
+            "hasCache": false,
+            "index": 0,
+            "name": "arms_rig_Mat0",
+            "type": "Material",
+            "uuid": "0c838948-6309-4a6d-8adf-c4a3138cfc10"
+        },
+        {
+            "hasCache": false,
+            "index": 1,
+            "name": "arms_rig_Mat1",
+            "type": "Material",
+            "uuid": "2f377e81-607e-4230-93c3-c4dded3d1e18"
+        },
+        {
+            "hasCache": false,
+            "index": 0,
+            "name": "arms_rig_Skeleton",
+            "type": "Skeleton",
+            "uuid": "24446ef4-6e1d-44a3-bd3d-52fa55884da5"
+        },
+        {
+            "hasCache": true,
+            "index": 0,
+            "name": "ArmsMesh",
+            "type": "SkeletalMesh",
+            "uuid": "36029c80-1ece-4cad-82a1-28273260beda"
+        },
+        {
+            "hasCache": false,
+            "index": 0,
+            "name": "arms_rig_AnimLib",
+            "type": "AnimationLib",
+            "uuid": "64e761cb-f722-4192-962e-3f7865e79c84"
+        }
+    ],
+    "uuid": "d09934b6-48a3-4e7e-9aeb-b02cef3a24c7"
+}
