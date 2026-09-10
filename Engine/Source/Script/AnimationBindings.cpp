@@ -37,10 +37,10 @@ void rv::LuaBindings::RegisterAnimationAPI(sol::state& lua)
                 if (auto* c = h.Get()) c->Play();
             },
             [](AnimatorHandle& h, const std::string& clipName) {
-                if (auto* c = h.Get()) {
-                    c->SetClip(clipName);
-                    c->Play();
-                }
+                if (auto* c = h.Get()) c->Play(clipName, 0.0f);
+            },
+            [](AnimatorHandle& h, const std::string& clipName, float blendTime) {
+                if (auto* c = h.Get()) c->Play(clipName, blendTime);
             }
         ),
         "Pause", [](AnimatorHandle& h) {

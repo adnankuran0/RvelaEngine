@@ -49,6 +49,33 @@ void AnimatorComponent::SetClip(const std::string& clipName)
     isStarted = false;
 }
 
+void AnimatorComponent::Play(const std::string& clipName, float blendTime)
+{
+    if (!library || !library->HasClip(clipName))
+        return;
+
+    if (currentClipName == clipName && isPlaying)
+        return;
+
+    bool wantsBlend = blendTime > 0.0f && currentClip != nullptr;
+
+    SetClip(clipName);
+    isPlaying = true;
+    isStarted = false;
+
+    if (wantsBlend)
+    {
+        isBlending = true;
+        blendDuration = blendTime;
+        blendElapsed = 0.0f;
+        blendSnapshotTaken = false;
+    }
+    else
+    {
+        isBlending = false;
+    }
+}
+
 json AnimatorComponent::Serialize() const
 {
     json j;

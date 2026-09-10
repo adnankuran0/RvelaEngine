@@ -27,6 +27,7 @@ void LuaBindings::RegisterMath(sol::state& lua)
             [](float s, const glm::vec2& a) { return a * s; }
         ),
         "__div", [](const glm::vec2& a, float s) { return a / s; },
+        sol::meta_function::unary_minus, [](const glm::vec2& v) { return -v; },
         sol::meta_function::to_string, [](const glm::vec2& v)
         {
             return std::format("Vec2({}, {})", v.x, v.y);
@@ -61,6 +62,7 @@ void LuaBindings::RegisterMath(sol::state& lua)
             [](float s, const glm::vec3& a) { return a * s; }
         ),
         "__div", [](const glm::vec3& a, float s) { return a / s; },
+        sol::meta_function::unary_minus, [](const glm::vec3& v) { return -v; },
         sol::meta_function::to_string, [](const glm::vec3& v)
         {
             return std::format("Vec3({}, {}, {})", v.x, v.y, v.z);
@@ -99,6 +101,7 @@ void LuaBindings::RegisterMath(sol::state& lua)
             [](const glm::vec4& a, const glm::vec4& b) { return a * b; }
         ),
         "__div", [](const glm::vec4& a, float s) { return a / s; },
+        sol::meta_function::unary_minus, [](const glm::vec4& v) { return -v; },
         sol::meta_function::to_string, [](const glm::vec4& v)
         {
             return std::format("Vec4({}, {}, {}, {})", v.x, v.y, v.z, v.w);

@@ -123,6 +123,26 @@ void AnimationSystem::Update()
         const auto& clip = animator.currentClip;
         float duration = clip->duration;
 
+        if (animator.isBlending && !animator.blendSnapshotTaken)
+        {
+            animator.blendFromPosition = transform.GetPosition();
+            animator.blendFromRotation = transform.GetRotation();
+            animator.blendFromScale = transform.GetScale();
+
+            if (reg.any_of<SkeletonComponent>(entity))
+            {
+                auto& skel = reg.get<SkeletonComponent>(entity);
+                if (!skel.localPositions.empty())
+                {
+                    animator.blendFromBonePositions = skel.localPositions;
+                    animator.blendFromBoneRotations = skel.localRotations;
+                    animator.blendFromBoneScales = skel.localScales;
+                }
+            }
+
+            animator.blendSnapshotTaken = true;
+        }
+
         if (animator.isPlaying)
         {
             float dt = Time::GetDeltaTime() * animator.playbackSpeed;
@@ -223,22 +243,39 @@ void AnimationSystem::Update()
 
         float sampleTime = animator.currentTime;
 
+        float blendAlpha = 1.0f;
+        if (animator.isBlending)
+        {
+            animator.blendElapsed += Time::GetDeltaTime();
+            blendAlpha = animator.blendDuration > 0.0f
+                ? std::clamp(animator.blendElapsed / animator.blendDuration, 0.0f, 1.0f)
+                : 1.0f;
+        }
+
         if (!clip->positionTrack.keyframes.empty())
         {
-            transform.SetPosition(clip->positionTrack.Sample(sampleTime));
+            glm::vec3 targetPos = clip->positionTrack.Sample(sampleTime);
+            transform.SetPosition(animator.isBlending
+                ? glm::mix(animator.blendFromPosition, targetPos, blendAlpha)
+                : targetPos);
             transform.SetDirty();
         }
 
         if (!clip->rotationTrack.keyframes.empty())
         {
-            glm::quat sampledRot = clip->rotationTrack.Sample(sampleTime);
-            transform.SetRotation(sampledRot);
+            glm::quat targetRot = clip->rotationTrack.Sample(sampleTime);
+            transform.SetRotation(animator.isBlending
+                ? glm::slerp(animator.blendFromRotation, targetRot, blendAlpha)
+                : targetRot);
             transform.SetDirty();
         }
 
         if (!clip->scaleTrack.keyframes.empty())
         {
-            transform.SetScale(clip->scaleTrack.Sample(sampleTime));
+            glm::vec3 targetScale = clip->scaleTrack.Sample(sampleTime);
+            transform.SetScale(animator.isBlending
+                ? glm::mix(animator.blendFromScale, targetScale, blendAlpha)
+                : targetScale);
             transform.SetDirty();
         }
 
@@ -258,6 +295,27 @@ void AnimationSystem::Update()
                     propTrack->Apply(reg, targetEntity, sampleTime);
                 }
             }
+        }
+
+        if (animator.isBlending && reg.any_of<SkeletonComponent>(entity))
+        {
+            auto& skel = reg.get<SkeletonComponent>(entity);
+            size_t boneCount = skel.localPositions.size();
+
+            if (boneCount > 0 && animator.blendFromBonePositions.size() == boneCount)
+            {
+                for (size_t i = 0; i < boneCount; ++i)
+                {
+                    skel.localPositions[i] = glm::mix(animator.blendFromBonePositions[i], skel.localPositions[i], blendAlpha);
+                    skel.localRotations[i] = glm::slerp(animator.blendFromBoneRotations[i], skel.localRotations[i], blendAlpha);
+                    skel.localScales[i] = glm::mix(animator.blendFromBoneScales[i], skel.localScales[i], blendAlpha);
+                }
+            }
+        }
+
+        if (animator.isBlending && blendAlpha >= 1.0f)
+        {
+            animator.isBlending = false;
         }
     }
 
