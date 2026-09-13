@@ -73,6 +73,21 @@
             "UUID": 11476915330109307513
         },
         {
+            "AudioEmitterComponent": {
+                "attenuationModel": 1,
+                "audioClip": "e7dc7a60-7295-4655-85f4-34ce2a2975d9",
+                "busID": 0,
+                "doppler": true,
+                "dopplerFactor": 1.0,
+                "loop": false,
+                "maxDistance": 100.0,
+                "minDistance": 1.0,
+                "pitch": 1.0,
+                "playOnCreate": false,
+                "rolloff": 1.0,
+                "spatial": false,
+                "volume": 2.0
+            },
             "CapsuleColliderComponent": {
                 "halfHeight": 0.6499999761581421,
                 "offset": [
@@ -243,7 +258,10 @@
         },
         {
             "Material": {
-                "material": "731201d1-4fef-460f-925d-82ad78443def"
+                "material": "731201d1-4fef-460f-925d-82ad78443def",
+                "overrides": {
+                    "roughness": 0.15000000596046448
+                }
             },
             "ParentUUID": 18000574449146859532,
             "SkeletalMeshComponent": {

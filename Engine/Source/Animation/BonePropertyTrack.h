@@ -3,6 +3,7 @@
 #include "Animation/AnimationTrack.h"
 #include "Scene/Components/SkeletonComponent.h"
 #include "Asset/AssetManager.h"
+#include "Asset/AssetUUID.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
@@ -20,7 +21,10 @@ class BonePropertyTrack : public IPropertyTrack
 public:
     AnimationTrack<T> track;
     BoneTransformType transformType = BoneTransformType::Rotation;
+
     mutable int cachedBoneIndex = -2;
+
+    mutable AssetUUID cachedSkeletonUUID;
 
     PropertyType GetType() const override;
 
@@ -39,16 +43,23 @@ public:
 
         auto& skel = reg.get<SkeletonComponent>(targetEntity);
 
+        if (skel.GetSkeletonID() != cachedSkeletonUUID)
+        {
+            cachedBoneIndex = -2;
+            cachedSkeletonUUID = skel.GetSkeletonID();
+        }
+
         if (cachedBoneIndex == -2)
         {
             auto skeletonAsset = AssetManager::Get().GetAsset<SkeletonAsset>(skel.GetSkeletonID());
-            if (skeletonAsset)
+
+            if (skeletonAsset && skeletonAsset->IsValid())
             {
                 cachedBoneIndex = skeletonAsset->FindBoneIndex(targetPath);
             }
             else
             {
-                cachedBoneIndex = -1;
+                return;
             }
         }
 
@@ -79,6 +90,7 @@ public:
         cloned->transformType = transformType;
         cloned->track = track;
         cloned->cachedBoneIndex = -2;
+        cloned->cachedSkeletonUUID = AssetUUID{};
         return cloned;
     }
 };

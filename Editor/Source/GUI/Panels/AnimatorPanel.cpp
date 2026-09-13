@@ -3,6 +3,9 @@
 #include "Scene/Components/AnimatorComponent.h"
 #include "Scene/Components/TransformComponent.h"
 #include "Scene/Components/SceneTreeComponent.h"
+#include "Animation/AnimationSystem.h"
+#include "Animation/BonePropertyTrack.h"
+#include "Scene/Components/SkeletonComponent.h"
 #include "Scene/Components/TagComponent.h"
 #include "AssetImporters/AnimationLibrarySerializer.h"
 #include "Asset/AssetManager.h"
@@ -166,11 +169,27 @@ void AnimatorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
         }
 
         Animation::PropertyBindingRegistry::Get().Init();
+
+        bool touchedSkeleton = false;
+
         for (const auto& propTrack : clip->propertyTracks) {
+            auto type = propTrack->GetType();
+
+            if (type == Animation::PropertyType::BoneVec3 || type == Animation::PropertyType::BoneQuat) {
+                propTrack->Apply(registry, selectedEntity, animator.currentTime);
+                touchedSkeleton = true;
+                continue;
+            }
+
             entt::entity targetEntity = ResolvePathStatic(registry, selectedEntity, propTrack->targetPath);
             if (targetEntity != entt::null && registry.valid(targetEntity)) {
                 propTrack->Apply(registry, targetEntity, animator.currentTime);
             }
+        }
+
+        if (touchedSkeleton && registry.any_of<SkeletonComponent>(selectedEntity)) {
+            auto& skel = registry.get<SkeletonComponent>(selectedEntity);
+            AnimationSystem::UpdateSkeletonBones(skel);
         }
         };
 

@@ -10,7 +10,7 @@ TPSCharacter.rotationSpeed = 12.0
 
 function TPSCharacter:OnCreate()
     self.cb = self.entity:GetComponent("CharacterBodyComponent")
-
+    self.ae = self.entity:GetComponent("AudioEmitterComponent")
     self.camHolder = self.scene:FindEntityByName("CameraHolder")
     self.mesh = self.scene:FindEntityByName("Mesh")
 
@@ -194,4 +194,18 @@ end
     self.wasGrounded = isGrounded
 end
 
+function TPSCharacter:OnAnimationEvent(source, eventName, parameter)
+    if source ~= self.mesh then
+        return
+    end
+
+    if eventName == "PlayFootstep" then
+        if self.ae then
+            self.ae.pitch = 0.9 + math.random() * 0.20
+            self.ae:Play()
+        end
+    end
+end
+
 return TPSCharacter
+

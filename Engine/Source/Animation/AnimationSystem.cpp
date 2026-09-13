@@ -206,31 +206,33 @@ void AnimationSystem::Update()
                 m_EventQueue.push_back({ entity, Animation::EventType::Looped, animator.currentClipName, "", "" });
             }
 
-            if (!clip->eventTrack.empty() && reg.any_of<ScriptComponent>(entity))
+            if (!clip->eventTrack.empty())
             {
-                auto& sc = reg.get<ScriptComponent>(entity);
-                if (sc.luaInstance.valid() && sc.OnAnimationEvent.valid())
+                for (const auto& ev : clip->eventTrack)
                 {
-                    for (const auto& ev : clip->eventTrack)
+                    bool triggered = false;
+
+                    if (!looped)
                     {
-                        bool triggered = false;
-
-                        if (!looped)
-                        {
-                            if (dt >= 0.0f)
-                                triggered = (ev.time > prevTime && ev.time <= currTime);
-                            else
-                                triggered = (ev.time < prevTime && ev.time >= currTime);
-                        }
+                        if (dt >= 0.0f)
+                            triggered = ev.time > prevTime && ev.time <= currTime;
                         else
-                        {
-                            triggered = (ev.time > prevTime || ev.time <= animator.currentTime);
-                        }
+                            triggered = ev.time < prevTime && ev.time >= currTime;
+                    }
+                    else
+                    {
+                        triggered = ev.time > prevTime || ev.time <= animator.currentTime;
+                    }
 
-                        if (triggered)
-                        {
-                            m_EventQueue.push_back({ entity, Animation::EventType::Triggered, animator.currentClipName, ev.name, ev.parameter });
-                        }
+                    if (triggered)
+                    {
+                        m_EventQueue.push_back({
+                            entity,
+                            Animation::EventType::Triggered,
+                            animator.currentClipName,
+                            ev.name,
+                            ev.parameter
+                            });
                     }
                 }
             }
@@ -252,50 +254,54 @@ void AnimationSystem::Update()
                 : 1.0f;
         }
 
-        if (!clip->positionTrack.keyframes.empty())
+        if (animator.isPlaying)
         {
-            glm::vec3 targetPos = clip->positionTrack.Sample(sampleTime);
-            transform.SetPosition(animator.isBlending
-                ? glm::mix(animator.blendFromPosition, targetPos, blendAlpha)
-                : targetPos);
-            transform.SetDirty();
-        }
-
-        if (!clip->rotationTrack.keyframes.empty())
-        {
-            glm::quat targetRot = clip->rotationTrack.Sample(sampleTime);
-            transform.SetRotation(animator.isBlending
-                ? glm::slerp(animator.blendFromRotation, targetRot, blendAlpha)
-                : targetRot);
-            transform.SetDirty();
-        }
-
-        if (!clip->scaleTrack.keyframes.empty())
-        {
-            glm::vec3 targetScale = clip->scaleTrack.Sample(sampleTime);
-            transform.SetScale(animator.isBlending
-                ? glm::mix(animator.blendFromScale, targetScale, blendAlpha)
-                : targetScale);
-            transform.SetDirty();
-        }
-
-        for (const auto& propTrack : clip->propertyTracks)
-        {
-            auto type = propTrack->GetType();
-
-            if (type == Animation::PropertyType::BoneVec3 || type == Animation::PropertyType::BoneQuat)
+            if (!clip->positionTrack.keyframes.empty())
             {
-                propTrack->Apply(reg, entity, sampleTime);
+                glm::vec3 targetPos = clip->positionTrack.Sample(sampleTime);
+                transform.SetPosition(animator.isBlending
+                    ? glm::mix(animator.blendFromPosition, targetPos, blendAlpha)
+                    : targetPos);
+                transform.SetDirty();
             }
-            else
+
+            if (!clip->rotationTrack.keyframes.empty())
             {
-                entt::entity targetEntity = ResolveAnimPath(entity, propTrack->targetPath);
-                if (targetEntity != entt::null && reg.valid(targetEntity))
+                glm::quat targetRot = clip->rotationTrack.Sample(sampleTime);
+                transform.SetRotation(animator.isBlending
+                    ? glm::slerp(animator.blendFromRotation, targetRot, blendAlpha)
+                    : targetRot);
+                transform.SetDirty();
+            }
+
+            if (!clip->scaleTrack.keyframes.empty())
+            {
+                glm::vec3 targetScale = clip->scaleTrack.Sample(sampleTime);
+                transform.SetScale(animator.isBlending
+                    ? glm::mix(animator.blendFromScale, targetScale, blendAlpha)
+                    : targetScale);
+                transform.SetDirty();
+            }
+
+            for (const auto& propTrack : clip->propertyTracks)
+            {
+                auto type = propTrack->GetType();
+
+                if (type == Animation::PropertyType::BoneVec3 || type == Animation::PropertyType::BoneQuat)
                 {
-                    propTrack->Apply(reg, targetEntity, sampleTime);
+                    propTrack->Apply(reg, entity, sampleTime);
+                }
+                else
+                {
+                    entt::entity targetEntity = ResolveAnimPath(entity, propTrack->targetPath);
+                    if (targetEntity != entt::null && reg.valid(targetEntity))
+                    {
+                        propTrack->Apply(reg, targetEntity, sampleTime);
+                    }
                 }
             }
         }
+        
 
         if (animator.isBlending && reg.any_of<SkeletonComponent>(entity))
         {

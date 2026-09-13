@@ -16,6 +16,8 @@ public:
     void OnStart();
     void Update();
 
+    static void UpdateSkeletonBones(SkeletonComponent& skel);
+
     std::vector<Animation::AnimationDispatchEvent> FlushEvents()
     {
         return std::move(m_EventQueue);
@@ -23,8 +25,6 @@ public:
 
 private:
     entt::entity ResolveAnimPath(entt::entity root, const std::string& path);
-
-    void UpdateSkeletonBones(SkeletonComponent& skel);
 
     std::vector<Animation::AnimationDispatchEvent> m_EventQueue;
     Scene& m_Scene;

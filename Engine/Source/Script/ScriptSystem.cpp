@@ -246,45 +246,51 @@ void ScriptSystem::DispatchAnimationEvents()
 {
     auto events = m_Scene.GetAnimationSystem().FlushEvents();
     auto& reg = m_Scene.GetRegistry();
+    auto scriptView = reg.view<ScriptComponent>();
 
     for (const auto& ev : events)
     {
         if (!reg.valid(ev.entity))
             continue;
 
-        ScriptComponent* sc = reg.try_get<ScriptComponent>(ev.entity);
-        if (!sc || !sc->luaInstance.valid())
-            continue;
+        Entity source(ev.entity, &m_Scene);
 
-        sol::protected_function_result result;
-
-        switch (ev.type)
+        for (auto entity : scriptView)
         {
-        case Animation::EventType::Started:
-            if (sc->OnAnimationStarted.valid())
-                result = sc->OnAnimationStarted(sc->luaInstance, ev.clipName);
-            break;
+            auto& sc = scriptView.get<ScriptComponent>(entity);
+            if (!sc.luaInstance.valid())
+                continue;
 
-        case Animation::EventType::Looped:
-            if (sc->OnAnimationLooped.valid())
-                result = sc->OnAnimationLooped(sc->luaInstance, ev.clipName);
-            break;
+            sol::protected_function_result result;
 
-        case Animation::EventType::Finished:
-            if (sc->OnAnimationFinished.valid())
-                result = sc->OnAnimationFinished(sc->luaInstance, ev.clipName);
-            break;
+            switch (ev.type)
+            {
+            case Animation::EventType::Started:
+                if (sc.OnAnimationStarted.valid())
+                    result = sc.OnAnimationStarted(sc.luaInstance, ev.clipName);
+                break;
 
-        case Animation::EventType::Triggered:
-            if (sc->OnAnimationEvent.valid())
-                result = sc->OnAnimationEvent(sc->luaInstance, ev.eventName, ev.parameter);
-            break;
-        }
+            case Animation::EventType::Looped:
+                if (sc.OnAnimationLooped.valid())
+                    result = sc.OnAnimationLooped(sc.luaInstance, ev.clipName);
+                break;
 
-        if (!result.valid())
-        {
-            sol::error err = result;
-            LOG_ERROR("Lua Animation Event error: {}", err.what());
+            case Animation::EventType::Finished:
+                if (sc.OnAnimationFinished.valid())
+                    result = sc.OnAnimationFinished(sc.luaInstance, ev.clipName);
+                break;
+
+            case Animation::EventType::Triggered:
+                if (sc.OnAnimationEvent.valid())
+                    result = sc.OnAnimationEvent(sc.luaInstance, source, ev.eventName, ev.parameter);
+                break;
+            }
+
+            if (result.valid() == false && result.status() != sol::call_status::ok)
+            {
+                sol::error err = result;
+                LOG_ERROR("Lua Animation Event error: {}", err.what());
+            }
         }
     }
 }

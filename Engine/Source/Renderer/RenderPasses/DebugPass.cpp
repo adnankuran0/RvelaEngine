@@ -42,13 +42,18 @@ void DebugPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 void DebugPass::DrawAABBs(const RenderContext& ctx)
 {
     auto& reg = ctx.scene->GetRegistry();
-       
-    auto view = reg.view<MeshRendererComponent>();
-    for (auto e : view)
+
+    auto meshView = reg.view<MeshRendererComponent>();
+    for (auto e : meshView)
     {
         auto& comp = reg.get<MeshRendererComponent>(e);
-        DebugRenderer::Get().DrawBox(comp.worldAABB.min, comp.worldAABB.max, { 0.0,1.0,1.0,1.0 });
+        DebugRenderer::Get().DrawBox(comp.worldAABB.min, comp.worldAABB.max, { 0.0f, 1.0f, 1.0f, 1.0f });
     }
-   
 
+    auto skelView = reg.view<SkeletalMeshRendererComponent>();
+    for (auto e : skelView)
+    {
+        auto& comp = reg.get<SkeletalMeshRendererComponent>(e);
+        DebugRenderer::Get().DrawBox(comp.worldAABB.min, comp.worldAABB.max, { 0.0f, 1.0f, 1.0f, 1.0f });
+    }
 }

@@ -84,9 +84,64 @@ void TransformSystem::UpdateNodeRecursive(entt::entity e, const glm::mat4& paren
         meshRenderer.worldAABB = meshRenderer.localAABB.CalculateWorldAABB(worldMatrix);
     }
 
+    if (isDirty && m_Scene.HasComponent<SkeletalMeshRendererComponent>(e)) {
+        auto& meshRenderer = m_Scene.GetComponent<SkeletalMeshRendererComponent>(e);
+
+        entt::entity skelEntity = FindSkeletonEntity(e);
+
+        if (skelEntity != entt::null) {
+            auto& skel = m_Scene.GetComponent<SkeletonComponent>(skelEntity);
+
+            if (!skel.modelSpaceMatrices.empty()) {
+                glm::vec3 boneMin(FLT_MAX);
+                glm::vec3 boneMax(-FLT_MAX);
+
+                for (const auto& boneMatrix : skel.modelSpaceMatrices) {
+                    glm::vec3 bonePos = glm::vec3(boneMatrix[3]);
+                    boneMin = glm::min(boneMin, bonePos);
+                    boneMax = glm::max(boneMax, bonePos);
+                }
+
+                glm::vec3 padding = (meshRenderer.localAABB.max - meshRenderer.localAABB.min) * 0.2f;
+                boneMin -= padding;
+                boneMax += padding;
+
+                AABB animatedAABB{ boneMin, boneMax };
+
+                auto& skelTransform = m_Scene.GetComponent<TransformComponent>(skelEntity);
+                meshRenderer.worldAABB = animatedAABB.CalculateWorldAABB(skelTransform.GetWorldMatrix());
+            }
+            else {
+                meshRenderer.worldAABB = meshRenderer.localAABB.CalculateWorldAABB(worldMatrix);
+            }
+        }
+        else {
+            meshRenderer.worldAABB = meshRenderer.localAABB.CalculateWorldAABB(worldMatrix);
+        }
+    }
+
     auto& sceneTree = m_Scene.GetComponent<SceneTreeComponent>(e);
     for (auto child : sceneTree.children) {
         if (m_Scene.GetRegistry().valid(child))
             UpdateNodeRecursive(child, worldMatrix, isDirty);
     }
+}
+
+entt::entity TransformSystem::FindSkeletonEntity(entt::entity e)
+{
+    auto& reg = m_Scene.GetRegistry();
+    entt::entity current = e;
+
+    while (reg.valid(current))
+    {
+        if (reg.any_of<SkeletonComponent>(current))
+            return current;
+
+        if (!reg.any_of<SceneTreeComponent>(current))
+            break;
+
+        current = reg.get<SceneTreeComponent>(current).parent;
+    }
+
+    return entt::null;
 }
