@@ -19,6 +19,7 @@ public:
 
 	GLuint GetEntityBuffer() { return m_RenderPipeline->GetEntityBuffer(); }
 	[[nodiscard]] inline GLuint GetFinalTexture() noexcept { return m_RenderPipeline->GetFinalTexture(); }
+	[[nodiscard]] inline GLuint GetFinalFramebuffer() { return m_RenderPipeline->GetFinalFramebuffer(); }
 	RenderContext& GetRenderContext() { return m_Context; }
 	RenderPassHandle PushRenderPass(std::unique_ptr<RenderPass> pass) { return m_RenderPipeline->PushRenderPass(std::move(pass)); }
 	RenderPass* GetRenderPass(RenderPassHandle id) { return m_RenderPipeline->GetRenderPass(id); };

@@ -29,6 +29,7 @@ public:
 	void Execute(const RenderContext& ctx);
 
 	[[nodiscard]] inline GLuint GetFinalTexture() noexcept { return m_RenderFrame.registry.Get("FinalTexture")->id; }
+	[[nodiscard]] inline GLuint GetFinalFramebuffer() noexcept { return m_RenderFrame.registry.Get("FinalFramebuffer")->id; }
 	[[nodiscard]] inline GLuint GetEntityBuffer() noexcept { return m_RenderFrame.registry.Get("EntityBuffer")->id; }
 
 private:

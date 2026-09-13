@@ -18,18 +18,15 @@ function AnimationTest:OnAnimationEvent(eventName, parameter)
 end
 
 function AnimationTest:OnAnimationStarted(clipName)
-    print("Anim started: " .. clipName)
 end
 
 function AnimationTest:OnAnimationFinished(clipName)
-    print("Anim finished: " .. clipName)
     if clipName == "Grow" then
         self.scene:DestroyEntity(self.entity)
     end
 end
 
 function AnimationTest:OnAnimationLooped(clipName)
-    print("Anim looped: " .. clipName)
 end
 
 return AnimationTest

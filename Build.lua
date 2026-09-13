@@ -21,3 +21,4 @@ OutputDir = "%{cfg.system}-%{cfg.architecture}/%{cfg.buildcfg}"
 
 include "Editor/Build-Editor.lua"
 include "Engine/Build-Engine.lua"
+include "Runtime/Build-Runtime.lua"
