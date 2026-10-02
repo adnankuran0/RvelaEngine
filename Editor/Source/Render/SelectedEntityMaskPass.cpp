@@ -157,6 +157,11 @@ void SelectedEntityMaskPass::Execute(const RenderContext& ctx, RenderFrame& fram
         RenderSkeletalMaskList(skeletalTransparentCommands);
     }
 
+    if (ctx.scene && m_SelectedEntity != entt::null && ctx.scene->HasComponent<RectTransformComponent>(m_SelectedEntity))
+    {
+        ctx.scene->GetUISystem().RenderSelectionMask(ctx.scene, m_SelectedEntity, static_cast<float>(ctx.viewportWidth), static_cast<float>(ctx.viewportHeight));
+    }
+
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glEnable(GL_DEPTH_TEST);

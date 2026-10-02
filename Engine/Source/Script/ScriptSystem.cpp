@@ -47,7 +47,15 @@ void ScriptSystem::BindLuaScript(ScriptComponent& sc, entt::entity e)
         return;
     }
 
-    sc.luaInstance = result;
+    if (result.valid() && result.get_type() == sol::type::table)
+    {
+        sc.luaInstance = result;
+    }
+    else
+    {
+        sc.luaInstance = sc.luaState->create_table();
+    }
+
     sc.luaInstance["entity"] = Entity(e, &m_Scene);
     sc.luaInstance["scene"] = &m_Scene;
     sc.luaInstance["physics"] = &m_Scene.GetPhysicsSystem().GetPhysicsWorld();

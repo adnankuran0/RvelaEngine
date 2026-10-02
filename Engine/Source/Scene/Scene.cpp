@@ -1,4 +1,4 @@
-﻿#include "rvelapch.h"
+#include "rvelapch.h"
 #include "Scene.h"
 #include "Entity.h"
 #include "Core/Time.h"
@@ -49,17 +49,27 @@ void Scene::SetState(SceneState newState)
     m_State = newState;
 }
 
+#include "Input/Input.h"
+
 void Scene::OnStart()
 {
     m_PhysicsSystem.OnStart();
     m_ScriptSystem.OnStart();
     m_AudioSystem.OnStart();
     m_AnimationSystem.OnStart();
+    m_UISystem.Init();
 }
 
 void Scene::OnUpdate(float dt)
 {
     m_ScriptSystem.OnUpdate(dt);
+    
+    glm::vec2 mousePos = Input::GetViewportMousePosition(1920.0f, 1080.0f);
+    bool pressed = Input::IsMouseButtonJustPressed(MouseCode::ButtonLeft);
+    bool held = Input::IsMouseButtonPressed(MouseCode::ButtonLeft);
+    bool released = Input::IsMouseButtonJustReleased(MouseCode::ButtonLeft);
+    m_UISystem.Update(this, dt, glm::vec2(1920.0f, 1080.0f), mousePos, pressed, held, released);
+
     JPH::BodyManager::DrawSettings settings;
     settings.mDrawBoundingBox = true;
     settings.mDrawShapeWireframe = true;
@@ -78,6 +88,7 @@ void rv::Scene::OnLateUpdate(float dt)
 
 void Scene::OnStop()
 {
+    m_UISystem.Shutdown();
     m_ScriptSystem.OnStop();
 }
 

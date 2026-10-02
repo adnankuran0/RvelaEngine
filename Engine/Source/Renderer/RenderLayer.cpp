@@ -50,6 +50,31 @@ void RenderLayer::OnRender()
 	CollectRenderCommands(&scene);
 	
 	m_RenderPipeline->Execute(m_Context);
+
+	GLuint finalFB = m_RenderPipeline->GetFinalFramebuffer();
+	GLuint depthTexture = m_RenderPipeline->GetDepthTexture();
+
+	if (finalFB != 0)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, finalFB);
+		glViewport(0, 0, m_Context.viewportWidth, m_Context.viewportHeight);
+
+		if (depthTexture != 0)
+		{
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0);
+		}
+	}
+
+	scene.GetUISystem().Render(&scene, (float)m_Context.viewportWidth, (float)m_Context.viewportHeight);
+
+	if (finalFB != 0)
+	{
+		if (depthTexture != 0)
+		{
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0);
+		}
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
 }
 
 void RenderLayer::CollectRenderCommands(Scene* scene)

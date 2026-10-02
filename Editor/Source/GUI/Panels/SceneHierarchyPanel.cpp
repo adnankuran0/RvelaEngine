@@ -1,4 +1,4 @@
-﻿#include "SceneHierarchyPanel.h"
+#include "SceneHierarchyPanel.h"
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_internal.h"
 #include <ImGui/tinyfiledialogs.h>
@@ -378,6 +378,84 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                 selectedEntity = scene.CreateEntity("PointLight");
                 scene.AddComponent<PointLightComponent>(selectedEntity);
             }
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("UI"))
+        {
+            if (ImGui::MenuItem("UI Canvas"))
+            {
+                selectedEntity = scene.CreateEntity("Canvas");
+                scene.AddComponent<UICanvasComponent>(selectedEntity);
+                scene.AddComponent<RectTransformComponent>(selectedEntity);
+            }
+            if (ImGui::MenuItem("UI Text"))
+            {
+                entt::entity parent = selectedEntity;
+                selectedEntity = scene.CreateEntity("UI Text");
+                scene.AddComponent<RectTransformComponent>(selectedEntity);
+                scene.AddComponent<UITextComponent>(selectedEntity);
+                if (registry.valid(parent) && parent != rootEntity)
+                {
+                    scene.SetParent(selectedEntity, parent);
+                }
+            }
+            if (ImGui::MenuItem("UI Button"))
+            {
+                entt::entity parent = selectedEntity;
+                selectedEntity = scene.CreateEntity("UI Button");
+                scene.AddComponent<RectTransformComponent>(selectedEntity);
+                scene.AddComponent<UIButtonComponent>(selectedEntity);
+                if (registry.valid(parent) && parent != rootEntity)
+                {
+                    scene.SetParent(selectedEntity, parent);
+                }
+            }
+            if (ImGui::MenuItem("UI Image"))
+            {
+                entt::entity parent = selectedEntity;
+                selectedEntity = scene.CreateEntity("UI Image");
+                scene.AddComponent<RectTransformComponent>(selectedEntity);
+                scene.AddComponent<UIImageComponent>(selectedEntity);
+                if (registry.valid(parent) && parent != rootEntity)
+                {
+                    scene.SetParent(selectedEntity, parent);
+                }
+            }
+            if (ImGui::MenuItem("UI Slider"))
+            {
+                entt::entity parent = selectedEntity;
+                selectedEntity = scene.CreateEntity("UI Slider");
+                scene.AddComponent<RectTransformComponent>(selectedEntity);
+                scene.AddComponent<UISliderComponent>(selectedEntity);
+                if (registry.valid(parent) && parent != rootEntity)
+                {
+                    scene.SetParent(selectedEntity, parent);
+                }
+            }
+            if (ImGui::MenuItem("UI Progress Bar"))
+            {
+                entt::entity parent = selectedEntity;
+                selectedEntity = scene.CreateEntity("UI Progress Bar");
+                scene.AddComponent<RectTransformComponent>(selectedEntity);
+                scene.AddComponent<UIProgressBarComponent>(selectedEntity);
+                if (registry.valid(parent) && parent != rootEntity)
+                {
+                    scene.SetParent(selectedEntity, parent);
+                }
+            }
+            if (ImGui::MenuItem("UI Checkbox"))
+            {
+                entt::entity parent = selectedEntity;
+                selectedEntity = scene.CreateEntity("UI Checkbox");
+                scene.AddComponent<RectTransformComponent>(selectedEntity);
+                scene.AddComponent<UICheckboxComponent>(selectedEntity);
+                if (registry.valid(parent) && parent != rootEntity)
+                {
+                    scene.SetParent(selectedEntity, parent);
+                }
+            }
+            ImGui::EndMenu();
             ImGui::EndMenu();
         }
 

@@ -5,6 +5,7 @@
 #include "Renderer/RenderFrame.h"
 #include "Renderer/ShaderManager.h"
 #include "Renderer/TextureCache.h"
+#include "Scene/Scene.h"
 
 using namespace rv;
 
@@ -147,6 +148,11 @@ void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
         RenderSkeletalCommandList(skeletalOpaqueCommands);
         RenderSkeletalCommandList(skeletalTransparentCommands);
+    }
+
+    if (ctx.scene)
+    {
+        ctx.scene->GetUISystem().RenderEntityIDs(ctx.scene, static_cast<float>(ctx.viewportWidth), static_cast<float>(ctx.viewportHeight));
     }
 
     glEnable(GL_CULL_FACE);

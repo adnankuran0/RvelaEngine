@@ -218,6 +218,30 @@ void SceneSerializer::LoadScene(Scene& scene, const std::string& path)
         if (entityJson.contains("SkeletonComponent"))
             scene.AddComponent<SkeletonComponent>(handle).Deserialize(entityJson["SkeletonComponent"]);
 
+        if (entityJson.contains("UICanvasComponent"))
+            scene.AddComponent<UICanvasComponent>(handle).Deserialize(entityJson["UICanvasComponent"]);
+
+        if (entityJson.contains("RectTransformComponent"))
+            scene.AddComponent<RectTransformComponent>(handle).Deserialize(entityJson["RectTransformComponent"]);
+
+        if (entityJson.contains("UIImageComponent"))
+            scene.AddComponent<UIImageComponent>(handle).Deserialize(entityJson["UIImageComponent"]);
+
+        if (entityJson.contains("UITextComponent"))
+            scene.AddComponent<UITextComponent>(handle).Deserialize(entityJson["UITextComponent"]);
+
+        if (entityJson.contains("UIButtonComponent"))
+            scene.AddComponent<UIButtonComponent>(handle).Deserialize(entityJson["UIButtonComponent"]);
+
+        if (entityJson.contains("UISliderComponent"))
+            scene.AddComponent<UISliderComponent>(handle).Deserialize(entityJson["UISliderComponent"]);
+
+        if (entityJson.contains("UIProgressBarComponent"))
+            scene.AddComponent<UIProgressBarComponent>(handle).Deserialize(entityJson["UIProgressBarComponent"]);
+
+        if (entityJson.contains("UICheckboxComponent"))
+            scene.AddComponent<UICheckboxComponent>(handle).Deserialize(entityJson["UICheckboxComponent"]);
+
         loadedEntities.push_back(handle);
     }
 
@@ -333,6 +357,30 @@ json SceneSerializer::SerializeEntity(Scene& scene, entt::entity e)
 
     if (scene.HasComponent<SkeletonComponent>(e))
         j["SkeletonComponent"] = scene.GetComponent<SkeletonComponent>(e).Serialize();
+
+    if (scene.HasComponent<UICanvasComponent>(e))
+        j["UICanvasComponent"] = scene.GetComponent<UICanvasComponent>(e).Serialize();
+
+    if (scene.HasComponent<RectTransformComponent>(e))
+        j["RectTransformComponent"] = scene.GetComponent<RectTransformComponent>(e).Serialize();
+
+    if (scene.HasComponent<UIImageComponent>(e))
+        j["UIImageComponent"] = scene.GetComponent<UIImageComponent>(e).Serialize();
+
+    if (scene.HasComponent<UITextComponent>(e))
+        j["UITextComponent"] = scene.GetComponent<UITextComponent>(e).Serialize();
+
+    if (scene.HasComponent<UIButtonComponent>(e))
+        j["UIButtonComponent"] = scene.GetComponent<UIButtonComponent>(e).Serialize();
+
+    if (scene.HasComponent<UISliderComponent>(e))
+        j["UISliderComponent"] = scene.GetComponent<UISliderComponent>(e).Serialize();
+
+    if (scene.HasComponent<UIProgressBarComponent>(e))
+        j["UIProgressBarComponent"] = scene.GetComponent<UIProgressBarComponent>(e).Serialize();
+
+    if (scene.HasComponent<UICheckboxComponent>(e))
+        j["UICheckboxComponent"] = scene.GetComponent<UICheckboxComponent>(e).Serialize();
 
     return j;
 }

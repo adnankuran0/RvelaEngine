@@ -73,6 +73,4 @@ To get the project up and running, you'll need to follow the setup instructions 
 
 ## Roadmap (TODO)
 
-- Animation system  
-- Ingame UI  
 - Project selector

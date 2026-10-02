@@ -190,4 +190,9 @@ void LuaBindings::RegisterInputAPI(sol::state& lua)
         {
             Input::SetMouseMode(static_cast<Input::MouseMode>(mode));
         };
+
+    lua["Input"]["IsMouseOverUI"] = []()
+        {
+            return Input::IsMouseOverUI();
+        };
 }

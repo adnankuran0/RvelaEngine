@@ -5,7 +5,7 @@ workspace "Rvela"
     startproject "RvelaEditor"
 
     filter "system:windows"
-        buildoptions { "/EHsc", "/Zc:preprocessor", "/Zc:__cplusplus", "/MP" }
+        buildoptions { "/EHsc", "/Zc:preprocessor", "/Zc:__cplusplus", "/MP", "/bigobj" }
         linkoptions { "/CGTHREADS:8" }
         defines { 'RVELA_ROOT_DIR="' .. _MAIN_SCRIPT_DIR:gsub('\\', '/') .. '"' }
 

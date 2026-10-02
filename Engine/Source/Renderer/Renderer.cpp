@@ -1,4 +1,4 @@
-﻿#include "rvelapch.h"
+#include "rvelapch.h"
 #include "Renderer.h"
 #include "Core/Log.h"
 #include "Core/Time.h"
@@ -55,6 +55,7 @@ void Renderer::Init(GLFWwindow* window)
     ShaderManager::Add(Shader("Line", ENGINE_PATH("Shaders\\line.glsl")));
     ShaderManager::Add(Shader("Particle", ENGINE_PATH("Shaders\\particle.glsl")));
     ShaderManager::Add(Shader("Gizmo", ENGINE_PATH("Shaders\\gizmo.glsl")));
+    ShaderManager::Add(Shader("UI", ENGINE_PATH("Shaders\\ui.glsl")));
 
     m_ScreenQuad.Init();
 }

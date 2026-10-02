@@ -5,8 +5,12 @@
 void rv::SetStyle()
 {
     ImGuiIO& io = ImGui::GetIO();
+    static const ImWchar turkishRanges[] = {
+        0x0020, 0x017F,
+        0
+    };
     io.Fonts->AddFontFromFileTTF(
-        EDITOR_PATH("Fonts\\roboto.ttf").GetAbsoluteStr().c_str(), 16.0f
+        EDITOR_PATH("Fonts\\roboto.ttf").GetAbsoluteStr().c_str(), 16.0f, nullptr, turkishRanges
     );
 
     ImGuiStyle& style = ImGui::GetStyle();

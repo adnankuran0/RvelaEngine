@@ -7,3 +7,4 @@
 #include "PhysicsBindings.h"
 #include "AudioBindings.h"
 #include "AnimationBindings.h"
+#include "UIBindings.h"

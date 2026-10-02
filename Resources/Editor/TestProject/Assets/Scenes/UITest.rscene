@@ -1,0 +1,590 @@
+{
+    "Entities": [
+        {
+            "ParentUUID": 0,
+            "RectTransformComponent": {
+                "anchorMax": [
+                    1.0,
+                    1.0
+                ],
+                "anchorMin": [
+                    0.0,
+                    0.0
+                ],
+                "pivot": [
+                    0.5,
+                    0.5
+                ],
+                "position": [
+                    0.0,
+                    0.0
+                ],
+                "raycastTarget": true,
+                "rotation": 0.0,
+                "scale": [
+                    1.0,
+                    1.0
+                ],
+                "size": [
+                    1920.0,
+                    1080.0
+                ]
+            },
+            "Tag": {
+                "tag": "UI Canvas"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UICanvasComponent": {
+                "billboardMode": 0,
+                "constantScaleFactor": 1.0,
+                "constantScreenSize": false,
+                "depthTest": true,
+                "matchWidthOrHeight": true,
+                "mode": 1,
+                "referenceResolution": [
+                    1920.0,
+                    1080.0
+                ],
+                "sortOrder": 0
+            },
+            "UUID": 1001
+        },
+        {
+            "ParentUUID": 1001,
+            "RectTransformComponent": {
+                "anchorMax": [
+                    0.5,
+                    0.8999999761581421
+                ],
+                "anchorMin": [
+                    0.5,
+                    0.8999999761581421
+                ],
+                "pivot": [
+                    0.5,
+                    0.5
+                ],
+                "position": [
+                    0.0,
+                    0.0
+                ],
+                "raycastTarget": true,
+                "rotation": 0.0,
+                "scale": [
+                    1.0,
+                    1.0
+                ],
+                "size": [
+                    600.0,
+                    60.0
+                ]
+            },
+            "Tag": {
+                "tag": "Title Text"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UITextComponent": {
+                "alignment": 1,
+                "characterSpacing": 0.0,
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "fontPath": "",
+                "fontSize": 38.0,
+                "fontUUID": "00000000-0000-0000-0000-000000000000",
+                "isBold": false,
+                "isOutline": false,
+                "lineSpacing": 1.2000000476837158,
+                "outlineColor": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "outlineSize": 1.0,
+                "text": "Rvela Engine UI System Demo",
+                "wordWrap": false
+            },
+            "UUID": 1002
+        },
+        {
+            "ParentUUID": 1001,
+            "RectTransformComponent": {
+                "anchorMax": [
+                    0.30000001192092896,
+                    0.6000000238418579
+                ],
+                "anchorMin": [
+                    0.30000001192092896,
+                    0.6000000238418579
+                ],
+                "pivot": [
+                    0.5,
+                    0.5
+                ],
+                "position": [
+                    0.0,
+                    0.0
+                ],
+                "raycastTarget": true,
+                "rotation": 12.0,
+                "scale": [
+                    1.0,
+                    1.0
+                ],
+                "size": [
+                    220.0,
+                    60.0
+                ]
+            },
+            "Tag": {
+                "tag": "Rotated Rounded Button"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    -0.3082847595214844,
+                    0.557830810546875,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UIButtonComponent": {
+                "cornerRadius": 16.0,
+                "disabledColor": [
+                    0.20000000298023224,
+                    0.20000000298023224,
+                    0.20000000298023224,
+                    0.5
+                ],
+                "fontPath": "",
+                "fontSize": 26.0,
+                "hoverColor": [
+                    0.3499999940395355,
+                    0.550000011920929,
+                    0.949999988079071,
+                    1.0
+                ],
+                "interactable": true,
+                "isBold": false,
+                "isOutline": false,
+                "luaCallback": "OnButtonClick",
+                "normalColor": [
+                    0.20000000298023224,
+                    0.4000000059604645,
+                    0.800000011920929,
+                    1.0
+                ],
+                "outlineColor": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "outlineSize": 1.0,
+                "pressedColor": [
+                    0.10000000149011612,
+                    0.25,
+                    0.6000000238418579,
+                    1.0
+                ],
+                "text": "Click Me!",
+                "textColor": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 1003
+        },
+        {
+            "ParentUUID": 1001,
+            "RectTransformComponent": {
+                "anchorMax": [
+                    0.699999988079071,
+                    0.6000000238418579
+                ],
+                "anchorMin": [
+                    0.699999988079071,
+                    0.6000000238418579
+                ],
+                "pivot": [
+                    0.5,
+                    0.5
+                ],
+                "position": [
+                    0.0,
+                    0.0
+                ],
+                "raycastTarget": true,
+                "rotation": 0.0,
+                "scale": [
+                    1.0,
+                    1.0
+                ],
+                "size": [
+                    280.0,
+                    30.0
+                ]
+            },
+            "Tag": {
+                "tag": "Volume Slider"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UISliderComponent": {
+                "backgroundColor": [
+                    0.15000000596046448,
+                    0.15000000596046448,
+                    0.18000000715255737,
+                    1.0
+                ],
+                "fillColor": [
+                    0.20000000298023224,
+                    0.75,
+                    0.4000000059604645,
+                    1.0
+                ],
+                "handleColor": [
+                    0.949999988079071,
+                    0.949999988079071,
+                    0.949999988079071,
+                    1.0
+                ],
+                "interactable": true,
+                "luaCallback": "OnSliderChanged",
+                "maxValue": 100.0,
+                "minValue": 0.0,
+                "value": 75.0
+            },
+            "UUID": 1004
+        },
+        {
+            "ParentUUID": 1001,
+            "RectTransformComponent": {
+                "anchorMax": [
+                    0.5,
+                    0.5
+                ],
+                "anchorMin": [
+                    0.5,
+                    0.5
+                ],
+                "pivot": [
+                    0.5,
+                    0.5
+                ],
+                "position": [
+                    -23.0,
+                    -55.0
+                ],
+                "raycastTarget": true,
+                "rotation": 0.0,
+                "scale": [
+                    1.0,
+                    1.0
+                ],
+                "size": [
+                    240.0,
+                    30.0
+                ]
+            },
+            "Tag": {
+                "tag": "Test Checkbox"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    -1.5561513900756836,
+                    1.8203208446502686,
+                    -6.103589839767665e-05
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UICheckboxComponent": {
+                "boxColor": [
+                    0.20000000298023224,
+                    0.20000000298023224,
+                    0.20000000298023224,
+                    1.0
+                ],
+                "boxSize": 30.5,
+                "checkmarkColor": [
+                    0.20000000298023224,
+                    0.6000000238418579,
+                    0.8999999761581421,
+                    1.0
+                ],
+                "fontSize": 21.0,
+                "interactable": true,
+                "isChecked": true,
+                "label": "Enable Sound Effects",
+                "luaCallback": "OnCheckboxChanged",
+                "textColor": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 12801636231391445956
+        },
+        {
+            "ParentUUID": 1001,
+            "RectTransformComponent": {
+                "anchorMax": [
+                    0.5,
+                    0.30000001192092896
+                ],
+                "anchorMin": [
+                    0.5,
+                    0.30000001192092896
+                ],
+                "pivot": [
+                    0.5,
+                    0.5
+                ],
+                "position": [
+                    0.0,
+                    0.0
+                ],
+                "raycastTarget": true,
+                "rotation": -5.0,
+                "scale": [
+                    1.0,
+                    1.0
+                ],
+                "size": [
+                    360.0,
+                    120.0
+                ]
+            },
+            "Tag": {
+                "tag": "Rounded Image Panel"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UIImageComponent": {
+                "color": [
+                    0.15000000596046448,
+                    0.18000000715255737,
+                    0.23999999463558197,
+                    0.8999999761581421
+                ],
+                "cornerRadius": 20.0,
+                "imageType": 0,
+                "texturePath": "",
+                "textureUUID": "00000000-0000-0000-0000-000000000000"
+            },
+            "UUID": 1005
+        },
+        {
+            "ParentUUID": 1005,
+            "RectTransformComponent": {
+                "anchorMax": [
+                    0.5,
+                    0.30000001192092896
+                ],
+                "anchorMin": [
+                    0.5,
+                    0.30000001192092896
+                ],
+                "pivot": [
+                    0.5,
+                    0.5
+                ],
+                "position": [
+                    0.0,
+                    0.0
+                ],
+                "raycastTarget": true,
+                "rotation": 0.0,
+                "scale": [
+                    1.0,
+                    1.0
+                ],
+                "size": [
+                    320.0,
+                    24.0
+                ]
+            },
+            "Tag": {
+                "tag": "Health Progress Bar"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UIProgressBarComponent": {
+                "backgroundColor": [
+                    0.10000000149011612,
+                    0.10000000149011612,
+                    0.10000000149011612,
+                    1.0
+                ],
+                "fillColor": [
+                    0.8999999761581421,
+                    0.20000000298023224,
+                    0.25,
+                    1.0
+                ],
+                "value": 0.8500000238418579
+            },
+            "UUID": 1006
+        },
+        {
+            "ParentUUID": 0,
+            "ScriptComponent": {
+                "scriptAssetUUID": "45ab988d-712c-4f11-a832-823cd082a991"
+            },
+            "Tag": {
+                "tag": "UI Event Controller Script"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 1007
+        }
+    ],
+    "Environment": {
+        "Bloom": false,
+        "Bloom_Intensity": 1.0,
+        "Bloom_Knee": 0.5,
+        "Bloom_Treshold": 1.0,
+        "HDRPath": "",
+        "Lighting_AmbientColor": [
+            1.0,
+            1.0,
+            1.0
+        ],
+        "Lighting_AmbientIntensity": 0.5,
+        "Lighting_IBL": true,
+        "Lighting_IBLIntensity": 0.5,
+        "PostProcess_ChromaticStrength": 0.009999999776482582,
+        "PostProcess_Exposure": 1.0,
+        "PostProcess_VignetteIntensity": 0.25,
+        "PostProcess_VignetteSmoothness": 0.5,
+        "SSAO": true,
+        "SSAO_Bias": 0.02500000037252903,
+        "SSAO_Intensity": 1.0,
+        "SSAO_Radius": 1.0,
+        "SSR": true
+    }
+}

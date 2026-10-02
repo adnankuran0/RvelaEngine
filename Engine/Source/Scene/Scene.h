@@ -13,6 +13,7 @@
 #include "Audio/AudioSystem.h"
 #include "ParticleSystem.h"
 #include "Animation/AnimationSystem.h"
+#include "UI/UISystem.h"
 
 namespace rv {
 
@@ -140,6 +141,7 @@ public:
     inline AudioSystem& GetAudioSystem() noexcept { return m_AudioSystem; }
     inline ParticleSystem& GetParticleSystem() noexcept { return m_ParticleSystem; }
     inline AnimationSystem& GetAnimationSystem() noexcept { return m_AnimationSystem; }
+    inline UISystem& GetUISystem() noexcept { return m_UISystem; }
     inline Environment& GetEnvironment() noexcept { return m_Environment; }
 
 
@@ -172,6 +174,7 @@ private:
     AudioSystem m_AudioSystem;
     ParticleSystem m_ParticleSystem;
     AnimationSystem m_AnimationSystem;
+    UISystem m_UISystem;
 
     Environment m_Environment;
 };

@@ -1,7 +1,8 @@
-﻿#include "rvelapch.h"
+#include "rvelapch.h"
 #include "CoreBindings.h"
 #include "sol/sol.hpp"
 #include "Scene/Entity.h"
+#include "Scene/Components/UIComponents.h"
 #include "ComponentHandle.h"
 #include <vector>
 
@@ -10,6 +11,7 @@ using namespace rv;
 void LuaBindings::RegisterCoreTypes(sol::state& lua)
 {
     lua.new_usertype<Entity>("Entity",
+        "IsValid", &Entity::IsValid,
         "name", sol::property(
             &Entity::GetName,
             &Entity::SetName
@@ -28,6 +30,11 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             if (parent) {
                 return parent;
             }
+            return sol::nullopt;
+        },
+        "FindChild", [](Entity& self, const std::string& childName) -> sol::optional<Entity> {
+            Entity child = self.FindChild(childName);
+            if (child) return child;
             return sol::nullopt;
         },
         "GetScriptType", [](Entity& e) -> std::string {
@@ -78,6 +85,14 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             else if (type == "CharacterBodyComponent") return e.HasComponent<CharacterBodyComponent>();
             else if (type == "AudioEmitterComponent") return e.HasComponent<AudioEmitterComponent>();
             else if (type == "AnimatorComponent") return e.HasComponent<AnimatorComponent>();
+            else if (type == "RectTransformComponent") return e.HasComponent<RectTransformComponent>();
+            else if (type == "UICanvasComponent") return e.HasComponent<UICanvasComponent>();
+            else if (type == "UIImageComponent") return e.HasComponent<UIImageComponent>();
+            else if (type == "UITextComponent") return e.HasComponent<UITextComponent>();
+            else if (type == "UIButtonComponent") return e.HasComponent<UIButtonComponent>();
+            else if (type == "UISliderComponent") return e.HasComponent<UISliderComponent>();
+            else if (type == "UIProgressBarComponent") return e.HasComponent<UIProgressBarComponent>();
+            else if (type == "UICheckboxComponent") return e.HasComponent<UICheckboxComponent>();
             return false;
         },
         "GetComponent", [&](Entity& e, const std::string& type) -> sol::object {
@@ -111,6 +126,30 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             else if (type == "AnimatorComponent") {
                 return sol::make_object(lua, ComponentHandle<AnimatorComponent>{ e });
             }
+            else if (type == "RectTransformComponent") {
+                return sol::make_object(lua, ComponentHandle<RectTransformComponent>{ e });
+            }
+            else if (type == "UICanvasComponent") {
+                return sol::make_object(lua, ComponentHandle<UICanvasComponent>{ e });
+            }
+            else if (type == "UIImageComponent") {
+                return sol::make_object(lua, ComponentHandle<UIImageComponent>{ e });
+            }
+            else if (type == "UITextComponent") {
+                return sol::make_object(lua, ComponentHandle<UITextComponent>{ e });
+            }
+            else if (type == "UIButtonComponent") {
+                return sol::make_object(lua, ComponentHandle<UIButtonComponent>{ e });
+            }
+            else if (type == "UISliderComponent") {
+                return sol::make_object(lua, ComponentHandle<UISliderComponent>{ e });
+            }
+            else if (type == "UIProgressBarComponent") {
+                return sol::make_object(lua, ComponentHandle<UIProgressBarComponent>{ e });
+            }
+            else if (type == "UICheckboxComponent") {
+                return sol::make_object(lua, ComponentHandle<UICheckboxComponent>{ e });
+            }
             return sol::make_object(lua, sol::nil);
         },
         "AddComponent", [&](Entity& e, const std::string& typeName) -> sol::object {
@@ -126,6 +165,24 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
                 return sol::make_object(lua, ComponentHandle<AudioEmitterComponent>{ e });
             else if (typeName == "AnimatorComponent")
                 return sol::make_object(lua, ComponentHandle<AnimatorComponent>{ e });
+            else if (typeName == "RectTransformComponent")
+                return sol::make_object(lua, ComponentHandle<RectTransformComponent>{ e });
+            else if (typeName == "UICanvasComponent")
+                return sol::make_object(lua, ComponentHandle<UICanvasComponent>{ e });
+            else if (typeName == "UIImageComponent")
+                return sol::make_object(lua, ComponentHandle<UIImageComponent>{ e });
+            else if (typeName == "UITextComponent")
+                return sol::make_object(lua, ComponentHandle<UITextComponent>{ e });
+            else if (typeName == "UIButtonComponent")
+                return sol::make_object(lua, ComponentHandle<UIButtonComponent>{ e });
+            else if (typeName == "UISliderComponent")
+                return sol::make_object(lua, ComponentHandle<UISliderComponent>{ e });
+            else if (typeName == "UIProgressBarComponent")
+                return sol::make_object(lua, ComponentHandle<UIProgressBarComponent>{ e });
+            else if (typeName == "UICheckboxComponent") {
+                if (!e.HasComponent<UICheckboxComponent>()) e.AddComponent<UICheckboxComponent>();
+                return sol::make_object(lua, ComponentHandle<UICheckboxComponent>{ e });
+            }
             return sol::nil;
         }
     );

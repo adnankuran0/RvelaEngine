@@ -31,6 +31,7 @@ public:
 	[[nodiscard]] inline GLuint GetFinalTexture() noexcept { return m_RenderFrame.registry.Get("FinalTexture")->id; }
 	[[nodiscard]] inline GLuint GetFinalFramebuffer() noexcept { return m_RenderFrame.registry.Get("FinalFramebuffer")->id; }
 	[[nodiscard]] inline GLuint GetEntityBuffer() noexcept { return m_RenderFrame.registry.Get("EntityBuffer")->id; }
+	[[nodiscard]] inline GLuint GetDepthTexture() noexcept { auto r = m_RenderFrame.registry.Get("DepthTexture"); return r ? r->id : 0; }
 
 private:
 	void UpdateUBOs(const RenderContext& ctx);

@@ -35,6 +35,12 @@ public:
 
 	static glm::vec2 GetMousePosition() noexcept;
 
+	static void SetViewportMousePos(const glm::vec2& pos) noexcept;
+	static glm::vec2 GetViewportMousePosition(float viewportWidth = 1920.0f, float viewportHeight = 1080.0f) noexcept;
+
+	static bool IsMouseOverUI() noexcept;
+	static void SetMouseOverUI(bool state) noexcept;
+
 	inline float GetMouseX() noexcept {
 		return s_LastMousePosition.x;
 	}

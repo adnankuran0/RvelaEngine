@@ -20,6 +20,7 @@ void ScriptEngine::Init()
     LuaBindings::RegisterPhysicsAPI(m_State);
     LuaBindings::RegisterAudioAPI(m_State);
     LuaBindings::RegisterAnimationAPI(m_State);
+    LuaBindings::RegisterUIComponents(m_State);
 
 }
 

@@ -92,6 +92,49 @@ void rv::Input::SetMouseMode(MouseMode mode) noexcept
     glfwSetInputMode(window, GLFW_CURSOR, glfwMode);
 }
 
+// Viewport relative mouse position storage
+static glm::vec2 s_ViewportMousePos = { -1.0f, -1.0f };
+static bool s_ViewportMousePosValid = false;
+
+void Input::SetViewportMousePos(const glm::vec2& pos) noexcept
+{
+    s_ViewportMousePos = pos;
+    s_ViewportMousePosValid = true;
+}
+
+glm::vec2 Input::GetViewportMousePosition(float viewportWidth, float viewportHeight) noexcept
+{
+    if (s_ViewportMousePosValid)
+    {
+        return s_ViewportMousePos;
+    }
+
+    auto* window = Engine::Get()->GetWindow().GetGLFWWindow();
+    if (!window) {
+        return { 0.0f, 0.0f };
+    }
+
+    double xPos, yPos;
+    glfwGetCursorPos(window, &xPos, &yPos);
+    WindowSize winSize = Engine::Get()->GetWindow().GetSize();
+    float winW = winSize.width > 0 ? (float)winSize.width : viewportWidth;
+    float winH = winSize.height > 0 ? (float)winSize.height : viewportHeight;
+
+    return glm::vec2((float)xPos / winW * viewportWidth, (float)yPos / winH * viewportHeight);
+}
+
+static bool s_IsMouseOverUI = false;
+
+void Input::SetMouseOverUI(bool state) noexcept
+{
+    s_IsMouseOverUI = state;
+}
+
+bool Input::IsMouseOverUI() noexcept
+{
+    return s_IsMouseOverUI;
+}
+
 glm::vec2 Input::GetMousePosition() noexcept {
     auto* window = Engine::Get()->GetWindow().GetGLFWWindow();
     if (!window) {

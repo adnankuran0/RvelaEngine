@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Scene/Components/TransformComponent.h"
 #include "Scene/Components/TagComponent.h"
@@ -21,7 +21,9 @@
 #include "Scene/Components/AnimatorComponent.h"
 #include "Scene/Components/SkeletalMeshComponent.h"
 #include "Scene/Components/SkeletalMeshRendererComponent.h"
+#include "Scene/Components/SkeletalMeshRendererComponent.h"
 #include "Scene/Components/SkeletonComponent.h"
+#include "Scene/Components/UIComponents.h"
 
 namespace rv {
 
@@ -54,6 +56,13 @@ enum class ComponentType
 	SkeletalMeshComponent,
 	SkeletalMeshMeshRenderer,
 	SkeletonComponent,
+	UICanvas,
+	RectTransform,
+	UIImage,
+	UIText,
+	UIButton,
+	UISlider,
+	UIProgressBar,
 
 };
 

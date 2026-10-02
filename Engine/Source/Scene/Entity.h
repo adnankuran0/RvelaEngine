@@ -56,16 +56,32 @@ public:
 	const std::string& GetName() { return GetComponent<TagComponent>().tag; }
 	void SetName(const std::string& name) { GetComponent<TagComponent>().tag = name; }
 	const entt::entity GetHandle() { return m_EntityHandle; }
+	Scene* GetScene() const { return m_Scene; }
+	bool IsValid() const { return m_EntityHandle != entt::null && m_Scene != nullptr; }
 	void SetParent(const Entity& parent) { m_Scene->SetParent(m_EntityHandle, parent); }
 	Entity GetParent(const Entity& child)
 	{
-		
 		auto parentHandle = m_Scene->GetParent(child);
 		if (parentHandle != entt::null && m_Scene->GetRegistry().valid(parentHandle))
 		{
 			return Entity(parentHandle, m_Scene);
 		}
 
+		return Entity{};
+	}
+
+	Entity FindChild(const std::string& childName)
+	{
+		if (!m_Scene || m_EntityHandle == entt::null) return Entity{};
+		if (HasComponent<SceneTreeComponent>())
+		{
+			const auto& children = GetComponent<SceneTreeComponent>().children;
+			for (auto childHandle : children)
+			{
+				Entity childEntity(childHandle, m_Scene);
+				if (childEntity.GetName() == childName) return childEntity;
+			}
+		}
 		return Entity{};
 	}
 

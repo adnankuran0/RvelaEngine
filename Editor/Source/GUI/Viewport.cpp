@@ -1,4 +1,4 @@
-﻿#include "Viewport.h"
+#include "Viewport.h"
 #include <iostream>
 #include "ImGui/imgui.h"
 #include "ImGui/ImGuizmo.h"
@@ -6,6 +6,7 @@
 #include <glm/gtx/matrix_decompose.hpp>
 #include "Renderer/RenderLayer.h"
 #include "Renderer/DebugRenderer.h"
+#include "Input/Input.h"
 
 using namespace rv;
 
@@ -308,6 +309,14 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity)
             ImVec2(1, 0),
             IM_COL32_WHITE
         );
+
+        ImVec2 mousePos = ImGui::GetIO().MousePos;
+        if (displaySize.x > 0.0f && displaySize.y > 0.0f)
+        {
+            float normX = (mousePos.x - displayPos.x) / displaySize.x;
+            float normY = (mousePos.y - displayPos.y) / displaySize.y;
+            Input::SetViewportMousePos(glm::vec2(normX * 1920.0f, normY * 1080.0f));
+        }
 
         DrawGizmos(engine, displayPos, displaySize, selectedEntity);
         HandleSelection(engine, displayPos, displaySize, selectedEntity);
