@@ -1,0 +1,31 @@
+{
+    "dependencies": [],
+    "importerID": "ModelImporter",
+    "importerSettings": {
+        "generatePrefab": true,
+        "importMaterials": true,
+        "importNormals": true,
+        "importTangents": true,
+        "importTextures": true,
+        "importUVs": true,
+        "scale": 1.0
+    },
+    "lastWriteTime": 13415805147,
+    "subAssets": [
+        {
+            "hasCache": false,
+            "index": 0,
+            "name": "Capsule_Mat0",
+            "type": "Material",
+            "uuid": "c041d50e-c5c8-4673-95be-7b01ea4e9718"
+        },
+        {
+            "hasCache": true,
+            "index": 0,
+            "name": "Capsule",
+            "type": "Mesh",
+            "uuid": "62345031-f93b-40f4-aa76-18c59801997d"
+        }
+    ],
+    "uuid": "ff9e7667-1130-46dc-8e99-89242cbe4a84"
+}

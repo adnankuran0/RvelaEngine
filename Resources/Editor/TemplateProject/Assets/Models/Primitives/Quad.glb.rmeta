@@ -1,0 +1,31 @@
+{
+    "dependencies": [],
+    "importerID": "ModelImporter",
+    "importerSettings": {
+        "generatePrefab": true,
+        "importMaterials": true,
+        "importNormals": true,
+        "importTangents": true,
+        "importTextures": true,
+        "importUVs": true,
+        "scale": 1.0
+    },
+    "lastWriteTime": 13431487470,
+    "subAssets": [
+        {
+            "hasCache": false,
+            "index": 0,
+            "name": "Quad_Mat0",
+            "type": "Material",
+            "uuid": "bd963caf-9a6b-4c16-9b6d-960f28126914"
+        },
+        {
+            "hasCache": true,
+            "index": 0,
+            "name": "Quad",
+            "type": "Mesh",
+            "uuid": "1d2596bb-18d3-41a6-9848-a8a584870ce3"
+        }
+    ],
+    "uuid": "aca417c6-1a6f-4909-b69e-473f5ba3e548"
+}

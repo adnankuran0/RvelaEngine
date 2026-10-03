@@ -45,7 +45,8 @@ public:
     static MaterialInstance CreateFromAsset(const Ref<MaterialAsset>& asset);
 
     Ref<MaterialAsset> GetSourceAsset() const { return m_SourceAsset; }
-    AssetUUID GetSourceUUID() const { return m_SourceAsset ? m_SourceAsset->GetUUID() : AssetUUID{}; }
+    AssetUUID GetSourceUUID() const { return m_SourceAsset ? m_SourceAsset->GetUUID() : AssetUUID::Invalid(); }
+    bool IsDefault() const { return m_SourceAsset.Get() == nullptr; }
 
     Ref<TextureAsset> GetAlbedoTexture() const { return IsOverridden(MatField::AlbedoTex) ? m_AlbedoTex : m_CachedAlbedoTex; }
     Ref<TextureAsset> GetNormalTexture() const { return IsOverridden(MatField::NormalTex) ? m_NormalTex : m_CachedNormalTex; }

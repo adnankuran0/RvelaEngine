@@ -1,0 +1,34 @@
+{
+    "Entities": [
+        {
+            "Material": {
+                "material": "ab90d890-0861-4c4c-809b-98515bf111db"
+            },
+            "Mesh": {
+                "mesh": "d5b8e68a-8170-4b1a-b439-62ae98d391f8"
+            },
+            "Tag": {
+                "tag": "Suzanne"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 16
+        }
+    ]
+}

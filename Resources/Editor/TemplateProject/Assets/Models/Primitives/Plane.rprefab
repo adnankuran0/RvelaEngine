@@ -1,0 +1,34 @@
+{
+    "Entities": [
+        {
+            "Material": {
+                "material": "fdea0b55-b65e-44c3-92ff-69700022b263"
+            },
+            "Mesh": {
+                "mesh": "077f6760-e8d5-44b4-895c-5d88be2db952"
+            },
+            "Tag": {
+                "tag": "Plane"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    0.5,
+                    0.5,
+                    0.5
+                ]
+            },
+            "UUID": 19
+        }
+    ]
+}

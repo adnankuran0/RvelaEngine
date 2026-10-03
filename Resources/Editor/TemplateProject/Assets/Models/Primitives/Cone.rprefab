@@ -1,0 +1,34 @@
+{
+    "Entities": [
+        {
+            "Material": {
+                "material": "f49d135b-9a56-4137-ad0c-aad770dee627"
+            },
+            "Mesh": {
+                "mesh": "92ffc5c9-9f6f-4332-ad83-e1d03b046a53"
+            },
+            "Tag": {
+                "tag": "Cone"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 6
+        }
+    ]
+}

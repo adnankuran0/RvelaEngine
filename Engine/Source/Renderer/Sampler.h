@@ -47,7 +47,7 @@ public:
     SamplerDesc& GetDesc() { return m_Decs; }
 private:
     SamplerDesc m_Decs;
-	unsigned int m_ID;
+	unsigned int m_ID = 0;
 };
 
 }

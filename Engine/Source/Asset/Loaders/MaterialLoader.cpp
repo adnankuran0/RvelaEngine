@@ -11,8 +11,7 @@ using json = nlohmann::json;
 
 MaterialLoader::MaterialLoader()
 {
-    AssetUUID uuid{};
-    s_DefaultMaterial = CreateRef<MaterialAsset>(uuid);
+    s_DefaultMaterial = CreateRef<MaterialAsset>(AssetUUID::Invalid());
 }
 
 Ref<Asset> MaterialLoader::Load(

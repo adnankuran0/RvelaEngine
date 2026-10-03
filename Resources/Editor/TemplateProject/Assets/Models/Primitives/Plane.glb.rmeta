@@ -1,0 +1,31 @@
+{
+    "dependencies": [],
+    "importerID": "ModelImporter",
+    "importerSettings": {
+        "generatePrefab": true,
+        "importMaterials": true,
+        "importNormals": true,
+        "importTangents": true,
+        "importTextures": true,
+        "importUVs": true,
+        "scale": 1.0
+    },
+    "lastWriteTime": 13415805229,
+    "subAssets": [
+        {
+            "hasCache": false,
+            "index": 0,
+            "name": "Plane_Mat0",
+            "type": "Material",
+            "uuid": "fdea0b55-b65e-44c3-92ff-69700022b263"
+        },
+        {
+            "hasCache": true,
+            "index": 0,
+            "name": "Plane",
+            "type": "Mesh",
+            "uuid": "077f6760-e8d5-44b4-895c-5d88be2db952"
+        }
+    ],
+    "uuid": "9d996abd-b867-4ede-86a0-6b58043a66e4"
+}

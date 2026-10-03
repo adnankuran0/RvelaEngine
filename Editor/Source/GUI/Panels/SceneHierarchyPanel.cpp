@@ -10,37 +10,161 @@
 #include <unordered_map>
 #include <vector>
 
+#include "Asset/AssetManager.h"
+#include "Utils/ProjectManager.h"
+#include "AssetImporters/ModelImporter.h"
+#include "Utils/FileUtils.h"
+
 using namespace rv;
 
-struct PrimitiveConfig { std::string name; AssetUUID uuid; };
+static Ref<MeshAsset> ResolvePrimitiveMesh(const std::string& primitiveMeshName, AssetUUID& outMeshUUID)
+{
+    auto& manager = AssetManager::Get();
+    auto& registry = manager.GetRegistry();
+    auto projectAssetsPath = ProjectManager::GetProjectPath() / "Assets";
+    auto primitivesDir = projectAssetsPath / "Models" / "Primitives";
+
+    static const std::vector<std::string> extensions = { ".glb", ".fbx", ".obj" };
+
+    std::filesystem::path foundModelPath;
+
+    // Check primitive paths
+    for (const auto& ext : extensions)
+    {
+        auto candidate = primitivesDir / (primitiveMeshName + ext);
+        if (std::filesystem::exists(candidate))
+        {
+            foundModelPath = candidate;
+            break;
+        }
+    }
+
+    if (foundModelPath.empty() && std::filesystem::exists(projectAssetsPath))
+    {
+        for (const auto& entry : std::filesystem::recursive_directory_iterator(projectAssetsPath))
+        {
+            if (!entry.is_regular_file()) continue;
+            const auto& p = entry.path();
+            if (p.extension() == ".rmeta") continue;
+            if (p.stem().string() == primitiveMeshName)
+            {
+                std::string ext = p.extension().string();
+                if (ext == ".glb" || ext == ".fbx" || ext == ".obj")
+                {
+                    foundModelPath = p;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (!foundModelPath.empty())
+    {
+        AssetUUID modelUUID = registry.GetUUID(foundModelPath);
+        if (!modelUUID.IsValid())
+        {
+            AssetMeta meta = registry.GetOrCreateMeta(foundModelPath);
+            modelUUID = meta.uuid;
+        }
+
+        if (modelUUID.IsValid())
+        {
+            AssetMeta meta = registry.GetMeta(modelUUID);
+            for (const auto& sub : meta.subAssets)
+            {
+                if (sub.type == "Mesh" && sub.uuid.IsValid())
+                {
+                    Ref<MeshAsset> mesh = manager.GetAsset<MeshAsset>(sub.uuid);
+                    if (mesh)
+                    {
+                        outMeshUUID = sub.uuid;
+                        return mesh;
+                    }
+                }
+            }
+        }
+
+        // try import primitives
+        ModelImporter importer;
+        ModelImportSettings settings;
+        ModelImportResult result = importer.ImportModel(foundModelPath, registry, settings);
+        for (const auto& [idx, uuid] : result.meshUUIDs)
+        {
+            Ref<MeshAsset> mesh = manager.GetAsset<MeshAsset>(uuid);
+            if (mesh)
+            {
+                outMeshUUID = uuid;
+                return mesh;
+            }
+        }
+    }
+
+    // fallback
+    static const std::unordered_map<std::string, AssetUUID> legacyMap =
+    {
+        {"Cube", AssetUUID::FromString("55dee74b-34c1-4aac-80c9-627b95a8cf58")},
+        {"Sphere", AssetUUID::FromString("b6c7f2a2-cce2-4b68-be50-19a8f552e727")},
+        {"Cylinder", AssetUUID::FromString("2c4d9b01-fea1-4eec-b741-bb054229ba61")},
+        {"Quad", AssetUUID::FromString("1d2596bb-18d3-41a6-9848-a8a584870ce3")},
+        {"Cone", AssetUUID::FromString("92ffc5c9-9f6f-4332-ad83-e1d03b046a53")},
+        {"Capsule", AssetUUID::FromString("62345031-f93b-40f4-aa76-18c59801997d")},
+        {"Plane", AssetUUID::FromString("077f6760-e8d5-44b4-895c-5d88be2db952")},
+        {"Monkey", AssetUUID::FromString("d5b8e68a-8170-4b1a-b439-62ae98d391f8")},
+        {"Torus", AssetUUID::FromString("db65917a-cf92-4335-addb-f30e2608d318")}
+    };
+
+    auto it = legacyMap.find(primitiveMeshName);
+    if (it != legacyMap.end())
+    {
+        Ref<MeshAsset> mesh = manager.GetAsset<MeshAsset>(it->second);
+        if (mesh)
+        {
+            outMeshUUID = it->second;
+            return mesh;
+        }
+    }
+
+    auto templatePrimitive = EDITOR_PATH("TemplateProject/Assets/Models/Primitives/" + primitiveMeshName + ".glb").GetAbsolute();
+    if (std::filesystem::exists(templatePrimitive))
+    {
+        std::filesystem::create_directories(primitivesDir);
+        auto destModel = primitivesDir / (primitiveMeshName + ".glb");
+        std::error_code ec;
+        std::filesystem::copy_file(templatePrimitive, destModel, std::filesystem::copy_options::overwrite_existing, ec);
+        if (!ec)
+        {
+            ModelImporter importer;
+            ModelImportSettings settings;
+            ModelImportResult result = importer.ImportModel(destModel, registry, settings);
+            for (const auto& [idx, uuid] : result.meshUUIDs)
+            {
+                Ref<MeshAsset> mesh = manager.GetAsset<MeshAsset>(uuid);
+                if (mesh)
+                {
+                    outMeshUUID = uuid;
+                    return mesh;
+                }
+            }
+        }
+    }
+
+    return nullptr;
+}
+
 static Entity LoadPrimitive(Scene& scene, const std::string& primitiveMeshName)
 {
-    static const std::unordered_map<std::string, PrimitiveConfig> map =
-    {
-        {"Cube", {"Cube", AssetUUID::FromString("55dee74b-34c1-4aac-80c9-627b95a8cf58")}},
-        {"Sphere", {"Sphere", AssetUUID::FromString("b6c7f2a2-cce2-4b68-be50-19a8f552e727")}},
-        {"Cylinder", {"Cylinder", AssetUUID::FromString("2c4d9b01-fea1-4eec-b741-bb054229ba61")}},
-        {"Quad", {"Quad", AssetUUID::FromString("1d2596bb-18d3-41a6-9848-a8a584870ce3")}},
-        {"Cone", {"Cone", AssetUUID::FromString("92ffc5c9-9f6f-4332-ad83-e1d03b046a53")}},
-        {"Capsule", {"Capsule", AssetUUID::FromString("62345031-f93b-40f4-aa76-18c59801997d")}},
-        {"Plane", {"Plane", AssetUUID::FromString("077f6760-e8d5-44b4-895c-5d88be2db952")}},
-        {"Monkey", {"Monkey", AssetUUID::FromString("d5b8e68a-8170-4b1a-b439-62ae98d391f8")}},
-        {"Torus", {"Torus", AssetUUID::FromString("db65917a-cf92-4335-addb-f30e2608d318")}}
-    };
-    auto it = map.find(primitiveMeshName);
-    if (it == map.end()) return Entity{};
-    const auto& cfg = it->second;
-    Entity root = scene.CreateEntity(cfg.name);
-
-    Ref<MeshAsset> m = AssetManager::Get().GetAsset<MeshAsset>(cfg.uuid);
+    AssetUUID meshUUID = AssetUUID::Invalid();
+    Ref<MeshAsset> m = ResolvePrimitiveMesh(primitiveMeshName, meshUUID);
     if (!m)
     {
-        LOG_ERROR("Mesh not found: {}", cfg.name);
-        return root;
+        LOG_ERROR("Mesh not found for primitive: {}", primitiveMeshName);
+        return Entity{};
     }
+
+    Entity root = scene.CreateEntity(primitiveMeshName);
     root.AddComponent<MeshComponent>(m->GetUUID());
     root.AddComponent<MeshRendererComponent>(m);
-    root.GetComponent<TagComponent>().tag = cfg.name;
+    root.GetComponent<TagComponent>().tag = primitiveMeshName;
     root.AddComponent<MaterialComponent>();
     root.AddComponent<RigidbodyComponent>();
     if (primitiveMeshName == "Cube")

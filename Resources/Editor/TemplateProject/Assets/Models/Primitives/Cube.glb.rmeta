@@ -1,0 +1,31 @@
+{
+    "dependencies": [],
+    "importerID": "ModelImporter",
+    "importerSettings": {
+        "generatePrefab": true,
+        "importMaterials": true,
+        "importNormals": true,
+        "importTangents": true,
+        "importTextures": true,
+        "importUVs": true,
+        "scale": 1.0
+    },
+    "lastWriteTime": 13415804895,
+    "subAssets": [
+        {
+            "hasCache": false,
+            "index": 0,
+            "name": "Cube_Mat0",
+            "type": "Material",
+            "uuid": "a9c5fb0f-1ac6-47f5-8750-5878b0934986"
+        },
+        {
+            "hasCache": true,
+            "index": 0,
+            "name": "Cube.001",
+            "type": "Mesh",
+            "uuid": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
+        }
+    ],
+    "uuid": "4e2826e0-d6da-4568-93ae-d443fc9aad64"
+}

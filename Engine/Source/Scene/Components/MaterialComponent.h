@@ -9,14 +9,16 @@ namespace rv {
 struct MaterialComponent
 {
 public:
-    MaterialComponent() = default;
+    inline static const AssetUUID s_LegacyDefaultMaterialUUID = AssetUUID::FromString("ee3dde12-6263-4f11-bb1d-812b3e196ab7");
 
-    explicit MaterialComponent(const AssetUUID& uuid) { Load(uuid); }
+    MaterialComponent();
+    explicit MaterialComponent(const AssetUUID& uuid);
 
     MaterialInstance& GetInstance() { return m_Instance; }
     const MaterialInstance& GetInstance() const { return m_Instance; }
 
     const AssetUUID& GetMaterialUUID() const { return m_MaterialUUID; }
+    bool IsDefault() const { return !m_MaterialUUID.IsValid() || m_MaterialUUID == s_LegacyDefaultMaterialUUID; }
 
     void SetMaterial(const AssetUUID& uuid) { Load(uuid); }
     void Reload() { Load(m_MaterialUUID); }
@@ -130,7 +132,7 @@ public:
 private:
     void Load(const AssetUUID& uuid);
 
-    AssetUUID m_MaterialUUID;
+    AssetUUID m_MaterialUUID = AssetUUID::Invalid();
     MaterialInstance m_Instance;
 };
 

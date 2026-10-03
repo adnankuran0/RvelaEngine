@@ -708,10 +708,19 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 			{
 				const MaterialInstance& inst = material.GetInstance();
 
-				float saveBtnWidth = inst.GetSourceAsset() ? 65.0f : 0.0f;
-				float slotWidth = inst.GetSourceAsset() ? ImGui::GetContentRegionAvail().x - saveBtnWidth : -FLT_MIN;
+				std::string matBtnLabel = "Default Material";
+				if (inst.GetSourceAsset())
+				{
+					auto path = AssetManager::Get().GetRegistry().GetPath(inst.GetSourceUUID());
+					if (!path.empty()) matBtnLabel = path.filename().string();
+					else matBtnLabel = "Material Asset";
+				}
 
-				ImGui::Button("Material Slot", ImVec2(slotWidth, 24.0f));
+				float saveBtnWidth = inst.GetSourceAsset() ? 65.0f : 0.0f;
+				float clearBtnWidth = inst.GetSourceAsset() ? 26.0f : 0.0f;
+				float slotWidth = inst.GetSourceAsset() ? ImGui::GetContentRegionAvail().x - saveBtnWidth - clearBtnWidth : -FLT_MIN;
+
+				ImGui::Button(matBtnLabel.c_str(), ImVec2(slotWidth, 24.0f));
 				if (ImGui::BeginDragDropTarget())
 				{
 					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
@@ -749,17 +758,22 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 						if (inst.IsOverridden(MatField::CullMode)) asset->cullMode = material.GetCullMode();
 						if (inst.IsOverridden(MatField::AlphaCutoff)) asset->alphaCutoff = material.GetAlphaCutoff();
 
-						if (inst.IsOverridden(MatField::AlbedoTex)) { asset->albedoTextureUUID = material.GetAlbedoTexture() ? material.GetAlbedoTexture()->GetUUID() : AssetUUID{}; asset->useAlbedoMap = material.IsUsingAlbedoMap(); }
-						if (inst.IsOverridden(MatField::NormalTex)) { asset->normalTextureUUID = material.GetNormalTexture() ? material.GetNormalTexture()->GetUUID() : AssetUUID{}; asset->useNormalMap = material.IsUsingNormalMap(); }
-						if (inst.IsOverridden(MatField::MetallicTex)) { asset->metallicTextureUUID = material.GetMetallicTexture() ? material.GetMetallicTexture()->GetUUID() : AssetUUID{}; asset->useMetallicMap = material.IsUsingMetallicMap(); }
-						if (inst.IsOverridden(MatField::RoughnessTex)) { asset->roughnessTextureUUID = material.GetRoughnessTexture() ? material.GetRoughnessTexture()->GetUUID() : AssetUUID{}; asset->useRoughnessMap = material.IsUsingRoughnessMap(); }
-						if (inst.IsOverridden(MatField::AOTex)) { asset->aoTextureUUID = material.GetAOTexture() ? material.GetAOTexture()->GetUUID() : AssetUUID{}; asset->useAOMap = material.IsUsingAOMap(); }
-						if (inst.IsOverridden(MatField::HeightTex)) { asset->heightTextureUUID = material.GetHeightTexture() ? material.GetHeightTexture()->GetUUID() : AssetUUID{}; asset->useHeightMap = material.IsUsingHeightMap(); }
+						if (inst.IsOverridden(MatField::AlbedoTex)) { asset->albedoTextureUUID = material.GetAlbedoTexture() ? material.GetAlbedoTexture()->GetUUID() : AssetUUID::Invalid(); asset->useAlbedoMap = material.IsUsingAlbedoMap(); }
+						if (inst.IsOverridden(MatField::NormalTex)) { asset->normalTextureUUID = material.GetNormalTexture() ? material.GetNormalTexture()->GetUUID() : AssetUUID::Invalid(); asset->useNormalMap = material.IsUsingNormalMap(); }
+						if (inst.IsOverridden(MatField::MetallicTex)) { asset->metallicTextureUUID = material.GetMetallicTexture() ? material.GetMetallicTexture()->GetUUID() : AssetUUID::Invalid(); asset->useMetallicMap = material.IsUsingMetallicMap(); }
+						if (inst.IsOverridden(MatField::RoughnessTex)) { asset->roughnessTextureUUID = material.GetRoughnessTexture() ? material.GetRoughnessTexture()->GetUUID() : AssetUUID::Invalid(); asset->useRoughnessMap = material.IsUsingRoughnessMap(); }
+						if (inst.IsOverridden(MatField::AOTex)) { asset->aoTextureUUID = material.GetAOTexture() ? material.GetAOTexture()->GetUUID() : AssetUUID::Invalid(); asset->useAOMap = material.IsUsingAOMap(); }
+						if (inst.IsOverridden(MatField::HeightTex)) { asset->heightTextureUUID = material.GetHeightTexture() ? material.GetHeightTexture()->GetUUID() : AssetUUID::Invalid(); asset->useHeightMap = material.IsUsingHeightMap(); }
 
 						auto path = AssetManager::Get().GetRegistry().GetPath(asset->GetUUID());
 						MaterialSerializer::Save(asset, path);
 						material.GetInstance().ClearAllOverrides();
 						material.GetInstance().RebuildCache();
+					}
+					ImGui::SameLine();
+					if (ImGui::Button("X##matclear", ImVec2(clearBtnWidth - 4.0f, 24.0f)))
+					{
+						material.SetMaterial(AssetUUID::Invalid());
 					}
 				}
 
@@ -1798,7 +1812,7 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 		ImGui::Separator();
 
 		DrawAddComponentEntry<ScriptComponent>("Script", filterBuf, registry, selectedEntity);
-		DrawAddComponentEntry<MaterialComponent>("Material", filterBuf, registry, selectedEntity, AssetUUID::FromString("ee3dde12-6263-4f11-bb1d-812b3e196ab7"));
+		DrawAddComponentEntry<MaterialComponent>("Material", filterBuf, registry, selectedEntity);
 		DrawAddComponentEntry<MeshComponent>("Mesh", filterBuf, registry, selectedEntity);
 		DrawAddComponentEntry<MeshRendererComponent>("Mesh Renderer", filterBuf, registry, selectedEntity);
 		DrawAddComponentEntry<SkeletalMeshComponent>("Skeletal Mesh", filterBuf, registry, selectedEntity);
