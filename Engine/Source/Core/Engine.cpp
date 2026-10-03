@@ -70,6 +70,7 @@ bool Engine::OpenProject(const std::string& projectFilePath)
 			if (std::filesystem::exists(scenePath))
 			{
 				m_SceneManager.LoadScene(scenePath.string());
+				m_SceneManager.Update(); // Immediately apply pending scene load
 				activeSceneName = scenePath.stem().string();
 			}
 			else
@@ -84,6 +85,8 @@ bool Engine::OpenProject(const std::string& projectFilePath)
 
 		std::string title = "Rvela Engine - [" + activeProj->name + "] - " + activeSceneName;
 		m_Window.SetTitle(title);
+
+		glfwSwapInterval(settings.vsync ? 1 : 0);
 	}
 
 	return true;
