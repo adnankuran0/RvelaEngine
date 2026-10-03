@@ -15,6 +15,10 @@ enum class TextureFormat : uint8_t
     BC3, // DXT5
     BC4, // R compressed
     BC5, // RG compressed
+    RGB16F,
+    RGBA16F,
+    RGB32F,
+    RGBA32F,
 };
 
 class TextureAsset : public Asset

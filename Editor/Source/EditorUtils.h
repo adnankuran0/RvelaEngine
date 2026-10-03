@@ -13,8 +13,7 @@ public:
 	static bool SaveScene(Engine& engine);
 	static bool SaveSceneAs(Engine& engine);
     static AssetUUID ReadUUIDFromMeta(const std::string& assetPath);
-   
-
+    static std::string GetAssetFileName(const AssetUUID& uuid);
 };
 
 }

@@ -305,6 +305,62 @@ bool TextureImporter::Import(
         isNormal = true;
     }
 
+    std::string ext = sourcePath.extension().string();
+    std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+    if (ext == ".hdr")
+    {
+        stbi_set_flip_vertically_on_load(true);
+        int w, h, channels;
+        float* pixels = stbi_loadf(sourcePath.string().c_str(), &w, &h, &channels, 0);
+        if (!pixels)
+        {
+            LOG_ERROR("stb_image failed to load HDR: {}", sourcePath.string());
+            return false;
+        }
+
+        TextureCacheHeader header{};
+        header.width = static_cast<uint32_t>(w);
+        header.height = static_cast<uint32_t>(h);
+        header.mipCount = 1;
+        header.isSRGB = 0;
+
+        TextureFormat format = TextureFormat::Unknown;
+        size_t dataSizeBytes = 0;
+        if (channels == 3)
+        {
+            format = TextureFormat::RGB32F;
+            dataSizeBytes = static_cast<size_t>(w) * h * 3 * sizeof(float);
+        }
+        else if (channels == 4)
+        {
+            format = TextureFormat::RGBA32F;
+            dataSizeBytes = static_cast<size_t>(w) * h * 4 * sizeof(float);
+        }
+        else
+        {
+            LOG_ERROR("Unsupported HDR channel count: {}", channels);
+            stbi_image_free(pixels);
+            return false;
+        }
+
+        header.format = format;
+        header.dataSize = static_cast<uint32_t>(dataSizeBytes);
+
+        std::ofstream file(outCachePath, std::ios::binary);
+        if (!file)
+        {
+            stbi_image_free(pixels);
+            LOG_ERROR("Cannot write cache: {}", outCachePath.string());
+            return false;
+        }
+
+        file.write(reinterpret_cast<const char*>(&header), sizeof(header));
+        file.write(reinterpret_cast<const char*>(pixels), header.dataSize);
+
+        stbi_image_free(pixels);
+        return true;
+    }
+
     stbi_set_flip_vertically_on_load(true);
     int w, h, channels;
     uint8_t* pixels = stbi_load(sourcePath.string().c_str(), &w, &h, &channels, 0);
@@ -333,7 +389,7 @@ bool TextureImporter::Import(
     }
 
     if (w > settings.maxSize || h > settings.maxSize)
-        LOG_WARN("Texture exceeds maxSize ({}): {}x{} — {}",
+        LOG_WARN("Texture exceeds maxSize ({}): {}x{} - {}",
             settings.maxSize, w, h, sourcePath.string());
 
     assert(!(isNormal && channels != 3) && "Normal map must be RGB!");

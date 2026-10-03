@@ -1,4 +1,4 @@
-﻿#include "rvelapch.h"
+#include "rvelapch.h"
 #include "GLAD/gl.h"
 #include "Texture.h"
 #define STB_IMAGE_IMPLEMENTATION
@@ -153,6 +153,7 @@ void Texture::GenerateFromAsset(Ref<TextureAsset> asset)
     bool isCompressed = false;
     GLenum internalFormat;
     GLenum dataFormat = GL_RGBA;
+    GLenum dataType = GL_UNSIGNED_BYTE;
     size_t bytesPerPixel = 0;
 
     switch (asset->GetFormat())
@@ -177,6 +178,32 @@ void Texture::GenerateFromAsset(Ref<TextureAsset> asset)
         internalFormat = GL_RG8;
         dataFormat = GL_RG;
         bytesPerPixel = 2;
+        break;
+
+    // FLOATING POINT
+    case TextureFormat::RGB16F:
+        internalFormat = GL_RGB16F;
+        dataFormat = GL_RGB;
+        dataType = GL_HALF_FLOAT;
+        bytesPerPixel = 6;
+        break;
+    case TextureFormat::RGBA16F:
+        internalFormat = GL_RGBA16F;
+        dataFormat = GL_RGBA;
+        dataType = GL_HALF_FLOAT;
+        bytesPerPixel = 8;
+        break;
+    case TextureFormat::RGB32F:
+        internalFormat = GL_RGB32F;
+        dataFormat = GL_RGB;
+        dataType = GL_FLOAT;
+        bytesPerPixel = 12;
+        break;
+    case TextureFormat::RGBA32F:
+        internalFormat = GL_RGBA32F;
+        dataFormat = GL_RGBA;
+        dataType = GL_FLOAT;
+        bytesPerPixel = 16;
         break;
 
     // COMPRESSED
@@ -224,7 +251,7 @@ void Texture::GenerateFromAsset(Ref<TextureAsset> asset)
         {
             glTexImage2D(GL_TEXTURE_2D, i, internalFormat,
                 mipW, mipH, 0,
-                dataFormat, GL_UNSIGNED_BYTE, ptr);
+                dataFormat, dataType, ptr);
             ptr += mipW * mipH * bytesPerPixel;
         }
 
@@ -233,7 +260,7 @@ void Texture::GenerateFromAsset(Ref<TextureAsset> asset)
     }
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, asset->GetMipCount() - 1);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, asset->GetMipCount() > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 

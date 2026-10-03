@@ -34,6 +34,7 @@ json Environment::Serialize()
     j["PostProcess_VignetteSmoothness"] = PostProcess_VignetteSmoothness;
     j["PostProcess_ChromaticStrength"] = PostProcess_ChromaticStrength;
 
+    j["HDR"] = m_Skybox.GetHDRUUID().IsValid() ? m_Skybox.GetHDRUUID().ToString() : "";
     j["HDRPath"] = m_Skybox.GetPath().GetVirtualStr();
 
     return j;
@@ -95,6 +96,20 @@ void Environment::Deserialize(const json& j)
     if (j.contains("PostProcess_ChromaticStrength"))
         PostProcess_ChromaticStrength = j["PostProcess_ChromaticStrength"];
 
-    if (j.contains("HDRPath"))
-        m_Skybox.InitHDR(Path::FromVirtual(j["HDRPath"]));
+    if (j.contains("HDR") && !j["HDR"].get<std::string>().empty())
+    {
+        AssetUUID uuid = AssetUUID::FromString(j["HDR"].get<std::string>());
+        if (uuid.IsValid())
+        {
+            m_Skybox.InitHDR(uuid);
+        }
+    }
+    else if (j.contains("HDRPath"))
+    {
+        std::string pathStr = j["HDRPath"].get<std::string>();
+        if (!pathStr.empty())
+        {
+            m_Skybox.InitHDR(Path::FromVirtual(pathStr));
+        }
+    }
 }

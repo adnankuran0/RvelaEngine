@@ -280,7 +280,8 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 	{
 		DrawComponent<MeshComponent>("Mesh", registry, selectedEntity, [](MeshComponent& mesh)
 			{
-				UI::DrawFullWidthAssetDropSlot("Mesh Slot", "", [&](const std::string& pathStr)
+				std::string meshName = EditorUtils::GetAssetFileName(mesh.GetMeshID());
+				UI::DrawFullWidthAssetDropSlot("Mesh Slot", meshName, [&](const std::string& pathStr)
 					{
 						if (pathStr.ends_with(".obj") || pathStr.ends_with(".fbx") || pathStr.ends_with(".gltf") || pathStr.ends_with(".glb") || pathStr.ends_with(".rmesh"))
 						{
@@ -293,7 +294,8 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 
 		DrawComponent<SkeletalMeshComponent>("Skeletal Mesh", registry, selectedEntity, [](SkeletalMeshComponent& mesh)
 			{
-				UI::DrawFullWidthAssetDropSlot("Skeletal mesh Slot", "", [&](const std::string& pathStr)
+				std::string skelMeshName = EditorUtils::GetAssetFileName(mesh.GetMeshID());
+				UI::DrawFullWidthAssetDropSlot("Skeletal mesh Slot", skelMeshName, [&](const std::string& pathStr)
 					{
 						if (pathStr.ends_with(".obj") || pathStr.ends_with(".fbx") || pathStr.ends_with(".gltf") || pathStr.ends_with(".glb") || pathStr.ends_with(".rskmesh"))
 						{
@@ -306,13 +308,7 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 
 		DrawComponent<SkeletonComponent>("Skeleton", registry, selectedEntity, [&](SkeletonComponent& skelComp)
 			{
-				std::string currentAssetName = "None (Drop .rskeleton)";
-				if (skelComp.GetSkeletonID().IsValid())
-				{
-					auto path = AssetManager::Get().GetRegistry().GetPath(skelComp.GetSkeletonID());
-					currentAssetName = path.empty() ? skelComp.GetSkeletonID().ToString() : path.filename().string();
-				}
-
+				std::string currentAssetName = EditorUtils::GetAssetFileName(skelComp.GetSkeletonID());
 				UI::DrawFullWidthAssetDropSlot("Skeleton Asset Slot", currentAssetName, [&](const std::string& pathStr)
 					{
 						if (pathStr.ends_with(".rskeleton") || pathStr.ends_with(".fbx"))
@@ -784,10 +780,17 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 					if (ImGui::Button(id, ImVec2(22, 22))) clearFn();
 					};
 
-				auto TextureSlot = [&](const char* label, const char* idSuffix, bool overridden, auto setTexFn, auto clearTexFn) {
+				auto TextureSlot = [&](const char* label, const char* idSuffix, bool overridden, Ref<TextureAsset> currentTex, auto setTexFn, auto clearTexFn) {
 					UI::PropertyLabel(label);
 					float btnWidth = overridden ? ImGui::GetContentRegionAvail().x - 26.0f : -FLT_MIN;
-					ImGui::Button("Texture", ImVec2(btnWidth, 22));
+					std::string btnText = "Texture";
+					if (currentTex)
+					{
+						std::string fn = EditorUtils::GetAssetFileName(currentTex->GetUUID());
+						if (!fn.empty())
+							btnText = fn;
+					}
+					ImGui::Button(btnText.c_str(), ImVec2(btnWidth, 22));
 					if (ImGui::BeginDragDropTarget())
 					{
 						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
@@ -886,7 +889,7 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 				{
 					if (UI::BeginPropertyTable("AlbedoTable"))
 					{
-						TextureSlot("Texture", "alb", inst.IsOverridden(MatField::AlbedoTex), [&](AssetUUID u) { material.SetAlbedoTexture(u); }, [&]() { material.ClearAlbedoTexture(); });
+						TextureSlot("Texture", "alb", inst.IsOverridden(MatField::AlbedoTex), material.GetAlbedoTexture(), [&](AssetUUID u) { material.SetAlbedoTexture(u); }, [&]() { material.ClearAlbedoTexture(); });
 
 						UI::PropertyLabel("Color");
 						glm::vec4 c = material.GetAlbedoColor();
@@ -904,7 +907,7 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 				{
 					if (UI::BeginPropertyTable("NormalTable"))
 					{
-						TextureSlot("Texture", "nrm", inst.IsOverridden(MatField::NormalTex), [&](AssetUUID u) { material.SetNormalTexture(u); }, [&]() { material.ClearNormalTexture(); });
+						TextureSlot("Texture", "nrm", inst.IsOverridden(MatField::NormalTex), material.GetNormalTexture(), [&](AssetUUID u) { material.SetNormalTexture(u); }, [&]() { material.ClearNormalTexture(); });
 
 						UI::PropertyLabel("Scale");
 						float normalScale = material.GetNormalScale();
@@ -921,7 +924,7 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 				{
 					if (UI::BeginPropertyTable("RoughnessTable"))
 					{
-						TextureSlot("Texture", "rgh", inst.IsOverridden(MatField::RoughnessTex), [&](AssetUUID u) { material.SetRoughnessTexture(u); }, [&]() { material.ClearRoughnessTexture(); });
+						TextureSlot("Texture", "rgh", inst.IsOverridden(MatField::RoughnessTex), material.GetRoughnessTexture(), [&](AssetUUID u) { material.SetRoughnessTexture(u); }, [&]() { material.ClearRoughnessTexture(); });
 
 						UI::PropertyLabel("Roughness");
 						float roughness = material.GetRoughness();
@@ -938,7 +941,7 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 				{
 					if (UI::BeginPropertyTable("MetallicTable"))
 					{
-						TextureSlot("Texture", "mtl", inst.IsOverridden(MatField::MetallicTex), [&](AssetUUID u) { material.SetMetallicTexture(u); }, [&]() { material.ClearMetallicTexture(); });
+						TextureSlot("Texture", "mtl", inst.IsOverridden(MatField::MetallicTex), material.GetMetallicTexture(), [&](AssetUUID u) { material.SetMetallicTexture(u); }, [&]() { material.ClearMetallicTexture(); });
 
 						UI::PropertyLabel("Metallic");
 						float metallicVal = material.GetMetallic();
@@ -962,7 +965,7 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 				{
 					if (UI::BeginPropertyTable("HeightTable"))
 					{
-						TextureSlot("Texture", "hgt", inst.IsOverridden(MatField::HeightTex), [&](AssetUUID u) { material.SetHeightTexture(u); }, [&]() { material.ClearHeightTexture(); });
+						TextureSlot("Texture", "hgt", inst.IsOverridden(MatField::HeightTex), material.GetHeightTexture(), [&](AssetUUID u) { material.SetHeightTexture(u); }, [&]() { material.ClearHeightTexture(); });
 
 						UI::PropertyLabel("Scale");
 						float heightScale = material.GetHeightScale();
@@ -979,7 +982,7 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 				{
 					if (UI::BeginPropertyTable("AOTable"))
 					{
-						TextureSlot("Texture", "ao", inst.IsOverridden(MatField::AOTex), [&](AssetUUID u) { material.SetAOTexture(u); }, [&]() { material.ClearAOTexture(); });
+						TextureSlot("Texture", "ao", inst.IsOverridden(MatField::AOTex), material.GetAOTexture(), [&](AssetUUID u) { material.SetAOTexture(u); }, [&]() { material.ClearAOTexture(); });
 
 						UI::PropertyLabel("AO");
 						float ao = material.GetAO();
@@ -1122,7 +1125,8 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 
 	DrawComponent<ScriptComponent>("Script", registry, selectedEntity, [](ScriptComponent& scriptComp)
 		{
-			UI::DrawFullWidthAssetDropSlot("Script Slot", "", [&](const std::string& pathStr)
+			std::string scriptName = EditorUtils::GetAssetFileName(scriptComp.scriptAssetUUID);
+			UI::DrawFullWidthAssetDropSlot("Script Slot", scriptName, [&](const std::string& pathStr)
 				{
 					if (pathStr.ends_with(".lua"))
 					{
@@ -1136,7 +1140,8 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 		{
 			auto& audio = AudioManager::Get();
 
-			UI::DrawFullWidthAssetDropSlot("Audio Clip", "", [&](const std::string& pathStr)
+			std::string audioName = EditorUtils::GetAssetFileName(emitter.audioClipUUID);
+			UI::DrawFullWidthAssetDropSlot("Audio Clip", audioName, [&](const std::string& pathStr)
 				{
 					if (pathStr.ends_with(".wav") || pathStr.ends_with(".mp3"))
 					{
@@ -1427,8 +1432,8 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 
 			DrawComponent<AnimatorComponent>("Animator", registry, selectedEntity, [&](AnimatorComponent& animator)
 				{
-
-					UI::DrawFullWidthAssetDropSlot("Animation Library", "Animation Library", [&](const std::string& pathStr)
+					std::string animLibName = EditorUtils::GetAssetFileName(animator.libraryUUID);
+					UI::DrawFullWidthAssetDropSlot("Animation Library", animLibName, [&](const std::string& pathStr)
 						{
 							if (pathStr.ends_with(".ranimlib"))
 							{

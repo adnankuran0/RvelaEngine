@@ -2,6 +2,10 @@
 #include "Core/Engine.h"
 #include "ImGui/imgui.h"
 #include "glm/glm.hpp"
+#include "EditorUtils.h"
+#include "Asset/AssetManager.h"
+#include "Asset/AssetRegistry.h"
+#include <filesystem>
 
 using namespace rv;
 
@@ -13,20 +17,82 @@ void EnvironmentPanel::Draw(Engine* engine)
 
     if (ImGui::CollapsingHeader("Lighting"))
     {
-        ImGui::Button("Skybox HDR", ImVec2(200, 20));
+        std::string hdrDisplayName = "Skybox HDR (None)";
+        AssetUUID currentUUID = env.GetSkybox().GetHDRUUID();
+        if (currentUUID.IsValid())
+        {
+            std::string fileName = EditorUtils::GetAssetFileName(currentUUID);
+            if (!fileName.empty())
+            {
+                hdrDisplayName = "HDR: " + fileName;
+            }
+            else if (env.GetSkybox().GetPath().IsValid())
+            {
+                std::string fn = env.GetSkybox().GetPath().GetFilename();
+                std::string stem = std::filesystem::path(fn).stem().string();
+                if (!AssetUUID::FromString(stem).IsValid())
+                    hdrDisplayName = "HDR: " + fn;
+                else
+                    hdrDisplayName = "HDR: Skybox";
+            }
+            else
+            {
+                hdrDisplayName = "HDR: Skybox";
+            }
+        }
+        else if (env.GetSkybox().GetPath().IsValid())
+        {
+            std::string fn = env.GetSkybox().GetPath().GetFilename();
+            std::string stem = std::filesystem::path(fn).stem().string();
+            if (!AssetUUID::FromString(stem).IsValid())
+                hdrDisplayName = "HDR: " + fn;
+            else
+                hdrDisplayName = "HDR: Skybox";
+        }
+
+        bool hasHDR = currentUUID.IsValid() || env.GetSkybox().GetPath().IsValid();
+        float clearBtnWidth = 24.0f;
+        float slotWidth = hasHDR ? (ImGui::GetContentRegionAvail().x - clearBtnWidth - 6.0f) : -FLT_MIN;
+
+        ImGui::Button(hdrDisplayName.c_str(), ImVec2(slotWidth, 24.0f));
         if (ImGui::BeginDragDropTarget())
         {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
             {
-                const char* path = (const char*)payload->Data;
-                std::string pathStr(path);
-                if (pathStr.ends_with(".hdr"))
+                std::string pathStr((const char*)payload->Data);
+                AssetUUID uuid = AssetUUID::Invalid();
+
+                if (pathStr.ends_with(".rtex"))
+                {
+                    uuid = AssetUUID::FromString(std::filesystem::path(pathStr).stem().string());
+                }
+                else if (pathStr.ends_with(".hdr"))
+                {
+                    uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
+                    if (!uuid.IsValid())
+                        uuid = AssetManager::Get().GetRegistry().GetUUID(pathStr);
+                }
+
+                if (uuid.IsValid())
+                {
+                    env.GetSkybox().InitHDR(uuid);
+                }
+                else if (pathStr.ends_with(".hdr"))
                 {
                     Path absolutePath = Path::FromAbsolute(pathStr);
                     env.GetSkybox().InitHDR(absolutePath);
                 }
             }
             ImGui::EndDragDropTarget();
+        }
+
+        if (hasHDR)
+        {
+            ImGui::SameLine();
+            if (ImGui::Button("X##hdrClear", ImVec2(clearBtnWidth, 24.0f)))
+            {
+                env.GetSkybox().ClearHDR();
+            }
         }
 
         bool* useIBL = &env.Lighting_IBL;

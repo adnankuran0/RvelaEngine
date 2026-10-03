@@ -1,8 +1,13 @@
-﻿#include "rvelapch.h"
+#include "rvelapch.h"
 #include "Skybox.h"
 #include <stb_image.h>
 #include "Core/Log.h"
 #include "ShaderManager.h"
+#include "Asset/AssetManager.h"
+#include "Asset/AssetRegistry.h"
+#include "Asset/Types/TextureAsset.h"
+#include "Renderer/TextureCache.h"
+#include "Renderer/Texture.h"
 #include <cmath>      
 
 using namespace rv;
@@ -14,6 +19,7 @@ Skybox::Skybox()
 
 Skybox::~Skybox()
 {
+    ClearHDR();
 
     if (skyboxVAO != 0) {
         glDeleteVertexArrays(1, &skyboxVAO);
@@ -24,7 +30,10 @@ Skybox::~Skybox()
         glDeleteBuffers(1, &skyboxVBO);
         skyboxVBO = 0;
     }
+}
 
+void Skybox::ClearHDR()
+{
     if (skyboxTexture != 0) {
         glDeleteTextures(1, &skyboxTexture);
         skyboxTexture = 0;
@@ -44,6 +53,9 @@ Skybox::~Skybox()
         glDeleteTextures(1, &brdfLUTTexture);
         brdfLUTTexture = 0;
     }
+
+    m_HDRUUID = AssetUUID::Invalid();
+    m_Path = Path();
 }
 
 void Skybox::Init(const std::vector<Path>& faces)
@@ -52,11 +64,109 @@ void Skybox::Init(const std::vector<Path>& faces)
     setupSkybox();
 }
 
+void Skybox::InitHDR(const AssetUUID& uuid)
+{
+    if (!uuid.IsValid())
+    {
+        ClearHDR();
+        return;
+    }
+
+    ClearHDR();
+
+    Ref<TextureAsset> textureAsset = AssetManager::Get().GetAsset<TextureAsset>(uuid);
+    GLuint hdrTexture = 0;
+    bool shouldDeleteHDRTexture = false;
+
+    if (textureAsset)
+    {
+        Texture& tex = TextureCache::Get().GetOrCreate(textureAsset);
+        hdrTexture = tex.GetID();
+        m_HDRUUID = uuid;
+        auto fsPath = AssetManager::Get().GetRegistry().GetPath(uuid);
+        if (!fsPath.empty())
+        {
+            m_Path = Path::FromAbsolute(fsPath.string());
+        }
+    }
+    else
+    {
+        // fallback
+        auto fsPath = AssetManager::Get().GetRegistry().GetPath(uuid);
+        if (!fsPath.empty())
+        {
+            Path p = Path::FromAbsolute(fsPath.string());
+            hdrTexture = LoadHDRTexture(p);
+            shouldDeleteHDRTexture = true;
+            m_HDRUUID = uuid;
+            m_Path = p;
+        }
+        else
+        {
+            LOG_ERROR("Skybox::InitHDR: Failed to find asset with UUID: {}", uuid.ToString());
+            return;
+        }
+    }
+
+    if (hdrTexture == 0)
+    {
+        LOG_ERROR("Skybox::InitHDR: Failed to get HDR texture for UUID: {}", uuid.ToString());
+        return;
+    }
+
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+    setupSkybox();
+    SetupQuad();
+
+    skyboxTexture = ConvertEquirectangularToCubemap(hdrTexture);
+    GenerateIBLMaps();
+
+    if (shouldDeleteHDRTexture)
+    {
+        glDeleteTextures(1, &hdrTexture);
+    }
+}
+
 void Skybox::InitHDR(const Path& hdrFilePath)
 {
+    if (!hdrFilePath.IsValid())
+    {
+        ClearHDR();
+        return;
+    }
+
+    AssetUUID uuid = AssetManager::Get().GetRegistry().GetUUID(hdrFilePath.GetAbsolute());
+    if (!uuid.IsValid())
+    {
+        uuid = AssetManager::Get().GetRegistry().GetUUID(hdrFilePath.GetVirtual());
+    }
+    if (!uuid.IsValid())
+    {
+        auto metaPath = AssetMeta::GetMetaPath(hdrFilePath.GetAbsolute());
+        if (std::filesystem::exists(metaPath))
+        {
+            AssetMeta meta;
+            if (meta.LoadFromFile(metaPath) && meta.uuid.IsValid())
+            {
+                uuid = meta.uuid;
+            }
+        }
+    }
+
+    if (uuid.IsValid())
+    {
+        InitHDR(uuid);
+        return;
+    }
+
+    ClearHDR();
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     GLuint hdrTexture = LoadHDRTexture(hdrFilePath);
+    if (hdrTexture == 0)
+        return;
+
     m_Path = hdrFilePath;
+    m_HDRUUID = AssetUUID::Invalid();
     setupSkybox();
     SetupQuad();
 
@@ -74,6 +184,9 @@ void Skybox::GenerateIBLMaps()
 
 void Skybox::Render(const glm::mat4& projection, const glm::mat4& view, GLuint screenFBO)
 {
+    if (skyboxTexture == 0)
+        return;
+
     Shader& shader = ShaderManager::Get("Skybox");
 
     glBindFramebuffer(GL_FRAMEBUFFER, screenFBO);

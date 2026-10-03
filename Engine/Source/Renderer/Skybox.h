@@ -6,6 +6,7 @@
 #include "GLAD/gl.h"
 #include "Utils/FileUtils.h"
 #include "Shader.h"
+#include "Asset/AssetUUID.h"
 
 namespace rv {
 
@@ -16,7 +17,9 @@ namespace rv {
         ~Skybox();
 
         void Init(const std::vector<Path>& faces);
+        void InitHDR(const AssetUUID& uuid);
         void InitHDR(const Path& hdrFilePath);
+        void ClearHDR();
 
         void Render(const glm::mat4& projection, const glm::mat4& view, GLuint screenFBO);
 
@@ -30,6 +33,7 @@ namespace rv {
 
         inline bool HasIBLMaps() const { return irradianceMap != 0 && prefilterMap != 0 && brdfLUTTexture != 0; }
         inline int GetPrefilterMaxMipLevels() const { return prefilterMaxMipLevels; }
+        const AssetUUID& GetHDRUUID() const { return m_HDRUUID; }
         Path& GetPath() { return m_Path; }
     private:
         GLuint skyboxVAO, skyboxVBO, quadVAO, quadVBO = 0;
@@ -42,6 +46,7 @@ namespace rv {
         static constexpr int PREFILTER_SIZE = 128;
         static constexpr int BRDF_LUT_SIZE = 512;
         Path m_Path;
+        AssetUUID m_HDRUUID = AssetUUID::Invalid();
         GLuint loadCubemap(const std::vector<Path>& faces);
         void GenerateIBLMaps();
         void setupSkybox();

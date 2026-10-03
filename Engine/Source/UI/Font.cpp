@@ -179,7 +179,6 @@ bool Font::Load(const std::string& filepath, float fontSize)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, atlasW, atlasH, 0, GL_RGBA, GL_UNSIGNED_BYTE, rgbaPixels.data());
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    LOG_INFO("Successfully loaded TrueType SDF Font: {} (Base Size: {}px, Glyphs: {})", filepath, baseSize, m_SDFGlyphs.size());
     return true;
 }
 
