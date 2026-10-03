@@ -44,6 +44,7 @@ public:
 	{
 		return m_WindowData.title;
 	}
+	void SetTitle(const std::string& title);
 
 	WindowSize GetSize() noexcept; 
 

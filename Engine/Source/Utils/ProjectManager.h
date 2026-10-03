@@ -27,6 +27,7 @@ public:
 
 	static std::vector<std::string> GetRecentProjects();
 	static void AddRecentProject(const std::string& projectFilePath);
+	static void RemoveRecentProject(const std::string& projectFilePath);
 	static void ClearRecentProjects();
 
 private:

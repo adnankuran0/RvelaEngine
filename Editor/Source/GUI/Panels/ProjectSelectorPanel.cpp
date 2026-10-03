@@ -24,7 +24,6 @@ bool ProjectSelectorPanel::Draw(Engine* engine)
 
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking;
 
-    // If no project is loaded yet, user MUST select or create one
     bool isModal = !ProjectManager::IsProjectLoaded();
 
     bool popupOpen = true;
@@ -48,7 +47,6 @@ bool ProjectSelectorPanel::Draw(Engine* engine)
 
         if (ImGui::BeginTabBar("ProjectSelectorTabs"))
         {
-            // TAB 1: Recent Projects
             if (ImGui::BeginTabItem("Recent Projects"))
             {
                 ImGui::Spacing();
@@ -64,17 +62,33 @@ bool ProjectSelectorPanel::Draw(Engine* engine)
                     ImGui::Spacing();
 
                     float listHeight = ImGui::GetContentRegionAvail().y - 45.0f;
-                    if (ImGui::BeginListBox("##RecentList", ImVec2(-1.0f, listHeight > 100.0f ? listHeight : 100.0f)))
+                    std::string projectToRemove = "";
+
+                    if (ImGui::BeginChild("##RecentListChild", ImVec2(-1.0f, listHeight > 100.0f ? listHeight : 100.0f), true))
                     {
-                        for (const auto& projPath : recents)
+                        for (size_t i = 0; i < recents.size(); ++i)
                         {
+                            const auto& projPath = recents[i];
                             std::filesystem::path p(projPath);
                             std::string projName = p.stem().string();
-                            std::string label = projName + "  (" + p.parent_path().string() + ")";
+                            bool exists = std::filesystem::exists(p);
 
-                            if (ImGui::Selectable(label.c_str(), false, ImGuiSelectableFlags_None))
+                            ImGui::PushID(static_cast<int>(i));
+
+                            std::string label = projName + "  (" + p.parent_path().string() + ")";
+                            if (!exists)
                             {
-                                if (engine->OpenProject(projPath))
+                                label += " [Missing]";
+                                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.7f, 0.4f, 0.4f, 1.0f));
+                            }
+
+                            if (ImGui::Selectable(label.c_str(), false))
+                            {
+                                if (!exists)
+                                {
+                                    m_ErrorMessage = "Project file not found on disk: " + projPath;
+                                }
+                                else if (engine->OpenProject(projPath))
                                 {
                                     m_IsOpen = false;
                                     projectSelected = true;
@@ -85,8 +99,29 @@ bool ProjectSelectorPanel::Draw(Engine* engine)
                                     m_ErrorMessage = "Failed to open project: " + projPath;
                                 }
                             }
+
+                            if (!exists)
+                            {
+                                ImGui::PopStyleColor();
+                            }
+
+                            if (ImGui::BeginPopupContextItem())
+                            {
+                                if (ImGui::MenuItem("Remove from Recent"))
+                                {
+                                    projectToRemove = projPath;
+                                }
+                                ImGui::EndPopup();
+                            }
+
+                            ImGui::PopID();
                         }
-                        ImGui::EndListBox();
+                    }
+                    ImGui::EndChild();
+
+                    if (!projectToRemove.empty())
+                    {
+                        ProjectManager::RemoveRecentProject(projectToRemove);
                     }
                 }
 

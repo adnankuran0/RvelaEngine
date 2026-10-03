@@ -194,6 +194,28 @@ void ProjectManager::AddRecentProject(const std::string& projectFilePath)
 	}
 }
 
+void ProjectManager::RemoveRecentProject(const std::string& projectFilePath)
+{
+	std::vector<std::string> recents = GetRecentProjects();
+	std::filesystem::path normalized = std::filesystem::path(projectFilePath).lexically_normal();
+	std::string normalizedStr = normalized.string();
+
+	recents.erase(std::remove(recents.begin(), recents.end(), normalizedStr), recents.end());
+
+	json j;
+	j["recentProjects"] = recents;
+
+	std::filesystem::path filePath = GetRecentProjectsFilePath();
+	std::error_code ec;
+	std::filesystem::create_directories(filePath.parent_path(), ec);
+
+	std::ofstream file(filePath);
+	if (file.is_open())
+	{
+		file << j.dump(4);
+	}
+}
+
 void ProjectManager::ClearRecentProjects()
 {
 	std::filesystem::path filePath = GetRecentProjectsFilePath();

@@ -53,6 +53,8 @@ bool Engine::OpenProject(const std::string& projectFilePath)
 		return false;
 	}
 
+	AudioManager::Get().StopAllInstances();
+
 	AssetManager::Get().UnloadAll();
 	m_AssetRegistry.Scan(ProjectManager::GetAssetDirectory());
 
@@ -60,12 +62,15 @@ bool Engine::OpenProject(const std::string& projectFilePath)
 	if (activeProj)
 	{
 		const auto& settings = activeProj->GetSettings();
+		std::string activeSceneName = "EmptyScene";
+
 		if (!settings.startScene.empty())
 		{
 			std::filesystem::path scenePath = ProjectManager::GetProjectPath() / settings.startScene;
 			if (std::filesystem::exists(scenePath))
 			{
 				m_SceneManager.LoadScene(scenePath.string());
+				activeSceneName = scenePath.stem().string();
 			}
 			else
 			{
@@ -76,6 +81,9 @@ bool Engine::OpenProject(const std::string& projectFilePath)
 		{
 			m_SceneManager.SetActiveScene(m_SceneManager.CreateScene("EmptyScene"));
 		}
+
+		std::string title = "Rvela Engine - [" + activeProj->name + "] - " + activeSceneName;
+		m_Window.SetTitle(title);
 	}
 
 	return true;

@@ -150,6 +150,15 @@ WindowSize Window::GetSize() noexcept
     return m_WindowData.size;
 }
 
+void Window::SetTitle(const std::string& title)
+{
+    m_WindowData.title = title;
+    if (m_Window)
+    {
+        glfwSetWindowTitle(m_Window, title.c_str());
+    }
+}
+
 
 void Window::Shutdown() const
 {

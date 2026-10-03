@@ -25,6 +25,7 @@ public:
 
     void CreateInstance(AudioEmitterComponent* comp);
     void DestroyInstance(AudioEmitterComponent* comp);
+    void StopAllInstances();
 
     void SetClip(AudioEmitterComponent* comp, Ref<AudioClipAsset> clip);
 

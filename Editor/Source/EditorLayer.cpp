@@ -159,7 +159,12 @@ void EditorLayer::Render()
 
     ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-    m_ProjectSelectorPanel.Draw(m_Engine);
+    bool projectSelected = m_ProjectSelectorPanel.Draw(m_Engine);
+    if (projectSelected)
+    {
+        m_SelectedEntity = entt::null;
+        m_SelectedEntities.clear();
+    }
 
     if (ProjectManager::IsProjectLoaded())
     {

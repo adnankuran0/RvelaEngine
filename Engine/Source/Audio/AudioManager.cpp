@@ -128,6 +128,16 @@ void AudioManager::DestroyInstance(AudioEmitterComponent* comp)
     comp->instanceID = UINT32_MAX;
 }
 
+void AudioManager::StopAllInstances()
+{
+    for (auto& [id, inst] : m_Instances)
+    {
+        ma_sound_uninit(&inst.sound);
+    }
+    m_Instances.clear();
+    m_NextInstanceID = 0;
+}
+
 void AudioManager::SetClip(AudioEmitterComponent* comp, Ref<AudioClipAsset> clip)
 {
     if (!comp || !clip->IsValid()) return;
