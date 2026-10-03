@@ -28,7 +28,7 @@ void AssetManager::Init(AssetRegistry& registry)
     RegisterLoader(std::make_unique<AnimationLibraryLoader>());
     RegisterLoader(std::make_unique<SkeletalMeshLoader>());
     RegisterLoader(std::make_unique<SkeletonLoader>());
-    m_Registry->Scan(ProjectManager::GetProjectPath() / "Assets");
+    m_Registry->Scan(ProjectManager::GetAssetDirectory());
 }
 
 void AssetManager::RegisterLoader(std::unique_ptr<IAssetLoader> loader)

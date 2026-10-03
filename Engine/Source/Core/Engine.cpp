@@ -1,4 +1,4 @@
-﻿#include "rvelapch.h"
+#include "rvelapch.h"
 #include "Engine.h"
 #include "Core/Log.h"
 #include "Renderer/RenderLayer.h"
@@ -25,7 +25,7 @@ Engine::Engine()
 
 	m_Window.Init();
 	m_ProjectManager.LoadProject(EDITOR_PATH("TestProject\\TestProject.rproj").GetAbsoluteStr());
-	m_AssetRegistry.Scan(ProjectManager::GetProjectPath() / "Assets");
+	m_AssetRegistry.Scan(ProjectManager::GetAssetDirectory());
 	AssetManager& assetManager = AssetManager::Get();
 	assetManager.Init(m_AssetRegistry);
 

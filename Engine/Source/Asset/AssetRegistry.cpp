@@ -1,12 +1,21 @@
-﻿#include "rvelapch.h"
+#include "rvelapch.h"
 #include "AssetRegistry.h"
 #include "Core/Log.h"
 #include <fstream>
 
 using namespace rv;
 
+void AssetRegistry::Clear()
+{
+    m_AssetDir.clear();
+    m_UUIDToPath.clear();
+    m_PathToUUID.clear();
+    m_Metas.clear();
+}
+
 void AssetRegistry::Scan(const std::filesystem::path& assetDir)
 {
+    Clear();
     m_AssetDir = assetDir;
     auto cacheRoot = assetDir / ".cache";
 

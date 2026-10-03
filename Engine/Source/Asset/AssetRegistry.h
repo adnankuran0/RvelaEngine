@@ -10,6 +10,7 @@ class AssetRegistry
 {
 public:
     void Scan(const std::filesystem::path& assetDir);
+    void Clear();
 
     AssetMeta GetMeta(const AssetUUID& uuid) const;
     AssetMeta GetOrCreateMeta(const std::filesystem::path& path);
@@ -18,6 +19,7 @@ public:
     bool Exists(const AssetUUID& uuid) const;
     std::filesystem::path GetPath(const AssetUUID& uuid) const;
     const std::filesystem::path& GetAssetDir() const { return m_AssetDir; }
+    std::filesystem::path GetCacheDir() const { return m_AssetDir / ".cache"; }
     AssetUUID GetUUID(const std::filesystem::path& path) const;
     std::vector<AssetUUID> GetDependencies(const AssetUUID& uuid) const;
     void RegisterPath(const AssetUUID& uuid, const std::filesystem::path& path);

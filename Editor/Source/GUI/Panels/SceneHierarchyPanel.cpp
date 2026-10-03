@@ -21,7 +21,7 @@ static Ref<MeshAsset> ResolvePrimitiveMesh(const std::string& primitiveMeshName,
 {
     auto& manager = AssetManager::Get();
     auto& registry = manager.GetRegistry();
-    auto projectAssetsPath = ProjectManager::GetProjectPath() / "Assets";
+    auto projectAssetsPath = ProjectManager::GetAssetDirectory();
     auto primitivesDir = projectAssetsPath / "Models" / "Primitives";
 
     static const std::vector<std::string> extensions = { ".glb", ".fbx", ".obj" };

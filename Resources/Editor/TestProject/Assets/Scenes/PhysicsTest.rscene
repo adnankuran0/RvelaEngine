@@ -74,7 +74,7 @@
                 ]
             },
             "Material": {
-                "material": "6f565b83-e131-46f0-9aad-316fee6b6ff2"
+                "material": ""
             },
             "ParentUUID": 0,
             "ScriptComponent": {
@@ -233,7 +233,7 @@
         },
         {
             "Material": {
-                "material": "6be6f57a-4297-4fa7-98ba-bff72aa03d6b",
+                "material": "",
                 "overrides": {
                     "albedoColor": [
                         0.0,
@@ -275,7 +275,7 @@
         },
         {
             "Material": {
-                "material": "7751df2c-ec30-4b89-8dfa-238de37d7e79",
+                "material": "",
                 "overrides": {
                     "albedoColor": [
                         1.0,
@@ -541,7 +541,7 @@
                 ]
             },
             "Material": {
-                "material": "ee3dde12-6263-4f11-bb1d-812b3e196ab7",
+                "material": "",
                 "overrides": {
                     "UVScale": [
                         12.300000190734863,
@@ -755,7 +755,7 @@
                 "playbackSpeed": -2.8625584125308023e-09
             },
             "Material": {
-                "material": "ff347f05-8793-455a-b2b5-935ab8376790",
+                "material": "",
                 "overrides": {
                     "albedoTex": "d4bb3fc3-349c-4d10-909f-51d8b7b065f8",
                     "billboardMode": 1,
@@ -856,7 +856,7 @@
         },
         {
             "Material": {
-                "material": "8cda0cf7-d943-42c2-a40a-1abf53a6b251",
+                "material": "",
                 "overrides": {
                     "albedoTex": "4d072ff5-378a-4fe2-8b2c-b797dc43aa2a",
                     "billboardMode": 2,
@@ -947,7 +947,7 @@
         },
         {
             "Material": {
-                "material": "9f302e14-647b-4ccb-9b2a-2745be9474a2",
+                "material": "",
                 "overrides": {
                     "albedoTex": "843640e9-bdbf-4d7e-b444-ddcd5e2d800d",
                     "billboardMode": 0,
@@ -986,7 +986,7 @@
         },
         {
             "Material": {
-                "material": "f61ceb99-1c6f-4183-9dc3-b56106f5acb3",
+                "material": "",
                 "overrides": {
                     "albedoTex": "843640e9-bdbf-4d7e-b444-ddcd5e2d800d",
                     "cullMode": 2,
@@ -1024,7 +1024,7 @@
         },
         {
             "Material": {
-                "material": "9eeffd75-444c-4265-a461-0785fce1c868",
+                "material": "",
                 "overrides": {
                     "metallic": 1.0,
                     "roughness": 0.0
@@ -1092,7 +1092,7 @@
             "AnimatorComponent": {
                 "autoplay": false,
                 "currentClipName": "",
-                "libraryUUID": "0000803f-0000-0000-0000-000000000000",
+                "libraryUUID": "00000000-0000-0000-0000-000000000000",
                 "playbackSpeed": 1.0
             },
             "BoxColliderComponent": {
@@ -1108,7 +1108,7 @@
                 ]
             },
             "Material": {
-                "material": "0c976ee6-f15d-4ac3-994b-cf8bac9c608e",
+                "material": "",
                 "overrides": {
                     "albedoColor": [
                         0.0,
@@ -1176,7 +1176,7 @@
             "AnimatorComponent": {
                 "autoplay": false,
                 "currentClipName": "",
-                "libraryUUID": "8eb7a1ab-1b17-4310-a11e-89da20fe0e40",
+                "libraryUUID": "00000000-0000-0000-0000-000000000000",
                 "playbackSpeed": 1.0
             },
             "ParentUUID": 0,
@@ -1242,7 +1242,7 @@
                 ]
             },
             "Material": {
-                "material": "90fe146c-1349-4ed7-86bf-545d3b223029"
+                "material": ""
             },
             "Mesh": {
                 "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
@@ -1424,7 +1424,8 @@
         "Bloom_Intensity": 1.0,
         "Bloom_Knee": 0.0,
         "Bloom_Treshold": 1.0,
-        "HDRPath": "Assets\\Textures\\skybox\\environment.hdr",
+        "HDR": "9336556f-443f-4c5f-a210-2c30fa69828f",
+        "HDRPath": "Assets\\.cache\\9336556f-443f-4c5f-a210-2c30fa69828f.rtex",
         "Lighting_AmbientColor": [
             1.0,
             1.0,

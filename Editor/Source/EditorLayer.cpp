@@ -171,7 +171,7 @@ void EditorLayer::Render()
 
     m_EnvironmentPanel.Draw(m_Engine);
 
-    m_AssetBrowserPanel.Draw(m_Engine, m_Engine->GetProjectManager().GetProjectPath() / "Assets",m_AssetImportPipeline);
+    m_AssetBrowserPanel.Draw(m_Engine, ProjectManager::GetAssetDirectory(), m_AssetImportPipeline);
 
     m_MixerPanel.Draw();
 

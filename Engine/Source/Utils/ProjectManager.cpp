@@ -1,33 +1,55 @@
 #include "rvelapch.h"
 #include "ProjectManager.h"
 #include "Utils/Serializer.h"
+#include "Utils/FileUtils.h"
+#include "json.hpp"
+#include <fstream>
+#include <algorithm>
 
 using namespace rv;
+using json = nlohmann::json;
 
 std::shared_ptr<Project> ProjectManager::m_ActiveProject;
 std::filesystem::path ProjectManager::m_ProjectFolderPath;
 
-
-bool ProjectManager::CreateProject(const std::string& name, const std::string& path)
+bool ProjectManager::CreateProject(const std::string& name, const std::string& parentPath)
 {
-	std::filesystem::path projectRoot = std::filesystem::path(path) / name;
+	std::filesystem::path projectRoot = std::filesystem::path(parentPath) / name;
 	std::filesystem::path assetsDir = projectRoot / "Assets";
 	std::filesystem::path materialsDir = assetsDir / "Materials";
 	std::filesystem::path shadersDir = assetsDir / "Shaders";
 	std::filesystem::path modelsDir = assetsDir / "Models";
 	std::filesystem::path texturesDir = assetsDir / "Textures";
-	std::filesystem::path scenesDir = projectRoot / "Scenes";
+	std::filesystem::path scenesDir = assetsDir / "Scenes";
 	std::filesystem::path projectFile = projectRoot / (name + ".rproj");
 
-	std::filesystem::create_directories(assetsDir);
-	std::filesystem::create_directories(materialsDir);
-	std::filesystem::create_directories(shadersDir);
-	std::filesystem::create_directories(modelsDir);
-	std::filesystem::create_directories(texturesDir);
-	std::filesystem::create_directories(scenesDir);
+	std::error_code ec;
+	std::filesystem::create_directories(assetsDir, ec);
+	std::filesystem::create_directories(materialsDir, ec);
+	std::filesystem::create_directories(shadersDir, ec);
+	std::filesystem::create_directories(modelsDir, ec);
+	std::filesystem::create_directories(texturesDir, ec);
+	std::filesystem::create_directories(scenesDir, ec);
 
-	m_ActiveProject = std::make_shared<Project>(name, projectRoot.string());
+	std::filesystem::path templateAssets = EDITOR_PATH("TemplateProject/Assets").GetAbsolute();
+	if (std::filesystem::exists(templateAssets))
+	{
+		std::filesystem::copy(templateAssets, assetsDir, 
+			std::filesystem::copy_options::recursive | std::filesystem::copy_options::skip_existing, ec);
+	}
+
+	auto project = std::make_shared<Project>(name, projectRoot.string());
+	ProjectSettings settings;
+	settings.name = name;
+	settings.assetDirectory = "Assets";
+	settings.cacheDirectory = "Assets/.cache";
+	project->SetSettings(settings);
+
+	m_ActiveProject = project;
+	m_ProjectFolderPath = projectRoot;
+
 	Serializer::SaveToFile(*m_ActiveProject, projectFile.string());
+	AddRecentProject(projectFile.string());
 
 	return true;
 }
@@ -39,19 +61,22 @@ bool ProjectManager::LoadProject(const std::string& projectFilePath)
 
 	auto project = std::make_shared<Project>();
 	Serializer::LoadFromFile(*project, projectFilePath);
-	m_ActiveProject = project;
 
+	std::filesystem::path resolvedFolder = std::filesystem::path(projectFilePath).parent_path();
 	if (!std::filesystem::exists(project->projectFolderPath))
 	{
-		// Project folder moved, write new path
-		project->projectFolderPath = std::filesystem::path(projectFilePath).parent_path(); // <-- düzeltme
+		project->projectFolderPath = resolvedFolder;
+		m_ActiveProject = project;
 		m_ProjectFolderPath = project->projectFolderPath;
 		SaveActiveProject();
 	}
 	else
 	{
+		m_ActiveProject = project;
 		m_ProjectFolderPath = project->projectFolderPath;
 	}
+
+	AddRecentProject(projectFilePath);
 	return true;
 }
 
@@ -64,7 +89,105 @@ void ProjectManager::SaveActiveProject()
 	}
 }
 
-std::shared_ptr<Project> ProjectManager::GetActiveProject()
+void ProjectManager::CloseProject()
 {
-	return m_ActiveProject;
+	m_ActiveProject.reset();
+	m_ProjectFolderPath.clear();
+}
+
+std::filesystem::path ProjectManager::GetAssetDirectory()
+{
+	if (m_ActiveProject)
+	{
+		return m_ProjectFolderPath / m_ActiveProject->GetSettings().assetDirectory;
+	}
+	return m_ProjectFolderPath / "Assets";
+}
+
+std::filesystem::path ProjectManager::GetCacheDirectory()
+{
+	if (m_ActiveProject)
+	{
+		return m_ProjectFolderPath / m_ActiveProject->GetSettings().cacheDirectory;
+	}
+	return m_ProjectFolderPath / "Assets" / ".cache";
+}
+
+std::filesystem::path ProjectManager::GetRecentProjectsFilePath()
+{
+	return EDITOR_PATH("recent_projects.json").GetAbsolute();
+}
+
+std::vector<std::string> ProjectManager::GetRecentProjects()
+{
+	std::vector<std::string> recents;
+	std::filesystem::path filePath = GetRecentProjectsFilePath();
+
+	if (!std::filesystem::exists(filePath))
+		return recents;
+
+	std::ifstream file(filePath);
+	if (!file.is_open())
+		return recents;
+
+	try
+	{
+		json j;
+		file >> j;
+		if (j.contains("recentProjects") && j["recentProjects"].is_array())
+		{
+			for (const auto& item : j["recentProjects"])
+			{
+				if (item.is_string())
+				{
+					std::string pathStr = item.get<std::string>();
+					if (std::filesystem::exists(pathStr))
+					{
+						recents.push_back(pathStr);
+					}
+				}
+			}
+		}
+	}
+	catch (...)
+	{
+	}
+
+	return recents;
+}
+
+void ProjectManager::AddRecentProject(const std::string& projectFilePath)
+{
+	std::vector<std::string> recents = GetRecentProjects();
+	std::filesystem::path normalized = std::filesystem::path(projectFilePath).lexically_normal();
+	std::string normalizedStr = normalized.string();
+
+	recents.erase(std::remove(recents.begin(), recents.end(), normalizedStr), recents.end());
+	recents.insert(recents.begin(), normalizedStr);
+
+	constexpr size_t maxRecent = 10;
+	if (recents.size() > maxRecent)
+	{
+		recents.resize(maxRecent);
+	}
+
+	json j;
+	j["recentProjects"] = recents;
+
+	std::filesystem::path filePath = GetRecentProjectsFilePath();
+	std::error_code ec;
+	std::filesystem::create_directories(filePath.parent_path(), ec);
+
+	std::ofstream file(filePath);
+	if (file.is_open())
+	{
+		file << j.dump(4);
+	}
+}
+
+void ProjectManager::ClearRecentProjects()
+{
+	std::filesystem::path filePath = GetRecentProjectsFilePath();
+	std::error_code ec;
+	std::filesystem::remove(filePath, ec);
 }
