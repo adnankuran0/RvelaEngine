@@ -25,6 +25,14 @@ void UIInteraction::UpdateInteractions(Scene* scene, float dt, const glm::vec2& 
     auto buttonView = scene->GetRegistry().view<RectTransformComponent, UIButtonComponent>();
     for (auto entity : buttonView)
     {
+        if (!scene->IsEntityActive(entity))
+        {
+            auto& button = buttonView.get<UIButtonComponent>(entity);
+            button.isHovered = false;
+            button.isPressed = false;
+            continue;
+        }
+
         auto& rect = buttonView.get<RectTransformComponent>(entity);
         auto& button = buttonView.get<UIButtonComponent>(entity);
 
@@ -60,6 +68,13 @@ void UIInteraction::UpdateInteractions(Scene* scene, float dt, const glm::vec2& 
     auto sliderView = scene->GetRegistry().view<RectTransformComponent, UISliderComponent>();
     for (auto entity : sliderView)
     {
+        if (!scene->IsEntityActive(entity))
+        {
+            auto& slider = sliderView.get<UISliderComponent>(entity);
+            slider.isDragging = false;
+            continue;
+        }
+
         auto& rect = sliderView.get<RectTransformComponent>(entity);
         auto& slider = sliderView.get<UISliderComponent>(entity);
 
@@ -111,6 +126,13 @@ void UIInteraction::UpdateInteractions(Scene* scene, float dt, const glm::vec2& 
     auto checkboxView = scene->GetRegistry().view<RectTransformComponent, UICheckboxComponent>();
     for (auto entity : checkboxView)
     {
+        if (!scene->IsEntityActive(entity))
+        {
+            auto& cb = checkboxView.get<UICheckboxComponent>(entity);
+            cb.isHovered = false;
+            continue;
+        }
+
         auto& rect = checkboxView.get<RectTransformComponent>(entity);
         auto& cb = checkboxView.get<UICheckboxComponent>(entity);
 
@@ -139,6 +161,9 @@ void UIInteraction::UpdateInteractions(Scene* scene, float dt, const glm::vec2& 
     auto rectView = scene->GetRegistry().view<RectTransformComponent>();
     for (auto entity : rectView)
     {
+        if (!scene->IsEntityActive(entity))
+            continue;
+
         const auto& rect = rectView.get<RectTransformComponent>(entity);
         if (!rect.raycastTarget) continue;
 

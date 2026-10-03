@@ -58,6 +58,11 @@ public:
 	const entt::entity GetHandle() { return m_EntityHandle; }
 	Scene* GetScene() const { return m_Scene; }
 	bool IsValid() const { return m_EntityHandle != entt::null && m_Scene != nullptr; }
+
+	bool IsActive() const { return m_Scene ? m_Scene->IsEntityActive(m_EntityHandle) : false; }
+	bool IsSelfActive() const { return m_Scene ? m_Scene->IsEntitySelfActive(m_EntityHandle) : false; }
+	void SetActive(bool active) { if (m_Scene) m_Scene->SetEntityActive(m_EntityHandle, active); }
+
 	void SetParent(const Entity& parent) { m_Scene->SetParent(m_EntityHandle, parent); }
 	Entity GetParent(const Entity& child)
 	{

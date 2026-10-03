@@ -80,6 +80,9 @@ void ScriptSystem::OnStart()
     auto view = m_Scene.GetRegistry().view<ScriptComponent>();
     for (auto entity : view)
     {
+        if (!m_Scene.IsEntityActive(entity))
+            continue;
+
         auto& sc = view.get<ScriptComponent>(entity);
         BindLuaScript(sc, entity);
         if (sc.OnCreate.valid())
@@ -104,6 +107,9 @@ void ScriptSystem::OnUpdate(float dt)
 
     for (auto entity : view)
     {
+        if (!m_Scene.IsEntityActive(entity))
+            continue;
+
         auto& sc = view.get<ScriptComponent>(entity);
 
         if (sc.luaInstance.valid())
@@ -126,6 +132,9 @@ void ScriptSystem::OnFixedUpdate(float dt)
 
     for (auto entity : view)
     {
+        if (!m_Scene.IsEntityActive(entity))
+            continue;
+
         auto& sc = view.get<ScriptComponent>(entity);
 
         if (sc.luaInstance.valid())
@@ -149,6 +158,9 @@ void ScriptSystem::OnLateUpdate(float dt)
 
     for (auto entity : view)
     {
+        if (!m_Scene.IsEntityActive(entity))
+            continue;
+
         auto& sc = view.get<ScriptComponent>(entity);
 
         if (sc.luaInstance.valid())

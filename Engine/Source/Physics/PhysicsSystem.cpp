@@ -1,4 +1,4 @@
-﻿#include "rvelapch.h"
+#include "rvelapch.h"
 #include "PhysicsSystem.h"
 #include <Jolt/Jolt.h>
 #include <Jolt/Core/TempAllocator.h>
@@ -71,6 +71,8 @@ void PhysicsSystem::DebugDraw()
 	auto view = m_Scene.GetRegistry().view<CharacterBodyComponent>();
 	for (auto e : view)
 	{
+		if (!m_Scene.IsEntityActive(e)) continue;
+
 		auto& cb = view.get<CharacterBodyComponent>(e);
 		if (!cb.character) continue;
 
@@ -196,6 +198,8 @@ void PhysicsSystem::BuildRigidbodies()
 	auto rbView = m_Scene.GetRegistry().view<RigidbodyComponent>();
 	for (auto& e : rbView)
 	{
+		if (!m_Scene.IsEntityActive(e)) continue;
+
 		auto& rb = m_Scene.GetComponent<RigidbodyComponent>(e);
 		if (!rb.RuntimeBodyID.IsInvalid()) continue;
 
@@ -225,6 +229,8 @@ void PhysicsSystem::BuildCharacterBodies()
 	auto cbView = m_Scene.GetRegistry().view<CharacterBodyComponent>();
 	for (auto& e : cbView)
 	{
+		if (!m_Scene.IsEntityActive(e)) continue;
+
 		auto& cb = m_Scene.GetComponent<CharacterBodyComponent>(e);
 		if (cb.character) continue;
 		auto& transform = m_Scene.GetComponent<TransformComponent>(e);
@@ -411,6 +417,8 @@ void rv::PhysicsSystem::UpdateCharacters(float dt)
 	auto cbView = m_Scene.GetRegistry().view<CharacterBodyComponent>();
 	for (auto& e : cbView)
 	{
+		if (!m_Scene.IsEntityActive(e)) continue;
+
 		auto& cb = m_Scene.GetComponent<CharacterBodyComponent>(e);
 		if (!cb.character) continue;
 

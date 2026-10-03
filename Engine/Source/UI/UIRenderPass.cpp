@@ -215,6 +215,9 @@ void UIRenderPass::RenderSelectionMask(Scene* scene, entt::entity selectedEntity
 
 void UIRenderPass::RenderEntityRecursively(Scene* scene, entt::entity entity)
 {
+    if (!scene->IsEntityActive(entity))
+        return;
+
     if (!scene->HasComponent<RectTransformComponent>(entity))
     {
         if (scene->HasComponent<UITextComponent>(entity) ||
@@ -368,6 +371,9 @@ void UIRenderPass::RenderEntityRecursively(Scene* scene, entt::entity entity)
 
 void UIRenderPass::RenderEntityIDRecursively(Scene* scene, entt::entity entity, std::shared_ptr<Shader> shader)
 {
+    if (!scene->IsEntityActive(entity))
+        return;
+
     if (!scene->HasComponent<RectTransformComponent>(entity))
     {
         if (scene->HasComponent<UITextComponent>(entity) ||

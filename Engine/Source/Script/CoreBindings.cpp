@@ -16,6 +16,10 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             &Entity::GetName,
             &Entity::SetName
         ),
+        "SetActive", &Entity::SetActive,
+        "IsActive", &Entity::IsActive,
+        "IsSelfActive", &Entity::IsSelfActive,
+        "active", sol::property(&Entity::IsActive, &Entity::SetActive),
         "GetUUID", &Entity::GetUUID,
         "SetParent", [](Entity& self, sol::optional<Entity> parent) {
             if (parent.has_value() && parent.value()) {

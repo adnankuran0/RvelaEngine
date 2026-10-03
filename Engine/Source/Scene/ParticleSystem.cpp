@@ -100,6 +100,9 @@ void ParticleSystem::Update(float dt)
 	auto view = registry.view<ParticleEmitterComponent, TransformComponent>();
 	for (auto entity : view)
 	{
+		if (!m_Scene.IsEntityActive(entity))
+			continue;
+
 		auto& emitter = view.get<ParticleEmitterComponent>(entity);
 		const auto& transform = view.get<TransformComponent>(entity);
 

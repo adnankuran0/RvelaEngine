@@ -46,6 +46,9 @@ void DebugPass::DrawAABBs(const RenderContext& ctx)
     auto meshView = reg.view<MeshRendererComponent>();
     for (auto e : meshView)
     {
+        if (!ctx.scene->IsEntityActive(e))
+            continue;
+
         auto& comp = reg.get<MeshRendererComponent>(e);
         DebugRenderer::Get().DrawBox(comp.worldAABB.min, comp.worldAABB.max, { 0.0f, 1.0f, 1.0f, 1.0f });
     }
@@ -53,6 +56,9 @@ void DebugPass::DrawAABBs(const RenderContext& ctx)
     auto skelView = reg.view<SkeletalMeshRendererComponent>();
     for (auto e : skelView)
     {
+        if (!ctx.scene->IsEntityActive(e))
+            continue;
+
         auto& comp = reg.get<SkeletalMeshRendererComponent>(e);
         DebugRenderer::Get().DrawBox(comp.worldAABB.min, comp.worldAABB.max, { 0.0f, 1.0f, 1.0f, 1.0f });
     }

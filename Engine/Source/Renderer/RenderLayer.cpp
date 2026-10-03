@@ -89,6 +89,9 @@ void RenderLayer::CollectRenderCommands(Scene* scene)
 	auto view = scene->GetRegistry().view<TransformComponent, MeshComponent, MeshRendererComponent, MaterialComponent> (entt::exclude<ParticleEmitterComponent>);
 	for (auto entity : view)
 	{
+		if (!scene->IsEntityActive(entity))
+			continue;
+
 		MeshComponent& meshComp = scene->GetComponent<MeshComponent>(entity);
 		if (meshComp.IsDirty())
 		{
@@ -127,6 +130,9 @@ void RenderLayer::CollectRenderCommands(Scene* scene)
 	auto skeletalView = scene->GetRegistry().view<TransformComponent, SkeletalMeshComponent, SkeletalMeshRendererComponent, MaterialComponent>(entt::exclude<ParticleEmitterComponent>);
 	for (auto entity : skeletalView)
 	{
+		if (!scene->IsEntityActive(entity))
+			continue;
+
 		SkeletalMeshComponent& meshComp = scene->GetComponent<SkeletalMeshComponent>(entity);
 		if (meshComp.IsDirty())
 		{

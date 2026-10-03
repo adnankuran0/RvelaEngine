@@ -229,8 +229,7 @@ void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 		std::strncpy(buffer, tag.tag.c_str(), sizeof(buffer));
 		buffer[sizeof(buffer) - 1] = '\0';
 
-		static bool enabled = true;
-		ImGui::Checkbox("##EntityEnabled", &enabled);
+		ImGui::Checkbox("##EntityEnabled", &tag.isActive);
 		ImGui::SameLine();
 
 		ImGui::SetNextItemWidth(-1.0f);

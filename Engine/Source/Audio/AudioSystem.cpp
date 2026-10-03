@@ -13,6 +13,9 @@ void AudioSystem::OnStart()
 
     for (auto e : view)
     {
+        if (!m_Scene.IsEntityActive(e))
+            continue;
+
         auto [emitter, transform] = view.get<AudioEmitterComponent, TransformComponent>(e);
 
         if (emitter.playOnCreate)
@@ -28,6 +31,9 @@ void AudioSystem::Update()
 
     for (auto e : view)
     {
+        if (!m_Scene.IsEntityActive(e))
+            continue;
+
         auto [emitter, transform] = view.get<AudioEmitterComponent, TransformComponent>(e);
         am.SyncState(&emitter);
 

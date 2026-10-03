@@ -269,13 +269,24 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             std::string nodeId = tagComponent.tag + "##" + std::to_string((uint32_t)entity);
 
             bool isPrefab = scene.HasComponent<PrefabComponent>(entity);
-            if (isPrefab)
+            bool isActiveInHierarchy = scene.IsEntityActive(entity);
+
+            int colorPushes = 0;
+            if (!isActiveInHierarchy)
+            {
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.50f, 0.50f, 0.50f, 0.60f));
+                colorPushes++;
+            }
+            else if (isPrefab)
+            {
                 ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.62f, 0.56f, 0.80f, 1.0f));
+                colorPushes++;
+            }
 
             bool nodeOpen = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tagComponent.tag.c_str());
 
-            if (isPrefab)
-                ImGui::PopStyleColor();
+            if (colorPushes > 0)
+                ImGui::PopStyleColor(colorPushes);
 
             if (!isRoot && (ImGui::IsItemClicked(ImGuiMouseButton_Left) || ImGui::IsItemClicked(ImGuiMouseButton_Right)))
                 selectedEntity = entity;

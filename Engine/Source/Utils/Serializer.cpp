@@ -1,4 +1,4 @@
-﻿#include "rvelapch.h"
+#include "rvelapch.h"
 #include "Serializer.h"
 
 namespace rv {
@@ -250,6 +250,9 @@ void SerializeBin_TagComp(const TagComponent& comp, std::vector<std::byte>& out)
 	WriteToBuffer(tempOut, len);
 	WriteBytesToBuffer(tempOut, comp.tag.data(), len);
 
+	uint8_t active = comp.isActive ? 1 : 0;
+	WriteToBuffer(tempOut, active);
+
 	size_t payloadSize = tempOut.size();
 
 	ComponentHeader header;
@@ -265,6 +268,10 @@ void DeserializeBin_TagComp(const std::byte*& cursor, TagComponent& comp)
 
 	comp.tag.resize(len);
 	ReadBytesFromBuffer(cursor, comp.tag.data(), len);
+
+	uint8_t active = 1;
+	ReadFromBuffer(cursor, active);
+	comp.isActive = (active != 0);
 }
 
 void SerializeBin_TransformComp(const TransformComponent& comp, std::vector<std::byte>& out)

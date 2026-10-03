@@ -95,6 +95,10 @@ public:
         return entt::null;
     }
 
+    bool IsEntityActive(entt::entity entity);
+    bool IsEntitySelfActive(entt::entity entity);
+    void SetEntityActive(entt::entity entity, bool active);
+
     void Update();
     void FixedUpdate();
     void LateUpdate();

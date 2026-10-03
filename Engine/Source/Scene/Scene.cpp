@@ -218,6 +218,54 @@ Entity rv::Scene::GetEntityByName(const std::string& name)
     return Entity{};
 }
 
+bool Scene::IsEntitySelfActive(entt::entity entity)
+{
+    if (entity == entt::null || !m_Registry.valid(entity))
+        return false;
+
+    if (auto* tag = m_Registry.try_get<TagComponent>(entity))
+        return tag->isActive;
+
+    return true;
+}
+
+bool Scene::IsEntityActive(entt::entity entity)
+{
+    if (entity == entt::null || !m_Registry.valid(entity))
+        return false;
+
+    entt::entity curr = entity;
+    while (curr != entt::null && m_Registry.valid(curr))
+    {
+        if (curr == m_RootEntity)
+            break;
+
+        if (auto* tag = m_Registry.try_get<TagComponent>(curr))
+        {
+            if (!tag->isActive)
+                return false;
+        }
+
+        if (!HasComponent<SceneTreeComponent>(curr))
+            break;
+
+        curr = GetComponent<SceneTreeComponent>(curr).parent;
+    }
+
+    return true;
+}
+
+void Scene::SetEntityActive(entt::entity entity, bool active)
+{
+    if (entity == entt::null || !m_Registry.valid(entity))
+        return;
+
+    if (auto* tag = m_Registry.try_get<TagComponent>(entity))
+    {
+        tag->isActive = active;
+    }
+}
+
 
 void Scene::SetParent(entt::entity child, entt::entity parent)
 {

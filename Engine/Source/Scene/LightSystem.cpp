@@ -8,6 +8,9 @@ std::vector<PointLight> LightSystem::CollectPointLights() noexcept {
 	std::vector<PointLight> lights;
 	auto view = m_Scene.GetRegistry().view<PointLightComponent, TransformComponent>();
 	for (auto e : view) {
+		if (!m_Scene.IsEntityActive(e))
+			continue;
+
 		auto& light = m_Scene.GetComponent<PointLightComponent>(e);
 		auto& t = m_Scene.GetComponent<TransformComponent>(e);
 		PointLight data;
@@ -30,6 +33,9 @@ std::optional<DirectionalLight> LightSystem::CollectDirectionalLight(glm::vec3 c
 {
 	auto view = m_Scene.GetRegistry().view<DirectionalLightComponent, TransformComponent>();
 	for (auto e : view) {
+		if (!m_Scene.IsEntityActive(e))
+			continue;
+
 		auto& light = m_Scene.GetComponent<DirectionalLightComponent>(e);
 		auto& t = m_Scene.GetComponent<TransformComponent>(e);
 		DirectionalLight data;

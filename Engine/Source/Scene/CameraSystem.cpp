@@ -8,6 +8,9 @@ Camera* CameraSystem::GetActiveCamera()
 {
     for (auto& e : m_Scene.GetRegistry().view<CameraComponent>())
     {
+        if (!m_Scene.IsEntityActive(e))
+            continue;
+
         auto& camComp = m_Scene.GetComponent<CameraComponent>(e);
         if (camComp.isActive)
         {

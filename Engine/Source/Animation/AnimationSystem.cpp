@@ -22,6 +22,9 @@ void AnimationSystem::OnStart()
     auto view = m_Scene.GetRegistry().view<AnimatorComponent>();
     for (auto entity : view)
     {
+        if (!m_Scene.IsEntityActive(entity))
+            continue;
+
         auto& animator = view.get<AnimatorComponent>(entity);
         if (animator.autoplay)
             animator.Play();
@@ -111,7 +114,7 @@ void AnimationSystem::Update()
 
     for (auto entity : view)
     {
-        if (!reg.valid(entity))
+        if (!reg.valid(entity) || !m_Scene.IsEntityActive(entity))
             continue;
 
         auto& animator = view.get<AnimatorComponent>(entity);
