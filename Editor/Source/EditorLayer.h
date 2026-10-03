@@ -15,6 +15,8 @@
 #include "GUI/Panels/EnvironmentPanel.h"
 #include "GUI/Panels/AnimatorPanel.h"
 #include "GUI/Panels/ConsolePanel.h"
+#include "GUI/Panels/ProjectSelectorPanel.h"
+#include "GUI/Panels/ProjectSettingsPanel.h"
 #include <Renderer/RenderPipeline.h>
 
 namespace rv {
@@ -54,6 +56,8 @@ private:
     MixerPanel m_MixerPanel;
     AnimatorPanel m_AnimatorPanel;
     ConsolePanel m_ConsolePanel;
+    ProjectSelectorPanel m_ProjectSelectorPanel;
+    ProjectSettingsPanel m_ProjectSettingsPanel;
     Viewport m_Viewport;
 
     RenderPassHandle m_GizmoPass;

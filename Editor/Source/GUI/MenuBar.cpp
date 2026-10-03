@@ -1,4 +1,4 @@
-﻿#include "MenuBar.h"
+#include "MenuBar.h"
 #include "Core/Engine.h"
 #include "Asset/AssetImportPipeline.h"
 #include "Asset/AssetRegistry.h"
@@ -8,13 +8,17 @@
 #include "EditorUtils.h"
 #include "tinyfiledialogs.h"
 #include "Asset/AssetManager.h"
+#include "Utils/ProjectManager.h"
+#include "Panels/ProjectSettingsPanel.h"
+#include "Panels/ProjectSelectorPanel.h"
 
 using namespace rv;
 
-void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter)
+void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter,
+    ProjectSettingsPanel* projectSettingsPanel,
+    ProjectSelectorPanel* projectSelectorPanel)
 {
     auto& registry = AssetManager::Get().GetRegistry();
-
 
     if (ImGui::BeginMainMenuBar())
     {
@@ -32,6 +36,21 @@ void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter)
             if (ImGui::MenuItem("Save scene as (Ctrl + Shift + S)"))
                 EditorUtils::SaveSceneAs(*engine);
 
+            ImGui::Separator();
+
+            if (ImGui::MenuItem("Switch Project..."))
+            {
+                if (projectSelectorPanel)
+                    projectSelectorPanel->Open();
+            }
+
+            if (ImGui::MenuItem("Save Project"))
+            {
+                ProjectManager::SaveActiveProject();
+            }
+
+            ImGui::Separator();
+
             if (ImGui::MenuItem("Import assets"))
             {
                 const char* filterPatterns[] = {
@@ -40,7 +59,6 @@ void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter)
                 };
                 const char* selected = tinyfd_openFileDialog(
                     "Select assets to import", "", 8, filterPatterns, NULL, 1);
-
 
                 if (selected)
                 {
@@ -94,6 +112,15 @@ void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter)
         {
             if (ImGui::MenuItem("Undo")) {}
             if (ImGui::MenuItem("Redo")) {}
+
+            ImGui::Separator();
+
+            if (ImGui::MenuItem("Project Settings..."))
+            {
+                if (projectSettingsPanel)
+                    projectSettingsPanel->Open();
+            }
+
             ImGui::EndMenu();
         }
 

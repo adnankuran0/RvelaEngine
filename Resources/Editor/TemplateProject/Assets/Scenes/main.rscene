@@ -1,0 +1,64 @@
+{
+    "Entities": [
+        {
+            "DirectionalLight": {
+                "castShadows": true,
+                "color": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "intensity": 5.0,
+                "reverseCullFace": false
+            },
+            "ParentUUID": 0,
+            "Tag": {
+                "tag": "DirectionalLight"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    -50.88434600830078,
+                    71.55713653564453,
+                    -6.05006742477417
+                ],
+                "scale": [
+                    0.999999463558197,
+                    0.9999957084655762,
+                    1.000000238418579
+                ]
+            },
+            "UUID": 5944518827088121068
+        }
+    ],
+    "Environment": {
+        "Bloom": false,
+        "Bloom_Intensity": 1.0,
+        "Bloom_Knee": 0.5,
+        "Bloom_Treshold": 1.0,
+        "HDR": "9336556f-443f-4c5f-a210-2c30fa69828f",
+        "HDRPath": "Assets/Textures/skybox/environment.hdr",
+        "Lighting_AmbientColor": [
+            1.0,
+            1.0,
+            1.0
+        ],
+        "Lighting_AmbientIntensity": 0.5,
+        "Lighting_IBL": true,
+        "Lighting_IBLIntensity": 0.30000001192092896,
+        "PostProcess_ChromaticStrength": 0.009999999776482582,
+        "PostProcess_Exposure": 1.0,
+        "PostProcess_VignetteIntensity": 0.25,
+        "PostProcess_VignetteSmoothness": 0.5,
+        "SSAO": true,
+        "SSAO_Bias": 0.02500000037252903,
+        "SSAO_Intensity": 1.0,
+        "SSAO_Radius": 1.0,
+        "SSR": true
+    }
+}

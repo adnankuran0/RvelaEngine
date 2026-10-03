@@ -33,6 +33,9 @@ void RenderLayer::OnRender()
 
 	Scene& scene = m_Engine->GetActiveScene();
 	Camera* camera = m_Engine->GetCamera();
+	if (!camera)
+		return;
+
 	LightSystem& lightSystem = scene.GetLightSystem();
 	
 	m_Context.Clear();

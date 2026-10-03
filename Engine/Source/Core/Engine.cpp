@@ -24,8 +24,6 @@ Engine::Engine()
 	Path::SetEditorResourcesPath(std::filesystem::path(RVELA_ROOT_DIR) / "Resources" / "Editor");
 
 	m_Window.Init();
-	m_ProjectManager.LoadProject(EDITOR_PATH("TestProject\\TestProject.rproj").GetAbsoluteStr());
-	m_AssetRegistry.Scan(ProjectManager::GetAssetDirectory());
 	AssetManager& assetManager = AssetManager::Get();
 	assetManager.Init(m_AssetRegistry);
 
@@ -45,6 +43,42 @@ Engine::Engine()
 		LOG_WARN("Another instance of Engine already exists!");
 	}
 
+}
+
+bool Engine::OpenProject(const std::string& projectFilePath)
+{
+	if (!m_ProjectManager.LoadProject(projectFilePath))
+	{
+		LOG_ERROR("Failed to load project: {}", projectFilePath);
+		return false;
+	}
+
+	AssetManager::Get().UnloadAll();
+	m_AssetRegistry.Scan(ProjectManager::GetAssetDirectory());
+
+	auto activeProj = m_ProjectManager.GetActiveProject();
+	if (activeProj)
+	{
+		const auto& settings = activeProj->GetSettings();
+		if (!settings.startScene.empty())
+		{
+			std::filesystem::path scenePath = ProjectManager::GetProjectPath() / settings.startScene;
+			if (std::filesystem::exists(scenePath))
+			{
+				m_SceneManager.LoadScene(scenePath.string());
+			}
+			else
+			{
+				m_SceneManager.SetActiveScene(m_SceneManager.CreateScene("EmptyScene"));
+			}
+		}
+		else
+		{
+			m_SceneManager.SetActiveScene(m_SceneManager.CreateScene("EmptyScene"));
+		}
+	}
+
+	return true;
 }
 
 Engine::~Engine()

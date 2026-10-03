@@ -159,27 +159,34 @@ void EditorLayer::Render()
 
     ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-    m_MenuBar.Draw(m_Engine,m_AssetImportPipeline);
-     
-    m_ToolBar.Draw(*m_Engine);
+    m_ProjectSelectorPanel.Draw(m_Engine);
 
-    m_Dockspace.Draw();
+    if (ProjectManager::IsProjectLoaded())
+    {
+        m_MenuBar.Draw(m_Engine, m_AssetImportPipeline, &m_ProjectSettingsPanel, &m_ProjectSelectorPanel);
+         
+        m_ToolBar.Draw(*m_Engine);
 
-    m_SceneHierarchyPanel.Draw(m_Engine, m_SelectedEntity);
+        m_Dockspace.Draw();
 
-    m_InspectorPanel.Draw(m_Engine, m_SelectedEntity);
+        m_SceneHierarchyPanel.Draw(m_Engine, m_SelectedEntity);
 
-    m_EnvironmentPanel.Draw(m_Engine);
+        m_InspectorPanel.Draw(m_Engine, m_SelectedEntity);
 
-    m_AssetBrowserPanel.Draw(m_Engine, ProjectManager::GetAssetDirectory(), m_AssetImportPipeline);
+        m_EnvironmentPanel.Draw(m_Engine);
 
-    m_MixerPanel.Draw();
+        m_AssetBrowserPanel.Draw(m_Engine, ProjectManager::GetAssetDirectory(), m_AssetImportPipeline);
 
-    m_AnimatorPanel.Draw(m_Engine, m_SelectedEntity);
+        m_MixerPanel.Draw();
 
-    m_ConsolePanel.Draw();
+        m_AnimatorPanel.Draw(m_Engine, m_SelectedEntity);
 
-    m_Viewport.Draw(m_Engine, m_SelectedEntity);
+        m_ConsolePanel.Draw();
+
+        m_ProjectSettingsPanel.Draw(m_Engine);
+
+        m_Viewport.Draw(m_Engine, m_SelectedEntity);
+    }
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

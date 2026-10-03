@@ -74,7 +74,13 @@ void Skybox::InitHDR(const AssetUUID& uuid)
 
     ClearHDR();
 
-    Ref<TextureAsset> textureAsset = AssetManager::Get().GetAsset<TextureAsset>(uuid);
+    Ref<TextureAsset> textureAsset = nullptr;
+    auto fsPath = AssetManager::Get().GetRegistry().GetPath(uuid);
+    if (!fsPath.empty() && fsPath.extension() == ".rtex")
+    {
+        textureAsset = AssetManager::Get().GetAsset<TextureAsset>(uuid);
+    }
+
     GLuint hdrTexture = 0;
     bool shouldDeleteHDRTexture = false;
 
@@ -83,7 +89,6 @@ void Skybox::InitHDR(const AssetUUID& uuid)
         Texture& tex = TextureCache::Get().GetOrCreate(textureAsset);
         hdrTexture = tex.GetID();
         m_HDRUUID = uuid;
-        auto fsPath = AssetManager::Get().GetRegistry().GetPath(uuid);
         if (!fsPath.empty())
         {
             m_Path = Path::FromAbsolute(fsPath.string());
@@ -92,7 +97,6 @@ void Skybox::InitHDR(const AssetUUID& uuid)
     else
     {
         // fallback
-        auto fsPath = AssetManager::Get().GetRegistry().GetPath(uuid);
         if (!fsPath.empty())
         {
             Path p = Path::FromAbsolute(fsPath.string());

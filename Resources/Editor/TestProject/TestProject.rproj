@@ -8,5 +8,14 @@
         }
     ],
     "name": "TestProject",
-    "projectPath": "C:/RvelaEngine\\Resources\\Editor\\TestProject"
+    "projectPath": "C:/RvelaEngine\\Resources\\Editor\\TestProject",
+    "settings": {
+        "assetDirectory": "Assets",
+        "cacheDirectory": "Assets/.cache",
+        "name": "TestProject",
+        "startScene": "Assets\\Scenes\\PhysicsTest.rscene",
+        "vsync": true,
+        "windowHeight": 1080,
+        "windowWidth": 1920
+    }
 }

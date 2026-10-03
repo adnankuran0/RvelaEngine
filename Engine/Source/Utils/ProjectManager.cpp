@@ -20,6 +20,10 @@ bool ProjectManager::CreateProject(const std::string& name, const std::string& p
 	std::filesystem::path shadersDir = assetsDir / "Shaders";
 	std::filesystem::path modelsDir = assetsDir / "Models";
 	std::filesystem::path texturesDir = assetsDir / "Textures";
+	std::filesystem::path animationsDir = assetsDir / "Animations";
+	std::filesystem::path soundsDir = assetsDir / "Sounds";
+	std::filesystem::path prefabsDir = assetsDir / "Prefabs";
+	std::filesystem::path scriptsDir = assetsDir / "Scripts";
 	std::filesystem::path scenesDir = assetsDir / "Scenes";
 	std::filesystem::path projectFile = projectRoot / (name + ".rproj");
 
@@ -29,6 +33,10 @@ bool ProjectManager::CreateProject(const std::string& name, const std::string& p
 	std::filesystem::create_directories(shadersDir, ec);
 	std::filesystem::create_directories(modelsDir, ec);
 	std::filesystem::create_directories(texturesDir, ec);
+	std::filesystem::create_directories(animationsDir, ec);
+	std::filesystem::create_directories(soundsDir, ec);
+	std::filesystem::create_directories(prefabsDir, ec);
+	std::filesystem::create_directories(scriptsDir, ec);
 	std::filesystem::create_directories(scenesDir, ec);
 
 	std::filesystem::path templateAssets = EDITOR_PATH("TemplateProject/Assets").GetAbsolute();
@@ -41,8 +49,7 @@ bool ProjectManager::CreateProject(const std::string& name, const std::string& p
 	auto project = std::make_shared<Project>(name, projectRoot.string());
 	ProjectSettings settings;
 	settings.name = name;
-	settings.assetDirectory = "Assets";
-	settings.cacheDirectory = "Assets/.cache";
+	settings.startScene = "Assets/Scenes/main.rscene";
 	project->SetSettings(settings);
 
 	m_ActiveProject = project;
@@ -59,10 +66,16 @@ bool ProjectManager::LoadProject(const std::string& projectFilePath)
 	if (!std::filesystem::exists(projectFilePath))
 		return false;
 
+	std::filesystem::path resolvedFolder = std::filesystem::path(projectFilePath).parent_path();
+	if (resolvedFolder.filename().string() == "TemplateProject")
+	{
+		LOG_WARN("Cannot open TemplateProject directly. It is a read-only template!");
+		return false;
+	}
+
 	auto project = std::make_shared<Project>();
 	Serializer::LoadFromFile(*project, projectFilePath);
 
-	std::filesystem::path resolvedFolder = std::filesystem::path(projectFilePath).parent_path();
 	if (!std::filesystem::exists(project->projectFolderPath))
 	{
 		project->projectFolderPath = resolvedFolder;
@@ -97,20 +110,12 @@ void ProjectManager::CloseProject()
 
 std::filesystem::path ProjectManager::GetAssetDirectory()
 {
-	if (m_ActiveProject)
-	{
-		return m_ProjectFolderPath / m_ActiveProject->GetSettings().assetDirectory;
-	}
-	return m_ProjectFolderPath / "Assets";
+	return m_ProjectFolderPath / ProjectSettings::AssetDirectory;
 }
 
 std::filesystem::path ProjectManager::GetCacheDirectory()
 {
-	if (m_ActiveProject)
-	{
-		return m_ProjectFolderPath / m_ActiveProject->GetSettings().cacheDirectory;
-	}
-	return m_ProjectFolderPath / "Assets" / ".cache";
+	return m_ProjectFolderPath / ProjectSettings::CacheDirectory;
 }
 
 std::filesystem::path ProjectManager::GetRecentProjectsFilePath()
@@ -143,7 +148,11 @@ std::vector<std::string> ProjectManager::GetRecentProjects()
 					std::string pathStr = item.get<std::string>();
 					if (std::filesystem::exists(pathStr))
 					{
-						recents.push_back(pathStr);
+						std::filesystem::path p(pathStr);
+						if (p.parent_path().filename().string() != "TemplateProject")
+						{
+							recents.push_back(pathStr);
+						}
 					}
 				}
 			}
