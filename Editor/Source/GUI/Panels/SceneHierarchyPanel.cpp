@@ -325,6 +325,15 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                     scene.RemoveParent(selectedEntity);
                 }
 
+                if (ImGui::MenuItem("Duplicate Entity", "Ctrl+D"))
+                {
+                    Entity duplicated = scene.DuplicateEntity(entity);
+                    if (duplicated.GetHandle() != entt::null)
+                    {
+                        selectedEntity = duplicated.GetHandle();
+                    }
+                }
+
                 ImGui::Separator();
 
                 if (ImGui::MenuItem("Delete Entity"))

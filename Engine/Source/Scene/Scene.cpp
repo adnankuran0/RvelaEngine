@@ -1,5 +1,6 @@
 #include "rvelapch.h"
 #include "Scene.h"
+#include "SceneSerializer.h"
 #include "Entity.h"
 #include "Core/Time.h"
 #include "Core/Log.h"
@@ -220,133 +221,17 @@ Entity rv::Scene::GetEntityByName(const std::string& name)
 
 void Scene::SetParent(entt::entity child, entt::entity parent)
 {
-    if (child == entt::null || !m_Registry.valid(child)) return;
-
-    if (child == parent) return;
-
-    if (!HasComponent<SceneTreeComponent>(child))
-        AddComponent<SceneTreeComponent>(child);
-
-    auto& childNode = GetComponent<SceneTreeComponent>(child);
-
-    if (childNode.parent == parent) return;
-
-    if (parent != entt::null)
-    {
-        entt::entity curr = parent;
-        while (curr != entt::null && m_Registry.valid(curr))
-        {
-            if (curr == child)
-            {
-                return;
-            }
-            if (!HasComponent<SceneTreeComponent>(curr))
-                break;
-            curr = GetComponent<SceneTreeComponent>(curr).parent;
-        }
-    }
-
-    if (parent != entt::null && !HasComponent<SceneTreeComponent>(parent))
-        AddComponent<SceneTreeComponent>(parent);
-
-    EntityUUID childUUID = GetComponent<UUIDComponent>(child).uuid;
-    glm::mat4 childWorldMatrix = GetComponent<TransformComponent>(child).GetWorldMatrix();
-
-    if (childNode.parent != entt::null && m_Registry.valid(childNode.parent))
-    {
-        auto& oldParentNode = GetComponent<SceneTreeComponent>(childNode.parent);
-
-        auto it = std::find(oldParentNode.children.begin(), oldParentNode.children.end(), child);
-        if (it != oldParentNode.children.end())
-            oldParentNode.children.erase(it);
-
-        auto uuidIt = std::find(oldParentNode.childrenUUIDs.begin(),
-            oldParentNode.childrenUUIDs.end(), childUUID);
-        if (uuidIt != oldParentNode.childrenUUIDs.end())
-            oldParentNode.childrenUUIDs.erase(uuidIt);
-
-        GetComponent<TransformComponent>(childNode.parent).SetDirty();
-    }
-
-    childNode.parent = parent;
-    childNode.parentUUID = (parent != entt::null) ? GetComponent<UUIDComponent>(parent).uuid : 0;
-
-    if (parent != entt::null)
-    {
-        auto& parentNode = GetComponent<SceneTreeComponent>(parent);
-
-        parentNode.children.push_back(child);
-
-        if (std::find(parentNode.childrenUUIDs.begin(), parentNode.childrenUUIDs.end(), childUUID)
-            == parentNode.childrenUUIDs.end())
-        {
-            parentNode.childrenUUIDs.push_back(childUUID);
-        }
-
-        glm::mat4 parentWorldMatrix = GetComponent<TransformComponent>(parent).GetWorldMatrix();
-        glm::mat4 parentInverse = glm::inverse(parentWorldMatrix);
-
-        glm::mat4 localMatrix = parentInverse * childWorldMatrix;
-
-        glm::vec3 scale, translation, skew;
-        glm::quat rotation;
-        glm::vec4 perspective;
-        glm::decompose(localMatrix, scale, rotation, translation, skew, perspective);
-
-        auto& childTransform = GetComponent<TransformComponent>(child);
-        childTransform.SetPosition(translation);
-        childTransform.SetRotation(rotation);
-        childTransform.SetScale(scale);
-        childTransform.SetDirty();
-
-        GetComponent<TransformComponent>(parent).SetDirty();
-    }
-    else
-    {
-        glm::vec3 scale, euler, position;
-        math::DecomposeToEulerAngles(childWorldMatrix, scale, euler, position);
-
-        auto& childTransform = GetComponent<TransformComponent>(child);
-        childTransform.SetPosition(position);
-        childTransform.SetRotation(glm::quat(glm::radians(euler)));
-        childTransform.SetScale(scale);
-        childTransform.SetDirty();
-    }
+    m_TransformSystem.SetParent(child, parent);
 }
+
 void Scene::SetParentKeepLocal(entt::entity child, entt::entity parent)
 {
-    if (child == entt::null || !m_Registry.valid(child)) return;
-    if (child == parent) return;
-
-    auto& childTree = GetComponent<SceneTreeComponent>(child);
-    EntityUUID childUUID = GetComponent<UUIDComponent>(child).uuid;
-
-    if (childTree.parent != entt::null && m_Registry.valid(childTree.parent))
-    {
-        auto& oldParentTree = GetComponent<SceneTreeComponent>(childTree.parent);
-        std::erase(oldParentTree.children, child);
-        std::erase(oldParentTree.childrenUUIDs, childUUID);
-    }
-
-    childTree.parent = parent;
-    childTree.parentUUID = (parent != entt::null && m_Registry.valid(parent))
-        ? GetComponent<UUIDComponent>(parent).uuid
-        : 0;
-
-    if (parent != entt::null && m_Registry.valid(parent))
-    {
-        auto& parentTree = GetComponent<SceneTreeComponent>(parent);
-        if (std::find(parentTree.children.begin(), parentTree.children.end(), child) == parentTree.children.end())
-        {
-            parentTree.children.push_back(child);
-            parentTree.childrenUUIDs.push_back(childUUID);
-        }
-    }
+    m_TransformSystem.SetParentKeepLocal(child, parent);
 }
 
 void Scene::RemoveParent(entt::entity child)
 {
-    SetParent(child, m_RootEntity);
+    m_TransformSystem.RemoveParent(child);
 }
 
 Entity Scene::Instantiate(const AssetUUID& prefabUUID)
@@ -559,4 +444,14 @@ void Scene::MoveChildOrder(entt::entity source, entt::entity target, bool insert
         children.push_back(source);
         childrenUUIDs.push_back(sourceUUID);
     }
+}
+
+Entity Scene::DuplicateEntity(entt::entity entityHandle)
+{
+    return SceneSerializer::CloneEntity(*this, entityHandle);
+}
+
+Entity Scene::DuplicateEntity(Entity entity)
+{
+    return DuplicateEntity(entity.GetHandle());
 }

@@ -223,6 +223,19 @@ void EditorLayer::HandleShortcuts()
             EditorUtils::CreateScene(*m_Engine);
         }
 
+        if (Input::IsKeyJustPressed(KeyCode::D))
+        {
+            if (m_SelectedEntity != entt::null && m_Engine->GetActiveScene().GetRegistry().valid(m_SelectedEntity))
+            {
+                Entity duplicated = m_Engine->GetActiveScene().DuplicateEntity(m_SelectedEntity);
+                if (duplicated.GetHandle() != entt::null)
+                {
+                    m_SelectedEntity = duplicated.GetHandle();
+                    m_SelectedEntities = { m_SelectedEntity };
+                }
+            }
+        }
+
         // Ctrl + Shift 
         if (Input::IsKeyPressed(KeyCode::LeftShift) || Input::IsKeyPressed(KeyCode::RightShift))
         {

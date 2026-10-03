@@ -100,6 +100,8 @@ public:
     void LateUpdate();
 
     Entity Instantiate(const AssetUUID& prefabUUID);
+    Entity DuplicateEntity(Entity entity);
+    Entity DuplicateEntity(entt::entity entityHandle);
 
     entt::registry& GetRegistry();
     std::unordered_map<EntityUUID, entt::entity>& GetUUIDEntityMap() { return m_EntityMap; }

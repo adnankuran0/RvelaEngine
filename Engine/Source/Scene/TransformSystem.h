@@ -10,6 +10,10 @@ class TransformSystem
 public:
     TransformSystem(Scene& scene) : m_Scene(scene) {}
     void Update();
+
+    void SetParent(entt::entity child, entt::entity parent);
+    void SetParentKeepLocal(entt::entity child, entt::entity parent);
+    void RemoveParent(entt::entity child);
 private:
     void InterpolatePhysicsBodies();
     void InterpolateRigidbodies(float alpha);

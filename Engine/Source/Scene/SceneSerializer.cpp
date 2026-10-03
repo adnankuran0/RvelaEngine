@@ -144,103 +144,7 @@ void SceneSerializer::LoadScene(Scene& scene, const std::string& path)
             scene.GetUUIDEntityMap()[uuidComp.uuid] = handle;
         }
 
-        if (entityJson.contains("Tag"))
-            scene.AddComponent<TagComponent>(handle).Deserialize(entityJson["Tag"]);
-
-        if (entityJson.contains("Transform"))
-            scene.GetComponent<TransformComponent>(handle).Deserialize(entityJson["Transform"]);
-
-        if (entityJson.contains("Material"))
-            scene.AddComponent<MaterialComponent>(handle).Deserialize(entityJson["Material"]);
-
-        if (entityJson.contains("Mesh"))
-        {
-            auto& comp = scene.AddComponent<MeshComponent>(handle);
-            comp.Deserialize(entityJson["Mesh"]);
-            scene.AddComponent<MeshRendererComponent>(handle, comp.GetMesh());
-        }
-
-        if (entityJson.contains("PointLight"))
-            scene.AddComponent<PointLightComponent>(handle).Deserialize(entityJson["PointLight"]);
-
-        if (entityJson.contains("DirectionalLight"))
-            scene.AddComponent<DirectionalLightComponent>(handle).Deserialize(entityJson["DirectionalLight"]);
-
-        if (entityJson.contains("CameraComponent"))
-            scene.AddComponent<CameraComponent>(handle).Deserialize(entityJson["CameraComponent"]);
-
-        if (entityJson.contains("ScriptComponent"))
-            scene.AddComponent<ScriptComponent>(handle).Deserialize(entityJson["ScriptComponent"]);
-
-        if (entityJson.contains("RigidbodyComponent"))
-            scene.AddComponent<RigidbodyComponent>(handle).Deserialize(entityJson["RigidbodyComponent"]);
-
-        if (entityJson.contains("CharacterBodyComponent"))
-            scene.AddComponent<CharacterBodyComponent>(handle).Deserialize(entityJson["CharacterBodyComponent"]);
-
-        if (entityJson.contains("BoxColliderComponent"))
-            scene.AddComponent<BoxColliderComponent>(handle).Deserialize(entityJson["BoxColliderComponent"]);
-
-        if (entityJson.contains("SphereColliderComponent"))
-            scene.AddComponent<SphereColliderComponent>(handle).Deserialize(entityJson["SphereColliderComponent"]);
-
-        if (entityJson.contains("CapsuleColliderComponent"))
-            scene.AddComponent<CapsuleColliderComponent>(handle).Deserialize(entityJson["CapsuleColliderComponent"]);
-
-        if (entityJson.contains("CylinderColliderComponent"))
-            scene.AddComponent<CylinderColliderComponent>(handle).Deserialize(entityJson["CylinderColliderComponent"]);
-
-        if (entityJson.contains("MeshColliderComponent"))
-            scene.AddComponent<MeshColliderComponent>(handle).Deserialize(entityJson["MeshColliderComponent"]);
-
-        if (entityJson.contains("ConvexHullColliderComponent"))
-            scene.AddComponent<ConvexHullColliderComponent>(handle).Deserialize(entityJson["ConvexHullColliderComponent"]);
-
-        if (entityJson.contains("ParentUUID"))
-            scene.GetComponent<SceneTreeComponent>(handle).parentUUID = entityJson["ParentUUID"];
-
-        if (entityJson.contains("AudioEmitterComponent"))
-            scene.AddComponent<AudioEmitterComponent>(handle).Deserialize(entityJson["AudioEmitterComponent"]);
-
-        if (entityJson.contains("ParticleEmitterComponent"))
-            scene.AddComponent<ParticleEmitterComponent>(handle).Deserialize(entityJson["ParticleEmitterComponent"]);
-
-        if (entityJson.contains("AnimatorComponent"))
-            scene.AddComponent<AnimatorComponent>(handle).Deserialize(entityJson["AnimatorComponent"]);
-
-        if (entityJson.contains("SkeletalMeshComponent"))
-        {
-            auto& comp = scene.AddComponent<SkeletalMeshComponent>(handle);
-            comp.Deserialize(entityJson["SkeletalMeshComponent"]);
-            scene.AddComponent<SkeletalMeshRendererComponent>(handle, comp.GetMesh());
-        }
-
-        if (entityJson.contains("SkeletonComponent"))
-            scene.AddComponent<SkeletonComponent>(handle).Deserialize(entityJson["SkeletonComponent"]);
-
-        if (entityJson.contains("UICanvasComponent"))
-            scene.AddComponent<UICanvasComponent>(handle).Deserialize(entityJson["UICanvasComponent"]);
-
-        if (entityJson.contains("RectTransformComponent"))
-            scene.AddComponent<RectTransformComponent>(handle).Deserialize(entityJson["RectTransformComponent"]);
-
-        if (entityJson.contains("UIImageComponent"))
-            scene.AddComponent<UIImageComponent>(handle).Deserialize(entityJson["UIImageComponent"]);
-
-        if (entityJson.contains("UITextComponent"))
-            scene.AddComponent<UITextComponent>(handle).Deserialize(entityJson["UITextComponent"]);
-
-        if (entityJson.contains("UIButtonComponent"))
-            scene.AddComponent<UIButtonComponent>(handle).Deserialize(entityJson["UIButtonComponent"]);
-
-        if (entityJson.contains("UISliderComponent"))
-            scene.AddComponent<UISliderComponent>(handle).Deserialize(entityJson["UISliderComponent"]);
-
-        if (entityJson.contains("UIProgressBarComponent"))
-            scene.AddComponent<UIProgressBarComponent>(handle).Deserialize(entityJson["UIProgressBarComponent"]);
-
-        if (entityJson.contains("UICheckboxComponent"))
-            scene.AddComponent<UICheckboxComponent>(handle).Deserialize(entityJson["UICheckboxComponent"]);
+        DeserializeEntityComponents(scene, handle, entityJson);
 
         loadedEntities.push_back(handle);
     }
@@ -390,6 +294,228 @@ void SceneSerializer::DeserializeEntity(
     const json& entityJson,
     std::unordered_map<EntityUUID, entt::entity>& uuidToEntity)
 {
+}
+
+void SceneSerializer::DeserializeEntityComponents(Scene& scene, entt::entity handle, const json& entityJson)
+{
+    if (entityJson.contains("Tag"))
+        scene.AddComponent<TagComponent>(handle).Deserialize(entityJson["Tag"]);
+
+    if (entityJson.contains("Transform"))
+        scene.GetComponent<TransformComponent>(handle).Deserialize(entityJson["Transform"]);
+
+    if (entityJson.contains("Material"))
+        scene.AddComponent<MaterialComponent>(handle).Deserialize(entityJson["Material"]);
+
+    if (entityJson.contains("Mesh"))
+    {
+        auto& comp = scene.AddComponent<MeshComponent>(handle);
+        comp.Deserialize(entityJson["Mesh"]);
+        scene.AddComponent<MeshRendererComponent>(handle, comp.GetMesh());
+    }
+
+    if (entityJson.contains("PointLight"))
+        scene.AddComponent<PointLightComponent>(handle).Deserialize(entityJson["PointLight"]);
+
+    if (entityJson.contains("DirectionalLight"))
+        scene.AddComponent<DirectionalLightComponent>(handle).Deserialize(entityJson["DirectionalLight"]);
+
+    if (entityJson.contains("CameraComponent"))
+        scene.AddComponent<CameraComponent>(handle).Deserialize(entityJson["CameraComponent"]);
+
+    if (entityJson.contains("ScriptComponent"))
+        scene.AddComponent<ScriptComponent>(handle).Deserialize(entityJson["ScriptComponent"]);
+
+    if (entityJson.contains("RigidbodyComponent"))
+    {
+        auto& rb = scene.AddComponent<RigidbodyComponent>(handle);
+        rb.Deserialize(entityJson["RigidbodyComponent"]);
+        rb.RuntimeBodyID = JPH::BodyID();
+        rb.SetShapeDirty();
+    }
+
+    if (entityJson.contains("CharacterBodyComponent"))
+    {
+        auto& cb = scene.AddComponent<CharacterBodyComponent>(handle);
+        cb.Deserialize(entityJson["CharacterBodyComponent"]);
+        cb.character = nullptr;
+        cb.SetShapeDirty();
+    }
+
+    if (entityJson.contains("BoxColliderComponent"))
+        scene.AddComponent<BoxColliderComponent>(handle).Deserialize(entityJson["BoxColliderComponent"]);
+
+    if (entityJson.contains("SphereColliderComponent"))
+        scene.AddComponent<SphereColliderComponent>(handle).Deserialize(entityJson["SphereColliderComponent"]);
+
+    if (entityJson.contains("CapsuleColliderComponent"))
+        scene.AddComponent<CapsuleColliderComponent>(handle).Deserialize(entityJson["CapsuleColliderComponent"]);
+
+    if (entityJson.contains("CylinderColliderComponent"))
+        scene.AddComponent<CylinderColliderComponent>(handle).Deserialize(entityJson["CylinderColliderComponent"]);
+
+    if (entityJson.contains("MeshColliderComponent"))
+        scene.AddComponent<MeshColliderComponent>(handle).Deserialize(entityJson["MeshColliderComponent"]);
+
+    if (entityJson.contains("ConvexHullColliderComponent"))
+        scene.AddComponent<ConvexHullColliderComponent>(handle).Deserialize(entityJson["ConvexHullColliderComponent"]);
+
+    if (entityJson.contains("ParentUUID"))
+        scene.GetComponent<SceneTreeComponent>(handle).parentUUID = entityJson["ParentUUID"];
+
+    if (entityJson.contains("AudioEmitterComponent"))
+    {
+        auto& audio = scene.AddComponent<AudioEmitterComponent>(handle);
+        audio.Deserialize(entityJson["AudioEmitterComponent"]);
+        audio.instanceID = UINT32_MAX;
+        audio.prevPosValid = false;
+    }
+
+    if (entityJson.contains("ParticleEmitterComponent"))
+        scene.AddComponent<ParticleEmitterComponent>(handle).Deserialize(entityJson["ParticleEmitterComponent"]);
+
+    if (entityJson.contains("AnimatorComponent"))
+        scene.AddComponent<AnimatorComponent>(handle).Deserialize(entityJson["AnimatorComponent"]);
+
+    if (entityJson.contains("SkeletalMeshComponent"))
+    {
+        auto& comp = scene.AddComponent<SkeletalMeshComponent>(handle);
+        comp.Deserialize(entityJson["SkeletalMeshComponent"]);
+        scene.AddComponent<SkeletalMeshRendererComponent>(handle, comp.GetMesh());
+    }
+
+    if (entityJson.contains("SkeletonComponent"))
+        scene.AddComponent<SkeletonComponent>(handle).Deserialize(entityJson["SkeletonComponent"]);
+
+    if (entityJson.contains("UICanvasComponent"))
+        scene.AddComponent<UICanvasComponent>(handle).Deserialize(entityJson["UICanvasComponent"]);
+
+    if (entityJson.contains("RectTransformComponent"))
+        scene.AddComponent<RectTransformComponent>(handle).Deserialize(entityJson["RectTransformComponent"]);
+
+    if (entityJson.contains("UIImageComponent"))
+        scene.AddComponent<UIImageComponent>(handle).Deserialize(entityJson["UIImageComponent"]);
+
+    if (entityJson.contains("UITextComponent"))
+        scene.AddComponent<UITextComponent>(handle).Deserialize(entityJson["UITextComponent"]);
+
+    if (entityJson.contains("UIButtonComponent"))
+        scene.AddComponent<UIButtonComponent>(handle).Deserialize(entityJson["UIButtonComponent"]);
+
+    if (entityJson.contains("UISliderComponent"))
+        scene.AddComponent<UISliderComponent>(handle).Deserialize(entityJson["UISliderComponent"]);
+
+    if (entityJson.contains("UIProgressBarComponent"))
+        scene.AddComponent<UIProgressBarComponent>(handle).Deserialize(entityJson["UIProgressBarComponent"]);
+
+    if (entityJson.contains("UICheckboxComponent"))
+        scene.AddComponent<UICheckboxComponent>(handle).Deserialize(entityJson["UICheckboxComponent"]);
+
+    if (entityJson.contains("Prefab"))
+    {
+        AssetUUID pUUID = AssetUUID::FromString(entityJson["Prefab"]);
+        if (pUUID.IsValid())
+        {
+            scene.AddComponent<PrefabComponent>(handle, pUUID);
+        }
+    }
+}
+
+std::string SceneSerializer::GenerateUniqueName(Scene& scene, const std::string& originalName)
+{
+    std::string baseName = originalName;
+
+    size_t lastSpace = baseName.find_last_of(' ');
+    if (lastSpace != std::string::npos && lastSpace + 1 < baseName.size())
+    {
+        bool onlyDigits = true;
+        for (size_t i = lastSpace + 1; i < baseName.size(); ++i)
+        {
+            if (!std::isdigit(static_cast<unsigned char>(baseName[i])))
+            {
+                onlyDigits = false;
+                break;
+            }
+        }
+        if (onlyDigits)
+        {
+            baseName = baseName.substr(0, lastSpace);
+        }
+    }
+
+    std::unordered_set<std::string> existingNames;
+    for (auto entity : scene.GetRegistry().view<TagComponent>())
+    {
+        existingNames.insert(scene.GetRegistry().get<TagComponent>(entity).tag);
+    }
+
+    int counter = 1;
+    std::string candidateName = baseName + " " + std::to_string(counter);
+    while (existingNames.count(candidateName) > 0)
+    {
+        counter++;
+        candidateName = baseName + " " + std::to_string(counter);
+    }
+
+    return candidateName;
+}
+
+Entity SceneSerializer::CloneEntity(Scene& scene, entt::entity sourceHandle)
+{
+    if (sourceHandle == entt::null || !scene.GetRegistry().valid(sourceHandle))
+        return Entity{};
+
+    if (sourceHandle == scene.GetRootEntity())
+        return Entity{};
+
+    auto CloneRecursive = [&scene](auto& self, entt::entity srcHandle, entt::entity parentHandle, bool isRoot) -> entt::entity
+    {
+        if (srcHandle == entt::null || !scene.GetRegistry().valid(srcHandle))
+            return entt::null;
+
+        json entityJson = SerializeEntity(scene, srcHandle);
+
+        Entity newEntity = scene.CreateEntityRaw();
+        entt::entity newHandle = newEntity.GetHandle();
+
+        EntityUUID newUUID = EntityUUIDGenerator::GeneratePersistent();
+        newEntity.GetComponent<UUIDComponent>().uuid = newUUID;
+        scene.GetUUIDEntityMap()[newUUID] = newHandle;
+
+        DeserializeEntityComponents(scene, newHandle, entityJson);
+
+        if (isRoot)
+        {
+            std::string srcName = scene.HasComponent<TagComponent>(newHandle)
+                ? scene.GetComponent<TagComponent>(newHandle).tag
+                : "Entity";
+            scene.GetComponent<TagComponent>(newHandle).tag = GenerateUniqueName(scene, srcName);
+        }
+
+        scene.SetParentKeepLocal(newHandle, parentHandle);
+
+        if (scene.HasComponent<SceneTreeComponent>(srcHandle))
+        {
+            auto childrenCopy = scene.GetComponent<SceneTreeComponent>(srcHandle).children;
+            for (entt::entity child : childrenCopy)
+            {
+                self(self, child, newHandle, false);
+            }
+        }
+
+        return newHandle;
+    };
+
+    entt::entity parentHandle = scene.GetRootEntity();
+    if (scene.HasComponent<SceneTreeComponent>(sourceHandle))
+    {
+        entt::entity p = scene.GetComponent<SceneTreeComponent>(sourceHandle).parent;
+        if (p != entt::null && scene.GetRegistry().valid(p))
+            parentHandle = p;
+    }
+
+    entt::entity cloned = CloneRecursive(CloneRecursive, sourceHandle, parentHandle, true);
+    return Entity(cloned, &scene);
 }
 
 void SceneSerializer::CollectChildrenRecursively(Scene& scene, entt::entity e, std::unordered_set<entt::entity>& out)
