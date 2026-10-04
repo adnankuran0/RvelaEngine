@@ -9,6 +9,9 @@ public:
 	void SaveScene(Scene& scene, const std::string& path);
 	void LoadScene(Scene& scene, const std::string& path);
 
+	static json SerializeScene(Scene& scene);
+	static void DeserializeScene(Scene& scene, const json& j);
+
     static json SerializeEntity(Scene& scene, entt::entity e, bool serializePrefabAsInstance = true);
     static void DeserializeEntity(Scene& scene, const json& entityJson,
         std::unordered_map<EntityUUID, entt::entity>& uuidToEntity);
@@ -19,8 +22,8 @@ public:
     static bool ApplyPrefabOverrides(Scene& scene, entt::entity rootEntity, const json& overrides);
 
 private:
-    void SerializeHierarchyRecursively(Scene& scene, entt::entity current, json& outEntitiesArray, const std::unordered_set<entt::entity>& prefabChildren);
-    void CollectChildrenRecursively(Scene& scene,entt::entity e,std::unordered_set<entt::entity>& out);
+    static void SerializeHierarchyRecursively(Scene& scene, entt::entity current, json& outEntitiesArray, const std::unordered_set<entt::entity>& prefabChildren);
+    static void CollectChildrenRecursively(Scene& scene, entt::entity e, std::unordered_set<entt::entity>& out);
 };
 
 }

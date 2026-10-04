@@ -13,6 +13,7 @@ public:
     AudioSystem(Scene& scene) : m_Scene(scene) { BindCallbacks(); }
 
     void OnStart();
+    void OnStop();
     void Update();
 
     std::vector<Audio::AudioDispatchEvent> FlushEvents()

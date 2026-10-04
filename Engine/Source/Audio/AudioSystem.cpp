@@ -23,6 +23,25 @@ void AudioSystem::OnStart()
     }
 }
 
+void AudioSystem::OnStop()
+{
+    auto& reg = m_Scene.GetRegistry();
+    auto view = reg.view<AudioEmitterComponent>();
+    AudioManager& am = AudioManager::Get();
+
+    for (auto e : view)
+    {
+        auto& emitter = view.get<AudioEmitterComponent>(e);
+        am.Stop(&emitter);
+        am.DestroyInstance(&emitter);
+        emitter.instanceID = UINT32_MAX;
+        emitter.prevPosValid = false;
+    }
+
+    am.StopAllInstances();
+    m_EventQueue.clear();
+}
+
 void AudioSystem::Update()
 {
     auto& reg = m_Scene.GetRegistry();

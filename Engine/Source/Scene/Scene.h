@@ -17,6 +17,8 @@
 
 namespace rv {
 
+using json = nlohmann::json;
+
 class Entity;
 
 enum class SceneState
@@ -38,6 +40,8 @@ public:
 
     inline const std::string& GetPath() noexcept { return m_ScenePath; }
     inline void SetPath(const std::string& path) noexcept { m_ScenePath = path; }
+    inline const std::string& GetName() const noexcept { return m_SceneName; }
+    inline void SetName(const std::string& name) noexcept { m_SceneName = name; }
 
     void OnStart();
     void OnUpdate(float dt);

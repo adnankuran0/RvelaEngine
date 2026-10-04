@@ -25,6 +25,7 @@ class PhysicsSystem
 public:
 	PhysicsSystem(Scene& scene);
 	void OnStart();
+	void OnStop();
 	void Step(float dt);
 	void Update();
 	inline Physics::PhysicsWorld& GetPhysicsWorld() { return m_PhysicsWorld; }

@@ -1,7 +1,8 @@
-﻿#include "ToolBar.h"
+#include "ToolBar.h"
 #include "ImGui/imgui.h"
 #include "Core/Engine.h"
 #include "EditorUtils.h"
+#include "EditorSelection.h"
 #include "Render/IconLibrary.h"
 
 using namespace rv;
@@ -59,10 +60,7 @@ void ToolBar::Draw(Engine& engine)
         ImGui::PushStyleColor(ImGuiCol_Button, isPlaying ? ImVec4(0.20f, 0.35f, 0.20f, 1.0f) : ImVec4(0.16f, 0.16f, 0.22f, 1.0f));
         if (ImGui::ImageButton("##PlayBtn", playIcon, icon_size, ImVec2(0, 0), ImVec2(1, 1), ImVec4(0, 0, 0, 0), tintWhite))
         {
-            if ((scene.GetState() == SceneState::EDIT && EditorUtils::SaveScene(engine)) || scene.GetState() == SceneState::PAUSE)
-            {
-                scene.SetState(SceneState::PLAY);
-            }
+            engine.GetSceneManager().PlayScene();
         }
         ImGui::PopStyleColor();
         ImGui::SameLine();
@@ -71,8 +69,7 @@ void ToolBar::Draw(Engine& engine)
         ImGui::PushStyleColor(ImGuiCol_Button, isPaused ? ImVec4(0.35f, 0.30f, 0.15f, 1.0f) : ImVec4(0.16f, 0.16f, 0.22f, 1.0f));
         if (ImGui::ImageButton("##PauseBtn", pauseIcon, icon_size, ImVec2(0, 0), ImVec2(1, 1), ImVec4(0, 0, 0, 0), tintWhite))
         {
-            if (scene.GetState() == SceneState::PLAY)
-                scene.SetState(SceneState::PAUSE);
+            engine.GetSceneManager().PauseScene();
         }
         ImGui::PopStyleColor();
         ImGui::SameLine();
@@ -80,12 +77,8 @@ void ToolBar::Draw(Engine& engine)
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.16f, 0.16f, 0.22f, 1.0f));
         if (ImGui::ImageButton("##StopBtn", stopIcon, icon_size, ImVec2(0, 0), ImVec2(1, 1), ImVec4(0, 0, 0, 0), tintWhite))
         {
-            if (scene.GetState() == SceneState::PLAY || scene.GetState() == SceneState::PAUSE)
-            {
-                const std::string& scenePath = scene.GetPath();
-                engine.GetSceneManager().LoadScene(scenePath);
-                scene.SetState(SceneState::EDIT);
-            }
+            engine.GetSceneManager().StopScene();
+            EditorSelection::Get().Clear();
         }
         ImGui::PopStyleColor();
 

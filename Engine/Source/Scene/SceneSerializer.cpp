@@ -29,10 +29,8 @@ void SceneSerializer::SerializeHierarchyRecursively(Scene& scene, entt::entity c
     }
 }
 
-void SceneSerializer::SaveScene(Scene& scene, const std::string& path)
+json SceneSerializer::SerializeScene(Scene& scene)
 {
-    scene.SetPath(path);
-
     json sceneJson;
     sceneJson["Environment"] = scene.GetEnvironment().Serialize();
     sceneJson["Entities"] = json::array();
@@ -73,29 +71,19 @@ void SceneSerializer::SaveScene(Scene& scene, const std::string& path)
         }
     }
 
+    return sceneJson;
+}
+
+void SceneSerializer::SaveScene(Scene& scene, const std::string& path)
+{
+    scene.SetPath(path);
+    json sceneJson = SerializeScene(scene);
     std::ofstream ofs(path);
     ofs << sceneJson.dump(4);
 }
 
-void SceneSerializer::LoadScene(Scene& scene, const std::string& path)
+void SceneSerializer::DeserializeScene(Scene& scene, const json& j)
 {
-    scene.SetPath(path);
-
-    json j;
-    std::ifstream stream(path);
-    if (!stream.is_open()) {
-        LOG_ERROR("Scene file could not be opened: {}", path);
-        return;
-    }
-
-    try {
-        stream >> j;
-    }
-    catch (const std::exception& e) {
-        LOG_ERROR("JSON parse error in {}: {}", path, e.what());
-        return;
-    }
-
     if (j.contains("Environment"))
         scene.GetEnvironment().Deserialize(j["Environment"]);
 
@@ -110,12 +98,25 @@ void SceneSerializer::LoadScene(Scene& scene, const std::string& path)
     EntityUUID rootUUID = scene.GetComponent<UUIDComponent>(rootHandle).uuid;
     uuidToEntity[rootUUID] = rootHandle;
 
-    for (auto& entityJson : j["Entities"])
+    for (const auto& entityJson : j["Entities"])
     {
         if (entityJson.contains("Prefab"))
         {
-            AssetUUID prefabUUID = AssetUUID::FromString(entityJson["Prefab"]);
+            AssetUUID prefabUUID;
+            if (entityJson["Prefab"].is_string())
+            {
+                prefabUUID = AssetUUID::FromString(entityJson["Prefab"].get<std::string>());
+            }
+            else if (entityJson["Prefab"].is_object())
+            {
+                prefabUUID = AssetUUID::FromString(entityJson["Prefab"].value("uuid", ""));
+            }
+
             json overrides = entityJson.value("Overrides", json::array());
+            if (overrides.empty() && entityJson["Prefab"].is_object() && entityJson["Prefab"].contains("overrides"))
+            {
+                overrides = entityJson["Prefab"]["overrides"];
+            }
 
             glm::vec3 pos(0.0f);
             glm::quat rot(1.0f, 0.0f, 0.0f, 0.0f);
@@ -144,13 +145,13 @@ void SceneSerializer::LoadScene(Scene& scene, const std::string& path)
 
                 if (entityJson.contains("UUID"))
                 {
-                    EntityUUID savedUUID = entityJson["UUID"];
+                    EntityUUID savedUUID = entityJson["UUID"].get<EntityUUID>();
                     uuidToEntity[savedUUID] = instance.GetHandle();
                     scene.GetUUIDEntityMap()[savedUUID] = instance.GetHandle();
                 }
 
                 scene.GetComponent<SceneTreeComponent>(instance).parentUUID =
-                    entityJson.contains("ParentUUID") ? entityJson["ParentUUID"].get<EntityUUID>() : 0;
+                    entityJson.value("ParentUUID", (EntityUUID)0);
 
                 prefabInstances.insert(instance.GetHandle());
                 loadedEntities.push_back(instance.GetHandle());
@@ -193,13 +194,35 @@ void SceneSerializer::LoadScene(Scene& scene, const std::string& path)
     }
 }
 
+void SceneSerializer::LoadScene(Scene& scene, const std::string& path)
+{
+    scene.SetPath(path);
+
+    json j;
+    std::ifstream stream(path);
+    if (!stream.is_open()) {
+        LOG_ERROR("Scene file could not be opened: {}", path);
+        return;
+    }
+
+    try {
+        stream >> j;
+    }
+    catch (const std::exception& e) {
+        LOG_ERROR("JSON parse error in {}: {}", path, e.what());
+        return;
+    }
+
+    DeserializeScene(scene, j);
+}
+
 json SceneSerializer::SerializeEntity(Scene& scene, entt::entity e, bool serializePrefabAsInstance)
 {
     json j;
 
     if (serializePrefabAsInstance && scene.HasComponent<PrefabComponent>(e))
     {
-        j["Prefab"] = scene.GetComponent<PrefabComponent>(e).Serialize();
+        j["Prefab"] = scene.GetComponent<PrefabComponent>(e).GetPrefabID().ToString();
         j["UUID"] = scene.GetComponent<UUIDComponent>(e).Serialize();
         if (scene.HasComponent<TagComponent>(e))
             j["Tag"] = scene.GetComponent<TagComponent>(e).Serialize();
@@ -217,6 +240,10 @@ json SceneSerializer::SerializeEntity(Scene& scene, entt::entity e, bool seriali
         if (diff.is_array() && !diff.empty())
         {
             j["Overrides"] = diff;
+        }
+        else if (scene.GetComponent<PrefabComponent>(e).HasOverrides())
+        {
+            j["Overrides"] = scene.GetComponent<PrefabComponent>(e).GetOverrides();
         }
 
         return j;
@@ -449,10 +476,18 @@ void SceneSerializer::DeserializeEntityComponents(Scene& scene, entt::entity han
 
     if (entityJson.contains("Prefab"))
     {
-        AssetUUID pUUID = AssetUUID::FromString(entityJson["Prefab"]);
+        AssetUUID pUUID;
+        if (entityJson["Prefab"].is_string())
+            pUUID = AssetUUID::FromString(entityJson["Prefab"].get<std::string>());
+        else if (entityJson["Prefab"].is_object())
+            pUUID = AssetUUID::FromString(entityJson["Prefab"].value("uuid", ""));
+
         if (pUUID.IsValid())
         {
-            scene.AddComponent<PrefabComponent>(handle, pUUID);
+            json ov = entityJson.value("Overrides", json::array());
+            if (ov.empty() && entityJson["Prefab"].is_object() && entityJson["Prefab"].contains("overrides"))
+                ov = entityJson["Prefab"]["overrides"];
+            scene.AddComponent<PrefabComponent>(handle, pUUID, ov);
         }
     }
 }

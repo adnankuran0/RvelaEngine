@@ -25,6 +25,10 @@ public:
         m_CurrentScene = std::move(newScene);
     }
 
+    void PlayScene();
+    void PauseScene();
+    void StopScene();
+
     void SaveScene(const std::string& path);
     void SaveScene(Scene& scene, const std::string& path);
     void LoadScene(const std::string& path);
@@ -37,7 +41,11 @@ private:
     bool m_HasPendingScene = false; 
     std::unique_ptr<Scene> m_CurrentScene = nullptr;
     SceneSerializer m_SceneSerializer;
-    
+
+    bool m_HasSnapshot = false;
+    json m_SceneSnapshot;
+    std::string m_SnapshotScenePath = "";
+    std::string m_SnapshotSceneName = "";
 };
 
 }

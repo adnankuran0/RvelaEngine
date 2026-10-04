@@ -45,7 +45,7 @@ void Scene::SetState(SceneState newState)
     if (newState == m_State) return;
     if (m_State == SceneState::EDIT && newState == SceneState::PLAY)
         OnStart();
-    if (m_State == SceneState::PLAY && newState == SceneState::EDIT)
+    if ((m_State == SceneState::PLAY || m_State == SceneState::PAUSE) && newState == SceneState::EDIT)
         OnStop();
     m_State = newState;
 }
@@ -91,6 +91,8 @@ void Scene::OnStop()
 {
     m_UISystem.Shutdown();
     m_ScriptSystem.OnStop();
+    m_AudioSystem.OnStop();
+    m_PhysicsSystem.OnStop();
 }
 
 Entity Scene::CreateEntityRaw()

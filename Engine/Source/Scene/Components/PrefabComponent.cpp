@@ -5,13 +5,6 @@ using namespace rv;
 
 json PrefabComponent::Serialize() const
 {
-    if (HasOverrides())
-    {
-        json j;
-        j["uuid"] = prefabUUID.ToString();
-        j["overrides"] = m_Overrides;
-        return j;
-    }
     return prefabUUID.ToString(); 
 }
 void PrefabComponent::Deserialize(const json& j)

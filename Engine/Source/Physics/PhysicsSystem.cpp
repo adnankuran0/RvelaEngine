@@ -110,6 +110,38 @@ void PhysicsSystem::OnStart()
 	m_PhysicsSystem.OptimizeBroadPhase();
 }
 
+void PhysicsSystem::OnStop()
+{
+	auto rbView = m_Scene.GetRegistry().view<RigidbodyComponent>();
+	for (auto e : rbView)
+	{
+		auto& rb = rbView.get<RigidbodyComponent>(e);
+		if (!rb.RuntimeBodyID.IsInvalid())
+		{
+			Physics::UserData* data = reinterpret_cast<Physics::UserData*>(BodyInterface().GetUserData(rb.RuntimeBodyID));
+			delete data;
+
+			BodyInterface().RemoveBody(rb.RuntimeBodyID);
+			BodyInterface().DestroyBody(rb.RuntimeBodyID);
+			rb.RuntimeBodyID = JPH::BodyID();
+		}
+	}
+
+	auto cbView = m_Scene.GetRegistry().view<CharacterBodyComponent>();
+	for (auto e : cbView)
+	{
+		auto& cb = cbView.get<CharacterBodyComponent>(e);
+		if (cb.character)
+		{
+			Physics::UserData* data = reinterpret_cast<Physics::UserData*>(cb.character->GetUserData());
+			delete data;
+			cb.character = nullptr;
+		}
+	}
+
+	m_CollisionEventQueue.clear();
+}
+
 void PhysicsSystem::BindCallbacks()
 {
 	auto& reg = m_Scene.GetRegistry();
