@@ -21,9 +21,10 @@ void VertexArray::Unbind() const
 	glBindVertexArray(0);
 }
 
-void VertexArray::Destroy() const
+void VertexArray::Destroy()
 {
 	glDeleteVertexArrays(1, &ID);
+    ID = 0;
 }
 
 void VertexArray::SetBufferLayout(const BufferLayout& layout)
@@ -78,7 +79,7 @@ void VertexArray::SetBufferLayout(const BufferLayout& layout)
 	}
 }
 
-unsigned int VertexArray::getID()
+unsigned int VertexArray::getID() const
 {
 	return ID;
 }

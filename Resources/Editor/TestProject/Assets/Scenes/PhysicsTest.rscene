@@ -684,114 +684,6 @@
             "UUID": 10
         },
         {
-            "AnimatorComponent": {
-                "autoplay": true,
-                "currentClipName": "",
-                "libraryUUID": "00000000-0000-0000-0000-000000000000",
-                "playbackSpeed": -2.8625584125308023e-09
-            },
-            "Material": {
-                "material": "",
-                "overrides": {
-                    "albedoTex": "d4bb3fc3-349c-4d10-909f-51d8b7b065f8",
-                    "billboardMode": 1,
-                    "blendMode": 1,
-                    "transparencyMode": 1
-                }
-            },
-            "Mesh": {
-                "mesh": "1d2596bb-18d3-41a6-9848-a8a584870ce3"
-            },
-            "ParentUUID": 0,
-            "ParticleEmitterComponent": {
-                "amount": 500,
-                "angularVelocityMax": 0.0,
-                "angularVelocityMin": 0.0,
-                "dampingMax": 0.0,
-                "dampingMin": 0.0,
-                "direction": [
-                    0.0,
-                    1.0,
-                    0.0
-                ],
-                "emitterShape": 1,
-                "emitting": true,
-                "endColor": [
-                    1.0,
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "explosiveness": 0.0,
-                "gravity": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "lifetime": 0.5099999904632568,
-                "lifetimeRandomness": 0.7200000286102295,
-                "linearAccelMax": 1.0,
-                "linearAccelMin": 0.0,
-                "linearVelocityMax": 2.0,
-                "linearVelocityMin": 1.0,
-                "localCoords": false,
-                "oneShot": false,
-                "randomness": 0.0,
-                "rotationMax": 0.0,
-                "rotationMin": 0.0,
-                "scaleEnd": 0.0,
-                "scaleMax": 0.25,
-                "scaleMin": 0.10000000149011612,
-                "shapeDimensions": [
-                    0.05000000074505806,
-                    1.0,
-                    1.0
-                ],
-                "speedScale": 1.0,
-                "spread": 7.699999809265137,
-                "startColor": [
-                    1.0,
-                    0.20098096132278442,
-                    0.04633206129074097,
-                    1.0
-                ]
-            },
-            "PointLight": {
-                "castShadows": false,
-                "color": [
-                    1.0,
-                    0.2969246506690979,
-                    0.08494210243225098
-                ],
-                "falloff": 2.0,
-                "intensity": 20.0,
-                "radius": 5.0
-            },
-            "Tag": {
-                "isActive": true,
-                "tag": "Fire"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    -2.60333251953125,
-                    2.0970699787139893,
-                    6.630308780586347e-05
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scale": [
-                    1.0,
-                    1.0,
-                    1.0
-                ]
-            },
-            "UUID": 18
-        },
-        {
             "Material": {
                 "material": "",
                 "overrides": {
@@ -1742,6 +1634,114 @@
                 ]
             },
             "UUID": 9270657603229051392
+        },
+        {
+            "ParentUUID": 0,
+            "Prefab": "3c17201c-5ca4-489d-bed4-6df228fefad9",
+            "Tag": {
+                "isActive": true,
+                "tag": "Fire"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    2.1440296173095703,
+                    2.5470025539398193,
+                    0.8583953976631165
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 11360801975810190087
+        },
+        {
+            "ParentUUID": 0,
+            "Prefab": "3c17201c-5ca4-489d-bed4-6df228fefad9",
+            "Tag": {
+                "isActive": true,
+                "tag": "Fire"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    4.837706565856934,
+                    1.2049016952514648,
+                    4.017955780029297
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 14765824290735053713
+        },
+        {
+            "ParentUUID": 0,
+            "Prefab": "3c17201c-5ca4-489d-bed4-6df228fefad9",
+            "Tag": {
+                "isActive": true,
+                "tag": "Fire"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    2.5018253326416016,
+                    1.651383399963379,
+                    3.5094316005706787
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 601282297770743228
+        },
+        {
+            "ParentUUID": 0,
+            "Prefab": "3c17201c-5ca4-489d-bed4-6df228fefad9",
+            "Tag": {
+                "isActive": true,
+                "tag": "Fire"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    9.682028121460462e-07,
+                    1.4773578643798828,
+                    0.027390480041503906
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 8679668103490891796
         }
     ],
     "Environment": {

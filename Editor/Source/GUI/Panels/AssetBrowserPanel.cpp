@@ -1,4 +1,4 @@
-﻿#include "AssetBrowserPanel.h"
+#include "AssetBrowserPanel.h"
 #include "ImGui/imgui.h"
 #include <filesystem>
 #include <string>
@@ -10,6 +10,8 @@
 #include "EditorUtils.h"
 #include "Core/Engine.h"
 #include "Scene/Entity.h"
+#include "EditorSelection.h"
+#include "Renderer/EditorCamera.h"
 #include "AssetImporters/MaterialSerializer.h"
 #include "AssetImporters/AnimationLibrarySerializer.h"
 #include <AssetImporters/TextureImporter.h>
@@ -630,7 +632,16 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
             {
                 AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(entry.path().string());
                 if (uuid.IsValid())
-                    engine->GetActiveScene().Instantiate(uuid);
+                {
+                    glm::vec3 spawnPos(0.0f);
+                    if (auto* cam = engine->GetEditorCamera())
+                    {
+                        spawnPos = cam->Position + cam->Front * 5.0f;
+                    }
+                    Entity inst = engine->GetActiveScene().Instantiate(uuid, spawnPos);
+                    if (inst.GetHandle() != entt::null)
+                        EditorSelection::Get().Select(inst.GetHandle());
+                }
             }
             else if (extension == ".glsl" || extension == ".lua")
             {

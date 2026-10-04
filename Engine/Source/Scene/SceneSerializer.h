@@ -9,7 +9,7 @@ public:
 	void SaveScene(Scene& scene, const std::string& path);
 	void LoadScene(Scene& scene, const std::string& path);
 
-    static json SerializeEntity(Scene& scene, entt::entity e);
+    static json SerializeEntity(Scene& scene, entt::entity e, bool serializePrefabAsInstance = true);
     static void DeserializeEntity(Scene& scene, const json& entityJson,
         std::unordered_map<EntityUUID, entt::entity>& uuidToEntity);
     static void DeserializeEntityComponents(Scene& scene, entt::entity handle, const json& entityJson);

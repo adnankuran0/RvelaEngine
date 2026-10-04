@@ -20,6 +20,9 @@ public:
         Scene& scene,
         entt::entity rootEntity);
 
+    static bool ApplyPrefab(Scene& scene, entt::entity rootEntity);
+    static bool RevertPrefab(Scene& scene, entt::entity rootEntity, bool preserveTag = false);
+
 private:
     static void SerializeEntityRecursively(
         entt::entity e,

@@ -7,6 +7,7 @@
 #include "AssetImporters/MaterialSerializer.h"
 #include "Audio/AudioManager.h"
 #include "EditorSelection.h"
+#include "AssetImporters/PrefabImporter.h"
 #include <algorithm>
 #include <array>
 #include <cstring>
@@ -249,6 +250,53 @@ void InspectorPanel::Draw(Engine* engine)
 	ImGui::Spacing();
 
 	bool isPrefab = registry.any_of<PrefabComponent>(selectedEntity);
+	if (isPrefab)
+	{
+		auto& prefabComp = registry.get<PrefabComponent>(selectedEntity);
+		AssetUUID pUUID = prefabComp.GetPrefabID();
+		std::string prefabName = EditorUtils::GetAssetFileName(pUUID);
+		if (prefabName.empty()) prefabName = "Prefab Asset";
+
+		ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.22f, 0.35f, 0.55f, 0.8f));
+		if (ImGui::CollapsingHeader("Prefab Instance", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::TextDisabled("Source:");
+			ImGui::SameLine();
+			ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s", prefabName.c_str());
+
+			float btnWidth = (ImGui::GetContentRegionAvail().x - 16.0f) / 3.0f;
+			if (ImGui::Button("Apply", ImVec2(btnWidth, 24.0f)))
+			{
+				PrefabImporter::ApplyPrefab(scene, selectedEntity);
+			}
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Save current hierarchy and component changes back to the .rprefab file");
+
+			ImGui::SameLine();
+			if (ImGui::Button("Revert", ImVec2(btnWidth, 24.0f)))
+			{
+				PrefabImporter::RevertPrefab(scene, selectedEntity);
+				// selectedEntity might have been replaced
+				ImGui::PopStyleColor();
+				ImGui::End();
+				return;
+			}
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Discard local changes and reload from the .rprefab file");
+
+			ImGui::SameLine();
+			if (ImGui::Button("Unpack", ImVec2(btnWidth, 24.0f)))
+			{
+				scene.RemoveComponent<PrefabComponent>(selectedEntity);
+			}
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Convert this instance into standard scene entities (Break Prefab link)");
+		}
+		ImGui::PopStyleColor();
+		ImGui::Spacing();
+		ImGui::Separator();
+		ImGui::Spacing();
+	}
 
 	DrawComponent<TransformComponent>("Transform", registry, selectedEntity, [](TransformComponent& transform)
 		{
@@ -279,9 +327,7 @@ void InspectorPanel::Draw(Engine* engine)
 			}
 		}, false);
 
-	if (!isPrefab)
-	{
-		DrawComponent<MeshComponent>("Mesh", registry, selectedEntity, [](MeshComponent& mesh)
+	DrawComponent<MeshComponent>("Mesh", registry, selectedEntity, [](MeshComponent& mesh)
 			{
 				std::string meshName = EditorUtils::GetAssetFileName(mesh.GetMeshID());
 				UI::DrawFullWidthAssetDropSlot("Mesh Slot", meshName, [&](const std::string& pathStr)
@@ -1098,7 +1144,6 @@ void InspectorPanel::Draw(Engine* engine)
 					}
 				}
 			});
-	}
 
 	DrawComponent<SceneTreeComponent>("Hierarchy", registry, selectedEntity, [&](SceneTreeComponent& selectedNode)
 		{

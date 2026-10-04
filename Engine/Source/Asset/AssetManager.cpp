@@ -82,7 +82,6 @@ void AssetManager::Unload(const AssetUUID& uuid)
     auto it = m_LoadedAssets.find(uuid);
     if (it == m_LoadedAssets.end())
     {
-        LOG_WARN("Tried to unload asset that isnt loaded: {}", uuid.ToString());
         return;
     }
     m_LoadedAssets.erase(it);

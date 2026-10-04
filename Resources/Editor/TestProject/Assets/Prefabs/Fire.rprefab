@@ -1,0 +1,112 @@
+{
+    "Entities": [
+        {
+            "AnimatorComponent": {
+                "autoplay": true,
+                "currentClipName": "",
+                "libraryUUID": "00000000-0000-0000-0000-000000000000",
+                "playbackSpeed": -2.8625584125308023e-09
+            },
+            "Material": {
+                "material": "",
+                "overrides": {
+                    "albedoTex": "d4bb3fc3-349c-4d10-909f-51d8b7b065f8",
+                    "billboardMode": 1,
+                    "blendMode": 1,
+                    "transparencyMode": 1
+                }
+            },
+            "Mesh": {
+                "mesh": "1d2596bb-18d3-41a6-9848-a8a584870ce3"
+            },
+            "ParticleEmitterComponent": {
+                "amount": 187,
+                "angularVelocityMax": 0.0,
+                "angularVelocityMin": 0.0,
+                "dampingMax": 0.0,
+                "dampingMin": 0.0,
+                "direction": [
+                    0.0,
+                    1.0,
+                    0.0
+                ],
+                "emitterShape": 1,
+                "emitting": true,
+                "endColor": [
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "explosiveness": 0.0,
+                "gravity": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "lifetime": 0.5099999904632568,
+                "lifetimeRandomness": 0.7200000286102295,
+                "linearAccelMax": 1.0,
+                "linearAccelMin": 0.0,
+                "linearVelocityMax": 2.0,
+                "linearVelocityMin": 1.0,
+                "localCoords": false,
+                "oneShot": false,
+                "randomness": 0.0,
+                "rotationMax": 0.0,
+                "rotationMin": 0.0,
+                "scaleEnd": 0.0,
+                "scaleMax": 0.25,
+                "scaleMin": 0.10000000149011612,
+                "shapeDimensions": [
+                    0.05000000074505806,
+                    1.0,
+                    1.0
+                ],
+                "speedScale": 1.0,
+                "spread": 7.699999809265137,
+                "startColor": [
+                    1.0,
+                    0.20098096132278442,
+                    0.04633206129074097,
+                    1.0
+                ]
+            },
+            "PointLight": {
+                "castShadows": true,
+                "color": [
+                    1.0,
+                    0.2969246506690979,
+                    0.08494210243225098
+                ],
+                "falloff": 2.0,
+                "intensity": 20.0,
+                "radius": 5.0
+            },
+            "Tag": {
+                "isActive": true,
+                "tag": "Fire"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 5959588685358643000,
+            "_isRoot": true
+        }
+    ]
+}

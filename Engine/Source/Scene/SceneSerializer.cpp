@@ -115,21 +115,32 @@ void SceneSerializer::LoadScene(Scene& scene, const std::string& path)
             AssetUUID prefabUUID = AssetUUID::FromString(entityJson["Prefab"]);
             Entity instance = scene.Instantiate(prefabUUID);
 
-            if (entityJson.contains("Transform"))
-                scene.GetComponent<TransformComponent>(instance).Deserialize(entityJson["Transform"]);
-
-            if (entityJson.contains("UUID"))
+            if (instance.GetHandle() != entt::null)
             {
-                EntityUUID savedUUID = entityJson["UUID"];
-                uuidToEntity[savedUUID] = instance.GetHandle();
-                scene.GetUUIDEntityMap()[savedUUID] = instance.GetHandle();
+                if (entityJson.contains("Tag"))
+                {
+                    if (scene.HasComponent<TagComponent>(instance))
+                        scene.GetComponent<TagComponent>(instance).Deserialize(entityJson["Tag"]);
+                    else
+                        scene.AddComponent<TagComponent>(instance).Deserialize(entityJson["Tag"]);
+                }
+
+                if (entityJson.contains("Transform"))
+                    scene.GetComponent<TransformComponent>(instance).Deserialize(entityJson["Transform"]);
+
+                if (entityJson.contains("UUID"))
+                {
+                    EntityUUID savedUUID = entityJson["UUID"];
+                    uuidToEntity[savedUUID] = instance.GetHandle();
+                    scene.GetUUIDEntityMap()[savedUUID] = instance.GetHandle();
+                }
+
+                scene.GetComponent<SceneTreeComponent>(instance).parentUUID =
+                    entityJson.contains("ParentUUID") ? entityJson["ParentUUID"].get<EntityUUID>() : 0;
+
+                prefabInstances.insert(instance.GetHandle());
+                loadedEntities.push_back(instance.GetHandle());
             }
-
-            scene.GetComponent<SceneTreeComponent>(instance).parentUUID =
-                entityJson.contains("ParentUUID") ? entityJson["ParentUUID"].get<EntityUUID>() : 0;
-
-            prefabInstances.insert(instance.GetHandle());
-            loadedEntities.push_back(instance.GetHandle());
             continue;
         }
 
@@ -145,6 +156,9 @@ void SceneSerializer::LoadScene(Scene& scene, const std::string& path)
         }
 
         DeserializeEntityComponents(scene, handle, entityJson);
+
+        if (!scene.HasComponent<TagComponent>(handle))
+            scene.AddComponent<TagComponent>(handle, "Entity");
 
         loadedEntities.push_back(handle);
     }
@@ -165,15 +179,17 @@ void SceneSerializer::LoadScene(Scene& scene, const std::string& path)
     }
 }
 
-json SceneSerializer::SerializeEntity(Scene& scene, entt::entity e)
+json SceneSerializer::SerializeEntity(Scene& scene, entt::entity e, bool serializePrefabAsInstance)
 {
     json j;
 
-    if(scene.HasComponent<PrefabComponent>(e))
+    if (serializePrefabAsInstance && scene.HasComponent<PrefabComponent>(e))
     {
         j["Prefab"] = scene.GetComponent<PrefabComponent>(e).Serialize();
-        j["Transform"] = scene.GetComponent<TransformComponent>(e).Serialize();
         j["UUID"] = scene.GetComponent<UUIDComponent>(e).Serialize();
+        if (scene.HasComponent<TagComponent>(e))
+            j["Tag"] = scene.GetComponent<TagComponent>(e).Serialize();
+        j["Transform"] = scene.GetComponent<TransformComponent>(e).Serialize();
 
         if (scene.HasComponent<SceneTreeComponent>(e))
         {
@@ -473,7 +489,7 @@ Entity SceneSerializer::CloneEntity(Scene& scene, entt::entity sourceHandle)
         if (srcHandle == entt::null || !scene.GetRegistry().valid(srcHandle))
             return entt::null;
 
-        json entityJson = SerializeEntity(scene, srcHandle);
+        json entityJson = SerializeEntity(scene, srcHandle, /*serializePrefabAsInstance=*/false);
 
         Entity newEntity = scene.CreateEntityRaw();
         entt::entity newHandle = newEntity.GetHandle();
@@ -483,6 +499,12 @@ Entity SceneSerializer::CloneEntity(Scene& scene, entt::entity sourceHandle)
         scene.GetUUIDEntityMap()[newUUID] = newHandle;
 
         DeserializeEntityComponents(scene, newHandle, entityJson);
+
+        if (!scene.HasComponent<TagComponent>(newHandle))
+            scene.AddComponent<TagComponent>(newHandle, "Entity");
+
+        if (scene.HasComponent<PrefabComponent>(srcHandle))
+            scene.AddComponent<PrefabComponent>(newHandle, scene.GetComponent<PrefabComponent>(srcHandle).GetPrefabID());
 
         if (isRoot)
         {

@@ -17,14 +17,27 @@ void AssetRegistry::Scan(const std::filesystem::path& assetDir)
 {
     Clear();
     m_AssetDir = assetDir;
+
+    std::error_code ec;
+    if (assetDir.empty() || !std::filesystem::exists(assetDir, ec) || !std::filesystem::is_directory(assetDir, ec))
+    {
+        LOG_WARN("[AssetRegistry::Scan] Directory does not exist or is not a directory: {}", assetDir.string());
+        return;
+    }
+
     auto cacheRoot = assetDir / ".cache";
 
     static const std::unordered_set<std::string> s_TrackOnlyExtensions = {
         ".rscene", ".lua", ".mp3", ".wav"
     };
 
-    for (auto& entry : std::filesystem::recursive_directory_iterator(assetDir))
+    for (auto& entry : std::filesystem::recursive_directory_iterator(assetDir, std::filesystem::directory_options::skip_permission_denied, ec))
     {
+        if (ec)
+        {
+            LOG_ERROR("[AssetRegistry::Scan] Directory iteration error: {}", ec.message());
+            break;
+        }
         if (!entry.is_regular_file()) continue;
         auto path = entry.path();
 

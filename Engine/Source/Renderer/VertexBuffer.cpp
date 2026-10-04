@@ -7,18 +7,24 @@ VertexBuffer::VertexBuffer(const void* data, size_t size)
 {
 	Init(data, size);
 }
+
 VertexBuffer::~VertexBuffer()
 {
-	glDeleteBuffers(1, &ID);
+	Destroy();
 }
-unsigned int VertexBuffer::getID()
+
+unsigned int VertexBuffer::getID() const
 {
 	return ID;
 }
 
-void VertexBuffer::Destroy() const
+void VertexBuffer::Destroy()
 {
-	glDeleteBuffers(1, &ID);
+	if (ID != 0)
+	{
+		glDeleteBuffers(1, &ID);
+		ID = 0;
+	}
 }
 
 void VertexBuffer::Bind() const

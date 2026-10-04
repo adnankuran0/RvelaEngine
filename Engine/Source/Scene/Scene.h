@@ -104,6 +104,7 @@ public:
     void LateUpdate();
 
     Entity Instantiate(const AssetUUID& prefabUUID);
+    Entity Instantiate(const AssetUUID& prefabUUID, const glm::vec3& position, const glm::quat& rotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f), entt::entity parent = entt::null);
     Entity DuplicateEntity(Entity entity);
     Entity DuplicateEntity(entt::entity entityHandle);
 

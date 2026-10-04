@@ -15,6 +15,7 @@
 #include "AssetImporters/ModelImporter.h"
 #include "Utils/FileUtils.h"
 #include "EditorSelection.h"
+#include "EditorUtils.h"
 
 using namespace rv;
 
@@ -231,6 +232,7 @@ void SceneHierarchyPanel::Draw(Engine* engine)
 
     auto matchesFilter = [&](entt::entity entity, auto& self) -> bool {
         if (searchFilter[0] == '\0') return true;
+        if (!scene.HasComponent<TagComponent>(entity)) return false;
         auto& tagComp = scene.GetComponent<TagComponent>(entity);
         std::string nameLower = tagComp.tag;
         std::string filterLower = searchFilter;
@@ -288,6 +290,9 @@ void SceneHierarchyPanel::Draw(Engine* engine)
             bool isSelected = (!isRoot && EditorSelection::Get().IsSelected(entity));
             if (isSelected)
                 flags |= ImGuiTreeNodeFlags_Selected;
+
+            if (!scene.HasComponent<TagComponent>(entity))
+                scene.AddComponent<TagComponent>(entity, "Entity");
 
             auto& tagComponent = scene.GetComponent<TagComponent>(entity);
             std::string nodeId = tagComponent.tag + "##" + std::to_string((uint32_t)entity);
@@ -386,11 +391,27 @@ void SceneHierarchyPanel::Draw(Engine* engine)
 
                 if (ImGui::MenuItem("Save as prefab"))
                 {
+                    std::string entityName = scene.HasComponent<TagComponent>(entity)
+                        ? scene.GetComponent<TagComponent>(entity).tag
+                        : "prefab";
+                    if (entityName.empty()) entityName = "prefab";
+                    std::string defaultFileName = entityName + ".rprefab";
+
+                    std::filesystem::path prefabsFolder = ProjectManager::GetAssetDirectory() / "Prefabs";
+                    std::error_code ec;
+                    if (!std::filesystem::exists(prefabsFolder, ec))
+                        std::filesystem::create_directories(prefabsFolder, ec);
+
+                    std::string defaultPath = (prefabsFolder / defaultFileName).string();
+
                     const char* filterPatterns[] = { "*.rprefab" };
-                    const char* filePath = tinyfd_saveFileDialog("Create prefab as", "prefab.rprefab", 1, filterPatterns, NULL);
+                    const char* filePath = tinyfd_saveFileDialog("Create prefab as", defaultPath.c_str(), 1, filterPatterns, NULL);
                     if (filePath)
                     {
                         std::filesystem::path prefabPath = filePath;
+                        if (prefabPath.extension() != ".rprefab")
+                            prefabPath += ".rprefab";
+
                         AssetRegistry& reg = AssetManager::Get().GetRegistry();
                         AssetMeta meta = reg.GetOrCreateMeta(prefabPath);
 
@@ -399,7 +420,16 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                         {
                             meta.importerID = "PrefabImporter";
                             reg.SaveMeta(prefabPath, meta);
-                            reg.Scan(reg.GetAssetDir());
+                            
+                            auto assetDir = reg.GetAssetDir();
+                            if (!assetDir.empty() && std::filesystem::exists(assetDir))
+                                reg.Scan(assetDir);
+
+                            if (!scene.HasComponent<PrefabComponent>(entity))
+                                scene.AddComponent<PrefabComponent>(entity, meta.uuid);
+                            else
+                                scene.GetComponent<PrefabComponent>(entity).SetPrefabID(meta.uuid);
+
                             LOG_INFO("Prefab saved: {}", prefabPath.string());
                         }
                     }
@@ -407,10 +437,22 @@ void SceneHierarchyPanel::Draw(Engine* engine)
 
                 if (scene.HasComponent<PrefabComponent>(entity))
                 {
-                    if (ImGui::MenuItem("Make local"))
+                    if (ImGui::MenuItem("Apply to Prefab"))
+                    {
+                        PrefabImporter::ApplyPrefab(scene, entity);
+                    }
+
+                    if (ImGui::MenuItem("Revert to Prefab"))
+                    {
+                        PrefabImporter::RevertPrefab(scene, entity);
+                    }
+
+                    if (ImGui::MenuItem("Unpack Prefab (Make Local)"))
                     {
                         scene.RemoveComponent<PrefabComponent>(entity);
                     }
+
+                    ImGui::Separator();
                 }
 
                 if (ImGui::MenuItem("Detach from parent"))
@@ -545,6 +587,21 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                         }
                     }
                 }
+
+                if (const ImGuiPayload* assetPayload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
+                {
+                    std::string pathStr((const char*)assetPayload->Data);
+                    if (pathStr.ends_with(".rprefab"))
+                    {
+                        AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
+                        if (uuid.IsValid())
+                        {
+                            Entity inst = scene.Instantiate(uuid, glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), entity);
+                            if (inst.GetHandle() != entt::null)
+                                EditorSelection::Get().Select(inst.GetHandle());
+                        }
+                    }
+                }
                 ImGui::EndDragDropTarget();
             }
 
@@ -585,6 +642,21 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                 if (targetMove != entt::null && registry.valid(targetMove) && !isDescendantOfAny(targetMove, toMove))
                 {
                     scene.SetParent(targetMove, rootEntity);
+                }
+            }
+        }
+
+        if (const ImGuiPayload* assetPayload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
+        {
+            std::string pathStr((const char*)assetPayload->Data);
+            if (pathStr.ends_with(".rprefab"))
+            {
+                AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
+                if (uuid.IsValid())
+                {
+                    Entity inst = scene.Instantiate(uuid, glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), rootEntity);
+                    if (inst.GetHandle() != entt::null)
+                        EditorSelection::Get().Select(inst.GetHandle());
                 }
             }
         }

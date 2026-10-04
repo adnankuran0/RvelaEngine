@@ -284,6 +284,11 @@ void Scene::RemoveParent(entt::entity child)
 
 Entity Scene::Instantiate(const AssetUUID& prefabUUID)
 {
+    return Instantiate(prefabUUID, glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), entt::null);
+}
+
+Entity Scene::Instantiate(const AssetUUID& prefabUUID, const glm::vec3& position, const glm::quat& rotation, entt::entity parent)
+{
     Ref<PrefabAsset> prefab = AssetManager::Get().GetAsset<PrefabAsset>(prefabUUID);
     if (!prefab || !prefab->IsValid())
     {
@@ -299,7 +304,7 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
         return Entity{};
     }
 
-    if (!prefabJson.contains("Entities"))
+    if (!prefabJson.contains("Entities") || !prefabJson["Entities"].is_array() || prefabJson["Entities"].empty())
     {
         LOG_ERROR("[Scene::Instantiate] No Entities in prefab: {}", prefabUUID.ToString());
         return Entity{};
@@ -310,16 +315,10 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
 
     for (auto& entityJson : prefabJson["Entities"])
     {
-        entt::entity handle = m_Registry.create();
-        Entity e(handle, this);
-
-        e.AddComponent<TransformComponent>();
-        e.AddComponent<SceneTreeComponent>();
-        e.AddComponent<TagComponent>();
-        e.AddComponent<UUIDComponent>();
+        Entity e = CreateEntityRaw();
+        entt::entity handle = e.GetHandle();
 
         EntityUUID oldUUID = entityJson.contains("UUID") ? entityJson["UUID"].get<EntityUUID>() : 0;
-
         EntityUUID newUUID = EntityUUIDGenerator::GeneratePersistent();
         e.GetComponent<UUIDComponent>().uuid = newUUID;
         m_EntityMap[newUUID] = handle;
@@ -327,79 +326,16 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
         if (oldUUID != 0)
             oldToNewEntity[oldUUID] = handle;
 
-        if (entityJson.contains("Tag"))
-            e.GetComponent<TagComponent>().Deserialize(entityJson["Tag"]);
-        else
+        SceneSerializer::DeserializeEntityComponents(*this, handle, entityJson);
+
+        if (!e.HasComponent<TagComponent>())
             e.AddComponent<TagComponent>("Entity");
-
-        if (entityJson.contains("Transform"))
-            e.GetComponent<TransformComponent>().Deserialize(entityJson["Transform"]);
-
-        if (entityJson.contains("Material"))
-            e.AddComponent<MaterialComponent>().Deserialize(entityJson["Material"]);
-
-        if (entityJson.contains("Mesh"))
-        {
-            auto& comp = e.AddComponent<MeshComponent>();
-            comp.Deserialize(entityJson["Mesh"]);
-            e.AddComponent<MeshRendererComponent>(comp.GetMesh());
-        }
-
-        if (entityJson.contains("SkeletalMeshComponent"))
-        {
-            auto& comp = e.AddComponent<SkeletalMeshComponent>();
-            comp.Deserialize(entityJson["SkeletalMeshComponent"]);
-            e.AddComponent<SkeletalMeshRendererComponent>(comp.GetMesh());
-        }
-
-        if (entityJson.contains("PointLight"))
-            e.AddComponent<PointLightComponent>().Deserialize(entityJson["PointLight"]);
-
-        if (entityJson.contains("DirectionalLight"))
-            e.AddComponent<DirectionalLightComponent>().Deserialize(entityJson["DirectionalLight"]);
-
-        if (entityJson.contains("CameraComponent"))
-            e.AddComponent<CameraComponent>().Deserialize(entityJson["CameraComponent"]);
-
-        if (entityJson.contains("RigidbodyComponent"))
-            e.AddComponent<RigidbodyComponent>().Deserialize(entityJson["RigidbodyComponent"]);
-
-        if (entityJson.contains("CharacterBodyComponent"))
-            e.AddComponent<CharacterBodyComponent>().Deserialize(entityJson["CharacterBodyComponent"]);
-
-        if (entityJson.contains("BoxColliderComponent"))
-            e.AddComponent<BoxColliderComponent>().Deserialize(entityJson["BoxColliderComponent"]);
-
-        if (entityJson.contains("SphereColliderComponent"))
-            e.AddComponent<SphereColliderComponent>().Deserialize(entityJson["SphereColliderComponent"]);
-
-        if (entityJson.contains("CapsuleColliderComponent"))
-            e.AddComponent<CapsuleColliderComponent>().Deserialize(entityJson["CapsuleColliderComponent"]);
-
-        if (entityJson.contains("CylinderColliderComponent"))
-            e.AddComponent<CylinderColliderComponent>().Deserialize(entityJson["CylinderColliderComponent"]);
-
-        if (entityJson.contains("MeshColliderComponent"))
-            e.AddComponent<MeshColliderComponent>().Deserialize(entityJson["MeshColliderComponent"]);
-
-        if (entityJson.contains("ConvexHullColliderComponent"))
-            e.AddComponent<ConvexHullColliderComponent>().Deserialize(entityJson["ConvexHullColliderComponent"]);
-
-        if (entityJson.contains("ScriptComponent"))
-            e.AddComponent<ScriptComponent>().Deserialize(entityJson["ScriptComponent"]);
-
-        if (entityJson.contains("AnimatorComponent"))
-            e.AddComponent<AnimatorComponent>().Deserialize(entityJson["AnimatorComponent"]);
-
-        if (entityJson.contains("SkeletonComponent"))
-            e.AddComponent<SkeletonComponent>().Deserialize(entityJson["SkeletonComponent"]);
-
-        if (entityJson.contains("ParentUUID"))
-            e.GetComponent<SceneTreeComponent>().parentUUID = entityJson["ParentUUID"];
 
         if (entityJson.contains("_isRoot") && entityJson["_isRoot"] == true)
             rootEntity = e;
     }
+
+    entt::entity defaultParent = (parent != entt::null && m_Registry.valid(parent)) ? parent : m_RootEntity;
 
     for (auto& [oldUUID, handle] : oldToNewEntity)
     {
@@ -412,7 +348,7 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
         }
         else
         {
-            SetParentKeepLocal(handle, m_RootEntity);
+            SetParentKeepLocal(handle, defaultParent);
 
             if (rootEntity.GetHandle() == entt::null)
                 rootEntity = Entity(handle, this);
@@ -422,12 +358,14 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
     if (rootEntity.GetHandle() != entt::null)
     {
         auto& tc = GetComponent<TransformComponent>(rootEntity.GetHandle());
-        tc.SetPosition(glm::vec3(0.0f));
-        tc.SetRotation(glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+        tc.SetPosition(position);
+        tc.SetRotation(rotation);
+        tc.SetDirty();
 
         AddComponent<PrefabComponent>(rootEntity.GetHandle(), prefabUUID);
     }
 
+    m_TransformSystem.Update();
     return rootEntity;
 }
 

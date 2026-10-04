@@ -9,8 +9,8 @@ public:
 	void Init();
 	void Bind() const;
 	void Unbind() const;
-	void Destroy() const;
-	unsigned int getID();
+	void Destroy();
+	unsigned int getID() const;
 	void SetBufferLayout(const BufferLayout& layout);
 private:
 	unsigned int ID = 0;

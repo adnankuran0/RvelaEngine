@@ -1,8 +1,10 @@
 #include "Viewport.h"
 #include <iostream>
 #include "ImGui/imgui.h"
+#include "ImGui/imgui_internal.h"
 #include "ImGui/ImGuizmo.h"
 #include "Core/Engine.h"
+#include "Core/Log.h"
 #include <glm/gtx/matrix_decompose.hpp>
 #include "Renderer/RenderLayer.h"
 #include "Renderer/DebugRenderer.h"
@@ -10,6 +12,8 @@
 #include "Renderer/EditorCamera.h"
 #include "EditorSettings.h"
 #include "EditorSelection.h"
+#include "EditorUtils.h"
+#include "Scene/Entity.h"
 
 using namespace rv;
 
@@ -662,6 +666,77 @@ void Viewport::Draw(Engine* engine)
             DrawOrientationGizmo(engine, displayPos, displaySize);
         }
         DrawOverlayStats(engine, displayPos, displaySize);
+
+        if (ImGui::BeginDragDropTargetCustom(ImGui::GetCurrentWindow()->Rect(), ImGui::GetID("ViewportDropTarget")))
+        {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
+            {
+                std::string pathStr((const char*)payload->Data);
+                if (!pathStr.ends_with(".rprefab"))
+                {
+                    std::filesystem::path p(pathStr);
+                    auto candidate = p;
+                    candidate.replace_extension(".rprefab");
+                    if (std::filesystem::exists(candidate))
+                        pathStr = candidate.string();
+                }
+
+                if (pathStr.ends_with(".rprefab"))
+                {
+                    AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
+                    if (uuid.IsValid())
+                    {
+                        glm::vec3 spawnPos(0.0f);
+                        if (auto* cam = engine->GetEditorCamera())
+                        {
+                            spawnPos = cam->Position + cam->Front * 5.0f;
+                            ImVec2 mousePos = ImGui::GetIO().MousePos;
+                            if (displaySize.x > 0.0f && displaySize.y > 0.0f)
+                            {
+                                float mouseX = mousePos.x - displayPos.x;
+                                float mouseY = mousePos.y - displayPos.y;
+                                if (mouseX >= 0.0f && mouseX <= displaySize.x && mouseY >= 0.0f && mouseY <= displaySize.y)
+                                {
+                                    float ndcX = (2.0f * mouseX) / displaySize.x - 1.0f;
+                                    float ndcY = 1.0f - (2.0f * mouseY) / displaySize.y;
+                                    glm::mat4 invVP = glm::inverse(cam->GetProjectionMatrix() * cam->GetViewMatrix());
+                                    glm::vec4 nearPoint = invVP * glm::vec4(ndcX, ndcY, -1.0f, 1.0f);
+                                    glm::vec4 farPoint = invVP * glm::vec4(ndcX, ndcY, 1.0f, 1.0f);
+                                    if (nearPoint.w != 0.0f && farPoint.w != 0.0f)
+                                    {
+                                        glm::vec3 rayOrigin = glm::vec3(nearPoint) / nearPoint.w;
+                                        glm::vec3 rayEnd = glm::vec3(farPoint) / farPoint.w;
+                                        glm::vec3 rayDir = glm::normalize(rayEnd - rayOrigin);
+                                        if (std::abs(rayDir.y) > 0.001f)
+                                        {
+                                            float t = -rayOrigin.y / rayDir.y;
+                                            if (t > 0.0f && t < 100.0f)
+                                                spawnPos = rayOrigin + rayDir * t;
+                                            else
+                                                spawnPos = rayOrigin + rayDir * 5.0f;
+                                        }
+                                        else
+                                        {
+                                            spawnPos = rayOrigin + rayDir * 5.0f;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        Entity inst = engine->GetActiveScene().Instantiate(uuid, spawnPos);
+                        if (inst.GetHandle() != entt::null)
+                        {
+                            EditorSelection::Get().Select(inst.GetHandle());
+                        }
+                    }
+                    else
+                    {
+                        LOG_WARN("[Viewport] Failed to read UUID from meta for: {}", pathStr);
+                    }
+                }
+            }
+            ImGui::EndDragDropTarget();
+        }
     }
     ImGui::End();
     ImGui::PopStyleVar();
