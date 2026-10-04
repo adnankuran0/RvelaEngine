@@ -8,6 +8,7 @@
 #include "Audio/AudioManager.h"
 #include "EditorSelection.h"
 #include "AssetImporters/PrefabImporter.h"
+#include "Scene/SceneSerializer.h"
 #include <algorithm>
 #include <array>
 #include <cstring>
@@ -263,6 +264,30 @@ void InspectorPanel::Draw(Engine* engine)
 			ImGui::TextDisabled("Source:");
 			ImGui::SameLine();
 			ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s", prefabName.c_str());
+
+			json overrides = SceneSerializer::ComputePrefabOverrides(scene, selectedEntity);
+			bool hasOverrides = overrides.is_array() && !overrides.empty();
+
+			ImGui::TextDisabled("Overrides:");
+			ImGui::SameLine();
+			if (hasOverrides)
+			{
+				ImGui::TextColored(ImVec4(1.0f, 0.75f, 0.2f, 1.0f), "%zu modified properties", overrides.size());
+				if (ImGui::TreeNode("View Overrides"))
+				{
+					for (const auto& op : overrides)
+					{
+						std::string path = op.value("path", "");
+						std::string opType = op.value("op", "");
+						ImGui::BulletText("[%s] %s", opType.c_str(), path.c_str());
+					}
+					ImGui::TreePop();
+				}
+			}
+			else
+			{
+				ImGui::TextColored(ImVec4(0.5f, 0.85f, 0.5f, 1.0f), "In Sync");
+			}
 
 			float btnWidth = (ImGui::GetContentRegionAvail().x - 16.0f) / 3.0f;
 			if (ImGui::Button("Apply", ImVec2(btnWidth, 24.0f)))

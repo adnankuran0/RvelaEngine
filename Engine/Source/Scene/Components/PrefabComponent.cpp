@@ -5,9 +5,25 @@ using namespace rv;
 
 json PrefabComponent::Serialize() const
 {
+    if (HasOverrides())
+    {
+        json j;
+        j["uuid"] = prefabUUID.ToString();
+        j["overrides"] = m_Overrides;
+        return j;
+    }
     return prefabUUID.ToString(); 
 }
 void PrefabComponent::Deserialize(const json& j)
 {
-    prefabUUID = AssetUUID::FromString(j.get<std::string>());
+    if (j.is_string())
+    {
+        prefabUUID = AssetUUID::FromString(j.get<std::string>());
+        m_Overrides = json::array();
+    }
+    else if (j.is_object())
+    {
+        prefabUUID = AssetUUID::FromString(j.value("uuid", ""));
+        m_Overrides = j.value("overrides", json::array());
+    }
 }

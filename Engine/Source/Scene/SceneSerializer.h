@@ -15,6 +15,8 @@ public:
     static void DeserializeEntityComponents(Scene& scene, entt::entity handle, const json& entityJson);
     static Entity CloneEntity(Scene& scene, entt::entity sourceHandle);
     static std::string GenerateUniqueName(Scene& scene, const std::string& baseName);
+    static json ComputePrefabOverrides(Scene& scene, entt::entity rootEntity);
+    static bool ApplyPrefabOverrides(Scene& scene, entt::entity rootEntity, const json& overrides);
 
 private:
     void SerializeHierarchyRecursively(Scene& scene, entt::entity current, json& outEntitiesArray, const std::unordered_set<entt::entity>& prefabChildren);

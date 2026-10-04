@@ -287,7 +287,7 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
     return Instantiate(prefabUUID, glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), entt::null);
 }
 
-Entity Scene::Instantiate(const AssetUUID& prefabUUID, const glm::vec3& position, const glm::quat& rotation, entt::entity parent)
+Entity Scene::Instantiate(const AssetUUID& prefabUUID, const glm::vec3& position, const glm::quat& rotation, entt::entity parent, const json& overrides)
 {
     Ref<PrefabAsset> prefab = AssetManager::Get().GetAsset<PrefabAsset>(prefabUUID);
     if (!prefab || !prefab->IsValid())
@@ -308,6 +308,15 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID, const glm::vec3& position
     {
         LOG_ERROR("[Scene::Instantiate] No Entities in prefab: {}", prefabUUID.ToString());
         return Entity{};
+    }
+
+    if (overrides.is_array() && !overrides.empty())
+    {
+        try {
+            prefabJson["Entities"] = prefabJson["Entities"].patch(overrides);
+        } catch (const json::exception& e) {
+            LOG_WARN("[Scene::Instantiate] Failed to patch prefab with overrides: {}", e.what());
+        }
     }
 
     std::unordered_map<EntityUUID, entt::entity> oldToNewEntity;
@@ -362,7 +371,11 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID, const glm::vec3& position
         tc.SetRotation(rotation);
         tc.SetDirty();
 
-        AddComponent<PrefabComponent>(rootEntity.GetHandle(), prefabUUID);
+        auto& pc = AddComponent<PrefabComponent>(rootEntity.GetHandle(), prefabUUID);
+        if (overrides.is_array() && !overrides.empty())
+        {
+            pc.SetOverrides(overrides);
+        }
     }
 
     m_TransformSystem.Update();

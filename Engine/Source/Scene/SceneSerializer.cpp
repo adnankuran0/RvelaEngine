@@ -2,6 +2,8 @@
 #include "SceneSerializer.h"
 #include "Entity.h"
 #include "Audio/AudioManager.h"
+#include "Asset/Types/PrefabAsset.h"
+#include "Asset/AssetManager.h"
 
 using namespace rv;
 
@@ -113,7 +115,19 @@ void SceneSerializer::LoadScene(Scene& scene, const std::string& path)
         if (entityJson.contains("Prefab"))
         {
             AssetUUID prefabUUID = AssetUUID::FromString(entityJson["Prefab"]);
-            Entity instance = scene.Instantiate(prefabUUID);
+            json overrides = entityJson.value("Overrides", json::array());
+
+            glm::vec3 pos(0.0f);
+            glm::quat rot(1.0f, 0.0f, 0.0f, 0.0f);
+            if (entityJson.contains("Transform"))
+            {
+                TransformComponent tempTC;
+                tempTC.Deserialize(entityJson["Transform"]);
+                pos = tempTC.GetPosition();
+                rot = tempTC.GetRotation();
+            }
+
+            Entity instance = scene.Instantiate(prefabUUID, pos, rot, entt::null, overrides);
 
             if (instance.GetHandle() != entt::null)
             {
@@ -197,6 +211,12 @@ json SceneSerializer::SerializeEntity(Scene& scene, entt::entity e, bool seriali
             j["ParentUUID"] = (parent != entt::null && parent != scene.GetRootEntity())
                 ? scene.GetComponent<UUIDComponent>(parent).uuid
                 : 0;
+        }
+
+        json diff = ComputePrefabOverrides(scene, e);
+        if (diff.is_array() && !diff.empty())
+        {
+            j["Overrides"] = diff;
         }
 
         return j;
@@ -546,4 +566,140 @@ void SceneSerializer::CollectChildrenRecursively(Scene& scene, entt::entity e, s
     if (scene.HasComponent<SceneTreeComponent>(e))
         for (auto child : scene.GetComponent<SceneTreeComponent>(e).children)
             CollectChildrenRecursively(scene, child, out);
+}
+
+json SceneSerializer::ComputePrefabOverrides(Scene& scene, entt::entity rootEntity)
+{
+    if (rootEntity == entt::null || !scene.GetRegistry().valid(rootEntity))
+        return json::array();
+
+    if (!scene.HasComponent<PrefabComponent>(rootEntity))
+        return json::array();
+
+    AssetUUID prefabUUID = scene.GetComponent<PrefabComponent>(rootEntity).GetPrefabID();
+    if (!prefabUUID.IsValid())
+        return json::array();
+
+    Ref<PrefabAsset> asset = AssetManager::Get().GetAsset<PrefabAsset>(prefabUUID);
+    if (!asset || !asset->IsValid())
+        return json::array();
+
+    json basePrefabJson;
+    try {
+        basePrefabJson = json::parse(asset->GetJSON());
+    } catch (...) {
+        return json::array();
+    }
+
+    if (!basePrefabJson.contains("Entities") || !basePrefabJson["Entities"].is_array() || basePrefabJson["Entities"].empty())
+        return json::array();
+
+    std::vector<entt::entity> hierarchy;
+    std::function<void(entt::entity)> collectDFS = [&](entt::entity curr) {
+        if (curr == entt::null || !scene.GetRegistry().valid(curr)) return;
+        hierarchy.push_back(curr);
+        if (scene.HasComponent<SceneTreeComponent>(curr))
+        {
+            for (auto child : scene.GetComponent<SceneTreeComponent>(curr).children)
+                collectDFS(child);
+        }
+    };
+    collectDFS(rootEntity);
+
+    json currentEntities = json::array();
+    for (size_t i = 0; i < hierarchy.size(); ++i)
+    {
+        json ej = SerializeEntity(scene, hierarchy[i], false);
+        if (i == 0) ej["_isRoot"] = true;
+        currentEntities.push_back(ej);
+    }
+
+    json baseEntities = basePrefabJson["Entities"];
+
+    auto cleanEntity = [](json& ent, bool isRoot) {
+        ent.erase("UUID");
+        ent.erase("ParentUUID");
+        ent.erase("_isRoot");
+        if (isRoot)
+        {
+            ent.erase("Transform");
+            ent.erase("Tag");
+        }
+        else if (ent.contains("Transform"))
+        {
+            ent["Transform"].erase("lockScaleRatio");
+        }
+    };
+
+    for (size_t i = 0; i < baseEntities.size(); ++i)
+        cleanEntity(baseEntities[i], i == 0);
+
+    for (size_t i = 0; i < currentEntities.size(); ++i)
+        cleanEntity(currentEntities[i], i == 0);
+
+    json diff;
+    try {
+        diff = json::diff(baseEntities, currentEntities);
+    } catch (...) {
+        return json::array();
+    }
+
+    if (!diff.is_array())
+        return json::array();
+
+    return diff;
+}
+
+bool SceneSerializer::ApplyPrefabOverrides(Scene& scene, entt::entity rootEntity, const json& overrides)
+{
+    if (overrides.empty() || !overrides.is_array())
+        return false;
+
+    if (rootEntity == entt::null || !scene.GetRegistry().valid(rootEntity))
+        return false;
+
+    if (!scene.HasComponent<PrefabComponent>(rootEntity))
+        return false;
+
+    AssetUUID prefabUUID = scene.GetComponent<PrefabComponent>(rootEntity).GetPrefabID();
+    if (!prefabUUID.IsValid())
+        return false;
+
+    glm::vec3 pos(0.0f);
+    glm::quat rot(1.0f, 0.0f, 0.0f, 0.0f);
+    glm::vec3 scale(1.0f);
+    if (scene.HasComponent<TransformComponent>(rootEntity))
+    {
+        auto& tc = scene.GetComponent<TransformComponent>(rootEntity);
+        pos = tc.GetPosition();
+        rot = tc.GetRotation();
+        scale = tc.GetScale();
+    }
+
+    entt::entity parentEntity = entt::null;
+    if (scene.HasComponent<SceneTreeComponent>(rootEntity))
+        parentEntity = scene.GetComponent<SceneTreeComponent>(rootEntity).parent;
+
+    std::string tag;
+    if (scene.HasComponent<TagComponent>(rootEntity))
+        tag = scene.GetComponent<TagComponent>(rootEntity).tag;
+
+    scene.DestroyEntity(rootEntity);
+
+    Entity newInst = scene.Instantiate(prefabUUID, pos, rot, parentEntity, overrides);
+    if (newInst.GetHandle() != entt::null)
+    {
+        if (scene.HasComponent<TransformComponent>(newInst.GetHandle()))
+        {
+            auto& tc = scene.GetComponent<TransformComponent>(newInst.GetHandle());
+            tc.SetScale(scale);
+            tc.SetDirty();
+        }
+        if (!tag.empty() && scene.HasComponent<TagComponent>(newInst.GetHandle()))
+        {
+            scene.GetComponent<TagComponent>(newInst.GetHandle()).tag = tag;
+        }
+        return true;
+    }
+    return false;
 }
