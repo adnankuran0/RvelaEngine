@@ -11,7 +11,7 @@ class Engine;
 class AnimatorPanel
 {
 public:
-    void Draw(Engine* engine, entt::entity& selectedEntity);
+    void Draw(Engine* engine);
 
 private:
     SequencerContext m_SeqContext;

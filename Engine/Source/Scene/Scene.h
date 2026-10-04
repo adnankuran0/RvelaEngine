@@ -115,9 +115,6 @@ public:
     entt::entity GetEntityByUUID(EntityUUID& uuid) { return m_EntityMap.at(uuid); }
     Entity GetEntityByName(const std::string& name);
 
-    void SetSelectedEntity(entt::entity selectedEntity) { this->selectedEntity = selectedEntity; }
-    entt::entity GetSelectedEntity() { return selectedEntity; }
-
     void MoveChildOrder(entt::entity source, entt::entity target, bool insertBefore);
     [[nodiscard]] inline std::vector<entt::entity> GetRootEntities() noexcept
     {
@@ -169,7 +166,6 @@ private:
     std::string m_SceneName;
     std::string m_ScenePath;
     std::unordered_map<EntityUUID, entt::entity> m_EntityMap;
-    entt::entity selectedEntity;
     entt::entity m_RootEntity;
     TransformSystem m_TransformSystem;
     CameraSystem m_CameraSystem;

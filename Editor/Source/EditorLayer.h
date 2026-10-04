@@ -64,9 +64,6 @@ private:
     RenderPassHandle m_SelectedEntityMaskPass;
     RenderPassHandle m_OutlinePass;
 
-    std::vector<entt::entity> m_SelectedEntities;
-
-    entt::entity m_SelectedEntity = entt::null;
     AssetImportPipeline m_AssetImportPipeline;
     EditorCamera m_EditorCamera;
     rv::Engine* m_Engine;

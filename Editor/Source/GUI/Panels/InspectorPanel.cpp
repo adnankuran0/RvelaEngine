@@ -6,6 +6,7 @@
 #include "EditorUtils.h"
 #include "AssetImporters/MaterialSerializer.h"
 #include "Audio/AudioManager.h"
+#include "EditorSelection.h"
 #include <algorithm>
 #include <array>
 #include <cstring>
@@ -203,8 +204,11 @@ static void DrawAddComponentEntry(const char* label, const char* searchFilter, e
 	}
 }
 
-void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity, const std::vector<entt::entity>& selectedEntities)
+void InspectorPanel::Draw(Engine* engine)
 {
+	entt::entity selectedEntity = EditorSelection::Get().GetPrimary();
+	const auto& selectedEntities = EditorSelection::Get().GetSelectedEntities();
+
 	Scene& scene = engine->GetActiveScene();
 	entt::registry& registry = scene.GetRegistry();
 

@@ -22,6 +22,7 @@
 #include <Event/WindowEvents.h>
 #include <Render/IconLibrary.h>
 #include "EditorSettings.h"
+#include "EditorSelection.h"
 
 using namespace rv;
 
@@ -88,19 +89,10 @@ void EditorLayer::OnUpdate()
             m_EditorCamera.Update();
 
     auto& reg = m_Engine->GetActiveScene().GetRegistry();
-    m_SelectedEntities.erase(
-        std::remove_if(m_SelectedEntities.begin(), m_SelectedEntities.end(),
-            [&reg](entt::entity e) { return e == entt::null || !reg.valid(e); }),
-        m_SelectedEntities.end()
-    );
-    if (m_SelectedEntity != entt::null && !reg.valid(m_SelectedEntity))
-    {
-        m_SelectedEntity = m_SelectedEntities.empty() ? entt::null : m_SelectedEntities.back();
-    }
-    m_Engine->GetActiveScene().SetSelectedEntity(m_SelectedEntity);
+    EditorSelection::Get().Validate(reg);
 
-    static_cast<SelectedEntityMaskPass*>(m_Engine->GetRenderLayer().GetRenderPass(m_SelectedEntityMaskPass))->SetSelectedEntities(m_SelectedEntities);
-    static_cast<OutlinePass*>(m_Engine->GetRenderLayer().GetRenderPass(m_OutlinePass))->SetHasSelection(!m_SelectedEntities.empty());
+    static_cast<SelectedEntityMaskPass*>(m_Engine->GetRenderLayer().GetRenderPass(m_SelectedEntityMaskPass))->SetSelectedEntities(EditorSelection::Get().GetSelectedEntities());
+    static_cast<OutlinePass*>(m_Engine->GetRenderLayer().GetRenderPass(m_OutlinePass))->SetHasSelection(!EditorSelection::Get().IsEmpty());
    
     HandleShortcuts();
 }
@@ -179,8 +171,7 @@ void EditorLayer::Render()
     bool projectSelected = m_ProjectSelectorPanel.Draw(m_Engine);
     if (projectSelected)
     {
-        m_SelectedEntity = entt::null;
-        m_SelectedEntities.clear();
+        EditorSelection::Get().Clear();
     }
 
     if (ProjectManager::IsProjectLoaded())
@@ -191,9 +182,9 @@ void EditorLayer::Render()
 
         m_Dockspace.Draw();
 
-        m_SceneHierarchyPanel.Draw(m_Engine, m_SelectedEntity, m_SelectedEntities);
+        m_SceneHierarchyPanel.Draw(m_Engine);
 
-        m_InspectorPanel.Draw(m_Engine, m_SelectedEntity, m_SelectedEntities);
+        m_InspectorPanel.Draw(m_Engine);
 
         m_EnvironmentPanel.Draw(m_Engine);
 
@@ -201,13 +192,13 @@ void EditorLayer::Render()
 
         m_MixerPanel.Draw();
 
-        m_AnimatorPanel.Draw(m_Engine, m_SelectedEntity);
+        m_AnimatorPanel.Draw(m_Engine);
 
         m_ConsolePanel.Draw();
 
         m_ProjectSettingsPanel.Draw(m_Engine);
 
-        m_Viewport.Draw(m_Engine, m_SelectedEntity, m_SelectedEntities);
+        m_Viewport.Draw(m_Engine);
     }
 
     ImGui::Render();
@@ -256,11 +247,13 @@ void EditorLayer::HandleShortcuts()
             }
             if (Input::IsKeyJustPressed(KeyCode::D))
             {
-                if (!m_SelectedEntities.empty())
+                if (!EditorSelection::Get().IsEmpty())
                 {
                     auto& scene = m_Engine->GetActiveScene();
                     auto& reg = scene.GetRegistry();
                     auto rootEntity = scene.GetRootEntity();
+                    const auto& selected = EditorSelection::Get().GetSelectedEntities();
+                    entt::entity primary = EditorSelection::Get().GetPrimary();
 
                     auto isDescendantOfAny = [&](entt::entity e, const std::vector<entt::entity>& entityList) -> bool {
                         entt::entity cur = e;
@@ -275,15 +268,15 @@ void EditorLayer::HandleShortcuts()
 
                     std::vector<entt::entity> newSelection;
                     entt::entity newPrimary = entt::null;
-                    for (auto e : m_SelectedEntities)
+                    for (auto e : selected)
                     {
-                        if (e != entt::null && reg.valid(e) && !isDescendantOfAny(e, m_SelectedEntities))
+                        if (e != entt::null && reg.valid(e) && !isDescendantOfAny(e, selected))
                         {
                             Entity duplicated = scene.DuplicateEntity(e);
                             if (duplicated.GetHandle() != entt::null)
                             {
                                 newSelection.push_back(duplicated.GetHandle());
-                                if (e == m_SelectedEntity)
+                                if (e == primary)
                                     newPrimary = duplicated.GetHandle();
                             }
                         }
@@ -291,9 +284,7 @@ void EditorLayer::HandleShortcuts()
 
                     if (!newSelection.empty())
                     {
-                        m_SelectedEntities = newSelection;
-                        m_SelectedEntity = (newPrimary != entt::null) ? newPrimary : newSelection.back();
-                        scene.SetSelectedEntity(m_SelectedEntity);
+                        EditorSelection::Get().SetSelection(newSelection, newPrimary);
                     }
                 }
             }
@@ -305,21 +296,19 @@ void EditorLayer::HandleShortcuts()
         {
             auto& scene = m_Engine->GetActiveScene();
             auto& reg = scene.GetRegistry();
-            for (auto e : m_SelectedEntities)
+            for (auto e : EditorSelection::Get().GetSelectedEntities())
             {
                 if (e != entt::null && reg.valid(e))
                 {
                     scene.QueueDestroyEntity(e);
                 }
             }
-            m_SelectedEntity = entt::null;
-            m_SelectedEntities.clear();
-            scene.SetSelectedEntity(entt::null);
+            EditorSelection::Get().Clear();
         }
 
         if (Input::IsKeyJustPressed(KeyCode::F))
         {
-            if (!m_SelectedEntities.empty())
+            if (!EditorSelection::Get().IsEmpty())
             {
                 auto& scene = m_Engine->GetActiveScene();
                 auto& reg = scene.GetRegistry();
@@ -327,7 +316,7 @@ void EditorLayer::HandleShortcuts()
                 glm::vec3 maxBound(-FLT_MAX);
                 bool hasBounds = false;
 
-                for (auto e : m_SelectedEntities)
+                for (auto e : EditorSelection::Get().GetSelectedEntities())
                 {
                     if (e != entt::null && reg.valid(e) && reg.any_of<TransformComponent>(e))
                     {
@@ -352,9 +341,7 @@ void EditorLayer::HandleShortcuts()
 
         if (Input::IsKeyJustPressed(KeyCode::Escape))
         {
-            m_SelectedEntity = entt::null;
-            m_SelectedEntities.clear();
-            m_Engine->GetActiveScene().SetSelectedEntity(entt::null);
+            EditorSelection::Get().Clear();
         }
     }
 }

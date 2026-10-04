@@ -14,6 +14,7 @@
 #include "Utils/ProjectManager.h"
 #include "AssetImporters/ModelImporter.h"
 #include "Utils/FileUtils.h"
+#include "EditorSelection.h"
 
 using namespace rv;
 
@@ -182,7 +183,7 @@ static Entity LoadPrimitive(Scene& scene, const std::string& primitiveMeshName)
     return root;
 }
 
-void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity, std::vector<entt::entity>& selectedEntities)
+void SceneHierarchyPanel::Draw(Engine* engine)
 {
     Scene& scene = engine->GetActiveScene();
     entt::entity rootEntity = scene.GetRootEntity();
@@ -204,10 +205,7 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity, std
     };
 
     auto selectSingle = [&](entt::entity e) {
-        selectedEntity = e;
-        if (e != entt::null) selectedEntities = { e };
-        else selectedEntities.clear();
-        scene.SetSelectedEntity(selectedEntity);
+        EditorSelection::Get().Select(e);
     };
 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.0f, 8.0f));
@@ -287,7 +285,7 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity, std
             if (!isRoot)
                 visibleOrder.push_back(entity);
 
-            bool isSelected = (!isRoot && std::find(selectedEntities.begin(), selectedEntities.end(), entity) != selectedEntities.end());
+            bool isSelected = (!isRoot && EditorSelection::Get().IsSelected(entity));
             if (isSelected)
                 flags |= ImGuiTreeNodeFlags_Selected;
 
@@ -298,7 +296,7 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity, std
             bool isActiveInHierarchy = scene.IsEntityActive(entity);
 
             int colorPushes = 0;
-            bool isPrimary = (isSelected && entity == selectedEntity && selectedEntities.size() > 1);
+            bool isPrimary = (isSelected && EditorSelection::Get().IsPrimary(entity) && EditorSelection::Get().GetCount() > 1);
 
             if (isPrimary)
             {
@@ -329,24 +327,14 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity, std
                 ImGuiIO& io = ImGui::GetIO();
                 if (io.KeyCtrl)
                 {
-                    auto it = std::find(selectedEntities.begin(), selectedEntities.end(), entity);
-                    if (it != selectedEntities.end())
-                    {
-                        selectedEntities.erase(it);
-                        if (selectedEntity == entity)
-                            selectedEntity = selectedEntities.empty() ? entt::null : selectedEntities.back();
-                    }
-                    else
-                    {
-                        selectedEntities.push_back(entity);
-                        selectedEntity = entity;
-                    }
+                    EditorSelection::Get().Toggle(entity);
                 }
                 else if (io.KeyShift)
                 {
-                    if (selectedEntity != entt::null && !selectedEntities.empty())
+                    entt::entity primary = EditorSelection::Get().GetPrimary();
+                    if (primary != entt::null && !EditorSelection::Get().IsEmpty())
                     {
-                        auto itA = std::find(visibleOrder.begin(), visibleOrder.end(), selectedEntity);
+                        auto itA = std::find(visibleOrder.begin(), visibleOrder.end(), primary);
                         auto itB = std::find(visibleOrder.begin(), visibleOrder.end(), entity);
                         if (itA != visibleOrder.end() && itB != visibleOrder.end())
                         {
@@ -354,47 +342,39 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity, std
                             size_t idxB = std::distance(visibleOrder.begin(), itB);
                             size_t start = std::min(idxA, idxB);
                             size_t end = std::max(idxA, idxB);
-                            selectedEntities.clear();
+                            std::vector<entt::entity> range;
                             for (size_t i = start; i <= end; ++i)
-                                selectedEntities.push_back(visibleOrder[i]);
-                            selectedEntity = entity;
+                                range.push_back(visibleOrder[i]);
+                            EditorSelection::Get().SelectRange(range, entity);
                         }
                         else
                         {
-                            selectedEntities = { entity };
-                            selectedEntity = entity;
+                            EditorSelection::Get().Select(entity);
                         }
                     }
                     else
                     {
-                        selectedEntities = { entity };
-                        selectedEntity = entity;
+                        EditorSelection::Get().Select(entity);
                     }
                 }
                 else
                 {
-                    selectedEntities = { entity };
-                    selectedEntity = entity;
+                    EditorSelection::Get().Select(entity);
                 }
-                scene.SetSelectedEntity(selectedEntity);
             }
             else if (!isRoot && ImGui::IsItemClicked(ImGuiMouseButton_Right))
             {
-                if (std::find(selectedEntities.begin(), selectedEntities.end(), entity) == selectedEntities.end())
+                if (!EditorSelection::Get().IsSelected(entity))
                 {
-                    selectedEntities = { entity };
-                    selectedEntity = entity;
-                    scene.SetSelectedEntity(selectedEntity);
+                    EditorSelection::Get().Select(entity);
                 }
             }
 
             if (!isRoot && ImGui::BeginPopupContextItem())
             {
-                if (std::find(selectedEntities.begin(), selectedEntities.end(), entity) == selectedEntities.end())
+                if (!EditorSelection::Get().IsSelected(entity))
                 {
-                    selectedEntities = { entity };
-                    selectedEntity = entity;
-                    scene.SetSelectedEntity(selectedEntity);
+                    EditorSelection::Get().Select(entity);
                 }
 
                 if (ImGui::MenuItem("Create Child Entity"))
@@ -435,37 +415,37 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity, std
 
                 if (ImGui::MenuItem("Detach from parent"))
                 {
-                    for (auto e : selectedEntities)
+                    for (auto e : EditorSelection::Get().GetSelectedEntities())
                     {
                         if (e != entt::null && registry.valid(e))
                             scene.RemoveParent(e);
                     }
                 }
 
-                if (selectedEntities.size() > 1)
+                if (EditorSelection::Get().GetCount() > 1)
                 {
                     if (ImGui::MenuItem("Duplicate Selected Entities", "Ctrl+D"))
                     {
+                        const auto& selected = EditorSelection::Get().GetSelectedEntities();
+                        entt::entity primary = EditorSelection::Get().GetPrimary();
                         std::vector<entt::entity> newSelection;
                         entt::entity newPrimary = entt::null;
-                        for (auto e : selectedEntities)
+                        for (auto e : selected)
                         {
-                            if (e != entt::null && registry.valid(e) && !isDescendantOfAny(e, selectedEntities))
+                            if (e != entt::null && registry.valid(e) && !isDescendantOfAny(e, selected))
                             {
                                 Entity duplicated = scene.DuplicateEntity(e);
                                 if (duplicated.GetHandle() != entt::null)
                                 {
                                     newSelection.push_back(duplicated.GetHandle());
-                                    if (e == selectedEntity)
+                                    if (e == primary)
                                         newPrimary = duplicated.GetHandle();
                                 }
                             }
                         }
                         if (!newSelection.empty())
                         {
-                            selectedEntities = newSelection;
-                            selectedEntity = (newPrimary != entt::null) ? newPrimary : newSelection.back();
-                            scene.SetSelectedEntity(selectedEntity);
+                            EditorSelection::Get().SetSelection(newSelection, newPrimary);
                         }
                     }
                 }
@@ -483,18 +463,16 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity, std
 
                 ImGui::Separator();
 
-                if (selectedEntities.size() > 1)
+                if (EditorSelection::Get().GetCount() > 1)
                 {
                     if (ImGui::MenuItem("Delete Selected Entities", "Del"))
                     {
-                        for (auto e : selectedEntities)
+                        for (auto e : EditorSelection::Get().GetSelectedEntities())
                         {
                             if (e != entt::null && registry.valid(e))
                                 scene.QueueDestroyEntity(e);
                         }
-                        selectedEntity = entt::null;
-                        selectedEntities.clear();
-                        scene.SetSelectedEntity(entt::null);
+                        EditorSelection::Get().Clear();
                     }
                 }
                 else
@@ -502,9 +480,7 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity, std
                     if (ImGui::MenuItem("Delete Entity", "Del"))
                     {
                         scene.QueueDestroyEntity(entity);
-                        selectedEntity = entt::null;
-                        selectedEntities.clear();
-                        scene.SetSelectedEntity(entt::null);
+                        EditorSelection::Get().Clear();
                     }
                 }
                 ImGui::EndPopup();
@@ -602,8 +578,8 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity, std
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY_DRAG"))
         {
             entt::entity dragged = *(entt::entity*)payload->Data;
-            bool draggedInSelection = (std::find(selectedEntities.begin(), selectedEntities.end(), dragged) != selectedEntities.end());
-            std::vector<entt::entity> toMove = (draggedInSelection && selectedEntities.size() > 1) ? selectedEntities : std::vector<entt::entity>{ dragged };
+            bool draggedInSelection = EditorSelection::Get().IsSelected(dragged);
+            std::vector<entt::entity> toMove = (draggedInSelection && EditorSelection::Get().GetCount() > 1) ? EditorSelection::Get().GetSelectedEntities() : std::vector<entt::entity>{ dragged };
             for (auto targetMove : toMove)
             {
                 if (targetMove != entt::null && registry.valid(targetMove) && !isDescendantOfAny(targetMove, toMove))
@@ -617,9 +593,7 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity, std
 
     if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowHovered() && !ImGui::IsAnyItemHovered())
     {
-        selectedEntity = entt::null;
-        selectedEntities.clear();
-        scene.SetSelectedEntity(entt::null);
+        EditorSelection::Get().Clear();
     }
 
     if (ImGui::BeginPopupContextWindow(nullptr, ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems))
@@ -703,7 +677,7 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity, std
             }
             if (ImGui::MenuItem("UI Text"))
             {
-                entt::entity parent = selectedEntity;
+                entt::entity parent = EditorSelection::Get().GetPrimary();
                 entt::entity text = scene.CreateEntity("UI Text");
                 scene.AddComponent<RectTransformComponent>(text);
                 scene.AddComponent<UITextComponent>(text);
@@ -715,7 +689,7 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity, std
             }
             if (ImGui::MenuItem("UI Button"))
             {
-                entt::entity parent = selectedEntity;
+                entt::entity parent = EditorSelection::Get().GetPrimary();
                 entt::entity button = scene.CreateEntity("UI Button");
                 scene.AddComponent<RectTransformComponent>(button);
                 scene.AddComponent<UIButtonComponent>(button);
@@ -727,7 +701,7 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity, std
             }
             if (ImGui::MenuItem("UI Image"))
             {
-                entt::entity parent = selectedEntity;
+                entt::entity parent = EditorSelection::Get().GetPrimary();
                 entt::entity img = scene.CreateEntity("UI Image");
                 scene.AddComponent<RectTransformComponent>(img);
                 scene.AddComponent<UIImageComponent>(img);
@@ -739,7 +713,7 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity, std
             }
             if (ImGui::MenuItem("UI Slider"))
             {
-                entt::entity parent = selectedEntity;
+                entt::entity parent = EditorSelection::Get().GetPrimary();
                 entt::entity slider = scene.CreateEntity("UI Slider");
                 scene.AddComponent<RectTransformComponent>(slider);
                 scene.AddComponent<UISliderComponent>(slider);
@@ -751,7 +725,7 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity, std
             }
             if (ImGui::MenuItem("UI Progress Bar"))
             {
-                entt::entity parent = selectedEntity;
+                entt::entity parent = EditorSelection::Get().GetPrimary();
                 entt::entity pbar = scene.CreateEntity("UI Progress Bar");
                 scene.AddComponent<RectTransformComponent>(pbar);
                 scene.AddComponent<UIProgressBarComponent>(pbar);
@@ -763,7 +737,7 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity, std
             }
             if (ImGui::MenuItem("UI Checkbox"))
             {
-                entt::entity parent = selectedEntity;
+                entt::entity parent = EditorSelection::Get().GetPrimary();
                 entt::entity cb = scene.CreateEntity("UI Checkbox");
                 scene.AddComponent<RectTransformComponent>(cb);
                 scene.AddComponent<UICheckboxComponent>(cb);

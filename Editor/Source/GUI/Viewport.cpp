@@ -9,6 +9,7 @@
 #include "Input/Input.h"
 #include "Renderer/EditorCamera.h"
 #include "EditorSettings.h"
+#include "EditorSelection.h"
 
 using namespace rv;
 
@@ -16,8 +17,11 @@ using namespace rv;
 #include <cmath>
 #include <glm/gtc/quaternion.hpp>
 
-void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySize, entt::entity selectedEntity, const std::vector<entt::entity>& selectedEntities)
+void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySize)
 {
+    entt::entity selectedEntity = EditorSelection::Get().GetPrimary();
+    const auto& selectedEntities = EditorSelection::Get().GetSelectedEntities();
+
     bool canDrawGizmo = selectedEntity != entt::null &&
         engine->GetActiveScene().GetRegistry().valid(selectedEntity) &&
         engine->GetActiveScene().GetRegistry().any_of<TransformComponent>(selectedEntity) &&
@@ -545,7 +549,7 @@ void Viewport::DrawOrientationGizmo(Engine* engine, ImVec2& displayPos, ImVec2& 
     }
 }
 
-void Viewport::HandleSelection(Engine* engine, ImVec2& displayPos, ImVec2& displaySize, entt::entity& selectedEntity, std::vector<entt::entity>& selectedEntities)
+void Viewport::HandleSelection(Engine* engine, ImVec2& displayPos, ImVec2& displaySize)
 {
     if (engine->GetActiveScene().GetState() != SceneState::EDIT) return;
 
@@ -588,41 +592,24 @@ void Viewport::HandleSelection(Engine* engine, ImVec2& displayPos, ImVec2& displ
             entt::entity entity = static_cast<entt::entity>(pickedID);
             if (isMultiModifier)
             {
-                auto it = std::find(selectedEntities.begin(), selectedEntities.end(), entity);
-                if (it != selectedEntities.end())
-                {
-                    selectedEntities.erase(it);
-                    if (selectedEntity == entity)
-                    {
-                        selectedEntity = selectedEntities.empty() ? entt::null : selectedEntities.back();
-                    }
-                }
-                else
-                {
-                    selectedEntities.push_back(entity);
-                    selectedEntity = entity;
-                }
+                EditorSelection::Get().Toggle(entity);
             }
             else
             {
-                selectedEntities = { entity };
-                selectedEntity = entity;
+                EditorSelection::Get().Select(entity);
             }
-            engine->GetActiveScene().SetSelectedEntity(selectedEntity);
         }
         else
         {
             if (!isMultiModifier)
             {
-                selectedEntities.clear();
-                selectedEntity = entt::null;
-                engine->GetActiveScene().SetSelectedEntity(entt::null);
+                EditorSelection::Get().Clear();
             }
         }
     }
 }
 
-void Viewport::Draw(Engine* engine, entt::entity& selectedEntity, std::vector<entt::entity>& selectedEntities)
+void Viewport::Draw(Engine* engine)
 {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
     ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
@@ -666,8 +653,8 @@ void Viewport::Draw(Engine* engine, entt::entity& selectedEntity, std::vector<en
             Input::SetViewportMousePos(glm::vec2(normX * 1920.0f, normY * 1080.0f));
         }
 
-        DrawGizmos(engine, displayPos, displaySize, selectedEntity, selectedEntities);
-        HandleSelection(engine, displayPos, displaySize, selectedEntity, selectedEntities);
+        DrawGizmos(engine, displayPos, displaySize);
+        HandleSelection(engine, displayPos, displaySize);
 
         if(engine->GetActiveScene().GetState() == SceneState::EDIT)
         {

@@ -8,6 +8,7 @@
 #include "Scene/Components.h"
 #include "Renderer/ShaderManager.h"
 #include "Render/IconLibrary.h"
+#include "EditorSelection.h"
 
 using namespace rv;
 
@@ -108,7 +109,7 @@ void GizmoPass::DrawEditorIconsVisual(const RenderContext& ctx, RenderFrame& fra
     glBindVertexArray(m_QuadVAO);
 
     auto& reg = ctx.scene->GetRegistry();
-    entt::entity selectedEntity = ctx.scene->GetSelectedEntity();
+    entt::entity selectedEntity = EditorSelection::Get().GetPrimary();
 
     for (auto e : reg.view<TransformComponent>())
     {
@@ -122,6 +123,8 @@ void GizmoPass::DrawEditorIconsVisual(const RenderContext& ctx, RenderFrame& fra
 
         if (e == selectedEntity)
             shader.setVec4("u_TintColor", glm::vec4(1.0f, 0.7f, 0.3f, 1.0f));
+        else if (EditorSelection::Get().IsSelected(e))
+            shader.setVec4("u_TintColor", glm::vec4(0.85f, 0.6f, 0.25f, 1.0f));
         else
             shader.setVec4("u_TintColor", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 

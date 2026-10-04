@@ -14,7 +14,7 @@ class AssetRegistry;
 class SceneHierarchyPanel
 {
 public:
-	void Draw(Engine* engine, entt::entity& selectedEntity, std::vector<entt::entity>& selectedEntities);
+	void Draw(Engine* engine);
 };
 
 }

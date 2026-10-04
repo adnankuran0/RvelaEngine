@@ -10,6 +10,7 @@
 #include "AssetImporters/AnimationLibrarySerializer.h"
 #include "Asset/AssetManager.h"
 #include "EditorUtils.h"
+#include "EditorSelection.h"
 #include <algorithm>
 #include <cmath>
 #include <map>
@@ -48,8 +49,10 @@ static std::vector<std::shared_ptr<Animation::IPropertyTrack>> GetVisiblePropert
     return visible;
 }
 
-void AnimatorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
+void AnimatorPanel::Draw(Engine* engine)
 {
+    entt::entity selectedEntity = EditorSelection::Get().GetPrimary();
+
     ImGui::Begin("Animator");
 
     if (m_SeqContext.lastSelectedEntity != selectedEntity) {

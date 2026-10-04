@@ -15,7 +15,7 @@ class Engine;
 class Viewport
 {
 public:
-	void Draw(Engine* engine, entt::entity& selectedEntity, std::vector<entt::entity>& selectedEntities);
+	void Draw(Engine* engine);
 
 	float GetSnapTranslate() const { return m_snapTranslate; }
 	void SetSnapTranslate(float v) { m_snapTranslate = v; }
@@ -29,11 +29,11 @@ public:
 	void SetGizmoMode(ImGuizmo::MODE m) { m_CurrentGizmoMode = m; }
 
 private:
-	void DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySize, entt::entity selectedEntity, const std::vector<entt::entity>& selectedEntities);
+	void DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySize);
 	void DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySize);
 	void DrawOverlayStats(Engine* engine, ImVec2& displayPos, ImVec2& displaySize);
 	void DrawOrientationGizmo(Engine* engine, ImVec2& displayPos, ImVec2& displaySize);
-	void HandleSelection(Engine* engine, ImVec2& displayPos, ImVec2& displaySize, entt::entity& selectedEntity, std::vector<entt::entity>& selectedEntities);
+	void HandleSelection(Engine* engine, ImVec2& displayPos, ImVec2& displaySize);
 
 private:
 	float m_snapTranslate = 1.0f;
