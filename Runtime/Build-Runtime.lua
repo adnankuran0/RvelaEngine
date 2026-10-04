@@ -71,6 +71,7 @@ project "RvelaRuntime"
        links { "Jolt" }
        optimize "On"
        symbols "On"
+       linkoptions { "/LTCG:incremental", "/NODEFAULTLIB:LIBCMT" }
        --postbuildcommands {
       --"{COPY} ../Vendor/Assimp/lib/assimp-vc143-mt.dll ../Binaries/" .. OutputDir .. "/%{prj.name}/"}
 
