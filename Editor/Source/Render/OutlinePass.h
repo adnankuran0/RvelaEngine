@@ -10,10 +10,11 @@ public:
     void Init(const RenderContext& ctx, RenderFrame& frame) override;
     void Execute(const RenderContext& ctx, RenderFrame& frame) override;
 
-    void SetSelectedEntity(entt::entity entity) { m_SelectedEntity = entity; }
+    void SetHasSelection(bool hasSelection) { m_HasSelection = hasSelection; }
+    void SetSelectedEntity(entt::entity entity) { m_HasSelection = (entity != entt::null); }
 private:
-    entt::entity m_SelectedEntity;
-    
+    bool m_HasSelection = false;
+    entt::entity m_SelectedEntity = entt::null;
 };
 
 }

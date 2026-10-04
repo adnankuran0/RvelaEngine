@@ -203,7 +203,7 @@ static void DrawAddComponentEntry(const char* label, const char* searchFilter, e
 	}
 }
 
-void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity)
+void InspectorPanel::Draw(Engine* engine, entt::entity& selectedEntity, const std::vector<entt::entity>& selectedEntities)
 {
 	Scene& scene = engine->GetActiveScene();
 	entt::registry& registry = scene.GetRegistry();

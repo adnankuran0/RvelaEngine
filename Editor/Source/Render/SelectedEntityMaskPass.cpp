@@ -36,7 +36,7 @@ void SelectedEntityMaskPass::Init(const RenderContext& ctx, RenderFrame& frame) 
 }
 
 void SelectedEntityMaskPass::Execute(const RenderContext& ctx, RenderFrame& frame) {
-    if (m_SelectedEntity == entt::null || ctx.scene->GetState() != SceneState::EDIT)
+    if (m_SelectedEntities.empty() || ctx.scene->GetState() != SceneState::EDIT)
         return;
 
     auto& opaqueCommands = frame.opaqueCommands;
@@ -91,7 +91,7 @@ void SelectedEntityMaskPass::Execute(const RenderContext& ctx, RenderFrame& fram
 
         auto RenderMaskList = [&](const auto& commands) {
             for (auto& command : commands) {
-                if (command.entityID != m_SelectedEntity)
+                if (std::find(m_SelectedEntities.begin(), m_SelectedEntities.end(), command.entityID) == m_SelectedEntities.end())
                     continue;
 
                 auto& material = command.material;
@@ -124,7 +124,7 @@ void SelectedEntityMaskPass::Execute(const RenderContext& ctx, RenderFrame& fram
 
         auto RenderSkeletalMaskList = [&](const auto& commands) {
             for (auto& command : commands) {
-                if (command.entityID != m_SelectedEntity)
+                if (std::find(m_SelectedEntities.begin(), m_SelectedEntities.end(), command.entityID) == m_SelectedEntities.end())
                     continue;
                 if (!command.mesh || command.mesh->indexCount == 0) continue;
 
@@ -157,9 +157,15 @@ void SelectedEntityMaskPass::Execute(const RenderContext& ctx, RenderFrame& fram
         RenderSkeletalMaskList(skeletalTransparentCommands);
     }
 
-    if (ctx.scene && m_SelectedEntity != entt::null && ctx.scene->HasComponent<RectTransformComponent>(m_SelectedEntity))
+    if (ctx.scene)
     {
-        ctx.scene->GetUISystem().RenderSelectionMask(ctx.scene, m_SelectedEntity, static_cast<float>(ctx.viewportWidth), static_cast<float>(ctx.viewportHeight));
+        for (auto entity : m_SelectedEntities)
+        {
+            if (entity != entt::null && ctx.scene->HasComponent<RectTransformComponent>(entity))
+            {
+                ctx.scene->GetUISystem().RenderSelectionMask(ctx.scene, entity, static_cast<float>(ctx.viewportWidth), static_cast<float>(ctx.viewportHeight));
+            }
+        }
     }
 
     glEnable(GL_CULL_FACE);

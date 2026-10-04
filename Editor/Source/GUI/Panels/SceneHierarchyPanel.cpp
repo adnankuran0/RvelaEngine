@@ -182,11 +182,33 @@ static Entity LoadPrimitive(Scene& scene, const std::string& primitiveMeshName)
     return root;
 }
 
-void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
+void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity, std::vector<entt::entity>& selectedEntities)
 {
     Scene& scene = engine->GetActiveScene();
     entt::entity rootEntity = scene.GetRootEntity();
     entt::registry& registry = scene.GetRegistry();
+
+    std::vector<entt::entity> visibleOrder;
+
+    auto isDescendantOfAny = [&](entt::entity e, const std::vector<entt::entity>& entityList) -> bool {
+        entt::entity cur = e;
+        while (cur != entt::null && registry.valid(cur) && scene.HasComponent<SceneTreeComponent>(cur)) {
+            entt::entity parent = scene.GetComponent<SceneTreeComponent>(cur).parent;
+            if (parent == entt::null || parent == rootEntity) break;
+            if (std::find(entityList.begin(), entityList.end(), parent) != entityList.end()) {
+                return true;
+            }
+            cur = parent;
+        }
+        return false;
+    };
+
+    auto selectSingle = [&](entt::entity e) {
+        selectedEntity = e;
+        if (e != entt::null) selectedEntities = { e };
+        else selectedEntities.clear();
+        scene.SetSelectedEntity(selectedEntity);
+    };
 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.0f, 8.0f));
     ImGui::Begin("Scene Hierarchy", nullptr, ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse);
@@ -262,7 +284,11 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                 flags |= ImGuiTreeNodeFlags_Leaf;
             }
 
-            if (!isRoot && entity == selectedEntity)
+            if (!isRoot)
+                visibleOrder.push_back(entity);
+
+            bool isSelected = (!isRoot && std::find(selectedEntities.begin(), selectedEntities.end(), entity) != selectedEntities.end());
+            if (isSelected)
                 flags |= ImGuiTreeNodeFlags_Selected;
 
             auto& tagComponent = scene.GetComponent<TagComponent>(entity);
@@ -272,7 +298,15 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
             bool isActiveInHierarchy = scene.IsEntityActive(entity);
 
             int colorPushes = 0;
-            if (!isActiveInHierarchy)
+            bool isPrimary = (isSelected && entity == selectedEntity && selectedEntities.size() > 1);
+
+            if (isPrimary)
+            {
+                ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.28f, 0.48f, 0.82f, 0.95f));
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.88f, 0.45f, 1.0f));
+                colorPushes += 2;
+            }
+            else if (!isActiveInHierarchy)
             {
                 ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.50f, 0.50f, 0.50f, 0.60f));
                 colorPushes++;
@@ -283,23 +317,91 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                 colorPushes++;
             }
 
-            bool nodeOpen = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tagComponent.tag.c_str());
+            std::string nodeTitle = tagComponent.tag;
+
+            bool nodeOpen = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", nodeTitle.c_str());
 
             if (colorPushes > 0)
                 ImGui::PopStyleColor(colorPushes);
 
-            if (!isRoot && (ImGui::IsItemClicked(ImGuiMouseButton_Left) || ImGui::IsItemClicked(ImGuiMouseButton_Right)))
-                selectedEntity = entity;
+            if (!isRoot && ImGui::IsItemClicked(ImGuiMouseButton_Left))
+            {
+                ImGuiIO& io = ImGui::GetIO();
+                if (io.KeyCtrl)
+                {
+                    auto it = std::find(selectedEntities.begin(), selectedEntities.end(), entity);
+                    if (it != selectedEntities.end())
+                    {
+                        selectedEntities.erase(it);
+                        if (selectedEntity == entity)
+                            selectedEntity = selectedEntities.empty() ? entt::null : selectedEntities.back();
+                    }
+                    else
+                    {
+                        selectedEntities.push_back(entity);
+                        selectedEntity = entity;
+                    }
+                }
+                else if (io.KeyShift)
+                {
+                    if (selectedEntity != entt::null && !selectedEntities.empty())
+                    {
+                        auto itA = std::find(visibleOrder.begin(), visibleOrder.end(), selectedEntity);
+                        auto itB = std::find(visibleOrder.begin(), visibleOrder.end(), entity);
+                        if (itA != visibleOrder.end() && itB != visibleOrder.end())
+                        {
+                            size_t idxA = std::distance(visibleOrder.begin(), itA);
+                            size_t idxB = std::distance(visibleOrder.begin(), itB);
+                            size_t start = std::min(idxA, idxB);
+                            size_t end = std::max(idxA, idxB);
+                            selectedEntities.clear();
+                            for (size_t i = start; i <= end; ++i)
+                                selectedEntities.push_back(visibleOrder[i]);
+                            selectedEntity = entity;
+                        }
+                        else
+                        {
+                            selectedEntities = { entity };
+                            selectedEntity = entity;
+                        }
+                    }
+                    else
+                    {
+                        selectedEntities = { entity };
+                        selectedEntity = entity;
+                    }
+                }
+                else
+                {
+                    selectedEntities = { entity };
+                    selectedEntity = entity;
+                }
+                scene.SetSelectedEntity(selectedEntity);
+            }
+            else if (!isRoot && ImGui::IsItemClicked(ImGuiMouseButton_Right))
+            {
+                if (std::find(selectedEntities.begin(), selectedEntities.end(), entity) == selectedEntities.end())
+                {
+                    selectedEntities = { entity };
+                    selectedEntity = entity;
+                    scene.SetSelectedEntity(selectedEntity);
+                }
+            }
 
             if (!isRoot && ImGui::BeginPopupContextItem())
             {
-                selectedEntity = entity;
+                if (std::find(selectedEntities.begin(), selectedEntities.end(), entity) == selectedEntities.end())
+                {
+                    selectedEntities = { entity };
+                    selectedEntity = entity;
+                    scene.SetSelectedEntity(selectedEntity);
+                }
 
                 if (ImGui::MenuItem("Create Child Entity"))
                 {
                     entt::entity child = scene.CreateEntity("New Entity");
                     scene.SetParent(child, entity);
-                    selectedEntity = child;
+                    selectSingle(child);
                 }
 
                 if (ImGui::MenuItem("Save as prefab"))
@@ -312,7 +414,7 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                         AssetRegistry& reg = AssetManager::Get().GetRegistry();
                         AssetMeta meta = reg.GetOrCreateMeta(prefabPath);
 
-                        Ref<PrefabAsset> prefab = PrefabImporter::CreatePrefabAsset(prefabPath, meta.uuid, scene, selectedEntity);
+                        Ref<PrefabAsset> prefab = PrefabImporter::CreatePrefabAsset(prefabPath, meta.uuid, scene, entity);
                         if (prefab)
                         {
                             meta.importerID = "PrefabImporter";
@@ -323,35 +425,87 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
                     }
                 }
 
-                if (scene.HasComponent<PrefabComponent>(selectedEntity))
+                if (scene.HasComponent<PrefabComponent>(entity))
                 {
                     if (ImGui::MenuItem("Make local"))
                     {
-                        scene.RemoveComponent<PrefabComponent>(selectedEntity);
+                        scene.RemoveComponent<PrefabComponent>(entity);
                     }
                 }
 
                 if (ImGui::MenuItem("Detach from parent"))
                 {
-                    scene.RemoveParent(selectedEntity);
+                    for (auto e : selectedEntities)
+                    {
+                        if (e != entt::null && registry.valid(e))
+                            scene.RemoveParent(e);
+                    }
                 }
 
-                if (ImGui::MenuItem("Duplicate Entity", "Ctrl+D"))
+                if (selectedEntities.size() > 1)
                 {
-                    Entity duplicated = scene.DuplicateEntity(entity);
-                    if (duplicated.GetHandle() != entt::null)
+                    if (ImGui::MenuItem("Duplicate Selected Entities", "Ctrl+D"))
                     {
-                        selectedEntity = duplicated.GetHandle();
+                        std::vector<entt::entity> newSelection;
+                        entt::entity newPrimary = entt::null;
+                        for (auto e : selectedEntities)
+                        {
+                            if (e != entt::null && registry.valid(e) && !isDescendantOfAny(e, selectedEntities))
+                            {
+                                Entity duplicated = scene.DuplicateEntity(e);
+                                if (duplicated.GetHandle() != entt::null)
+                                {
+                                    newSelection.push_back(duplicated.GetHandle());
+                                    if (e == selectedEntity)
+                                        newPrimary = duplicated.GetHandle();
+                                }
+                            }
+                        }
+                        if (!newSelection.empty())
+                        {
+                            selectedEntities = newSelection;
+                            selectedEntity = (newPrimary != entt::null) ? newPrimary : newSelection.back();
+                            scene.SetSelectedEntity(selectedEntity);
+                        }
+                    }
+                }
+                else
+                {
+                    if (ImGui::MenuItem("Duplicate Entity", "Ctrl+D"))
+                    {
+                        Entity duplicated = scene.DuplicateEntity(entity);
+                        if (duplicated.GetHandle() != entt::null)
+                        {
+                            selectSingle(duplicated.GetHandle());
+                        }
                     }
                 }
 
                 ImGui::Separator();
 
-                if (ImGui::MenuItem("Delete Entity", "Del"))
+                if (selectedEntities.size() > 1)
                 {
-                    scene.QueueDestroyEntity(entity);
-                    if (selectedEntity == entity)
+                    if (ImGui::MenuItem("Delete Selected Entities", "Del"))
+                    {
+                        for (auto e : selectedEntities)
+                        {
+                            if (e != entt::null && registry.valid(e))
+                                scene.QueueDestroyEntity(e);
+                        }
                         selectedEntity = entt::null;
+                        selectedEntities.clear();
+                        scene.SetSelectedEntity(entt::null);
+                    }
+                }
+                else
+                {
+                    if (ImGui::MenuItem("Delete Entity", "Del"))
+                    {
+                        scene.QueueDestroyEntity(entity);
+                        selectedEntity = entt::null;
+                        selectedEntities.clear();
+                        scene.SetSelectedEntity(entt::null);
+                    }
                 }
                 ImGui::EndPopup();
             }
@@ -448,28 +602,38 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY_DRAG"))
         {
             entt::entity dragged = *(entt::entity*)payload->Data;
-            if (dragged != entt::null && registry.valid(dragged))
+            bool draggedInSelection = (std::find(selectedEntities.begin(), selectedEntities.end(), dragged) != selectedEntities.end());
+            std::vector<entt::entity> toMove = (draggedInSelection && selectedEntities.size() > 1) ? selectedEntities : std::vector<entt::entity>{ dragged };
+            for (auto targetMove : toMove)
             {
-                scene.SetParent(dragged, rootEntity);
+                if (targetMove != entt::null && registry.valid(targetMove) && !isDescendantOfAny(targetMove, toMove))
+                {
+                    scene.SetParent(targetMove, rootEntity);
+                }
             }
         }
         ImGui::EndDragDropTarget();
     }
 
     if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowHovered() && !ImGui::IsAnyItemHovered())
+    {
         selectedEntity = entt::null;
+        selectedEntities.clear();
+        scene.SetSelectedEntity(entt::null);
+    }
 
     if (ImGui::BeginPopupContextWindow(nullptr, ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems))
     {
         if (ImGui::MenuItem("Create Entity"))
         {
-            selectedEntity = scene.CreateEntity("New Entity");
+            selectSingle(scene.CreateEntity("New Entity"));
         }
 
         if (ImGui::MenuItem("Camera"))
         {
-            selectedEntity = scene.CreateEntity("Camera");
-            scene.AddComponent<CameraComponent>(selectedEntity);
+            entt::entity cam = scene.CreateEntity("Camera");
+            scene.AddComponent<CameraComponent>(cam);
+            selectSingle(cam);
         }
 
         if (ImGui::MenuItem("Particle Emitter"))
@@ -484,28 +648,29 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
 
                 emitterEntity.GetComponent<TagComponent>().tag = "Particle Emitter";
                 emitterEntity.AddComponent<ParticleEmitterComponent>();
-                selectedEntity = emitterEntity ? emitterEntity.GetHandle() : entt::null;
+                selectSingle(emitterEntity ? emitterEntity.GetHandle() : entt::null);
             }
         }
 
 
         if (ImGui::MenuItem("Audio Emitter"))
         {
-            selectedEntity = scene.CreateEntity("AudioEmitter");
-            scene.AddComponent<AudioEmitterComponent>(selectedEntity);
+            entt::entity audio = scene.CreateEntity("AudioEmitter");
+            scene.AddComponent<AudioEmitterComponent>(audio);
+            selectSingle(audio);
         }
 
         if (ImGui::BeginMenu("Primitives"))
         {
-            if (ImGui::MenuItem("Cube")) selectedEntity = LoadPrimitive(scene, "Cube");
-            if (ImGui::MenuItem("Sphere")) selectedEntity = LoadPrimitive(scene, "Sphere");
-            if (ImGui::MenuItem("Cylinder")) selectedEntity = LoadPrimitive(scene, "Cylinder");
-            if (ImGui::MenuItem("Quad")) selectedEntity = LoadPrimitive(scene, "Quad");
-            if (ImGui::MenuItem("Cone")) selectedEntity = LoadPrimitive(scene, "Cone");
-            if (ImGui::MenuItem("Capsule")) selectedEntity = LoadPrimitive(scene, "Capsule");
-            if (ImGui::MenuItem("Torus")) selectedEntity = LoadPrimitive(scene, "Torus");
-            if (ImGui::MenuItem("Plane")) selectedEntity = LoadPrimitive(scene, "Plane");
-            if (ImGui::MenuItem("Monkey")) selectedEntity = LoadPrimitive(scene, "Monkey");
+            if (ImGui::MenuItem("Cube")) selectSingle(LoadPrimitive(scene, "Cube"));
+            if (ImGui::MenuItem("Sphere")) selectSingle(LoadPrimitive(scene, "Sphere"));
+            if (ImGui::MenuItem("Cylinder")) selectSingle(LoadPrimitive(scene, "Cylinder"));
+            if (ImGui::MenuItem("Quad")) selectSingle(LoadPrimitive(scene, "Quad"));
+            if (ImGui::MenuItem("Cone")) selectSingle(LoadPrimitive(scene, "Cone"));
+            if (ImGui::MenuItem("Capsule")) selectSingle(LoadPrimitive(scene, "Capsule"));
+            if (ImGui::MenuItem("Torus")) selectSingle(LoadPrimitive(scene, "Torus"));
+            if (ImGui::MenuItem("Plane")) selectSingle(LoadPrimitive(scene, "Plane"));
+            if (ImGui::MenuItem("Monkey")) selectSingle(LoadPrimitive(scene, "Monkey"));
             ImGui::EndMenu();
         }
 
@@ -513,14 +678,16 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
         {
             if (ImGui::MenuItem("Directional Light"))
             {
-                selectedEntity = scene.CreateEntity("DirectionalLight");
-                scene.GetComponent<TransformComponent>(selectedEntity).SetEulerRotation(glm::vec3(-60.0f, -90.0f, 0.0f));
-                scene.AddComponent<DirectionalLightComponent>(selectedEntity);
+                entt::entity light = scene.CreateEntity("DirectionalLight");
+                scene.GetComponent<TransformComponent>(light).SetEulerRotation(glm::vec3(-60.0f, -90.0f, 0.0f));
+                scene.AddComponent<DirectionalLightComponent>(light);
+                selectSingle(light);
             }
             if (ImGui::MenuItem("Point Light"))
             {
-                selectedEntity = scene.CreateEntity("PointLight");
-                scene.AddComponent<PointLightComponent>(selectedEntity);
+                entt::entity light = scene.CreateEntity("PointLight");
+                scene.AddComponent<PointLightComponent>(light);
+                selectSingle(light);
             }
             ImGui::EndMenu();
         }
@@ -529,75 +696,82 @@ void SceneHierarchyPanel::Draw(Engine* engine, entt::entity& selectedEntity)
         {
             if (ImGui::MenuItem("UI Canvas"))
             {
-                selectedEntity = scene.CreateEntity("Canvas");
-                scene.AddComponent<UICanvasComponent>(selectedEntity);
-                scene.AddComponent<RectTransformComponent>(selectedEntity);
+                entt::entity canvas = scene.CreateEntity("Canvas");
+                scene.AddComponent<UICanvasComponent>(canvas);
+                scene.AddComponent<RectTransformComponent>(canvas);
+                selectSingle(canvas);
             }
             if (ImGui::MenuItem("UI Text"))
             {
                 entt::entity parent = selectedEntity;
-                selectedEntity = scene.CreateEntity("UI Text");
-                scene.AddComponent<RectTransformComponent>(selectedEntity);
-                scene.AddComponent<UITextComponent>(selectedEntity);
+                entt::entity text = scene.CreateEntity("UI Text");
+                scene.AddComponent<RectTransformComponent>(text);
+                scene.AddComponent<UITextComponent>(text);
                 if (registry.valid(parent) && parent != rootEntity)
                 {
-                    scene.SetParent(selectedEntity, parent);
+                    scene.SetParent(text, parent);
                 }
+                selectSingle(text);
             }
             if (ImGui::MenuItem("UI Button"))
             {
                 entt::entity parent = selectedEntity;
-                selectedEntity = scene.CreateEntity("UI Button");
-                scene.AddComponent<RectTransformComponent>(selectedEntity);
-                scene.AddComponent<UIButtonComponent>(selectedEntity);
+                entt::entity button = scene.CreateEntity("UI Button");
+                scene.AddComponent<RectTransformComponent>(button);
+                scene.AddComponent<UIButtonComponent>(button);
                 if (registry.valid(parent) && parent != rootEntity)
                 {
-                    scene.SetParent(selectedEntity, parent);
+                    scene.SetParent(button, parent);
                 }
+                selectSingle(button);
             }
             if (ImGui::MenuItem("UI Image"))
             {
                 entt::entity parent = selectedEntity;
-                selectedEntity = scene.CreateEntity("UI Image");
-                scene.AddComponent<RectTransformComponent>(selectedEntity);
-                scene.AddComponent<UIImageComponent>(selectedEntity);
+                entt::entity img = scene.CreateEntity("UI Image");
+                scene.AddComponent<RectTransformComponent>(img);
+                scene.AddComponent<UIImageComponent>(img);
                 if (registry.valid(parent) && parent != rootEntity)
                 {
-                    scene.SetParent(selectedEntity, parent);
+                    scene.SetParent(img, parent);
                 }
+                selectSingle(img);
             }
             if (ImGui::MenuItem("UI Slider"))
             {
                 entt::entity parent = selectedEntity;
-                selectedEntity = scene.CreateEntity("UI Slider");
-                scene.AddComponent<RectTransformComponent>(selectedEntity);
-                scene.AddComponent<UISliderComponent>(selectedEntity);
+                entt::entity slider = scene.CreateEntity("UI Slider");
+                scene.AddComponent<RectTransformComponent>(slider);
+                scene.AddComponent<UISliderComponent>(slider);
                 if (registry.valid(parent) && parent != rootEntity)
                 {
-                    scene.SetParent(selectedEntity, parent);
+                    scene.SetParent(slider, parent);
                 }
+                selectSingle(slider);
             }
             if (ImGui::MenuItem("UI Progress Bar"))
             {
                 entt::entity parent = selectedEntity;
-                selectedEntity = scene.CreateEntity("UI Progress Bar");
-                scene.AddComponent<RectTransformComponent>(selectedEntity);
-                scene.AddComponent<UIProgressBarComponent>(selectedEntity);
+                entt::entity pbar = scene.CreateEntity("UI Progress Bar");
+                scene.AddComponent<RectTransformComponent>(pbar);
+                scene.AddComponent<UIProgressBarComponent>(pbar);
                 if (registry.valid(parent) && parent != rootEntity)
                 {
-                    scene.SetParent(selectedEntity, parent);
+                    scene.SetParent(pbar, parent);
                 }
+                selectSingle(pbar);
             }
             if (ImGui::MenuItem("UI Checkbox"))
             {
                 entt::entity parent = selectedEntity;
-                selectedEntity = scene.CreateEntity("UI Checkbox");
-                scene.AddComponent<RectTransformComponent>(selectedEntity);
-                scene.AddComponent<UICheckboxComponent>(selectedEntity);
+                entt::entity cb = scene.CreateEntity("UI Checkbox");
+                scene.AddComponent<RectTransformComponent>(cb);
+                scene.AddComponent<UICheckboxComponent>(cb);
                 if (registry.valid(parent) && parent != rootEntity)
                 {
-                    scene.SetParent(selectedEntity, parent);
+                    scene.SetParent(cb, parent);
                 }
+                selectSingle(cb);
             }
             ImGui::EndMenu();
             ImGui::EndMenu();

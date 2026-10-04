@@ -1,0 +1,22 @@
+{
+    "camera": {
+        "farClip": 1000.0,
+        "fov": 75.0,
+        "mouseSensitivity": 0.07500000298023224,
+        "movementSpeed": 3.0,
+        "nearClip": 0.10000000149011612,
+        "orthoSize": 10.0,
+        "positionSmoothness": 25.0,
+        "projection": 0,
+        "sprintSpeed": 5.0
+    },
+    "viewport": {
+        "drawBoundingBoxes": false,
+        "drawColliders": false,
+        "enableSnap": false,
+        "gizmoMode": 0,
+        "snapRotate": 15.0,
+        "snapScale": 0.5,
+        "snapTranslate": 1.0
+    }
+}

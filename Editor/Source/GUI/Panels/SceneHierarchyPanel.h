@@ -4,6 +4,8 @@
 #include <unordered_map>
 
 
+#include <vector>
+
 namespace rv { 
 
 class Engine;
@@ -12,7 +14,7 @@ class AssetRegistry;
 class SceneHierarchyPanel
 {
 public:
-	void Draw(Engine* engine, entt::entity& selectedEntity);
+	void Draw(Engine* engine, entt::entity& selectedEntity, std::vector<entt::entity>& selectedEntities);
 };
 
 }

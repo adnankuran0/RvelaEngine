@@ -48,15 +48,17 @@ void SkyboxPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         auto& camera = ctx.camera;
         if (camera->ProjectionType == Camera::Projection::Orthographic)
         {
-            float aspect = float(camera->width) / float(camera->height);
-            proj = glm::perspective(glm::radians(camera->FOV), aspect, camera->NearClip, camera->FarClip);
+            float aspect = (camera->height > 0) ? (float(camera->width) / float(camera->height)) : 1.0f;
+            float fov = (camera->FOV > 0.0f) ? camera->FOV : 60.0f;
+            float nearP = (camera->NearClip > 0.001f) ? camera->NearClip : 0.1f;
+            proj = glm::perspective(glm::radians(fov), aspect, nearP, camera->FarClip);
         }
         else
         {
             proj = camera->GetProjectionMatrix();
         }
        
-        skybox.Render(ctx.camera->GetProjectionMatrix(), ctx.camera->GetViewMatrix(), screenFBO);
+        skybox.Render(proj, ctx.camera->GetViewMatrix(), screenFBO);
     }
     
     frame.registry.Register("SkyboxTexture", { RenderResourceType::Texture, skybox.GetEnvironmentMap() });

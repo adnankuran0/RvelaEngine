@@ -1,4 +1,4 @@
-﻿#include "rvelapch.h"
+#include "rvelapch.h"
 #include "OutlinePass.h"
 #include "Scene/Scene.h"
 #include "Scene/Components.h"
@@ -12,7 +12,7 @@ void OutlinePass::Init(const RenderContext& ctx, RenderFrame& frame)
 }
 
 void OutlinePass::Execute(const RenderContext& ctx, RenderFrame& frame) {
-    if (m_SelectedEntity == entt::null || ctx.scene->GetState() != SceneState::EDIT)
+    if (!m_HasSelection || ctx.scene->GetState() != SceneState::EDIT)
         return;
 
     auto* maskRes = frame.registry.Get("SelectedEntityMask");

@@ -46,6 +46,24 @@ void EditorCamera::Focus(const glm::vec3& focusPoint, float distance)
     Position = targetPosition;
 }
 
+void EditorCamera::SetDirection(const glm::vec3& direction, const glm::vec3* focusPoint)
+{
+    if (glm::length(direction) < 0.0001f) return;
+    glm::vec3 normDir = glm::normalize(direction);
+
+    if (focusPoint)
+    {
+        float dist = glm::length(Position - *focusPoint);
+        if (dist < 0.1f) dist = 5.0f;
+        targetPosition = *focusPoint - normDir * dist;
+        Position = targetPosition;
+    }
+
+    Pitch = glm::degrees(asin(std::clamp(normDir.y, -0.999f, 0.999f)));
+    Yaw = glm::degrees(atan2(normDir.z, normDir.x));
+    UpdateCameraVectors();
+}
+
 void EditorCamera::ProcessKeyboard()
 {
     float dt = Time::GetDeltaTime();
@@ -98,6 +116,21 @@ void EditorCamera::OnMouseMoved(double xPosIn, double yPosIn, GLFWwindow* window
     lastY = ypos;
 
     ProcessMouseMovement(xoffset, yoffset);
+}
+
+void EditorCamera::ProcessMouseScroll(float yoffset)
+{
+    if (ProjectionType == Projection::Orthographic)
+    {
+        OrthoSize -= yoffset * 0.5f;
+        if (OrthoSize < 0.1f) OrthoSize = 0.1f;
+        if (OrthoSize > 500.0f) OrthoSize = 500.0f;
+    }
+    else
+    {
+        MovementSpeed += yoffset;
+        MovementSpeed = std::clamp(MovementSpeed, 1.0f, 100.0f);
+    }
 }
 
 

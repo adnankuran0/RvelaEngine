@@ -200,11 +200,12 @@ void Skybox::Render(const glm::mat4& projection, const glm::mat4& view, GLuint s
     glDisable(GL_CULL_FACE);
 
     shader.use();
-    glm::mat4 viewNoTranslation = glm::mat4(glm::mat3(view));
+    shader.setMat4("u_Projection", projection);
+    shader.setMat4("u_View", view);
 
-    glActiveTexture(GL_TEXTURE3);
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
-    shader.setInt("skybox", 3);
+    shader.setInt("skybox", 0);
 
     glBindVertexArray(skyboxVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
