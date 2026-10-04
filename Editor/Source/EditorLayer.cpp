@@ -11,6 +11,7 @@
 #include <Render/GizmoPass.h>
 #include "Input/Input.h"
 #include "EditorUtils.h"
+#include "Scene/Components/TransformComponent.h"
 #include "AssetImporters/PrefabImporter.h"
 #include "AssetImporters/ModelImporter.h"
 #include "AssetImporters/TextureImporter.h"
@@ -207,43 +208,80 @@ void EditorLayer::Render()
 
 void EditorLayer::HandleShortcuts()
 {
-    if (Input::IsKeyPressed(KeyCode::LeftControl) || Input::IsKeyPressed(KeyCode::RightControl))
+    if (ImGui::GetIO().WantTextInput)
+        return;
+
+    bool isCtrl = Input::IsKeyPressed(KeyCode::LeftControl) || Input::IsKeyPressed(KeyCode::RightControl);
+    bool isShift = Input::IsKeyPressed(KeyCode::LeftShift) || Input::IsKeyPressed(KeyCode::RightShift);
+
+    if (isCtrl)
     {
-        if (Input::IsKeyJustPressed(KeyCode::S))
-        {
-            EditorUtils::SaveScene(*m_Engine);
-            m_Engine->GetProjectManager().SaveActiveProject();
-        }
-        if (Input::IsKeyJustPressed(KeyCode::O))
-        {
-            EditorUtils::OpenScene(*m_Engine);
-        }
-        if (Input::IsKeyJustPressed(KeyCode::N))
-        {
-            EditorUtils::CreateScene(*m_Engine);
-        }
-
-        if (Input::IsKeyJustPressed(KeyCode::D))
-        {
-            if (m_SelectedEntity != entt::null && m_Engine->GetActiveScene().GetRegistry().valid(m_SelectedEntity))
-            {
-                Entity duplicated = m_Engine->GetActiveScene().DuplicateEntity(m_SelectedEntity);
-                if (duplicated.GetHandle() != entt::null)
-                {
-                    m_SelectedEntity = duplicated.GetHandle();
-                    m_SelectedEntities = { m_SelectedEntity };
-                }
-            }
-        }
-
-        // Ctrl + Shift 
-        if (Input::IsKeyPressed(KeyCode::LeftShift) || Input::IsKeyPressed(KeyCode::RightShift))
+        if (isShift)
         {
             if (Input::IsKeyJustPressed(KeyCode::S))
             {
                 EditorUtils::SaveSceneAs(*m_Engine);
             }
         }
+        else
+        {
+            if (Input::IsKeyJustPressed(KeyCode::S))
+            {
+                EditorUtils::SaveScene(*m_Engine);
+                m_Engine->GetProjectManager().SaveActiveProject();
+            }
+            if (Input::IsKeyJustPressed(KeyCode::O))
+            {
+                EditorUtils::OpenScene(*m_Engine);
+            }
+            if (Input::IsKeyJustPressed(KeyCode::N))
+            {
+                EditorUtils::CreateScene(*m_Engine);
+            }
+            if (Input::IsKeyJustPressed(KeyCode::D))
+            {
+                if (m_SelectedEntity != entt::null && m_Engine->GetActiveScene().GetRegistry().valid(m_SelectedEntity))
+                {
+                    Entity duplicated = m_Engine->GetActiveScene().DuplicateEntity(m_SelectedEntity);
+                    if (duplicated.GetHandle() != entt::null)
+                    {
+                        m_SelectedEntity = duplicated.GetHandle();
+                        m_SelectedEntities = { m_SelectedEntity };
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        if (Input::IsKeyJustPressed(KeyCode::Delete))
+        {
+            if (m_SelectedEntity != entt::null && m_Engine->GetActiveScene().GetRegistry().valid(m_SelectedEntity))
+            {
+                m_Engine->GetActiveScene().QueueDestroyEntity(m_SelectedEntity);
+                m_SelectedEntity = entt::null;
+                m_SelectedEntities.clear();
+            }
+        }
 
+        if (Input::IsKeyJustPressed(KeyCode::F))
+        {
+            if (m_SelectedEntity != entt::null && m_Engine->GetActiveScene().GetRegistry().valid(m_SelectedEntity))
+            {
+                if (m_Engine->GetActiveScene().GetRegistry().any_of<TransformComponent>(m_SelectedEntity))
+                {
+                    auto& tc = m_Engine->GetActiveScene().GetRegistry().get<TransformComponent>(m_SelectedEntity);
+                    glm::vec3 targetPos = tc.GetWorldPosition();
+                    float distance = std::clamp(glm::length(tc.GetWorldScale()) * 2.0f, 3.0f, 50.0f);
+                    m_EditorCamera.Focus(targetPos, distance);
+                }
+            }
+        }
+
+        if (Input::IsKeyJustPressed(KeyCode::Escape))
+        {
+            m_SelectedEntity = entt::null;
+            m_SelectedEntities.clear();
+        }
     }
 }

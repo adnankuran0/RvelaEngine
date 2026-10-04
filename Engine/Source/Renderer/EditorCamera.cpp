@@ -40,6 +40,12 @@ void EditorCamera::Update()
     Position = glm::mix(Position, targetPosition, positionSmoothness * dt);
 }
 
+void EditorCamera::Focus(const glm::vec3& focusPoint, float distance)
+{
+    targetPosition = focusPoint - Front * distance;
+    Position = targetPosition;
+}
+
 void EditorCamera::ProcessKeyboard()
 {
     float dt = Time::GetDeltaTime();

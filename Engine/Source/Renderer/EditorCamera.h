@@ -24,6 +24,7 @@ public:
     void Update();
     void OnMouseMoved(double xPosIn, double yPosIn, GLFWwindow* window);
     void ProcessMouseScroll(float yoffset);
+    void Focus(const glm::vec3& focusPoint, float distance = 5.0f);
 
 private:
     void ProcessKeyboard();

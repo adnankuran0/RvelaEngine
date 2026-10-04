@@ -28,13 +28,13 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
     glm::mat4 view = engine->GetCamera()->GetViewMatrix();
     glm::mat4 projection = engine->GetCamera()->GetProjectionMatrix();
 
-    if (ImGui::IsWindowFocused())
+    if (ImGui::IsWindowFocused() || ImGui::IsWindowHovered())
     {
-        if (ImGui::IsKeyPressed(ImGuiKey_T))
-            m_CurrentGizmoMode = (m_CurrentGizmoMode == ImGuizmo::WORLD) ? ImGuizmo::LOCAL : ImGuizmo::WORLD;
-
-        if (!ImGui::IsMouseDown(ImGuiMouseButton_Right))
+        if (!ImGui::GetIO().WantTextInput && !ImGui::IsMouseDown(ImGuiMouseButton_Right) && !ImGuizmo::IsUsing())
         {
+            if (ImGui::IsKeyPressed(ImGuiKey_T))
+                m_CurrentGizmoMode = (m_CurrentGizmoMode == ImGuizmo::WORLD) ? ImGuizmo::LOCAL : ImGuizmo::WORLD;
+
             if (ImGui::IsKeyPressed(ImGuiKey_Q)) m_CurrentGizmoOperation = static_cast<ImGuizmo::OPERATION>(-1);
             if (ImGui::IsKeyPressed(ImGuiKey_W)) m_CurrentGizmoOperation = ImGuizmo::TRANSLATE;
             if (ImGui::IsKeyPressed(ImGuiKey_E)) m_CurrentGizmoOperation = ImGuizmo::ROTATE;
@@ -48,10 +48,12 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
     ImGuizmo::GetStyle().TranslationLineArrowSize = 5.0f;
     ImGuizmo::GetStyle().TranslationLineThickness = 3.0f;
 
-    bool useSnap = ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || m_EnableSnap;
+    bool isCtrlDown = ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || ImGui::IsKeyDown(ImGuiKey_RightCtrl);
+    bool useSnap = m_EnableSnap ? !isCtrlDown : isCtrlDown;
 
     float snapTranslate[3] = { m_snapTranslate, m_snapTranslate, m_snapTranslate };
     float snapScale[3] = { m_snapScale, m_snapScale, m_snapScale };
+    float snapRotate[3] = { m_snapRotate, m_snapRotate, m_snapRotate };
 
     if (m_CurrentGizmoOperation == ImGuizmo::TRANSLATE)
     {
@@ -65,7 +67,7 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
         ImGuizmo::Manipulate(glm::value_ptr(view), glm::value_ptr(projection),
             m_CurrentGizmoOperation, m_CurrentGizmoMode,
             glm::value_ptr(transform), nullptr,
-            useSnap ? &m_snapRotate : nullptr);
+            useSnap ? snapRotate : nullptr);
     }
     else if (m_CurrentGizmoOperation == ImGuizmo::SCALE)
     {
@@ -91,13 +93,6 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
         glm::quat lRot;
         glm::vec4 persp;
         glm::decompose(localM, lScale, lRot, lPos, skew, persp);
-
-        if (useSnap && m_CurrentGizmoOperation == ImGuizmo::SCALE)
-        {
-            lScale.x = glm::round(lScale.x / m_snapScale) * m_snapScale;
-            lScale.y = glm::round(lScale.y / m_snapScale) * m_snapScale;
-            lScale.z = glm::round(lScale.z / m_snapScale) * m_snapScale;
-        }
 
         tc.SetPosition(lPos);
         tc.SetScale(lScale);
@@ -214,7 +209,9 @@ void Viewport::DrawOverlayStats(Engine* engine, ImVec2& displayPos, ImVec2& disp
 {
     ImDrawList* drawList = ImGui::GetWindowDrawList();
 
-    if (ImGui::GetIO().KeyCtrl || m_EnableSnap)
+    bool isCtrlDown = ImGui::GetIO().KeyCtrl;
+    bool isSnappingActive = m_EnableSnap ? !isCtrlDown : isCtrlDown;
+    if (isSnappingActive)
     {
         const char* label = "";
         float val = 0.0f;
@@ -225,7 +222,8 @@ void Viewport::DrawOverlayStats(Engine* engine, ImVec2& displayPos, ImVec2& disp
         char buf[64];
         snprintf(buf, sizeof(buf), label, val);
         ImVec2 textPos = ImVec2(displayPos.x + 12.0f, displayPos.y + 48.0f);
-        drawList->AddRectFilled(ImVec2(textPos.x - 4, textPos.y - 2), ImVec2(textPos.x + 80, textPos.y + 18), IM_COL32(18, 20, 24, 200), 4.0f);
+        ImVec2 snapTextSize = ImGui::CalcTextSize(buf);
+        drawList->AddRectFilled(ImVec2(textPos.x - 4, textPos.y - 2), ImVec2(textPos.x + snapTextSize.x + 6, textPos.y + snapTextSize.y + 4), IM_COL32(18, 20, 24, 200), 4.0f);
         drawList->AddText(textPos, IM_COL32(245, 195, 65, 255), buf);
     }
 

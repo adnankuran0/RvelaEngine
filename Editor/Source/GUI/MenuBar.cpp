@@ -24,16 +24,16 @@ void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter,
     {
         if (ImGui::BeginMenu("File"))
         {
-            if (ImGui::MenuItem("New scene (Ctrl + N)"))
+            if (ImGui::MenuItem("New scene", "Ctrl+N"))
                 EditorUtils::CreateScene(*engine);
 
-            if (ImGui::MenuItem("Open scene (Ctrl + O)"))
+            if (ImGui::MenuItem("Open scene", "Ctrl+O"))
                 EditorUtils::OpenScene(*engine);
 
-            if (ImGui::MenuItem("Save scene (Ctrl + S)"))
+            if (ImGui::MenuItem("Save scene", "Ctrl+S"))
                 EditorUtils::SaveScene(*engine);
 
-            if (ImGui::MenuItem("Save scene as (Ctrl + Shift + S)"))
+            if (ImGui::MenuItem("Save scene as", "Ctrl+Shift+S"))
                 EditorUtils::SaveSceneAs(*engine);
 
             ImGui::Separator();

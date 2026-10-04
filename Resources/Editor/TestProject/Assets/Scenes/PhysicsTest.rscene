@@ -13,6 +13,7 @@
             },
             "ParentUUID": 0,
             "Tag": {
+                "isActive": true,
                 "tag": "DirectionalLight"
             },
             "Transform": {
@@ -81,6 +82,7 @@
                 "scriptAssetUUID": "b3326755-edfb-4522-ada1-080110d5fba5"
             },
             "Tag": {
+                "isActive": true,
                 "tag": "Character"
             },
             "Transform": {
@@ -109,6 +111,7 @@
                 "scriptAssetUUID": "bc183720-0ea6-40c0-adb4-6438019b61d8"
             },
             "Tag": {
+                "isActive": true,
                 "tag": "CameraHolder"
             },
             "Transform": {
@@ -144,6 +147,7 @@
                 "scriptAssetUUID": "bafc3142-3be3-4e45-a482-e6a0a7c30d00"
             },
             "Tag": {
+                "isActive": true,
                 "tag": "Camera"
             },
             "Transform": {
@@ -178,6 +182,7 @@
                 "skeleton": "24446ef4-6e1d-44a3-bd3d-52fa55884da5"
             },
             "Tag": {
+                "isActive": true,
                 "tag": "arms_rig"
             },
             "Transform": {
@@ -209,6 +214,7 @@
                 "skeletalMesh": "36029c80-1ece-4cad-82a1-28273260beda"
             },
             "Tag": {
+                "isActive": true,
                 "tag": "ArmsMesh"
             },
             "Transform": {
@@ -251,6 +257,7 @@
             },
             "ParentUUID": 0,
             "Tag": {
+                "isActive": true,
                 "tag": "Sphere"
             },
             "Transform": {
@@ -295,6 +302,7 @@
             },
             "ParentUUID": 0,
             "Tag": {
+                "isActive": true,
                 "tag": "Sphere"
             },
             "Transform": {
@@ -361,6 +369,7 @@
                 "useCCD": false
             },
             "Tag": {
+                "isActive": true,
                 "tag": "Cube"
             },
             "Transform": {
@@ -439,6 +448,7 @@
                 "useCCD": false
             },
             "Tag": {
+                "isActive": true,
                 "tag": "Cube"
             },
             "Transform": {
@@ -505,6 +515,7 @@
                 "useCCD": false
             },
             "Tag": {
+                "isActive": true,
                 "tag": "Cube"
             },
             "Transform": {
@@ -583,6 +594,7 @@
                 "useCCD": false
             },
             "Tag": {
+                "isActive": true,
                 "tag": "Cube"
             },
             "Transform": {
@@ -645,6 +657,7 @@
                 "useCCD": false
             },
             "Tag": {
+                "isActive": true,
                 "tag": "utility_box_02"
             },
             "Transform": {
@@ -752,13 +765,14 @@
                 "radius": 5.0
             },
             "Tag": {
+                "isActive": true,
                 "tag": "Fire"
             },
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
-                    -2.1310696601867676,
-                    1.5800000429153442,
+                    -2.1337239742279053,
+                    1.759798526763916,
                     0.0
                 ],
                 "rotation": [
@@ -843,6 +857,7 @@
                 ]
             },
             "Tag": {
+                "isActive": true,
                 "tag": "Smoke"
             },
             "Transform": {
@@ -882,6 +897,7 @@
             },
             "ParentUUID": 0,
             "Tag": {
+                "isActive": true,
                 "tag": "Quad"
             },
             "Transform": {
@@ -920,6 +936,7 @@
             },
             "ParentUUID": 0,
             "Tag": {
+                "isActive": true,
                 "tag": "Quad"
             },
             "Transform": {
@@ -986,6 +1003,7 @@
                 "radius": 0.5
             },
             "Tag": {
+                "isActive": true,
                 "tag": "Sphere"
             },
             "Transform": {
@@ -1070,6 +1088,7 @@
                 "scriptAssetUUID": "89a68d71-d2cb-430c-9e62-b847634cef72"
             },
             "Tag": {
+                "isActive": true,
                 "tag": "Cube"
             },
             "Transform": {
@@ -1101,6 +1120,7 @@
             },
             "ParentUUID": 0,
             "Tag": {
+                "isActive": true,
                 "tag": "Door"
             },
             "Transform": {
@@ -1126,6 +1146,7 @@
         {
             "ParentUUID": 5,
             "Tag": {
+                "isActive": true,
                 "tag": "DoorPivot"
             },
             "Transform": {
@@ -1195,6 +1216,7 @@
                 "scriptAssetUUID": "c820e8b6-be0a-4277-92f5-4bc2e0b37628"
             },
             "Tag": {
+                "isActive": true,
                 "tag": "DoorMesh"
             },
             "Transform": {
@@ -1229,6 +1251,7 @@
                 "skeleton": "07f6acb2-5ad3-4147-8551-458883c8bfc9"
             },
             "Tag": {
+                "isActive": true,
                 "tag": "UAL1_Standard"
             },
             "Transform": {
@@ -1254,6 +1277,7 @@
         {
             "ParentUUID": 6256066378453909279,
             "Tag": {
+                "isActive": true,
                 "tag": "Mannequin"
             },
             "Transform": {
@@ -1285,6 +1309,7 @@
                 "skeletalMesh": "788ce859-dc53-4b71-b7ee-0018b5e05dd9"
             },
             "Tag": {
+                "isActive": true,
                 "tag": "Mannequin_0"
             },
             "Transform": {
@@ -1316,6 +1341,7 @@
                 "skeletalMesh": "7cb0f2f3-a7fa-47bc-8b14-f76e6a5bc77b"
             },
             "Tag": {
+                "isActive": true,
                 "tag": "Mannequin_1"
             },
             "Transform": {
@@ -1394,6 +1420,7 @@
                 "useCCD": false
             },
             "Tag": {
+                "isActive": true,
                 "tag": "Cube 1"
             },
             "Transform": {
@@ -1472,6 +1499,7 @@
                 "useCCD": false
             },
             "Tag": {
+                "isActive": true,
                 "tag": "Cube 2"
             },
             "Transform": {
@@ -1550,6 +1578,7 @@
                 "useCCD": false
             },
             "Tag": {
+                "isActive": true,
                 "tag": "Cube 3"
             },
             "Transform": {
