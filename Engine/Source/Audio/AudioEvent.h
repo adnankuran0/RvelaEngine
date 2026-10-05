@@ -13,7 +13,7 @@ struct AudioDispatchEvent
 {
     entt::entity entity;
     EventType type;
-    AssetUUID clipUUID;
+    AssetUUID clipUUID = AssetUUID::Invalid();
 };
 
 }

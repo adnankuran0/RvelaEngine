@@ -24,7 +24,7 @@ public:
 
     mutable int cachedBoneIndex = -2;
 
-    mutable AssetUUID cachedSkeletonUUID;
+    mutable AssetUUID cachedSkeletonUUID = AssetUUID::Invalid();
 
     PropertyType GetType() const override;
 

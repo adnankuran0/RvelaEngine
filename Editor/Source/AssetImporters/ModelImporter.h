@@ -22,9 +22,9 @@ class AssetRegistry;
 
 struct ModelImportResult
 {
-    AssetUUID prefabUUID;
-    AssetUUID skeletonUUID;
-    AssetUUID animLibUUID;
+    AssetUUID prefabUUID = AssetUUID::Invalid();
+    AssetUUID skeletonUUID = AssetUUID::Invalid();
+    AssetUUID animLibUUID = AssetUUID::Invalid();
     std::unordered_map<unsigned int, AssetUUID> meshUUIDs;         // meshIndex - uuid
     std::unordered_map<unsigned int, AssetUUID> materialUUIDs;     // matIndex - uuid
     std::unordered_map<std::string, AssetUUID>  textureUUIDs;      // path - uuid

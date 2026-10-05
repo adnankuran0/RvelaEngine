@@ -1,4 +1,4 @@
-﻿#include "rvelapch.h"
+#include "rvelapch.h"
 #include "ModelImporter.h"
 #include "PrefabImporter.h"
 #include "Asset/AssetRegistry.h"
@@ -213,6 +213,19 @@ void ModelImporter::MergeAndSaveSubAssets(
         entry.index = 0;
         entry.hasCache = false;
         ensureSubAsset(entry);
+    }
+    else
+    {
+        std::erase_if(parentMeta.subAssets, [](const SubAssetEntry& sub) {
+            return sub.type == "AnimationLib";
+        });
+    }
+
+    if (!result.skeletonUUID.IsValid())
+    {
+        std::erase_if(parentMeta.subAssets, [](const SubAssetEntry& sub) {
+            return sub.type == "Skeleton";
+        });
     }
 
     registry.SaveMeta(modelPath, parentMeta);
@@ -537,6 +550,20 @@ AssetUUID ModelImporter::ConstructPrefab(
     if (result.animLibUUID.IsValid())
     {
         prefabScene.AddComponent<AnimatorComponent>(rootEntity, result.animLibUUID);
+    }
+
+    if (scene->mRootNode->mNumMeshes == 1)
+    {
+        AttachMeshToEntity(0, scene->mRootNode, scene, prefabScene, rootEntity, result);
+    }
+    else if (scene->mRootNode->mNumMeshes > 1)
+    {
+        for (unsigned int i = 0; i < scene->mRootNode->mNumMeshes; ++i)
+        {
+            entt::entity child = prefabScene.CreateEntity(rootName + "_" + std::to_string(i)).GetHandle();
+            AttachMeshToEntity(i, scene->mRootNode, scene, prefabScene, child, result);
+            prefabScene.SetParent(child, rootEntity);
+        }
     }
 
     for (unsigned int i = 0; i < scene->mRootNode->mNumChildren; ++i)

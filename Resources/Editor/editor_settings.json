@@ -3,7 +3,7 @@
         "farClip": 1000.0,
         "fov": 75.0,
         "mouseSensitivity": 0.07500000298023224,
-        "movementSpeed": 7.0,
+        "movementSpeed": 4.0,
         "nearClip": 0.10000000149011612,
         "orthoSize": 10.0,
         "positionSmoothness": 25.0,

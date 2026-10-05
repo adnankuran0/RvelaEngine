@@ -257,6 +257,17 @@ void SceneHierarchyPanel::Draw(Engine* engine)
         return false;
         };
 
+    auto getPrefabRoot = [&](entt::entity e) -> entt::entity {
+        entt::entity curr = e;
+        while (curr != entt::null && curr != rootEntity)
+        {
+            if (scene.HasComponent<PrefabComponent>(curr))
+                return curr;
+            curr = scene.GetParent(curr);
+        }
+        return entt::null;
+    };
+
     ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.20f, 0.20f, 0.27f, 0.8f));
     ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.55f, 0.50f, 0.72f, 0.6f));
     ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.62f, 0.56f, 0.80f, 0.9f));
@@ -297,7 +308,8 @@ void SceneHierarchyPanel::Draw(Engine* engine)
             auto& tagComponent = scene.GetComponent<TagComponent>(entity);
             std::string nodeId = tagComponent.tag + "##" + std::to_string((uint32_t)entity);
 
-            bool isPrefab = scene.HasComponent<PrefabComponent>(entity);
+            entt::entity prefabRoot = getPrefabRoot(entity);
+            bool isPrefab = (prefabRoot != entt::null);
             bool isActiveInHierarchy = scene.IsEntityActive(entity);
 
             int colorPushes = 0;
@@ -435,21 +447,41 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                     }
                 }
 
-                if (scene.HasComponent<PrefabComponent>(entity))
+                if (prefabRoot != entt::null)
                 {
-                    if (ImGui::MenuItem("Apply to Prefab"))
+                    if (prefabRoot == entity)
                     {
-                        PrefabImporter::ApplyPrefab(scene, entity);
-                    }
+                        if (ImGui::MenuItem("Apply to Prefab"))
+                        {
+                            PrefabImporter::ApplyPrefab(scene, entity);
+                        }
 
-                    if (ImGui::MenuItem("Revert to Prefab"))
-                    {
-                        PrefabImporter::RevertPrefab(scene, entity);
-                    }
+                        if (ImGui::MenuItem("Revert to Prefab"))
+                        {
+                            PrefabImporter::RevertPrefab(scene, entity);
+                        }
 
-                    if (ImGui::MenuItem("Unpack Prefab (Make Local)"))
+                        if (ImGui::MenuItem("Unpack Prefab (Make Local)"))
+                        {
+                            scene.RemoveComponent<PrefabComponent>(entity);
+                        }
+                    }
+                    else
                     {
-                        scene.RemoveComponent<PrefabComponent>(entity);
+                        if (ImGui::MenuItem("Apply to Prefab Root"))
+                        {
+                            PrefabImporter::ApplyPrefab(scene, prefabRoot);
+                        }
+
+                        if (ImGui::MenuItem("Revert to Prefab Root"))
+                        {
+                            PrefabImporter::RevertPrefab(scene, prefabRoot);
+                        }
+
+                        if (ImGui::MenuItem("Select Prefab Root"))
+                        {
+                            selectSingle(prefabRoot);
+                        }
                     }
 
                     ImGui::Separator();
