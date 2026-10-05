@@ -7,9 +7,15 @@ json ScriptComponent::Serialize() const
 {
     json j;
     j["scriptAssetUUID"] = scriptAssetUUID.ToString();
+    j["propertyValues"] = propertyValues;
     return j;
 }
 void ScriptComponent::Deserialize(const json& j)
 {
-    scriptAssetUUID = AssetUUID::FromString(j.at("scriptAssetUUID").get<std::string>());
+    if (j.contains("scriptAssetUUID") && j["scriptAssetUUID"].is_string())
+        scriptAssetUUID = AssetUUID::FromString(j.at("scriptAssetUUID").get<std::string>());
+    if (j.contains("propertyValues") && j["propertyValues"].is_object())
+        propertyValues = j["propertyValues"];
+    else
+        propertyValues = json::object();
 }

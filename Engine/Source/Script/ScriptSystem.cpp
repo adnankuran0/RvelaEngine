@@ -48,18 +48,90 @@ void ScriptSystem::BindLuaScript(ScriptComponent& sc, entt::entity e)
         return;
     }
 
+    sol::table scriptTable;
     if (result.valid() && result.get_type() == sol::type::table)
     {
-        sc.luaInstance = result;
+        scriptTable = result;
     }
-    else
+
+    sc.luaInstance = sc.luaState->create_table();
+    if (scriptTable.valid())
     {
-        sc.luaInstance = sc.luaState->create_table();
+        sol::table mt = sc.luaState->create_table();
+        mt["__index"] = scriptTable;
+        sc.luaInstance[sol::metatable_key] = mt;
     }
 
     sc.luaInstance["entity"] = Entity(e, &m_Scene);
     sc.luaInstance["scene"] = &m_Scene;
     sc.luaInstance["physics"] = &m_Scene.GetPhysicsSystem().GetPhysicsWorld();
+
+    // Defaults
+    const auto& propDefs = ScriptEngine::GetScriptPropertyDefs(sc.scriptAssetUUID);
+    for (const auto& def : propDefs)
+    {
+        switch (def.type)
+        {
+        case ScriptPropertyType::Float:       sc.luaInstance[def.name] = def.floatVal; break;
+        case ScriptPropertyType::Int:         sc.luaInstance[def.name] = def.intVal; break;
+        case ScriptPropertyType::Bool:        sc.luaInstance[def.name] = def.boolVal; break;
+        case ScriptPropertyType::String:      sc.luaInstance[def.name] = def.stringVal; break;
+        case ScriptPropertyType::Vec2:        sc.luaInstance[def.name] = def.vec2Val; break;
+        case ScriptPropertyType::Vec3:        sc.luaInstance[def.name] = def.vec3Val; break;
+        case ScriptPropertyType::Vec4:
+        case ScriptPropertyType::Color:       sc.luaInstance[def.name] = def.vec4Val; break;
+        case ScriptPropertyType::AssetHandle: sc.luaInstance[def.name] = def.assetVal; break;
+        }
+    }
+
+    // Overrides
+    for (const auto& def : propDefs)
+    {
+        if (!sc.propertyValues.contains(def.name))
+            continue;
+
+        const auto& val = sc.propertyValues[def.name];
+        try
+        {
+            switch (def.type)
+            {
+            case ScriptPropertyType::Float:
+                if (val.is_number()) sc.luaInstance[def.name] = val.get<float>();
+                break;
+            case ScriptPropertyType::Int:
+                if (val.is_number_integer()) sc.luaInstance[def.name] = val.get<int>();
+                else if (val.is_number()) sc.luaInstance[def.name] = static_cast<int>(val.get<float>());
+                break;
+            case ScriptPropertyType::Bool:
+                if (val.is_boolean()) sc.luaInstance[def.name] = val.get<bool>();
+                break;
+            case ScriptPropertyType::String:
+                if (val.is_string()) sc.luaInstance[def.name] = val.get<std::string>();
+                break;
+            case ScriptPropertyType::Vec2:
+                if (val.is_array() && val.size() >= 2)
+                    sc.luaInstance[def.name] = glm::vec2(val[0].get<float>(), val[1].get<float>());
+                break;
+            case ScriptPropertyType::Vec3:
+                if (val.is_array() && val.size() >= 3)
+                    sc.luaInstance[def.name] = glm::vec3(val[0].get<float>(), val[1].get<float>(), val[2].get<float>());
+                break;
+            case ScriptPropertyType::Vec4:
+            case ScriptPropertyType::Color:
+                if (val.is_array() && val.size() >= 4)
+                    sc.luaInstance[def.name] = glm::vec4(val[0].get<float>(), val[1].get<float>(), val[2].get<float>(), val[3].get<float>());
+                break;
+            case ScriptPropertyType::AssetHandle:
+                if (val.is_string())
+                    sc.luaInstance[def.name] = AssetUUID::FromString(val.get<std::string>());
+                break;
+            }
+        }
+        catch (const std::exception& ex)
+        {
+            LOG_WARN("Failed to apply script property override '{}': {}", def.name, ex.what());
+        }
+    }
 
     sc.OnCreate = sc.luaInstance["OnCreate"];
     sc.OnUpdate = sc.luaInstance["OnUpdate"];

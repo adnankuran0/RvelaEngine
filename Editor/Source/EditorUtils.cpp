@@ -79,11 +79,35 @@ AssetUUID EditorUtils::ReadUUIDFromMeta(const std::string& assetPath)
     return meta.uuid;
 }
 
+static tsl::robin_map<AssetUUID, std::string> s_FileNameCache;
+
+void EditorUtils::ClearAssetFileNameCache()
+{
+    s_FileNameCache.clear();
+}
+
 std::string EditorUtils::GetAssetFileName(const AssetUUID& uuid)
 {
     if (!uuid.IsValid())
         return "";
 
+    auto it = s_FileNameCache.find(uuid);
+    if (it != s_FileNameCache.end())
+        return it->second;
+
+    auto path = AssetManager::Get().GetRegistry().GetPath(uuid);
+    if (!path.empty())
+    {
+        std::string stem = path.stem().string();
+        if (path.string().find(".cache") == std::string::npos && !AssetUUID::FromString(stem).IsValid())
+        {
+            std::string filename = path.filename().string();
+            s_FileNameCache[uuid] = filename;
+            return filename;
+        }
+    }
+
+    // Fallback if not found in memory, scan assetDir once and cache all found UUIDs so we never scan disk again
     const auto& assetDir = AssetManager::Get().GetRegistry().GetAssetDir();
     if (!assetDir.empty() && std::filesystem::exists(assetDir))
     {
@@ -97,35 +121,26 @@ std::string EditorUtils::GetAssetFileName(const AssetUUID& uuid)
                 AssetMeta meta;
                 if (meta.LoadFromFile(entry.path()))
                 {
-                    if (meta.uuid == uuid)
-                    {
-                        auto srcPath = entry.path();
-                        srcPath.replace_extension("");
-                        return srcPath.filename().string();
-                    }
+                    auto srcPath = entry.path();
+                    srcPath.replace_extension("");
+                    std::string fn = srcPath.filename().string();
+
+                    s_FileNameCache[meta.uuid] = fn;
                     for (const auto& sub : meta.subAssets)
                     {
-                        if (sub.uuid == uuid)
-                        {
-                            auto srcPath = entry.path();
-                            srcPath.replace_extension("");
-                            return srcPath.filename().string();
-                        }
+                        if (sub.uuid.IsValid())
+                            s_FileNameCache[sub.uuid] = fn;
                     }
                 }
             }
         }
     }
 
-    auto path = AssetManager::Get().GetRegistry().GetPath(uuid);
-    if (!path.empty())
-    {
-        std::string stem = path.stem().string();
-        if (path.string().find(".cache") == std::string::npos && !AssetUUID::FromString(stem).IsValid())
-        {
-            return path.filename().string();
-        }
-    }
+    auto cachedIt = s_FileNameCache.find(uuid);
+    if (cachedIt != s_FileNameCache.end())
+        return cachedIt->second;
 
+    // Cache empty string to avoid rescanning filesystem for nonexistent assets
+    s_FileNameCache[uuid] = "";
     return "";
 }

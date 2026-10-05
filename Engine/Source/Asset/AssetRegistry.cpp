@@ -97,6 +97,8 @@ void AssetRegistry::Scan(const std::filesystem::path& assetDir)
         {
             if (!sub.uuid.IsValid()) continue;
 
+            m_UUIDToPath[sub.uuid] = path;
+
             if (!m_Metas.contains(sub.uuid))
             {
                 AssetMeta subMeta;
@@ -221,6 +223,11 @@ AssetMeta AssetRegistry::GetOrCreateMeta(const std::filesystem::path& path)
             m_UUIDToPath[meta.uuid] = path;
             m_PathToUUID[path.string()] = meta.uuid;
             m_Metas[meta.uuid] = meta;
+            for (auto& sub : meta.subAssets)
+            {
+                if (sub.uuid.IsValid())
+                    m_UUIDToPath[sub.uuid] = path;
+            }
             return meta;
         }
     }
@@ -251,6 +258,8 @@ void AssetRegistry::SaveMeta(const std::filesystem::path& path, const AssetMeta&
     for (auto& sub : meta.subAssets)
     {
         if (!sub.uuid.IsValid()) continue;
+
+        m_UUIDToPath[sub.uuid] = path;
 
         if (!m_Metas.contains(sub.uuid))
         {

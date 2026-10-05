@@ -79,6 +79,10 @@
             },
             "ParentUUID": 0,
             "ScriptComponent": {
+                "propertyValues": {
+                    "firePrefab": "a1b0801d-324b-4f2d-a3e5-c8d6d516f323",
+                    "gravity": -12.0
+                },
                 "scriptAssetUUID": "b3326755-edfb-4522-ada1-080110d5fba5"
             },
             "Tag": {
@@ -108,6 +112,7 @@
         {
             "ParentUUID": 27,
             "ScriptComponent": {
+                "propertyValues": {},
                 "scriptAssetUUID": "bc183720-0ea6-40c0-adb4-6438019b61d8"
             },
             "Tag": {
@@ -144,6 +149,7 @@
             },
             "ParentUUID": 28,
             "ScriptComponent": {
+                "propertyValues": {},
                 "scriptAssetUUID": "bafc3142-3be3-4e45-a482-e6a0a7c30d00"
             },
             "Tag": {
@@ -621,44 +627,8 @@
             "UUID": 9
         },
         {
-            "ConvexHullColliderComponent": {
-                "maxConvexRadius": 0.0,
-                "offset": [
-                    0.0,
-                    0.0,
-                    0.0
-                ]
-            },
-            "Material": {
-                "material": "f93d7599-ebd5-4dab-af6c-06858b61612f"
-            },
-            "Mesh": {
-                "mesh": "1b8e0e23-21b6-4020-9f6e-d3fd22f35ca6"
-            },
             "ParentUUID": 0,
-            "RigidbodyComponent": {
-                "allowSleep": 1,
-                "angularDamping": 0.05000000074505806,
-                "autoCalculateMass": 0,
-                "bodyType": 2,
-                "collisionLayer": 1,
-                "collisionMask": 4294967295,
-                "friction": 0.5,
-                "gravityFactor": 1.0,
-                "isSensor": false,
-                "linearDamping": 0.05000000074505806,
-                "lockRotationX": false,
-                "lockRotationY": false,
-                "lockRotationZ": false,
-                "lockTranslationX": false,
-                "lockTranslationY": false,
-                "lockTranslationZ": false,
-                "mass": 50.0,
-                "maxAngularVelocity": 50.0,
-                "maxLinearVelocity": 500.0,
-                "restitution": 0.0,
-                "useCCD": false
-            },
+            "Prefab": "a1b0801d-324b-4f2d-a3e5-c8d6d516f323",
             "Tag": {
                 "isActive": true,
                 "tag": "utility_box_02"
@@ -681,7 +651,7 @@
                     0.9999991655349731
                 ]
             },
-            "UUID": 10
+            "UUID": 11982307200884446410
         },
         {
             "Material": {
@@ -981,6 +951,7 @@
                 "useCCD": false
             },
             "ScriptComponent": {
+                "propertyValues": {},
                 "scriptAssetUUID": "89a68d71-d2cb-430c-9e62-b847634cef72"
             },
             "Tag": {
@@ -1109,6 +1080,7 @@
                 "useCCD": false
             },
             "ScriptComponent": {
+                "propertyValues": {},
                 "scriptAssetUUID": "c820e8b6-be0a-4277-92f5-4bc2e0b37628"
             },
             "Tag": {
@@ -1660,7 +1632,66 @@
                     1.0
                 ]
             },
-            "UUID": 5739850553380055517
+            "UUID": 1324798191797823299
+        },
+        {
+            "ParentUUID": 0,
+            "ScriptComponent": {
+                "propertyValues": {
+                    "testPrefab": "a1b0801d-324b-4f2d-a3e5-c8d6d516f323"
+                },
+                "scriptAssetUUID": "fd27841d-643b-409f-a65f-0d75bc0868e0"
+            },
+            "Tag": {
+                "isActive": true,
+                "tag": "PropertyTester"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    2.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 99901
+        },
+        {
+            "ParentUUID": 0,
+            "Prefab": "342bca25-b578-45e3-bf44-c9ae419a8665",
+            "Tag": {
+                "isActive": true,
+                "tag": "Ball"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    -2.9774999618530273,
+                    1.7004544734954834,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 4558845759223644490
         }
     ],
     "Environment": {
@@ -1676,8 +1707,8 @@
             1.0
         ],
         "Lighting_AmbientIntensity": 0.10000000149011612,
-        "Lighting_IBL": false,
-        "Lighting_IBLIntensity": 0.30000001192092896,
+        "Lighting_IBL": true,
+        "Lighting_IBLIntensity": 0.20000000298023224,
         "PostProcess_ChromaticStrength": 0.009999999776482582,
         "PostProcess_Exposure": 1.0,
         "PostProcess_VignetteIntensity": 0.25,

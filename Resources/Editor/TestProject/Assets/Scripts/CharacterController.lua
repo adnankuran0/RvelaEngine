@@ -1,11 +1,14 @@
 Player = {}
 
-Player.jumpStrength     = 5.0
-Player.walkSpeed        = 3.0
-Player.sprintSpeed      = 5.0
-Player.acceleration     = 20.0
-Player.deceleration     = 20.0
-Player.gravity          = -12.0
+Player.properties = {
+    walkSpeed        = 3.0,
+    sprintSpeed      = 5.0,
+    jumpStrength     = 5.0,
+    acceleration     = 20.0,
+    deceleration     = 20.0,
+    gravity          = -12.0,
+    firePrefab       = { type = "AssetHandle"}
+}
 
 function Player:OnCreate()
     self.transform  = self.entity:GetComponent("TransformComponent")
@@ -24,11 +27,7 @@ end
 function Player:OnUpdate(dt)
     if not self.cb then return end
 
-    if Input.IsMouseButtonJustPressed(MouseButton.Left) and self.transform then
-        local spawnPos = self.transform.worldPosition
-        local spawnRot = self.transform.worldRotation
-        self.scene:Instantiate("Prefabs/Fire.rprefab", spawnPos, spawnRot)
-    end
+    
 
     local camForward = Vec3.new(0, 0, -1)
     local camRight   = Vec3.new(1, 0,  0)
@@ -39,6 +38,14 @@ function Player:OnUpdate(dt)
         camForward.y = 0
         camForward   = camForward:Normalized()
         camRight     = camT.right
+    end
+
+    if Input.IsMouseButtonJustPressed(MouseButton.Left) and self.transform then
+        local spawnPos = self.transform.worldPosition + camForward * 3.0
+        local spawnRot = self.transform.worldRotation
+        if self.firePrefab and self.firePrefab:IsValid() then
+            self.scene:Instantiate(self.firePrefab, spawnPos, spawnRot)
+        end
     end
 
     local inputDir = Vec3.new(0, 0, 0)
@@ -57,7 +64,7 @@ function Player:OnUpdate(dt)
 
     local verticalVel = velocity.y
     if not isGrounded then
-        verticalVel = verticalVel + Player.gravity * dt
+        verticalVel = verticalVel + self.gravity * dt
     else
         if verticalVel < 0 then verticalVel = 0 end
     end
