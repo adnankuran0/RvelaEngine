@@ -14,22 +14,22 @@ struct ScriptComponent
     sol::state* luaState = nullptr;
     sol::table luaInstance;
 
-    sol::function OnCreate;
-    sol::function OnUpdate;
-    sol::function OnFixedUpdate;
-    sol::function OnLateUpdate;
-    sol::function OnDestroy;
+    sol::protected_function OnCreate;
+    sol::protected_function OnUpdate;
+    sol::protected_function OnFixedUpdate;
+    sol::protected_function OnLateUpdate;
+    sol::protected_function OnDestroy;
 
-    sol::function OnCollisionEnter;
-    sol::function OnCollisionStay;
-    sol::function OnCollisionExit;
+    sol::protected_function OnCollisionEnter;
+    sol::protected_function OnCollisionStay;
+    sol::protected_function OnCollisionExit;
 
-    sol::function OnAnimationEvent;
-    sol::function OnAnimationStarted;
-    sol::function OnAnimationFinished;
-    sol::function OnAnimationLooped;
+    sol::protected_function OnAnimationEvent;
+    sol::protected_function OnAnimationStarted;
+    sol::protected_function OnAnimationFinished;
+    sol::protected_function OnAnimationLooped;
 
-    sol::function OnAudioFinished;
+    sol::protected_function OnAudioFinished;
 
     json Serialize() const;
     void Deserialize(const json& j);

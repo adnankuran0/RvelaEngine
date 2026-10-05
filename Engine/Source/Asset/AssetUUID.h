@@ -14,6 +14,10 @@ public:
 
     explicit AssetUUID(const UUIDv4::UUID& uuid) : m_UUID(uuid) {}
 
+    AssetUUID(const std::string& str) {
+        m_UUID.fromStr(str.c_str());
+    }
+
     inline static AssetUUID Invalid() {
         static const UUIDv4::UUID emptyUUID{}; 
         return AssetUUID(emptyUUID);
@@ -37,9 +41,17 @@ public:
         return !(*this == other);
     }
 
+    bool operator<(const AssetUUID& other) const {
+        return m_UUID < other.m_UUID;
+    }
+
     inline bool IsValid() const {
         static const UUIDv4::UUID emptyUUID{};
         return !(m_UUID == emptyUUID);
+    }
+
+    inline bool IsEmpty() const {
+        return !IsValid();
     }
 
     inline const UUIDv4::UUID& Raw() const {
@@ -49,6 +61,8 @@ public:
 private:
     UUIDv4::UUID m_UUID;
 };
+
+using AssetHandle = AssetUUID;
 
 }
 

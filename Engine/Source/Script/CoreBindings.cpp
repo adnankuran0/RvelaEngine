@@ -1,17 +1,66 @@
 #include "rvelapch.h"
 #include "CoreBindings.h"
+#include "SceneBindings.h"
 #include "sol/sol.hpp"
 #include "Scene/Entity.h"
+#include "Scene/Scene.h"
 #include "Scene/Components/UIComponents.h"
 #include "ComponentHandle.h"
+#include "Asset/AssetManager.h"
+#include "Asset/AssetUUID.h"
 #include <vector>
 
 using namespace rv;
 
 void LuaBindings::RegisterCoreTypes(sol::state& lua)
 {
+    lua.new_usertype<AssetHandle>("AssetHandle",
+        sol::constructors<AssetHandle(), AssetHandle(const std::string&)>(),
+        "ToString", &AssetHandle::ToString,
+        "IsValid", &AssetHandle::IsValid,
+        "IsEmpty", &AssetHandle::IsEmpty,
+        sol::meta_function::to_string, &AssetHandle::ToString,
+        sol::meta_function::equal_to, &AssetHandle::operator==,
+        sol::meta_function::less_than, &AssetHandle::operator<
+    );
+    lua["AssetHandle"]["FromString"] = &AssetHandle::FromString;
+    lua["AssetHandle"]["Invalid"] = &AssetHandle::Invalid;
+    lua["AssetUUID"] = lua["AssetHandle"];
+
+    lua["AssetManager"] = lua.create_table();
+    lua["AssetManager"]["GetByPath"] = [](const std::string& path) -> AssetHandle {
+        return AssetManager::Get().GetRegistry().GetUUID(path);
+    };
+    lua["AssetManager"]["GetPath"] = [](const AssetHandle& handle) -> std::string {
+        return AssetManager::Get().GetRegistry().GetPath(handle).generic_string();
+    };
+    lua["AssetManager"]["Exists"] = [](const AssetHandle& handle) -> bool {
+        return AssetManager::Get().GetRegistry().Exists(handle);
+    };
+    lua["AssetManager"]["GetHandle"] = [](sol::object obj) -> AssetHandle {
+        if (obj.is<AssetHandle>()) {
+            return obj.as<AssetHandle>();
+        }
+        if (obj.is<std::string>()) {
+            std::string identifier = obj.as<std::string>();
+            if (identifier.length() == 36 && identifier[8] == '-' && identifier[13] == '-' && identifier[18] == '-' && identifier[23] == '-')
+            {
+                AssetUUID parsed = AssetUUID::FromString(identifier);
+                if (parsed.IsValid()) return parsed;
+            }
+            return AssetManager::Get().GetRegistry().GetUUID(identifier);
+        }
+        return AssetHandle::Invalid();
+    };
+    lua["Assets"] = lua["AssetManager"];
+
     lua.new_usertype<Entity>("Entity",
         "IsValid", &Entity::IsValid,
+        "Destroy", [](Entity& self) {
+            if (self.GetScene()) {
+                self.GetScene()->QueueDestroyEntity(self);
+            }
+        },
         "name", sol::property(
             &Entity::GetName,
             &Entity::SetName

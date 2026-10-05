@@ -4,6 +4,7 @@
 #include "Scene/Components/MaterialComponent.h"
 #include "Scene/Entity.h"
 #include "Physics/CollisionInfo.h"
+#include "SceneBindings.h"
 #include <Asset/Types/ScriptAsset.h>
 
 using namespace rv;
@@ -112,6 +113,20 @@ void ScriptSystem::OnUpdate(float dt)
 
         auto& sc = view.get<ScriptComponent>(entity);
 
+        if (!sc.luaInstance.valid())
+        {
+            BindLuaScript(sc, entity);
+            if (sc.OnCreate.valid())
+            {
+                sol::protected_function_result result = sc.OnCreate(sc.luaInstance);
+                if (!result.valid())
+                {
+                    sol::error err = result;
+                    LOG_ERROR("Lua OnCreate error: {}", err.what());
+                }
+            }
+        }
+
         if (sc.luaInstance.valid())
         {
             if (sc.OnUpdate.valid())
@@ -136,6 +151,20 @@ void ScriptSystem::OnFixedUpdate(float dt)
             continue;
 
         auto& sc = view.get<ScriptComponent>(entity);
+
+        if (!sc.luaInstance.valid())
+        {
+            BindLuaScript(sc, entity);
+            if (sc.OnCreate.valid())
+            {
+                sol::protected_function_result result = sc.OnCreate(sc.luaInstance);
+                if (!result.valid())
+                {
+                    sol::error err = result;
+                    LOG_ERROR("Lua OnCreate error: {}", err.what());
+                }
+            }
+        }
 
         if (sc.luaInstance.valid())
         {
@@ -216,7 +245,7 @@ void ScriptSystem::DispatchCollisionEvents()
 
     auto dispatchEvent = [](ScriptComponent& sc, Physics::CollisionEventType type, Physics::CollisionInfo& info)
         {
-            sol::function* fn = nullptr;
+            sol::protected_function* fn = nullptr;
             const char* name = "";
 
             switch (type)

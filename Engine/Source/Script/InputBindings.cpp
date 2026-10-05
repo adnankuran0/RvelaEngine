@@ -157,6 +157,11 @@ void LuaBindings::RegisterInputAPI(sol::state& lua)
     BIND_MOUSE(ButtonMiddle)
 #undef BIND_MOUSE
 
+    lua["MouseCode"]["Left"] = static_cast<int>(MouseCode::ButtonLeft);
+    lua["MouseCode"]["Right"] = static_cast<int>(MouseCode::ButtonRight);
+    lua["MouseCode"]["Middle"] = static_cast<int>(MouseCode::ButtonMiddle);
+    lua["MouseButton"] = lua["MouseCode"];
+
     lua["MouseMode"] = lua.create_table();
 
     lua["MouseMode"]["VISIBLE"] = static_cast<int>(Input::MouseMode::VISIBLE);
@@ -176,9 +181,24 @@ void LuaBindings::RegisterInputAPI(sol::state& lua)
             return Input::IsKeyJustPressed(static_cast<KeyCode>(key));
         };
 
+    lua["Input"]["IsKeyJustReleased"] = [](int key)
+        {
+            return Input::IsKeyJustReleased(static_cast<KeyCode>(key));
+        };
+
     lua["Input"]["IsMouseButtonPressed"] = [](int button)
         {
             return Input::IsMouseButtonPressed(static_cast<MouseCode>(button));
+        };
+
+    lua["Input"]["IsMouseButtonJustPressed"] = [](int button)
+        {
+            return Input::IsMouseButtonJustPressed(static_cast<MouseCode>(button));
+        };
+
+    lua["Input"]["IsMouseButtonJustReleased"] = [](int button)
+        {
+            return Input::IsMouseButtonJustReleased(static_cast<MouseCode>(button));
         };
 
     lua["Input"]["GetMousePosition"] = []()

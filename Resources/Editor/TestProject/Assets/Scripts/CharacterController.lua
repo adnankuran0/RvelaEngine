@@ -5,11 +5,12 @@ Player.walkSpeed        = 3.0
 Player.sprintSpeed      = 5.0
 Player.acceleration     = 20.0
 Player.deceleration     = 20.0
-Player.gravity = -12.0
+Player.gravity          = -12.0
 
 function Player:OnCreate()
-    self.cb = self.entity:GetComponent("CharacterBodyComponent")
-    self.ae = self.entity:GetComponent("AudioEmitterComponent")
+    self.transform  = self.entity:GetComponent("TransformComponent")
+    self.cb         = self.entity:GetComponent("CharacterBodyComponent")
+    self.ae         = self.entity:GetComponent("AudioEmitterComponent")
     self.camHolder  = self.scene:FindEntityByName("CameraHolder")
     self.cam        = self.scene:FindEntityByName("Camera")
     self.headBobTime = 0.0
@@ -18,12 +19,16 @@ function Player:OnCreate()
         local t = self.cam:GetComponent("TransformComponent")
         self.camStartY = t.position.y
     end
-
 end
-
 
 function Player:OnUpdate(dt)
     if not self.cb then return end
+
+    if Input.IsMouseButtonJustPressed(MouseButton.Left) and self.transform then
+        local spawnPos = self.transform.worldPosition
+        local spawnRot = self.transform.worldRotation
+        self.scene:Instantiate("Prefabs/Fire.rprefab", spawnPos, spawnRot)
+    end
 
     local camForward = Vec3.new(0, 0, -1)
     local camRight   = Vec3.new(1, 0,  0)

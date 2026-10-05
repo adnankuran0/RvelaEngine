@@ -282,10 +282,44 @@ std::filesystem::path AssetRegistry::GetPath(const AssetUUID& uuid) const
 
 AssetUUID AssetRegistry::GetUUID(const std::filesystem::path& path) const
 {
-    auto it = m_PathToUUID.find(path.string());
-    if (it == m_PathToUUID.end())
-        return AssetUUID::Invalid();
-    return it->second;
+    std::string pathStr = path.string();
+
+    auto it = m_PathToUUID.find(pathStr);
+    if (it != m_PathToUUID.end())
+        return it->second;
+
+    std::string genericStr = path.generic_string();
+    std::string relativeToAssets = genericStr;
+    if (relativeToAssets.starts_with("Assets/"))
+        relativeToAssets = relativeToAssets.substr(7);
+
+    if (!m_AssetDir.empty())
+    {
+        auto combined = (m_AssetDir / relativeToAssets).lexically_normal();
+        it = m_PathToUUID.find(combined.string());
+        if (it != m_PathToUUID.end())
+            return it->second;
+    }
+
+    for (const auto& [uuid, fullPath] : m_UUIDToPath)
+    {
+        std::string fullGeneric = fullPath.generic_string();
+        if (fullGeneric.ends_with(genericStr) ||
+            fullGeneric.ends_with(relativeToAssets) ||
+            fullPath.filename().generic_string() == genericStr)
+        {
+            return uuid;
+        }
+    }
+
+    if (pathStr.length() == 36 && pathStr[8] == '-' && pathStr[13] == '-' && pathStr[18] == '-' && pathStr[23] == '-')
+    {
+        AssetUUID parsed = AssetUUID::FromString(pathStr);
+        if (parsed.IsValid())
+            return parsed;
+    }
+
+    return AssetUUID::Invalid();
 }
 
 std::vector<AssetUUID> AssetRegistry::GetDependencies(const AssetUUID& uuid) const
