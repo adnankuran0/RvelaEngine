@@ -1,0 +1,39 @@
+{
+    "Lua.runtime.version": "LuaJIT",
+    "Lua.workspace.checkThirdParty": false,
+    "Lua.workspace.library": [
+        "${workspaceFolder}/api"
+    ],
+    "Lua.diagnostics.globals": [
+        "Vec2",
+        "Vec3",
+        "Vec4",
+        "Color",
+        "Quat",
+        "Math",
+        "AssetHandle",
+        "AssetUUID",
+        "AssetManager",
+        "Assets",
+        "Input",
+        "KeyCode",
+        "MouseCode",
+        "MouseButton",
+        "MouseMode",
+        "Physics",
+        "MotionType",
+        "Audio",
+        "AttenuationModel",
+        "LoopMode",
+        "EaseType",
+        "ParticleEmitterShape",
+        "Scene",
+        "Entity"
+    ],
+    "Lua.completion.callSnippet": "Both",
+    "Lua.completion.keywordSnippet": "Both",
+    "Lua.completion.displayContext": 50,
+    "Lua.hint.enable": true,
+    "Lua.hint.paramType": true,
+    "Lua.hint.setType": true
+}

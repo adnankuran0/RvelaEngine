@@ -12,6 +12,7 @@ public:
 	static void OpenScene(Engine& engine);
 	static bool SaveScene(Engine& engine);
 	static bool SaveSceneAs(Engine& engine);
+    static void OpenVSCodeWorkspace();
     static AssetUUID ReadUUIDFromMeta(const std::string& assetPath);
     static std::string GetAssetFileName(const AssetUUID& uuid);
     static void ClearAssetFileNameCache();

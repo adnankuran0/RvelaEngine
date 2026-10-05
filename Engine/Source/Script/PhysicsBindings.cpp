@@ -45,6 +45,10 @@ void rv::LuaBindings::RegisterPhysicsAPI(sol::state& lua)
 
     lua.new_usertype<RigidbodyHandle>("RigidbodyComponent",
         "IsValid", &RigidbodyHandle::IsValid,
+        "mass", sol::property(
+            [](RigidbodyHandle& h) { return h.Get() ? h.Get()->mass : 0.0f; },
+            [](RigidbodyHandle& h, float mass) { if (auto* c = h.Get()) c->mass = mass; }
+        ),
         "motionType", sol::property(
             [=](RigidbodyHandle& h) { return h.Get() ? GetPW().GetMotionType(h.Get()) : MotionType::STATIC; },
             [=](RigidbodyHandle& h, MotionType type) { if (auto* c = h.Get()) GetPW().SetMotionType(c, type); }

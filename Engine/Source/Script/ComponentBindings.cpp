@@ -8,7 +8,6 @@ using namespace rv;
 using TransformHandle = ComponentHandle<TransformComponent>;
 using CameraHandle = ComponentHandle<CameraComponent>;
 using DirectionalLightHandle = ComponentHandle<DirectionalLightComponent>;
-using RigidbodyHandle = ComponentHandle<RigidbodyComponent>;
 using PointLightHandle = ComponentHandle<PointLightComponent>;
 using MeshRendererHandle = ComponentHandle<MeshRendererComponent>;
 using MaterialHandle = ComponentHandle<MaterialComponent>;
@@ -78,14 +77,6 @@ void LuaBindings::RegisterComponents(sol::state& lua)
         "reverseCullFace", sol::property(
             [](DirectionalLightHandle& h) { return h.Get() ? h.Get()->reverseCullFace : false; },
             [](DirectionalLightHandle& h, bool v) { if (auto* c = h.Get()) c->reverseCullFace = v; }
-        )
-    );
-
-    lua.new_usertype<RigidbodyHandle>("RigidbodyComponent",
-        "IsValid", &RigidbodyHandle::IsValid,
-        "mass", sol::property(
-            [](RigidbodyHandle& h) { return h.Get() ? h.Get()->mass : 0.0f; },
-            [](RigidbodyHandle& h, float v) { if (auto* c = h.Get()) c->mass = v; }
         )
     );
 

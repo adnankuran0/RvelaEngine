@@ -9,7 +9,7 @@ using json = nlohmann::json;
 
 struct ScriptComponent 
 {
-    AssetUUID scriptAssetUUID{};
+    AssetUUID scriptAssetUUID = AssetUUID::Invalid();
     json propertyValues = json::object();
 
     sol::state* luaState = nullptr;

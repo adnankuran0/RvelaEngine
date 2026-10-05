@@ -76,18 +76,10 @@ bool ProjectManager::LoadProject(const std::string& projectFilePath)
 	auto project = std::make_shared<Project>();
 	Serializer::LoadFromFile(*project, projectFilePath);
 
-	if (!std::filesystem::exists(project->projectFolderPath))
-	{
-		project->projectFolderPath = resolvedFolder;
-		m_ActiveProject = project;
-		m_ProjectFolderPath = project->projectFolderPath;
-		SaveActiveProject();
-	}
-	else
-	{
-		m_ActiveProject = project;
-		m_ProjectFolderPath = project->projectFolderPath;
-	}
+	project->projectFolderPath = resolvedFolder;
+	m_ActiveProject = project;
+	m_ProjectFolderPath = resolvedFolder;
+	SaveActiveProject();
 
 	AddRecentProject(projectFilePath);
 	return true;

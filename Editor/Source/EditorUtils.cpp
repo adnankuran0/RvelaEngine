@@ -4,8 +4,24 @@
 #include "Core/Engine.h"
 #include "Asset/AssetManager.h"
 #include "Asset/AssetRegistry.h"
+#include "Utils/ProjectManager.h"
+#include <cstdlib>
+#include <filesystem>
 
 using namespace rv;
+
+void EditorUtils::OpenVSCodeWorkspace()
+{
+    if (!ProjectManager::IsProjectLoaded())
+        return;
+
+    const auto scriptsDir = ProjectManager::GetAssetDirectory() / "Scripts";
+    if (!std::filesystem::exists(scriptsDir))
+        return;
+
+    const std::string command = "code \"" + scriptsDir.string() + "\"";
+    std::system(command.c_str());
+}
 
 void EditorUtils::CreateScene(Engine& engine)
 {

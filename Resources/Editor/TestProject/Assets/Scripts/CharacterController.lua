@@ -1,3 +1,18 @@
+---@class Player : ScriptInstance
+---@field walkSpeed number
+---@field sprintSpeed number
+---@field jumpStrength number
+---@field acceleration number
+---@field deceleration number
+---@field gravity number
+---@field firePrefab AssetHandle
+---@field transform TransformComponent
+---@field cb CharacterBodyComponent
+---@field ae AudioEmitterComponent
+---@field camHolder Entity?
+---@field cam Entity?
+---@field headBobTime number
+---@field camStartY number
 Player = {}
 
 Player.properties = {
@@ -11,15 +26,15 @@ Player.properties = {
 }
 
 function Player:OnCreate()
-    self.transform  = self.entity:GetComponent("TransformComponent")
-    self.cb         = self.entity:GetComponent("CharacterBodyComponent")
-    self.ae         = self.entity:GetComponent("AudioEmitterComponent")
+    self.transform  = self.entity:GetComponent("Transform")
+    self.cb         = self.entity:GetComponent("CharacterBody")
+    self.ae         = self.entity:GetComponent("AudioEmitter")
     self.camHolder  = self.scene:FindEntityByName("CameraHolder")
     self.cam        = self.scene:FindEntityByName("Camera")
     self.headBobTime = 0.0
 
     if self.cam then
-        local t = self.cam:GetComponent("TransformComponent")
+        local t = self.cam:GetComponent("Transform")
         self.camStartY = t.position.y
     end
 end
@@ -33,7 +48,7 @@ function Player:OnUpdate(dt)
     local camRight   = Vec3.new(1, 0,  0)
 
     if self.camHolder then
-        local camT   = self.camHolder:GetComponent("TransformComponent")
+        local camT   = self.camHolder:GetComponent("Transform")
         camForward   = camT.forward
         camForward.y = 0
         camForward   = camForward:Normalized()
@@ -41,8 +56,21 @@ function Player:OnUpdate(dt)
     end
 
     if Input.IsMouseButtonJustPressed(MouseButton.Left) and self.transform then
-        local spawnPos = self.transform.worldPosition + camForward * 3.0
+        local aimForward = camForward
         local spawnRot = self.transform.worldRotation
+        if self.cam then
+            local camT = self.cam:GetComponent("Transform")
+            if camT and camT:IsValid() then
+                aimForward = camT.forward
+                spawnRot = camT.worldRotation
+            end
+        elseif self.camHolder then
+            local camT = self.camHolder:GetComponent("Transform")
+            if camT and camT:IsValid() then
+                spawnRot = camT.worldRotation
+            end
+        end
+        local spawnPos = self.transform.worldPosition + aimForward
         if self.firePrefab and self.firePrefab:IsValid() then
             self.scene:Instantiate(self.firePrefab, spawnPos, spawnRot)
         end
@@ -73,10 +101,12 @@ function Player:OnUpdate(dt)
         inputDir = inputDir:Normalized()
         local targetVel = inputDir * targetSpeed
         local diff      = targetVel - horizontal
+        ---@type Vec3
         local newH      = horizontal + diff * math.min(1.0, self.acceleration * dt)
         
         self.cb.velocity = Vec3.new(newH.x, verticalVel, newH.z)
     else
+        ---@type Vec3
         local newH = horizontal * math.max(0.0, 1.0 - self.deceleration * dt)
         
         self.cb.velocity = Vec3.new(newH.x, verticalVel, newH.z)  
@@ -89,8 +119,8 @@ function Player:OnUpdate(dt)
     end
 
     if self.cam then
-        local camComp = self.cam:GetComponent("CameraComponent")
-        if camComp then
+        local camComp = self.cam:GetComponent("Camera")
+        if camComp:IsValid() then
             local targetFOV  = isSprinting and 90.0 or 75.0
             local currentFOV = camComp.fov
             camComp.fov = currentFOV + (targetFOV - currentFOV) * math.min(1.0, 10.0 * dt)
@@ -98,7 +128,7 @@ function Player:OnUpdate(dt)
     end
 
     if self.cam then
-        local camT   = self.cam:GetComponent("TransformComponent")
+        local camT   = self.cam:GetComponent("Transform")
         local moving = inputDir:LengthSq() > 0 and isGrounded
         local freq   = isSprinting and 14.0 or 8.0
         local amp    = isSprinting and 0.05 or 0.06

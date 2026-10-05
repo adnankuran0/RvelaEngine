@@ -109,6 +109,7 @@ void LuaBindings::RegisterMath(sol::state& lua)
     );
     lua["Vec4"]["ZERO"] = []() { return glm::vec4(0.0f); };
     lua["Vec4"]["ONE"] = []() { return glm::vec4(1.0f); };
+    lua["Color"] = lua["Vec4"];
 
     // Quat
     lua.new_usertype<glm::quat>("Quat",

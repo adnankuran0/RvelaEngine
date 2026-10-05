@@ -44,6 +44,9 @@ void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter,
                     projectSelectorPanel->Open();
             }
 
+            if (ImGui::MenuItem("Open VS Code Workspace", nullptr, false, ProjectManager::IsProjectLoaded()))
+                EditorUtils::OpenVSCodeWorkspace();
+
             if (ImGui::MenuItem("Save Project"))
             {
                 ProjectManager::SaveActiveProject();

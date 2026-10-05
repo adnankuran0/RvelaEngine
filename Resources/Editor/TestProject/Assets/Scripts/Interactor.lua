@@ -1,8 +1,9 @@
+---@class Interactor : ScriptInstance
 Interactor = {}
 Interactor.transform = nil
 
 function Interactor:OnCreate()
-    self.transform = self.entity:GetComponent("TransformComponent")
+    self.transform = self.entity:GetComponent("Transform")
 end
 
 function Interactor:OnUpdate(dt)

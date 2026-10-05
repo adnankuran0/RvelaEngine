@@ -1,11 +1,14 @@
+---@class Door : ScriptInstance
+---@field doorRoot Entity?
+---@field animator AnimatorComponent?
+---@field isOpen boolean
 Door = {
     className = "Door"
 }
 
 function Door:OnCreate()
     self.doorRoot = self.entity:GetParent():GetParent()
-    ---@type AnimatorComponent
-    self.animator = self.doorRoot:GetComponent("AnimatorComponent")
+    self.animator = self.doorRoot:GetComponent("Animator")
     self.isOpen = false
 end
 

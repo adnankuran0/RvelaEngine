@@ -1,3 +1,4 @@
+---@class PropertyTest : ScriptInstance
 PropertyTest = {}
 
 PropertyTest.properties = {

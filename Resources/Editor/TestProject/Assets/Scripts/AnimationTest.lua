@@ -1,7 +1,8 @@
+---@class AnimationTest : ScriptInstance
 AnimationTest = {}
 
 function AnimationTest:OnCreate()
-    self.animator = self.entity:GetComponent("AnimatorComponent")
+    self.animator = self.entity:GetComponent("Animator")
 end
 
 function AnimationTest:OnUpdate(dt)

@@ -1,4 +1,5 @@
 -- UITestScript.lua
+---@class UITestScript : ScriptInstance
 UITestScript = {
     className = "UITestScript"
 }

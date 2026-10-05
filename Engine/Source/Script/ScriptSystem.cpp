@@ -18,6 +18,9 @@ ScriptSystem::ScriptSystem(Scene& scene) : m_Scene(scene)
 
 void ScriptSystem::BindLuaScript(ScriptComponent& sc, entt::entity e)
 {
+    if (!sc.scriptAssetUUID.IsValid())
+        return;
+
     auto scriptAsset = AssetManager::Get().GetAsset<ScriptAsset>(sc.scriptAssetUUID);
     if (!scriptAsset || !scriptAsset->IsValid())
     {

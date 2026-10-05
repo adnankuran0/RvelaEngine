@@ -8,7 +8,7 @@
         }
     ],
     "name": "TestProject",
-    "projectPath": "C:/RvelaEngine\\Resources\\Editor\\TestProject",
+    "projectPath": "C:\\RvelaEngine\\Resources\\Editor\\TestProject",
     "settings": {
         "name": "TestProject",
         "startScene": "Assets\\Scenes\\PhysicsTest.rscene",

@@ -7,43 +7,18 @@
             "Mesh": {
                 "mesh": "b6c7f2a2-cce2-4b68-be50-19a8f552e727"
             },
-            "RigidbodyComponent": {
-                "allowSleep": 1,
-                "angularDamping": 0.05000000074505806,
-                "autoCalculateMass": 0,
-                "bodyType": 2,
-                "collisionLayer": 1,
-                "collisionMask": 4294967295,
-                "friction": 0.5,
-                "gravityFactor": 1.0,
-                "isSensor": false,
-                "linearDamping": 0.05000000074505806,
-                "lockRotationX": false,
-                "lockRotationY": false,
-                "lockRotationZ": false,
-                "lockTranslationX": false,
-                "lockTranslationY": false,
-                "lockTranslationZ": false,
-                "mass": 2.0,
-                "maxAngularVelocity": 50.0,
-                "maxLinearVelocity": 500.0,
-                "restitution": 0.0,
-                "useCCD": false
-            },
-            "SphereColliderComponent": {
-                "offset": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "radius": 0.5
+            "ScriptComponent": {
+                "propertyValues": {
+                    "speed": 20.0
+                },
+                "scriptAssetUUID": "5ec5b495-85ae-451f-bb42-959430e47874"
             },
             "Tag": {
                 "isActive": true,
                 "tag": "Ball"
             },
             "Transform": {
-                "lockScaleRatio": true,
+                "lockScaleRatio": false,
                 "position": [
                     0.0,
                     0.0,
@@ -55,12 +30,12 @@
                     0.0
                 ],
                 "scale": [
-                    0.44999998807907104,
-                    0.44999998807907104,
-                    0.44999998807907104
+                    0.3500000238418579,
+                    0.3500000238418579,
+                    0.3500000238418579
                 ]
             },
-            "UUID": 3394495552274123330,
+            "UUID": 14673590084110389912,
             "_isRoot": true
         }
     ]

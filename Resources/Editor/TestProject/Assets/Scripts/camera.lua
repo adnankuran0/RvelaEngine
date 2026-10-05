@@ -1,3 +1,4 @@
+---@class Camera : ScriptInstance
 Camera = {}
 
 Camera.yaw = -90.0
@@ -17,7 +18,7 @@ end
 function Camera:OnUpdate(dt)
     if Input.IsKeyJustPressed(KeyCode.Escape) then
         self.captureMouse = not self.captureMouse
-
+        self.entity:GetComponent("Transform")
         if self.captureMouse then
             Input.SetMouseMode(MouseMode.CAPTURED)
         else
@@ -29,7 +30,7 @@ function Camera:OnUpdate(dt)
         return
     end
 
-    local transform = self.entity:GetComponent("TransformComponent")
+    local transform = self.entity:GetComponent("Transform")
 
     local mouse = Input.GetMousePosition()
     local mouseX = mouse.x

@@ -1,3 +1,4 @@
+---@class TPSCharacter : ScriptInstance
 TPSCharacter = {}
 
 TPSCharacter.jumpStrength = 5.0
@@ -9,13 +10,13 @@ TPSCharacter.gravity = -12.0
 TPSCharacter.rotationSpeed = 12.0
 
 function TPSCharacter:OnCreate()
-    self.cb = self.entity:GetComponent("CharacterBodyComponent")
-    self.ae = self.entity:GetComponent("AudioEmitterComponent")
+    self.cb = self.entity:GetComponent("CharacterBody")
+    self.ae = self.entity:GetComponent("AudioEmitter")
     self.camHolder = self.scene:FindEntityByName("CameraHolder")
     self.mesh = self.scene:FindEntityByName("Mesh")
 
     if self.mesh then
-        self.animator = self.mesh:GetComponent("AnimatorComponent")
+        self.animator = self.mesh:GetComponent("Animator")
     end
 
     self.wasGrounded = true
@@ -45,7 +46,7 @@ function TPSCharacter:OnUpdate(dt)
     local camRight = Vec3.new(1, 0, 0)
 
     if self.camHolder then
-        local camT = self.camHolder:GetComponent("TransformComponent")
+        local camT = self.camHolder:GetComponent("Transform")
 
         if camT then
             camForward = camT.forward
@@ -105,6 +106,7 @@ function TPSCharacter:OnUpdate(dt)
         local targetVel = inputDir * targetSpeed
         local diff = targetVel - horizontal
 
+        ---@type Vec3
         local newH = horizontal + diff * math.min(
             1.0,
             self.acceleration * dt
@@ -117,10 +119,10 @@ function TPSCharacter:OnUpdate(dt)
         )
 
         if self.mesh then
-            local meshT = self.mesh:GetComponent("TransformComponent")
+            local meshT = self.mesh:GetComponent("Transform")
 
             if meshT then
-                local targetYaw = math.deg(math.atan(
+                local targetYaw = math.deg(math.atan2(
                     inputDir.x,
                     inputDir.z
                 ))

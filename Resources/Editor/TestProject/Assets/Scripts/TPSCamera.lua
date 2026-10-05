@@ -1,3 +1,4 @@
+---@class TPSCamera : ScriptInstance
 TPSCamera = {}
 
 TPSCamera.yaw = -90.0
@@ -23,9 +24,9 @@ function TPSCamera:OnCreate()
     self.TPSCamera = self.scene:FindEntityByName("Camera")
 
     if self.TPSCamera then
-        self.camTransform = self.TPSCamera:GetComponent("TransformComponent")
+        self.camTransform = self.TPSCamera:GetComponent("Transform")
 
-        if self.camTransform then
+        if self.camTransform:IsValid() then
             local localPos = self.camTransform.position
             self.localX = localPos.x
             self.localY = localPos.y
@@ -35,6 +36,7 @@ function TPSCamera:OnCreate()
                 self.desiredDistance = math.abs(z)
                 self.zSign = z / math.abs(z)
             end
+
         end
     end
 
@@ -56,7 +58,7 @@ function TPSCamera:OnUpdate(dt)
         return
     end
 
-    local transform = self.entity:GetComponent("TransformComponent")
+    local transform = self.entity:GetComponent("Transform")
 
     local mouse = Input.GetMousePosition()
     local mouseX = mouse.x

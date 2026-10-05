@@ -1336,9 +1336,9 @@ void InspectorPanel::Draw(Engine* engine)
 				{
 					if (pathStr.ends_with(".lua"))
 					{
-						AssetUUID scriptUUID = EditorUtils::ReadUUIDFromMeta(pathStr);
-						if (!scriptUUID.IsValid())
-							scriptUUID = AssetManager::Get().GetRegistry().GetUUID(pathStr);
+						auto& assetRegistry = AssetManager::Get().GetRegistry();
+						AssetMeta scriptMeta = assetRegistry.GetOrCreateMeta(pathStr);
+						AssetUUID scriptUUID = scriptMeta.uuid;
 
 						if (scriptUUID != scriptComp.scriptAssetUUID)
 						{
@@ -1352,10 +1352,6 @@ void InspectorPanel::Draw(Engine* engine)
 			if (!scriptComp.scriptAssetUUID.IsValid())
 				return;
 
-			const auto& propDefs = ScriptEngine::GetScriptPropertyDefs(scriptComp.scriptAssetUUID);
-			if (propDefs.empty())
-				return;
-
 			ImGui::Spacing();
 			ImGui::Separator();
 			ImGui::Spacing();
@@ -1363,12 +1359,19 @@ void InspectorPanel::Draw(Engine* engine)
 			float availWidth = ImGui::GetContentRegionAvail().x;
 			ImGui::TextDisabled("Script Properties");
 			ImGui::SameLine(availWidth - 55.0f);
-			if (ImGui::SmallButton("Refresh"))
+			const bool refreshProperties = ImGui::SmallButton("Refresh");
+			if (refreshProperties)
 			{
 				ScriptEngine::InvalidateScriptPropertyDefs(scriptComp.scriptAssetUUID);
 			}
 
 			ImGui::Spacing();
+			const auto& propDefs = ScriptEngine::GetScriptPropertyDefs(scriptComp.scriptAssetUUID);
+			if (propDefs.empty())
+			{
+				ImGui::TextDisabled("No exported properties.");
+				return;
+			}
 
 			if (UI::BeginPropertyTable("ScriptPropertiesTable", 0.40f))
 			{

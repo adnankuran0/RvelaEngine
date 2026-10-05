@@ -17,6 +17,7 @@
 #include <AssetImporters/TextureImporter.h>
 #include <AssetImporters/ModelImporter.h>
 #include "Render/IconLibrary.h"
+#include "Utils/ProjectManager.h"
 
 using namespace rv;
 
@@ -51,6 +52,15 @@ static bool s_DirectoryTreeDirty = true;
 static bool s_RenamingActive = false;
 static std::filesystem::path s_RenamingPath;
 static char s_RenameBuffer[256] = "";
+
+static bool IsEditorSupportEntry(const std::filesystem::path& path, bool isDirectory)
+{
+    const std::string name = path.filename().string();
+    if (!name.empty() && name.front() == '.')
+        return true;
+
+    return isDirectory && name == "api" && path.parent_path().filename() == "Scripts";
+}
 
 static void DrawReimportWindow(AssetImportPipeline& importPipeline)
 {
@@ -236,7 +246,7 @@ static void BuildDirectoryTreeRecursive(const std::filesystem::path& path, std::
 {
     for (const auto& entry : std::filesystem::directory_iterator(path))
     {
-        if (!entry.is_directory())
+        if (!entry.is_directory() || IsEditorSupportEntry(entry.path(), true))
             continue;
 
         DirNode node;
@@ -278,10 +288,10 @@ static void RefreshAssets(const std::filesystem::path& directory)
     {
         for (const auto& entry : std::filesystem::directory_iterator(directory))
         {
-            if (entry.is_regular_file() && entry.path().extension() == ".rmeta")
+            if (IsEditorSupportEntry(entry.path(), entry.is_directory()))
                 continue;
 
-            if (entry.is_directory() && entry.path().filename().string().front() == '.')
+            if (entry.is_regular_file() && entry.path().extension() == ".rmeta")
                 continue;
 
             if (entry.is_regular_file() || entry.is_directory())
@@ -321,6 +331,24 @@ static void CollectSearchResults(const std::vector<std::filesystem::directory_en
         if (filenameLower.find(queryLower) != std::string::npos)
             s_SearchResults.emplace_back(entry);
     }
+}
+static void OpenInVSCode(const std::filesystem::path& targetPath)
+{
+    std::filesystem::path scriptsDir = ProjectManager::GetAssetDirectory() / "Scripts";
+    std::string cmd;
+    if (std::filesystem::is_directory(targetPath))
+    {
+        cmd = "code \"" + targetPath.string() + "\"";
+    }
+    else if (targetPath.extension() == ".lua" && std::filesystem::exists(scriptsDir))
+    {
+        cmd = "code \"" + scriptsDir.string() + "\" \"" + targetPath.string() + "\"";
+    }
+    else
+    {
+        cmd = "code \"" + targetPath.string() + "\"";
+    }
+    std::system(cmd.c_str());
 }
 
 static void DrawBackgroundContextMenu(Engine* engine, const std::filesystem::path& currentDir)
@@ -395,7 +423,14 @@ static void DrawBackgroundContextMenu(Engine* engine, const std::filesystem::pat
                 int i = 1;
                 while (std::filesystem::exists(newPath))
                     newPath = currentDir / ("NewScript" + std::to_string(i++) + ".lua");
-                CreateEmptyTextFile(newPath, "-- New Script\n");
+                const std::string scriptType = newPath.stem().string();
+                const std::string scriptTemplate =
+                    "---@class " + scriptType + " : ScriptInstance\n" +
+                    "local " + scriptType + " = {}\n\n" +
+                    "function " + scriptType + ":OnCreate()\n" +
+                    "end\n\n" +
+                    "return " + scriptType + "\n";
+                CreateEmptyTextFile(newPath, scriptTemplate);
                 s_NeedsRefresh = true;
 
             }
@@ -415,6 +450,11 @@ static void DrawBackgroundContextMenu(Engine* engine, const std::filesystem::pat
         {
             std::string cmd = "explorer \"" + currentDir.string() + "\"";
             std::system(cmd.c_str());
+        }
+
+        if (ImGui::MenuItem("Open in VS Code"))
+        {
+            OpenInVSCode(currentDir);
         }
 
         ImGui::EndPopup();
@@ -456,15 +496,21 @@ static void DrawItemContextMenu(const std::filesystem::path& itemPath, AssetImpo
             std::system(cmd.c_str());
         }
 
-        if (!std::filesystem::is_directory(itemPath))
+        if (std::filesystem::is_directory(itemPath))
+        {
+            if (ImGui::MenuItem("Open in VS Code"))
+            {
+                OpenInVSCode(itemPath);
+            }
+        }
+        else
         {
             auto ext = itemPath.extension();
             if (ext == ".glsl" || ext == ".lua")
             {
                 if (ImGui::MenuItem("Open in VS Code"))
                 {
-                    std::string cmd = "code \"" + itemPath.string() + "\"";
-                    std::system(cmd.c_str());
+                    OpenInVSCode(itemPath);
                 }
             }
 
@@ -645,8 +691,13 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
             }
             else if (extension == ".glsl" || extension == ".lua")
             {
-                std::string command = "code \"" + entry.path().string() + "\"";
-                std::system(command.c_str());
+                if (extension == ".lua")
+                    OpenInVSCode(entry.path());
+                else
+                {
+                    std::string command = "code \"" + entry.path().string() + "\"";
+                    std::system(command.c_str());
+                }
             }
             else if (extension == ".png" || extension == ".jpeg" ||
                 extension == ".jpg" || extension == ".tga")
