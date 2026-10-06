@@ -14,7 +14,12 @@ namespace rv::Physics {
 class ContactListener : public JPH::ContactListener
 {
 public:
-	void Init(JPH::PhysicsSystem* physicsSystem , std::vector<CollisionEvent>* eventQueue) { m_PhysicsSystem = physicsSystem; m_EventQueue = eventQueue; }
+	void Init(JPH::PhysicsSystem* physicsSystem, std::vector<CollisionEvent>* eventQueue, std::mutex* eventMutex)
+	{
+		m_PhysicsSystem = physicsSystem;
+		m_EventQueue = eventQueue;
+		m_EventMutex = eventMutex;
+	}
 	
 private:
 	virtual JPH::ValidateResult	OnContactValidate(const JPH::Body& inBody1, const JPH::Body& inBody2, JPH::RVec3Arg inBaseOffset, const JPH::CollideShapeResult& inCollisionResult) override;
@@ -25,7 +30,8 @@ private:
 	CollisionEvent BuildEvent(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, const CollisionEventType& eventType);
 
 	JPH::PhysicsSystem* m_PhysicsSystem = nullptr;
-	std::mutex m_EventMutex;
+	std::mutex m_ActiveContactsMutex;
+	std::mutex* m_EventMutex = nullptr;
 	std::vector<CollisionEvent>* m_EventQueue;
 	std::unordered_map<ContactKey, CollisionEvent, ContactKeyHash> m_ActiveContacts;
 };

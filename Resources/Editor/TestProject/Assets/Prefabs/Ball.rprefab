@@ -44,7 +44,7 @@
                 "autoCalculateMass": 1,
                 "bodyType": 2,
                 "collisionLayer": 1,
-                "collisionMask": 4294967295,
+                "collisionMask": 4294967293,
                 "friction": 0.5,
                 "gravityFactor": 1.0,
                 "isSensor": false,
@@ -72,7 +72,7 @@
                 "tag": "Ball"
             },
             "Transform": {
-                "lockScaleRatio": false,
+                "lockScaleRatio": true,
                 "position": [
                     0.0,
                     0.0,
@@ -84,12 +84,12 @@
                     0.0
                 ],
                 "scale": [
-                    0.3500000238418579,
-                    0.3500000238418579,
-                    0.3500000238418579
+                    0.30000001192092896,
+                    0.30000001192092896,
+                    0.30000001192092896
                 ]
             },
-            "UUID": 9361880778603926319,
+            "UUID": 2660239966567617444,
             "_isRoot": true
         }
     ]

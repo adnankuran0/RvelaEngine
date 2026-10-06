@@ -3,13 +3,19 @@
 #include <Jolt/Physics/Character/CharacterVirtual.h>
 #include "CollisionEvent.h"
 #include "CharacterContactKey.h"
+#include <mutex>
 
 namespace rv::Physics {
 
 class CharacterContactListener : public JPH::CharacterContactListener
 {
 public:
-    void Init(JPH::PhysicsSystem* physicsSystem, std::vector<CollisionEvent>* eventQueue) { m_PhysicsSystem = physicsSystem; m_EventQueue = eventQueue; }
+    void Init(JPH::PhysicsSystem* physicsSystem, std::vector<CollisionEvent>* eventQueue, std::mutex* eventMutex)
+    {
+        m_PhysicsSystem = physicsSystem;
+        m_EventQueue = eventQueue;
+        m_EventMutex = eventMutex;
+    }
 
     bool OnContactValidate(const JPH::CharacterVirtual* inCharacter, const JPH::BodyID& inBodyID2, 
         const JPH::SubShapeID& inSubShapeID2) override;
@@ -57,9 +63,10 @@ private:
         CollisionEventType eventType);
 
     JPH::PhysicsSystem* m_PhysicsSystem = nullptr;
-    std::mutex m_EventMutex;
+    std::mutex m_ActiveContactsMutex;
+    std::mutex* m_EventMutex = nullptr;
     std::vector<CollisionEvent>* m_EventQueue = nullptr;
     std::unordered_map<CharacterContactKey, CollisionEvent, CharacterContactKeyHash> m_ActiveContacts;
 };
 
-} 
+}

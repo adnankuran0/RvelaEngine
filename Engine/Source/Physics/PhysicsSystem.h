@@ -6,6 +6,7 @@
 #include "BroadPhaseLayer.h"
 #include "ObjectVsBroadPhaseLayerFilter.h"
 #include <memory>
+#include <mutex>
 #include "ContactListener.h"
 #include "CharacterContactListener.h"
 #include "BodyActivationListener.h"
@@ -29,7 +30,13 @@ public:
 	void Step(float dt);
 	void Update();
 	inline Physics::PhysicsWorld& GetPhysicsWorld() { return m_PhysicsWorld; }
-	std::vector<Physics::CollisionEvent> FlushEvents() { return std::move(m_CollisionEventQueue); }
+	std::vector<Physics::CollisionEvent> FlushEvents()
+	{
+		std::lock_guard lock(m_CollisionEventMutex);
+		std::vector<Physics::CollisionEvent> events;
+		events.swap(m_CollisionEventQueue);
+		return events;
+	}
 
 private:
 	void BindCallbacks();
@@ -85,6 +92,7 @@ private:
 
 	Physics::PhysicsWorld m_PhysicsWorld;
 
+	std::mutex m_CollisionEventMutex;
 	std::vector<Physics::CollisionEvent> m_CollisionEventQueue;
 
 	JoltDebugRenderer m_DebugRenderer;

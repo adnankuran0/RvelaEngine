@@ -38,9 +38,10 @@ void ContactListener::OnContactAdded(const JPH::Body& inBody1, const JPH::Body& 
 	CollisionEvent e = BuildEvent(inBody1, inBody2, inManifold, CollisionEventType::ENTER);
 
 	ContactKey key(inBody1.GetID(), inBody2.GetID());
+	std::lock_guard contactsLock(m_ActiveContactsMutex);
 	m_ActiveContacts[key] = e;
 
-	std::lock_guard lock(m_EventMutex);
+	std::lock_guard eventLock(*m_EventMutex);
 	m_EventQueue->push_back(e);
 }
 
@@ -50,15 +51,17 @@ void ContactListener::OnContactPersisted(const JPH::Body& inBody1, const JPH::Bo
 	CollisionEvent e = BuildEvent(inBody1, inBody2, inManifold, CollisionEventType::STAY);
 
 	ContactKey key(inBody1.GetID(), inBody2.GetID());
+	std::lock_guard contactsLock(m_ActiveContactsMutex);
 	m_ActiveContacts[key] = e;
 
-	std::lock_guard lock(m_EventMutex);
+	std::lock_guard eventLock(*m_EventMutex);
 	m_EventQueue->push_back(e);
 }
 
 void ContactListener::OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair)
 {
 	ContactKey key(inSubShapePair.GetBody1ID(), inSubShapePair.GetBody2ID());
+	std::lock_guard contactsLock(m_ActiveContactsMutex);
 
 	auto it = m_ActiveContacts.find(key);
 	if (it == m_ActiveContacts.end())
@@ -67,7 +70,7 @@ void ContactListener::OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair
 	CollisionEvent e = it->second;
 	e.eventType = CollisionEventType::EXIT;
 
-	std::lock_guard lock(m_EventMutex);
+	std::lock_guard eventLock(*m_EventMutex);
 	m_EventQueue->push_back(e);
 
 	m_ActiveContacts.erase(it);

@@ -39,8 +39,8 @@ PhysicsSystem::PhysicsSystem(Scene& scene) :
 	m_PhysicsWorld.Init(m_PhysicsSystem);
 
 	m_CollisionEventQueue.reserve(50);
-	m_ContactListener.Init(&m_PhysicsSystem,&m_CollisionEventQueue);
-	m_CharacterContactListener.Init(&m_PhysicsSystem, &m_CollisionEventQueue);
+	m_ContactListener.Init(&m_PhysicsSystem, &m_CollisionEventQueue, &m_CollisionEventMutex);
+	m_CharacterContactListener.Init(&m_PhysicsSystem, &m_CollisionEventQueue, &m_CollisionEventMutex);
 
 	BindCallbacks();
 }
@@ -139,7 +139,10 @@ void PhysicsSystem::OnStop()
 		}
 	}
 
-	m_CollisionEventQueue.clear();
+	{
+		std::lock_guard lock(m_CollisionEventMutex);
+		m_CollisionEventQueue.clear();
+	}
 }
 
 void PhysicsSystem::BindCallbacks()
