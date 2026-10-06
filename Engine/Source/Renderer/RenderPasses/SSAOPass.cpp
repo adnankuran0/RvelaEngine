@@ -8,7 +8,6 @@
 
 using namespace rv;
 
-constexpr int KERNEL_SIZE = 32;
 constexpr int NOISE_SIZE = 16;
 
 void SSAOPass::Init(const RenderContext& ctx, RenderFrame& frame)
@@ -23,7 +22,6 @@ void SSAOPass::Init(const RenderContext& ctx, RenderFrame& frame)
 
     m_Framebuffer = Framebuffer(desc);
 
-    GenerateSampleKernel();
     GenerateNoiseTexture();
 
     frame.registry.Register("SSAOTexture", { RenderResourceType::Texture, m_Framebuffer.GetColorAttachment(0) });
@@ -60,36 +58,9 @@ void SSAOPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     ssaoShader.setInt("gDepth", 1);
     ssaoShader.setInt("texNoise", 2);
 
-    for (unsigned int i = 0; i < KERNEL_SIZE; ++i)
-        ssaoShader.setVec3("samples[" + std::to_string(i) + "]", kernel.at(i));
-
     Renderer::DrawFullScreenQuad();
     Framebuffer::BindDefault();
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
-}
-
-void SSAOPass::GenerateSampleKernel()
-{
-    std::uniform_real_distribution<float> randomFloats(0.0f, 1.0f);
-    std::default_random_engine generator;
-    kernel.reserve(KERNEL_SIZE);
-
-    for (unsigned int i = 0; i < KERNEL_SIZE; ++i)
-    {
-        glm::vec3 sample(
-            randomFloats(generator) * 2.0f - 1.0f,
-            randomFloats(generator) * 2.0f - 1.0f,
-            randomFloats(generator)
-        );
-        sample = glm::normalize(sample);
-        sample *= randomFloats(generator);
-
-        float scale = static_cast<float>(i) / KERNEL_SIZE;
-        scale = glm::mix(0.1f, 1.0f, scale * scale);
-        sample *= scale;
-
-        kernel.push_back(sample);
-    }
 }
 
 void SSAOPass::GenerateNoiseTexture()

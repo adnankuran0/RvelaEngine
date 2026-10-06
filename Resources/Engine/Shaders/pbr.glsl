@@ -251,7 +251,8 @@ void main()
     float roughnessMapValue = useRoughnessMap ? texture(roughnessMap, mappedTexCoords).r : 1.0;
     float roughness = clamp(roughnessValue * roughnessMapValue, 0.0, 1.0);
     float materialAO = useAOMap ? texture(aoMap, mappedTexCoords).r : aoValue;
-    float ao = materialAO * sampleSSAO();
+    float screenSpaceAO = transparencyMode == 1 ? 1.0 : sampleSSAO();
+    float ao = materialAO * screenSpaceAO;
 
     vec3 V = normalize(camPos - FragPos);
     vec3 Nmap = getNormalFromMap(mappedTexCoords, N, T, B);

@@ -12,8 +12,6 @@ public:
 private:
     Framebuffer m_Framebuffer;
     GLuint noiseTexture = 0;
-    std::vector<glm::vec3> kernel;
-    void GenerateSampleKernel();
     void GenerateNoiseTexture();
 };
 }
