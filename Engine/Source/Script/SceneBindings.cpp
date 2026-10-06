@@ -3,6 +3,7 @@
 #include "sol/sol.hpp"
 #include "Scene/Entity.h"
 #include "Scene/Scene.h"
+#include "Scene/SceneManager.h"
 #include "Asset/AssetManager.h"
 #include "Asset/AssetUUID.h"
 #include <glm/gtc/quaternion.hpp>
@@ -78,9 +79,30 @@ Entity LuaBindings::InstantiatePrefabHelper(Scene& scene, sol::object prefabObj,
     return scene.Instantiate(prefabUUID, position, rotation, parentHandle);
 }
 
-void LuaBindings::RegisterSceneAPI(sol::state& lua)
+void LuaBindings::RegisterSceneAPI(sol::state& lua, SceneManager* sceneManager)
 {
     lua["Scene"] = lua.create_table();
+    lua["SceneManager"] = lua.create_table();
+    lua["SceneManager"]["ChangeScene"] = [sceneManager](sol::object target) -> bool {
+        if (!sceneManager)
+        {
+            LOG_ERROR("SceneManager:ChangeScene is unavailable outside an Engine-managed scene");
+            return false;
+        }
+
+        if (target.is<AssetHandle>())
+            return sceneManager->LoadScene(target.as<AssetHandle>());
+        if (target.is<AssetHandle*>())
+        {
+            AssetHandle* handle = target.as<AssetHandle*>();
+            return handle && sceneManager->LoadScene(*handle);
+        }
+        if (target.is<std::string>())
+            return sceneManager->LoadScene(target.as<std::string>());
+
+        LOG_ERROR("SceneManager:ChangeScene expects a .rscene path or AssetHandle");
+        return false;
+    };
 
     lua.new_usertype<Scene>("Scene",
         "CreateEntity", &Scene::CreateEntity,

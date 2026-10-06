@@ -24,7 +24,7 @@ Player.properties = {
     acceleration     = 20.0,
     deceleration     = 20.0,
     gravity          = -12.0,
-    firePrefab       = { type = "AssetHandle"}
+    firePrefab       = { type = "AssetHandle"},
 }
 
 function Player:OnCreate()

@@ -2,16 +2,20 @@
 local Ball = {}
 
 Ball.properties = {
-    speed = 10.0
+    speed = 100.0,
+    destroySecons = 2
 }
 
 function Ball:OnCreate()
-    self.transform = self.entity:GetComponent("Transform")
+    self:StartTimer(self.destroySecons,function (self)
+        self.entity:Destroy()
+    end)
 end
 
-function Ball:OnUpdate(dt)
-	if not self.transform or not self.transform:IsValid() then return end
-	self.transform:Translate(self.transform.forward * self.speed * dt)
+function Ball:OnReady()
+    self.transform = self.entity:GetComponent("Transform")
+    self.rb = self.entity:GetComponent("Rigidbody")
+    self.rb:AddImpulse(self.transform.forward * self.speed)
 end
 
 

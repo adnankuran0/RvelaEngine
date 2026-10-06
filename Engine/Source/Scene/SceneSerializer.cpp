@@ -194,15 +194,13 @@ void SceneSerializer::DeserializeScene(Scene& scene, const json& j)
     }
 }
 
-void SceneSerializer::LoadScene(Scene& scene, const std::string& path)
+bool SceneSerializer::LoadScene(Scene& scene, const std::string& path)
 {
-    scene.SetPath(path);
-
     json j;
     std::ifstream stream(path);
     if (!stream.is_open()) {
         LOG_ERROR("Scene file could not be opened: {}", path);
-        return;
+        return false;
     }
 
     try {
@@ -210,10 +208,27 @@ void SceneSerializer::LoadScene(Scene& scene, const std::string& path)
     }
     catch (const std::exception& e) {
         LOG_ERROR("JSON parse error in {}: {}", path, e.what());
-        return;
+        return false;
     }
 
-    DeserializeScene(scene, j);
+    if (!j.is_object() || !j.contains("Entities") || !j["Entities"].is_array())
+    {
+        LOG_ERROR("Invalid scene data (expected an Entities array): {}", path);
+        return false;
+    }
+
+    try
+    {
+        DeserializeScene(scene, j);
+    }
+    catch (const std::exception& e)
+    {
+        LOG_ERROR("Scene deserialization error in {}: {}", path, e.what());
+        return false;
+    }
+
+    scene.SetPath(path);
+    return true;
 }
 
 json SceneSerializer::SerializeEntity(Scene& scene, entt::entity e, bool serializePrefabAsInstance)

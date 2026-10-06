@@ -30,19 +30,15 @@ Engine::Engine()
 	AudioManager::Init();
 
 	m_Renderer.Init(m_Window.GetGLFWWindow());
+	if (s_Instance == nullptr)
+		s_Instance = this;
+	else
+		LOG_WARN("Another instance of Engine already exists!");
+
 	m_SceneManager.Init();
 	m_RenderLayer = new RenderLayer(this);
 	PushLayer(m_RenderLayer);
 	Selection = SelectionManager(m_RenderLayer);
-	if (s_Instance == nullptr)
-	{
-		s_Instance = this;
-	}
-	else
-	{
-		LOG_WARN("Another instance of Engine already exists!");
-	}
-
 }
 
 bool Engine::OpenProject(const std::string& projectFilePath)

@@ -3,7 +3,8 @@
 #include "Scene/Entity.h"
 
 namespace rv {
-	class Scene;
+class Scene;
+class SceneManager;
 }
 
 namespace rv::LuaBindings {
@@ -13,6 +14,6 @@ namespace rv::LuaBindings {
 		sol::optional<sol::object> rotObj,
 		sol::optional<sol::object> parentObj);
 
-	void RegisterSceneAPI(sol::state& lua);
+	void RegisterSceneAPI(sol::state& lua, SceneManager* sceneManager);
 
 }

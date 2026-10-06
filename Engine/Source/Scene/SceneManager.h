@@ -1,6 +1,7 @@
 #pragma once
 #include "Scene.h"
 #include "SceneSerializer.h"
+#include "Asset/AssetUUID.h"
 
 namespace rv {
 
@@ -31,7 +32,8 @@ public:
 
     void SaveScene(const std::string& path);
     void SaveScene(Scene& scene, const std::string& path);
-    void LoadScene(const std::string& path);
+    bool LoadScene(const std::string& path);
+    bool LoadScene(const AssetUUID& sceneAsset);
 
     void Update();
     void FixedUpdate();

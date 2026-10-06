@@ -1,6 +1,7 @@
 #include "rvelapch.h"
 #include "ScriptEngine.h"
 #include "ScriptBindings.h"
+#include "Core/Engine.h"
 #include "sol/variadic_args.hpp"
 #include "Core/EditorConsoleSink.h"
 #include "Asset/AssetManager.h"
@@ -32,7 +33,8 @@ void ScriptEngine::Init()
     LuaBindings::RegisterCoreTypes(m_State);
     LuaBindings::RegisterComponents(m_State);
     LuaBindings::RegisterInputAPI(m_State);
-    LuaBindings::RegisterSceneAPI(m_State);
+    Engine* engine = Engine::Get();
+    LuaBindings::RegisterSceneAPI(m_State, engine ? &engine->GetSceneManager() : nullptr);
     LuaBindings::RegisterPhysicsAPI(m_State);
     LuaBindings::RegisterAudioAPI(m_State);
     LuaBindings::RegisterAnimationAPI(m_State);

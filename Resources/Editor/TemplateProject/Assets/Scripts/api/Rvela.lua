@@ -1043,6 +1043,16 @@ function Scene:Instantiate(prefab, position, rotation, parent) end
 
 _G.Scene = Scene
 
+---@class SceneManager
+local SceneManager = {}
+
+---Queues a scene change by .rscene path or scene AssetHandle. Relative paths can start at the project or Assets folder. Returns whether the request was accepted.
+---@param target string|AssetHandle
+---@return boolean accepted
+function SceneManager.ChangeScene(target) end
+
+_G.SceneManager = SceneManager
+
 
 -------------------------------------------------------------------------------
 -- SCRIPT BASE / LIFECYCLE

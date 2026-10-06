@@ -1,15 +1,69 @@
 {
     "Entities": [
         {
+            "BoxColliderComponent": {
+                "offset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    0.5,
+                    0.5,
+                    0.5
+                ]
+            },
             "Material": {
-                "material": ""
+                "material": "",
+                "overrides": {
+                    "emissiveColor": [
+                        0.0,
+                        0.39230191707611084,
+                        0.5907335877418518
+                    ],
+                    "emissiveIntensity": 4.199999809265137
+                }
             },
             "Mesh": {
                 "mesh": "b6c7f2a2-cce2-4b68-be50-19a8f552e727"
             },
+            "PointLight": {
+                "castShadows": true,
+                "color": [
+                    0.0,
+                    0.9845559597015381,
+                    0.904727041721344
+                ],
+                "falloff": 2.490000009536743,
+                "intensity": 4.260000228881836,
+                "radius": 2.549999952316284
+            },
+            "RigidbodyComponent": {
+                "allowSleep": 1,
+                "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
+                "bodyType": 2,
+                "collisionLayer": 1,
+                "collisionMask": 4294967295,
+                "friction": 0.5,
+                "gravityFactor": 1.0,
+                "isSensor": false,
+                "linearDamping": 0.05000000074505806,
+                "lockRotationX": false,
+                "lockRotationY": false,
+                "lockRotationZ": false,
+                "lockTranslationX": false,
+                "lockTranslationY": false,
+                "lockTranslationZ": false,
+                "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
+                "restitution": 0.5,
+                "useCCD": false
+            },
             "ScriptComponent": {
                 "propertyValues": {
-                    "speed": 20.0
+                    "speed": 500.0
                 },
                 "scriptAssetUUID": "5ec5b495-85ae-451f-bb42-959430e47874"
             },
@@ -35,7 +89,7 @@
                     0.3500000238418579
                 ]
             },
-            "UUID": 14673590084110389912,
+            "UUID": 9361880778603926319,
             "_isRoot": true
         }
     ]

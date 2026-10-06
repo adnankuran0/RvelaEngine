@@ -7,7 +7,7 @@ class SceneSerializer
 {
 public:
 	void SaveScene(Scene& scene, const std::string& path);
-	void LoadScene(Scene& scene, const std::string& path);
+	bool LoadScene(Scene& scene, const std::string& path);
 
 	static json SerializeScene(Scene& scene);
 	static void DeserializeScene(Scene& scene, const json& j);
