@@ -13,6 +13,7 @@
     "viewport": {
         "drawBoundingBoxes": false,
         "drawColliders": false,
+        "drawInfiniteGrid": true,
         "enableSnap": false,
         "gizmoMode": 0,
         "snapRotate": 15.0,

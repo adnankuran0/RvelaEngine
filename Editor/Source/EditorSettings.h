@@ -29,6 +29,7 @@ struct ViewportGizmoSettings
     float SnapScale = 0.5f;
     bool DrawColliders = false;
     bool DrawBoundingBoxes = false;
+    bool DrawInfiniteGrid = true;
 };
 
 class EditorSettings

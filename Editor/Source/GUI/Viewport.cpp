@@ -469,6 +469,7 @@ void Viewport::DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySi
 
         ImGui::TextDisabled("Debug Visuals");
         ImGui::Separator();
+        if (ImGui::Checkbox("Infinite Grid", &debugSettings.drawInfiniteGrid)) viewChanged = true;
         if (ImGui::Checkbox("Draw Colliders", &debugSettings.drawColliders)) viewChanged = true;
         if (ImGui::Checkbox("Draw Bounding Boxes", &debugSettings.drawBoundingBoxes)) viewChanged = true;
 

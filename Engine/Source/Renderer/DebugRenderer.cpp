@@ -26,6 +26,12 @@ void DebugRenderer::DrawLine(const glm::vec3& from, const glm::vec3& to, const g
 	m_LineVertices.emplace_back(to, color);
 }
 
+void DebugRenderer::DrawLine(const glm::vec3& from, const glm::vec4& fromColor, const glm::vec3& to, const glm::vec4& toColor)
+{
+	m_LineVertices.emplace_back(from, fromColor);
+	m_LineVertices.emplace_back(to, toColor);
+}
+
 void DebugRenderer::DrawTriangle(const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3, const glm::vec4& color)
 {
 	DrawLine(v1, v2, color);
