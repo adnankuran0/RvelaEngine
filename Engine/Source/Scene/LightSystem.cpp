@@ -1,15 +1,20 @@
 #include "rvelapch.h"
 #include "LightSystem.h"
 #include "Scene/Scene.h"
+#include "Renderer/RenderTypes.h"
 
 using namespace rv;
 
 std::vector<PointLight> LightSystem::CollectPointLights() noexcept {
 	std::vector<PointLight> lights;
+	lights.reserve(rv::MaxPointLights);
+	int nextShadowIndex = 0;
 	auto view = m_Scene.GetRegistry().view<PointLightComponent, TransformComponent>();
 	for (auto e : view) {
 		if (!m_Scene.IsEntityActive(e))
 			continue;
+		if (lights.size() >= rv::MaxPointLights)
+			break;
 
 		auto& light = m_Scene.GetComponent<PointLightComponent>(e);
 		auto& t = m_Scene.GetComponent<TransformComponent>(e);
@@ -19,8 +24,8 @@ std::vector<PointLight> LightSystem::CollectPointLights() noexcept {
 		data.intensity = light.intensity;
 		data.radius = light.radius;
 		data.falloff = light.falloff;
-		data.castShadows = light.castShadows;
-		data.shadowIndex = light.shadowIndex;
+		data.castShadows = light.castShadows && nextShadowIndex < rv::MaxPointLights;
+		data.shadowIndex = data.castShadows ? nextShadowIndex++ : -1;
 		data.shadowBias = light.shadowBias;
 		data.reverseCullFace = light.reverseCullFace;
 		data.blurRadius = light.blurRadius;

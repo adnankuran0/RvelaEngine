@@ -3,6 +3,7 @@
 #include "Utils/GPUTimer.h"
 #include "Core/Engine.h"
 #include "RenderContext.h"
+#include "Renderer/RenderTypes.h"
 #include "Renderer/RenderPasses/LightingPass.h"
 #include "Renderer/RenderPasses/SkyboxPass.h"
 #include "Renderer/RenderPasses/ShadowPass.h"
@@ -102,7 +103,7 @@ void RenderPipeline::UpdateUBOs(const RenderContext& ctx)
 		lightData.hasDirLight = 0;
 	}
 
-	int count = std::min(static_cast<int>(ctx.pointLights.size()), 20);
+	int count = std::min(static_cast<int>(ctx.pointLights.size()), MaxPointLights);
 	lightData.pointLightCount = count;
 
 	for (int i = 0; i < count; ++i)

@@ -1,6 +1,7 @@
 ﻿#include "rvelapch.h"
 #include "ShadowPass.h"
 #include "Renderer/RenderContext.h"
+#include "Renderer/RenderTypes.h"
 #include "Renderer/RenderFrame.h"
 #include "Renderer/ShaderManager.h"
 #include "Renderer/TextureCache.h"
@@ -40,7 +41,7 @@ void ShadowPass::InitPointShadowMap()
         GL_DEPTH_COMPONENT16,
         POINT_SHADOW_WIDTH,
         POINT_SHADOW_HEIGHT,
-        6 * 20,
+        6 * MaxPointLights,
         0,
         GL_DEPTH_COMPONENT,
         GL_FLOAT,
@@ -54,7 +55,7 @@ void ShadowPass::InitPointShadowMap()
     glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
     glBindFramebuffer(GL_FRAMEBUFFER, pointFBO);
-    for (int layer = 0; layer < 6 * 20; ++layer) {
+    for (int layer = 0; layer < 6 * MaxPointLights; ++layer) {
         glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, o_PointShadowMap, 0, layer);
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
             LOG_ERROR("Point shadow framebuffer layer {} not complete!", layer);

@@ -18,25 +18,13 @@ public:
     bool reverseCullFace = true;
     float shadowBias = 0.1f;
     float blurRadius = 0.03f;
-    int shadowIndex = -1;
-    PointLightComponent()
-    {
-        shadowIndex = s_ShadowIndexCounter;
-        s_ShadowIndexCounter++;
-    }
-    PointLightComponent(const glm::vec3& color, float intensity, float radius) : color(color), intensity(intensity), radius(radius) 
-    {
-        shadowIndex = s_ShadowIndexCounter;
-        s_ShadowIndexCounter++;
-    }
+    PointLightComponent() = default;
+    PointLightComponent(const glm::vec3& color, float intensity, float radius)
+        : color(color), intensity(intensity), radius(radius) {}
 
     json Serialize() const;
     void Deserialize(const json& j);
  
-
-private:
-    inline static int s_ShadowIndexCounter = 0;
-
 };
 
 
