@@ -652,7 +652,7 @@
                     0.9999991655349731
                 ]
             },
-            "UUID": 16228779990387229354
+            "UUID": 4564225880120794456
         },
         {
             "Material": {
@@ -1418,7 +1418,7 @@
                     1.0
                 ]
             },
-            "UUID": 7085973496891739761
+            "UUID": 1173904352162770914
         },
         {
             "ParentUUID": 0,
@@ -1597,7 +1597,7 @@
                     0.3500000238418579
                 ]
             },
-            "UUID": 17740772980447203852
+            "UUID": 6229619110603015929
         }
     ],
     "Environment": {
@@ -1606,7 +1606,7 @@
         "Bloom_Knee": 0.0,
         "Bloom_Treshold": 1.0,
         "HDR": "9336556f-443f-4c5f-a210-2c30fa69828f",
-        "HDRPath": "Assets\\.cache\\9336556f-443f-4c5f-a210-2c30fa69828f.rtex",
+        "HDRPath": "Assets\\Textures\\skybox\\environment.hdr",
         "Lighting_AmbientColor": [
             1.0,
             1.0,
@@ -1614,7 +1614,7 @@
         ],
         "Lighting_AmbientIntensity": 0.10000000149011612,
         "Lighting_IBL": true,
-        "Lighting_IBLIntensity": 0.20000000298023224,
+        "Lighting_IBLIntensity": 0.10000000149011612,
         "PostProcess_ChromaticStrength": 0.009999999776482582,
         "PostProcess_Exposure": 1.0,
         "PostProcess_VignetteIntensity": 0.25,

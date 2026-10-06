@@ -10,6 +10,7 @@ class IAssetImporter
 public:
 	virtual ~IAssetImporter() = default;
 	virtual std::string GetImporterID() const = 0;
+	virtual uint32_t GetImporterVersion(const std::filesystem::path&) const { return 0; }
 	virtual std::filesystem::path GetCachePath(
 		const std::filesystem::path& sourcePath,
 		const AssetMeta& meta,

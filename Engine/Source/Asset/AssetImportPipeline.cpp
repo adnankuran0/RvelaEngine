@@ -68,6 +68,7 @@ bool AssetImportPipeline::ImportAsset(const std::filesystem::path& sourcePath, A
 
     auto updatedMeta = registry.GetMeta(meta.uuid);
     updatedMeta.lastWriteTime = meta.lastWriteTime;
+    updatedMeta.importerVersion = importer->GetImporterVersion(sourcePath);
     registry.SaveMeta(sourcePath, updatedMeta);
     registry.RegisterPath(updatedMeta.uuid, cachePath);
 
@@ -120,6 +121,9 @@ bool AssetImportPipeline::NeedsReimport(const std::filesystem::path& sourcePath,
     IAssetImporter* importer = FindImporter(sourcePath.extension().string());
     if (!importer)
         return false;
+
+    if (meta.importerVersion != importer->GetImporterVersion(sourcePath))
+        return true;
 
     auto& registry = AssetManager::Get().GetRegistry();
     auto cacheRoot = registry.GetAssetDir() / ".cache";

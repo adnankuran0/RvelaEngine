@@ -12,6 +12,7 @@ bool AssetMeta::SaveToFile(const std::filesystem::path& metaPath) const
     j["uuid"] = uuid.ToString();
     j["importerID"] = importerID;
     j["lastWriteTime"] = lastWriteTime;
+    j["importerVersion"] = importerVersion;
     j["importerSettings"] = importerSettingsJson.empty() ? json::object() : json::parse(importerSettingsJson);
 
     json deps = json::array();
@@ -69,6 +70,8 @@ bool AssetMeta::LoadFromFile(const std::filesystem::path& metaPath)
         lastWriteTime = j.value<uint64_t>("lastWriteTime", 0);
     else if (j.contains("sourceHash"))
         lastWriteTime = j.value<uint64_t>("sourceHash", 0);
+
+    importerVersion = j.value<uint32_t>("importerVersion", 0);
 
     importerSettingsJson = j.contains("importerSettings") ? j["importerSettings"].dump() : "{}";
 

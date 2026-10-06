@@ -21,6 +21,7 @@ struct AssetMeta
     AssetUUID uuid;
     std::string importerID;
     uint64_t lastWriteTime = 0;
+    uint32_t importerVersion = 0;
     std::string importerSettingsJson;
 
     std::vector<AssetUUID> dependencies;  

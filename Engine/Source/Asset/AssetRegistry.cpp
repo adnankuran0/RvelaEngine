@@ -1,7 +1,10 @@
 #include "rvelapch.h"
 #include "AssetRegistry.h"
+#include "Asset/CacheTypes/TextureCacheHeader.h"
 #include "Core/Log.h"
 #include <fstream>
+#include <algorithm>
+#include <cctype>
 
 using namespace rv;
 
@@ -131,6 +134,31 @@ void AssetRegistry::Scan(const std::filesystem::path& assetDir)
 
             bool hasMeta = m_Metas.contains(uuid);
             bool hasPath = m_UUIDToPath.contains(uuid);
+
+            if (ext == ".rtex" && hasPath)
+            {
+                auto sourcePath = m_UUIDToPath[uuid];
+                std::string sourceExtension = sourcePath.extension().string();
+                std::transform(sourceExtension.begin(), sourceExtension.end(), sourceExtension.begin(),
+                    [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+                if (sourceExtension == ".hdr")
+                {
+                    TextureCacheHeader header{};
+                    std::ifstream cacheFile(cachePath, std::ios::binary);
+                    cacheFile.read(reinterpret_cast<char*>(&header), sizeof(header));
+                    const uint64_t channels = header.format == TextureFormat::RGB32F ? 3u
+                        : header.format == TextureFormat::RGBA32F ? 4u : 0u;
+                    const uint64_t expectedSize = static_cast<uint64_t>(header.width) * header.height * channels * sizeof(float);
+                    const bool validHDRCache = cacheFile && header.magic == MAGIC_TEXTURE &&
+                        header.version == TEXTURE_CACHE_VERSION && channels != 0 && !header.isSRGB &&
+                        header.mipCount == 1 && header.dataSize == expectedSize;
+                    if (!validHDRCache)
+                    {
+                        LOG_WARN("Ignoring outdated or invalid HDR texture cache: {}", cachePath.string());
+                        continue;
+                    }
+                }
+            }
 
             if (!hasMeta)
             {

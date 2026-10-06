@@ -17,6 +17,7 @@ class TextureImporter : public IAssetImporter
 {
 public:
     std::string GetImporterID() const override { return "TextureImporter"; }
+    uint32_t GetImporterVersion(const std::filesystem::path& sourcePath) const override;
 
     std::vector<std::string> GetSupportedExtensions() const override
     {

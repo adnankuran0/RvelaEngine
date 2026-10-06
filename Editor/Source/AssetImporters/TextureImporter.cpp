@@ -282,6 +282,15 @@ std::filesystem::path TextureImporter::GetCachePath(
     return cacheRoot / (meta.uuid.ToString() + ".rtex");
 }
 
+uint32_t TextureImporter::GetImporterVersion(const std::filesystem::path& sourcePath) const
+{
+    std::string extension = sourcePath.extension().string();
+    std::transform(extension.begin(), extension.end(), extension.begin(),
+        [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+    // Version 2 stores HDR cache pixels as unclamped floating-point data.
+    return extension == ".hdr" ? 2u : 0u;
+}
+
 bool TextureImporter::Import(
     const std::filesystem::path& sourcePath,
     const std::filesystem::path& outCachePath,
