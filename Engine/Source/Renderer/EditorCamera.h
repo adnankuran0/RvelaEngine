@@ -21,8 +21,9 @@ public:
 
 
 
-    void Update();
+    void Update(bool allowNavigation = true);
     void OnMouseMoved(double xPosIn, double yPosIn, GLFWwindow* window);
+    void EndMouseCapture(GLFWwindow* window);
     void ProcessMouseScroll(float yoffset);
     void Focus(const glm::vec3& focusPoint, float distance = 5.0f);
     void SetDirection(const glm::vec3& direction, const glm::vec3* focusPoint = nullptr);

@@ -21,6 +21,12 @@ using namespace rv;
 #include <cmath>
 #include <glm/gtc/quaternion.hpp>
 
+bool Viewport::ContainsPoint(const glm::vec2& point) const
+{
+	return point.x >= m_PanelPosition.x && point.x <= m_PanelPosition.x + m_PanelSize.x &&
+		point.y >= m_PanelPosition.y && point.y <= m_PanelPosition.y + m_PanelSize.y;
+}
+
 void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySize)
 {
     entt::entity selectedEntity = EditorSelection::Get().GetPrimary();
@@ -618,6 +624,13 @@ void Viewport::Draw(Engine* engine)
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
     ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
     {
+        m_PanelPosition = ImGui::GetWindowPos();
+        m_PanelSize = ImGui::GetWindowSize();
+        const bool isPlaying = engine->GetActiveScene().GetState() == SceneState::PLAY;
+        const bool viewportHasFocus = ImGui::IsWindowFocused();
+        const bool capturedGameplayKeepsFocus = Input::IsGameplayInputEnabled() && Input::IsMouseCaptured();
+        Input::SetGameplayInputEnabled(isPlaying && (viewportHasFocus || capturedGameplayKeepsFocus));
+
         ImVec2 viewportSize = ImGui::GetContentRegionAvail();
 
         const float textureWidth = 1920.0f;

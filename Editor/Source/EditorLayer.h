@@ -45,6 +45,7 @@ public:
 
 private:
     void HandleShortcuts();
+    bool IsCursorOverViewport() const;
 
     MenuBar m_MenuBar;
     ToolBar m_ToolBar;
@@ -69,6 +70,7 @@ private:
     rv::Engine* m_Engine;
     bool m_ShowUI = true;
     bool m_ShowGrid = true;
+    bool m_EditorCameraDragActive = false;
 };
 
 }

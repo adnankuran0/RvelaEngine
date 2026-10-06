@@ -167,9 +167,11 @@ void Engine::HandleEvents() noexcept
 	EventManager::DispatchEvents([this](Event& event) 
 		{
 		
-			for (auto* layer : m_LayerStack)
+			auto layer = m_LayerStack.end();
+			while (layer != m_LayerStack.begin() && !event.Handled)
 			{
-				layer->OnEvent(event);
+				--layer;
+				(*layer)->OnEvent(event);
 			}
 		});
 }

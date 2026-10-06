@@ -173,37 +173,37 @@ void LuaBindings::RegisterInputAPI(sol::state& lua)
 
     lua["Input"]["IsKeyPressed"] = [](int key)
         {
-            return Input::IsKeyPressed(static_cast<KeyCode>(key));
+            return Input::IsGameplayInputEnabled() && Input::IsKeyPressed(static_cast<KeyCode>(key));
         };
 
     lua["Input"]["IsKeyJustPressed"] = [](int key)
         {
-            return Input::IsKeyJustPressed(static_cast<KeyCode>(key));
+            return Input::IsGameplayInputEnabled() && Input::IsKeyJustPressed(static_cast<KeyCode>(key));
         };
 
     lua["Input"]["IsKeyJustReleased"] = [](int key)
         {
-            return Input::IsKeyJustReleased(static_cast<KeyCode>(key));
+            return Input::IsGameplayInputEnabled() && Input::IsKeyJustReleased(static_cast<KeyCode>(key));
         };
 
     lua["Input"]["IsMouseButtonPressed"] = [](int button)
         {
-            return Input::IsMouseButtonPressed(static_cast<MouseCode>(button));
+            return Input::IsGameplayInputEnabled() && Input::IsMouseButtonPressed(static_cast<MouseCode>(button));
         };
 
     lua["Input"]["IsMouseButtonJustPressed"] = [](int button)
         {
-            return Input::IsMouseButtonJustPressed(static_cast<MouseCode>(button));
+            return Input::IsGameplayInputEnabled() && Input::IsMouseButtonJustPressed(static_cast<MouseCode>(button));
         };
 
     lua["Input"]["IsMouseButtonJustReleased"] = [](int button)
         {
-            return Input::IsMouseButtonJustReleased(static_cast<MouseCode>(button));
+            return Input::IsGameplayInputEnabled() && Input::IsMouseButtonJustReleased(static_cast<MouseCode>(button));
         };
 
     lua["Input"]["GetMousePosition"] = []()
         {
-            return Input::GetMousePosition();;
+            return Input::GetMousePosition();
         };
 
     lua["Input"]["SetMouseMode"] = [](int mode)

@@ -16,6 +16,7 @@ class Viewport
 {
 public:
 	void Draw(Engine* engine);
+	bool ContainsPoint(const glm::vec2& point) const;
 
 	float GetSnapTranslate() const { return m_snapTranslate; }
 	void SetSnapTranslate(float v) { m_snapTranslate = v; }
@@ -52,6 +53,8 @@ private:
 	};
 
 	bool m_WasGizmoUsing = false;
+	ImVec2 m_PanelPosition{ 0.0f, 0.0f };
+	ImVec2 m_PanelSize{ 0.0f, 0.0f };
 	std::unordered_map<entt::entity, InitialTransform> m_InitialTransforms;
 	glm::mat4 m_ActiveGizmoMatrix{ 1.0f };
 	glm::mat4 m_InitialGizmoMatrix{ 1.0f };

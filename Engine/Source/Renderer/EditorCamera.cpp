@@ -30,9 +30,9 @@ EditorCamera::EditorCamera(float posX, float posY, float posZ,
     UpdateCameraVectors();
 }
 
-void EditorCamera::Update()
+void EditorCamera::Update(bool allowNavigation)
 {
-    if (Input::IsMouseButtonPressed(MouseCode::Button1))
+    if (allowNavigation)
         ProcessKeyboard();
 
     UpdateFrustum();
@@ -90,7 +90,7 @@ void EditorCamera::ProcessKeyboard()
 
 void EditorCamera::OnMouseMoved(double xPosIn, double yPosIn, GLFWwindow* window)
 {
-    if (!Input::IsMouseButtonPressed(MouseCode::Button1))
+    if (!Input::IsMouseButtonPressed(MouseCode::ButtonRight))
     {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         firstMouse = true;
@@ -116,6 +116,13 @@ void EditorCamera::OnMouseMoved(double xPosIn, double yPosIn, GLFWwindow* window
     lastY = ypos;
 
     ProcessMouseMovement(xoffset, yoffset);
+}
+
+void EditorCamera::EndMouseCapture(GLFWwindow* window)
+{
+    if (window)
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    firstMouse = true;
 }
 
 void EditorCamera::ProcessMouseScroll(float yoffset)

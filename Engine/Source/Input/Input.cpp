@@ -6,6 +6,9 @@ using namespace rv;
 
 // Cache for the last known mouse position to avoid redundant GLFW calls
 glm::vec2 Input::s_LastMousePosition = { 0.0f, 0.0f };
+bool Input::s_GameplayInputEnabled = true;
+Input::MouseMode Input::s_RequestedMouseMode = Input::MouseMode::VISIBLE;
+Input::MouseMode Input::s_ActiveMouseMode = Input::MouseMode::VISIBLE;
 // Cache previosly pressed keys and buttons
 std::unordered_map<KeyCode, bool> Input::s_PreviousKeyState;
 std::unordered_map<MouseCode, bool> Input::s_PreviousMouseButtonState;
@@ -71,6 +74,31 @@ bool Input::IsMouseButtonJustReleased(MouseCode button) noexcept
 
 void rv::Input::SetMouseMode(MouseMode mode) noexcept
 {
+	s_RequestedMouseMode = mode;
+	ApplyMouseMode(s_GameplayInputEnabled ? mode : MouseMode::VISIBLE);
+}
+
+void Input::SetGameplayInputEnabled(bool enabled) noexcept
+{
+	if (s_GameplayInputEnabled == enabled)
+		return;
+
+	s_GameplayInputEnabled = enabled;
+	ApplyMouseMode(enabled ? s_RequestedMouseMode : MouseMode::VISIBLE);
+}
+
+bool Input::IsGameplayInputEnabled() noexcept
+{
+	return s_GameplayInputEnabled;
+}
+
+bool Input::IsMouseCaptured() noexcept
+{
+	return s_ActiveMouseMode == MouseMode::CAPTURED;
+}
+
+void Input::ApplyMouseMode(MouseMode mode) noexcept
+{
     int glfwMode;
     switch (mode)
     {
@@ -89,7 +117,9 @@ void rv::Input::SetMouseMode(MouseMode mode) noexcept
     }
 
     GLFWwindow* window = Engine::Get()->GetWindow().GetGLFWWindow();
-    glfwSetInputMode(window, GLFW_CURSOR, glfwMode);
+    if (window)
+		glfwSetInputMode(window, GLFW_CURSOR, glfwMode);
+	s_ActiveMouseMode = mode;
 }
 
 // Viewport relative mouse position storage
@@ -132,10 +162,13 @@ void Input::SetMouseOverUI(bool state) noexcept
 
 bool Input::IsMouseOverUI() noexcept
 {
-    return s_IsMouseOverUI;
+	return s_GameplayInputEnabled && s_IsMouseOverUI;
 }
 
 glm::vec2 Input::GetMousePosition() noexcept {
+	if (!s_GameplayInputEnabled)
+		return s_LastMousePosition;
+
     auto* window = Engine::Get()->GetWindow().GetGLFWWindow();
     if (!window) {
         return { 0.0f, 0.0f };

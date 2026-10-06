@@ -32,6 +32,9 @@ public:
 	static bool IsMouseButtonJustReleased(MouseCode button) noexcept;
 
 	static void SetMouseMode(MouseMode mode) noexcept;
+	static void SetGameplayInputEnabled(bool enabled) noexcept;
+	static bool IsGameplayInputEnabled() noexcept;
+	static bool IsMouseCaptured() noexcept;
 
 	static glm::vec2 GetMousePosition() noexcept;
 
@@ -51,6 +54,10 @@ public:
 
 private:
 	static glm::vec2 s_LastMousePosition;
+	static bool s_GameplayInputEnabled;
+	static MouseMode s_RequestedMouseMode;
+	static MouseMode s_ActiveMouseMode;
+	static void ApplyMouseMode(MouseMode mode) noexcept;
 	static std::unordered_map<KeyCode, bool> s_PreviousKeyState;
 	static std::unordered_map<MouseCode, bool> s_PreviousMouseButtonState;
 };

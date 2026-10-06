@@ -86,7 +86,7 @@ void EditorLayer::OnDetach()
 void EditorLayer::OnUpdate()
 {
     if (m_Engine->GetActiveScene().GetState() == SceneState::EDIT)
-            m_EditorCamera.Update();
+        m_EditorCamera.Update(m_EditorCameraDragActive);
 
     auto& reg = m_Engine->GetActiveScene().GetRegistry();
     EditorSelection::Get().Validate(reg);
@@ -110,21 +110,73 @@ void EditorLayer::OnLateUpdate()
 {
 }
 
+bool EditorLayer::IsCursorOverViewport() const
+{
+    GLFWwindow* window = m_Engine->GetWindow().GetGLFWWindow();
+    if (!window)
+        return false;
+
+    double cursorX = 0.0;
+    double cursorY = 0.0;
+    int windowX = 0;
+    int windowY = 0;
+    glfwGetCursorPos(window, &cursorX, &cursorY);
+    glfwGetWindowPos(window, &windowX, &windowY);
+
+    return m_Viewport.ContainsPoint(glm::vec2(
+        static_cast<float>(cursorX + windowX),
+        static_cast<float>(cursorY + windowY)));
+}
+
 void EditorLayer::OnEvent(Event& event)
 {
     switch (event.GetEventType())
     {
+    case EventType::MouseButtonPressed:
+    {
+        if (m_Engine->GetActiveScene().GetState() == SceneState::EDIT)
+        {
+            if (auto* mouseEvent = static_cast<MouseButtonPressedEvent*>(&event);
+                mouseEvent->GetMouseCode() == MouseCode::ButtonRight)
+            {
+                m_EditorCameraDragActive = IsCursorOverViewport();
+                if (m_EditorCameraDragActive)
+                    event.Handled = true;
+            }
+        }
+        if (m_Engine->GetActiveScene().GetState() == SceneState::PLAY && !Input::IsMouseCaptured())
+        {
+            if (!IsCursorOverViewport())
+                Input::SetGameplayInputEnabled(false);
+        }
+        break;
+    }
+    case EventType::MouseButtonReleased:
+    {
+        if (m_Engine->GetActiveScene().GetState() == SceneState::EDIT)
+        {
+            if (auto* mouseEvent = static_cast<MouseButtonReleasedEvent*>(&event);
+                mouseEvent->GetMouseCode() == MouseCode::ButtonRight)
+            {
+                m_EditorCameraDragActive = false;
+                m_EditorCamera.EndMouseCapture(m_Engine->GetWindow().GetGLFWWindow());
+                event.Handled = true;
+            }
+        }
+        break;
+    }
     case EventType::MouseMoved:
     {
         if (MouseMovedEvent* mouseEvent = static_cast<MouseMovedEvent*>(&event))
         {
-            if (m_Engine->GetActiveScene().GetState() == SceneState::EDIT)
+            if (m_Engine->GetActiveScene().GetState() == SceneState::EDIT && m_EditorCameraDragActive)
             {
                 m_EditorCamera.OnMouseMoved(
                     mouseEvent->GetX(),
                     mouseEvent->GetY(),
                     m_Engine->GetWindow().GetGLFWWindow()
                 );
+                event.Handled = true;
             }
 
         }
@@ -134,7 +186,11 @@ void EditorLayer::OnEvent(Event& event)
     {
         if (MouseScrolledEvent* scrollEvent = static_cast<MouseScrolledEvent*>(&event))
         {
-            m_EditorCamera.ProcessMouseScroll(scrollEvent->GetYOffset());
+            if (IsCursorOverViewport())
+            {
+                m_EditorCamera.ProcessMouseScroll(scrollEvent->GetYOffset());
+                event.Handled = true;
+            }
         }
         break;
     }
@@ -164,6 +220,18 @@ void EditorLayer::Render()
 {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
+    ImGuiIO& io = ImGui::GetIO();
+    const bool gameplayOwnsInput = m_Engine->GetActiveScene().GetState() == SceneState::PLAY && Input::IsGameplayInputEnabled();
+    if (gameplayOwnsInput)
+        io.ConfigFlags |= ImGuiConfigFlags_NoKeyboard;
+    else
+        io.ConfigFlags &= ~ImGuiConfigFlags_NoKeyboard;
+
+    if ((gameplayOwnsInput && Input::IsMouseCaptured()) || m_EditorCameraDragActive)
+        io.ConfigFlags |= ImGuiConfigFlags_NoMouse;
+    else
+        io.ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
+
     ImGui::NewFrame();
 
     ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -215,6 +283,9 @@ void EditorLayer::Render()
 
 void EditorLayer::HandleShortcuts()
 {
+    if (m_Engine->GetActiveScene().GetState() == SceneState::PLAY && Input::IsGameplayInputEnabled())
+        return;
+
     if (ImGui::GetIO().WantTextInput)
         return;
 

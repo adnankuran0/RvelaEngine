@@ -80,10 +80,11 @@ void Scene::OnUpdate(float dt)
 {
     m_ScriptSystem.OnUpdate(dt);
     
-    glm::vec2 mousePos = Input::GetViewportMousePosition(1920.0f, 1080.0f);
-    bool pressed = Input::IsMouseButtonJustPressed(MouseCode::ButtonLeft);
-    bool held = Input::IsMouseButtonPressed(MouseCode::ButtonLeft);
-    bool released = Input::IsMouseButtonJustReleased(MouseCode::ButtonLeft);
+    const bool inputEnabled = Input::IsGameplayInputEnabled();
+    glm::vec2 mousePos = inputEnabled ? Input::GetViewportMousePosition(1920.0f, 1080.0f) : glm::vec2(-1.0f);
+    bool pressed = inputEnabled && Input::IsMouseButtonJustPressed(MouseCode::ButtonLeft);
+    bool held = inputEnabled && Input::IsMouseButtonPressed(MouseCode::ButtonLeft);
+    bool released = inputEnabled && Input::IsMouseButtonJustReleased(MouseCode::ButtonLeft);
     m_UISystem.Update(this, dt, glm::vec2(1920.0f, 1080.0f), mousePos, pressed, held, released);
 
     JPH::BodyManager::DrawSettings settings;
