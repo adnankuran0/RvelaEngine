@@ -945,6 +945,18 @@ function Entity:HasMethod(methodName) end
 ---@return any
 function Entity:CallMethod(methodName, ...) end
 
+---Connects one of this entity's script signals to a method on another entity.
+---@param signalName string
+---@param target Entity Entity whose script receives the signal
+---@param methodName string
+---@return integer connectionId Use with DisconnectSignal; 0 means failure
+function Entity:ConnectSignal(signalName, target, methodName) end
+
+---Disconnects a signal connection created by this entity.
+---@param connectionId integer
+---@return boolean disconnected
+function Entity:DisconnectSignal(connectionId) end
+
 ---Checks if entity has a specific component.
 ---@param typeName ComponentTypeName|string
 ---@return boolean
@@ -1037,8 +1049,15 @@ _G.Scene = Scene
 ---@field scene Scene The active scene
 ---@field physics any The physics world
 ---@field properties table<string, any> Exported properties inspected in editor
+---@field signals string[] Names of signals declared by this script, e.g. { "Opened" }
 ---@field [string] any Script-specific fields added by each Lua script
 local ScriptInstance = {}
+
+---Emits one of the signals declared in the script's `signals` list.
+---@param signalName string
+---@param ... any
+---@return boolean success
+function ScriptInstance:EmitSignal(signalName, ...) end
 
 ---Called once when the script is initialized or game starts.
 function ScriptInstance:OnCreate() end

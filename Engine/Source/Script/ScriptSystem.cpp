@@ -6,6 +6,8 @@
 #include "Physics/CollisionInfo.h"
 #include "SceneBindings.h"
 #include <Asset/Types/ScriptAsset.h>
+#include "sol/variadic_args.hpp"
+#include <algorithm>
 
 using namespace rv;
 
@@ -63,11 +65,33 @@ void ScriptSystem::BindLuaScript(ScriptComponent& sc, entt::entity e)
         sol::table mt = sc.luaState->create_table();
         mt["__index"] = scriptTable;
         sc.luaInstance[sol::metatable_key] = mt;
+
+        m_SignalDefinitions.erase(e);
+        sol::object signalsObject = scriptTable["signals"];
+        if (signalsObject.valid() && signalsObject.get_type() == sol::type::table)
+        {
+            sol::table signals = signalsObject.as<sol::table>();
+            for (const auto& [key, value] : signals)
+            {
+                if (value.get_type() == sol::type::string)
+                    m_SignalDefinitions[e].insert(value.as<std::string>());
+                else if (key.get_type() == sol::type::string && value.get_type() == sol::type::boolean && value.as<bool>())
+                    m_SignalDefinitions[e].insert(key.as<std::string>());
+            }
+        }
     }
 
     sc.luaInstance["entity"] = Entity(e, &m_Scene);
     sc.luaInstance["scene"] = &m_Scene;
     sc.luaInstance["physics"] = &m_Scene.GetPhysicsSystem().GetPhysicsWorld();
+    sc.luaInstance["EmitSignal"] = [this, e](sol::table, const std::string& signalName, sol::variadic_args va)
+    {
+        std::vector<sol::object> args;
+        args.reserve(va.size());
+        for (auto arg : va)
+            args.push_back(arg.get<sol::object>());
+        return EmitSignal(e, signalName, args);
+    };
 
     // Defaults
     const auto& propDefs = ScriptEngine::GetScriptPropertyDefs(sc.scriptAssetUUID);
@@ -223,8 +247,17 @@ void ScriptSystem::OnEntityActivationChanged(entt::entity entity, bool active)
 void ScriptSystem::OnEntityDestroyed(entt::entity entity)
 {
     auto* sc = m_Scene.GetRegistry().try_get<ScriptComponent>(entity);
-    if (!sc || !sc->runtimeInitialized || sc->runtimeDestroying)
+    if (!sc)
+    {
+        DisconnectSignalsForEntity(entity);
         return;
+    }
+    if (!sc->runtimeInitialized || sc->runtimeDestroying)
+    {
+        if (!sc->runtimeDestroying)
+            DisconnectSignalsForEntity(entity);
+        return;
+    }
 
     sc->runtimeDestroying = true;
 
@@ -238,6 +271,104 @@ void ScriptSystem::OnEntityDestroyed(entt::entity entity)
     sc->runtimeReady = false;
     sc->runtimeScenePaused = false;
     sc->runtimeDestroying = false;
+    DisconnectSignalsForEntity(entity);
+}
+
+uint64_t ScriptSystem::ConnectSignal(entt::entity source, const std::string& signalName, entt::entity target, const std::string& methodName)
+{
+	if (!m_IsRunning || signalName.empty() || methodName.empty() ||
+		!m_Scene.GetRegistry().valid(source) || !m_Scene.GetRegistry().valid(target) ||
+		!m_Scene.GetRegistry().any_of<ScriptComponent>(source) || !m_Scene.GetRegistry().any_of<ScriptComponent>(target))
+		return 0;
+
+	for (const auto& connection : m_SignalConnections)
+	{
+		if (connection.source == source && connection.signalName == signalName &&
+			connection.target == target && connection.methodName == methodName)
+			return connection.id;
+	}
+
+	const uint64_t id = m_NextSignalConnectionId++;
+	m_SignalConnections.push_back({ id, source, signalName, target, methodName });
+	return id;
+}
+
+bool ScriptSystem::DisconnectSignal(entt::entity source, uint64_t connectionId)
+{
+	auto it = std::find_if(m_SignalConnections.begin(), m_SignalConnections.end(),
+		[source, connectionId](const SignalConnection& connection)
+		{
+			return connection.id == connectionId && connection.source == source;
+		});
+	if (it == m_SignalConnections.end())
+		return false;
+
+	m_SignalConnections.erase(it);
+	return true;
+}
+
+bool ScriptSystem::EmitSignal(entt::entity source, const std::string& signalName, const std::vector<sol::object>& args)
+{
+	if (!m_IsRunning || !m_Scene.GetRegistry().valid(source))
+		return false;
+
+	auto definitions = m_SignalDefinitions.find(source);
+	if (definitions == m_SignalDefinitions.end() || !definitions->second.contains(signalName))
+	{
+		LOG_WARN("Cannot emit undefined Lua signal '{}' from entity {}", signalName, static_cast<uint32_t>(source));
+		return false;
+	}
+
+	std::vector<SignalConnection> listeners;
+	for (const auto& connection : m_SignalConnections)
+	{
+		if (connection.source == source && connection.signalName == signalName)
+			listeners.push_back(connection);
+	}
+
+	for (const auto& listener : listeners)
+	{
+		const bool stillConnected = std::any_of(m_SignalConnections.begin(), m_SignalConnections.end(),
+			[&listener](const SignalConnection& connection) { return connection.id == listener.id; });
+		if (!stillConnected || !m_Scene.GetRegistry().valid(listener.target))
+			continue;
+
+		auto* targetScript = m_Scene.GetRegistry().try_get<ScriptComponent>(listener.target);
+		if (!targetScript || !targetScript->luaInstance.valid())
+			continue;
+
+		sol::object methodObject = targetScript->luaInstance[listener.methodName];
+		if (!methodObject.valid() || methodObject.get_type() != sol::type::function)
+		{
+			LOG_WARN("Lua signal receiver method '{}' was not found on entity {}", listener.methodName, static_cast<uint32_t>(listener.target));
+			continue;
+		}
+
+		sol::protected_function method = methodObject;
+		sol::protected_function_result result = method(targetScript->luaInstance, sol::as_args(args));
+		if (!result.valid())
+		{
+			sol::error err = result;
+			LOG_ERROR("Lua signal '{}' callback '{}' error: {}", signalName, listener.methodName, err.what());
+		}
+	}
+
+	return true;
+}
+
+void ScriptSystem::DisconnectSignalsForEntity(entt::entity entity)
+{
+	m_SignalDefinitions.erase(entity);
+	std::erase_if(m_SignalConnections, [entity](const SignalConnection& connection)
+		{
+			return connection.source == entity || connection.target == entity;
+		});
+}
+
+void ScriptSystem::ClearSignals()
+{
+	m_SignalDefinitions.clear();
+	m_SignalConnections.clear();
 }
 
 void ScriptSystem::OnScenePaused()
@@ -416,6 +547,7 @@ void ScriptSystem::OnStop()
         mc.Reload();
         //TODO: WTF IS THIS?
     }
+	ClearSignals();
 
 }
 

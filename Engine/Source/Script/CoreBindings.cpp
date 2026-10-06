@@ -128,6 +128,15 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             }
             return sol::nil;
         },
+        "ConnectSignal", [](Entity& source, const std::string& signalName, Entity target, const std::string& methodName) -> uint64_t {
+            if (!source.GetScene() || target.GetScene() != source.GetScene()) return 0;
+            return source.GetScene()->GetScriptSystem().ConnectSignal(
+                source.GetHandle(), signalName, target.GetHandle(), methodName);
+        },
+        "DisconnectSignal", [](Entity& source, uint64_t connectionId) -> bool {
+            if (!source.GetScene()) return false;
+            return source.GetScene()->GetScriptSystem().DisconnectSignal(source.GetHandle(), connectionId);
+        },
         "HasComponent", [&](Entity& e, const std::string& type) {
             if (type == "Transform") return e.HasComponent<TransformComponent>();
             else if (type == "Camera") return e.HasComponent<CameraComponent>();
