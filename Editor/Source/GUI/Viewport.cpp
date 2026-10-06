@@ -619,7 +619,7 @@ void Viewport::HandleSelection(Engine* engine, ImVec2& displayPos, ImVec2& displ
     }
 }
 
-void Viewport::Draw(Engine* engine)
+void Viewport::Draw(Engine* engine, bool orbitDragActive)
 {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
     ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
@@ -670,8 +670,19 @@ void Viewport::Draw(Engine* engine)
             Input::SetViewportMousePos(glm::vec2(normX * 1920.0f, normY * 1080.0f));
         }
 
-        DrawGizmos(engine, displayPos, displaySize);
-        HandleSelection(engine, displayPos, displaySize);
+        const bool altHeld = ImGui::IsKeyDown(ImGuiKey_LeftAlt) || ImGui::IsKeyDown(ImGuiKey_RightAlt);
+        const bool suppressViewportEditing = altHeld || orbitDragActive;
+        if (suppressViewportEditing)
+        {
+            m_WasGizmoUsing = false;
+            m_InitialTransforms.clear();
+        }
+        else
+        {
+            DrawGizmos(engine, displayPos, displaySize);
+        }
+        if (!suppressViewportEditing)
+            HandleSelection(engine, displayPos, displaySize);
 
         if(engine->GetActiveScene().GetState() == SceneState::EDIT)
         {

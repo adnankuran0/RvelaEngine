@@ -10,6 +10,8 @@ namespace rv {
 class EditorCamera : public Camera
 {
 public:
+    enum class NavigationMode { None, FreeLook, Orbit, Pan };
+
     EditorCamera(glm::vec3 position = { 0.0f, 2.0f, 5.0f },
         glm::vec3 up = { 0.0f, 1.0f, 0.0f },
         int width = 1920, int height = 1080);
@@ -21,11 +23,13 @@ public:
 
 
 
-    void Update(bool allowNavigation = true);
-    void OnMouseMoved(double xPosIn, double yPosIn, GLFWwindow* window);
+    void Update(NavigationMode mode = NavigationMode::None);
+    void OnMouseMoved(double xPosIn, double yPosIn, GLFWwindow* window, NavigationMode mode);
+    void BeginMouseCapture(GLFWwindow* window);
     void EndMouseCapture(GLFWwindow* window);
     void ProcessMouseScroll(float yoffset);
     void Focus(const glm::vec3& focusPoint, float distance = 5.0f);
+    void SetOrbitTarget(const glm::vec3& focusPoint);
     void SetDirection(const glm::vec3& direction, const glm::vec3* focusPoint = nullptr);
 
 private:
@@ -47,6 +51,8 @@ public:
 
     float positionSmoothness{ 25.0f };
     glm::vec3 targetPosition{};
+    glm::vec3 orbitTarget{};
+    float orbitDistance{ 5.0f };
 
 
 };

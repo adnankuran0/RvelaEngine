@@ -15,7 +15,7 @@ class Engine;
 class Viewport
 {
 public:
-	void Draw(Engine* engine);
+	void Draw(Engine* engine, bool orbitDragActive = false);
 	bool ContainsPoint(const glm::vec2& point) const;
 
 	float GetSnapTranslate() const { return m_snapTranslate; }

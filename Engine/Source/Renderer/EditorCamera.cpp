@@ -16,6 +16,7 @@ EditorCamera::EditorCamera(glm::vec3 position,
     : targetPosition(position)
 {
     UpdateCameraVectors();
+    orbitTarget = targetPosition + Front * orbitDistance;
 }
 
 EditorCamera::EditorCamera(float posX, float posY, float posZ,
@@ -28,22 +29,40 @@ EditorCamera::EditorCamera(float posX, float posY, float posZ,
     targetPosition(Position)
 {
     UpdateCameraVectors();
+    orbitTarget = targetPosition + Front * orbitDistance;
 }
 
-void EditorCamera::Update(bool allowNavigation)
+void EditorCamera::Update(NavigationMode mode)
 {
-    if (allowNavigation)
+    if (mode != NavigationMode::None)
         ProcessKeyboard();
 
+    const float dt = std::max(Time::GetDeltaTime(), 0.0f);
+    if (mode == NavigationMode::Orbit)
+        Position = targetPosition;
+    else
+    {
+        // Keep the previous editor-camera response while preventing a long frame
+        // from making glm::mix extrapolate past the target position.
+        const float blend = std::clamp(positionSmoothness * dt, 0.0f, 1.0f);
+        Position = glm::mix(Position, targetPosition, blend);
+    }
     UpdateFrustum();
-    float dt = Time::GetDeltaTime();
-    Position = glm::mix(Position, targetPosition, positionSmoothness * dt);
 }
 
 void EditorCamera::Focus(const glm::vec3& focusPoint, float distance)
 {
+    orbitTarget = focusPoint;
+    orbitDistance = std::max(distance, 0.1f);
     targetPosition = focusPoint - Front * distance;
     Position = targetPosition;
+}
+
+void EditorCamera::SetOrbitTarget(const glm::vec3& focusPoint)
+{
+    orbitTarget = focusPoint;
+    orbitDistance = std::max(glm::length(Position - focusPoint), 0.1f);
+    targetPosition = Position;
 }
 
 void EditorCamera::SetDirection(const glm::vec3& direction, const glm::vec3* focusPoint)
@@ -55,6 +74,8 @@ void EditorCamera::SetDirection(const glm::vec3& direction, const glm::vec3* foc
     {
         float dist = glm::length(Position - *focusPoint);
         if (dist < 0.1f) dist = 5.0f;
+        orbitTarget = *focusPoint;
+        orbitDistance = dist;
         targetPosition = *focusPoint - normDir * dist;
         Position = targetPosition;
     }
@@ -68,36 +89,34 @@ void EditorCamera::ProcessKeyboard()
 {
     float dt = Time::GetDeltaTime();
     float velocity = (Input::IsKeyPressed(KeyCode::LeftShift) ? MovementSpeed * 2.0f : MovementSpeed) * dt;
+    glm::vec3 movement{ 0.0f };
 
     if (Input::IsKeyPressed(KeyCode::W))
-        targetPosition += Front * velocity;
+        movement += Front * velocity;
 
     if (Input::IsKeyPressed(KeyCode::S))
-        targetPosition -= Front * velocity;
+        movement -= Front * velocity;
 
     if (Input::IsKeyPressed(KeyCode::A))
-        targetPosition -= Right * velocity;
+        movement -= Right * velocity;
 
     if (Input::IsKeyPressed(KeyCode::D))
-        targetPosition += Right * velocity;
+        movement += Right * velocity;
 
     if (Input::IsKeyPressed(KeyCode::Q))
-        targetPosition -= WorldUp * velocity;
+        movement -= WorldUp * velocity;
 
     if (Input::IsKeyPressed(KeyCode::E))
-        targetPosition += WorldUp * velocity;
+        movement += WorldUp * velocity;
+
+    targetPosition += movement;
+    orbitTarget += movement;
 }
 
-void EditorCamera::OnMouseMoved(double xPosIn, double yPosIn, GLFWwindow* window)
+void EditorCamera::OnMouseMoved(double xPosIn, double yPosIn, GLFWwindow* window, NavigationMode mode)
 {
-    if (!Input::IsMouseButtonPressed(MouseCode::ButtonRight))
-    {
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        firstMouse = true;
+    if (!window || mode == NavigationMode::None)
         return;
-    }
-
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     float xpos = static_cast<float>(xPosIn);
     float ypos = static_cast<float>(yPosIn);
@@ -115,13 +134,42 @@ void EditorCamera::OnMouseMoved(double xPosIn, double yPosIn, GLFWwindow* window
     lastX = xpos;
     lastY = ypos;
 
-    ProcessMouseMovement(xoffset, yoffset);
+    if (mode == NavigationMode::Orbit)
+    {
+        ProcessMouseMovement(xoffset, yoffset);
+        targetPosition = orbitTarget - Front * orbitDistance;
+        Position = targetPosition;
+    }
+    else if (mode == NavigationMode::FreeLook)
+        ProcessMouseMovement(xoffset, yoffset);
+    else if (mode == NavigationMode::Pan)
+    {
+        const float panScale = std::max(orbitDistance, 0.1f) * 0.002f;
+        const glm::vec3 movement = (Right * xoffset + Up * yoffset) * panScale;
+        targetPosition += movement;
+        orbitTarget += movement;
+    }
+}
+
+void EditorCamera::BeginMouseCapture(GLFWwindow* window)
+{
+    if (window)
+    {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        if (glfwRawMouseMotionSupported())
+            glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+    }
+    firstMouse = true;
 }
 
 void EditorCamera::EndMouseCapture(GLFWwindow* window)
 {
     if (window)
+    {
+        if (glfwRawMouseMotionSupported())
+            glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_FALSE);
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
     firstMouse = true;
 }
 

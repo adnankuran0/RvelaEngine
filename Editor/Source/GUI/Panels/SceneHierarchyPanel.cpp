@@ -214,8 +214,13 @@ void SceneHierarchyPanel::Draw(Engine* engine)
 
     static char searchFilter[128] = "";
     ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.17f, 0.17f, 0.23f, 1.0f));
-    ImGui::SetNextItemWidth(-FLT_MIN);
+    ImGui::SetNextItemWidth(-ImGui::GetFrameHeightWithSpacing());
     ImGui::InputTextWithHint("##HierarchySearch", "Search Entities...", searchFilter, sizeof(searchFilter));
+    ImGui::SameLine();
+    if (ImGui::SmallButton("X##ClearHierarchySearch"))
+        searchFilter[0] = '\0';
+    if (ImGui::IsItemHovered())
+        ImGui::SetTooltip("Clear search");
     ImGui::PopStyleColor();
 
     ImGui::Spacing();
@@ -273,6 +278,21 @@ void SceneHierarchyPanel::Draw(Engine* engine)
     ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.62f, 0.56f, 0.80f, 0.9f));
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4.0f, 2.0f));
 
+    if (m_RenamingEntity != entt::null && !registry.valid(m_RenamingEntity))
+        m_RenamingEntity = entt::null;
+
+    ImGuiIO& hierarchyIO = ImGui::GetIO();
+    if (ImGui::IsWindowFocused() && !hierarchyIO.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_F2))
+    {
+        entt::entity selected = EditorSelection::Get().GetPrimary();
+        if (selected != entt::null && selected != rootEntity && registry.valid(selected) && scene.HasComponent<TagComponent>(selected))
+        {
+            m_RenamingEntity = selected;
+            strncpy_s(m_RenameBuffer, sizeof(m_RenameBuffer), scene.GetComponent<TagComponent>(selected).tag.c_str(), _TRUNCATE);
+            m_FocusRenameInput = true;
+        }
+    }
+
     std::function<void(entt::entity)> DrawEntityNode = [&](entt::entity entity)
         {
             if (!registry.valid(entity)) return;
@@ -294,6 +314,9 @@ void SceneHierarchyPanel::Draw(Engine* engine)
             {
                 flags |= ImGuiTreeNodeFlags_Leaf;
             }
+
+            if (!isRoot && searchFilter[0] != '\0' && !children.empty())
+                ImGui::SetNextItemOpen(true, ImGuiCond_Always);
 
             if (!isRoot)
                 visibleOrder.push_back(entity);
@@ -333,15 +356,41 @@ void SceneHierarchyPanel::Draw(Engine* engine)
             }
 
             std::string nodeTitle = tagComponent.tag;
+            const bool isRenaming = (m_RenamingEntity == entity);
 
-            bool nodeOpen = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", nodeTitle.c_str());
+            bool nodeOpen = isRenaming
+                ? ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "##EntityRenameNode")
+                : ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", nodeTitle.c_str());
+
+            if (isRenaming)
+            {
+                ImGui::SameLine();
+                ImGui::SetNextItemWidth(-FLT_MIN);
+                if (m_FocusRenameInput)
+                {
+                    ImGui::SetKeyboardFocusHere();
+                    m_FocusRenameInput = false;
+                }
+
+                const bool commitRename = ImGui::InputText("##EntityRenameInput", m_RenameBuffer, sizeof(m_RenameBuffer), ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll);
+                if (commitRename)
+                {
+                    if (m_RenameBuffer[0] != '\0')
+                        tagComponent.tag = m_RenameBuffer;
+                    m_RenamingEntity = entt::null;
+                }
+                else if (ImGui::IsKeyPressed(ImGuiKey_Escape))
+                {
+                    m_RenamingEntity = entt::null;
+                }
+            }
 
             if (colorPushes > 0)
                 ImGui::PopStyleColor(colorPushes);
 
             // Select on release so starting a drag from the hierarchy does not
             // change the Inspector target before the drag reaches its drop slot.
-            if (!isRoot && ImGui::IsItemDeactivated() && ImGui::IsItemHovered() && !ImGui::IsDragDropActive())
+            if (!isRoot && !isRenaming && ImGui::IsItemDeactivated() && ImGui::IsItemHovered() && !ImGui::IsDragDropActive())
             {
                 ImGuiIO& io = ImGui::GetIO();
                 if (io.KeyCtrl)
@@ -660,6 +709,9 @@ void SceneHierarchyPanel::Draw(Engine* engine)
     {
         DrawEntityNode(entity);
     }
+
+    if (searchFilter[0] != '\0' && visibleOrder.empty())
+        ImGui::TextDisabled("No entities found");
 
     ImGui::PopStyleVar();
     ImGui::PopStyleColor(3);

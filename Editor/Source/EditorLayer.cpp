@@ -86,7 +86,7 @@ void EditorLayer::OnDetach()
 void EditorLayer::OnUpdate()
 {
     if (m_Engine->GetActiveScene().GetState() == SceneState::EDIT)
-        m_EditorCamera.Update(m_EditorCameraDragActive);
+        m_EditorCamera.Update(m_EditorCameraNavigation);
 
     auto& reg = m_Engine->GetActiveScene().GetRegistry();
     EditorSelection::Get().Validate(reg);
@@ -136,12 +136,34 @@ void EditorLayer::OnEvent(Event& event)
     {
         if (m_Engine->GetActiveScene().GetState() == SceneState::EDIT)
         {
-            if (auto* mouseEvent = static_cast<MouseButtonPressedEvent*>(&event);
-                mouseEvent->GetMouseCode() == MouseCode::ButtonRight)
+            if (auto* mouseEvent = static_cast<MouseButtonPressedEvent*>(&event))
             {
-                m_EditorCameraDragActive = IsCursorOverViewport();
-                if (m_EditorCameraDragActive)
+                EditorCamera::NavigationMode requestedMode = EditorCamera::NavigationMode::None;
+                if (mouseEvent->GetMouseCode() == MouseCode::ButtonRight)
+                    requestedMode = EditorCamera::NavigationMode::FreeLook;
+                else if (mouseEvent->GetMouseCode() == MouseCode::ButtonMiddle)
+                    requestedMode = EditorCamera::NavigationMode::Pan;
+                else if (mouseEvent->GetMouseCode() == MouseCode::ButtonLeft &&
+                    (Input::IsKeyPressed(KeyCode::LeftAlt) || Input::IsKeyPressed(KeyCode::RightAlt)))
+                {
+                    const entt::entity selected = EditorSelection::Get().GetPrimary();
+                    const auto& registry = m_Engine->GetActiveScene().GetRegistry();
+                    if (m_EditorCameraNavigation == EditorCamera::NavigationMode::None &&
+                        selected != entt::null && selected != m_Engine->GetActiveScene().GetRootEntity() &&
+                        registry.valid(selected) && registry.any_of<TransformComponent>(selected) && IsCursorOverViewport())
+                    {
+                        requestedMode = EditorCamera::NavigationMode::Orbit;
+                        m_EditorCamera.SetOrbitTarget(registry.get<TransformComponent>(selected).GetWorldPosition());
+                    }
+                }
+
+                if (requestedMode != EditorCamera::NavigationMode::None &&
+                    m_EditorCameraNavigation == EditorCamera::NavigationMode::None && IsCursorOverViewport())
+                {
+                    m_EditorCameraNavigation = requestedMode;
+                    m_EditorCamera.BeginMouseCapture(m_Engine->GetWindow().GetGLFWWindow());
                     event.Handled = true;
+                }
             }
         }
         if (m_Engine->GetActiveScene().GetState() == SceneState::PLAY && !Input::IsMouseCaptured())
@@ -155,12 +177,18 @@ void EditorLayer::OnEvent(Event& event)
     {
         if (m_Engine->GetActiveScene().GetState() == SceneState::EDIT)
         {
-            if (auto* mouseEvent = static_cast<MouseButtonReleasedEvent*>(&event);
-                mouseEvent->GetMouseCode() == MouseCode::ButtonRight)
+            if (auto* mouseEvent = static_cast<MouseButtonReleasedEvent*>(&event))
             {
-                m_EditorCameraDragActive = false;
-                m_EditorCamera.EndMouseCapture(m_Engine->GetWindow().GetGLFWWindow());
-                event.Handled = true;
+                const bool releasedNavigationButton =
+                    (m_EditorCameraNavigation == EditorCamera::NavigationMode::FreeLook && mouseEvent->GetMouseCode() == MouseCode::ButtonRight) ||
+                    (m_EditorCameraNavigation == EditorCamera::NavigationMode::Orbit && mouseEvent->GetMouseCode() == MouseCode::ButtonLeft) ||
+                    (m_EditorCameraNavigation == EditorCamera::NavigationMode::Pan && mouseEvent->GetMouseCode() == MouseCode::ButtonMiddle);
+                if (releasedNavigationButton)
+                {
+                    m_EditorCameraNavigation = EditorCamera::NavigationMode::None;
+                    m_EditorCamera.EndMouseCapture(m_Engine->GetWindow().GetGLFWWindow());
+                    event.Handled = true;
+                }
             }
         }
         break;
@@ -169,12 +197,13 @@ void EditorLayer::OnEvent(Event& event)
     {
         if (MouseMovedEvent* mouseEvent = static_cast<MouseMovedEvent*>(&event))
         {
-            if (m_Engine->GetActiveScene().GetState() == SceneState::EDIT && m_EditorCameraDragActive)
+            if (m_Engine->GetActiveScene().GetState() == SceneState::EDIT && m_EditorCameraNavigation != EditorCamera::NavigationMode::None)
             {
                 m_EditorCamera.OnMouseMoved(
                     mouseEvent->GetX(),
                     mouseEvent->GetY(),
-                    m_Engine->GetWindow().GetGLFWWindow()
+                    m_Engine->GetWindow().GetGLFWWindow(),
+                    m_EditorCameraNavigation
                 );
                 event.Handled = true;
             }
@@ -227,7 +256,7 @@ void EditorLayer::Render()
     else
         io.ConfigFlags &= ~ImGuiConfigFlags_NoKeyboard;
 
-    if ((gameplayOwnsInput && Input::IsMouseCaptured()) || m_EditorCameraDragActive)
+    if ((gameplayOwnsInput && Input::IsMouseCaptured()) || m_EditorCameraNavigation != EditorCamera::NavigationMode::None)
         io.ConfigFlags |= ImGuiConfigFlags_NoMouse;
     else
         io.ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
@@ -266,7 +295,7 @@ void EditorLayer::Render()
 
         m_ProjectSettingsPanel.Draw(m_Engine);
 
-        m_Viewport.Draw(m_Engine);
+        m_Viewport.Draw(m_Engine, m_EditorCameraNavigation == EditorCamera::NavigationMode::Orbit);
     }
 
     ImGui::Render();

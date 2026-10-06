@@ -70,7 +70,7 @@ private:
     rv::Engine* m_Engine;
     bool m_ShowUI = true;
     bool m_ShowGrid = true;
-    bool m_EditorCameraDragActive = false;
+    EditorCamera::NavigationMode m_EditorCameraNavigation = EditorCamera::NavigationMode::None;
 };
 
 }
