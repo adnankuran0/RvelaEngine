@@ -1057,6 +1057,38 @@ _G.Scene = Scene
 ---@field [string] any Script-specific fields added by each Lua script
 local ScriptInstance = {}
 
+---Waits for a number of seconds. Only use inside a coroutine started with StartCoroutine.
+---@param seconds number
+function await(seconds) end
+_G.await = await
+
+---Starts a coroutine. The callback receives this script instance as its argument.
+---@param callback fun(self: ScriptInstance)
+---@return integer coroutineId
+function ScriptInstance:StartCoroutine(callback) end
+
+---Stops a coroutine started by this script.
+---@param coroutineId integer
+---@return boolean stopped
+function ScriptInstance:StopCoroutine(coroutineId) end
+
+---Runs a callback once after the given number of seconds. The callback receives this script instance.
+---@param seconds number
+---@param callback fun(self: ScriptInstance)
+---@return integer timerId
+function ScriptInstance:StartTimer(seconds, callback) end
+
+---Runs a callback repeatedly. The callback receives this script instance.
+---@param interval number
+---@param callback fun(self: ScriptInstance)
+---@return integer timerId
+function ScriptInstance:StartRepeatingTimer(interval, callback) end
+
+---Cancels a timer started by this script.
+---@param timerId integer
+---@return boolean cancelled
+function ScriptInstance:CancelTimer(timerId) end
+
 ---Emits one of the signals declared in the script's `signals` list.
 ---@param signalName string
 ---@param ... any

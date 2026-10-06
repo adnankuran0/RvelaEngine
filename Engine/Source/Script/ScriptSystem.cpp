@@ -8,6 +8,7 @@
 #include <Asset/Types/ScriptAsset.h>
 #include "sol/variadic_args.hpp"
 #include <algorithm>
+#include <cmath>
 
 using namespace rv;
 
@@ -91,6 +92,28 @@ void ScriptSystem::BindLuaScript(ScriptComponent& sc, entt::entity e)
         for (auto arg : va)
             args.push_back(arg.get<sol::object>());
         return EmitSignal(e, signalName, args);
+    };
+    sc.luaInstance["StartCoroutine"] = [this, e](sol::table, sol::function function)
+    {
+        return StartCoroutine(e, std::move(function));
+    };
+    sc.luaInstance["StopCoroutine"] = [this, e](sol::table, uint64_t coroutineId)
+    {
+        return StopCoroutine(e, coroutineId);
+    };
+    sc.luaInstance["StartTimer"] = [this, e](sol::table, float seconds, sol::protected_function callback)
+    {
+        return StartTimer(e, seconds, std::move(callback));
+    };
+    sc.luaInstance["StartRepeatingTimer"] = [this, e](sol::table, float interval, sol::protected_function callback)
+    {
+		if (!std::isfinite(interval) || interval <= 0.0f)
+			return uint64_t{ 0 };
+        return StartTimer(e, interval, std::move(callback), interval);
+    };
+    sc.luaInstance["CancelTimer"] = [this, e](sol::table, uint64_t timerId)
+    {
+        return CancelTimer(e, timerId);
     };
 
     // Defaults
@@ -207,6 +230,174 @@ void ScriptSystem::InvokeLifecycleCallback(ScriptComponent& sc, sol::protected_f
     }
 }
 
+uint64_t ScriptSystem::StartCoroutine(entt::entity owner, sol::function function)
+{
+	if (!m_IsRunning || !m_Scene.GetRegistry().valid(owner) || !function.valid())
+		return 0;
+
+	sol::state_view lua(function.lua_state());
+	sol::function createCoroutine = lua["coroutine"]["create"];
+	if (!createCoroutine.valid())
+		return 0;
+
+	sol::thread thread = createCoroutine(function);
+	if (!thread.valid())
+		return 0;
+
+	const uint64_t id = m_NextScheduledTaskId++;
+	m_Coroutines.emplace(id, CoroutineTask{ id, owner, sol::coroutine(thread), 0.0f, true });
+	return id;
+}
+
+bool ScriptSystem::StopCoroutine(entt::entity owner, uint64_t coroutineId)
+{
+	auto it = m_Coroutines.find(coroutineId);
+	if (it == m_Coroutines.end() || it->second.owner != owner)
+		return false;
+
+	m_Coroutines.erase(it);
+	return true;
+}
+
+uint64_t ScriptSystem::StartTimer(entt::entity owner, float seconds, sol::protected_function callback, float interval)
+{
+	if (!m_IsRunning || !m_Scene.GetRegistry().valid(owner) || !callback.valid())
+		return 0;
+
+	if (!std::isfinite(seconds)) seconds = 0.0f;
+	if (!std::isfinite(interval)) interval = 0.0f;
+	seconds = std::max(seconds, 0.0f);
+	interval = std::max(interval, 0.0f);
+	if (interval > 0.0f)
+		seconds = std::max(seconds, interval);
+
+	const uint64_t id = m_NextScheduledTaskId++;
+	m_Timers.emplace(id, TimerTask{ id, owner, std::move(callback), seconds, interval });
+	return id;
+}
+
+bool ScriptSystem::CancelTimer(entt::entity owner, uint64_t timerId)
+{
+	auto it = m_Timers.find(timerId);
+	if (it == m_Timers.end() || it->second.owner != owner)
+		return false;
+
+	m_Timers.erase(it);
+	return true;
+}
+
+void ScriptSystem::AdvanceScheduledTasks(float dt)
+{
+	std::vector<uint64_t> timerIds;
+	timerIds.reserve(m_Timers.size());
+	for (const auto& [id, timer] : m_Timers)
+		timerIds.push_back(id);
+
+	for (uint64_t id : timerIds)
+	{
+		auto it = m_Timers.find(id);
+		if (it == m_Timers.end())
+			continue;
+
+		TimerTask& timer = it->second;
+		if (!m_Scene.GetRegistry().valid(timer.owner) || !m_Scene.IsEntityActive(timer.owner))
+			continue;
+
+		timer.waitRemaining -= dt;
+		if (timer.waitRemaining > 0.0f)
+			continue;
+
+		const entt::entity owner = timer.owner;
+		sol::protected_function callback = timer.callback;
+		if (timer.interval > 0.0f)
+			timer.waitRemaining = timer.interval;
+		else
+			m_Timers.erase(it);
+
+		auto* sc = m_Scene.GetRegistry().try_get<ScriptComponent>(owner);
+		if (!sc || !sc->luaInstance.valid())
+			continue;
+
+		sol::protected_function_result result = callback(sc->luaInstance);
+		if (!result.valid())
+		{
+			sol::error err = result;
+			LOG_ERROR("Lua timer callback error: {}", err.what());
+			m_Timers.erase(id);
+		}
+	}
+
+	std::vector<uint64_t> coroutineIds;
+	coroutineIds.reserve(m_Coroutines.size());
+	for (const auto& [id, task] : m_Coroutines)
+		coroutineIds.push_back(id);
+
+	for (uint64_t id : coroutineIds)
+	{
+		auto it = m_Coroutines.find(id);
+		if (it == m_Coroutines.end())
+			continue;
+
+		CoroutineTask& task = it->second;
+		if (!m_Scene.GetRegistry().valid(task.owner) || !m_Scene.IsEntityActive(task.owner))
+			continue;
+
+		task.waitRemaining = std::max(0.0f, task.waitRemaining - dt);
+		if (task.waitRemaining > 0.0f)
+			continue;
+
+		auto* sc = m_Scene.GetRegistry().try_get<ScriptComponent>(task.owner);
+		if (!sc || !sc->luaInstance.valid())
+		{
+			m_Coroutines.erase(it);
+			continue;
+		}
+
+		const entt::entity owner = task.owner;
+		const bool firstResume = task.firstResume;
+		sol::coroutine coroutine = task.coroutine;
+		sol::table instance = sc->luaInstance;
+		task.firstResume = false;
+
+		sol::protected_function_result result;
+		if (firstResume)
+			result = coroutine(instance);
+		else
+			result = coroutine();
+
+		it = m_Coroutines.find(id);
+		if (it == m_Coroutines.end())
+			continue;
+
+		if (!result.valid())
+		{
+			sol::error err = result;
+			LOG_ERROR("Lua coroutine error on entity {}: {}", static_cast<uint32_t>(owner), err.what());
+			m_Coroutines.erase(it);
+			continue;
+		}
+
+		if (result.status() == sol::call_status::yielded)
+		{
+			float waitSeconds = 0.0f;
+			if (result.return_count() > 0 && result.get_type() == sol::type::number)
+				waitSeconds = result.get<float>();
+			if (!std::isfinite(waitSeconds)) waitSeconds = 0.0f;
+			it->second.waitRemaining = std::max(waitSeconds, 0.0f);
+		}
+		else
+		{
+			m_Coroutines.erase(it);
+		}
+	}
+}
+
+void ScriptSystem::ClearScheduledTasksForEntity(entt::entity entity)
+{
+	std::erase_if(m_Coroutines, [entity](const auto& entry) { return entry.second.owner == entity; });
+	std::erase_if(m_Timers, [entity](const auto& entry) { return entry.second.owner == entity; });
+}
+
 void ScriptSystem::EnsureScriptInitialized(ScriptComponent& sc, entt::entity entity)
 {
     if (sc.runtimeInitialized || sc.runtimeDestroying)
@@ -261,12 +452,14 @@ void ScriptSystem::OnEntityDestroyed(entt::entity entity)
     if (!sc)
     {
         DisconnectSignalsForEntity(entity);
+		ClearScheduledTasksForEntity(entity);
         return;
     }
     if (!sc->runtimeInitialized || sc->runtimeDestroying)
     {
         if (!sc->runtimeDestroying)
             DisconnectSignalsForEntity(entity);
+		ClearScheduledTasksForEntity(entity);
         return;
     }
 
@@ -283,6 +476,7 @@ void ScriptSystem::OnEntityDestroyed(entt::entity entity)
     sc->runtimeScenePaused = false;
     sc->runtimeDestroying = false;
     DisconnectSignalsForEntity(entity);
+	ClearScheduledTasksForEntity(entity);
 }
 
 uint64_t ScriptSystem::ConnectSignal(entt::entity source, const std::string& signalName, entt::entity target, const std::string& methodName)
@@ -447,6 +641,7 @@ void ScriptSystem::OnUpdate(float dt)
     DispatchCollisionEvents();
     DispatchAnimationEvents();
     DispatchAudioEvents();
+	AdvanceScheduledTasks(dt);
 
     auto view = m_Scene.GetRegistry().view<ScriptComponent>();
 
@@ -559,6 +754,8 @@ void ScriptSystem::OnStop()
         //TODO: WTF IS THIS?
     }
 	ClearSignals();
+	m_Coroutines.clear();
+	m_Timers.clear();
 
 }
 

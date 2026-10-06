@@ -42,6 +42,12 @@ private:
 	void DispatchAudioEvents();
 	void EnsureScriptInitialized(ScriptComponent& sc, entt::entity entity);
 	void InvokeLifecycleCallback(ScriptComponent& sc, sol::protected_function& callback, const char* callbackName);
+	uint64_t StartCoroutine(entt::entity owner, sol::function function);
+	bool StopCoroutine(entt::entity owner, uint64_t coroutineId);
+	uint64_t StartTimer(entt::entity owner, float seconds, sol::protected_function callback, float interval = 0.0f);
+	bool CancelTimer(entt::entity owner, uint64_t timerId);
+	void AdvanceScheduledTasks(float dt);
+	void ClearScheduledTasksForEntity(entt::entity entity);
 	void DisconnectSignalsForEntity(entt::entity entity);
 	void ClearSignals();
 	Physics::CollisionInfo BuildCollisionInfo(const Physics::Collision& collision, entt::entity otherEntity, bool isTrigger);
@@ -54,14 +60,35 @@ private:
 		entt::entity target;
 		std::string methodName;
 	};
+
+	struct CoroutineTask
+	{
+		uint64_t id = 0;
+		entt::entity owner = entt::null;
+		sol::coroutine coroutine;
+		float waitRemaining = 0.0f;
+		bool firstResume = true;
+	};
+
+	struct TimerTask
+	{
+		uint64_t id = 0;
+		entt::entity owner = entt::null;
+		sol::protected_function callback;
+		float waitRemaining = 0.0f;
+		float interval = 0.0f;
+	};
 	
 	ScriptEngine m_ScriptEngine;
 	Scene& m_Scene;
 	bool m_IsRunning = false;
 	bool m_IsReady = false;
 	uint64_t m_NextSignalConnectionId = 1;
+	uint64_t m_NextScheduledTaskId = 1;
 	std::unordered_map<entt::entity, std::unordered_set<std::string>> m_SignalDefinitions;
 	std::vector<SignalConnection> m_SignalConnections;
+	std::unordered_map<uint64_t, CoroutineTask> m_Coroutines;
+	std::unordered_map<uint64_t, TimerTask> m_Timers;
 };
 
 }

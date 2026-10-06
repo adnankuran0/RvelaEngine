@@ -22,7 +22,9 @@ static int SafeLuaPanic(lua_State* L)
 void ScriptEngine::Init()
 {
     m_State.set_panic(sol::c_call<decltype(&SafeLuaPanic), &SafeLuaPanic>);
-    m_State.open_libraries(sol::lib::base, sol::lib::math, sol::lib::table, sol::lib::string, sol::lib::os);
+    m_State.open_libraries(sol::lib::base, sol::lib::math, sol::lib::table, sol::lib::string, sol::lib::os, sol::lib::coroutine);
+
+    m_State.script("function await(seconds) return coroutine.yield(math.max(0, seconds or 0)) end");
 
     InitOverrides();
 
