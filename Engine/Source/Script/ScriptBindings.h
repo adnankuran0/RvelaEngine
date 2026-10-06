@@ -2,6 +2,7 @@
 #include "MathBindings.h"
 #include "CoreBindings.h"
 #include "ComponentBindings.h"
+#include "DebugBindings.h"
 #include "InputBindings.h"
 #include "SceneBindings.h"
 #include "PhysicsBindings.h"

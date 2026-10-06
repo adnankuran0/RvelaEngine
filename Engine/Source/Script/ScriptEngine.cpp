@@ -31,6 +31,7 @@ void ScriptEngine::Init()
 
     LuaBindings::RegisterMath(m_State);
     LuaBindings::RegisterCoreTypes(m_State);
+    LuaBindings::RegisterDebugAPI(m_State);
     LuaBindings::RegisterComponents(m_State);
     LuaBindings::RegisterInputAPI(m_State);
     Engine* engine = Engine::Get();
