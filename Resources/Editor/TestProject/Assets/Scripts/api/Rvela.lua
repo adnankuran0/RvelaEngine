@@ -898,6 +898,10 @@ local Entity = {}
 ---@return boolean
 function Entity:IsValid() end
 
+---Gets the entity's tag name.
+---@return string
+function Entity:GetName() end
+
 ---Queues this entity for destruction at end of frame.
 function Entity:Destroy() end
 
@@ -1048,7 +1052,7 @@ _G.Scene = Scene
 ---@field entity Entity The entity owning this script instance
 ---@field scene Scene The active scene
 ---@field physics any The physics world
----@field properties table<string, any> Exported properties inspected in editor
+---@field properties table<string, any> Exported properties inspected in editor; use { type = "Entity" } for an entity reference
 ---@field signals string[] Names of signals declared by this script, e.g. { "Opened" }
 ---@field [string] any Script-specific fields added by each Lua script
 local ScriptInstance = {}

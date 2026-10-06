@@ -651,7 +651,7 @@
                     0.9999991655349731
                 ]
             },
-            "UUID": 14437298761617673878
+            "UUID": 2671012776344443386
         },
         {
             "Material": {
@@ -891,221 +891,6 @@
                 ]
             },
             "UUID": 70
-        },
-        {
-            "AnimatorComponent": {
-                "autoplay": false,
-                "currentClipName": "",
-                "libraryUUID": "00000000-0000-0000-0000-000000000000",
-                "playbackSpeed": 1.0
-            },
-            "BoxColliderComponent": {
-                "offset": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "size": [
-                    0.5,
-                    0.5,
-                    0.5
-                ]
-            },
-            "Material": {
-                "material": "",
-                "overrides": {
-                    "albedoColor": [
-                        0.0,
-                        0.0,
-                        0.0,
-                        1.0
-                    ],
-                    "transparencyMode": 1
-                }
-            },
-            "Mesh": {
-                "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
-            },
-            "ParentUUID": 0,
-            "RigidbodyComponent": {
-                "allowSleep": 1,
-                "angularDamping": 0.05000000074505806,
-                "autoCalculateMass": 1,
-                "bodyType": 0,
-                "collisionLayer": 1,
-                "collisionMask": 4294967295,
-                "friction": 0.5,
-                "gravityFactor": 1.0,
-                "isSensor": false,
-                "linearDamping": 0.05000000074505806,
-                "lockRotationX": false,
-                "lockRotationY": false,
-                "lockRotationZ": false,
-                "lockTranslationX": false,
-                "lockTranslationY": false,
-                "lockTranslationZ": false,
-                "mass": 1.0,
-                "maxAngularVelocity": 50.0,
-                "maxLinearVelocity": 500.0,
-                "restitution": 0.0,
-                "useCCD": false
-            },
-            "ScriptComponent": {
-                "propertyValues": {},
-                "scriptAssetUUID": "89a68d71-d2cb-430c-9e62-b847634cef72"
-            },
-            "Tag": {
-                "isActive": true,
-                "tag": "Cube"
-            },
-            "Transform": {
-                "lockScaleRatio": true,
-                "position": [
-                    9.58004379272461,
-                    1.9744240045547485,
-                    -3.653118133544922
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scale": [
-                    0.5,
-                    0.5,
-                    0.5
-                ]
-            },
-            "UUID": 21
-        },
-        {
-            "AnimatorComponent": {
-                "autoplay": false,
-                "currentClipName": "",
-                "libraryUUID": "00000000-0000-0000-0000-000000000000",
-                "playbackSpeed": 1.0
-            },
-            "ParentUUID": 0,
-            "Tag": {
-                "isActive": true,
-                "tag": "Door"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    12.64704418182373,
-                    0.5,
-                    3.4898152351379395
-                ],
-                "rotation": [
-                    180.0,
-                    -89.98021697998047,
-                    180.0
-                ],
-                "scale": [
-                    0.9999950528144836,
-                    1.0,
-                    0.9999945759773254
-                ]
-            },
-            "UUID": 5
-        },
-        {
-            "ParentUUID": 5,
-            "Tag": {
-                "isActive": true,
-                "tag": "DoorPivot"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scale": [
-                    0.9999930262565613,
-                    1.0,
-                    0.9999929666519165
-                ]
-            },
-            "UUID": 3
-        },
-        {
-            "BoxColliderComponent": {
-                "offset": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "size": [
-                    0.5,
-                    0.5,
-                    0.5
-                ]
-            },
-            "Material": {
-                "material": ""
-            },
-            "Mesh": {
-                "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
-            },
-            "ParentUUID": 3,
-            "RigidbodyComponent": {
-                "allowSleep": 1,
-                "angularDamping": 0.05000000074505806,
-                "autoCalculateMass": 1,
-                "bodyType": 0,
-                "collisionLayer": 1,
-                "collisionMask": 4294967295,
-                "friction": 0.5,
-                "gravityFactor": 1.0,
-                "isSensor": false,
-                "linearDamping": 0.05000000074505806,
-                "lockRotationX": false,
-                "lockRotationY": false,
-                "lockRotationZ": false,
-                "lockTranslationX": false,
-                "lockTranslationY": false,
-                "lockTranslationZ": false,
-                "mass": 1.0,
-                "maxAngularVelocity": 50.0,
-                "maxLinearVelocity": 500.0,
-                "restitution": 0.0,
-                "useCCD": false
-            },
-            "ScriptComponent": {
-                "propertyValues": {},
-                "scriptAssetUUID": "c820e8b6-be0a-4277-92f5-4bc2e0b37628"
-            },
-            "Tag": {
-                "isActive": true,
-                "tag": "DoorMesh"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    -0.5,
-                    1.0,
-                    0.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scale": [
-                    1.0,
-                    2.0,
-                    0.10000000149011612
-                ]
-            },
-            "UUID": 4
         },
         {
             "AnimatorComponent": {
@@ -1632,12 +1417,13 @@
                     1.0
                 ]
             },
-            "UUID": 6680345888498974426
+            "UUID": 8051152395345961851
         },
         {
             "ParentUUID": 0,
             "ScriptComponent": {
                 "propertyValues": {
+                    "testEntity": "",
                     "testPrefab": "a1b0801d-324b-4f2d-a3e5-c8d6d516f323"
                 },
                 "scriptAssetUUID": "fd27841d-643b-409f-a65f-0d75bc0868e0"
@@ -1665,33 +1451,6 @@
                 ]
             },
             "UUID": 99901
-        },
-        {
-            "ParentUUID": 0,
-            "Prefab": "342bca25-b578-45e3-bf44-c9ae419a8665",
-            "Tag": {
-                "isActive": true,
-                "tag": "Ball"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    -3.9899699687957764,
-                    1.2587549686431885,
-                    0.6286811828613281
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scale": [
-                    0.3500000238418579,
-                    0.3500000238418579,
-                    0.3500000238418579
-                ]
-            },
-            "UUID": 14673590084110389912
         }
     ],
     "Environment": {

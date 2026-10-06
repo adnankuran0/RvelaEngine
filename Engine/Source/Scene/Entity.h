@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Scene/Scene.h"
+#include "Scene/EntityUUID.h"
 #include "entt/entt.h"
 
 namespace rv {
@@ -57,7 +58,7 @@ public:
 	void SetName(const std::string& name) { GetComponent<TagComponent>().tag = name; }
 	const entt::entity GetHandle() { return m_EntityHandle; }
 	Scene* GetScene() const { return m_Scene; }
-	bool IsValid() const { return m_EntityHandle != entt::null && m_Scene != nullptr; }
+	bool IsValid() const { return m_EntityHandle != entt::null && m_Scene != nullptr && m_Scene->GetRegistry().valid(m_EntityHandle); }
 
 	bool IsActive() const { return m_Scene ? m_Scene->IsEntityActive(m_EntityHandle) : false; }
 	bool IsSelfActive() const { return m_Scene ? m_Scene->IsEntitySelfActive(m_EntityHandle) : false; }

@@ -1,5 +1,6 @@
 #pragma once
 #include "Asset/AssetUUID.h"
+#include "Scene/EntityUUID.h"
 #include <string>
 #include <vector>
 #include <glm/glm.hpp>
@@ -16,7 +17,8 @@ enum class ScriptPropertyType
     Vec3,
     Vec4,
     Color,
-    AssetHandle
+    AssetHandle,
+    Entity
 };
 
 struct ScriptPropertyDef
@@ -33,6 +35,7 @@ struct ScriptPropertyDef
     glm::vec3 vec3Val{ 0.0f };
     glm::vec4 vec4Val{ 0.0f };
     AssetUUID assetVal{};
+    EntityHandle entityVal{};
 
     // Metadata
     float minVal = 0.0f;

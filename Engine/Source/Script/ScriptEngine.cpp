@@ -270,6 +270,23 @@ static void ParsePropertyTableItem(ScriptPropertyDef& def, const sol::table& ite
         def.type = ScriptPropertyType::String;
         if (defObj.valid() && defObj.is<std::string>()) def.stringVal = defObj.as<std::string>();
     }
+    else if (typeStr == "entity" || typeStr == "entityhandle")
+    {
+        def.type = ScriptPropertyType::Entity;
+        if (defObj.valid())
+        {
+            try
+            {
+                if (defObj.is<std::string>())
+                    def.entityVal.uuid = std::stoull(defObj.as<std::string>());
+                else if (defObj.is<uint64_t>())
+                    def.entityVal.uuid = defObj.as<uint64_t>();
+                else if (defObj.is<int64_t>() && defObj.as<int64_t>() > 0)
+                    def.entityVal.uuid = static_cast<EntityUUID>(defObj.as<int64_t>());
+            }
+            catch (const std::exception&) {}
+        }
+    }
     else if (typeStr == "vec2")
     {
         def.type = ScriptPropertyType::Vec2;

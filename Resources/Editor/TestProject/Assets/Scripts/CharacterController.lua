@@ -15,6 +15,8 @@
 ---@field camStartY number
 Player = {}
 
+Player.className = "CharacterController"
+
 Player.properties = {
     walkSpeed        = 3.0,
     sprintSpeed      = 5.0,

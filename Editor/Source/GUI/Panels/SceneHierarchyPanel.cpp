@@ -339,7 +339,9 @@ void SceneHierarchyPanel::Draw(Engine* engine)
             if (colorPushes > 0)
                 ImGui::PopStyleColor(colorPushes);
 
-            if (!isRoot && ImGui::IsItemClicked(ImGuiMouseButton_Left))
+            // Select on release so starting a drag from the hierarchy does not
+            // change the Inspector target before the drag reaches its drop slot.
+            if (!isRoot && ImGui::IsItemDeactivated() && ImGui::IsItemHovered() && !ImGui::IsDragDropActive())
             {
                 ImGuiIO& io = ImGui::GetIO();
                 if (io.KeyCtrl)

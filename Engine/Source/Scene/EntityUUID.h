@@ -6,6 +6,20 @@ namespace rv {
 
 using EntityUUID = uint64_t;
 
+class Entity;
+class Scene;
+
+// Stable scene reference used by serialized properties. Runtime Entity values
+// are resolved from this UUID so references survive entity handle changes.
+struct EntityHandle {
+    EntityUUID uuid = 0;
+
+    bool IsValid() const { return uuid != 0; }
+    explicit operator bool() const { return IsValid(); }
+    bool operator==(const EntityHandle&) const = default;
+    Entity Resolve(Scene& scene) const;
+};
+
 class EntityUUIDGenerator {
 public:
     static uint64_t Generate() {

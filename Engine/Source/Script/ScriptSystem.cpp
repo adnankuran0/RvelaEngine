@@ -108,6 +108,9 @@ void ScriptSystem::BindLuaScript(ScriptComponent& sc, entt::entity e)
         case ScriptPropertyType::Vec4:
         case ScriptPropertyType::Color:       sc.luaInstance[def.name] = def.vec4Val; break;
         case ScriptPropertyType::AssetHandle: sc.luaInstance[def.name] = def.assetVal; break;
+        case ScriptPropertyType::Entity:
+            sc.luaInstance[def.name] = def.entityVal.Resolve(m_Scene);
+            break;
         }
     }
 
@@ -151,6 +154,14 @@ void ScriptSystem::BindLuaScript(ScriptComponent& sc, entt::entity e)
             case ScriptPropertyType::AssetHandle:
                 if (val.is_string())
                     sc.luaInstance[def.name] = AssetUUID::FromString(val.get<std::string>());
+                break;
+            case ScriptPropertyType::Entity:
+                if (val.is_string())
+                {
+                    EntityHandle handle;
+                    handle.uuid = std::stoull(val.get<std::string>());
+                    sc.luaInstance[def.name] = handle.Resolve(m_Scene);
+                }
                 break;
             }
         }

@@ -9,6 +9,7 @@
 #include "EditorSelection.h"
 #include "AssetImporters/PrefabImporter.h"
 #include "Scene/SceneSerializer.h"
+#include "Scene/Entity.h"
 #include "Script/ScriptEngine.h"
 #include "Script/ScriptProperty.h"
 #include "Asset/AssetRegistry.h"
@@ -1581,6 +1582,60 @@ void InspectorPanel::Draw(Engine* engine)
 							scriptComp.propertyValues[prop.name] = AssetUUID{}.ToString();
 							if (scriptComp.luaInstance.valid())
 								scriptComp.luaInstance[prop.name] = AssetUUID{};
+						}
+						break;
+					}
+					case ScriptPropertyType::Entity:
+					{
+						UI::PropertyLabel(prop.name.c_str());
+						EntityHandle value = prop.entityVal;
+						if (scriptComp.propertyValues.contains(prop.name) && scriptComp.propertyValues[prop.name].is_string())
+						{
+							try { value.uuid = std::stoull(scriptComp.propertyValues[prop.name].get<std::string>()); }
+							catch (const std::exception&) { value = {}; }
+						}
+						const EntityUUID originalUUID = value.uuid;
+
+						std::string entityName = "<None>";
+						if (value.IsValid())
+						{
+							const auto uuidIt = scene.GetUUIDEntityMap().find(value.uuid);
+							if (uuidIt != scene.GetUUIDEntityMap().end() && registry.valid(uuidIt->second) && registry.any_of<TagComponent>(uuidIt->second))
+								entityName = registry.get<TagComponent>(uuidIt->second).tag;
+							else
+								entityName = "<Missing Entity>";
+						}
+
+						const float totalAvail = ImGui::GetContentRegionAvail().x;
+						constexpr float clearButtonWidth = 22.0f;
+						const float slotWidth = std::max(totalAvail - clearButtonWidth - 4.0f, 20.0f);
+						const std::string slotId = entityName + "##EntityProperty_" + prop.name;
+						ImGui::Button(slotId.c_str(), ImVec2(slotWidth, 22.0f));
+						if (ImGui::BeginDragDropTarget())
+						{
+							if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY_DRAG"))
+							{
+								if (payload->DataSize == sizeof(entt::entity))
+								{
+									const entt::entity draggedEntity = *static_cast<const entt::entity*>(payload->Data);
+									if (registry.valid(draggedEntity) && registry.any_of<UUIDComponent>(draggedEntity))
+										value.uuid = registry.get<UUIDComponent>(draggedEntity).uuid;
+								}
+							}
+							ImGui::EndDragDropTarget();
+						}
+
+						ImGui::SameLine(0, 4.0f);
+						const std::string clearId = "X##EntityProperty_" + prop.name;
+						if (ImGui::Button(clearId.c_str(), ImVec2(clearButtonWidth, 22.0f)))
+							value = {};
+
+						if (value.uuid != originalUUID)
+						{
+							scriptComp.propertyValues[prop.name] = value.IsValid() ? std::to_string(value.uuid) : std::string{};
+							Entity resolved = value.Resolve(scene);
+							if (scriptComp.luaInstance.valid())
+								scriptComp.luaInstance[prop.name] = resolved;
 						}
 						break;
 					}
