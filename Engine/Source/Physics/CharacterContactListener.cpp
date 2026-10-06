@@ -107,6 +107,7 @@ CollisionEvent CharacterContactListener::BuildEvent(
     event.entityA = CharacterToEntity(inCharacter);
     event.entityB = BodyToEntity(m_PhysicsSystem, inBodyID2);
     event.eventType = eventType;
+    event.isTrigger = m_PhysicsSystem->GetBodyInterface().IsSensor(inBodyID2);
     event.collision.point = math::FromJoltRVec3(inContactPosition);
     event.collision.normal = math::FromJoltVec3(inContactNormal);
     return event;

@@ -471,6 +471,7 @@ _G.MotionType = MotionType
 ---@field point Vec3 Collision contact point
 ---@field normal Vec3 Surface contact normal
 ---@field other Entity The other entity collided with
+---@field isTrigger boolean Whether this contact came from a sensor/trigger body
 
 ---@class RaycastResult
 ---@field hit boolean Whether the ray hit something
@@ -1042,6 +1043,15 @@ local ScriptInstance = {}
 ---Called once when the script is initialized or game starts.
 function ScriptInstance:OnCreate() end
 
+---Called after startup scripts have run OnCreate and OnEnabled.
+function ScriptInstance:OnReady() end
+
+---Called when the running scene enters the paused state.
+function ScriptInstance:OnScenePaused() end
+
+---Called when the running scene resumes from the paused state.
+function ScriptInstance:OnSceneResumed() end
+
 ---Called every frame.
 ---@param dt number Delta time in seconds
 function ScriptInstance:OnUpdate(dt) end
@@ -1057,6 +1067,12 @@ function ScriptInstance:OnLateUpdate(dt) end
 ---Called when the entity is destroyed or scene stops.
 function ScriptInstance:OnDestroy() end
 
+---Called when the script's entity becomes active in the hierarchy.
+function ScriptInstance:OnEnabled() end
+
+---Called when the script's entity becomes inactive in the hierarchy.
+function ScriptInstance:OnDisabled() end
+
 ---Called when physics collision starts.
 ---@param collision CollisionInfo
 function ScriptInstance:OnCollisionEnter(collision) end
@@ -1069,12 +1085,16 @@ function ScriptInstance:OnCollisionStay(collision) end
 ---@param collision CollisionInfo
 function ScriptInstance:OnCollisionExit(collision) end
 
----Called when a character/rigidbody enters a trigger volume.
----@param other Entity
+---Called when a physics body enters a trigger volume.
+---@param other CollisionInfo
 function ScriptInstance:OnTriggerEnter(other) end
 
----Called when a character/rigidbody exits a trigger volume.
----@param other Entity
+---Called while the script's entity remains inside a trigger volume.
+---@param other CollisionInfo
+function ScriptInstance:OnTriggerStay(other) end
+
+---Called when a physics body exits a trigger volume.
+---@param other CollisionInfo
 function ScriptInstance:OnTriggerExit(other) end
 
 ---Called when an animation event marker is triggered.

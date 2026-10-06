@@ -43,6 +43,21 @@ Scene::~Scene()
 void Scene::SetState(SceneState newState)
 {
     if (newState == m_State) return;
+
+    if (m_State == SceneState::PLAY && newState == SceneState::PAUSE)
+    {
+        m_State = newState;
+        m_ScriptSystem.OnScenePaused();
+        return;
+    }
+
+    if (m_State == SceneState::PAUSE && newState == SceneState::PLAY)
+    {
+        m_State = newState;
+        m_ScriptSystem.OnSceneResumed();
+        return;
+    }
+
     if (m_State == SceneState::EDIT && newState == SceneState::PLAY)
         OnStart();
     if ((m_State == SceneState::PLAY || m_State == SceneState::PAUSE) && newState == SceneState::EDIT)
@@ -124,6 +139,8 @@ Entity Scene::CreateEntityWithUUID(const std::string& name, EntityUUID uuid) {
 
 void Scene::DestroyEntity(entt::entity entity) {
     if (entity == entt::null || !m_Registry.valid(entity)) return;
+
+    m_ScriptSystem.OnEntityDestroyed(entity);
 
     auto& node = GetComponent<SceneTreeComponent>(entity);
     if (node.parent != entt::null && m_Registry.valid(node.parent)) {
@@ -262,9 +279,32 @@ void Scene::SetEntityActive(entt::entity entity, bool active)
     if (entity == entt::null || !m_Registry.valid(entity))
         return;
 
-    if (auto* tag = m_Registry.try_get<TagComponent>(entity))
+    auto* tag = m_Registry.try_get<TagComponent>(entity);
+    if (!tag || tag->isActive == active)
+        return;
+
+    std::vector<std::pair<entt::entity, bool>> affected;
+    std::function<void(entt::entity)> collect = [&](entt::entity current)
     {
-        tag->isActive = active;
+        if (!m_Registry.valid(current))
+            return;
+
+        affected.emplace_back(current, IsEntityActive(current));
+        if (auto* tree = m_Registry.try_get<SceneTreeComponent>(current))
+        {
+            for (entt::entity child : tree->children)
+                collect(child);
+        }
+    };
+    collect(entity);
+
+    tag->isActive = active;
+
+    for (const auto& [affectedEntity, wasActive] : affected)
+    {
+        const bool isActive = IsEntityActive(affectedEntity);
+        if (wasActive != isActive)
+            m_ScriptSystem.OnEntityActivationChanged(affectedEntity, isActive);
     }
 }
 

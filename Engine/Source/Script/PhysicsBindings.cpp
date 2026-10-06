@@ -26,7 +26,8 @@ void rv::LuaBindings::RegisterPhysicsAPI(sol::state& lua)
     lua.new_usertype<CollisionInfo>("CollisionInfo",
         "point", sol::property([](CollisionInfo& ci) { return ci.collision.point; }),
         "normal", sol::property([](CollisionInfo& ci) { return ci.collision.normal; }),
-        "other", sol::property([](CollisionInfo& ci) -> Entity& { return ci.other; })
+        "other", sol::property([](CollisionInfo& ci) -> Entity& { return ci.other; }),
+        "isTrigger", sol::property([](CollisionInfo& ci) { return ci.isTrigger; })
     );
 
     lua.new_usertype<RaycastResult>("RaycastResult",

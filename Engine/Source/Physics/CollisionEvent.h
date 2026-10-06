@@ -17,6 +17,7 @@ struct  CollisionEvent
 	entt::entity entityB;
 	Collision collision;
 	CollisionEventType eventType;
+	bool isTrigger = false;
 };
 
 }

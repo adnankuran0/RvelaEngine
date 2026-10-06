@@ -7,6 +7,7 @@ struct CollisionInfo
 {
 	Entity other;
 	Collision collision;
+	bool isTrigger = false;
 };
 
 

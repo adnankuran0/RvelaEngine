@@ -137,13 +137,21 @@ void ScriptSystem::BindLuaScript(ScriptComponent& sc, entt::entity e)
     }
 
     sc.OnCreate = sc.luaInstance["OnCreate"];
+    sc.OnReady = sc.luaInstance["OnReady"];
     sc.OnUpdate = sc.luaInstance["OnUpdate"];
     sc.OnFixedUpdate = sc.luaInstance["OnFixedUpdate"];
     sc.OnLateUpdate = sc.luaInstance["OnLateUpdate"];
     sc.OnDestroy = sc.luaInstance["OnDestroy"];
+    sc.OnEnabled = sc.luaInstance["OnEnabled"];
+    sc.OnDisabled = sc.luaInstance["OnDisabled"];
+    sc.OnScenePaused = sc.luaInstance["OnScenePaused"];
+    sc.OnSceneResumed = sc.luaInstance["OnSceneResumed"];
     sc.OnCollisionEnter = sc.luaInstance["OnCollisionEnter"];
     sc.OnCollisionStay = sc.luaInstance["OnCollisionStay"];
     sc.OnCollisionExit = sc.luaInstance["OnCollisionExit"];
+    sc.OnTriggerEnter = sc.luaInstance["OnTriggerEnter"];
+    sc.OnTriggerStay = sc.luaInstance["OnTriggerStay"];
+    sc.OnTriggerExit = sc.luaInstance["OnTriggerExit"];
     sc.OnAnimationEvent = sc.luaInstance["OnAnimationEvent"];
     sc.OnAnimationStarted = sc.luaInstance["OnAnimationStarted"];
     sc.OnAnimationFinished = sc.luaInstance["OnAnimationFinished"];
@@ -151,8 +159,119 @@ void ScriptSystem::BindLuaScript(ScriptComponent& sc, entt::entity e)
     sc.OnAudioFinished = sc.luaInstance["OnAudioFinished"];
 }
 
+void ScriptSystem::InvokeLifecycleCallback(ScriptComponent& sc, sol::protected_function& callback, const char* callbackName)
+{
+    if (!sc.luaInstance.valid() || !callback.valid())
+        return;
+
+    sol::protected_function_result result = callback(sc.luaInstance);
+    if (!result.valid())
+    {
+        sol::error err = result;
+        LOG_ERROR("Lua {} error: {}", callbackName, err.what());
+    }
+}
+
+void ScriptSystem::EnsureScriptInitialized(ScriptComponent& sc, entt::entity entity)
+{
+    if (sc.runtimeInitialized || sc.runtimeDestroying)
+        return;
+
+    BindLuaScript(sc, entity);
+    if (!sc.luaInstance.valid())
+        return;
+
+    sc.runtimeInitialized = true;
+    InvokeLifecycleCallback(sc, sc.OnCreate, "OnCreate");
+}
+
+void ScriptSystem::OnEntityActivationChanged(entt::entity entity, bool active)
+{
+    if (!m_IsRunning)
+		return;
+
+    auto* sc = m_Scene.GetRegistry().try_get<ScriptComponent>(entity);
+    if (!sc || sc->runtimeDestroying)
+        return;
+
+    if (active)
+    {
+        EnsureScriptInitialized(*sc, entity);
+        if (m_Scene.IsEntityActive(entity) && sc->runtimeInitialized && !sc->runtimeEnabled)
+        {
+            sc->runtimeEnabled = true;
+            InvokeLifecycleCallback(*sc, sc->OnEnabled, "OnEnabled");
+        }
+        if (m_IsReady && m_Scene.IsEntityActive(entity) && sc->runtimeInitialized && !sc->runtimeReady)
+        {
+            sc->runtimeReady = true;
+            InvokeLifecycleCallback(*sc, sc->OnReady, "OnReady");
+        }
+        if (m_Scene.GetState() == SceneState::PAUSE && sc->runtimeInitialized && !sc->runtimeScenePaused)
+        {
+            sc->runtimeScenePaused = true;
+            InvokeLifecycleCallback(*sc, sc->OnScenePaused, "OnScenePaused");
+        }
+    }
+    else if (sc->runtimeEnabled)
+    {
+        sc->runtimeEnabled = false;
+        InvokeLifecycleCallback(*sc, sc->OnDisabled, "OnDisabled");
+    }
+}
+
+void ScriptSystem::OnEntityDestroyed(entt::entity entity)
+{
+    auto* sc = m_Scene.GetRegistry().try_get<ScriptComponent>(entity);
+    if (!sc || !sc->runtimeInitialized || sc->runtimeDestroying)
+        return;
+
+    sc->runtimeDestroying = true;
+
+    if (sc->runtimeEnabled)
+    {
+        sc->runtimeEnabled = false;
+        InvokeLifecycleCallback(*sc, sc->OnDisabled, "OnDisabled");
+    }
+    InvokeLifecycleCallback(*sc, sc->OnDestroy, "OnDestroy");
+    sc->runtimeInitialized = false;
+    sc->runtimeReady = false;
+    sc->runtimeScenePaused = false;
+    sc->runtimeDestroying = false;
+}
+
+void ScriptSystem::OnScenePaused()
+{
+    auto view = m_Scene.GetRegistry().view<ScriptComponent>();
+    for (auto entity : view)
+    {
+        auto& sc = view.get<ScriptComponent>(entity);
+        if (!sc.runtimeInitialized || sc.runtimeScenePaused)
+            continue;
+
+        sc.runtimeScenePaused = true;
+        InvokeLifecycleCallback(sc, sc.OnScenePaused, "OnScenePaused");
+    }
+}
+
+void ScriptSystem::OnSceneResumed()
+{
+    auto view = m_Scene.GetRegistry().view<ScriptComponent>();
+    for (auto entity : view)
+    {
+        auto& sc = view.get<ScriptComponent>(entity);
+        if (!sc.runtimeInitialized || !sc.runtimeScenePaused)
+            continue;
+
+        sc.runtimeScenePaused = false;
+        InvokeLifecycleCallback(sc, sc.OnSceneResumed, "OnSceneResumed");
+    }
+}
+
 void ScriptSystem::OnStart()
 {
+	m_IsRunning = true;
+	m_IsReady = false;
     auto view = m_Scene.GetRegistry().view<ScriptComponent>();
     for (auto entity : view)
     {
@@ -160,16 +279,24 @@ void ScriptSystem::OnStart()
             continue;
 
         auto& sc = view.get<ScriptComponent>(entity);
-        BindLuaScript(sc, entity);
-        if (sc.OnCreate.valid())
+        EnsureScriptInitialized(sc, entity);
+        if (m_Scene.IsEntityActive(entity) && sc.runtimeInitialized && !sc.runtimeEnabled)
         {
-            sol::protected_function_result result = sc.OnCreate(sc.luaInstance);
-            if (!result.valid())
-            {
-                sol::error err = result;
-                LOG_ERROR("Lua OnCreate error: {}", err.what());
-            }
+            sc.runtimeEnabled = true;
+            InvokeLifecycleCallback(sc, sc.OnEnabled, "OnEnabled");
         }
+    }
+
+    m_IsReady = true;
+    auto readyView = m_Scene.GetRegistry().view<ScriptComponent>();
+    for (auto entity : readyView)
+    {
+        auto& sc = readyView.get<ScriptComponent>(entity);
+        if (!m_Scene.IsEntityActive(entity) || !sc.runtimeInitialized || sc.runtimeReady)
+            continue;
+
+        sc.runtimeReady = true;
+        InvokeLifecycleCallback(sc, sc.OnReady, "OnReady");
     }
 }
 
@@ -190,17 +317,11 @@ void ScriptSystem::OnUpdate(float dt)
 
         if (!sc.luaInstance.valid())
         {
-            BindLuaScript(sc, entity);
-            if (sc.OnCreate.valid())
-            {
-                sol::protected_function_result result = sc.OnCreate(sc.luaInstance);
-                if (!result.valid())
-                {
-                    sol::error err = result;
-                    LOG_ERROR("Lua OnCreate error: {}", err.what());
-                }
-            }
+            OnEntityActivationChanged(entity, true);
         }
+
+        if (!m_Scene.IsEntityActive(entity))
+            continue;
 
         if (sc.luaInstance.valid())
         {
@@ -229,17 +350,11 @@ void ScriptSystem::OnFixedUpdate(float dt)
 
         if (!sc.luaInstance.valid())
         {
-            BindLuaScript(sc, entity);
-            if (sc.OnCreate.valid())
-            {
-                sol::protected_function_result result = sc.OnCreate(sc.luaInstance);
-                if (!result.valid())
-                {
-                    sol::error err = result;
-                    LOG_ERROR("Lua OnCreate error: {}", err.what());
-                }
-            }
+            OnEntityActivationChanged(entity, true);
         }
+
+        if (!m_Scene.IsEntityActive(entity))
+            continue;
 
         if (sc.luaInstance.valid())
         {
@@ -285,22 +400,15 @@ void ScriptSystem::OnLateUpdate(float dt)
 
 void ScriptSystem::OnStop()
 {
+    m_IsRunning = false;
+	m_IsReady = false;
     auto scView = m_Scene.GetRegistry().view<ScriptComponent>();
     for (auto entity : scView)
     {
         auto& sc = scView.get<ScriptComponent>(entity);
 
-        if (sc.OnDestroy.valid())
-        {
-            sol::protected_function_result result = sc.OnDestroy(sc.luaInstance);
-            if (!result.valid())
-            {
-                sol::error err = result;
-                LOG_ERROR("Lua OnDestroy error: {}", err.what());
-            }
-        }
-    } 
-
+        OnEntityDestroyed(entity);
+    }
     auto mcView = m_Scene.GetRegistry().view<MaterialComponent>();
     for (auto entity : mcView)
     {
@@ -323,11 +431,23 @@ void ScriptSystem::DispatchCollisionEvents()
             sol::protected_function* fn = nullptr;
             const char* name = "";
 
-            switch (type)
+            if (info.isTrigger)
             {
-            case Physics::CollisionEventType::ENTER: fn = &sc.OnCollisionEnter; name = "OnCollisionEnter"; break;
-            case Physics::CollisionEventType::STAY:  fn = &sc.OnCollisionStay;  name = "OnCollisionStay";  break;
-            case Physics::CollisionEventType::EXIT:  fn = &sc.OnCollisionExit;  name = "OnCollisionExit";  break;
+                switch (type)
+                {
+                case Physics::CollisionEventType::ENTER: fn = &sc.OnTriggerEnter; name = "OnTriggerEnter"; break;
+                case Physics::CollisionEventType::STAY:  fn = &sc.OnTriggerStay;  name = "OnTriggerStay";  break;
+                case Physics::CollisionEventType::EXIT:  fn = &sc.OnTriggerExit; name = "OnTriggerExit"; break;
+                }
+            }
+            else
+            {
+                switch (type)
+                {
+                case Physics::CollisionEventType::ENTER: fn = &sc.OnCollisionEnter; name = "OnCollisionEnter"; break;
+                case Physics::CollisionEventType::STAY:  fn = &sc.OnCollisionStay;  name = "OnCollisionStay";  break;
+                case Physics::CollisionEventType::EXIT:  fn = &sc.OnCollisionExit;  name = "OnCollisionExit";  break;
+                }
             }
 
             if (fn && fn->valid())
@@ -346,24 +466,24 @@ void ScriptSystem::DispatchCollisionEvents()
         ScriptComponent* scA = reg.try_get<ScriptComponent>(event.entityA);
         ScriptComponent* scB = reg.try_get<ScriptComponent>(event.entityB);
 
-        if (scA)
+        if (scA && scA->luaInstance.valid() && m_Scene.IsEntityActive(event.entityA))
         {
-            Physics::CollisionInfo info = BuildCollisionInfo(event.collision, event.entityB);
+            Physics::CollisionInfo info = BuildCollisionInfo(event.collision, event.entityB, event.isTrigger);
             dispatchEvent(*scA, event.eventType, info);
         }
 
-        if (scB && reg.try_get<ScriptComponent>(event.entityB))
+        if (scB && scB->luaInstance.valid() && m_Scene.IsEntityActive(event.entityB))
         {
-            Physics::CollisionInfo info = BuildCollisionInfo(event.collision, event.entityA);
+            Physics::CollisionInfo info = BuildCollisionInfo(event.collision, event.entityA, event.isTrigger);
             info.collision.normal *= -1.0f;
             dispatchEvent(*scB, event.eventType, info);
         }
     }
 }
 
-Physics::CollisionInfo ScriptSystem::BuildCollisionInfo(const Physics::Collision& collision, entt::entity otherEntity)
+Physics::CollisionInfo ScriptSystem::BuildCollisionInfo(const Physics::Collision& collision, entt::entity otherEntity, bool isTrigger)
 {
-    return { Entity(otherEntity, &m_Scene), collision };
+    return { Entity(otherEntity, &m_Scene), collision, isTrigger };
 }
 
 void ScriptSystem::DispatchAnimationEvents()
@@ -382,7 +502,7 @@ void ScriptSystem::DispatchAnimationEvents()
         for (auto entity : scriptView)
         {
             auto& sc = scriptView.get<ScriptComponent>(entity);
-            if (!sc.luaInstance.valid())
+            if (!sc.luaInstance.valid() || !m_Scene.IsEntityActive(entity))
                 continue;
 
             sol::protected_function_result result;
@@ -430,7 +550,7 @@ void ScriptSystem::DispatchAudioEvents()
             continue;
 
         ScriptComponent* sc = reg.try_get<ScriptComponent>(ev.entity);
-        if (!sc || !sc->luaInstance.valid())
+        if (!sc || !sc->luaInstance.valid() || !m_Scene.IsEntityActive(ev.entity))
             continue;
 
         if (ev.type == Audio::EventType::FINISHED && sc->OnAudioFinished.valid())

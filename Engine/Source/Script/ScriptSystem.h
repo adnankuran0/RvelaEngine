@@ -23,6 +23,10 @@ public:
 	void OnFixedUpdate(float dt);
 	void OnLateUpdate(float dt);
 	void OnStop();
+	void OnScenePaused();
+	void OnSceneResumed();
+	void OnEntityActivationChanged(entt::entity entity, bool active);
+	void OnEntityDestroyed(entt::entity entity);
 
 	void BindLuaScript(ScriptComponent& sc, entt::entity e);
 
@@ -30,10 +34,14 @@ private:
 	void DispatchCollisionEvents();
 	void DispatchAnimationEvents();
 	void DispatchAudioEvents();
-	Physics::CollisionInfo BuildCollisionInfo(const Physics::Collision& collision, entt::entity otherEntity);
+	void EnsureScriptInitialized(ScriptComponent& sc, entt::entity entity);
+	void InvokeLifecycleCallback(ScriptComponent& sc, sol::protected_function& callback, const char* callbackName);
+	Physics::CollisionInfo BuildCollisionInfo(const Physics::Collision& collision, entt::entity otherEntity, bool isTrigger);
 	
 	ScriptEngine m_ScriptEngine;
 	Scene& m_Scene;
+	bool m_IsRunning = false;
+	bool m_IsReady = false;
 };
 
 }

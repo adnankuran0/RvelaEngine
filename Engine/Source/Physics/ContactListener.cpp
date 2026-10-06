@@ -79,6 +79,7 @@ CollisionEvent ContactListener::BuildEvent(const JPH::Body& inBody1, const JPH::
 	event.entityA = BodyToEntity(inBody1);
 	event.entityB = BodyToEntity(inBody2);
 	event.eventType = eventType;
+	event.isTrigger = inBody1.IsSensor() || inBody2.IsSensor();
 
 	JPH::Vec3 localPoint = inManifold.mRelativeContactPointsOn1[0];
 	JPH::RVec3 worldPoint = inManifold.mBaseOffset + localPoint;
