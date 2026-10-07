@@ -13,6 +13,7 @@ class AssetBrowserPanel
 public:
 	void Draw(Engine* engine ,const std::filesystem::path& rootDirectory, AssetImportPipeline& importPipeline);
 	void HandleFileDrop(FileDroppedEvent& event, AssetImportPipeline& importPipeline);
+	static void RequestRename(const std::filesystem::path& path);
 };
 
 }

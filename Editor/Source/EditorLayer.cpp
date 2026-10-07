@@ -70,6 +70,7 @@ void EditorLayer::OnAttach()
     EditorSettings::Get().Load();
     EditorSettings::Get().ApplyToCamera(m_EditorCamera);
     EditorSettings::Get().ApplyToViewport(m_Viewport);
+
 }
 
 void EditorLayer::OnDetach()
@@ -245,8 +246,44 @@ void EditorLayer::OnEvent(Event& event)
     }
 }
 
+void EditorLayer::UpdateWindowMode()
+{
+    Window& win = m_Engine->GetWindow();
+    const bool loaded = ProjectManager::IsProjectLoaded();
+
+    if (!loaded && !m_LauncherMode)
+    {
+        m_SavedMaximized = win.IsMaximized();
+        if (m_SavedMaximized)
+        {
+            win.Restore();
+        }
+        else
+        {
+            glm::ivec2 pos = win.GetPosition();
+            WindowSize sz = win.GetSize();
+            m_SavedX = pos.x; m_SavedY = pos.y;
+            m_SavedW = sz.width; m_SavedH = sz.height;
+        }
+
+        win.SetSize(820, 540);
+        win.CenterOnMonitor();
+        m_LauncherMode = true;
+    }
+    else if (loaded && m_LauncherMode)
+    {
+        win.SetSize(m_SavedW, m_SavedH);
+        win.SetPosition(m_SavedX, m_SavedY);
+        if (m_SavedMaximized)
+            win.Maximize();
+        m_LauncherMode = false;
+    }
+}
+
 void EditorLayer::Render()
 {
+    UpdateWindowMode();
+
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGuiIO& io = ImGui::GetIO();
@@ -444,4 +481,7 @@ void EditorLayer::HandleShortcuts()
             EditorSelection::Get().Clear();
         }
     }
+
+    
+
 }

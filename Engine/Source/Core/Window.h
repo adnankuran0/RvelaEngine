@@ -1,7 +1,8 @@
 #pragma once
 #include <string>
-
+#include "glm/fwd.hpp"
 struct GLFWwindow;
+
 
 namespace rv { 
 
@@ -47,7 +48,13 @@ public:
 	void SetTitle(const std::string& title);
 
 	WindowSize GetSize() noexcept; 
-
+	void SetSize(int width, int height);
+	void SetPosition(int x, int y);
+	void CenterOnMonitor();
+	glm::ivec2 GetPosition() const;
+	bool IsMaximized() const;
+	void Maximize();
+	void Restore();
 	void Shutdown() const;
 	
 private:

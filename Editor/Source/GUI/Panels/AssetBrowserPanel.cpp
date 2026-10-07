@@ -18,6 +18,7 @@
 #include <AssetImporters/ModelImporter.h>
 #include "Render/IconLibrary.h"
 #include "Utils/ProjectManager.h"
+#include <sstream>
 
 using namespace rv;
 
@@ -52,6 +53,7 @@ static bool s_DirectoryTreeDirty = true;
 static bool s_RenamingActive = false;
 static std::filesystem::path s_RenamingPath;
 static char s_RenameBuffer[256] = "";
+static std::string s_RenameExtension;
 
 static bool IsEditorSupportEntry(const std::filesystem::path& path, bool isDirectory)
 {
@@ -218,11 +220,53 @@ static void CreateEmptyTextFile(const std::filesystem::path& path, const std::st
     f << content;
 }
 
+static std::string MakeLuaTemplate(const std::string& scriptType)
+{
+    return
+        "---@class " + scriptType + " : ScriptInstance\n" +
+        "local " + scriptType + " = {}\n\n" +
+        "function " + scriptType + ":OnReady()\n" +
+        "end\n\n" +
+        "function " + scriptType + ":OnUpdate(dt)\n" +
+        "end\n\n" +
+        "return " + scriptType + "\n";
+}
+
+static std::filesystem::path MakeUniquePath(const std::filesystem::path& dir,
+    const std::string& stem, const std::string& ext)
+{
+    auto p = dir / (stem + ext);
+    int i = 1;
+    while (std::filesystem::exists(p))
+        p = dir / (stem + std::to_string(i++) + ext);
+    return p;
+}
+
+static void BeginRenameForNew(const std::filesystem::path& path)
+{
+    const bool isDir = std::filesystem::is_directory(path);
+    s_RenamingPath = path;
+    s_RenamingActive = true;
+    s_RenameExtension = isDir ? "" : path.extension().string();
+    const std::string initial = isDir ? path.filename().string() : path.stem().string();
+    strncpy_s(s_RenameBuffer, sizeof(s_RenameBuffer), initial.c_str(), _TRUNCATE);
+    s_SearchBuffer[0] = '\0';
+    s_NeedsRefresh = true;
+    s_DirectoryTreeDirty = true;
+}
+
 static void RenamePathWithMeta(const std::filesystem::path& oldPath, const std::string& newName)
 {
     if (newName.empty()) return;
 
     auto newPath = oldPath.parent_path() / newName;
+    if (newPath == oldPath) return;
+
+    if (std::filesystem::exists(newPath))
+    {
+        LOG_WARN("Rename skipped, already exists: {}", newName);
+        return;
+    }
 
     std::error_code ec;
     std::filesystem::rename(oldPath, newPath, ec);
@@ -235,6 +279,22 @@ static void RenamePathWithMeta(const std::filesystem::path& oldPath, const std::
         std::filesystem::rename(oldMeta, newMeta, ec);
         if (ec) LOG_WARN("Meta rename failed: {}", ec.message());
     }
+
+    if (newPath.extension() == ".lua")
+    {
+        std::string content;
+        {
+            std::ifstream in(newPath);
+            std::stringstream ss;
+            ss << in.rdbuf();
+            content = ss.str();
+        }
+        if (content == MakeLuaTemplate(oldPath.stem().string()))
+            CreateEmptyTextFile(newPath, MakeLuaTemplate(newPath.stem().string()));
+    }
+
+    auto& reg = AssetManager::Get().GetRegistry();
+    reg.Scan(reg.GetAssetDir());
 
     LOG_INFO("Renamed: {} -> {}", oldPath.filename().string(), newName);
     s_NeedsRefresh = true;
@@ -359,22 +419,10 @@ static void DrawBackgroundContextMenu(Engine* engine, const std::filesystem::pat
         {
             if (ImGui::MenuItem("Folder"))
             {
-                auto newPath = currentDir / "New Folder";
+                auto newPath = MakeUniquePath(currentDir, "New Folder", "");
                 std::error_code ec;
-                int i = 1;
-                while (std::filesystem::exists(newPath))
-                    newPath = currentDir / ("New Folder " + std::to_string(i++));
-
                 std::filesystem::create_directory(newPath, ec);
-                if (!ec)
-                {
-                    s_RenamingPath = newPath;
-                    s_RenamingActive = true;
-                    strncpy_s(s_RenameBuffer, sizeof(s_RenameBuffer),
-                        newPath.filename().string().c_str(), _TRUNCATE);
-                    s_NeedsRefresh = true;
-                    s_DirectoryTreeDirty = true;
-                }
+                if (!ec) BeginRenameForNew(newPath);
                 else LOG_ERROR("Create folder failed: {}", ec.message());
             }
 
@@ -384,55 +432,34 @@ static void DrawBackgroundContextMenu(Engine* engine, const std::filesystem::pat
 
             if (ImGui::MenuItem("Material"))
             {
-                auto newPath = currentDir / "NewMaterial.rmat";
-                int i = 1;
-                while (std::filesystem::exists(newPath))
-                    newPath = currentDir / ("NewMaterial" + std::to_string(i++) + ".rmat");
+                auto newPath = MakeUniquePath(currentDir, "NewMaterial", ".rmat");
                 MaterialSerializer::CreateNew(newPath, assetReg);
                 assetReg.Scan(assetReg.GetAssetDir());
-                s_NeedsRefresh = true;
+                BeginRenameForNew(newPath);
             }
 
             if (ImGui::MenuItem("AnimationLibrary"))
             {
-                auto newPath = currentDir / "NewAnimationLibrary.ranimlib";
-                int i = 1;
-                while (std::filesystem::exists(newPath))
-                    newPath = currentDir / ("NewAnimationLibrary" + std::to_string(i++) + ".ranimlib");
+                auto newPath = MakeUniquePath(currentDir, "NewAnimationLibrary", ".ranimlib");
                 AnimationLibrarySerializer::CreateNew(newPath, assetReg);
                 assetReg.Scan(assetReg.GetAssetDir());
-                s_NeedsRefresh = true;
+                BeginRenameForNew(newPath);
             }
 
             if (ImGui::MenuItem("Scene"))
             {
-                auto newPath = currentDir / "NewScene.rscene";
-                int i = 1;
-                while (std::filesystem::exists(newPath))
-                    newPath = currentDir / ("NewScene" + std::to_string(i++) + ".rscene");
+                auto newPath = MakeUniquePath(currentDir, "NewScene", ".rscene");
                 auto scene = engine->GetSceneManager().CreateScene("NewScene");
-                engine->GetSceneManager().SaveScene(*scene,newPath.string());
+                engine->GetSceneManager().SaveScene(*scene, newPath.string());
                 assetReg.Scan(assetReg.GetAssetDir());
-                s_NeedsRefresh = true;
-                
+                BeginRenameForNew(newPath);
             }
 
             if (ImGui::MenuItem("Lua Script"))
             {
-                auto newPath = currentDir / "NewScript.lua";
-                int i = 1;
-                while (std::filesystem::exists(newPath))
-                    newPath = currentDir / ("NewScript" + std::to_string(i++) + ".lua");
-                const std::string scriptType = newPath.stem().string();
-                const std::string scriptTemplate =
-                    "---@class " + scriptType + " : ScriptInstance\n" +
-                    "local " + scriptType + " = {}\n\n" +
-                    "function " + scriptType + ":OnCreate()\n" +
-                    "end\n\n" +
-                    "return " + scriptType + "\n";
-                CreateEmptyTextFile(newPath, scriptTemplate);
-                s_NeedsRefresh = true;
-
+                auto newPath = MakeUniquePath(currentDir, "NewScript", ".lua");
+                CreateEmptyTextFile(newPath, MakeLuaTemplate(newPath.stem().string()));
+                BeginRenameForNew(newPath);
             }
 
             ImGui::EndMenu();
@@ -474,6 +501,7 @@ static void DrawItemContextMenu(const std::filesystem::path& itemPath, AssetImpo
         {
             s_RenamingPath = itemPath;
             s_RenamingActive = true;
+            s_RenameExtension.clear();
             strncpy_s(s_RenameBuffer, sizeof(s_RenameBuffer),
                 itemPath.filename().string().c_str(), _TRUNCATE);
         }
@@ -623,7 +651,7 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
                 ImGuiInputTextFlags_EnterReturnsTrue |
                 ImGuiInputTextFlags_AutoSelectAll))
             {
-                RenamePathWithMeta(s_RenamingPath, s_RenameBuffer);
+                RenamePathWithMeta(s_RenamingPath, std::string(s_RenameBuffer) + s_RenameExtension);
                 s_RenamingActive = false;
             }
             if (ImGui::IsKeyPressed(ImGuiKey_Escape))
@@ -776,4 +804,10 @@ void AssetBrowserPanel::HandleFileDrop(FileDroppedEvent& event, AssetImportPipel
 
     s_NeedsRefresh = true;
     s_DirectoryTreeDirty = true;
+}
+
+void AssetBrowserPanel::RequestRename(const std::filesystem::path& path)
+{
+    s_CurrentDirectory = path.parent_path();
+    BeginRenameForNew(path);
 }

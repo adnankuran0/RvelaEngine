@@ -1,0 +1,97 @@
+{
+    "Entities": [
+        {
+            "Material": {
+                "material": "",
+                "overrides": {
+                    "albedoTex": "4d072ff5-378a-4fe2-8b2c-b797dc43aa2a",
+                    "billboardMode": 2,
+                    "blendMode": 0,
+                    "receiveShadows": true,
+                    "shadingMode": 0,
+                    "transparencyMode": 1
+                }
+            },
+            "Mesh": {
+                "mesh": "1d2596bb-18d3-41a6-9848-a8a584870ce3"
+            },
+            "ParticleEmitterComponent": {
+                "amount": 500,
+                "angularVelocityMax": 0.0,
+                "angularVelocityMin": 0.0,
+                "dampingMax": 0.0,
+                "dampingMin": 0.0,
+                "direction": [
+                    1.0,
+                    0.0,
+                    0.0
+                ],
+                "emitterShape": 1,
+                "emitting": true,
+                "endColor": [
+                    0.13899612426757813,
+                    0.13899612426757813,
+                    0.13899612426757813,
+                    0.0
+                ],
+                "explosiveness": 0.0,
+                "gravity": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "lifetime": 2.0,
+                "lifetimeRandomness": 0.6700000166893005,
+                "linearAccelMax": 180.0,
+                "linearAccelMin": 0.0,
+                "linearVelocityMax": 0.0,
+                "linearVelocityMin": 0.0,
+                "localCoords": false,
+                "oneShot": false,
+                "randomness": 0.20999999344348907,
+                "rotationMax": 360.0,
+                "rotationMin": 0.0,
+                "scaleEnd": 2.0,
+                "scaleMax": 0.0,
+                "scaleMin": 0.0,
+                "shapeDimensions": [
+                    0.75,
+                    1.0,
+                    1.0
+                ],
+                "speedScale": 0.3499999940395355,
+                "spread": 0.0,
+                "startColor": [
+                    0.4864864945411682,
+                    0.4864864945411682,
+                    0.4864864945411682,
+                    1.0
+                ]
+            },
+            "Tag": {
+                "isActive": true,
+                "tag": "Smoke"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 20,
+            "_isRoot": true
+        }
+    ]
+}

@@ -44,6 +44,7 @@ public:
 
 
 private:
+    void UpdateWindowMode();
     void HandleShortcuts();
     bool IsCursorOverViewport() const;
 
@@ -71,6 +72,11 @@ private:
     bool m_ShowUI = true;
     bool m_ShowGrid = true;
     EditorCamera::NavigationMode m_EditorCameraNavigation = EditorCamera::NavigationMode::None;
+
+    bool m_LauncherMode = false;
+    bool m_SavedMaximized = false;
+    int  m_SavedX = 100, m_SavedY = 100;
+    int  m_SavedW = 1600, m_SavedH = 900;
 };
 
 }

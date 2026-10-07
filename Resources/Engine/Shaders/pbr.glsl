@@ -333,7 +333,7 @@ void main()
         vec3 irradiance = texture(irradianceMap, Nmap).rgb;
         vec3 diffuse = irradiance * albedo;
 
-        float lod = roughness * 4.0;
+        float lod = roughness * 8.0;
         vec3 prefilteredColor = textureLod(prefilterMap, R, lod).rgb;
         vec2 brdf = texture(brdfLUT, vec2(NdotV, roughness)).rg;
         

@@ -9,7 +9,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-
+#include "AssetBrowserPanel.h"
 #include "Asset/AssetManager.h"
 #include "Utils/ProjectManager.h"
 #include "AssetImporters/ModelImporter.h"
@@ -457,44 +457,39 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                     std::string entityName = scene.HasComponent<TagComponent>(entity)
                         ? scene.GetComponent<TagComponent>(entity).tag
                         : "prefab";
+                    for (char& c : entityName)
+                        if (std::string("\\/:*?\"<>|").find(c) != std::string::npos) c = '_';
                     if (entityName.empty()) entityName = "prefab";
-                    std::string defaultFileName = entityName + ".rprefab";
 
                     std::filesystem::path prefabsFolder = ProjectManager::GetAssetDirectory() / "Prefabs";
                     std::error_code ec;
                     if (!std::filesystem::exists(prefabsFolder, ec))
                         std::filesystem::create_directories(prefabsFolder, ec);
 
-                    std::string defaultPath = (prefabsFolder / defaultFileName).string();
+                    std::filesystem::path prefabPath = prefabsFolder / (entityName + ".rprefab");
+                    for (int i = 1; std::filesystem::exists(prefabPath); ++i)
+                        prefabPath = prefabsFolder / (entityName + std::to_string(i) + ".rprefab");
 
-                    const char* filterPatterns[] = { "*.rprefab" };
-                    const char* filePath = tinyfd_saveFileDialog("Create prefab as", defaultPath.c_str(), 1, filterPatterns, NULL);
-                    if (filePath)
+                    AssetRegistry& reg = AssetManager::Get().GetRegistry();
+                    AssetMeta meta = reg.GetOrCreateMeta(prefabPath);
+
+                    Ref<PrefabAsset> prefab = PrefabImporter::CreatePrefabAsset(prefabPath, meta.uuid, scene, entity);
+                    if (prefab)
                     {
-                        std::filesystem::path prefabPath = filePath;
-                        if (prefabPath.extension() != ".rprefab")
-                            prefabPath += ".rprefab";
+                        meta.importerID = "PrefabImporter";
+                        reg.SaveMeta(prefabPath, meta);
 
-                        AssetRegistry& reg = AssetManager::Get().GetRegistry();
-                        AssetMeta meta = reg.GetOrCreateMeta(prefabPath);
+                        auto assetDir = reg.GetAssetDir();
+                        if (!assetDir.empty() && std::filesystem::exists(assetDir))
+                            reg.Scan(assetDir);
 
-                        Ref<PrefabAsset> prefab = PrefabImporter::CreatePrefabAsset(prefabPath, meta.uuid, scene, entity);
-                        if (prefab)
-                        {
-                            meta.importerID = "PrefabImporter";
-                            reg.SaveMeta(prefabPath, meta);
-                            
-                            auto assetDir = reg.GetAssetDir();
-                            if (!assetDir.empty() && std::filesystem::exists(assetDir))
-                                reg.Scan(assetDir);
+                        if (!scene.HasComponent<PrefabComponent>(entity))
+                            scene.AddComponent<PrefabComponent>(entity, meta.uuid);
+                        else
+                            scene.GetComponent<PrefabComponent>(entity).SetPrefabID(meta.uuid);
 
-                            if (!scene.HasComponent<PrefabComponent>(entity))
-                                scene.AddComponent<PrefabComponent>(entity, meta.uuid);
-                            else
-                                scene.GetComponent<PrefabComponent>(entity).SetPrefabID(meta.uuid);
-
-                            LOG_INFO("Prefab saved: {}", prefabPath.string());
-                        }
+                        LOG_INFO("Prefab saved: {}", prefabPath.string());
+                        AssetBrowserPanel::RequestRename(prefabPath);
                     }
                 }
 

@@ -15,27 +15,34 @@ bool ProjectSelectorPanel::Draw(Engine* engine)
 
     bool projectSelected = false;
 
-    ImGuiIO& io = ImGui::GetIO();
-    ImVec2 center = ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f);
-    ImVec2 popupSize = ImVec2(750.0f, 500.0f);
-
-    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-    ImGui::SetNextWindowSize(popupSize, ImGuiCond_Appearing);
-
+    ImGuiViewport* vp = ImGui::GetMainViewport();
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking;
 
     bool isModal = !ProjectManager::IsProjectLoaded();
 
-    bool popupOpen = true;
     bool visible = false;
 
     if (isModal)
     {
+        ImGui::SetNextWindowPos(vp->Pos, ImGuiCond_Always);
+        ImGui::SetNextWindowSize(vp->Size, ImGuiCond_Always);
+        flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+            ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings;
+
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(24.0f, 20.0f));
+
         ImGui::OpenPopup("Project Selector##Modal");
         visible = ImGui::BeginPopupModal("Project Selector##Modal", nullptr, flags);
+
+        ImGui::PopStyleVar(3);
     }
     else
     {
+        ImVec2 center = vp->GetCenter();
+        ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+        ImGui::SetNextWindowSize(ImVec2(750.0f, 500.0f), ImGuiCond_Appearing);
         visible = ImGui::Begin("Project Selector", &m_IsOpen, flags);
     }
 

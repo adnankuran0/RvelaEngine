@@ -9,6 +9,7 @@
 #include "Event/MouseEvents.h"
 #include "Event/WindowEvents.h"
 #include "Utils/FileUtils.h"
+#include "glm/vec2.hpp"
 
 using namespace rv;
 
@@ -159,6 +160,55 @@ void Window::SetTitle(const std::string& title)
     }
 }
 
+void Window::SetSize(int width, int height)
+{
+    if (!m_Window) return;
+    m_WindowData.size.width = width;
+    m_WindowData.size.height = height;
+    glfwSetWindowSize(m_Window, width, height);
+}
+
+void Window::SetPosition(int x, int y)
+{
+    if (!m_Window) return;
+    glfwSetWindowPos(m_Window, x, y);
+}
+
+void Window::CenterOnMonitor()
+{
+    if (!m_Window) return;
+    GLFWmonitor* mon = glfwGetPrimaryMonitor();
+    if (!mon) return;
+
+    int mx, my, mw, mh;
+    glfwGetMonitorWorkarea(mon, &mx, &my, &mw, &mh);
+
+    int w, h;
+    glfwGetWindowSize(m_Window, &w, &h);
+    glfwSetWindowPos(m_Window, mx + (mw - w) / 2, my + (mh - h) / 2);
+}
+
+glm::ivec2 Window::GetPosition() const
+{
+    int x = 0, y = 0;
+    if (m_Window) glfwGetWindowPos(m_Window, &x, &y);
+    return { x, y };
+}
+
+bool Window::IsMaximized() const
+{
+    return m_Window && glfwGetWindowAttrib(m_Window, GLFW_MAXIMIZED) == GLFW_TRUE;
+}
+
+void Window::Maximize()
+{
+    if (m_Window) glfwMaximizeWindow(m_Window);
+}
+
+void Window::Restore()
+{
+    if (m_Window) glfwRestoreWindow(m_Window);
+}
 
 void Window::Shutdown() const
 {
