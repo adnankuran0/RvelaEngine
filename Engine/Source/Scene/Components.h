@@ -24,6 +24,7 @@
 #include "Scene/Components/SkeletalMeshRendererComponent.h"
 #include "Scene/Components/SkeletonComponent.h"
 #include "Scene/Components/UIComponents.h"
+#include "Scene/Components/DecalComponent.h"
 
 namespace rv {
 
@@ -63,6 +64,7 @@ enum class ComponentType
 	UIButton,
 	UISlider,
 	UIProgressBar,
+	Decal,
 
 };
 

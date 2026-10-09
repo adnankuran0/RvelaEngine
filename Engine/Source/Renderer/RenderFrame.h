@@ -13,6 +13,7 @@ public:
     std::vector<RenderCommand> transparentCommands;
     std::vector<SkeletalRenderCommand> skeletalTransparentCommands;
     std::vector<ParticleRenderCommand> particleCommands;
+    std::vector<DecalRenderCommand> decalCommands;
     RenderResourceRegistry registry;
 
 private:
@@ -24,6 +25,7 @@ private:
         transparentCommands.clear();
         skeletalTransparentCommands.clear();
         particleCommands.clear();
+        decalCommands.clear();
         //registry.Clear();
     }
 };

@@ -331,6 +331,9 @@ json SceneSerializer::SerializeEntity(Scene& scene, entt::entity e, bool seriali
     if (scene.HasComponent<ParticleEmitterComponent>(e))
         j["ParticleEmitterComponent"] = scene.GetComponent<ParticleEmitterComponent>(e).Serialize();
 
+    if (scene.HasComponent<DecalComponent>(e))
+        j["DecalComponent"] = scene.GetComponent<DecalComponent>(e).Serialize();
+
     if (scene.HasComponent<AnimatorComponent>(e))
         j["AnimatorComponent"] = scene.GetComponent<AnimatorComponent>(e).Serialize();
 
@@ -451,6 +454,8 @@ void SceneSerializer::DeserializeEntityComponents(Scene& scene, entt::entity han
 
     if (entityJson.contains("ParticleEmitterComponent"))
         scene.AddComponent<ParticleEmitterComponent>(handle).Deserialize(entityJson["ParticleEmitterComponent"]);
+    if (entityJson.contains("DecalComponent"))
+        scene.AddComponent<DecalComponent>(handle).Deserialize(entityJson["DecalComponent"]);
 
     if (entityJson.contains("AnimatorComponent"))
         scene.AddComponent<AnimatorComponent>(handle).Deserialize(entityJson["AnimatorComponent"]);

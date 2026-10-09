@@ -787,6 +787,13 @@ void SceneHierarchyPanel::Draw(Engine* engine)
             selectSingle(audio);
         }
 
+        if (ImGui::MenuItem("Decal"))
+        {
+            entt::entity decalEnt = scene.CreateEntity("Decal");
+            scene.AddComponent<DecalComponent>(decalEnt);
+            selectSingle(decalEnt);
+        }
+
         if (ImGui::BeginMenu("Primitives"))
         {
             if (ImGui::MenuItem("Cube")) selectSingle(LoadPrimitive(scene, "Cube"));

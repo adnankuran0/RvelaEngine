@@ -1,4 +1,4 @@
-﻿#include "rvelapch.h"
+#include "rvelapch.h"
 #include "RenderPipeline.h"
 #include "Utils/GPUTimer.h"
 #include "Core/Engine.h"
@@ -17,6 +17,7 @@
 #include "Renderer/RenderPasses/DebugPass.h"
 #include "Renderer/RenderPasses/TransparentPass.h"
 #include "Renderer/RenderPasses/ParticlePass.h"
+#include "Renderer/RenderPasses/DecalPass.h"
 
 using namespace rv;
 
@@ -31,6 +32,7 @@ RenderPipeline::RenderPipeline()
 	PushRenderPass(std::make_unique<SSAOPass>());
 	PushRenderPass(std::make_unique<LightingPass>());
 	PushRenderPass(std::make_unique<SkyboxPass>());
+	PushRenderPass(std::make_unique<DecalPass>());
 	PushRenderPass(std::make_unique<TransparentPass>());
 	PushRenderPass(std::make_unique<ParticlePass>());
 	PushRenderPass(std::make_unique<SSRPass>());

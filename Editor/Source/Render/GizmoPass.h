@@ -8,10 +8,11 @@ namespace rv {
 enum class GizmoPriority : int
 {
     None = 0,
-    Audio = 1,
-    Particle = 2,
-    Light = 3,
-    Camera = 4
+    Decal = 1,
+    Audio = 2,
+    Particle = 3,
+    Light = 4,
+    Camera = 5
 };
 
 struct GizmoInfo
@@ -33,6 +34,7 @@ public:
 private:
     void DrawCameraFrustum(const RenderContext& ctx, RenderFrame& frame);
     void DrawDirectionalLightArrow(const RenderContext& ctx, RenderFrame& frame);
+    void DrawDecalGizmo(const RenderContext& ctx, RenderFrame& frame);
 
 
     void DrawEditorIconsVisual(const RenderContext& ctx, RenderFrame& frame);

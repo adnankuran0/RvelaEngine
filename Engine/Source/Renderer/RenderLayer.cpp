@@ -209,5 +209,22 @@ void RenderLayer::CollectRenderCommands(Scene* scene)
 		}
 	);
 
+	auto decalView = scene->GetRegistry().view<TransformComponent, DecalComponent>();
+	for (auto entity : decalView)
+	{
+		if (!scene->IsEntityActive(entity))
+			continue;
+
+		const auto& transform = scene->GetComponent<TransformComponent>(entity);
+		const auto& decal = scene->GetComponent<DecalComponent>(entity);
+
+		DecalRenderCommand cmd;
+		cmd.entityID = entity;
+		cmd.transform = &transform;
+		cmd.decal = &decal;
+		cmd.distanceToCamera = glm::length2(camPos - transform.GetWorldPosition());
+
+		m_RenderPipeline->m_RenderFrame.decalCommands.push_back(cmd);
+	}
 }
 

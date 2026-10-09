@@ -47,11 +47,10 @@ void GizmoPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     DrawCameraFrustum(ctx, frame);
     DrawDirectionalLightArrow(ctx, frame);
+    DrawDecalGizmo(ctx, frame);
 
     DrawEditorIconsVisual(ctx, frame);
     DrawEditorIconsPicking(ctx, frame);
-
-    
 }
 
 GizmoInfo GizmoPass::GetEntityPrimaryIcon(entt::registry& reg, entt::entity e)
@@ -62,6 +61,7 @@ GizmoInfo GizmoPass::GetEntityPrimaryIcon(entt::registry& reg, entt::entity e)
     if (reg.all_of<PointLightComponent>(e)) return { IconLibrary::Get().GetIcon(EditorIcon::PointLight).GetID(), GizmoPriority::Light };
     if (reg.all_of<SpotLightComponent>(e)) return { IconLibrary::Get().GetIcon(EditorIcon::SpotLight).GetID(), GizmoPriority::Light };
     if (reg.all_of<AudioEmitterComponent>(e)) return { IconLibrary::Get().GetIcon(EditorIcon::AudioEmitter).GetID(), GizmoPriority::Audio };
+    if (reg.all_of<DecalComponent>(e)) return { IconLibrary::Get().GetIcon(EditorIcon::Texture).GetID(), GizmoPriority::Decal };
 
     return { 0, GizmoPriority::None };
 }
@@ -281,6 +281,99 @@ void GizmoPass::DrawDirectionalLightArrow(const RenderContext& ctx, RenderFrame&
         DebugRenderer::Get().DrawLine(pUp, pLeft, arrowColor);
         DebugRenderer::Get().DrawLine(pLeft, pDown, arrowColor);
         DebugRenderer::Get().DrawLine(pDown, pRight, arrowColor);
+    }
+
+    glm::mat4 editorViewProj = ctx.camera->GetProjectionMatrix() * ctx.camera->GetViewMatrix();
+    DebugRenderer::Get().EndFrame(editorViewProj);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void GizmoPass::DrawDecalGizmo(const RenderContext& ctx, RenderFrame& frame)
+{
+    auto* finalFboRes = frame.registry.Get("FinalFramebuffer");
+    auto* depthTexRes = frame.registry.Get("DepthTexture");
+    if (!finalFboRes || !depthTexRes) return;
+
+    auto& registry = ctx.scene->GetRegistry();
+    entt::entity selectedEntity = EditorSelection::Get().GetPrimary();
+
+    bool hasDecalToDraw = false;
+    for (auto e : registry.view<TransformComponent, DecalComponent>())
+    {
+        if (e == selectedEntity || EditorSelection::Get().IsSelected(e))
+        {
+            hasDecalToDraw = true;
+            break;
+        }
+    }
+    if (!hasDecalToDraw) return;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, finalFboRes->id);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexRes->id, 0);
+    glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
+
+    DebugRenderer::Get().BeginFrame();
+
+    const glm::vec4 boxColor = glm::vec4(0.2f, 0.8f, 1.0f, 0.9f);
+    const glm::vec4 arrowColor = glm::vec4(1.0f, 0.5f, 0.1f, 1.0f);
+
+    for (auto e : registry.view<TransformComponent, DecalComponent>())
+    {
+        if (e != selectedEntity && !EditorSelection::Get().IsSelected(e))
+            continue;
+
+        auto& tc = registry.get<TransformComponent>(e);
+        glm::mat4 worldMat = tc.GetWorldMatrix();
+
+        glm::vec3 c[8] = {
+            glm::vec3(worldMat * glm::vec4(-0.5f, -0.5f, -0.5f, 1.0f)),
+            glm::vec3(worldMat * glm::vec4( 0.5f, -0.5f, -0.5f, 1.0f)),
+            glm::vec3(worldMat * glm::vec4( 0.5f,  0.5f, -0.5f, 1.0f)),
+            glm::vec3(worldMat * glm::vec4(-0.5f,  0.5f, -0.5f, 1.0f)),
+            glm::vec3(worldMat * glm::vec4(-0.5f, -0.5f,  0.5f, 1.0f)),
+            glm::vec3(worldMat * glm::vec4( 0.5f, -0.5f,  0.5f, 1.0f)),
+            glm::vec3(worldMat * glm::vec4( 0.5f,  0.5f,  0.5f, 1.0f)),
+            glm::vec3(worldMat * glm::vec4(-0.5f,  0.5f,  0.5f, 1.0f))
+        };
+
+        // Back
+        DebugRenderer::Get().DrawLine(c[0], c[1], boxColor);
+        DebugRenderer::Get().DrawLine(c[1], c[2], boxColor);
+        DebugRenderer::Get().DrawLine(c[2], c[3], boxColor);
+        DebugRenderer::Get().DrawLine(c[3], c[0], boxColor);
+
+        // Front
+        DebugRenderer::Get().DrawLine(c[4], c[5], boxColor);
+        DebugRenderer::Get().DrawLine(c[5], c[6], boxColor);
+        DebugRenderer::Get().DrawLine(c[6], c[7], boxColor);
+        DebugRenderer::Get().DrawLine(c[7], c[4], boxColor);
+
+        // Edges
+        DebugRenderer::Get().DrawLine(c[0], c[4], boxColor);
+        DebugRenderer::Get().DrawLine(c[1], c[5], boxColor);
+        DebugRenderer::Get().DrawLine(c[2], c[6], boxColor);
+        DebugRenderer::Get().DrawLine(c[3], c[7], boxColor);
+
+        glm::vec3 center = tc.GetWorldPosition();
+        glm::vec3 forward = tc.GetForward();
+        glm::vec3 up = tc.GetUp();
+        glm::vec3 right = tc.GetRight();
+        glm::vec3 halfScale = tc.GetWorldScale() * 0.5f;
+        float arrowLen = halfScale.z > 0.001f ? halfScale.z : 0.5f;
+
+        glm::vec3 arrowStart = center;
+        glm::vec3 arrowEnd = center + forward * arrowLen;
+        DebugRenderer::Get().DrawLine(arrowStart, arrowEnd, arrowColor);
+
+        float headLen = arrowLen * 0.25f;
+        float headRad = headLen * 0.5f;
+        glm::vec3 base = arrowEnd - forward * headLen;
+        DebugRenderer::Get().DrawLine(arrowEnd, base + right * headRad, arrowColor);
+        DebugRenderer::Get().DrawLine(arrowEnd, base - right * headRad, arrowColor);
+        DebugRenderer::Get().DrawLine(arrowEnd, base + up * headRad, arrowColor);
+        DebugRenderer::Get().DrawLine(arrowEnd, base - up * headRad, arrowColor);
     }
 
     glm::mat4 editorViewProj = ctx.camera->GetProjectionMatrix() * ctx.camera->GetViewMatrix();

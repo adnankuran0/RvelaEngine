@@ -54,6 +54,7 @@ void Renderer::Init(GLFWwindow* window)
     ShaderManager::Add(Shader("BRDF", ENGINE_PATH("Shaders\\brdf.glsl")));
     ShaderManager::Add(Shader("Line", ENGINE_PATH("Shaders\\line.glsl")));
     ShaderManager::Add(Shader("Particle", ENGINE_PATH("Shaders\\particle.glsl")));
+    ShaderManager::Add(Shader("Decal", ENGINE_PATH("Shaders\\decal.glsl")));
     ShaderManager::Add(Shader("Gizmo", ENGINE_PATH("Shaders\\gizmo.glsl")));
     ShaderManager::Add(Shader("UI", ENGINE_PATH("Shaders\\ui.glsl")));
 

@@ -4,9 +4,18 @@
 #include "Scene/Components/SkeletalMeshRendererComponent.h"
 #include "Scene/Components/SkeletonComponent.h"
 #include "Scene/Components/MaterialComponent.h"
+#include "Scene/Components/DecalComponent.h"
 #include "entt/entt.h"
 
 namespace rv {
+
+struct DecalRenderCommand
+{
+    entt::entity entityID = entt::null;
+    const TransformComponent* transform = nullptr;
+    const DecalComponent* decal = nullptr;
+    float distanceToCamera = 0.0f;
+};
 
 struct ParticleRenderCommand {
     MeshRendererComponent* mesh;

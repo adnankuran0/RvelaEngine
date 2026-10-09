@@ -1939,6 +1939,76 @@ void InspectorPanel::Draw(Engine* engine)
 				}
 			});
 
+		DrawComponent<DecalComponent>("Decal", registry, selectedEntity, [&](DecalComponent& decal)
+			{
+				std::string textureName = EditorUtils::GetAssetFileName(decal.textureUUID);
+				UI::DrawFullWidthAssetDropSlot("Decal Texture Slot", textureName, [&](const std::string& pathStr)
+					{
+						static constexpr std::array exts = { ".png", ".jpg", ".jpeg", ".tga", ".hdr", ".rtex" };
+						bool isImage = std::any_of(exts.begin(), exts.end(), [&](const char* e) { return pathStr.ends_with(e); });
+						if (isImage)
+						{
+							AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
+							if (uuid.IsValid())
+								decal.SetTexture(uuid);
+						}
+					});
+
+				if (decal.textureUUID.IsValid())
+				{
+					if (ImGui::Button("Clear Texture", ImVec2(-FLT_MIN, 22)))
+					{
+						decal.ClearTexture();
+					}
+				}
+
+				if (UI::BeginPropertyTable("DecalTable"))
+				{
+					UI::PropertyLabel("Color");
+					float col[4] = { decal.color.r, decal.color.g, decal.color.b, decal.color.a };
+					if (ImGui::ColorEdit4("##DecalColor", col))
+						decal.color = glm::vec4(col[0], col[1], col[2], col[3]);
+
+					UI::PropertyLabel("Opacity");
+					ImGui::SliderFloat("##DecalOpacity", &decal.opacity, 0.0f, 1.0f);
+
+					UI::PropertyLabel("Lit");
+					ImGui::Checkbox("##DecalLit", &decal.lit);
+
+					if (decal.lit)
+					{
+						UI::PropertyLabel("Receive Shadows");
+						ImGui::Checkbox("##DecalReceiveShadows", &decal.receiveShadows);
+					}
+
+					UI::PropertyLabel("Angle Cutoff");
+					ImGui::SliderFloat("##DecalAngleCutoff", &decal.angleCutoff, 0.0f, 90.0f, "%.1f deg");
+
+					UI::PropertyLabel("Upper Fade");
+					ImGui::SliderFloat("##DecalUpperFade", &decal.upperFade, 0.0f, 0.5f, "%.2f");
+
+					UI::PropertyLabel("Lower Fade");
+					ImGui::SliderFloat("##DecalLowerFade", &decal.lowerFade, 0.0f, 0.5f, "%.2f");
+
+					UI::PropertyLabel("Distance Fade");
+					ImGui::Checkbox("##DecalDistanceFade", &decal.distanceFade);
+
+					if (decal.distanceFade)
+					{
+						UI::PropertyLabel("Fade Start");
+						ImGui::DragFloat("##DecalFadeStart", &decal.fadeStart, 0.5f, 0.0f, decal.fadeEnd, "%.1f m");
+
+						UI::PropertyLabel("Fade End");
+						ImGui::DragFloat("##DecalFadeEnd", &decal.fadeEnd, 0.5f, decal.fadeStart, 1000.0f, "%.1f m");
+					}
+
+					UI::PropertyLabel("Render Order");
+					ImGui::DragInt("##DecalRenderOrder", &decal.renderOrder, 1, -100, 100);
+
+					UI::EndPropertyTable();
+				}
+			});
+
 			DrawComponent<AnimatorComponent>("Animator", registry, selectedEntity, [&](AnimatorComponent& animator)
 				{
 					std::string animLibName = EditorUtils::GetAssetFileName(animator.libraryUUID);
@@ -2343,6 +2413,7 @@ void InspectorPanel::Draw(Engine* engine)
 		DrawAddComponentEntry<ConvexHullColliderComponent>("Convex Hull Collider", filterBuf, registry, selectedEntity);
 		DrawAddComponentEntry<AudioEmitterComponent>("Audio Emitter", filterBuf, registry, selectedEntity);
 		DrawAddComponentEntry<ParticleEmitterComponent>("Particle Emitter", filterBuf, registry, selectedEntity);
+		DrawAddComponentEntry<DecalComponent>("Decal", filterBuf, registry, selectedEntity);
 		DrawAddComponentEntry<AnimatorComponent>("Animator", filterBuf, registry, selectedEntity);
 
 		DrawAddComponentEntry<UICanvasComponent>("UI Canvas", filterBuf, registry, selectedEntity);
