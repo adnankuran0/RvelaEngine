@@ -105,6 +105,7 @@ void LuaBindings::RegisterSceneAPI(sol::state& lua, SceneManager* sceneManager)
     };
 
     lua.new_usertype<Scene>("Scene",
+        "IsValid", [](Scene& scene) { return true; },
         "CreateEntity", &Scene::CreateEntity,
         "DestroyEntity", [](Scene& scene, Entity& e) { scene.QueueDestroyEntity(e); },
         "FindEntityByName", &Scene::GetEntityByName,

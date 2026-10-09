@@ -1,4 +1,4 @@
-﻿#include "rvelapch.h"
+#include "rvelapch.h"
 #include "sol/sol.hpp"
 #include "PhysicsBindings.h"
 #include "Physics/PhysicsWorld.h"
@@ -8,6 +8,7 @@
 #include "Scene/Entity.h"
 #include "Core/Engine.h"
 #include "ComponentHandle.h"
+#include "Math/RvelaMath.h"
 
 using RigidbodyHandle = rv::ComponentHandle<rv::RigidbodyComponent>;
 using CharacterBodyHandle = rv::ComponentHandle<rv::CharacterBodyComponent>;
@@ -95,6 +96,10 @@ void rv::LuaBindings::RegisterPhysicsAPI(sol::state& lua)
         "rotation", sol::property(
             [](RigidbodyHandle& h) { return h.Get() && h.entity.HasComponent<TransformComponent>() ? h.entity.GetComponent<TransformComponent>().GetRotation() : glm::quat(); },
             [=](RigidbodyHandle& h, const glm::quat& r) { if (auto* c = h.Get()) GetPW().SetRotation(c, r); }
+        ),
+        "eulerRotation", sol::property(
+            [](RigidbodyHandle& h) { return h.Get() && h.entity.HasComponent<TransformComponent>() ? h.entity.GetComponent<TransformComponent>().GetEulerRotation() : glm::vec3(0.0f); },
+            [=](RigidbodyHandle& h, const glm::vec3& euler) { if (auto* c = h.Get()) GetPW().SetRotation(c, math::EulerToQuat(euler)); }
         ),
 
         "MoveKinematic", [=](RigidbodyHandle& h, const glm::vec3& p, const glm::quat& r, float dt) { if (auto* c = h.Get()) GetPW().MoveKinematic(c, p, r, dt); },

@@ -17,6 +17,8 @@ void PhysicsWorld::SetPosition(RigidbodyComponent* comp, const glm::vec3& positi
 	if (!comp || comp->RuntimeBodyID.IsInvalid()) return;
 
 	BodyInterface().SetPosition(comp->RuntimeBodyID, math::ToJoltVec3(position), JPH::EActivation::Activate);
+	comp->previousPosition = position;
+	comp->currentPosition = position;
 }
 
 void PhysicsWorld::SetRotation(RigidbodyComponent* comp, const glm::quat& rotation)
@@ -24,6 +26,8 @@ void PhysicsWorld::SetRotation(RigidbodyComponent* comp, const glm::quat& rotati
 	if (!comp || comp->RuntimeBodyID.IsInvalid()) return;
 
 	BodyInterface().SetRotation(comp->RuntimeBodyID, math::ToJoltQuat(rotation), JPH::EActivation::Activate);
+	comp->previousRotation = rotation;
+	comp->currentRotation = rotation;
 }
 
 void rv::Physics::PhysicsWorld::MoveKinematic(RigidbodyComponent* comp, 
@@ -253,6 +257,8 @@ void PhysicsWorld::SetCharacterPosition(CharacterBodyComponent* comp, const glm:
 	if (!comp || !comp->character) return;
 
 	comp->character->SetPosition(math::ToJoltRVec3(position));
+	comp->previousPosition = position;
+	comp->currentPosition = position;
 }
 
 glm::quat PhysicsWorld::GetCharacterRotation(CharacterBodyComponent* comp)
@@ -267,6 +273,8 @@ void PhysicsWorld::SetCharacterRotation(CharacterBodyComponent* comp, const glm:
 	if (!comp || !comp->character) return;
 
 	comp->character->SetRotation(math::ToJoltQuat(rotation));
+	comp->previousRotation = rotation;
+	comp->currentRotation = rotation;
 }
 
 glm::vec3 PhysicsWorld::GetCharacterCenterOfMassPosition(CharacterBodyComponent* comp)

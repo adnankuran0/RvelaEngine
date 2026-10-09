@@ -40,6 +40,7 @@ void LuaBindings::RegisterComponents(sol::state& lua)
         "up", sol::property([](TransformHandle& h) { return h.Get() ? h.Get()->GetUp() : glm::vec3(0.0f); }),
         "right", sol::property([](TransformHandle& h) { return h.Get() ? h.Get()->GetRight() : glm::vec3(0.0f); }),
 
+        "Rotate", [](TransformHandle& h, float angleDeg, const glm::vec3& axis) { if (auto* c = h.Get()) c->Rotate(angleDeg, axis); },
         "Translate", [](TransformHandle& h, const glm::vec3& v) { if (auto* c = h.Get()) c->Translate(v); },
         "LookAt", [](TransformHandle& h, const glm::vec3& p, const glm::vec3& up) { if (auto* c = h.Get()) c->LookAt(p, up); }
     );

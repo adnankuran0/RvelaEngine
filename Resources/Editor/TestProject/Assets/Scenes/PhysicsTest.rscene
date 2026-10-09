@@ -495,7 +495,10 @@
                 ]
             },
             "Material": {
-                "material": "117abcf2-653c-4baa-b1ef-78ccd02c4fa6"
+                "material": "117abcf2-653c-4baa-b1ef-78ccd02c4fa6",
+                "overrides": {
+                    "roughness": 0.0
+                }
             },
             "Mesh": {
                 "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
@@ -652,7 +655,7 @@
                     0.9999991655349731
                 ]
             },
-            "UUID": 7672490251497724140
+            "UUID": 12071543858477211056
         },
         {
             "Material": {
@@ -1418,7 +1421,7 @@
                     1.0
                 ]
             },
-            "UUID": 13412136208800969531
+            "UUID": 18170860980651133620
         },
         {
             "ParentUUID": 0,
@@ -1597,7 +1600,7 @@
                     0.3500000238418579
                 ]
             },
-            "UUID": 15645603297538519432
+            "UUID": 16903502755778651945
         }
     ],
     "Environment": {
@@ -1623,6 +1626,11 @@
         "SSAO_Bias": 0.02500000037252903,
         "SSAO_Intensity": 1.0,
         "SSAO_Radius": 1.0,
-        "SSR": true
+        "SSR": true,
+        "SSR_Intensity": 1.0,
+        "SSR_MaxDistance": 58.599998474121094,
+        "SSR_MaxSteps": 64,
+        "SSR_RoughnessCutoff": 0.9300000071525574,
+        "SSR_Thickness": 0.4099999964237213
     }
 }
