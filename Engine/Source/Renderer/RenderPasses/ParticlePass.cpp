@@ -1,4 +1,4 @@
-﻿#include "rvelapch.h"
+#include "rvelapch.h"
 #include "ParticlePass.h"
 #include "Renderer/ShaderManager.h"
 #include "Renderer/TextureCache.h"
@@ -68,6 +68,18 @@ void ParticlePass::Execute(const RenderContext& ctx, RenderFrame& frame)
     shader.setVec3("ambientColor", env.Lighting_AmbientColor);
     shader.setFloat("ambientIntensity", env.Lighting_AmbientIntensity);
 
+    auto i_DirectionalShadowMap = resourceRegistry.Get("DirectionalShadowMap")->id;
+    auto i_PointShadowMap = resourceRegistry.Get("PointShadowMap")->id;
+
+    constexpr int DIR_SHADOW_MAP_SLOT = 6;
+    constexpr int POINT_SHADOW_MAP_SLOT = 7;
+
+    shader.setInt("shadowMap", DIR_SHADOW_MAP_SLOT);
+    glBindTextureUnit(DIR_SHADOW_MAP_SLOT, i_DirectionalShadowMap);
+
+    shader.setInt("pointShadowMap", POINT_SHADOW_MAP_SLOT);
+    glBindTextureUnit(POINT_SHADOW_MAP_SLOT, i_PointShadowMap);
+
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_FALSE);
     glEnable(GL_BLEND);
@@ -118,6 +130,7 @@ void ParticlePass::Execute(const RenderContext& ctx, RenderFrame& frame)
         shader.setVec2("UVScale", material->GetUVScale());
         shader.setVec2("UVOffset", material->GetUVOffset());
 
+        shader.setBool("receiveShadows", material->GetReceiveShadows());
         shader.setInt("shadingMode", static_cast<int>(material->GetShadingMode()));
         shader.setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
         shader.setInt("instanceOffset", cmd.instanceOffset);

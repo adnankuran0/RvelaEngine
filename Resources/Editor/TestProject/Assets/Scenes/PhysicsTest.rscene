@@ -655,7 +655,7 @@
                     0.9999991655349731
                 ]
             },
-            "UUID": 12071543858477211056
+            "UUID": 4502128652364949672
         },
         {
             "Material": {
@@ -664,7 +664,7 @@
                     "albedoTex": "4d072ff5-378a-4fe2-8b2c-b797dc43aa2a",
                     "billboardMode": 2,
                     "blendMode": 0,
-                    "receiveShadows": true,
+                    "receiveShadows": false,
                     "shadingMode": 0,
                     "transparencyMode": 1
                 }
@@ -709,7 +709,7 @@
                 "randomness": 0.20999999344348907,
                 "rotationMax": 360.0,
                 "rotationMin": 0.0,
-                "scaleEnd": 2.0,
+                "scaleEnd": 1.5,
                 "scaleMax": 0.0,
                 "scaleMin": 0.0,
                 "shapeDimensions": [
@@ -733,9 +733,9 @@
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
-                    7.162295341491699,
-                    2.543675184249878,
-                    0.4194208085536957
+                    7.162231922149658,
+                    2.453571081161499,
+                    4.049375057220459
                 ],
                 "rotation": [
                     0.0,
@@ -1421,7 +1421,7 @@
                     1.0
                 ]
             },
-            "UUID": 18170860980651133620
+            "UUID": 9097767789517918446
         },
         {
             "ParentUUID": 0,
@@ -1600,7 +1600,7 @@
                     0.3500000238418579
                 ]
             },
-            "UUID": 16903502755778651945
+            "UUID": 5900720480506012721
         }
     ],
     "Environment": {
@@ -1626,11 +1626,6 @@
         "SSAO_Bias": 0.02500000037252903,
         "SSAO_Intensity": 1.0,
         "SSAO_Radius": 1.0,
-        "SSR": true,
-        "SSR_Intensity": 1.0,
-        "SSR_MaxDistance": 58.599998474121094,
-        "SSR_MaxSteps": 64,
-        "SSR_RoughnessCutoff": 0.9300000071525574,
-        "SSR_Thickness": 0.4099999964237213
+        "SSR": true
     }
 }

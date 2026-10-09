@@ -106,8 +106,12 @@ in vec3 Normal;
 
 #include "Common/Camera.glsl"
 #include "Common/Lights.glsl"
+#include "Common/Shadows.glsl"
 
 layout(binding = 0) uniform sampler2D albedoMap;
+layout(binding = 6) uniform sampler2D shadowMap;
+layout(binding = 7) uniform samplerCubeArray pointShadowMap;
+uniform bool receiveShadows;
 
 uniform bool useAlbedoMap;
 uniform vec4 albedoColor;
@@ -122,12 +126,45 @@ uniform int shadingMode;
 uniform vec3 ambientColor;
 uniform float ambientIntensity;
 
+float calculateParticleDirShadow(sampler2D sMap, vec4 lightSpacePos, vec3 normal, vec3 lightDir, float shadowBias) {
+    vec3 proj = lightSpacePos.xyz / lightSpacePos.w;
+    proj = proj * 0.5 + 0.5;
+
+    if (proj.z > 1.0 || any(lessThan(proj.xy, vec2(0.0))) || any(greaterThan(proj.xy, vec2(1.0))))
+        return 0.0;
+
+    float bias = min(shadowBias * (1.0 - dot(normal, lightDir)), shadowBias);
+    float currentDepth = proj.z - bias;
+
+    vec2 texelSize = 1.0 / textureSize(sMap, 0);
+    float s0 = step(texture(sMap, proj.xy + vec2(-0.5, -0.5) * texelSize).r, currentDepth);
+    float s1 = step(texture(sMap, proj.xy + vec2( 0.5, -0.5) * texelSize).r, currentDepth);
+    float s2 = step(texture(sMap, proj.xy + vec2(-0.5,  0.5) * texelSize).r, currentDepth);
+    float s3 = step(texture(sMap, proj.xy + vec2( 0.5,  0.5) * texelSize).r, currentDepth);
+    return (s0 + s1 + s2 + s3) * 0.25;
+}
+
+float calculateParticlePointShadow(samplerCubeArray pMap, int index, vec3 fragPos, vec3 lightPos, float farPlane, vec3 normal, float shadowBias) {
+    vec3 fragToLight = fragPos - lightPos;
+    float currentDepth = length(fragToLight);
+    if (currentDepth > farPlane) return 0.0;
+
+    vec3 L = normalize(lightPos - fragPos);
+    float bias = max(shadowBias * (1.0 - dot(normal, L)), shadowBias * 0.05);
+    float closestDepth = texture(pMap, vec4(fragToLight, float(index))).r * farPlane;
+    return step(closestDepth, currentDepth - bias);
+}
+
 void main()
 {
     vec4 texColor = useAlbedoMap ? texture(albedoMap, TexCoords) : vec4(1.0);
     vec4 finalColor = texColor * albedoColor * ParticleColor;
     
     float alpha = finalColor.a;
+
+    float camDist = length(FragPos - camPos);
+    float nearFade = clamp((camDist - nearPlane) / 0.5, 0.0, 1.0);
+    alpha *= nearFade;
 
     if (transparencyMode == 0) 
     {
@@ -139,7 +176,7 @@ void main()
         alpha = 1.0; 
     }
 
-    if(alpha < 0.001)
+    if (alpha < 0.01)
         discard;
         
     vec3 albedo = finalColor.rgb;
@@ -155,12 +192,18 @@ void main()
 
         if (hasDirectionalLight == 1) {
             vec3 L = normalize(-directionalLight.direction.xyz);
-            float NdotL = max(dot(N, L), 0.0);
             
+            float NdotL = clamp(dot(N, L) * 0.4 + 0.6, 0.0, 1.0);
+            
+            bool castShadows = directionalLight.direction.w > 0.5;
+            vec4 fragPosLightSpace = lightSpaceMatrix * vec4(FragPos, 1.0);
+            float shadow = (castShadows && receiveShadows) ?
+                calculateParticleDirShadow(shadowMap, fragPosLightSpace, N, L, directionalLight.shadowBias) : 0.0;
+
             vec3 lightColor = directionalLight.colorIntensity.rgb;
             float lightIntensity = directionalLight.colorIntensity.a;
 
-            Lo += albedo * lightColor * lightIntensity * NdotL;
+            Lo += (1.0 - shadow) * albedo * lightColor * lightIntensity * NdotL;
         }
 
         for (int i = 0; i < pointLightCount; ++i) {
@@ -177,9 +220,14 @@ void main()
             float num = clamp(1.0 - (dist2 / radius2) * (dist2 / radius2), 0.0, 1.0);
             float attenuation = (num * num) / (dist2 + 1.0);
             
-            float NdotL = max(dot(N, L), 0.0);
+            float NdotL = clamp(dot(N, L) * 0.4 + 0.6, 0.0, 1.0);
+            
+            bool castShadows = light.shadowIndex >= 0;
+            float shadow = (castShadows && receiveShadows) ?
+                calculateParticlePointShadow(pointShadowMap, light.shadowIndex, FragPos, light.position.xyz, light.radius, N, light.shadowBias) : 0.0;
+
             vec3 radiance = light.colorIntensity.rgb * light.colorIntensity.a * attenuation;
-            Lo += albedo * radiance * NdotL;
+            Lo += (1.0 - shadow) * albedo * radiance * NdotL;
         }
 
         resultRGB = ambient + Lo;
