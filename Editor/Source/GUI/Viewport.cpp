@@ -14,6 +14,7 @@
 #include "EditorSelection.h"
 #include "EditorUtils.h"
 #include "Scene/Entity.h"
+#include "Scene/Components/PrefabComponent.h"
 
 using namespace rv;
 
@@ -467,6 +468,12 @@ void Viewport::DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySi
     {
         bool viewChanged = false;
 
+        ImGui::TextDisabled("Selection");
+        ImGui::Separator();
+        if (ImGui::Checkbox("Select Root Entity", &m_SelectRootEntity)) viewChanged = true;
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("When clicking an entity in the viewport, automatically select the root entity of the tree.");
+
+        ImGui::Spacing();
         ImGui::TextDisabled("Debug Visuals");
         ImGui::Separator();
         if (ImGui::Checkbox("Infinite Grid", &debugSettings.drawInfiniteGrid)) viewChanged = true;
@@ -601,6 +608,33 @@ void Viewport::HandleSelection(Engine* engine, ImVec2& displayPos, ImVec2& displ
         if (pickedID != 0)
         {
             entt::entity entity = static_cast<entt::entity>(pickedID);
+
+            if (m_SelectRootEntity)
+            {
+                auto& scene = engine->GetActiveScene();
+                entt::entity current = entity;
+                entt::entity rootCandidate = current;
+
+                while (current != entt::null && current != scene.GetRootEntity())
+                {
+                    if (scene.HasComponent<PrefabComponent>(current))
+                    {
+                        rootCandidate = current;
+                        break;
+                    }
+
+                    entt::entity parent = scene.GetParent(current);
+                    if (parent == entt::null || parent == scene.GetRootEntity())
+                    {
+                        rootCandidate = current;
+                        break;
+                    }
+                    current = parent;
+                    rootCandidate = current;
+                }
+                entity = rootCandidate;
+            }
+
             if (isMultiModifier)
             {
                 EditorSelection::Get().Toggle(entity);
@@ -627,6 +661,7 @@ void Viewport::Draw(Engine* engine, bool orbitDragActive)
     {
         m_PanelPosition = ImGui::GetWindowPos();
         m_PanelSize = ImGui::GetWindowSize();
+        m_SelectRootEntity = EditorSettings::Get().ViewportSettings.SelectRootEntity;
         const bool isPlaying = engine->GetActiveScene().GetState() == SceneState::PLAY;
         const bool viewportHasFocus = ImGui::IsWindowFocused();
         const bool capturedGameplayKeepsFocus = Input::IsGameplayInputEnabled() && Input::IsMouseCaptured();

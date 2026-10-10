@@ -11,6 +11,7 @@
 #include "Utils/ProjectManager.h"
 #include "Panels/ProjectSettingsPanel.h"
 #include "Panels/ProjectSelectorPanel.h"
+#include "EditorSettings.h"
 
 using namespace rv;
 
@@ -115,6 +116,15 @@ void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter,
         {
             if (ImGui::MenuItem("Undo")) {}
             if (ImGui::MenuItem("Redo")) {}
+
+            ImGui::Separator();
+
+            bool selectRoot = EditorSettings::Get().ViewportSettings.SelectRootEntity;
+            if (ImGui::MenuItem("Select Root Entity on Click", nullptr, &selectRoot))
+            {
+                EditorSettings::Get().ViewportSettings.SelectRootEntity = selectRoot;
+                EditorSettings::Get().Save();
+            }
 
             ImGui::Separator();
 

@@ -30,6 +30,7 @@ struct ViewportGizmoSettings
     bool DrawColliders = false;
     bool DrawBoundingBoxes = false;
     bool DrawInfiniteGrid = true;
+    bool SelectRootEntity = true;
 };
 
 class EditorSettings

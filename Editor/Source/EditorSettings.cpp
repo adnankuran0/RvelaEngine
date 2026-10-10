@@ -59,6 +59,7 @@ void EditorSettings::Load()
             if (v.contains("drawColliders")) ViewportSettings.DrawColliders = v["drawColliders"].get<bool>();
             if (v.contains("drawBoundingBoxes")) ViewportSettings.DrawBoundingBoxes = v["drawBoundingBoxes"].get<bool>();
             if (v.contains("drawInfiniteGrid")) ViewportSettings.DrawInfiniteGrid = v["drawInfiniteGrid"].get<bool>();
+            if (v.contains("selectRootEntity")) ViewportSettings.SelectRootEntity = v["selectRootEntity"].get<bool>();
         }
     }
     catch (const std::exception& e)
@@ -94,7 +95,8 @@ void EditorSettings::Save()
         { "snapScale", ViewportSettings.SnapScale },
         { "drawColliders", ViewportSettings.DrawColliders },
         { "drawBoundingBoxes", ViewportSettings.DrawBoundingBoxes },
-        { "drawInfiniteGrid", ViewportSettings.DrawInfiniteGrid }
+        { "drawInfiniteGrid", ViewportSettings.DrawInfiniteGrid },
+        { "selectRootEntity", ViewportSettings.SelectRootEntity }
     };
 
     std::ofstream file(filePath);
@@ -143,6 +145,7 @@ void EditorSettings::ApplyToViewport(Viewport& viewport) const
     debugSettings.drawColliders = ViewportSettings.DrawColliders;
     debugSettings.drawBoundingBoxes = ViewportSettings.DrawBoundingBoxes;
     debugSettings.drawInfiniteGrid = ViewportSettings.DrawInfiniteGrid;
+    viewport.SetSelectRootEntity(ViewportSettings.SelectRootEntity);
 }
 
 void EditorSettings::UpdateFromViewport(const Viewport& viewport)
@@ -157,4 +160,5 @@ void EditorSettings::UpdateFromViewport(const Viewport& viewport)
     ViewportSettings.DrawColliders = debugSettings.drawColliders;
     ViewportSettings.DrawBoundingBoxes = debugSettings.drawBoundingBoxes;
     ViewportSettings.DrawInfiniteGrid = debugSettings.drawInfiniteGrid;
+    ViewportSettings.SelectRootEntity = viewport.GetSelectRootEntity();
 }
