@@ -77,6 +77,7 @@ private:
     bool m_SavedMaximized = false;
     int  m_SavedX = 100, m_SavedY = 100;
     int  m_SavedW = 1600, m_SavedH = 900;
+    std::string m_LastWindowTitle;
 };
 
 }

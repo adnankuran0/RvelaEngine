@@ -96,6 +96,30 @@ void EditorLayer::OnUpdate()
     static_cast<OutlinePass*>(m_Engine->GetRenderLayer().GetRenderPass(m_OutlinePass))->SetHasSelection(!EditorSelection::Get().IsEmpty());
    
     HandleShortcuts();
+
+    if (!ProjectManager::IsProjectLoaded())
+    {
+        std::string title = "Rvela Engine";
+        if (title != m_LastWindowTitle)
+        {
+            m_LastWindowTitle = title;
+            m_Engine->GetWindow().SetTitle(title);
+        }
+    }
+    else
+    {
+        auto& scene = m_Engine->GetActiveScene();
+        std::string sceneName = scene.GetName().empty() ? "Untitled" : scene.GetName();
+        std::string title = "Rvela Engine - [" + ProjectManager::GetActiveProject()->name + "] - " + sceneName;
+        if (scene.IsDirty())
+            title += "*";
+
+        if (title != m_LastWindowTitle)
+        {
+            m_LastWindowTitle = title;
+            m_Engine->GetWindow().SetTitle(title);
+        }
+    }
 }
 
 void EditorLayer::OnRender()

@@ -43,6 +43,14 @@ public:
     inline const std::string& GetName() const noexcept { return m_SceneName; }
     inline void SetName(const std::string& name) noexcept { m_SceneName = name; }
 
+    [[nodiscard]] inline bool IsDirty() const noexcept { return m_IsDirty; }
+    inline void SetDirty(bool dirty = true) noexcept
+    {
+        if (dirty && (m_State != SceneState::EDIT || isLoading))
+            return;
+        m_IsDirty = dirty;
+    }
+
     void OnStart();
     void OnUpdate(float dt);
     void OnFixedUpdate(float dt);
@@ -61,6 +69,7 @@ public:
 
     template<typename Component, typename... Args>
     Component& AddComponent(entt::entity entity, Args&&... args) {
+        SetDirty(true);
         return m_Registry.emplace<Component>(entity, std::forward<Args>(args)...);
     }
 
@@ -81,6 +90,7 @@ public:
 
     template<typename Component>
     void RemoveComponent(entt::entity entity) {
+        SetDirty(true);
         m_Registry.remove<Component>(entity);
     }
 
@@ -168,6 +178,7 @@ private:
     unsigned int CountEntitiesRecursively(entt::entity& rootEntity);
     friend class Entity;
     SceneState m_State = SceneState::EDIT;
+    bool m_IsDirty = false;
     std::string m_SceneName;
     std::string m_ScenePath;
     std::unordered_map<EntityUUID, entt::entity> m_EntityMap;

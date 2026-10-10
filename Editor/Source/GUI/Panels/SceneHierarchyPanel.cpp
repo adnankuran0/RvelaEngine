@@ -914,6 +914,11 @@ void SceneHierarchyPanel::Draw(Engine* engine)
         ImGui::EndPopup();
     }
 
+    if ((ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) || ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows)) && GImGui && GImGui->ActiveIdHasBeenEditedThisFrame)
+    {
+        scene.SetDirty(true);
+    }
+
     ImGui::End();
     ImGui::PopStyleVar();
 }

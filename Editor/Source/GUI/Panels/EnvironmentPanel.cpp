@@ -1,6 +1,7 @@
 #include "EnvironmentPanel.h"
 #include "Core/Engine.h"
 #include "ImGui/imgui.h"
+#include "ImGui/imgui_internal.h"
 #include "glm/glm.hpp"
 #include "EditorUtils.h"
 #include "Asset/AssetManager.h"
@@ -76,11 +77,13 @@ void EnvironmentPanel::Draw(Engine* engine)
                 if (uuid.IsValid())
                 {
                     env.GetSkybox().InitHDR(uuid);
+                    engine->GetActiveScene().SetDirty(true);
                 }
                 else if (pathStr.ends_with(".hdr"))
                 {
                     Path absolutePath = Path::FromAbsolute(pathStr);
                     env.GetSkybox().InitHDR(absolutePath);
+                    engine->GetActiveScene().SetDirty(true);
                 }
             }
             ImGui::EndDragDropTarget();
@@ -92,6 +95,7 @@ void EnvironmentPanel::Draw(Engine* engine)
             if (ImGui::Button("X##hdrClear", ImVec2(clearBtnWidth, 24.0f)))
             {
                 env.GetSkybox().ClearHDR();
+                engine->GetActiveScene().SetDirty(true);
             }
         }
 
@@ -133,6 +137,11 @@ void EnvironmentPanel::Draw(Engine* engine)
         ImGui::SliderFloat("Chromatic Aberration", &env.PostProcess_ChromaticStrength, 0.001f, 0.1f);
         ImGui::SliderFloat("Vignette Intensity", &env.PostProcess_VignetteIntensity, 0.0f, 1.0f);
         ImGui::SliderFloat("Vignette Smoothness", &env.PostProcess_VignetteSmoothness, 0.1f, 1.0f);
+    }
+
+    if ((ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) || ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows)) && GImGui && GImGui->ActiveIdHasBeenEditedThisFrame)
+    {
+        engine->GetActiveScene().SetDirty(true);
     }
 
     ImGui::End();

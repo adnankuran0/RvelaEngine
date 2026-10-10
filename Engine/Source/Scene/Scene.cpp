@@ -32,7 +32,7 @@ m_AnimationSystem(*this)
     entity.AddComponent<TagComponent>(sceneName);
     entity.AddComponent<UUIDComponent>(EntityUUIDGenerator::Generate());
     m_EntityMap[entity.GetUUID()] = (entt::entity)m_RootEntity;
-
+    m_IsDirty = false;
 }
 
 Scene::~Scene()
@@ -113,6 +113,7 @@ void Scene::OnStop()
 
 Entity Scene::CreateEntityRaw()
 {
+    SetDirty(true);
     Entity e(m_Registry.create(), this);
     e.AddComponent<TransformComponent>();
     e.AddComponent<SceneTreeComponent>();
@@ -140,6 +141,7 @@ Entity Scene::CreateEntityWithUUID(const std::string& name, EntityUUID uuid) {
 
 void Scene::DestroyEntity(entt::entity entity) {
     if (entity == entt::null || !m_Registry.valid(entity)) return;
+    SetDirty(true);
 
     m_ScriptSystem.OnEntityDestroyed(entity);
 
@@ -300,6 +302,7 @@ void Scene::SetEntityActive(entt::entity entity, bool active)
     collect(entity);
 
     tag->isActive = active;
+    SetDirty(true);
 
     for (const auto& [affectedEntity, wasActive] : affected)
     {
@@ -312,16 +315,19 @@ void Scene::SetEntityActive(entt::entity entity, bool active)
 
 void Scene::SetParent(entt::entity child, entt::entity parent)
 {
+    SetDirty(true);
     m_TransformSystem.SetParent(child, parent);
 }
 
 void Scene::SetParentKeepLocal(entt::entity child, entt::entity parent)
 {
+    SetDirty(true);
     m_TransformSystem.SetParentKeepLocal(child, parent);
 }
 
 void Scene::RemoveParent(entt::entity child)
 {
+    SetDirty(true);
     m_TransformSystem.RemoveParent(child);
 }
 
@@ -332,6 +338,7 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
 
 Entity Scene::Instantiate(const AssetUUID& prefabUUID, const glm::vec3& position, const glm::quat& rotation, entt::entity parent, const json& overrides)
 {
+    SetDirty(true);
     Ref<PrefabAsset> prefab = AssetManager::Get().GetAsset<PrefabAsset>(prefabUUID);
     if (!prefab || !prefab->IsValid())
     {
@@ -442,6 +449,7 @@ void Scene::MoveChildOrder(entt::entity source, entt::entity target, bool insert
 {
     if (source == entt::null || target == entt::null || source == target) return;
     if (!m_Registry.valid(source) || !m_Registry.valid(target)) return;
+    SetDirty(true);
 
     auto& sourceTree = GetComponent<SceneTreeComponent>(source);
     auto& targetTree = GetComponent<SceneTreeComponent>(target);
@@ -490,6 +498,7 @@ void Scene::MoveChildOrder(entt::entity source, entt::entity target, bool insert
 
 Entity Scene::DuplicateEntity(entt::entity entityHandle)
 {
+    SetDirty(true);
     return SceneSerializer::CloneEntity(*this, entityHandle);
 }
 

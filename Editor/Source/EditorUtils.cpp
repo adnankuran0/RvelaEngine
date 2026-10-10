@@ -27,6 +27,7 @@ void EditorUtils::CreateScene(Engine& engine)
 {
     auto& sm = engine.GetSceneManager();
     sm.SetActiveScene(sm.CreateScene("NewScene"));
+    sm.GetActiveScene().SetDirty(false);
 }
 
 void EditorUtils::OpenScene(Engine& engine)
@@ -49,6 +50,7 @@ bool EditorUtils::SaveScene(Engine& engine)
     if (!activeScene.GetPath().empty())
     {
         engine.GetSceneManager().SaveScene(activeScene.GetPath());
+        activeScene.SetDirty(false);
         return true;
     }
     else
@@ -72,7 +74,10 @@ bool EditorUtils::SaveSceneAs(Engine& engine)
         if (ofs.is_open())
         {
             ofs.close();
+            std::filesystem::path p(file);
+            activeScene.SetName(p.stem().string());
             engine.GetSceneManager().SaveScene(file);
+            activeScene.SetDirty(false);
             return true;
         }
     }

@@ -77,6 +77,7 @@ void SceneManager::PlayScene()
         m_SceneSnapshot = m_SceneSerializer.SerializeScene(*m_CurrentScene);
         m_SnapshotScenePath = m_CurrentScene->GetPath();
         m_SnapshotSceneName = m_CurrentScene->GetName();
+        m_SnapshotIsDirty = m_CurrentScene->IsDirty();
         m_HasSnapshot = true;
 
         m_CurrentScene->SetState(SceneState::PLAY);
@@ -112,6 +113,7 @@ void SceneManager::StopScene()
             std::unique_ptr<Scene> restoredScene = CreateScene(m_SnapshotSceneName.empty() ? "Untitled" : m_SnapshotSceneName);
             restoredScene->SetPath(m_SnapshotScenePath);
             m_SceneSerializer.DeserializeScene(*restoredScene, m_SceneSnapshot);
+            restoredScene->SetDirty(m_SnapshotIsDirty);
             SetActiveScene(std::move(restoredScene));
 
             m_HasSnapshot = false;

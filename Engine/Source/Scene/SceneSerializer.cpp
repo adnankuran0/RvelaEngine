@@ -77,13 +77,25 @@ json SceneSerializer::SerializeScene(Scene& scene)
 void SceneSerializer::SaveScene(Scene& scene, const std::string& path)
 {
     scene.SetPath(path);
+    std::filesystem::path p(path);
+    if (scene.GetName().empty() || scene.GetName() == "Untitled" || scene.GetName() == "NewScene" || scene.GetName() == "EmptyScene")
+    {
+        scene.SetName(p.stem().string());
+    }
     json sceneJson = SerializeScene(scene);
     std::ofstream ofs(path);
     ofs << sceneJson.dump(4);
+    scene.SetDirty(false);
 }
 
 void SceneSerializer::DeserializeScene(Scene& scene, const json& j)
 {
+    struct LoadingScope {
+        Scene& s;
+        LoadingScope(Scene& sc) : s(sc) { s.isLoading = true; }
+        ~LoadingScope() { s.isLoading = false; }
+    } scope(scene);
+
     if (j.contains("Environment"))
         scene.GetEnvironment().Deserialize(j["Environment"]);
 
@@ -192,6 +204,7 @@ void SceneSerializer::DeserializeScene(Scene& scene, const json& j)
             scene.SetParentKeepLocal(entity, rootHandle);
         }
     }
+    scene.SetDirty(false);
 }
 
 bool SceneSerializer::LoadScene(Scene& scene, const std::string& path)
@@ -228,6 +241,7 @@ bool SceneSerializer::LoadScene(Scene& scene, const std::string& path)
     }
 
     scene.SetPath(path);
+    scene.SetDirty(false);
     return true;
 }
 

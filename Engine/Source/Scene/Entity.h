@@ -16,6 +16,7 @@ public:
 	template<typename T, typename... Args>
 	T& AddComponent(Args&&... args)
 	{
+		if (m_Scene) m_Scene->SetDirty(true);
 		T& component = m_Scene->GetRegistry().emplace<T>(m_EntityHandle, std::forward<Args>(args)...);
 		return component;
 	}
@@ -23,6 +24,7 @@ public:
 	template<typename T, typename... Args>
 	T& AddOrReplaceComponent(Args&&... args)
 	{
+		if (m_Scene) m_Scene->SetDirty(true);
 		T& component = m_Scene->GetRegistry().emplace_or_replace<T>(m_EntityHandle, std::forward<Args>(args)...);
 		return component;
 	}
@@ -42,6 +44,7 @@ public:
 	template<typename T>
 	void RemoveComponent()
 	{
+		if (m_Scene) m_Scene->SetDirty(true);
 		m_Scene->GetRegistry().remove<T>(m_EntityHandle);
 	}
 
@@ -55,7 +58,10 @@ public:
 	operator uint32_t() const { return (uint32_t)m_EntityHandle; }
 
 	const std::string& GetName() { return GetComponent<TagComponent>().tag; }
-	void SetName(const std::string& name) { GetComponent<TagComponent>().tag = name; }
+	void SetName(const std::string& name) {
+		if (m_Scene) m_Scene->SetDirty(true);
+		GetComponent<TagComponent>().tag = name;
+	}
 	const entt::entity GetHandle() { return m_EntityHandle; }
 	Scene* GetScene() const { return m_Scene; }
 	bool IsValid() const { return m_EntityHandle != entt::null && m_Scene != nullptr && m_Scene->GetRegistry().valid(m_EntityHandle); }

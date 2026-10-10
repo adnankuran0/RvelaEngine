@@ -48,6 +48,7 @@ private:
     json m_SceneSnapshot;
     std::string m_SnapshotScenePath = "";
     std::string m_SnapshotSceneName = "";
+    bool m_SnapshotIsDirty = false;
 };
 
 }

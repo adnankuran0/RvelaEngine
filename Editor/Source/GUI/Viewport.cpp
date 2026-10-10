@@ -176,6 +176,7 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
                 }
             }
             m_WasGizmoUsing = true;
+            engine->GetActiveScene().SetDirty(true);
         }
 
         auto applyWorldTransform = [&](entt::entity target, const glm::mat4& targetWorld) {
@@ -285,6 +286,10 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
     }
     else
     {
+        if (m_WasGizmoUsing)
+        {
+            engine->GetActiveScene().SetDirty(true);
+        }
         m_WasGizmoUsing = false;
         m_InitialTransforms.clear();
     }
