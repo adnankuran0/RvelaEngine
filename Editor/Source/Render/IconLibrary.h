@@ -31,7 +31,9 @@ enum class EditorIcon
 	Skinned,
 	ArrowBack,
 	ArrowForward,
-	ArrowUp
+	ArrowUp,
+	LockOpen,
+	LockClosed
 };
 
 class IconLibrary

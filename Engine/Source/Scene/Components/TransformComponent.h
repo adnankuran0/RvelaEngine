@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "glm/glm.hpp"
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtc/matrix_transform.hpp"
@@ -34,13 +34,28 @@ public:
         m_Dirty = true;
     }
     void SetScale(const glm::vec3& scl) {
-        if (m_LockScaleRatio) {
-            float ratio = (m_LocalScale.x != 0.0f) ? (scl.x / m_LocalScale.x) : 1.0f;
-            m_LocalScale *= ratio;
-        }
-        else {
-            m_LocalScale = scl;
-        }
+        m_LocalScale = scl;
+        m_Dirty = true;
+    }
+
+    void Reset() {
+        m_LocalPosition = glm::vec3(0.0f);
+        m_LocalEuler = glm::vec3(0.0f);
+        m_LocalRotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+        m_LocalScale = glm::vec3(1.0f);
+        m_Dirty = true;
+    }
+    void ResetPosition() {
+        m_LocalPosition = glm::vec3(0.0f);
+        m_Dirty = true;
+    }
+    void ResetRotation() {
+        m_LocalEuler = glm::vec3(0.0f);
+        m_LocalRotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+        m_Dirty = true;
+    }
+    void ResetScale() {
+        m_LocalScale = glm::vec3(1.0f);
         m_Dirty = true;
     }
 

@@ -14,15 +14,30 @@
 #include "Script/ScriptProperty.h"
 #include "Asset/AssetRegistry.h"
 #include "Asset/AssetManager.h"
+#include "Render/IconLibrary.h"
 #include <algorithm>
 #include <array>
 #include <cstring>
 #include <string>
+#include <type_traits>
 
 using namespace rv;
 
+struct TransformClipboardData
+{
+	glm::vec3 position{ 0.0f };
+	glm::vec3 rotation{ 0.0f };
+	glm::vec3 scale{ 1.0f };
+	bool hasTransform = false;
+
+	glm::vec3 vec3Value{ 0.0f };
+	bool hasVec3 = false;
+};
+static TransformClipboardData s_TransformClipboard;
+
 namespace UI
 {
+
 	static bool BeginPropertyTable(const char* id = "PropertyTable", float labelRatio = 0.40f)
 	{
 		if (ImGui::BeginTable(id, 2, ImGuiTableFlags_Resizable | ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_NoSavedSettings))
@@ -47,6 +62,203 @@ namespace UI
 		ImGui::TextUnformatted(label);
 		ImGui::TableSetColumnIndex(1);
 		ImGui::SetNextItemWidth(-FLT_MIN);
+	}
+
+	static bool DrawTransformRow(const char* label, glm::vec3& values, float resetValue = 0.0f, float speed = 0.1f, float min = 0.0f, float max = 0.0f, bool isScale = false, bool* lockRatio = nullptr)
+	{
+		ImGui::TableNextRow(ImGuiTableRowFlags_None, 26.0f);
+		ImGui::TableSetColumnIndex(0);
+		ImGui::AlignTextToFramePadding();
+
+		ImGui::PushID(label);
+
+		// Reset button
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.55f, 0.50f, 0.72f, 0.35f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.68f, 0.62f, 0.88f, 0.50f));
+		ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.0f);
+		float btnH = ImGui::GetFrameHeight();
+		bool changed = false;
+
+		if (ImGui::Button("R", ImVec2(btnH, btnH)))
+		{
+			values = glm::vec3(resetValue);
+			changed = true;
+		}
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::SetTooltip("Reset %s to (%.2f, %.2f, %.2f)", label, resetValue, resetValue, resetValue);
+		}
+		ImGui::PopStyleVar();
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine(0, 4.0f);
+		ImGui::TextUnformatted(label);
+
+		if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
+		{
+			ImGui::OpenPopup("RowContextMenu");
+		}
+
+		// Lock
+		if (isScale && lockRatio)
+		{
+			float availCol0 = ImGui::GetContentRegionAvail().x;
+			float lockSize = btnH;
+			if (availCol0 > lockSize + 4.0f)
+				ImGui::SameLine(ImGui::GetCursorPosX() + availCol0 - lockSize);
+			else
+				ImGui::SameLine(0, 6.0f);
+
+			bool locked = *lockRatio;
+			ImTextureID lockTex = (ImTextureID)(intptr_t)IconLibrary::Get().GetIcon(locked ? EditorIcon::LockClosed : EditorIcon::LockOpen).GetID();
+
+			ImVec4 lockBtnCol = locked ? ImVec4(0.24f, 0.45f, 0.78f, 0.65f) : ImVec4(0, 0, 0, 0);
+			ImVec4 lockBtnHov = locked ? ImVec4(0.32f, 0.55f, 0.88f, 0.85f) : ImVec4(0.55f, 0.50f, 0.72f, 0.30f);
+			ImGui::PushStyleColor(ImGuiCol_Button, lockBtnCol);
+			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, lockBtnHov);
+			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.40f, 0.62f, 0.95f, 0.95f));
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.0f);
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(3.0f, 3.0f));
+
+			const ImVec2 iconSize(lockSize - 6.0f, lockSize - 6.0f);
+			const ImVec4 tintCol = locked ? ImVec4(1.0f, 1.0f, 1.0f, 1.0f) : ImVec4(0.70f, 0.70f, 0.75f, 0.85f);
+
+			if (ImGui::ImageButton("##lockRatioBtn", lockTex, iconSize, ImVec2(0, 0), ImVec2(1, 1), ImVec4(0, 0, 0, 0), tintCol))
+			{
+				*lockRatio = !locked;
+			}
+			ImGui::PopStyleVar(2);
+			ImGui::PopStyleColor(3);
+
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::SetTooltip(locked ? "Scale proportions locked (Uniform scaling)\nClick to unlock"
+				                         : "Scale proportions unlocked\nClick to lock proportions");
+			}
+		}
+
+		if (ImGui::BeginPopup("RowContextMenu"))
+		{
+			if (ImGui::MenuItem(("Reset " + std::string(label)).c_str()))
+			{
+				values = glm::vec3(resetValue);
+				changed = true;
+			}
+			ImGui::Separator();
+			if (ImGui::MenuItem(("Copy " + std::string(label)).c_str()))
+			{
+				s_TransformClipboard.vec3Value = values;
+				s_TransformClipboard.hasVec3 = true;
+			}
+			if (ImGui::MenuItem(("Paste " + std::string(label)).c_str(), nullptr, false, s_TransformClipboard.hasVec3))
+			{
+				values = s_TransformClipboard.vec3Value;
+				changed = true;
+			}
+			if (isScale && lockRatio)
+			{
+				ImGui::Separator();
+				if (ImGui::MenuItem("Lock Scale Proportions", nullptr, lockRatio))
+				{
+				}
+			}
+			ImGui::EndPopup();
+		}
+
+		// Values
+		ImGui::TableSetColumnIndex(1);
+
+		ImGuiStyle& style = ImGui::GetStyle();
+		float buttonWidth = ImGui::GetFrameHeight();
+		float totalWidth = ImGui::GetContentRegionAvail().x;
+		float itemSpacing = style.ItemSpacing.x;
+		float inputWidth = std::max((totalWidth - (buttonWidth * 3.0f) - (itemSpacing * 5.0f)) / 3.0f, 1.0f);
+
+		glm::vec3 oldVals = values;
+		bool chX = false, chY = false, chZ = false;
+
+		auto DrawAxis = [&](const char* axisLabel, float& val, bool& axisChanged,
+			const ImVec4& colNormal, const ImVec4& colHover, const ImVec4& colActive)
+		{
+			ImGui::PushStyleColor(ImGuiCol_Button, colNormal);
+			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, colHover);
+			ImGui::PushStyleColor(ImGuiCol_ButtonActive, colActive);
+			ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.0f);
+			if (ImGui::Button(axisLabel, ImVec2(buttonWidth, buttonWidth)))
+			{
+				if (isScale && lockRatio && *lockRatio)
+					values = glm::vec3(resetValue);
+				else
+					val = resetValue;
+				axisChanged = true;
+			}
+			ImGui::PopStyleVar();
+			ImGui::PopStyleColor(3);
+
+			ImGui::SameLine(0, 2.0f);
+			ImGui::SetNextItemWidth(inputWidth);
+			std::string dragLabel = std::string("##") + axisLabel;
+			if (ImGui::DragFloat(dragLabel.c_str(), &val, speed, min, max, "%.2f"))
+			{
+				axisChanged = true;
+			}
+		};
+
+		DrawAxis("X", values.x, chX, ImVec4(0.78f, 0.22f, 0.22f, 1.0f), ImVec4(0.90f, 0.32f, 0.32f, 1.0f), ImVec4(0.68f, 0.16f, 0.16f, 1.0f));
+		ImGui::SameLine(0, itemSpacing);
+		DrawAxis("Y", values.y, chY, ImVec4(0.22f, 0.70f, 0.22f, 1.0f), ImVec4(0.32f, 0.82f, 0.32f, 1.0f), ImVec4(0.16f, 0.60f, 0.16f, 1.0f));
+		ImGui::SameLine(0, itemSpacing);
+		DrawAxis("Z", values.z, chZ, ImVec4(0.22f, 0.45f, 0.88f, 1.0f), ImVec4(0.32f, 0.58f, 0.98f, 1.0f), ImVec4(0.16f, 0.36f, 0.78f, 1.0f));
+
+		if (isScale && lockRatio && *lockRatio)
+		{
+			if (chX)
+			{
+				float ratio = (oldVals.x != 0.0f) ? (values.x / oldVals.x) : 1.0f;
+				if (std::abs(oldVals.x) < 0.0001f)
+				{
+					values.y = values.x;
+					values.z = values.x;
+				}
+				else
+				{
+					values.y = std::clamp(oldVals.y * ratio, min, max);
+					values.z = std::clamp(oldVals.z * ratio, min, max);
+				}
+			}
+			else if (chY)
+			{
+				float ratio = (oldVals.y != 0.0f) ? (values.y / oldVals.y) : 1.0f;
+				if (std::abs(oldVals.y) < 0.0001f)
+				{
+					values.x = values.y;
+					values.z = values.y;
+				}
+				else
+				{
+					values.x = std::clamp(oldVals.x * ratio, min, max);
+					values.z = std::clamp(oldVals.z * ratio, min, max);
+				}
+			}
+			else if (chZ)
+			{
+				float ratio = (oldVals.z != 0.0f) ? (values.z / oldVals.z) : 1.0f;
+				if (std::abs(oldVals.z) < 0.0001f)
+				{
+					values.x = values.z;
+					values.y = values.z;
+				}
+				else
+				{
+					values.x = std::clamp(oldVals.x * ratio, min, max);
+					values.y = std::clamp(oldVals.y * ratio, min, max);
+				}
+			}
+		}
+
+		ImGui::PopID();
+		return changed || chX || chY || chZ || (values != oldVals);
 	}
 
 	static void DrawVec3Control(const char* label, glm::vec3& values, float resetValue = 0.0f, float speed = 0.1f, float min = 0.0f, float max = 0.0f)
@@ -194,10 +406,74 @@ static void DrawComponent(const std::string& name, entt::registry& registry, ent
 
 	bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeNodeFlags, "%s", name.c_str());
 
+	if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
+		ImGui::OpenPopup("ComponentSettings");
+
 	float lineHeight = ImGui::GetFrameHeight();
 	float buttonSize = lineHeight - 4.0f;
 
-	if (removable)
+	if constexpr (std::is_same_v<T, TransformComponent>)
+	{
+		ImGui::SameLine(contentRegion.x - buttonSize * 2.0f - 4.0f);
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.55f, 0.50f, 0.72f, 0.40f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.68f, 0.62f, 0.88f, 0.60f));
+		if (ImGui::Button("R##resetAllTransform", ImVec2(buttonSize, buttonSize)))
+		{
+			component.Reset();
+		}
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::SetTooltip("Reset all Transform properties (Position, Rotation, Scale)");
+		}
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine(contentRegion.x - buttonSize);
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.55f, 0.50f, 0.72f, 0.40f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.68f, 0.62f, 0.88f, 0.60f));
+		if (ImGui::Button("...", ImVec2(buttonSize, buttonSize)))
+			ImGui::OpenPopup("ComponentSettings");
+		ImGui::PopStyleColor(3);
+
+		if (ImGui::BeginPopup("ComponentSettings"))
+		{
+			if (ImGui::MenuItem("Reset Transform"))
+			{
+				component.Reset();
+			}
+			ImGui::Separator();
+			if (ImGui::MenuItem("Reset Position"))
+			{
+				component.ResetPosition();
+			}
+			if (ImGui::MenuItem("Reset Rotation"))
+			{
+				component.ResetRotation();
+			}
+			if (ImGui::MenuItem("Reset Scale"))
+			{
+				component.ResetScale();
+			}
+			ImGui::Separator();
+			if (ImGui::MenuItem("Copy Transform"))
+			{
+				s_TransformClipboard.position = component.GetPosition();
+				s_TransformClipboard.rotation = component.GetEulerRotation();
+				s_TransformClipboard.scale = component.GetScale();
+				s_TransformClipboard.hasTransform = true;
+			}
+			if (ImGui::MenuItem("Paste Transform", nullptr, false, s_TransformClipboard.hasTransform))
+			{
+				component.SetPosition(s_TransformClipboard.position);
+				component.SetEulerRotation(s_TransformClipboard.rotation);
+				component.SetScale(s_TransformClipboard.scale);
+				component.SetDirty();
+			}
+			ImGui::EndPopup();
+		}
+	}
+	else if (removable)
 	{
 		ImGui::SameLine(contentRegion.x - buttonSize);
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
@@ -466,21 +742,30 @@ void InspectorPanel::Draw(Engine* engine)
 				glm::vec3 scale = transform.GetScale();
 				bool isScaleRatioLocked = transform.IsScaleRatioLocked();
 
-				glm::vec3 oldPos = pos;
-				glm::vec3 oldEuler = euler;
-				glm::vec3 oldScale = scale;
+				bool oldLocked = isScaleRatioLocked;
 
-				UI::DrawVec3Control("Position", pos, 0.0f, 0.1f);
-				UI::DrawVec3Control("Rotation", euler, 0.0f, 0.1f, -360.0f, 360.0f);
-				UI::DrawVec3Control("Scale", scale, 1.0f, 0.05f, 0.001f, 10000.0f);
+				if (UI::DrawTransformRow("Position", pos, 0.0f, 0.1f))
+				{
+					transform.SetPosition(pos);
+					transform.SetDirty();
+				}
 
-				if (pos != oldPos) { transform.SetPosition(pos); transform.SetDirty(); }
-				if (euler != oldEuler) { transform.SetEulerRotation(euler); transform.SetDirty(); }
-				if (scale != oldScale) { transform.SetScale(scale); transform.SetDirty(); }
+				if (UI::DrawTransformRow("Rotation", euler, 0.0f, 0.1f, -360.0f, 360.0f))
+				{
+					transform.SetEulerRotation(euler);
+					transform.SetDirty();
+				}
 
-				UI::PropertyLabel("Lock Ratio");
-				if (ImGui::Checkbox("##LockRatio", &isScaleRatioLocked))
+				if (UI::DrawTransformRow("Scale", scale, 1.0f, 0.05f, 0.001f, 10000.0f, true, &isScaleRatioLocked))
+				{
+					transform.SetScale(scale);
+					transform.SetDirty();
+				}
+
+				if (isScaleRatioLocked != oldLocked)
+				{
 					transform.SetLockScaleRatio(isScaleRatioLocked);
+				}
 
 				UI::EndPropertyTable();
 			}
