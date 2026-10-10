@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <glm/glm.hpp>
 #include <limits>
@@ -34,6 +34,10 @@ public:
 
     glm::vec3 Size() const {
         return max - min;
+    }
+
+    bool IsValid() const {
+        return min.x <= max.x && min.y <= max.y && min.z <= max.z;
     }
 
     bool Intersects(const AABB& other) const {

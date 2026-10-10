@@ -695,10 +695,13 @@ void InspectorPanel::Draw(Engine* engine)
 					if (dirLight.castShadows)
 					{
 						UI::PropertyLabel("Shadow Bias");
-						ImGui::SliderFloat("##DirShadowBias", &dirLight.shadowBias, 0.0f, 0.1f, "%.4f");
+						ImGui::SliderFloat("##DirShadowBias", &dirLight.shadowBias, 0.0f, 0.02f, "%.4f");
+
+						UI::PropertyLabel("Normal Bias");
+						ImGui::SliderFloat("##DirNormalBias", &dirLight.normalBias, 0.0f, 0.05f, "%.4f");
 
 						UI::PropertyLabel("Blur Radius");
-						ImGui::SliderFloat("##DirBlurRadius", &dirLight.blurRadius, 0.0f, 2.0f, "%.3f");
+						ImGui::SliderFloat("##DirBlurRadius", &dirLight.blurRadius, 0.0f, 3.0f, "%.3f");
 
 						UI::PropertyLabel("Reverse Cull Face");
 						ImGui::Checkbox("##DirReverseCullFace", &dirLight.reverseCullFace);

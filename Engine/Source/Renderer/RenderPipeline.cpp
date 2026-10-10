@@ -98,7 +98,18 @@ void RenderPipeline::UpdateUBOs(const RenderContext& ctx)
 		lightData.dirLight.colorIntensity = glm::vec4(dir.color, dir.intensity);
 		lightData.dirLight.shadowBias = dir.shadowBias;
 		lightData.dirLight.blurRadius = dir.blurRadius;
-		lightData.lightSpaceMatrix = dir.lightSpace;
+		lightData.dirLight.normalBias = dir.normalBias;
+		lightData.dirLight.cascadeCount = NUM_SHADOW_CASCADES;
+		for (int c = 0; c < NUM_SHADOW_CASCADES; ++c)
+		{
+			lightData.cascadeMatrices[c] = dir.cascadeMatrices[c];
+		}
+		lightData.cascadeSplits = glm::vec4(
+			dir.cascadeSplits[0],
+			dir.cascadeSplits[1],
+			dir.cascadeSplits[2],
+			dir.cascadeSplits[3]
+		);
 	}
 	else
 	{

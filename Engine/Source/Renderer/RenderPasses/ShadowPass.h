@@ -12,16 +12,18 @@ public:
     void Init(const RenderContext& ctx, RenderFrame& frame) override;
     void Execute(const RenderContext& ctx, RenderFrame& frame) override;
 private:
+    void InitDirectionalShadowMap();
     void InitPointShadowMap();
     void RenderDirectionalShadowMap(const RenderContext& ctx, RenderFrame& frame);
     void RenderPointShadowMap(const RenderContext& ctx, RenderFrame& frame);
 
-    Framebuffer m_DirectionalShadowFramebuffer;
+    GLuint dirShadowFBO = 0;
+    GLuint o_DirectionalShadowMap = 0;
 
     GLuint pointFBO = 0;
     GLuint o_PointShadowMap = 0;
 
-    const unsigned int SHADOW_WIDTH = 4096, SHADOW_HEIGHT = 4096;
+    const unsigned int SHADOW_WIDTH = 2048, SHADOW_HEIGHT = 2048;
     const unsigned int POINT_SHADOW_WIDTH = 512, POINT_SHADOW_HEIGHT = 512;
 };
 

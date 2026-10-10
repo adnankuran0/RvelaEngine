@@ -26,7 +26,7 @@ layout(binding = 0) uniform sampler2D u_DepthTexture;
 layout(binding = 1) uniform sampler2D u_NormalTexture;
 layout(binding = 2) uniform sampler2D u_DecalTexture;
 
-layout(binding = 6) uniform sampler2D shadowMap;
+layout(binding = 6) uniform sampler2DArray shadowMap;
 layout(binding = 7) uniform samplerCubeArray pointShadowMap;
 layout(binding = 8) uniform samplerCube irradianceMap;
 
@@ -132,9 +132,9 @@ void main()
             float NdotL = max(dot(worldNormal, L), 0.0);
 
             bool castShadows = directionalLight.direction.w > 0.5;
-            vec4 fragPosLightSpace = lightSpaceMatrix * vec4(worldPos, 1.0);
+            float viewDepth = abs((view * vec4(worldPos, 1.0)).z);
             float shadow = (castShadows && u_ReceiveShadows) ?
-                calculateDirectionalShadow(shadowMap, fragPosLightSpace, worldNormal, L, directionalLight.shadowBias, directionalLight.blurRadius) : 0.0;
+                calculateDirectionalShadow(shadowMap, worldPos, worldNormal, L, viewDepth, directionalLight.shadowBias, directionalLight.normalBias, directionalLight.blurRadius) : 0.0;
 
             vec3 lightColor = directionalLight.colorIntensity.rgb;
             float lightIntensity = directionalLight.colorIntensity.a;

@@ -2,6 +2,7 @@
     "Entities": [
         {
             "DirectionalLight": {
+                "blurRadius": 1.0,
                 "castShadows": true,
                 "color": [
                     1.0,
@@ -9,7 +10,9 @@
                     1.0
                 ],
                 "intensity": 5.0,
-                "reverseCullFace": false
+                "normalBias": 0.00800000037997961,
+                "reverseCullFace": false,
+                "shadowBias": 0.0003000000142492354
             },
             "ParentUUID": 0,
             "Tag": {
@@ -495,7 +498,11 @@
                 ]
             },
             "Material": {
-                "material": "117abcf2-653c-4baa-b1ef-78ccd02c4fa6"
+                "material": "117abcf2-653c-4baa-b1ef-78ccd02c4fa6",
+                "overrides": {
+                    "useTriplanar": true,
+                    "useWorldTriplanar": true
+                }
             },
             "Mesh": {
                 "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
@@ -652,7 +659,7 @@
                     0.9999991655349731
                 ]
             },
-            "UUID": 3009459145990404097
+            "UUID": 6635918172487213184
         },
         {
             "Material": {
@@ -912,7 +919,7 @@
                 "lockScaleRatio": false,
                 "position": [
                     1.5143542289733887,
-                    0.4844054877758026,
+                    0.5001166462898254,
                     2.6994800567626953
                 ],
                 "rotation": [
@@ -1340,7 +1347,11 @@
                 ]
             },
             "Material": {
-                "material": "117abcf2-653c-4baa-b1ef-78ccd02c4fa6"
+                "material": "117abcf2-653c-4baa-b1ef-78ccd02c4fa6",
+                "overrides": {
+                    "useTriplanar": true,
+                    "useWorldTriplanar": true
+                }
             },
             "Mesh": {
                 "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
@@ -1394,6 +1405,23 @@
             "UUID": 9270657603229051392
         },
         {
+            "Overrides": [
+                {
+                    "op": "add",
+                    "path": "/0/PointLight/blurRadius",
+                    "value": 0.029999999329447746
+                },
+                {
+                    "op": "add",
+                    "path": "/0/PointLight/reverseCullFace",
+                    "value": true
+                },
+                {
+                    "op": "add",
+                    "path": "/0/PointLight/shadowBias",
+                    "value": 0.10000000149011612
+                }
+            ],
             "ParentUUID": 0,
             "Prefab": "3c17201c-5ca4-489d-bed4-6df228fefad9",
             "Tag": {
@@ -1418,7 +1446,7 @@
                     1.0
                 ]
             },
-            "UUID": 4210087732836564843
+            "UUID": 9514087279516259117
         },
         {
             "ParentUUID": 0,
@@ -1562,15 +1590,18 @@
             "Overrides": [
                 {
                     "op": "add",
-                    "path": "/0/Material/overrides",
-                    "value": {
-                        "emissiveColor": [
-                            0.0,
-                            0.39230191707611084,
-                            0.5907335877418518
-                        ],
-                        "emissiveIntensity": 4.199999809265137
-                    }
+                    "path": "/0/PointLight/blurRadius",
+                    "value": 0.029999999329447746
+                },
+                {
+                    "op": "add",
+                    "path": "/0/PointLight/reverseCullFace",
+                    "value": true
+                },
+                {
+                    "op": "add",
+                    "path": "/0/PointLight/shadowBias",
+                    "value": 0.10000000149011612
                 }
             ],
             "ParentUUID": 0,
@@ -1597,7 +1628,7 @@
                     0.3500000238418579
                 ]
             },
-            "UUID": 3397599091854903065
+            "UUID": 14719566516766883578
         }
     ],
     "Environment": {

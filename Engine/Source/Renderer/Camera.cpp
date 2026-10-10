@@ -30,7 +30,7 @@ glm::mat4 Camera::GetViewMatrix()
 
 float Camera::GetAspectRatio()
 {
-    return width / height;
+    return (height > 0) ? (static_cast<float>(width) / static_cast<float>(height)) : (16.0f / 9.0f);
 }
 
 bool Camera::Intersects(const AABB& AABB)

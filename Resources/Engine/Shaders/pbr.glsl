@@ -88,7 +88,7 @@ void main()
 #endif
 
     TexCoords = aTexCoords * UVScale + UVOffset;
-    FragPosLightSpace = lightSpaceMatrix * worldPos;
+    FragPosLightSpace = cascadeMatrices[0] * worldPos;
 
     gl_Position = projection * view * worldPos;
 }
@@ -151,7 +151,7 @@ uniform float ambientIntensity;
 uniform int shadingMode;
 uniform bool receiveShadows;
 
-layout(binding = 6) uniform sampler2D shadowMap;
+layout(binding = 6) uniform sampler2DArray shadowMap;
 layout(binding = 7) uniform samplerCubeArray pointShadowMap;
 
 layout(binding = 8) uniform samplerCube irradianceMap;
@@ -370,8 +370,9 @@ void main()
         float NdotL = max(dot(Nmap, L), 0.0);
         
         bool castShadows = directionalLight.direction.w > 0.5;
+        float viewDepth = abs((view * vec4(FragPos, 1.0)).z);
         float shadow = (castShadows && receiveShadows) ?   
-            calculateDirectionalShadow(shadowMap, FragPosLightSpace, Nmap, L, directionalLight.shadowBias, directionalLight.blurRadius) : 0.0;
+            calculateDirectionalShadow(shadowMap, FragPos, Nmap, L, viewDepth, directionalLight.shadowBias, directionalLight.normalBias, directionalLight.blurRadius) : 0.0;
 
         vec3 lightColor = directionalLight.colorIntensity.rgb;
         float lightIntensity = directionalLight.colorIntensity.a;

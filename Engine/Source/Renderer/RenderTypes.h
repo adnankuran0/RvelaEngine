@@ -68,13 +68,15 @@ struct DirectionalLightUBOData {
     glm::vec4 colorIntensity;
     float shadowBias;
     float blurRadius;
-    glm::vec2 padding;
+    float normalBias;
+    int cascadeCount;
 };
 
 struct LightUBOData {
     DirectionalLightUBOData dirLight;
     PointLightUBOData pointLights[MaxPointLights];
-    glm::mat4 lightSpaceMatrix;
+    glm::mat4 cascadeMatrices[4];
+    glm::vec4 cascadeSplits;
     int pointLightCount;
     int hasDirLight;
     glm::vec2 padding;

@@ -42,7 +42,7 @@ void RenderLayer::OnRender()
 
 	m_Context.camera = camera;
 	m_Context.pointLights = lightSystem.CollectPointLights();
-	m_Context.directionalLight = lightSystem.CollectDirectionalLight(camera->Position);
+	m_Context.directionalLight = lightSystem.CollectDirectionalLight(camera);
 	m_Context.viewportWidth = 1920;
 	m_Context.viewportHeight = 1080;
 	m_Context.scene = &scene;

@@ -16,9 +16,9 @@ uniform int billboardMode;
 #endif
 
 #include "Common/Camera.glsl"
-#include "Common/Lights.glsl"
 
 uniform mat4 model;
+uniform mat4 lightSpaceMatrix;
 uniform vec2 UVScale;
 uniform vec2 UVOffset;
 
