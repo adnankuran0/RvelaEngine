@@ -24,6 +24,8 @@ out vec2 TexCoords;
 out vec4 FragPosLightSpace;
 out vec3 Tangent;
 out vec3 Bitangent;
+out vec3 LocalPos;
+out vec3 LocalNormal;
 
 uniform mat4 model;
 uniform vec2 UVScale;
@@ -77,6 +79,13 @@ void main()
     Normal = N;
     Tangent = T;
     Bitangent = B;
+#ifdef SKELETAL
+    LocalPos = localPos.xyz;
+    LocalNormal = normalize(localNormal);
+#else
+    LocalPos = aPos;
+    LocalNormal = normalize(aNormal);
+#endif
 
     TexCoords = aTexCoords * UVScale + UVOffset;
     FragPosLightSpace = lightSpaceMatrix * worldPos;
@@ -93,6 +102,8 @@ in vec3 Normal;
 in vec4 FragPosLightSpace;
 in vec3 Tangent;
 in vec3 Bitangent;
+in vec3 LocalPos;
+in vec3 LocalNormal;
 
 #include "Common/Camera.glsl"
 #include "Common/Lights.glsl"
@@ -113,6 +124,13 @@ uniform bool useMetallicMap;
 uniform bool useRoughnessMap;
 uniform bool useAOMap;
 uniform bool useHeightMap;
+
+uniform bool useTriplanar;
+uniform bool useWorldTriplanar;
+uniform float triplanarSharpness;
+uniform vec2 UVScale;
+uniform vec2 UVOffset;
+uniform mat3 normalMatrix;
 
 uniform vec4 albedoColor;
 uniform vec3 emmisiveColor;
@@ -145,6 +163,48 @@ uniform bool useSSAO;
 
 uniform bool useIBL;
 uniform float iblIntensity;
+
+vec3 getTriplanarWeights(vec3 normal, float sharpness)
+{
+    vec3 w = pow(abs(normal), vec3(sharpness));
+    return w / max(0.00001, (w.x + w.y + w.z));
+}
+
+vec4 sampleTriplanar(sampler2D tex, vec3 p, vec3 weights)
+{
+    vec4 sampX = texture(tex, p.zy * vec2(-1.0, 1.0));
+    vec4 sampY = texture(tex, p.xz);
+    vec4 sampZ = texture(tex, p.xy);
+    return vec4(
+        sampX.rgb * weights.x + sampY.rgb * weights.y + sampZ.rgb * weights.z,
+        sampX.a * weights.x + sampY.a * weights.y + sampZ.a * weights.z
+    );
+}
+
+vec3 unpackNormalRG(sampler2D tex, vec2 uv)
+{
+    vec2 rg = texture(tex, uv).rg * 2.0 - 1.0;
+    rg *= normalScale;
+    float z = sqrt(max(0.0, 1.0 - dot(rg, rg)));
+    return vec3(rg, z);   
+}
+
+vec3 sampleTriplanarNormal(sampler2D tex, vec3 p, vec3 weights, vec3 geomNormal)
+{
+    vec3 nX = unpackNormalRG(tex, p.zy * vec2(-1.0, 1.0));
+    vec3 nY = unpackNormalRG(tex, p.xz);
+    vec3 nZ = unpackNormalRG(tex, p.xy);
+
+    vec3 s = vec3(geomNormal.x >= 0.0 ? 1.0 : -1.0,
+                  geomNormal.y >= 0.0 ? 1.0 : -1.0,
+                  geomNormal.z >= 0.0 ? 1.0 : -1.0);
+
+    vec3 wX = vec3(nX.z * s.x, nX.y, -nX.x * s.x);
+    vec3 wY = vec3(nY.x, nY.z * s.y, nY.y);
+    vec3 wZ = vec3(nZ.x, nZ.y, nZ.z * s.z);
+
+    return normalize(wX * weights.x + wY * weights.y + wZ * weights.z);
+}
 
 vec2 parallaxOcclusionMapping(vec2 texCoords, vec3 viewDirTS)
 {
@@ -225,12 +285,49 @@ void main()
     T = normalize(T - dot(T, N) * N);
     vec3 B = normalize(cross(N, T));
 
-    mat3 TBN = mat3(T, B, N);
-    vec3 viewDirTS = transpose(TBN) * viewDir;
+    vec4 albedoTex;
+    vec3 Nmap;
+    float metallic;
+    float roughnessMapValue;
+    float materialAO;
 
-    vec2 mappedTexCoords = parallaxOcclusionMapping(TexCoords, viewDirTS);
+    if (useTriplanar)
+    {
+        vec3 triPos = useWorldTriplanar ? FragPos : LocalPos;
+        vec3 triGeomNormal = useWorldTriplanar ? N : normalize(LocalNormal);
+        
+        vec3 triP = triPos * UVScale.x + vec3(UVOffset.x, UVOffset.y, 0.0);
+        
+        vec3 triWeights = getTriplanarWeights(triGeomNormal, triplanarSharpness);
 
-    vec4 albedoTex = useAlbedoMap ? texture(albedoMap, mappedTexCoords) : vec4(1.0);
+        albedoTex = useAlbedoMap ? sampleTriplanar(albedoMap, triP, triWeights) : vec4(1.0);
+        metallic = useMetallicMap ? sampleTriplanar(metallicMap, triP, triWeights).r : metallicValue;
+        roughnessMapValue = useRoughnessMap ? sampleTriplanar(roughnessMap, triP, triWeights).r : 1.0;
+        materialAO = useAOMap ? sampleTriplanar(aoMap, triP, triWeights).r : aoValue;
+
+        if (useNormalMap)
+        {
+            vec3 blendedNorm = sampleTriplanarNormal(normalMap, triP, triWeights, triGeomNormal);
+            Nmap = useWorldTriplanar ? blendedNorm : normalize(normalMatrix * blendedNorm);
+        }
+        else
+        {
+            Nmap = N;
+        }
+    }
+    else
+    {
+        mat3 TBN = mat3(T, B, N);
+        vec3 viewDirTS = transpose(TBN) * viewDir;
+        vec2 mappedTexCoords = parallaxOcclusionMapping(TexCoords, viewDirTS);
+
+        albedoTex = useAlbedoMap ? texture(albedoMap, mappedTexCoords) : vec4(1.0);
+        metallic = useMetallicMap ? texture(metallicMap, mappedTexCoords).r : metallicValue;
+        roughnessMapValue = useRoughnessMap ? texture(roughnessMap, mappedTexCoords).r : 1.0;
+        materialAO = useAOMap ? texture(aoMap, mappedTexCoords).r : aoValue;
+        Nmap = getNormalFromMap(mappedTexCoords, N, T, B);
+    }
+
     vec4 fullAlbedo = albedoTex * albedoColor;
     vec3 albedo = fullAlbedo.rgb;
     float alpha = fullAlbedo.a;
@@ -247,15 +344,11 @@ void main()
         return; 
     }
 
-    float metallic = useMetallicMap ? texture(metallicMap, mappedTexCoords).r : metallicValue;
-    float roughnessMapValue = useRoughnessMap ? texture(roughnessMap, mappedTexCoords).r : 1.0;
     float roughness = clamp(roughnessValue * roughnessMapValue, 0.0, 1.0);
-    float materialAO = useAOMap ? texture(aoMap, mappedTexCoords).r : aoValue;
     float screenSpaceAO = transparencyMode == 1 ? 1.0 : sampleSSAO();
     float ao = materialAO * screenSpaceAO;
 
     vec3 V = normalize(camPos - FragPos);
-    vec3 Nmap = getNormalFromMap(mappedTexCoords, N, T, B);
     vec3 F0 = mix(vec3(0.04), albedo, metallic);
 
     vec3 Lo = vec3(0.0);

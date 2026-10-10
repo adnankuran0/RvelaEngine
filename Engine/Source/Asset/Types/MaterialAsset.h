@@ -40,6 +40,9 @@ public:
     float heightScale = 0.1f;
     glm::vec2 UVScale = glm::vec2(1.0f);
     glm::vec2 UVOffset = glm::vec2(0.0f);
+    bool useTriplanar = false;
+    bool useWorldTriplanar = false;
+    float triplanarSharpness = 4.0f;
 
     bool useAlbedoMap = false;
     bool useNormalMap = false;

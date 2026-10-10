@@ -109,6 +109,9 @@ void TransparentPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             shader.setFloat("alphaCutoff", material->GetAlphaCutoff());
             shader.setVec2("UVScale", material->GetUVScale());
             shader.setVec2("UVOffset", material->GetUVOffset());
+            shader.setBool("useTriplanar", material->GetUseTriplanar());
+            shader.setBool("useWorldTriplanar", material->GetUseWorldTriplanar());
+            shader.setFloat("triplanarSharpness", material->GetTriplanarSharpness());
             shader.setVec4("albedoColor", material->GetAlbedoColor());
             shader.setVec3("emmisiveColor", material->GetEmissiveColor());
             shader.setFloat("emmisiveIntensity", material->GetEmissiveIntensity());

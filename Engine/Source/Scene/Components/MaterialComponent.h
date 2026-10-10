@@ -67,6 +67,18 @@ public:
     void SetUVOffset(const glm::vec2& v) { m_Instance.SetUVOffset(v); }
     void ClearUVOffset() { m_Instance.ClearUVOffset(); }
 
+    bool GetUseTriplanar() const { return m_Instance.GetUseTriplanar(); }
+    void SetUseTriplanar(bool v) { m_Instance.SetUseTriplanar(v); }
+    void ClearUseTriplanar() { m_Instance.ClearUseTriplanar(); }
+
+    bool GetUseWorldTriplanar() const { return m_Instance.GetUseWorldTriplanar(); }
+    void SetUseWorldTriplanar(bool v) { m_Instance.SetUseWorldTriplanar(v); }
+    void ClearUseWorldTriplanar() { m_Instance.ClearUseWorldTriplanar(); }
+
+    float GetTriplanarSharpness() const { return m_Instance.GetTriplanarSharpness(); }
+    void SetTriplanarSharpness(float v) { m_Instance.SetTriplanarSharpness(v); }
+    void ClearTriplanarSharpness() { m_Instance.ClearTriplanarSharpness(); }
+
     TransparencyMode GetTransparencyMode() const { return m_Instance.GetTransparencyMode(); }
     void SetTransparencyMode(TransparencyMode mode) { m_Instance.SetTransparencyMode(mode); }
     void ClearTransparencyMode() { m_Instance.ClearTransparencyMode(); }

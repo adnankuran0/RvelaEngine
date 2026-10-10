@@ -51,6 +51,9 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     auto BindMaterialGBuffer = [](Shader& shader, MaterialComponent* material) {
         shader.setVec2("UVScale", material->GetUVScale());
         shader.setVec2("UVOffset", material->GetUVOffset());
+        shader.setBool("useTriplanar", material->GetUseTriplanar());
+        shader.setBool("useWorldTriplanar", material->GetUseWorldTriplanar());
+        shader.setFloat("triplanarSharpness", material->GetTriplanarSharpness());
         shader.setInt("transparencyMode", static_cast<int>(material->GetTransparencyMode()));
         shader.setFloat("alphaCutoff", material->GetAlphaCutoff());
         shader.setVec4("albedoColor", material->GetAlbedoColor());

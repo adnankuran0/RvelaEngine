@@ -30,6 +30,10 @@ uniform vec2 UVOffset;
 out vec3 FragPos;
 out vec3 Normal;
 out vec2 TexCoords;
+out vec3 WorldPos;
+out vec3 WorldNormal;
+out vec3 LocalPos;
+out vec3 LocalNormal;
 
 void main()
 {
@@ -79,6 +83,16 @@ void main()
 
     FragPos = vec3(view * worldPos);
     Normal = calculatedViewNormal;
+    WorldPos = worldPos.xyz;
+#ifdef SKELETAL
+    WorldNormal = normalize(normalMatrix * skinnedNormal);
+    LocalPos = skinnedPos.xyz;
+    LocalNormal = normalize(skinnedNormal);
+#else
+    WorldNormal = normalize(normalMatrix * aNormal);
+    LocalPos = aPos;
+    LocalNormal = normalize(aNormal);
+#endif
     TexCoords = aTexCoords * UVScale + UVOffset;
     gl_Position = projection * view * worldPos;
 }
@@ -88,6 +102,10 @@ void main()
 in vec3 FragPos;
 in vec3 Normal;
 in vec2 TexCoords;
+in vec3 WorldPos;
+in vec3 WorldNormal;
+in vec3 LocalPos;
+in vec3 LocalNormal;
 
 layout(location = 0) out vec3 gNormal;
 layout(location = 1) out float gRoughness;
@@ -101,6 +119,12 @@ uniform bool useAlbedoMap;
 uniform bool useRoughnessMap;
 uniform bool useMetallicMap;
 
+uniform bool useTriplanar;
+uniform bool useWorldTriplanar;
+uniform float triplanarSharpness;
+uniform vec2 UVScale;
+uniform vec2 UVOffset;
+
 uniform vec4 albedoColor;
 uniform float roughness;
 uniform float metallic;
@@ -108,18 +132,55 @@ uniform float metallic;
 uniform int transparencyMode;
 uniform float alphaCutoff;
 
+vec3 getTriplanarWeights(vec3 normal, float sharpness)
+{
+    vec3 w = pow(abs(normal), vec3(sharpness));
+    return w / max(0.00001, (w.x + w.y + w.z));
+}
+
+vec4 sampleTriplanar(sampler2D tex, vec3 p, vec3 weights)
+{
+    vec4 sampX = texture(tex, p.zy * vec2(-1.0, 1.0));
+    vec4 sampY = texture(tex, p.xz);
+    vec4 sampZ = texture(tex, p.xy);
+    return sampX * weights.x + sampY * weights.y + sampZ * weights.z;
+}
+
 void main()
 {
-    if (transparencyMode == 2)
+    if (useTriplanar)
     {
-        float alpha = (useAlbedoMap ? texture(albedoMap, TexCoords).a : 1.0) * albedoColor.a;
-        if (alpha < alphaCutoff)
-        {
-            discard;
-        }
-    }
+        vec3 triPos = useWorldTriplanar ? WorldPos : LocalPos;
+        vec3 triGeomNormal = useWorldTriplanar ? WorldNormal : normalize(LocalNormal);
+        vec3 triP = vec3(triPos.x * UVScale.x, triPos.y * UVScale.y, triPos.z * UVScale.x) + vec3(UVOffset.x, UVOffset.y, 0.0);
+        vec3 triWeights = getTriplanarWeights(triGeomNormal, triplanarSharpness);
 
-    gNormal = normalize(Normal);
-    gRoughness = useRoughnessMap ? texture(roughnessMap, TexCoords).r : roughness;
-    gMetallic = useMetallicMap ? texture(metallicMap, TexCoords).r : metallic;
+        if (transparencyMode == 2)
+        {
+            float alpha = (useAlbedoMap ? sampleTriplanar(albedoMap, triP, triWeights).a : 1.0) * albedoColor.a;
+            if (alpha < alphaCutoff)
+            {
+                discard;
+            }
+        }
+
+        gNormal = normalize(Normal);
+        gRoughness = useRoughnessMap ? sampleTriplanar(roughnessMap, triP, triWeights).r : roughness;
+        gMetallic = useMetallicMap ? sampleTriplanar(metallicMap, triP, triWeights).r : metallic;
+    }
+    else
+    {
+        if (transparencyMode == 2)
+        {
+            float alpha = (useAlbedoMap ? texture(albedoMap, TexCoords).a : 1.0) * albedoColor.a;
+            if (alpha < alphaCutoff)
+            {
+                discard;
+            }
+        }
+
+        gNormal = normalize(Normal);
+        gRoughness = useRoughnessMap ? texture(roughnessMap, TexCoords).r : roughness;
+        gMetallic = useMetallicMap ? texture(metallicMap, TexCoords).r : metallic;
+    }
 }

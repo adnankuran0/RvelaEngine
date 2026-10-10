@@ -36,6 +36,9 @@ enum class MatField : uint8_t {
     ShadingMode,
     ReceiveShadows,
     BillboardMode,
+    UseTriplanar,
+    UseWorldTriplanar,
+    TriplanarSharpness,
     COUNT
 };
 
@@ -83,6 +86,9 @@ public:
 
     void SetShadingMode(ShadingMode mode) { m_ShadingMode = mode; SetOverride(MatField::ShadingMode); }
     void SetReceiveShadows(bool v) { m_ReceiveShadows = v; SetOverride(MatField::ReceiveShadows); }
+    void SetUseTriplanar(bool v) { m_UseTriplanar = v; SetOverride(MatField::UseTriplanar); }
+    void SetUseWorldTriplanar(bool v) { m_UseWorldTriplanar = v; SetOverride(MatField::UseWorldTriplanar); }
+    void SetTriplanarSharpness(float v) { m_TriplanarSharpness = v; SetOverride(MatField::TriplanarSharpness); }
 
     glm::vec4 GetAlbedoColor() const { return IsOverridden(MatField::AlbedoColor) ? m_AlbedoColor : (m_SourceAsset ? m_SourceAsset->albedoColor : m_AlbedoColor); }
     glm::vec3 GetEmissiveColor() const { return IsOverridden(MatField::EmissiveColor) ? m_EmissiveColor : (m_SourceAsset ? m_SourceAsset->emissiveColor : m_EmissiveColor); }
@@ -105,6 +111,9 @@ public:
 
     ShadingMode GetShadingMode() const { return IsOverridden(MatField::ShadingMode) ? m_ShadingMode : (m_SourceAsset ? m_SourceAsset->shadingMode : m_ShadingMode); }
     bool GetReceiveShadows() const { return IsOverridden(MatField::ReceiveShadows) ? m_ReceiveShadows : (m_SourceAsset ? m_SourceAsset->receiveShadows : m_ReceiveShadows); }
+    bool GetUseTriplanar() const { return IsOverridden(MatField::UseTriplanar) ? m_UseTriplanar : (m_SourceAsset ? m_SourceAsset->useTriplanar : false); }
+    bool GetUseWorldTriplanar() const { return IsOverridden(MatField::UseWorldTriplanar) ? m_UseWorldTriplanar : (m_SourceAsset ? m_SourceAsset->useWorldTriplanar : false); }
+    float GetTriplanarSharpness() const { return IsOverridden(MatField::TriplanarSharpness) ? m_TriplanarSharpness : (m_SourceAsset ? m_SourceAsset->triplanarSharpness : 4.0f); }
 
     bool UsesAlbedoMap() const { return IsOverridden(MatField::AlbedoTex) ? m_UseAlbedoMap : (m_SourceAsset ? m_SourceAsset->useAlbedoMap : false); }
     bool UsesNormalMap() const { return IsOverridden(MatField::NormalTex) ? m_UseNormalMap : (m_SourceAsset ? m_SourceAsset->useNormalMap : false); }
@@ -140,6 +149,9 @@ public:
 
     void ClearShadingMode() { ClearOverride(MatField::ShadingMode); }
     void ClearReceiveShadows() { ClearOverride(MatField::ReceiveShadows); }
+    void ClearUseTriplanar() { ClearOverride(MatField::UseTriplanar); }
+    void ClearUseWorldTriplanar() { ClearOverride(MatField::UseWorldTriplanar); }
+    void ClearTriplanarSharpness() { ClearOverride(MatField::TriplanarSharpness); }
 
     Sampler& GetSampler() { return m_Sampler; }
     const Sampler& GetSampler() const { return m_Sampler; }
@@ -187,6 +199,9 @@ private:
     float m_HeightScale = 0.1f;
     glm::vec2 m_UVScale = glm::vec2(1.0f);
     glm::vec2 m_UVOffset = glm::vec2(0.0f);
+    bool m_UseTriplanar = false;
+    bool m_UseWorldTriplanar = false;
+    float m_TriplanarSharpness = 4.0f;
 
     TransparencyMode m_TransparencyMode = TransparencyMode::Opaque;
     BlendMode m_BlendMode = BlendMode::Mix;

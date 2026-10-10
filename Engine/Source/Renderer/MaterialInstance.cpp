@@ -41,6 +41,12 @@ json MaterialInstance::SerializeOverrides() const
         j["UVScale"] = { m_UVScale.x, m_UVScale.y };
     if (IsOverridden(MatField::UVOffset))
         j["UVOffset"] = { m_UVOffset.x, m_UVOffset.y };
+    if (IsOverridden(MatField::UseTriplanar))
+        j["useTriplanar"] = m_UseTriplanar;
+    if (IsOverridden(MatField::UseWorldTriplanar))
+        j["useWorldTriplanar"] = m_UseWorldTriplanar;
+    if (IsOverridden(MatField::TriplanarSharpness))
+        j["triplanarSharpness"] = m_TriplanarSharpness;
 
     if (IsOverridden(MatField::ShadingMode))
         j["shadingMode"] = static_cast<int>(m_ShadingMode);
@@ -133,6 +139,21 @@ void MaterialInstance::DeserializeOverrides(const json& j)
     {
         m_UVOffset = { j["UVOffset"][0], j["UVOffset"][1] };
         SetOverride(MatField::UVOffset);
+    }
+    if (j.contains("useTriplanar"))
+    {
+        m_UseTriplanar = j["useTriplanar"].get<bool>();
+        SetOverride(MatField::UseTriplanar);
+    }
+    if (j.contains("useWorldTriplanar"))
+    {
+        m_UseWorldTriplanar = j["useWorldTriplanar"].get<bool>();
+        SetOverride(MatField::UseWorldTriplanar);
+    }
+    if (j.contains("triplanarSharpness"))
+    {
+        m_TriplanarSharpness = j["triplanarSharpness"].get<float>();
+        SetOverride(MatField::TriplanarSharpness);
     }
 
     if (j.contains("transparencyMode"))

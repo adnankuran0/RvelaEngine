@@ -106,5 +106,9 @@ Ref<Asset> MaterialLoader::Load(
     if (j.contains("UVOffset"))
         asset->UVOffset = { j["UVOffset"][0], j["UVOffset"][1] };
 
+    asset->useTriplanar = j.value("useTriplanar", false);
+    asset->useWorldTriplanar = j.value("useWorldTriplanar", false);
+    asset->triplanarSharpness = j.value("triplanarSharpness", 4.0f);
+
     return asset;
 }

@@ -957,6 +957,9 @@ void InspectorPanel::Draw(Engine* engine)
 						if (inst.IsOverridden(MatField::HeightScale)) asset->heightScale = material.GetHeightScale();
 						if (inst.IsOverridden(MatField::UVScale)) asset->UVScale = material.GetUVScale();
 						if (inst.IsOverridden(MatField::UVOffset)) asset->UVOffset = material.GetUVOffset();
+						if (inst.IsOverridden(MatField::UseTriplanar)) asset->useTriplanar = material.GetUseTriplanar();
+						if (inst.IsOverridden(MatField::UseWorldTriplanar)) asset->useWorldTriplanar = material.GetUseWorldTriplanar();
+						if (inst.IsOverridden(MatField::TriplanarSharpness)) asset->triplanarSharpness = material.GetTriplanarSharpness();
 						if (inst.IsOverridden(MatField::TransparencyMode)) asset->transparencyMode = material.GetTransparencyMode();
 						if (inst.IsOverridden(MatField::BlendMode)) asset->blendMode = material.GetBlendMode();
 						if (inst.IsOverridden(MatField::CullMode)) asset->cullMode = material.GetCullMode();
@@ -1298,6 +1301,26 @@ void InspectorPanel::Draw(Engine* engine)
 						ImGui::SetNextItemWidth(sclW);
 						if (ImGui::DragFloat2("##uvscl", &uvScale[0], 0.05f)) material.SetUVScale(uvScale);
 						if (inst.IsOverridden(MatField::UVScale)) RevertButton("R##uvscl", [&]() { material.ClearUVScale(); });
+
+						UI::PropertyLabel("Triplanar");
+						bool useTriplanar = material.GetUseTriplanar();
+						if (ImGui::Checkbox("##triplanar", &useTriplanar)) material.SetUseTriplanar(useTriplanar);
+						if (inst.IsOverridden(MatField::UseTriplanar)) RevertButton("R##triplanar", [&]() { material.ClearUseTriplanar(); });
+
+						if (material.GetUseTriplanar())
+						{
+							UI::PropertyLabel("World Triplanar");
+							bool useWorldTriplanar = material.GetUseWorldTriplanar();
+							if (ImGui::Checkbox("##worldtriplanar", &useWorldTriplanar)) material.SetUseWorldTriplanar(useWorldTriplanar);
+							if (inst.IsOverridden(MatField::UseWorldTriplanar)) RevertButton("R##worldtriplanar", [&]() { material.ClearUseWorldTriplanar(); });
+
+							UI::PropertyLabel("Triplanar Sharpness");
+							float sharpness = material.GetTriplanarSharpness();
+							float sharpW = inst.IsOverridden(MatField::TriplanarSharpness) ? ImGui::GetContentRegionAvail().x - 26.0f : -FLT_MIN;
+							ImGui::SetNextItemWidth(sharpW);
+							if (ImGui::SliderFloat("##triplanarsharpness", &sharpness, 1.0f, 16.0f, "%.2f")) material.SetTriplanarSharpness(sharpness);
+							if (inst.IsOverridden(MatField::TriplanarSharpness)) RevertButton("R##triplanarsharpness", [&]() { material.ClearTriplanarSharpness(); });
+						}
 
 						UI::EndPropertyTable();
 					}
