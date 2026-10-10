@@ -42,6 +42,9 @@ void IconLibrary::Init()
     lib.LoadIcon(EditorIcon::Stop, "Icons\\stop.png");
     lib.LoadIcon(EditorIcon::Skeleton, "Icons\\skeleton.png");
     lib.LoadIcon(EditorIcon::Skinned, "Icons\\skinned.png");
+    lib.LoadIcon(EditorIcon::ArrowBack, "Icons\\arrowBack.png");
+    lib.LoadIcon(EditorIcon::ArrowForward, "Icons\\arrowForward.png");
+    lib.LoadIcon(EditorIcon::ArrowUp, "Icons\\arrowUp.png");
 
 }
 

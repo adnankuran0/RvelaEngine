@@ -28,7 +28,10 @@ enum class EditorIcon
 	Pause,
 	Stop,
 	Skeleton,
-	Skinned
+	Skinned,
+	ArrowBack,
+	ArrowForward,
+	ArrowUp
 };
 
 class IconLibrary
