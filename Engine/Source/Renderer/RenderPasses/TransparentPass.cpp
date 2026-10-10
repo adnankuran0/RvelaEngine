@@ -45,6 +45,7 @@ void TransparentPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
         constexpr int DIR_SHADOW_MAP_SLOT = 6;
         constexpr int POINT_SHADOW_MAP_SLOT = 7;
+        constexpr int ARM_MAP_SLOT = 12;
 
         auto& env = *ctx.environment;
         auto& skybox = env.GetSkybox();
@@ -122,13 +123,14 @@ void TransparentPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             shader.setFloat("specularIntensity", material->GetSpecular());
             shader.setFloat("heightScale", material->GetHeightScale());
 
-            std::array<MapInfo, 6> maps = { {
+            std::array<MapInfo, 7> maps = { {
                 { material->IsUsingAlbedoMap(),    "albedoMap",    0, "useAlbedoMap",    material->GetAlbedoTexture() },
                 { material->IsUsingNormalMap(),    "normalMap",    1, "useNormalMap",    material->GetNormalTexture() },
                 { material->IsUsingMetallicMap(),  "metallicMap",  2, "useMetallicMap",  material->GetMetallicTexture() },
                 { material->IsUsingRoughnessMap(), "roughnessMap", 3, "useRoughnessMap", material->GetRoughnessTexture() },
                 { material->IsUsingAOMap(),        "aoMap",        4, "useAOMap",        material->GetAOTexture() },
-                { material->IsUsingHeightMap(),    "heightMap",    5, "useHeightMap",    material->GetHeightTexture() }
+                { material->IsUsingHeightMap(),    "heightMap",    5, "useHeightMap",    material->GetHeightTexture() },
+                { material->IsUsingARMMap(),       "armMap",       ARM_MAP_SLOT, "useARMMap", material->GetARMTexture() }
             } };
 
             for (const auto& map : maps)
@@ -151,6 +153,7 @@ void TransparentPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         auto CleanupMaterialSamplers = []() {
             for (int slot = 0; slot < 6; ++slot)
                 glBindSampler(slot, 0);
+            glBindSampler(ARM_MAP_SLOT, 0);
             };
 
         glEnable(GL_DEPTH_TEST);

@@ -18,6 +18,7 @@ public:
     AssetUUID roughnessTextureUUID;
     AssetUUID aoTextureUUID;
     AssetUUID heightTextureUUID;
+    AssetUUID armTextureUUID;
 
     ShadingMode shadingMode = ShadingMode::Lit;
     bool receiveShadows = true;
@@ -50,6 +51,7 @@ public:
     bool useRoughnessMap = false;
     bool useAOMap = false;
     bool useHeightMap = false;
+    bool useARMMap = false;
 
     SamplerDesc samplerDesc;
 

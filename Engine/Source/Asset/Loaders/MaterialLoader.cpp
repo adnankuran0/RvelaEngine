@@ -84,6 +84,11 @@ Ref<Asset> MaterialLoader::Load(
         asset->heightTextureUUID = AssetUUID::FromString(j["heightTexture"]);
         asset->useHeightMap = j.value("useHeightMap", true);
     }
+    if (j.contains("armTexture"))
+    {
+        asset->armTextureUUID = AssetUUID::FromString(j["armTexture"]);
+        asset->useARMMap = j.value("useARMMap", true);
+    }
 
     if (j.contains("albedoColor"))
     {

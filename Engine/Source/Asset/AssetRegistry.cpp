@@ -100,13 +100,27 @@ void AssetRegistry::Scan(const std::filesystem::path& assetDir)
         {
             if (!sub.uuid.IsValid()) continue;
 
-            m_UUIDToPath[sub.uuid] = path;
+            if (sub.hasCache)
+            {
+                std::string subExt = sub.type == "Mesh" ? ".rmesh"
+                    : sub.type == "SkeletalMesh" ? ".rskmesh"
+                    : sub.type == "Texture" ? ".rtex"
+                    : "";
+                auto cachePath = GetCacheDir() / (sub.uuid.ToString() + subExt);
+                m_UUIDToPath[sub.uuid] = cachePath;
+                m_PathToUUID[cachePath.string()] = sub.uuid;
+            }
+            else if (!m_UUIDToPath.contains(sub.uuid))
+            {
+                m_UUIDToPath[sub.uuid] = path;
+            }
 
             if (!m_Metas.contains(sub.uuid))
             {
                 AssetMeta subMeta;
                 subMeta.uuid = sub.uuid;
                 subMeta.importerID = sub.type == "Mesh" ? "MeshImporter"
+                    : sub.type == "SkeletalMesh" ? "SkeletalMeshImporter"
                     : sub.type == "Material" ? "MaterialLoader"
                     : "";
                 m_Metas[sub.uuid] = subMeta;
@@ -253,8 +267,22 @@ AssetMeta AssetRegistry::GetOrCreateMeta(const std::filesystem::path& path)
             m_Metas[meta.uuid] = meta;
             for (auto& sub : meta.subAssets)
             {
-                if (sub.uuid.IsValid())
+                if (!sub.uuid.IsValid()) continue;
+
+                if (sub.hasCache)
+                {
+                    std::string subExt = sub.type == "Mesh" ? ".rmesh"
+                        : sub.type == "SkeletalMesh" ? ".rskmesh"
+                        : sub.type == "Texture" ? ".rtex"
+                        : "";
+                    auto cachePath = GetCacheDir() / (sub.uuid.ToString() + subExt);
+                    m_UUIDToPath[sub.uuid] = cachePath;
+                    m_PathToUUID[cachePath.string()] = sub.uuid;
+                }
+                else if (!m_UUIDToPath.contains(sub.uuid))
+                {
                     m_UUIDToPath[sub.uuid] = path;
+                }
             }
             return meta;
         }
@@ -287,13 +315,27 @@ void AssetRegistry::SaveMeta(const std::filesystem::path& path, const AssetMeta&
     {
         if (!sub.uuid.IsValid()) continue;
 
-        m_UUIDToPath[sub.uuid] = path;
+        if (sub.hasCache)
+        {
+            std::string subExt = sub.type == "Mesh" ? ".rmesh"
+                : sub.type == "SkeletalMesh" ? ".rskmesh"
+                : sub.type == "Texture" ? ".rtex"
+                : "";
+            auto cachePath = GetCacheDir() / (sub.uuid.ToString() + subExt);
+            m_UUIDToPath[sub.uuid] = cachePath;
+            m_PathToUUID[cachePath.string()] = sub.uuid;
+        }
+        else if (!m_UUIDToPath.contains(sub.uuid))
+        {
+            m_UUIDToPath[sub.uuid] = path;
+        }
 
         if (!m_Metas.contains(sub.uuid))
         {
             AssetMeta subMeta;
             subMeta.uuid = sub.uuid;
             subMeta.importerID = sub.type == "Mesh" ? "MeshImporter"
+                : sub.type == "SkeletalMesh" ? "SkeletalMeshImporter"
                 : sub.type == "Material" ? "MaterialLoader"
                 : "";
             m_Metas[sub.uuid] = subMeta;

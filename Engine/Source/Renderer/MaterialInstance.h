@@ -29,6 +29,8 @@ enum class MatField : uint8_t {
     RoughnessTex,
     AOTex,
     HeightTex,
+    ARMTex,
+    UseARMMap,
     TransparencyMode,
     BlendMode,
     CullMode,
@@ -57,6 +59,7 @@ public:
     Ref<TextureAsset> GetRoughnessTex() const { return IsOverridden(MatField::RoughnessTex) ? m_RoughnessTex : m_CachedRoughnessTex; }
     Ref<TextureAsset> GetAOTexture() const { return IsOverridden(MatField::AOTex) ? m_AOTex : m_CachedAOTex; }
     Ref<TextureAsset> GetHeightTexture() const { return IsOverridden(MatField::HeightTex) ? m_HeightTex : m_CachedHeightTex; }
+    Ref<TextureAsset> GetARMTexture() const { return IsOverridden(MatField::ARMTex) ? m_ARMTex : m_CachedARMTex; }
 
     void SetAlbedoTexture(Ref<TextureAsset> tex) { m_AlbedoTex = tex; m_UseAlbedoMap = static_cast<bool>(tex); SetOverride(MatField::AlbedoTex); }
     void SetNormalTexture(Ref<TextureAsset> tex) { m_NormalTex = tex; m_UseNormalMap = static_cast<bool>(tex); SetOverride(MatField::NormalTex); }
@@ -64,6 +67,7 @@ public:
     void SetRoughnessTexture(Ref<TextureAsset> tex) { m_RoughnessTex = tex; m_UseRoughnessMap = static_cast<bool>(tex); SetOverride(MatField::RoughnessTex); }
     void SetAOTexture(Ref<TextureAsset> tex) { m_AOTex = tex; m_UseAOMap = static_cast<bool>(tex); SetOverride(MatField::AOTex); }
     void SetHeightTexture(Ref<TextureAsset> tex) { m_HeightTex = tex; m_UseHeightMap = static_cast<bool>(tex); SetOverride(MatField::HeightTex); }
+    void SetARMTexture(Ref<TextureAsset> tex) { m_ARMTex = tex; m_UseARMMap = static_cast<bool>(tex); SetOverride(MatField::ARMTex); }
 
     void SetAlbedoColor(const glm::vec4& v) { m_AlbedoColor = v; SetOverride(MatField::AlbedoColor); }
     void SetEmissiveColor(const glm::vec3& v) { m_EmissiveColor = v; SetOverride(MatField::EmissiveColor); }
@@ -139,6 +143,12 @@ public:
     void ClearRoughnessTexture() { m_RoughnessTex = nullptr; m_UseRoughnessMap = false; ClearOverride(MatField::RoughnessTex); }
     void ClearAOTexture() { m_AOTex = nullptr; m_UseAOMap = false; ClearOverride(MatField::AOTex); }
     void ClearHeightTexture() { m_HeightTex = nullptr; m_UseHeightMap = false; ClearOverride(MatField::HeightTex); }
+    void ClearARMTexture() { m_ARMTex = nullptr; m_UseARMMap = false; ClearOverride(MatField::ARMTex); }
+
+    bool GetUseARMMap() const { return IsOverridden(MatField::UseARMMap) ? m_UseARMMap : (m_SourceAsset ? m_SourceAsset->useARMMap : m_UseARMMap); }
+    void SetUseARMMap(bool v) { m_UseARMMap = v; SetOverride(MatField::UseARMMap); }
+    void ClearUseARMMap() { ClearOverride(MatField::UseARMMap); }
+    bool UsesARMMap() const { return GetUseARMMap() && static_cast<bool>(GetARMTexture()); }
 
     void ClearTransparencyMode() { ClearOverride(MatField::TransparencyMode); }
     void ClearBlendMode() { ClearOverride(MatField::BlendMode); }
@@ -180,6 +190,7 @@ private:
     Ref<TextureAsset> m_RoughnessTex;
     Ref<TextureAsset> m_AOTex;
     Ref<TextureAsset> m_HeightTex;
+    Ref<TextureAsset> m_ARMTex;
 
     Ref<TextureAsset> m_CachedAlbedoTex;
     Ref<TextureAsset> m_CachedNormalTex;
@@ -187,6 +198,7 @@ private:
     Ref<TextureAsset> m_CachedRoughnessTex;
     Ref<TextureAsset> m_CachedAOTex;
     Ref<TextureAsset> m_CachedHeightTex;
+    Ref<TextureAsset> m_CachedARMTex;
 
     glm::vec4 m_AlbedoColor = glm::vec4(1.0f);
     glm::vec3 m_EmissiveColor = glm::vec3(0.0f);
@@ -219,6 +231,7 @@ private:
     bool m_UseRoughnessMap = false;
     bool m_UseAOMap = false;
     bool m_UseHeightMap = false;
+    bool m_UseARMMap = false;
 
     Sampler m_Sampler;
 };

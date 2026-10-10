@@ -974,6 +974,8 @@ void InspectorPanel::Draw(Engine* engine)
 						if (inst.IsOverridden(MatField::RoughnessTex)) { asset->roughnessTextureUUID = material.GetRoughnessTexture() ? material.GetRoughnessTexture()->GetUUID() : AssetUUID::Invalid(); asset->useRoughnessMap = material.IsUsingRoughnessMap(); }
 						if (inst.IsOverridden(MatField::AOTex)) { asset->aoTextureUUID = material.GetAOTexture() ? material.GetAOTexture()->GetUUID() : AssetUUID::Invalid(); asset->useAOMap = material.IsUsingAOMap(); }
 						if (inst.IsOverridden(MatField::HeightTex)) { asset->heightTextureUUID = material.GetHeightTexture() ? material.GetHeightTexture()->GetUUID() : AssetUUID::Invalid(); asset->useHeightMap = material.IsUsingHeightMap(); }
+						if (inst.IsOverridden(MatField::ARMTex)) { asset->armTextureUUID = material.GetARMTexture() ? material.GetARMTexture()->GetUUID() : AssetUUID::Invalid(); asset->useARMMap = material.IsUsingARMMap(); }
+						if (inst.IsOverridden(MatField::UseARMMap)) { asset->useARMMap = material.GetUseARMMap(); }
 
 						auto path = AssetManager::Get().GetRegistry().GetPath(asset->GetUUID());
 						MaterialSerializer::Save(asset, path);
@@ -1204,6 +1206,23 @@ void InspectorPanel::Draw(Engine* engine)
 						ImGui::SetNextItemWidth(aoW);
 						if (ImGui::SliderFloat("##aoval", &ao, 0.0f, 1.0f, "%.2f")) material.SetAO(ao);
 						if (inst.IsOverridden(MatField::AO)) RevertButton("R##aoval", [&]() { material.ClearAO(); });
+
+						UI::EndPropertyTable();
+					}
+				}
+
+				if (ImGui::CollapsingHeader("ARM##armhdr"))
+				{
+					if (UI::BeginPropertyTable("ARMTable"))
+					{
+						UI::PropertyLabel("Use ARM Map");
+						bool useARM = material.GetUseARMMap();
+						float armCheckW = inst.IsOverridden(MatField::UseARMMap) ? ImGui::GetContentRegionAvail().x - 26.0f : -FLT_MIN;
+						ImGui::SetNextItemWidth(armCheckW);
+						if (ImGui::Checkbox("##usearm", &useARM)) material.SetUseARMMap(useARM);
+						if (inst.IsOverridden(MatField::UseARMMap)) RevertButton("R##usearm", [&]() { material.ClearUseARMMap(); });
+
+						TextureSlot("ARM Map", "arm", inst.IsOverridden(MatField::ARMTex), material.GetARMTexture(), [&](AssetUUID u) { material.SetARMTexture(u); }, [&]() { material.ClearARMTexture(); });
 
 						UI::EndPropertyTable();
 					}

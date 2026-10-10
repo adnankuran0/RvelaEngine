@@ -19,6 +19,9 @@
 #include <Assimp/postprocess.h>
 #include <nlohmann/json.hpp>
 #include "MaterialSerializer.h"
+#include <fstream>
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb/stb_image_write.h"
 
 using namespace rv;
 using json = nlohmann::json;
@@ -265,35 +268,7 @@ void ModelImporter::ExtractTextures(
     AssetRegistry& registry,
     ModelImportResult& result)
 {
-    std::unordered_set<std::string> uniquePaths;
-
-    for (uint32_t i = 0; i < scene->mNumMaterials; ++i)
-    {
-        aiMaterial* mat = scene->mMaterials[i];
-        for (int type = aiTextureType_NONE + 1; type <= aiTextureType_UNKNOWN; ++type)
-        {
-            int count = mat->GetTextureCount((aiTextureType)type);
-            for (int t = 0; t < count; ++t)
-            {
-                aiString texPath;
-                if (mat->GetTexture((aiTextureType)type, t, &texPath) == AI_SUCCESS)
-                {
-                    auto resolved = ResolveRelativePath(texPath.C_Str(), modelPath);
-                    uniquePaths.insert(resolved.string());
-                }
-            }
-        }
-    }
-
-    for (const auto& pathStr : uniquePaths)
-    {
-        std::filesystem::path texPath = pathStr;
-        if (!std::filesystem::exists(texPath))
-        {
-            LOG_WARN("Texture not found: {}", pathStr);
-            continue;
-        }
-
+    auto ImportTextureFile = [&](const std::filesystem::path& texPath) -> AssetUUID {
         AssetMeta meta = registry.GetOrCreateMeta(texPath);
         auto cacheRoot = registry.GetAssetDir() / ".cache";
         auto cachePath = m_TextureImporter.GetCachePath(texPath, meta, cacheRoot);
@@ -324,12 +299,186 @@ void ModelImporter::ExtractTextures(
             else
             {
                 LOG_ERROR("Texture import failed: {}", texPath.string());
-                continue;
+                return AssetUUID::Invalid();
             }
         }
 
         registry.RegisterSubAsset(meta.uuid, cachePath, "TextureImporter");
-        result.textureUUIDs[pathStr] = meta.uuid;
+        return meta.uuid;
+    };
+
+    // 1. Extract all embedded textures (GLB, embedded FBX, etc.)
+    if (scene->mNumTextures > 0)
+    {
+        auto texturesDir = modelPath.parent_path() / (modelPath.stem().string() + "_Textures");
+        std::filesystem::create_directories(texturesDir);
+
+        for (uint32_t t = 0; t < scene->mNumTextures; ++t)
+        {
+            const aiTexture* embedded = scene->mTextures[t];
+            if (!embedded) continue;
+
+            std::string ext = "png";
+            if (embedded->mHeight == 0)
+            {
+                std::string hint = embedded->achFormatHint;
+                std::transform(hint.begin(), hint.end(), hint.begin(), ::tolower);
+                if (hint.find("jpg") != std::string::npos || hint.find("jpeg") != std::string::npos)
+                    ext = "jpg";
+                else if (hint.find("png") != std::string::npos)
+                    ext = "png";
+                else if (hint.find("tga") != std::string::npos)
+                    ext = "tga";
+                else if (hint.find("bmp") != std::string::npos)
+                    ext = "bmp";
+                else if (embedded->mWidth >= 4)
+                {
+                    const uint8_t* b = reinterpret_cast<const uint8_t*>(embedded->pcData);
+                    if (b[0] == 0x89 && b[1] == 'P' && b[2] == 'N' && b[3] == 'G')
+                        ext = "png";
+                    else if (b[0] == 0xFF && b[1] == 0xD8 && b[2] == 0xFF)
+                        ext = "jpg";
+                }
+            }
+
+            std::string stemName;
+            std::string rawName = embedded->mFilename.C_Str();
+            if (!rawName.empty() && rawName[0] != '*')
+            {
+                std::string clean = SanitizeFilename(std::filesystem::path(rawName).stem().string());
+                if (!clean.empty())
+                    stemName = modelPath.stem().string() + "_" + clean;
+            }
+            if (stemName.empty())
+            {
+                stemName = modelPath.stem().string() + "_embed_" + std::to_string(t);
+            }
+
+            auto outFilePath = texturesDir / (stemName + "." + ext);
+
+            bool writeOk = true;
+            if (!std::filesystem::exists(outFilePath))
+            {
+                if (embedded->mHeight == 0)
+                {
+                    std::ofstream out(outFilePath, std::ios::binary);
+                    if (out.is_open())
+                    {
+                        out.write(reinterpret_cast<const char*>(embedded->pcData), embedded->mWidth);
+                        out.close();
+                    }
+                    else writeOk = false;
+                }
+                else
+                {
+                    uint32_t w = embedded->mWidth;
+                    uint32_t h = embedded->mHeight;
+                    std::vector<uint8_t> rgba(w * h * 4);
+                    const aiTexel* texels = embedded->pcData;
+                    for (uint32_t i = 0; i < w * h; ++i)
+                    {
+                        rgba[i * 4 + 0] = texels[i].r;
+                        rgba[i * 4 + 1] = texels[i].g;
+                        rgba[i * 4 + 2] = texels[i].b;
+                        rgba[i * 4 + 3] = texels[i].a;
+                    }
+                    int ret = stbi_write_png(outFilePath.string().c_str(), w, h, 4, rgba.data(), w * 4);
+                    if (!ret) writeOk = false;
+                }
+            }
+
+            if (writeOk && std::filesystem::exists(outFilePath))
+            {
+                AssetUUID uuid = ImportTextureFile(outFilePath);
+                if (uuid.IsValid())
+                {
+                    std::string starKey = "*" + std::to_string(t);
+                    result.textureUUIDs[starKey] = uuid;
+                    result.textureUUIDs[outFilePath.string()] = uuid;
+                    result.textureUUIDs[outFilePath.lexically_normal().string()] = uuid;
+                    if (!rawName.empty())
+                    {
+                        result.textureUUIDs[rawName] = uuid;
+                        result.textureUUIDs[ResolveRelativePath(rawName, modelPath).string()] = uuid;
+                        result.textureUUIDs[ResolveRelativePath(rawName, modelPath).lexically_normal().string()] = uuid;
+                    }
+                }
+            }
+        }
+    }
+
+    // 2. Collect external textures from materials
+    std::unordered_map<std::string, std::filesystem::path> externalTextures;
+
+    for (uint32_t i = 0; i < scene->mNumMaterials; ++i)
+    {
+        aiMaterial* mat = scene->mMaterials[i];
+        for (int type = aiTextureType_NONE + 1; type <= aiTextureType_UNKNOWN; ++type)
+        {
+            int count = mat->GetTextureCount((aiTextureType)type);
+            for (int t = 0; t < count; ++t)
+            {
+                aiString texPath;
+                if (mat->GetTexture((aiTextureType)type, t, &texPath) == AI_SUCCESS)
+                {
+                    std::string rawPath = texPath.C_Str();
+                    if (rawPath.empty()) continue;
+                    if (result.textureUUIDs.contains(rawPath)) continue;
+
+                    if (const aiTexture* emb = scene->GetEmbeddedTexture(rawPath.c_str()))
+                    {
+                        continue;
+                    }
+
+                    auto resolved = ResolveRelativePath(rawPath, modelPath);
+                    if (!std::filesystem::exists(resolved))
+                    {
+                        auto fb1 = modelPath.parent_path() / resolved.filename();
+                        if (std::filesystem::exists(fb1))
+                            resolved = fb1;
+                        else
+                        {
+                            auto fb2 = modelPath.parent_path() / "textures" / resolved.filename();
+                            if (std::filesystem::exists(fb2))
+                                resolved = fb2;
+                            else
+                            {
+                                auto fb3 = modelPath.parent_path() / "Textures" / resolved.filename();
+                                if (std::filesystem::exists(fb3))
+                                    resolved = fb3;
+                            }
+                        }
+                    }
+
+                    if (std::filesystem::exists(resolved))
+                    {
+                        externalTextures[rawPath] = resolved.lexically_normal();
+                    }
+                    else
+                    {
+                        LOG_WARN("Texture not found: {}", rawPath);
+                    }
+                }
+            }
+        }
+    }
+
+    // Import external textures
+    for (const auto& [rawPath, texPath] : externalTextures)
+    {
+        std::string resolvedStr = texPath.string();
+        if (result.textureUUIDs.contains(resolvedStr))
+        {
+            result.textureUUIDs[rawPath] = result.textureUUIDs[resolvedStr];
+            continue;
+        }
+
+        AssetUUID uuid = ImportTextureFile(texPath);
+        if (uuid.IsValid())
+        {
+            result.textureUUIDs[resolvedStr] = uuid;
+            result.textureUUIDs[rawPath] = uuid;
+        }
     }
 }
 
@@ -340,6 +489,40 @@ void ModelImporter::ExtractMaterials(
     ModelImportResult& result)
 {
     AssetMeta parentMeta = registry.GetOrCreateMeta(modelPath);
+
+    auto GetTextureInfo = [&](aiMaterial* mat, aiTextureType type, int index = 0) -> std::pair<std::string, AssetUUID> {
+        aiString texPath;
+        if (mat->GetTexture(type, index, &texPath) == AI_SUCCESS)
+        {
+            std::string raw = texPath.C_Str();
+            if (raw.empty()) return { "", AssetUUID::Invalid() };
+
+            if (result.textureUUIDs.contains(raw))
+                return { raw, result.textureUUIDs.at(raw) };
+
+            auto resolved = ResolveRelativePath(raw, modelPath).lexically_normal().string();
+            if (result.textureUUIDs.contains(resolved))
+                return { raw, result.textureUUIDs.at(resolved) };
+
+            std::string fn = std::filesystem::path(raw).filename().string();
+            for (const auto& [key, uuid] : result.textureUUIDs)
+            {
+                if (std::filesystem::path(key).filename().string() == fn)
+                    return { raw, uuid };
+            }
+        }
+        return { "", AssetUUID::Invalid() };
+    };
+
+    auto isARMPathName = [](const std::string& path) -> bool {
+        std::string lower = path;
+        std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+        return lower.find("arm") != std::string::npos ||
+               lower.find("orm") != std::string::npos ||
+               lower.find("metallicroughness") != std::string::npos ||
+               lower.find("occlusionroughnessmetallic") != std::string::npos ||
+               lower.find("roughnessmetallic") != std::string::npos;
+    };
 
     for (uint32_t i = 0; i < scene->mNumMaterials; ++i)
     {
@@ -357,30 +540,24 @@ void ModelImporter::ExtractMaterials(
         }
 
         auto asset = CreateRef<MaterialAsset>(meta.uuid);
+        ai_real value;
 
-        aiString  texPath;
-        ai_real   value;
+        // 1. Albedo / Base Color
+        auto [albedoPath, albedoUUID] = GetTextureInfo(aiMat, aiTextureType_DIFFUSE);
+        if (!albedoUUID.IsValid())
+            std::tie(albedoPath, albedoUUID) = GetTextureInfo(aiMat, aiTextureType_BASE_COLOR);
 
-        // Albedo
-        if (aiMat->GetTexture(aiTextureType_DIFFUSE, 0, &texPath) == AI_SUCCESS ||
-            aiMat->GetTexture(aiTextureType_BASE_COLOR, 0, &texPath) == AI_SUCCESS)
+        if (albedoUUID.IsValid())
         {
-            auto resolved = ResolveRelativePath(texPath.C_Str(), modelPath).string();
-            if (result.textureUUIDs.contains(resolved))
-            {
-                asset->albedoTextureUUID = result.textureUUIDs.at(resolved);
-                asset->useAlbedoMap = true;
-            }
+            asset->albedoTextureUUID = albedoUUID;
+            asset->useAlbedoMap = true;
             asset->albedoColor = glm::vec4(1.0f);
         }
         else
         {
             aiColor4D aiColor(1.0f, 1.0f, 1.0f, 1.0f);
-            if (aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_DIFFUSE, &aiColor) == AI_SUCCESS)
-            {
-                asset->albedoColor = glm::vec4(aiColor.r, aiColor.g, aiColor.b, aiColor.a);
-            }
-            else if (aiGetMaterialColor(aiMat, AI_MATKEY_BASE_COLOR, &aiColor) == AI_SUCCESS)
+            if (aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_DIFFUSE, &aiColor) == AI_SUCCESS ||
+                aiGetMaterialColor(aiMat, AI_MATKEY_BASE_COLOR, &aiColor) == AI_SUCCESS)
             {
                 asset->albedoColor = glm::vec4(aiColor.r, aiColor.g, aiColor.b, aiColor.a);
             }
@@ -390,56 +567,111 @@ void ModelImporter::ExtractMaterials(
             }
         }
 
-        // Normal
-        if (aiMat->GetTexture(aiTextureType_NORMALS, 0, &texPath) == AI_SUCCESS ||
-            aiMat->GetTexture(aiTextureType_HEIGHT, 0, &texPath) == AI_SUCCESS)
+        // 2. Normal
+        auto [normalPath, normalUUID] = GetTextureInfo(aiMat, aiTextureType_NORMALS);
+        if (!normalUUID.IsValid())
+            std::tie(normalPath, normalUUID) = GetTextureInfo(aiMat, aiTextureType_HEIGHT);
+
+        if (normalUUID.IsValid())
         {
-            auto resolved = ResolveRelativePath(texPath.C_Str(), modelPath).string();
-            if (result.textureUUIDs.contains(resolved))
-            {
-                asset->normalTextureUUID = result.textureUUIDs.at(resolved);
-                asset->useNormalMap = true;
-            }
+            asset->normalTextureUUID = normalUUID;
+            asset->useNormalMap = true;
         }
 
-        // Metallic
-        if (aiMat->GetTexture(aiTextureType_METALNESS, 0, &texPath) == AI_SUCCESS)
+        // 3. Metallic, Roughness, AO & ARM Detection
+        auto [metalPath, metalUUID] = GetTextureInfo(aiMat, aiTextureType_METALNESS);
+
+        auto [roughPath, roughUUID] = GetTextureInfo(aiMat, aiTextureType_DIFFUSE_ROUGHNESS);
+        if (!roughUUID.IsValid())
+            std::tie(roughPath, roughUUID) = GetTextureInfo(aiMat, aiTextureType_SHININESS);
+        if (!roughUUID.IsValid())
+            std::tie(roughPath, roughUUID) = GetTextureInfo(aiMat, aiTextureType_UNKNOWN);
+
+        auto [aoPath, aoUUID] = GetTextureInfo(aiMat, aiTextureType_AMBIENT_OCCLUSION);
+        if (!aoUUID.IsValid())
+            std::tie(aoPath, aoUUID) = GetTextureInfo(aiMat, aiTextureType_LIGHTMAP);
+
+        bool isARM = false;
+        AssetUUID armUUID = AssetUUID::Invalid();
+
+        if (metalUUID.IsValid() && roughUUID.IsValid() && metalUUID == roughUUID)
         {
-            auto resolved = ResolveRelativePath(texPath.C_Str(), modelPath).string();
-            if (result.textureUUIDs.contains(resolved))
+            isARM = true;
+            armUUID = metalUUID;
+        }
+        else if (metalUUID.IsValid() && isARMPathName(metalPath))
+        {
+            isARM = true;
+            armUUID = metalUUID;
+        }
+        else if (roughUUID.IsValid() && isARMPathName(roughPath))
+        {
+            isARM = true;
+            armUUID = roughUUID;
+        }
+        else if (aoUUID.IsValid() && isARMPathName(aoPath))
+        {
+            isARM = true;
+            armUUID = aoUUID;
+        }
+
+        if (isARM && armUUID.IsValid())
+        {
+            asset->useARMMap = true;
+            asset->armTextureUUID = armUUID;
+            asset->useMetallicMap = false;
+            asset->useRoughnessMap = false;
+
+            if (!aoUUID.IsValid() || aoUUID == armUUID)
             {
-                asset->metallicTextureUUID = result.textureUUIDs.at(resolved);
+                asset->useAOMap = false;
+            }
+            else
+            {
+                asset->useAOMap = true;
+                asset->aoTextureUUID = aoUUID;
+            }
+        }
+        else
+        {
+            asset->useARMMap = false;
+
+            if (metalUUID.IsValid())
+            {
+                asset->metallicTextureUUID = metalUUID;
                 asset->useMetallicMap = true;
             }
-        }
-        else if (aiGetMaterialFloat(aiMat, AI_MATKEY_METALLIC_FACTOR, &value) == AI_SUCCESS)
-            asset->metallic = static_cast<float>(value);
 
-        // Roughness
-        if (aiMat->GetTexture(aiTextureType_DIFFUSE_ROUGHNESS, 0, &texPath) == AI_SUCCESS ||
-            aiMat->GetTexture(aiTextureType_SHININESS, 0, &texPath) == AI_SUCCESS ||
-            aiMat->GetTexture(aiTextureType_UNKNOWN, 0, &texPath) == AI_SUCCESS)
-        {
-            auto resolved = ResolveRelativePath(texPath.C_Str(), modelPath).string();
-            if (result.textureUUIDs.contains(resolved))
+            if (roughUUID.IsValid())
             {
-                asset->roughnessTextureUUID = result.textureUUIDs.at(resolved);
+                asset->roughnessTextureUUID = roughUUID;
                 asset->useRoughnessMap = true;
             }
-        }
-        else if (aiGetMaterialFloat(aiMat, AI_MATKEY_ROUGHNESS_FACTOR, &value) == AI_SUCCESS)
-            asset->roughness = static_cast<float>(value);
 
-        // AO
-        if (aiMat->GetTexture(aiTextureType_AMBIENT_OCCLUSION, 0, &texPath) == AI_SUCCESS)
-        {
-            auto resolved = ResolveRelativePath(texPath.C_Str(), modelPath).string();
-            if (result.textureUUIDs.contains(resolved))
+            if (aoUUID.IsValid())
             {
-                asset->aoTextureUUID = result.textureUUIDs.at(resolved);
+                asset->aoTextureUUID = aoUUID;
                 asset->useAOMap = true;
             }
         }
+
+        // Values
+        if (aiGetMaterialFloat(aiMat, AI_MATKEY_METALLIC_FACTOR, &value) == AI_SUCCESS)
+            asset->metallic = static_cast<float>(value);
+
+        if (aiGetMaterialFloat(aiMat, AI_MATKEY_ROUGHNESS_FACTOR, &value) == AI_SUCCESS)
+            asset->roughness = static_cast<float>(value);
+
+        // Emissive
+        aiColor4D emissiveColor(0.0f, 0.0f, 0.0f, 1.0f);
+        if (aiGetMaterialColor(aiMat, AI_MATKEY_COLOR_EMISSIVE, &emissiveColor) == AI_SUCCESS)
+        {
+            asset->emissiveColor = glm::vec3(emissiveColor.r, emissiveColor.g, emissiveColor.b);
+            if (asset->emissiveColor.r > 0.0f || asset->emissiveColor.g > 0.0f || asset->emissiveColor.b > 0.0f)
+                asset->emissiveIntensity = 1.0f;
+        }
+        if (aiGetMaterialFloat(aiMat, AI_MATKEY_EMISSIVE_INTENSITY, &value) == AI_SUCCESS)
+            asset->emissiveIntensity = static_cast<float>(value);
 
         // UV Transform
         aiUVTransform uvTransform;

@@ -77,6 +77,10 @@ json MaterialInstance::SerializeOverrides() const
         j["aoTex"] = m_AOTex ? m_AOTex->GetUUID().ToString() : "";
     if (IsOverridden(MatField::HeightTex))
         j["heightTex"] = m_HeightTex ? m_HeightTex->GetUUID().ToString() : "";
+    if (IsOverridden(MatField::ARMTex))
+        j["armTex"] = m_ARMTex ? m_ARMTex->GetUUID().ToString() : "";
+    if (IsOverridden(MatField::UseARMMap))
+        j["useARMMap"] = m_UseARMMap;
 
     return j;
 }
@@ -216,6 +220,12 @@ void MaterialInstance::DeserializeOverrides(const json& j)
     loadTex("roughnessTex", m_RoughnessTex, m_UseRoughnessMap, MatField::RoughnessTex);
     loadTex("aoTex", m_AOTex, m_UseAOMap, MatField::AOTex);
     loadTex("heightTex", m_HeightTex, m_UseHeightMap, MatField::HeightTex);
+    loadTex("armTex", m_ARMTex, m_UseARMMap, MatField::ARMTex);
+    if (j.contains("useARMMap"))
+    {
+        m_UseARMMap = j["useARMMap"].get<bool>();
+        SetOverride(MatField::UseARMMap);
+    }
 }
 
 void MaterialInstance::RebuildCache()
@@ -228,4 +238,5 @@ void MaterialInstance::RebuildCache()
     m_CachedRoughnessTex = m_SourceAsset->useRoughnessMap ? mgr.GetAsset<TextureAsset>(m_SourceAsset->roughnessTextureUUID) : nullptr;
     m_CachedAOTex = m_SourceAsset->useAOMap ? mgr.GetAsset<TextureAsset>(m_SourceAsset->aoTextureUUID) : nullptr;
     m_CachedHeightTex = m_SourceAsset->useHeightMap ? mgr.GetAsset<TextureAsset>(m_SourceAsset->heightTextureUUID) : nullptr;
+    m_CachedARMTex = m_SourceAsset->useARMMap ? mgr.GetAsset<TextureAsset>(m_SourceAsset->armTextureUUID) : nullptr;
 }

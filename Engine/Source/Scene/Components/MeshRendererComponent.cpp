@@ -7,6 +7,12 @@ void MeshRendererComponent::RecreateFromMesh(Ref<MeshAsset> mesh)
 {
     Destroy();
 
+    if (!mesh || !mesh->IsValid())
+    {
+        indexCount = 0;
+        return;
+    }
+
     std::vector<float> packedVertices;
     PackVertices(mesh->GetVertices(), packedVertices);
 

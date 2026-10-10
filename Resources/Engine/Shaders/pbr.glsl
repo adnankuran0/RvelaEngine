@@ -117,6 +117,7 @@ layout(binding = 2) uniform sampler2D metallicMap;
 layout(binding = 3) uniform sampler2D roughnessMap;
 layout(binding = 4) uniform sampler2D aoMap;
 layout(binding = 5) uniform sampler2D heightMap;
+layout(binding = 12) uniform sampler2D armMap;
 
 uniform bool useAlbedoMap;
 uniform bool useNormalMap;
@@ -124,6 +125,7 @@ uniform bool useMetallicMap;
 uniform bool useRoughnessMap;
 uniform bool useAOMap;
 uniform bool useHeightMap;
+uniform bool useARMMap;
 
 uniform bool useTriplanar;
 uniform bool useWorldTriplanar;
@@ -301,9 +303,19 @@ void main()
         vec3 triWeights = getTriplanarWeights(triGeomNormal, triplanarSharpness);
 
         albedoTex = useAlbedoMap ? sampleTriplanar(albedoMap, triP, triWeights) : vec4(1.0);
-        metallic = useMetallicMap ? sampleTriplanar(metallicMap, triP, triWeights).r : metallicValue;
-        roughnessMapValue = useRoughnessMap ? sampleTriplanar(roughnessMap, triP, triWeights).r : 1.0;
-        materialAO = useAOMap ? sampleTriplanar(aoMap, triP, triWeights).r : aoValue;
+        if (useARMMap)
+        {
+            vec3 arm = sampleTriplanar(armMap, triP, triWeights).rgb;
+            materialAO = useAOMap ? sampleTriplanar(aoMap, triP, triWeights).r : (arm.r * aoValue);
+            roughnessMapValue = arm.g;
+            metallic = arm.b * metallicValue;
+        }
+        else
+        {
+            metallic = useMetallicMap ? sampleTriplanar(metallicMap, triP, triWeights).r : metallicValue;
+            roughnessMapValue = useRoughnessMap ? sampleTriplanar(roughnessMap, triP, triWeights).r : 1.0;
+            materialAO = useAOMap ? sampleTriplanar(aoMap, triP, triWeights).r : aoValue;
+        }
 
         if (useNormalMap)
         {
@@ -322,9 +334,19 @@ void main()
         vec2 mappedTexCoords = parallaxOcclusionMapping(TexCoords, viewDirTS);
 
         albedoTex = useAlbedoMap ? texture(albedoMap, mappedTexCoords) : vec4(1.0);
-        metallic = useMetallicMap ? texture(metallicMap, mappedTexCoords).r : metallicValue;
-        roughnessMapValue = useRoughnessMap ? texture(roughnessMap, mappedTexCoords).r : 1.0;
-        materialAO = useAOMap ? texture(aoMap, mappedTexCoords).r : aoValue;
+        if (useARMMap)
+        {
+            vec3 arm = texture(armMap, mappedTexCoords).rgb;
+            materialAO = useAOMap ? texture(aoMap, mappedTexCoords).r : (arm.r * aoValue);
+            roughnessMapValue = arm.g;
+            metallic = arm.b * metallicValue;
+        }
+        else
+        {
+            metallic = useMetallicMap ? texture(metallicMap, mappedTexCoords).r : metallicValue;
+            roughnessMapValue = useRoughnessMap ? texture(roughnessMap, mappedTexCoords).r : 1.0;
+            materialAO = useAOMap ? texture(aoMap, mappedTexCoords).r : aoValue;
+        }
         Nmap = getNormalFromMap(mappedTexCoords, N, T, B);
     }
 

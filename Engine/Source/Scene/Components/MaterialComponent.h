@@ -113,6 +113,7 @@ public:
     bool IsUsingRoughnessMap() const { return m_Instance.UsesRoughnessMap(); }
     bool IsUsingAOMap() const { return m_Instance.UsesAOMap(); }
     bool IsUsingHeightMap() const { return m_Instance.UsesHeightMap(); }
+    bool IsUsingARMMap() const { return m_Instance.UsesARMMap(); }
 
     Ref<TextureAsset> GetAlbedoTexture() const { return m_Instance.GetAlbedoTexture(); }
     Ref<TextureAsset> GetNormalTexture() const { return m_Instance.GetNormalTexture(); }
@@ -120,6 +121,7 @@ public:
     Ref<TextureAsset> GetRoughnessTexture() const { return m_Instance.GetRoughnessTex(); }
     Ref<TextureAsset> GetAOTexture() const { return m_Instance.GetAOTexture(); }
     Ref<TextureAsset> GetHeightTexture() const { return m_Instance.GetHeightTexture(); }
+    Ref<TextureAsset> GetARMTexture() const { return m_Instance.GetARMTexture(); }
 
     void SetAlbedoTexture(const AssetUUID& uuid) { m_Instance.SetAlbedoTexture(AssetManager::Get().GetAsset<TextureAsset>(uuid)); }
     void SetNormalTexture(const AssetUUID& uuid) { m_Instance.SetNormalTexture(AssetManager::Get().GetAsset<TextureAsset>(uuid)); }
@@ -127,6 +129,7 @@ public:
     void SetRoughnessTexture(const AssetUUID& uuid) { m_Instance.SetRoughnessTexture(AssetManager::Get().GetAsset<TextureAsset>(uuid)); }
     void SetAOTexture(const AssetUUID& uuid) { m_Instance.SetAOTexture(AssetManager::Get().GetAsset<TextureAsset>(uuid)); }
     void SetHeightTexture(const AssetUUID& uuid) { m_Instance.SetHeightTexture(AssetManager::Get().GetAsset<TextureAsset>(uuid)); }
+    void SetARMTexture(const AssetUUID& uuid) { m_Instance.SetARMTexture(AssetManager::Get().GetAsset<TextureAsset>(uuid)); }
 
     void ClearAlbedoTexture() { m_Instance.ClearAlbedoTexture(); }
     void ClearNormalTexture() { m_Instance.ClearNormalTexture(); }
@@ -134,6 +137,11 @@ public:
     void ClearRoughnessTexture() { m_Instance.ClearRoughnessTexture(); }
     void ClearAOTexture() { m_Instance.ClearAOTexture(); }
     void ClearHeightTexture() { m_Instance.ClearHeightTexture(); }
+    void ClearARMTexture() { m_Instance.ClearARMTexture(); }
+
+    bool GetUseARMMap() const { return m_Instance.GetUseARMMap(); }
+    void SetUseARMMap(bool v) { m_Instance.SetUseARMMap(v); }
+    void ClearUseARMMap() { m_Instance.ClearUseARMMap(); }
 
     Sampler& GetSampler() { return m_Instance.GetSampler(); }
     const Sampler& GetSampler() const { return m_Instance.GetSampler(); }

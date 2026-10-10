@@ -26,7 +26,8 @@ public:
     MeshRendererComponent& operator=(MeshRendererComponent&&) = default;
     MeshRendererComponent(Ref<MeshAsset> mesh)
     {
-        RecreateFromMesh(mesh);
+        if (mesh)
+            RecreateFromMesh(mesh);
     }
 
     void RecreateFromMesh(Ref<MeshAsset> mesh);

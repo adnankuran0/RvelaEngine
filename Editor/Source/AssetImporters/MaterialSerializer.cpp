@@ -50,6 +50,9 @@ bool MaterialSerializer::Save(const Ref<MaterialAsset>& asset, const std::filesy
     j["useHeightMap"] = asset->useHeightMap;
     if (asset->useHeightMap) j["heightTexture"] = asset->heightTextureUUID.ToString();
 
+    j["useARMMap"] = asset->useARMMap;
+    if (asset->useARMMap) j["armTexture"] = asset->armTextureUUID.ToString();
+
     j["emissiveColor"] = { asset->emissiveColor.r, asset->emissiveColor.g, asset->emissiveColor.b };
     j["emissiveIntensity"] = asset->emissiveIntensity;
     j["specular"] = asset->specular;
@@ -128,6 +131,10 @@ bool MaterialSerializer::Load(const Ref<MaterialAsset>& asset, const std::filesy
     asset->useHeightMap = j.value("useHeightMap", false);
     if (j.contains("heightTexture"))
         asset->heightTextureUUID = AssetUUID::FromString(j["heightTexture"].get<std::string>());
+
+    asset->useARMMap = j.value("useARMMap", false);
+    if (j.contains("armTexture"))
+        asset->armTextureUUID = AssetUUID::FromString(j["armTexture"].get<std::string>());
 
     if (j.contains("emissiveColor"))
     {
