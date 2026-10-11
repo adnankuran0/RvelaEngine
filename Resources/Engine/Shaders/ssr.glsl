@@ -21,175 +21,139 @@ layout(location = 0) out vec4 FragColor;
 
 layout(binding = 0) uniform sampler2D uDepthTexture;
 layout(binding = 1) uniform sampler2D uNormalTexture;
-layout(binding = 2) uniform sampler2D uMetallicTexture;
-layout(binding = 3) uniform sampler2D uRoughnessTexture;
+layout(binding = 2) uniform sampler2D uRoughnessTexture;
+layout(binding = 3) uniform sampler2D uMetallicTexture;
 layout(binding = 4) uniform sampler2D uScreenTexture;
 layout(binding = 5) uniform samplerCube uSkybox;
 
-const int MAX_STEPS = 20;
-const int BINARY_SEARCH_STEPS = 5;
-const float INITIAL_RAY_STEP = 0.1;
-const float DEPTH_BIAS = 0.05;
-const float MAX_DISTANCE = 50.0;
-const float MIN_RAY_STEP = 0.01;
-const float RAY_HIT_THRESHOLD = 0.01;
+uniform int uMaxSteps = 32;
+uniform float uMaxDistance = 25.0;
+uniform float uThickness = 0.5;
+uniform float uEdgeFade = 0.15;
+uniform float uMaxRoughness = 0.6;
 
-vec3 projectToScreen(vec3 worldPos) {
-    vec4 clipPos = projection * (view * vec4(worldPos, 1.0));
-    vec3 ndcPos = clipPos.xyz / clipPos.w;
-    return vec3(ndcPos.xy * 0.5 + 0.5, ndcPos.z * 0.5 + 0.5);
-}
-
-vec3 rayMarch(vec3 rayStart, vec3 rayDir, float roughness, out bool hit) 
+void main()
 {
-    hit = false;
-    vec3 currentPos = rayStart;
-    
-    float rayStep = mix(INITIAL_RAY_STEP, INITIAL_RAY_STEP * 2.0, roughness);
-    float stepFactor = 0.95;
-    vec3 stepVec = rayDir * rayStep;
-    float maxDistSq = MAX_DISTANCE * MAX_DISTANCE;
-    float distSq = 0.0;
-    
-    for (int i = 0; i < MAX_STEPS; i++) 
+    vec2 uv = TexCoord;
+
+    float depth = texture(uDepthTexture, uv).r;
+    if (depth >= 0.99999)
     {
-        currentPos += stepVec;
-        vec3 screenPos = projectToScreen(currentPos);
-        
-        if (any(lessThan(screenPos.xy, vec2(0.0)))) break;
-        if (any(greaterThan(screenPos.xy, vec2(1.0)))) break;
-        
-        vec3 toCurrent = currentPos - camPos;
-        distSq = dot(toCurrent, toCurrent);
-        if (distSq > maxDistSq) break;
-        
-        float sampledDepth = texture(uDepthTexture, screenPos.xy).r;
-        if (sampledDepth > 0.999) continue;
-        
-        float rayDepth = sqrt(distSq);
-        vec3 sampledViewPos = ReconstructViewPos(screenPos.xy, sampledDepth, invProjection);
-        vec4 sampledWorldPosTemp = invView * vec4(sampledViewPos, 1.0);
-        vec3 sampledWorldPos = sampledWorldPosTemp.xyz / sampledWorldPosTemp.w;
-        
-        float surfaceDepth = distance(camPos, sampledWorldPos);
-        if (rayDepth > surfaceDepth + DEPTH_BIAS) 
+        FragColor = vec4(0.0);
+        return;
+    }
+
+    float roughness = texture(uRoughnessTexture, uv).r;
+    if (roughness > uMaxRoughness)
+    {
+        FragColor = vec4(0.0);
+        return;
+    }
+
+    float metallic = texture(uMetallicTexture, uv).r;
+
+    vec3 viewPos = ReconstructViewPos(uv, depth, invProjection);
+    vec3 viewNormal = normalize(texture(uNormalTexture, uv).xyz);
+
+    vec3 viewDir = normalize(viewPos);
+    vec3 reflectDir = normalize(reflect(viewDir, viewNormal));
+
+    if (reflectDir.z > 0.05)
+    {
+        FragColor = vec4(0.0);
+        return;
+    }
+
+    float stepSize = uMaxDistance / float(uMaxSteps);
+    vec3 rayStep = reflectDir * stepSize;
+    vec3 rayPos = viewPos + rayStep * 0.5;
+
+    bool hit = false;
+    vec2 hitUV = vec2(0.0);
+    float hitDistance = 0.0;
+
+    for (int i = 0; i < uMaxSteps; ++i)
+    {
+        rayPos += rayStep;
+
+        vec4 clip = projection * vec4(rayPos, 1.0);
+        if (clip.w <= 0.0) break;
+
+        vec2 sampleUV = (clip.xy / clip.w) * 0.5 + 0.5;
+        if (sampleUV.x < 0.0 || sampleUV.x > 1.0 || sampleUV.y < 0.0 || sampleUV.y > 1.0)
+            break;
+
+        float sampleDepth = texture(uDepthTexture, sampleUV).r;
+        if (sampleDepth >= 0.99999) continue;
+
+        vec3 scenePos = ReconstructViewPos(sampleUV, sampleDepth, invProjection);
+
+        float rayDepth = -rayPos.z;
+        float sceneDepth = -scenePos.z;
+        float depthDiff = rayDepth - sceneDepth;
+
+        if (depthDiff > 0.0 && depthDiff < uThickness)
         {
-            vec3 hitPos = currentPos - stepVec;
-            vec3 refineStep = stepVec * 0.5;
-            
-            for (int j = 0; j < BINARY_SEARCH_STEPS; j++) {
-                hitPos += refineStep;
-                vec3 refinedScreenPos = projectToScreen(hitPos);
-                
-                if (all(greaterThanEqual(refinedScreenPos.xy, vec2(0.0))) && 
-                    all(lessThanEqual(refinedScreenPos.xy, vec2(1.0)))) {
-                    
-                    float refinedDepth = texture(uDepthTexture, refinedScreenPos.xy).r;
-                    if (refinedDepth < 0.999) {
-                        vec3 refinedSampledViewPos = ReconstructViewPos(refinedScreenPos.xy, refinedDepth, invProjection);
-                        vec4 refinedSampledWorldPosTemp = invView * vec4(refinedSampledViewPos, 1.0);
-                        vec3 refinedSampledWorldPos = refinedSampledWorldPosTemp.xyz / refinedSampledWorldPosTemp.w;
-                        
-                        float refinedRayDepth = distance(camPos, hitPos);
-                        float refinedSurfaceDepth = distance(camPos, refinedSampledWorldPos);
-                        
-                        if (abs(refinedRayDepth - refinedSurfaceDepth) < RAY_HIT_THRESHOLD) break;
-                        
-                        if (refinedRayDepth > refinedSurfaceDepth + DEPTH_BIAS) {
-                            hitPos -= refineStep;
-                        }
-                    }
+            vec3 startP = rayPos - rayStep;
+            vec3 endP = rayPos;
+
+            for (int j = 0; j < 4; ++j)
+            {
+                vec3 midP = (startP + endP) * 0.5;
+                vec4 midClip = projection * vec4(midP, 1.0);
+                vec2 midUV = (midClip.xy / midClip.w) * 0.5 + 0.5;
+                float midDepth = texture(uDepthTexture, midUV).r;
+                vec3 midScene = ReconstructViewPos(midUV, midDepth, invProjection);
+                float diff = (-midP.z) - (-midScene.z);
+
+                if (diff > 0.0 && diff < uThickness)
+                {
+                    endP = midP;
+                    sampleUV = midUV;
                 }
-                refineStep *= 0.5;
+                else
+                {
+                    startP = midP;
+                }
             }
-            
-            hit = true;
-            return projectToScreen(hitPos);
-        }
-        
-        rayStep = max(rayStep * stepFactor, MIN_RAY_STEP);
-        stepVec = rayDir * rayStep;
-    }
-    
-    return vec3(0.0);
-}
 
-void main() {
-    vec2 halfResUV = gl_FragCoord.xy / (windowSize * 0.5);
-    vec2 texCoord = halfResUV;
-    
-    float depth = texture(uDepthTexture, texCoord).r;
-    if (depth > 0.999) {
+            vec3 hitNormal = normalize(texture(uNormalTexture, sampleUV).xyz);
+            if (dot(hitNormal, reflectDir) < 0.0)
+            {
+                hit = true;
+                hitUV = sampleUV;
+                hitDistance = length(endP - viewPos);
+                break;
+            }
+        }
+    }
+
+    if (!hit)
+    {
         FragColor = vec4(0.0);
         return;
     }
-    
-    vec3 normal = texture(uNormalTexture, texCoord).xyz;
-    float roughness = texture(uRoughnessTexture, texCoord).r;
-    float metallic = texture(uMetallicTexture, texCoord).r;
-    
-    float reflectionProbability = mix(1.0 - roughness, 1.0, metallic);
-    if (reflectionProbability < 0.1) {
+
+    vec2 edgeDist = min(hitUV, 1.0 - hitUV);
+    float edgeFactor = min(edgeDist.x, edgeDist.y);
+    float edgeFade = smoothstep(0.0, uEdgeFade, edgeFactor);
+
+    float distFade = 1.0 - smoothstep(uMaxDistance * 0.5, uMaxDistance, hitDistance);
+
+    float roughnessFade = 1.0 - smoothstep(0.0, uMaxRoughness, roughness);
+
+    float dirFade = clamp(-reflectDir.z * 5.0, 0.0, 1.0);
+
+    float nDotV = clamp(dot(viewNormal, -viewDir), 0.0, 1.0);
+    float fresnel = mix(0.04, 1.0, pow(1.0 - nDotV, 5.0));
+    float finalAlpha = mix(fresnel, 1.0, metallic) * edgeFade * distFade * roughnessFade * dirFade;
+
+    if (finalAlpha <= 0.001)
+    {
         FragColor = vec4(0.0);
         return;
     }
-    
-    vec3 viewPos = ReconstructViewPos(texCoord, depth, invProjection);
-    vec4 worldPosTemp = invView * vec4(viewPos, 1.0);
-    vec3 worldPos = worldPosTemp.xyz / worldPosTemp.w;
-    
-    vec3 viewDir = normalize(worldPos - camPos);
-    vec3 worldNormal = mat3(invView) * normal;
-    vec3 reflectionDir = reflect(viewDir, normalize(worldNormal));
-    
-    float roughnessJitter = roughness * roughness * 0.2;
-    float rand1 = fract(sin(dot(texCoord, vec2(12.9898, 78.233))) * 43758.5453);
-    float rand2 = fract(sin(dot(texCoord, vec2(39.346, 11.135))) * 87653.2315);
-    vec3 jitter = vec3(rand1 * 2.0 - 1.0, rand2 * 2.0 - 1.0, 0.0);
-    reflectionDir = normalize(reflectionDir + roughnessJitter * jitter);
-    
-    bool hit;
-    vec3 hitScreenPos = rayMarch(worldPos, reflectionDir, roughness, hit);
-    
-    if (hit) {
-        vec2 edgeFade = smoothstep(0.0, 0.1, hitScreenPos.xy) * 
-                       smoothstep(1.0, 0.9, hitScreenPos.xy);
-        float fadeFactor = edgeFade.x * edgeFade.y;
-        
-        if (fadeFactor < 0.01) {
-            FragColor = vec4(0.0);
-            return;
-        }
-        
-        vec3 reflectionColor = texture(uScreenTexture, hitScreenPos.xy).rgb;
-        
-        float fresnel = pow(1.0 - max(dot(-viewDir, worldNormal), 0.0), 5.0);
-        float fresnelFactor = mix(mix(0.04, 0.2, fresnel), mix(0.7, 1.0, fresnel), metallic);
-        
-        float roughnessAtt = 1.0 / (1.0 + roughness * roughness * 10.0);
-        float reflectionStrength = fresnelFactor * roughnessAtt * mix(0.3, 1.0, metallic) * fadeFactor;
-        
-        if (roughness > 0.2) {
-            vec2 texelSize = 1.0 / windowSize;
 
-            vec3 c0 = texture(uScreenTexture, hitScreenPos.xy).rgb;
-            vec3 c1 = texture(uScreenTexture, hitScreenPos.xy + vec2(texelSize.x, 0)).rgb;
-            vec3 c2 = texture(uScreenTexture, hitScreenPos.xy + vec2(0, texelSize.y)).rgb;
-
-            reflectionColor = (c0 + c1 + c2) * 0.333;
-        }
-        
-        FragColor = vec4(reflectionColor, reflectionStrength);
-    } 
-    else {
-        vec3 envColor = texture(uSkybox, reflectionDir).rgb;
-        
-        float fresnel = pow(1.0 - max(dot(-viewDir, worldNormal), 0.0), 5.0);
-        float reflectionStrength = mix(0.04, 1.0, fresnel);
-
-        reflectionStrength *= 1.0 - roughness; 
-        reflectionStrength *= metallic;          
-
-        FragColor = vec4(envColor * reflectionStrength, reflectionStrength);
-    }
+    vec3 hitColor = texture(uScreenTexture, hitUV).rgb;
+    FragColor = vec4(hitColor, finalAlpha);
 }

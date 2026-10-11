@@ -35,8 +35,6 @@ void main()
     vec3 bloomColor = texture(bloomTexture, TexCoords).rgb;
     vec4 ssrSample  = texture(ssrTexture,  TexCoords);
 
-    hdrColor = mix(hdrColor, hdrColor + ssrSample.rgb, ssrSample.a);
-
     vec3 combined = hdrColor + bloomColor * bloomIntensity;
 
     combined    = vec3(1.0) - exp(-combined * exposure);

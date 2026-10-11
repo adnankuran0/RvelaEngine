@@ -23,6 +23,8 @@ void SSRPass::Init(const RenderContext& ctx, RenderFrame& frame)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, w, h, 0, GL_RGBA, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, o_SsrTexture, 0);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -43,12 +45,24 @@ void SSRPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
     if (!ctx.environment->SSR) return;
 
+    auto& env = *ctx.environment;
+
     auto i_Depth = frame.registry.Get("DepthTexture")->id;
     auto i_Normal = frame.registry.Get("NormalTexture")->id;
     auto i_Roughness = frame.registry.Get("RoughnessTexture")->id;
     auto i_Metallic = frame.registry.Get("MetallicTexture")->id;
     auto i_Screen = frame.registry.Get("ScreenTexture")->id;
     auto i_Skybox = frame.registry.Get("SkyboxTexture")->id;
+    auto screenFBO = frame.registry.Get("ScreenBuffer")->id;
+    auto intermediateFBO = frame.registry.Get("IntermediateBuffer")->id;
+
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, screenFBO);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, intermediateFBO);
+    glBlitFramebuffer(
+        0, 0, ctx.viewportWidth, ctx.viewportHeight,
+        0, 0, ctx.viewportWidth, ctx.viewportHeight,
+        GL_COLOR_BUFFER_BIT, GL_NEAREST
+    );
 
     Shader& ssrShader = ShaderManager::Get("SSR");
     glDisable(GL_DEPTH_TEST);
@@ -72,12 +86,43 @@ void SSRPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     ssrShader.setInt("uScreenTexture", 4);
     ssrShader.setInt("uSkybox", 5);
 
+    ssrShader.setInt("uMaxSteps", env.SSR_MaxSteps);
+    ssrShader.setFloat("uMaxDistance", env.SSR_MaxDistance);
+    ssrShader.setFloat("uThickness", env.SSR_Thickness);
+    ssrShader.setFloat("uEdgeFade", env.SSR_EdgeFade);
+    ssrShader.setFloat("uMaxRoughness", env.SSR_MaxRoughness);
+
     Renderer::DrawFullScreenQuad();
 
+    glBindFramebuffer(GL_FRAMEBUFFER, screenFBO);
+    glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendEquation(GL_FUNC_ADD);
+    glDisable(GL_DEPTH_TEST);
+    glDepthMask(GL_FALSE);
+
+    Shader& blendShader = ShaderManager::Get("SSRBlend");
+    blendShader.use();
+    blendShader.setInt("u_SSRTexture", 0);
+    glBindTextureUnit(0, o_SsrTexture);
+
+    Renderer::DrawFullScreenQuad();
+
+    glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
+
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, screenFBO);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, intermediateFBO);
+    glBlitFramebuffer(
+        0, 0, ctx.viewportWidth, ctx.viewportHeight,
+        0, 0, ctx.viewportWidth, ctx.viewportHeight,
+        GL_COLOR_BUFFER_BIT, GL_NEAREST
+    );
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
 
     frame.registry.Register("SSRTexture", { RenderResourceType::Texture, o_SsrTexture });
 }

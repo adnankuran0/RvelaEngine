@@ -659,7 +659,7 @@
                     0.9999991655349731
                 ]
             },
-            "UUID": 10406115913290908098
+            "UUID": 18041917450133973391
         },
         {
             "Material": {
@@ -1446,7 +1446,7 @@
                     1.0
                 ]
             },
-            "UUID": 6449139815643729229
+            "UUID": 9106370362046832226
         },
         {
             "ParentUUID": 0,
@@ -1628,7 +1628,7 @@
                     0.3500000238418579
                 ]
             },
-            "UUID": 15329246333823611039
+            "UUID": 11141740964970536366
         },
         {
             "ConvexHullColliderComponent": {
@@ -1730,6 +1730,11 @@
         "SSAO_Bias": 0.02500000037252903,
         "SSAO_Intensity": 1.0,
         "SSAO_Radius": 1.0,
-        "SSR": false
+        "SSR": true,
+        "SSR_EdgeFade": 0.15000000596046448,
+        "SSR_MaxDistance": 25.0,
+        "SSR_MaxRoughness": 0.6000000238418579,
+        "SSR_MaxSteps": 64,
+        "SSR_Thickness": 0.5
     }
 }

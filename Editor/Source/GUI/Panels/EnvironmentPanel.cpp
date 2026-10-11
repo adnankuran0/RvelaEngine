@@ -121,7 +121,18 @@ void EnvironmentPanel::Draw(Engine* engine)
         ImGui::SliderFloat("Bias", &env.SSAO_Bias, 0.0f, 0.1f);
     }
 
-    ImGui::Checkbox("SSR", &env.SSR);
+    if (ImGui::CollapsingHeader("SSR"))
+    {
+        ImGui::Checkbox("Use SSR", &env.SSR);
+        if (env.SSR)
+        {
+            ImGui::SliderInt("Max Steps", &env.SSR_MaxSteps, 8, 64);
+            ImGui::SliderFloat("Max Distance", &env.SSR_MaxDistance, 1.0f, 60.0f, "%.1f m");
+            ImGui::SliderFloat("Thickness", &env.SSR_Thickness, 0.05f, 2.0f, "%.2f m");
+            ImGui::SliderFloat("Edge Fade", &env.SSR_EdgeFade, 0.01f, 0.3f, "%.2f");
+            ImGui::SliderFloat("Max Roughness", &env.SSR_MaxRoughness, 0.1f, 1.0f, "%.2f");
+        }
+    }
 
     if (ImGui::CollapsingHeader("Bloom"))
     {

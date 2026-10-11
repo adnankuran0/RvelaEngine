@@ -23,6 +23,11 @@ json Environment::Serialize()
     j["SSAO_Intensity"] = SSAO_Intensity;
 
     j["SSR"] = SSR;
+    j["SSR_MaxSteps"] = SSR_MaxSteps;
+    j["SSR_MaxDistance"] = SSR_MaxDistance;
+    j["SSR_Thickness"] = SSR_Thickness;
+    j["SSR_EdgeFade"] = SSR_EdgeFade;
+    j["SSR_MaxRoughness"] = SSR_MaxRoughness;
 
     j["Bloom"] = Bloom;
     j["Bloom_Intensity"] = Bloom_Intensity;
@@ -71,6 +76,16 @@ void Environment::Deserialize(const json& j)
 
     if (j.contains("SSR"))
         SSR = j["SSR"];
+    if (j.contains("SSR_MaxSteps"))
+        SSR_MaxSteps = j["SSR_MaxSteps"];
+    if (j.contains("SSR_MaxDistance"))
+        SSR_MaxDistance = j["SSR_MaxDistance"];
+    if (j.contains("SSR_Thickness"))
+        SSR_Thickness = j["SSR_Thickness"];
+    if (j.contains("SSR_EdgeFade"))
+        SSR_EdgeFade = j["SSR_EdgeFade"];
+    if (j.contains("SSR_MaxRoughness"))
+        SSR_MaxRoughness = j["SSR_MaxRoughness"];
 
     if (j.contains("Bloom"))
         Bloom = j["Bloom"];

@@ -18,6 +18,11 @@ public:
 	float SSAO_Intensity = 1.0f;
 
 	bool SSR = true;
+	int SSR_MaxSteps = 64;
+	float SSR_MaxDistance = 10.0f;
+	float SSR_Thickness = 0.15f;
+	float SSR_EdgeFade = 0.10f;
+	float SSR_MaxRoughness = 0.6f;
 
 	bool Bloom = false;
 	float Bloom_Intensity = 1.0f;

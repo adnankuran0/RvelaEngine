@@ -16,7 +16,7 @@ void SSAOPass::Init(const RenderContext& ctx, RenderFrame& frame)
     desc.width = ctx.viewportWidth / 2;
     desc.height = ctx.viewportHeight / 2;
     desc.colorAttachments = {
-        { FramebufferTextureFormat::R16F, FramebufferFilterMode::Nearest }
+        { FramebufferTextureFormat::R16F, FramebufferFilterMode::Linear }
     };
     desc.hasDepth = false;
 

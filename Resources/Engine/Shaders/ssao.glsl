@@ -28,6 +28,11 @@ uniform float radius = 1.0;
 uniform float bias = 0.025;
 uniform float intensity = 1.0;
 
+float InterleavedGradientNoise(vec2 screenPos)
+{
+    return fract(52.9829189 * fract(0.06711056 * screenPos.x + 0.00583715 * screenPos.y));
+}
+
 void main()
 {
     float depth = texture(gDepth, TexCoords).r;
@@ -40,47 +45,57 @@ void main()
     vec3 fragPos = ReconstructViewPos(TexCoords, depth, invProjection);
     vec3 normal = normalize(texture(gNormal, TexCoords).rgb);
 
-    // horizon search
-    vec2 noiseScale = windowSize * 0.25;
-    vec2 randomVec = texture(texNoise, TexCoords * noiseScale).xy;
-    float rotation = atan(randomVec.y, randomVec.x);
-    float pixelRadius = max(radius * projection[1][1] * windowSize.y * 0.5 / max(-fragPos.z, 0.001), 1.0);
+    float pixelRadius = clamp(radius * projection[1][1] * windowSize.y * 0.25 / max(-fragPos.z, 0.1), 2.0, windowSize.y * 0.25);
+
+    float ign = InterleavedGradientNoise(gl_FragCoord.xy);
+    float baseAngle = ign * 6.2831853;
 
     const int DIRECTION_COUNT = 8;
-    const int STEP_COUNT = 6;
+    const int STEP_COUNT = 4;
     float occlusion = 0.0;
-    for (int directionIndex = 0; directionIndex < DIRECTION_COUNT; ++directionIndex)
+    float totalWeight = 0.0;
+
+    for (int dirIdx = 0; dirIdx < DIRECTION_COUNT; ++dirIdx)
     {
-        float angle = rotation + (float(directionIndex) + 0.5) * (6.2831853 / float(DIRECTION_COUNT));
-        vec2 direction = vec2(cos(angle), sin(angle));
-        float horizon = 0.0;
+        float angle = baseAngle + float(dirIdx) * (6.2831853 / float(DIRECTION_COUNT));
+        vec2 dir = vec2(cos(angle), sin(angle));
 
-        for (int stepIndex = 1; stepIndex <= STEP_COUNT; ++stepIndex)
+        for (int stepIdx = 1; stepIdx <= STEP_COUNT; ++stepIdx)
         {
-            float stepFraction = float(stepIndex) / float(STEP_COUNT);
-            float samplePixels = pixelRadius * stepFraction * stepFraction;
-            vec2 sampleUV = TexCoords + direction * samplePixels / windowSize;
-            if (any(lessThan(sampleUV, vec2(0.0))) || any(greaterThan(sampleUV, vec2(1.0))))
+            float stepFraction = (float(stepIdx) + ign) / (float(STEP_COUNT) + 1.0);
+            float stepPixels = pixelRadius * stepFraction;
+            vec2 sampleUV = TexCoords + dir * (stepPixels / windowSize);
+
+            if (sampleUV.x < 0.0 || sampleUV.x > 1.0 || sampleUV.y < 0.0 || sampleUV.y > 1.0)
                 continue;
 
-            float sampleDepthValue = texture(gDepth, sampleUV).r;
-            if (sampleDepthValue >= 0.999999)
+            float sampleDepth = texture(gDepth, sampleUV).r;
+            if (sampleDepth >= 0.999999)
                 continue;
 
-            vec3 samplePos = ReconstructViewPos(sampleUV, sampleDepthValue, invProjection);
+            vec3 samplePos = ReconstructViewPos(sampleUV, sampleDepth, invProjection);
             vec3 delta = samplePos - fragPos;
-            float distanceToSample = length(delta);
-            if (distanceToSample <= bias || distanceToSample >= radius)
+            float dist = length(delta);
+
+            if (dist > radius || dist < 0.01)
                 continue;
 
-            float normalFacing = dot(normal, delta / distanceToSample);
-            float distanceFade = 1.0 - smoothstep(radius * 0.5, radius, distanceToSample);
-            horizon = max(horizon, max(normalFacing - bias, 0.0) * distanceFade);
-        }
+            float nDotD = dot(normal, delta / dist);
 
-        occlusion += horizon;
+            if (nDotD > bias)
+            {
+                float distFade = 1.0 - (dist / radius);
+                occlusion += (nDotD - bias) * distFade * distFade;
+            }
+            totalWeight += 1.0;
+        }
     }
 
-    float visibility = clamp(1.0 - occlusion / float(DIRECTION_COUNT), 0.0, 1.0);
-    FragColor = pow(visibility, intensity);
+    float ao = 1.0;
+    if (totalWeight > 0.0)
+    {
+        ao = clamp(1.0 - (occlusion / totalWeight) * intensity * 2.0, 0.0, 1.0);
+    }
+
+    FragColor = ao;
 }
