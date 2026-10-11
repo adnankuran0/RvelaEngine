@@ -383,6 +383,27 @@ static std::string MakeLuaTemplate(const std::string& scriptType)
         "return " + scriptType + "\n";
 }
 
+static std::string MakeShaderTemplate()
+{
+    return
+        "shader_type spatial;\n"
+        "render_mode lit;\n\n"
+        "uniform vec4 u_Color : source_color = vec4(1.0, 1.0, 1.0, 1.0);\n"
+        "uniform float u_Metallic : hint_range(0.0, 1.0) = 0.0;\n"
+        "uniform float u_Roughness : hint_range(0.0, 1.0) = 0.5;\n"
+        "uniform sampler2D u_MainTexture;\n\n"
+        "void vertex() {\n"
+        "    // Modify VERTEX, NORMAL, UV, etc.\n"
+        "}\n\n"
+        "void fragment() {\n"
+        "    vec4 tex = texture(u_MainTexture, UV);\n"
+        "    ALBEDO = tex.rgb * u_Color.rgb;\n"
+        "    ALPHA = tex.a * u_Color.a;\n"
+        "    METALLIC = u_Metallic;\n"
+        "    ROUGHNESS = u_Roughness;\n"
+        "}\n";
+}
+
 static std::filesystem::path MakeUniquePath(const std::filesystem::path& dir,
     const std::string& stem, const std::string& ext)
 {
@@ -558,7 +579,7 @@ static ImTextureID ResolveFileIcon(const std::string& extension, bool isDirector
     if (extension == ".ranimlib") return lib.GetIcon(EditorIcon::AnimLib).GetID();
     if (extension == ".rskmesh") return lib.GetIcon(EditorIcon::Skinned).GetID();
     if (extension == ".rskeleton") return lib.GetIcon(EditorIcon::Skeleton).GetID();
-    if (extension == ".lua" || extension == ".glsl")
+    if (extension == ".lua" || extension == ".glsl" || extension == ".rshader")
         return lib.GetIcon(EditorIcon::Script).GetID();
 
     return lib.GetIcon(EditorIcon::Script).GetID();
@@ -742,6 +763,14 @@ static void DrawBackgroundContextMenu(Engine* engine, const std::filesystem::pat
             {
                 auto newPath = MakeUniquePath(currentDir, "NewScript", ".lua");
                 CreateEmptyTextFile(newPath, MakeLuaTemplate(newPath.stem().string()));
+                BeginRenameForNew(newPath);
+            }
+
+            if (ImGui::MenuItem("Shader"))
+            {
+                auto newPath = MakeUniquePath(currentDir, "NewShader", ".rshader");
+                CreateEmptyTextFile(newPath, MakeShaderTemplate());
+                assetReg.Scan(assetReg.GetAssetDir());
                 BeginRenameForNew(newPath);
             }
 
@@ -1234,7 +1263,7 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
                         EditorSelection::Get().Select(inst.GetHandle());
                 }
             }
-            else if (item.extension == ".glsl" || item.extension == ".lua")
+            else if (item.extension == ".glsl" || item.extension == ".lua" || item.extension == ".rshader")
             {
                 if (item.extension == ".lua")
                     OpenInVSCode(item.path);

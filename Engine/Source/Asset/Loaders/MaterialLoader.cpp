@@ -115,5 +115,33 @@ Ref<Asset> MaterialLoader::Load(
     asset->useWorldTriplanar = j.value("useWorldTriplanar", false);
     asset->triplanarSharpness = j.value("triplanarSharpness", 4.0f);
 
+    if (j.contains("customShader"))
+    {
+        asset->customShaderUUID = AssetUUID::FromString(j["customShader"].get<std::string>());
+    }
+    if (j.contains("customUniforms") && j["customUniforms"].is_object())
+    {
+        asset->customUniforms.clear();
+        for (auto& [name, item] : j["customUniforms"].items())
+        {
+            CustomUniformValue val;
+            val.type = static_cast<ShaderUniformType>(item.value("type", 0));
+            auto& v = item["value"];
+            switch (val.type)
+            {
+            case ShaderUniformType::Float: val.floatVal = v.get<float>(); break;
+            case ShaderUniformType::Int: val.intVal = v.get<int>(); break;
+            case ShaderUniformType::Bool: val.boolVal = v.get<bool>(); break;
+            case ShaderUniformType::Vec2: val.vec2Val = glm::vec2(v[0].get<float>(), v[1].get<float>()); break;
+            case ShaderUniformType::Vec3:
+            case ShaderUniformType::Color3: val.vec3Val = glm::vec3(v[0].get<float>(), v[1].get<float>(), v[2].get<float>()); break;
+            case ShaderUniformType::Vec4:
+            case ShaderUniformType::Color4: val.vec4Val = glm::vec4(v[0].get<float>(), v[1].get<float>(), v[2].get<float>(), v[3].get<float>()); break;
+            case ShaderUniformType::Texture2D: val.textureUUID = AssetUUID::FromString(v.get<std::string>()); break;
+            }
+            asset->customUniforms[name] = val;
+        }
+    }
+
     return asset;
 }

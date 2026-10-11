@@ -143,6 +143,80 @@ public:
     void SetUseARMMap(bool v) { m_Instance.SetUseARMMap(v); }
     void ClearUseARMMap() { m_Instance.ClearUseARMMap(); }
 
+    AssetUUID GetCustomShaderUUID() const { return m_Instance.GetCustomShaderUUID(); }
+    void SetCustomShader(const AssetUUID& uuid) { m_Instance.SetCustomShader(uuid); }
+    void ClearCustomShader() { m_Instance.ClearCustomShader(); }
+    Ref<ShaderAsset> GetCustomShaderAsset() const { return m_Instance.GetCustomShaderAsset(); }
+    bool HasCustomShader() const { return m_Instance.GetCustomShaderUUID().IsValid() && m_Instance.GetCustomShaderAsset() != nullptr; }
+
+    CustomUniformValue GetCustomUniform(const std::string& name) const { return m_Instance.GetCustomUniform(name); }
+    void SetCustomUniform(const std::string& name, const CustomUniformValue& val) { m_Instance.SetCustomUniform(name, val); }
+    void ClearCustomUniform(const std::string& name) { m_Instance.ClearCustomUniform(name); }
+    bool IsCustomUniformOverridden(const std::string& name) const { return m_Instance.IsCustomUniformOverridden(name); }
+
+    void SetCustomFloat(const std::string& name, float v)
+    {
+        CustomUniformValue val = GetCustomUniform(name);
+        val.type = ShaderUniformType::Float;
+        val.floatVal = v;
+        SetCustomUniform(name, val);
+    }
+    float GetCustomFloat(const std::string& name) const { return GetCustomUniform(name).floatVal; }
+
+    void SetCustomInt(const std::string& name, int v)
+    {
+        CustomUniformValue val = GetCustomUniform(name);
+        val.type = ShaderUniformType::Int;
+        val.intVal = v;
+        SetCustomUniform(name, val);
+    }
+    int GetCustomInt(const std::string& name) const { return GetCustomUniform(name).intVal; }
+
+    void SetCustomBool(const std::string& name, bool v)
+    {
+        CustomUniformValue val = GetCustomUniform(name);
+        val.type = ShaderUniformType::Bool;
+        val.boolVal = v;
+        SetCustomUniform(name, val);
+    }
+    bool GetCustomBool(const std::string& name) const { return GetCustomUniform(name).boolVal; }
+
+    void SetCustomVec2(const std::string& name, const glm::vec2& v)
+    {
+        CustomUniformValue val = GetCustomUniform(name);
+        val.type = ShaderUniformType::Vec2;
+        val.vec2Val = v;
+        SetCustomUniform(name, val);
+    }
+    glm::vec2 GetCustomVec2(const std::string& name) const { return GetCustomUniform(name).vec2Val; }
+
+    void SetCustomVec3(const std::string& name, const glm::vec3& v)
+    {
+        CustomUniformValue val = GetCustomUniform(name);
+        val.type = ShaderUniformType::Vec3;
+        val.vec3Val = v;
+        SetCustomUniform(name, val);
+    }
+    glm::vec3 GetCustomVec3(const std::string& name) const { return GetCustomUniform(name).vec3Val; }
+
+    void SetCustomVec4(const std::string& name, const glm::vec4& v)
+    {
+        CustomUniformValue val = GetCustomUniform(name);
+        val.type = ShaderUniformType::Vec4;
+        val.vec4Val = v;
+        SetCustomUniform(name, val);
+    }
+    glm::vec4 GetCustomVec4(const std::string& name) const { return GetCustomUniform(name).vec4Val; }
+
+    void SetCustomColor(const std::string& name, const glm::vec4& v)
+    {
+        CustomUniformValue val = GetCustomUniform(name);
+        val.type = ShaderUniformType::Color4;
+        val.vec4Val = v;
+        val.vec3Val = glm::vec3(v);
+        SetCustomUniform(name, val);
+    }
+
     Sampler& GetSampler() { return m_Instance.GetSampler(); }
     const Sampler& GetSampler() const { return m_Instance.GetSampler(); }
 

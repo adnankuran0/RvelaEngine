@@ -14,6 +14,7 @@
 #include "Script/ScriptProperty.h"
 #include "Asset/AssetRegistry.h"
 #include "Asset/AssetManager.h"
+#include "Asset/Types/ShaderAsset.h"
 #include "Render/IconLibrary.h"
 #include <algorithm>
 #include <array>
@@ -1262,6 +1263,12 @@ void InspectorPanel::Draw(Engine* engine)
 						if (inst.IsOverridden(MatField::ARMTex)) { asset->armTextureUUID = material.GetARMTexture() ? material.GetARMTexture()->GetUUID() : AssetUUID::Invalid(); asset->useARMMap = material.IsUsingARMMap(); }
 						if (inst.IsOverridden(MatField::UseARMMap)) { asset->useARMMap = material.GetUseARMMap(); }
 
+						if (inst.IsOverridden(MatField::CustomShader)) asset->customShaderUUID = material.GetCustomShaderUUID();
+						for (const auto& [name, val] : inst.GetCustomUniformOverrides())
+						{
+							asset->customUniforms[name] = val;
+						}
+
 						auto path = AssetManager::Get().GetRegistry().GetPath(asset->GetUUID());
 						MaterialSerializer::Save(asset, path);
 						material.GetInstance().ClearAllOverrides();
@@ -1312,6 +1319,210 @@ void InspectorPanel::Draw(Engine* engine)
 						RevertButton((std::string("R##") + idSuffix).c_str(), clearTexFn);
 					}
 					};
+
+				if (UI::BeginPropertyTable("CustomShaderTable"))
+				{
+					UI::PropertyLabel("Shader");
+					std::string shaderBtnLabel = "Default (Built-in PBR)";
+					AssetUUID curShaderUUID = material.GetCustomShaderUUID();
+					Ref<ShaderAsset> shaderAsset = material.GetCustomShaderAsset();
+					if (curShaderUUID.IsValid())
+					{
+						auto sPath = AssetManager::Get().GetRegistry().GetPath(curShaderUUID);
+						if (!sPath.empty()) shaderBtnLabel = sPath.filename().string();
+						else shaderBtnLabel = "Shader Asset";
+					}
+
+					float sClearWidth = curShaderUUID.IsValid() ? 26.0f : 0.0f;
+					float sSlotWidth = curShaderUUID.IsValid() ? ImGui::GetContentRegionAvail().x - sClearWidth : -FLT_MIN;
+
+					ImGui::Button(shaderBtnLabel.c_str(), ImVec2(sSlotWidth, 22.0f));
+					if (ImGui::BeginDragDropTarget())
+					{
+						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
+						{
+							std::string pathStr((const char*)payload->Data);
+							if (pathStr.ends_with(".rshader"))
+							{
+								AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
+								if (uuid.IsValid()) material.SetCustomShader(uuid);
+								else LOG_ERROR("Could not find UUID for shader: {}", pathStr);
+							}
+						}
+						ImGui::EndDragDropTarget();
+					}
+					if (curShaderUUID.IsValid())
+					{
+						ImGui::SameLine();
+						if (ImGui::Button("X##customshaderclear", ImVec2(sClearWidth - 4.0f, 22.0f)))
+						{
+							material.ClearCustomShader();
+						}
+					}
+					UI::EndPropertyTable();
+				}
+
+				if (material.GetCustomShaderUUID().IsValid())
+				{
+					Ref<ShaderAsset> shaderAsset = material.GetCustomShaderAsset();
+					if (shaderAsset)
+					{
+						ImGui::Spacing();
+						ImGui::TextUnformatted("Shader Status:");
+						ImGui::SameLine();
+						if (shaderAsset->compileSuccess)
+						{
+							ImGui::TextColored(shaderAsset->isLit ? ImVec4(0.3f, 1.0f, 0.4f, 1.0f) : ImVec4(1.0f, 0.85f, 0.2f, 1.0f),
+								shaderAsset->isLit ? "[Lit - PBR]" : "[Unlit]");
+						}
+						else
+						{
+							ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "[Compile Error]");
+						}
+
+						ImGui::SameLine();
+						if (ImGui::SmallButton("Recompile##shaderrecompile"))
+						{
+							AssetUUID sUUID = material.GetCustomShaderUUID();
+							auto sPath = sUUID.IsValid() ? AssetManager::Get().GetRegistry().GetPath(sUUID) : std::filesystem::path{};
+							shaderAsset->ReloadAndCompile(sPath);
+						}
+
+						if (!shaderAsset->compileSuccess && !shaderAsset->compileError.empty())
+						{
+							ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.4f, 0.4f, 1.0f));
+							ImGui::TextWrapped("Error:\n%s", shaderAsset->compileError.c_str());
+							ImGui::PopStyleColor();
+						}
+
+						if (!shaderAsset->uniforms.empty() && ImGui::CollapsingHeader("Shader Parameters##customuniformshdr", ImGuiTreeNodeFlags_DefaultOpen))
+						{
+							if (UI::BeginPropertyTable("CustomUniformsTable"))
+							{
+								for (const auto& uDef : shaderAsset->uniforms)
+								{
+									if (uDef.engineTexture != EngineTextureType::None)
+										continue;
+
+									UI::PropertyLabel(uDef.displayName.c_str());
+									bool isOver = inst.IsCustomUniformOverridden(uDef.name);
+									CustomUniformValue uVal = material.GetCustomUniform(uDef.name);
+									bool changed = false;
+
+									float ctrlWidth = isOver ? ImGui::GetContentRegionAvail().x - 26.0f : -FLT_MIN;
+									ImGui::SetNextItemWidth(ctrlWidth);
+
+									std::string uId = "##cu_" + uDef.name;
+									switch (uDef.type)
+									{
+									case ShaderUniformType::Float:
+									{
+										if (uDef.hasRange)
+										{
+											if (ImGui::SliderFloat(uId.c_str(), &uVal.floatVal, uDef.minVal, uDef.maxVal))
+												changed = true;
+										}
+										else
+										{
+											if (ImGui::DragFloat(uId.c_str(), &uVal.floatVal, 0.05f))
+												changed = true;
+										}
+										break;
+									}
+									case ShaderUniformType::Int:
+									{
+										if (ImGui::DragInt(uId.c_str(), &uVal.intVal))
+											changed = true;
+										break;
+									}
+									case ShaderUniformType::Bool:
+									{
+										if (ImGui::Checkbox(uId.c_str(), &uVal.boolVal))
+											changed = true;
+										break;
+									}
+									case ShaderUniformType::Vec2:
+									{
+										if (ImGui::DragFloat2(uId.c_str(), &uVal.vec2Val[0], 0.05f))
+											changed = true;
+										break;
+									}
+									case ShaderUniformType::Color3:
+									{
+										if (ImGui::ColorEdit3(uId.c_str(), &uVal.vec3Val[0]))
+											changed = true;
+										break;
+									}
+									case ShaderUniformType::Vec3:
+									{
+										if (ImGui::DragFloat3(uId.c_str(), &uVal.vec3Val[0], 0.05f))
+											changed = true;
+										break;
+									}
+									case ShaderUniformType::Color4:
+									{
+										if (ImGui::ColorEdit4(uId.c_str(), &uVal.vec4Val[0]))
+											changed = true;
+										break;
+									}
+									case ShaderUniformType::Vec4:
+									{
+										if (ImGui::DragFloat4(uId.c_str(), &uVal.vec4Val[0], 0.05f))
+											changed = true;
+										break;
+									}
+									case ShaderUniformType::Texture2D:
+									{
+										std::string texLabel = "Texture";
+										if (uVal.textureUUID.IsValid())
+										{
+											std::string fn = EditorUtils::GetAssetFileName(uVal.textureUUID);
+											if (!fn.empty()) texLabel = fn;
+										}
+										ImGui::Button(texLabel.c_str(), ImVec2(ctrlWidth, 22.0f));
+										if (ImGui::BeginDragDropTarget())
+										{
+											if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
+											{
+												std::string pathStr((const char*)payload->Data);
+												static constexpr std::array exts = { ".png", ".jpg", ".jpeg", ".tga", ".hdr", ".rtex" };
+												bool isImage = std::any_of(exts.begin(), exts.end(), [&](const char* e) { return pathStr.ends_with(e); });
+												if (isImage)
+												{
+													AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
+													if (uuid.IsValid())
+													{
+														uVal.textureUUID = uuid;
+														changed = true;
+													}
+												}
+											}
+											ImGui::EndDragDropTarget();
+										}
+										break;
+									}
+									}
+
+									if (changed)
+									{
+										material.SetCustomUniform(uDef.name, uVal);
+									}
+
+									if (isOver)
+									{
+										RevertButton(("R##revert_" + uDef.name).c_str(), [&]() {
+											material.ClearCustomUniform(uDef.name);
+										});
+									}
+								}
+								UI::EndPropertyTable();
+							}
+						}
+					}
+					ImGui::Spacing();
+					ImGui::Separator();
+					ImGui::Spacing();
+				}
 
 				if (ImGui::CollapsingHeader("Transparency##transphdr"))
 				{

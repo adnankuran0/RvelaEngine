@@ -2,6 +2,7 @@
 #include "Asset/AssetUUID.h"
 #include "Asset/Types/MaterialAsset.h"
 #include "Asset/Types/TextureAsset.h"
+#include "Asset/Types/ShaderAsset.h"
 #include "Core/Ref.h"
 #include "Renderer/Sampler.h"
 #include <glm/glm.hpp>
@@ -41,6 +42,7 @@ enum class MatField : uint8_t {
     UseTriplanar,
     UseWorldTriplanar,
     TriplanarSharpness,
+    CustomShader,
     COUNT
 };
 
@@ -163,12 +165,27 @@ public:
     void ClearUseWorldTriplanar() { ClearOverride(MatField::UseWorldTriplanar); }
     void ClearTriplanarSharpness() { ClearOverride(MatField::TriplanarSharpness); }
 
+    AssetUUID GetCustomShaderUUID() const { return IsOverridden(MatField::CustomShader) ? m_CustomShaderUUID : (m_SourceAsset ? m_SourceAsset->customShaderUUID : m_CustomShaderUUID); }
+    void SetCustomShader(const AssetUUID& uuid);
+    void ClearCustomShader();
+    Ref<ShaderAsset> GetCustomShaderAsset() const {
+        return IsOverridden(MatField::CustomShader) ? m_CustomShader : m_CachedCustomShader;
+    }
+
+    CustomUniformValue GetCustomUniform(const std::string& name) const;
+    void SetCustomUniform(const std::string& name, const CustomUniformValue& val);
+    void ClearCustomUniform(const std::string& name);
+    bool IsCustomUniformOverridden(const std::string& name) const;
+    void ClearAllCustomUniformOverrides() { m_CustomUniformOverrides.clear(); }
+    const std::unordered_map<std::string, CustomUniformValue>& GetCustomUniformOverrides() const { return m_CustomUniformOverrides; }
+    const std::unordered_map<std::string, CustomUniformValue>& GetCachedCustomUniforms() const { return m_CachedCustomUniforms; }
+
     Sampler& GetSampler() { return m_Sampler; }
     const Sampler& GetSampler() const { return m_Sampler; }
 
     bool IsOverridden(MatField f) const { return m_OverrideMask.test((size_t)f); }
     bool HasAnyOverride() const { return m_OverrideMask.any(); }
-    void ClearAllOverrides() { m_OverrideMask.reset(); }
+    void ClearAllOverrides() { m_OverrideMask.reset(); m_CustomUniformOverrides.clear(); }
     bool IsValid() const { return m_SourceAsset.Get() != nullptr; }
     void RebuildCache();
 
@@ -232,6 +249,12 @@ private:
     bool m_UseAOMap = false;
     bool m_UseHeightMap = false;
     bool m_UseARMMap = false;
+
+    AssetUUID m_CustomShaderUUID = AssetUUID::Invalid();
+    Ref<ShaderAsset> m_CustomShader;
+    Ref<ShaderAsset> m_CachedCustomShader;
+    std::unordered_map<std::string, CustomUniformValue> m_CustomUniformOverrides;
+    std::unordered_map<std::string, CustomUniformValue> m_CachedCustomUniforms;
 
     Sampler m_Sampler;
 };

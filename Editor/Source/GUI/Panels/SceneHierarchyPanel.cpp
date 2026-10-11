@@ -488,7 +488,7 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                         else
                             scene.GetComponent<PrefabComponent>(entity).SetPrefabID(meta.uuid);
 
-                        LOG_INFO("Prefab saved: {}", prefabPath.string());
+                        //LOG_INFO("Prefab saved: {}", prefabPath.string());
                         AssetBrowserPanel::RequestRename(prefabPath);
                     }
                 }
@@ -907,7 +907,6 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                 }
                 selectSingle(cb);
             }
-            ImGui::EndMenu();
             ImGui::EndMenu();
         }
 

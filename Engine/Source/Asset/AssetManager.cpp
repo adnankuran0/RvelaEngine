@@ -11,6 +11,7 @@
 #include "Asset/Loaders/AnimationLibraryLoader.h"
 #include "Asset/Loaders/SkeletalMeshLoader.h"
 #include "Asset/Loaders/SkeletonLoader.h"
+#include "Asset/Loaders/ShaderLoader.h"
 #include "Utils/ProjectManager.h"
 
 using namespace rv;
@@ -20,6 +21,7 @@ void AssetManager::Init(AssetRegistry& registry)
     m_Registry = &registry;
     RegisterLoader(std::make_unique<PrefabLoader>());
     RegisterLoader(std::make_unique<MaterialLoader>());
+    RegisterLoader(std::make_unique<ShaderLoader>());
     RegisterLoader(std::make_unique<MeshLoader>());
     RegisterLoader(std::make_unique<SceneLoader>());
     RegisterLoader(std::make_unique<TextureLoader>());

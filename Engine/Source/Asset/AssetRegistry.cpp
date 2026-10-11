@@ -31,7 +31,7 @@ void AssetRegistry::Scan(const std::filesystem::path& assetDir)
     auto cacheRoot = assetDir / ".cache";
 
     static const std::unordered_set<std::string> s_TrackOnlyExtensions = {
-        ".rscene", ".lua", ".mp3", ".wav"
+        ".rscene", ".lua", ".mp3", ".wav", ".rshader"
     };
 
     for (auto& entry : std::filesystem::recursive_directory_iterator(assetDir, std::filesystem::directory_options::skip_permission_denied, ec))

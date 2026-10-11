@@ -8,6 +8,7 @@
 #include "Scene/Environment.h"
 #include "Renderer/ShaderManager.h"
 #include "Renderer/TextureCache.h"
+#include "Core/Time.h"
 #include <glm/gtc/type_ptr.hpp>
 
 using namespace rv;
@@ -99,6 +100,27 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         shader.setBool("useSSAO", ctx.environment->SSAO);
         shader.setInt("ssaoTexture", SSAO_SLOT);
         glBindTextureUnit(SSAO_SLOT, i_SSAO);
+
+        auto* screenRes = resourceRegistry.Get("ScreenTexture");
+        if (screenRes && screenRes->id != 0)
+        {
+            shader.setInt("u_EngineScreenTexture", 14);
+            glBindTextureUnit(14, screenRes->id);
+        }
+
+        auto* depthRes = resourceRegistry.Get("DepthTexture");
+        if (depthRes && depthRes->id != 0)
+        {
+            shader.setInt("u_EngineDepthTexture", 15);
+            glBindTextureUnit(15, depthRes->id);
+        }
+
+        auto* normalRes = resourceRegistry.Get("NormalTexture");
+        if (normalRes && normalRes->id != 0)
+        {
+            shader.setInt("u_EngineNormalTexture", 16);
+            glBindTextureUnit(16, normalRes->id);
+        }
         };
 
     auto ApplyCullMode = [](CullMode mode) {
@@ -108,6 +130,27 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         else {
             glEnable(GL_CULL_FACE);
             glCullFace(mode == CullMode::Back ? GL_BACK : GL_FRONT);
+        }
+        };
+
+    auto ApplyBlendMode = [](BlendMode mode) {
+        switch (mode) {
+        case BlendMode::Mix:
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glBlendEquation(GL_FUNC_ADD);
+            break;
+        case BlendMode::Add:
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+            glBlendEquation(GL_FUNC_ADD);
+            break;
+        case BlendMode::Subtract:
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+            glBlendEquation(GL_FUNC_REVERSE_SUBTRACT);
+            break;
+        case BlendMode::Multiply:
+            glBlendFunc(GL_DST_COLOR, GL_ZERO);
+            glBlendEquation(GL_FUNC_ADD);
+            break;
         }
         };
 
@@ -163,12 +206,130 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         for (int slot = 0; slot < 6; ++slot)
             glBindSampler(slot, 0);
         glBindSampler(ARM_MAP_SLOT, 0);
+        for (int slot = 13; slot < 28; ++slot)
+        {
+            glBindSampler(slot, 0);
+            glBindTextureUnit(slot, 0);
+        }
+        };
+
+    auto BindCustomShaderUniforms = [](Shader& shader, const MaterialInstance& inst, const ShaderAsset& shaderAsset) {
+        int nextTextureSlot = 17;
+        const auto& overrides = inst.GetCustomUniformOverrides();
+        const auto& cached = inst.GetCachedCustomUniforms();
+
+        for (const auto& uDef : shaderAsset.uniforms)
+        {
+            if (uDef.engineTexture != EngineTextureType::None)
+            {
+                if (uDef.hasCustomSampler)
+                {
+                    auto itSampler = shaderAsset.samplers.find(uDef.name);
+                    if (itSampler != shaderAsset.samplers.end() && itSampler->second)
+                    {
+                        if (uDef.engineTexture == EngineTextureType::Screen)
+                            itSampler->second->Bind(14);
+                        else if (uDef.engineTexture == EngineTextureType::Depth)
+                            itSampler->second->Bind(15);
+                        else if (uDef.engineTexture == EngineTextureType::Normal)
+                            itSampler->second->Bind(16);
+                    }
+                }
+                continue;
+            }
+
+            CustomUniformValue val;
+            auto itOver = overrides.find(uDef.name);
+            if (itOver != overrides.end())
+            {
+                val = itOver->second;
+            }
+            else
+            {
+                auto itCached = cached.find(uDef.name);
+                if (itCached != cached.end())
+                    val = itCached->second;
+                else
+                {
+                    val.type = uDef.type;
+                    val.floatVal = uDef.floatVal;
+                    val.intVal = uDef.intVal;
+                    val.boolVal = uDef.boolVal;
+                    val.vec2Val = uDef.vec2Val;
+                    val.vec3Val = uDef.vec3Val;
+                    val.vec4Val = uDef.vec4Val;
+                    val.textureUUID = uDef.textureUUID;
+                }
+            }
+
+            switch (uDef.type)
+            {
+            case ShaderUniformType::Float:
+                shader.setFloat(uDef.name, val.floatVal);
+                break;
+            case ShaderUniformType::Int:
+                shader.setInt(uDef.name, val.intVal);
+                break;
+            case ShaderUniformType::Bool:
+                shader.setBool(uDef.name, val.boolVal);
+                break;
+            case ShaderUniformType::Vec2:
+                shader.setVec2(uDef.name, val.vec2Val);
+                break;
+            case ShaderUniformType::Vec3:
+            case ShaderUniformType::Color3:
+                shader.setVec3(uDef.name, val.vec3Val);
+                break;
+            case ShaderUniformType::Vec4:
+            case ShaderUniformType::Color4:
+                shader.setVec4(uDef.name, val.vec4Val);
+                break;
+            case ShaderUniformType::Texture2D:
+                shader.setInt(uDef.name, nextTextureSlot);
+                if (val.textureUUID.IsValid())
+                {
+                    auto texAsset = AssetManager::Get().GetAsset<TextureAsset>(val.textureUUID);
+                    if (texAsset)
+                    {
+                        TextureCache::Get().GetOrCreate(texAsset).Bind(nextTextureSlot);
+                    }
+                    else
+                    {
+                        TextureCache::Get().GetWhiteTexture().Bind(nextTextureSlot);
+                    }
+                }
+                else
+                {
+                    TextureCache::Get().GetWhiteTexture().Bind(nextTextureSlot);
+                }
+
+                if (uDef.hasCustomSampler)
+                {
+                    auto itSampler = shaderAsset.samplers.find(uDef.name);
+                    if (itSampler != shaderAsset.samplers.end() && itSampler->second)
+                    {
+                        itSampler->second->Bind(nextTextureSlot);
+                    }
+                    else
+                    {
+                        inst.GetSampler().Bind(nextTextureSlot);
+                    }
+                }
+                else
+                {
+                    inst.GetSampler().Bind(nextTextureSlot);
+                }
+                nextTextureSlot++;
+                break;
+            }
+        }
         };
 
     if (!staticCommands.empty())
     {
         Shader& staticShader = ShaderManager::Get("PBR");
         BindGlobalTexturesAndUniforms(staticShader);
+        Shader* lastBoundShader = &staticShader;
 
         for (auto& command : staticCommands)
         {
@@ -177,14 +338,73 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             glDisable(GL_STENCIL_TEST);
             ApplyCullMode(command.material->GetCullMode());
 
-            SetupMaterial(staticShader, command.material);
+            Shader* currentShader = &staticShader;
+            auto customShaderAsset = command.material->GetInstance().GetCustomShaderAsset();
+            bool hasCustomShader = (customShaderAsset && customShaderAsset->IsValid() && customShaderAsset->staticShader);
 
-            staticShader.setMat4("model", command.transform->GetWorldMatrix());
+            if (hasCustomShader)
+            {
+                if (customShaderAsset->renderModes.hasCullMode)
+                    ApplyCullMode(customShaderAsset->renderModes.cullMode);
+                if (customShaderAsset->renderModes.hasBlendMode)
+                {
+                    glEnable(GL_BLEND);
+                    ApplyBlendMode(customShaderAsset->renderModes.blendMode);
+                }
+                if (customShaderAsset->renderModes.depthTestDisabled)
+                    glDisable(GL_DEPTH_TEST);
+                if (customShaderAsset->renderModes.depthDrawDisabled)
+                    glDepthMask(GL_FALSE);
+                if (customShaderAsset->renderModes.wireframe)
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+                currentShader = customShaderAsset->staticShader.get();
+                if (currentShader != lastBoundShader)
+                {
+                    currentShader->use();
+                    BindGlobalTexturesAndUniforms(*currentShader);
+                    lastBoundShader = currentShader;
+                }
+                if (customShaderAsset->isLit)
+                {
+                    currentShader->setBool("receiveShadows", command.material->GetReceiveShadows());
+                }
+                BindCustomShaderUniforms(*currentShader, command.material->GetInstance(), *customShaderAsset);
+            }
+            else
+            {
+                if (lastBoundShader != &staticShader)
+                {
+                    staticShader.use();
+                    BindGlobalTexturesAndUniforms(staticShader);
+                    lastBoundShader = &staticShader;
+                }
+                SetupMaterial(staticShader, command.material);
+            }
+
+            currentShader->setMat4("model", command.transform->GetWorldMatrix());
             glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(command.transform->GetWorldMatrix())));
-            staticShader.setMat3("normalMatrix", normalMatrix);
+            currentShader->setMat3("normalMatrix", normalMatrix);
+            currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
+            currentShader->setVec2("UVScale", command.material->GetUVScale());
+            currentShader->setVec2("UVOffset", command.material->GetUVOffset());
 
             command.mesh->VAO.Bind();
             glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+
+            if (hasCustomShader)
+            {
+                if (customShaderAsset->renderModes.wireframe)
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+                if (customShaderAsset->renderModes.depthTestDisabled)
+                    glEnable(GL_DEPTH_TEST);
+                if (customShaderAsset->renderModes.depthDrawDisabled)
+                    glDepthMask(GL_TRUE);
+                if (customShaderAsset->renderModes.hasBlendMode)
+                    glDisable(GL_BLEND);
+                if (customShaderAsset->renderModes.hasCullMode)
+                    ApplyCullMode(command.material->GetCullMode());
+            }
 
             CleanupMaterialSamplers();
         }
@@ -194,23 +414,69 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     {
         Shader& skeletalShader = ShaderManager::Get("PBR_Skeletal");
         BindGlobalTexturesAndUniforms(skeletalShader);
+        Shader* lastBoundShader = &skeletalShader;
 
-        GLint boneLoc = glGetUniformLocation(skeletalShader.ID, "u_BoneMatrices");
+        GLint defaultBoneLoc = glGetUniformLocation(skeletalShader.ID, "u_BoneMatrices");
 
         for (auto& command : skeletalCommands)
         {
             if (!command.mesh || command.mesh->indexCount == 0) continue;
-            //if (!ctx.camera->Intersects(command.mesh->worldAABB)) continue; TODO: sswwwwwwwwwwwwwwwwwwwww
 
             glDisable(GL_STENCIL_TEST);
             ApplyCullMode(command.material->GetCullMode());
 
-            SetupMaterial(skeletalShader, command.material);
+            Shader* currentShader = &skeletalShader;
+            auto customShaderAsset = command.material->GetInstance().GetCustomShaderAsset();
+            bool hasCustomShader = (customShaderAsset && customShaderAsset->IsValid() && customShaderAsset->skeletalShader);
 
-            skeletalShader.setMat4("model", command.transform->GetWorldMatrix());
+            if (hasCustomShader)
+            {
+                if (customShaderAsset->renderModes.hasCullMode)
+                    ApplyCullMode(customShaderAsset->renderModes.cullMode);
+                if (customShaderAsset->renderModes.hasBlendMode)
+                {
+                    glEnable(GL_BLEND);
+                    ApplyBlendMode(customShaderAsset->renderModes.blendMode);
+                }
+                if (customShaderAsset->renderModes.depthTestDisabled)
+                    glDisable(GL_DEPTH_TEST);
+                if (customShaderAsset->renderModes.depthDrawDisabled)
+                    glDepthMask(GL_FALSE);
+                if (customShaderAsset->renderModes.wireframe)
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+                currentShader = customShaderAsset->skeletalShader.get();
+                if (currentShader != lastBoundShader)
+                {
+                    currentShader->use();
+                    BindGlobalTexturesAndUniforms(*currentShader);
+                    lastBoundShader = currentShader;
+                }
+                if (customShaderAsset->isLit)
+                {
+                    currentShader->setBool("receiveShadows", command.material->GetReceiveShadows());
+                }
+                BindCustomShaderUniforms(*currentShader, command.material->GetInstance(), *customShaderAsset);
+            }
+            else
+            {
+                if (lastBoundShader != &skeletalShader)
+                {
+                    skeletalShader.use();
+                    BindGlobalTexturesAndUniforms(skeletalShader);
+                    lastBoundShader = &skeletalShader;
+                }
+                SetupMaterial(skeletalShader, command.material);
+            }
+
+            currentShader->setMat4("model", command.transform->GetWorldMatrix());
             glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(command.transform->GetWorldMatrix())));
-            skeletalShader.setMat3("normalMatrix", normalMatrix);
+            currentShader->setMat3("normalMatrix", normalMatrix);
+            currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
+            currentShader->setVec2("UVScale", command.material->GetUVScale());
+            currentShader->setVec2("UVOffset", command.material->GetUVOffset());
 
+            GLint boneLoc = hasCustomShader ? glGetUniformLocation(currentShader->ID, "u_BoneMatrices") : defaultBoneLoc;
             if (boneLoc != -1 && command.skeleton && !command.skeleton->skinningPalette.empty())
             {
                 glUniformMatrix4fv(
@@ -223,6 +489,20 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
             command.mesh->VAO.Bind();
             glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+
+            if (hasCustomShader)
+            {
+                if (customShaderAsset->renderModes.wireframe)
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+                if (customShaderAsset->renderModes.depthTestDisabled)
+                    glEnable(GL_DEPTH_TEST);
+                if (customShaderAsset->renderModes.depthDrawDisabled)
+                    glDepthMask(GL_TRUE);
+                if (customShaderAsset->renderModes.hasBlendMode)
+                    glDisable(GL_BLEND);
+                if (customShaderAsset->renderModes.hasCullMode)
+                    ApplyCullMode(command.material->GetCullMode());
+            }
 
             CleanupMaterialSamplers();
         }

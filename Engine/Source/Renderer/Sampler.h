@@ -41,9 +41,9 @@ public:
 	Sampler() = default;
 	void Init(const SamplerDesc& desc);
 	~Sampler();
-	void Bind(unsigned int slot);
-	void Unbind(unsigned int slot);
-	unsigned int GetID() { return m_ID; }
+	void Bind(unsigned int slot) const;
+	void Unbind(unsigned int slot) const;
+	unsigned int GetID() const { return m_ID; }
     SamplerDesc& GetDesc() { return m_Decs; }
 private:
     SamplerDesc m_Decs;

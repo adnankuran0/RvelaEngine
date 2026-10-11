@@ -33,6 +33,17 @@ public:
         return fallback;
     }
 
+    Texture& GetWhiteTexture()
+    {
+        static Texture white = []() {
+            uint8_t pixels[4] = { 255, 255, 255, 255 };
+            Texture t;
+            t.GenerateFromMemory(pixels, 1, 1, TextureFormat::RGBA8, false);
+            return t;
+            }();
+        return white;
+    }
+
     void Remove(const AssetUUID& uuid);
 
     void Clear()

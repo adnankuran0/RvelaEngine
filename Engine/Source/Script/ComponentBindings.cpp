@@ -170,7 +170,78 @@ void LuaBindings::RegisterComponents(sol::state& lua)
         "uvOffset", sol::property(
             [](MaterialHandle& h) { return h.Get() ? h.Get()->GetUVOffset() : glm::vec2(0.0f); },
             [](MaterialHandle& h, const glm::vec2& v) { if (auto* c = h.Get()) c->SetUVOffset(v); }
-        )
+        ),
+        "HasCustomShader", [](MaterialHandle& h) {
+            return h.Get() ? h.Get()->HasCustomShader() : false;
+        },
+        "SetShaderFloat", [](MaterialHandle& h, const std::string& name, float v) {
+            if (auto* c = h.Get()) c->SetCustomFloat(name, v);
+        },
+        "GetShaderFloat", [](MaterialHandle& h, const std::string& name) {
+            return h.Get() ? h.Get()->GetCustomFloat(name) : 0.0f;
+        },
+        "SetShaderInt", [](MaterialHandle& h, const std::string& name, int v) {
+            if (auto* c = h.Get()) c->SetCustomInt(name, v);
+        },
+        "GetShaderInt", [](MaterialHandle& h, const std::string& name) {
+            return h.Get() ? h.Get()->GetCustomInt(name) : 0;
+        },
+        "SetShaderBool", [](MaterialHandle& h, const std::string& name, bool v) {
+            if (auto* c = h.Get()) c->SetCustomBool(name, v);
+        },
+        "GetShaderBool", [](MaterialHandle& h, const std::string& name) {
+            return h.Get() ? h.Get()->GetCustomBool(name) : false;
+        },
+        "SetShaderVec2", [](MaterialHandle& h, const std::string& name, const glm::vec2& v) {
+            if (auto* c = h.Get()) c->SetCustomVec2(name, v);
+        },
+        "GetShaderVec2", [](MaterialHandle& h, const std::string& name) {
+            return h.Get() ? h.Get()->GetCustomVec2(name) : glm::vec2(0.0f);
+        },
+        "SetShaderVec3", [](MaterialHandle& h, const std::string& name, const glm::vec3& v) {
+            if (auto* c = h.Get()) c->SetCustomVec3(name, v);
+        },
+        "GetShaderVec3", [](MaterialHandle& h, const std::string& name) {
+            return h.Get() ? h.Get()->GetCustomVec3(name) : glm::vec3(0.0f);
+        },
+        "SetShaderVec4", [](MaterialHandle& h, const std::string& name, const glm::vec4& v) {
+            if (auto* c = h.Get()) c->SetCustomVec4(name, v);
+        },
+        "GetShaderVec4", [](MaterialHandle& h, const std::string& name) {
+            return h.Get() ? h.Get()->GetCustomVec4(name) : glm::vec4(0.0f);
+        },
+        "SetShaderColor", [](MaterialHandle& h, const std::string& name, const glm::vec4& v) {
+            if (auto* c = h.Get()) c->SetCustomColor(name, v);
+        },
+        "SetShaderParameter", [](MaterialHandle& h, const std::string& name, sol::object val) {
+            auto* c = h.Get();
+            if (!c) return;
+
+            if (val.is<float>())
+            {
+                c->SetCustomFloat(name, val.as<float>());
+            }
+            else if (val.is<int>())
+            {
+                c->SetCustomInt(name, val.as<int>());
+            }
+            else if (val.is<bool>())
+            {
+                c->SetCustomBool(name, val.as<bool>());
+            }
+            else if (val.is<glm::vec2>())
+            {
+                c->SetCustomVec2(name, val.as<glm::vec2>());
+            }
+            else if (val.is<glm::vec3>())
+            {
+                c->SetCustomVec3(name, val.as<glm::vec3>());
+            }
+            else if (val.is<glm::vec4>())
+            {
+                c->SetCustomVec4(name, val.as<glm::vec4>());
+            }
+        }
     );
 
     lua.new_enum<ParticleEmitterShape>("ParticleEmitterShape", {

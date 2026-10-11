@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <memory>
 
 namespace rv { 
@@ -24,12 +24,15 @@ public:
     T* operator->() const { return ptr.get(); }
     T& operator*() const { return *ptr; }
     T* Get() const { return ptr.get(); }
+    T* get() const { return ptr.get(); }
     void Reset() {
         ptr.reset();
     }
     std::shared_ptr<T> GetShared() const { return ptr; }
 
     operator bool() const { return ptr != nullptr; }
+    bool operator==(std::nullptr_t) const { return ptr == nullptr; }
+    bool operator!=(std::nullptr_t) const { return ptr != nullptr; }
 
     Ref& operator=(std::nullptr_t) {
         ptr.reset();

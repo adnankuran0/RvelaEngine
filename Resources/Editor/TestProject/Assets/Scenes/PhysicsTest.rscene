@@ -659,7 +659,7 @@
                     0.9999991655349731
                 ]
             },
-            "UUID": 9380422557340679860
+            "UUID": 10406115913290908098
         },
         {
             "Material": {
@@ -1446,7 +1446,7 @@
                     1.0
                 ]
             },
-            "UUID": 13223531878625188115
+            "UUID": 6449139815643729229
         },
         {
             "ParentUUID": 0,
@@ -1628,7 +1628,83 @@
                     0.3500000238418579
                 ]
             },
-            "UUID": 16639799827623151874
+            "UUID": 15329246333823611039
+        },
+        {
+            "ConvexHullColliderComponent": {
+                "maxConvexRadius": 0.0,
+                "offset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ]
+            },
+            "Material": {
+                "material": "",
+                "overrides": {
+                    "customShader": "718685dd-c845-42b3-b5da-e605fdd0d534",
+                    "customUniformOverrides": {
+                        "aberration_amount": {
+                            "type": 0,
+                            "value": 0.003000000026077032
+                        },
+                        "highlight_strength": {
+                            "type": 0,
+                            "value": 0.0
+                        }
+                    }
+                }
+            },
+            "Mesh": {
+                "mesh": "1d2596bb-18d3-41a6-9848-a8a584870ce3"
+            },
+            "ParentUUID": 0,
+            "RigidbodyComponent": {
+                "allowSleep": 1,
+                "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
+                "bodyType": 0,
+                "collisionLayer": 1,
+                "collisionMask": 4294967295,
+                "friction": 0.5,
+                "gravityFactor": 1.0,
+                "isSensor": false,
+                "linearDamping": 0.05000000074505806,
+                "lockRotationX": false,
+                "lockRotationY": false,
+                "lockRotationZ": false,
+                "lockTranslationX": false,
+                "lockTranslationY": false,
+                "lockTranslationZ": false,
+                "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
+                "restitution": 0.0,
+                "useCCD": false
+            },
+            "Tag": {
+                "isActive": true,
+                "tag": "Quad"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    -1.3124662637710571,
+                    1.6294410228729248,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    89.98021697998047,
+                    0.0
+                ],
+                "scale": [
+                    2.039999008178711,
+                    2.0399999618530273,
+                    2.039999008178711
+                ]
+            },
+            "UUID": 4023841527513290583
         }
     ],
     "Environment": {
@@ -1654,6 +1730,6 @@
         "SSAO_Bias": 0.02500000037252903,
         "SSAO_Intensity": 1.0,
         "SSAO_Radius": 1.0,
-        "SSR": true
+        "SSR": false
     }
 }

@@ -57,12 +57,12 @@ Sampler::~Sampler()
     glDeleteSamplers(1, &m_ID);
 }
 
-void Sampler::Bind(unsigned int slot)
+void Sampler::Bind(unsigned int slot) const
 {
     glBindSampler(slot, m_ID);
 }
 
-void Sampler::Unbind(unsigned int slot)
+void Sampler::Unbind(unsigned int slot) const
 {
     glBindSampler(slot, 0);
 }

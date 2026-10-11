@@ -62,6 +62,31 @@ bool MaterialSerializer::Save(const Ref<MaterialAsset>& asset, const std::filesy
     j["UVScale"] = { asset->UVScale.x, asset->UVScale.y };
     j["UVOffset"] = { asset->UVOffset.x, asset->UVOffset.y };
 
+    if (asset->customShaderUUID.IsValid())
+    {
+        j["customShader"] = asset->customShaderUUID.ToString();
+        json uJson = json::object();
+        for (const auto& [name, val] : asset->customUniforms)
+        {
+            json item;
+            item["type"] = static_cast<int>(val.type);
+            switch (val.type)
+            {
+            case ShaderUniformType::Float: item["value"] = val.floatVal; break;
+            case ShaderUniformType::Int: item["value"] = val.intVal; break;
+            case ShaderUniformType::Bool: item["value"] = val.boolVal; break;
+            case ShaderUniformType::Vec2: item["value"] = { val.vec2Val.x, val.vec2Val.y }; break;
+            case ShaderUniformType::Vec3:
+            case ShaderUniformType::Color3: item["value"] = { val.vec3Val.x, val.vec3Val.y, val.vec3Val.z }; break;
+            case ShaderUniformType::Vec4:
+            case ShaderUniformType::Color4: item["value"] = { val.vec4Val.x, val.vec4Val.y, val.vec4Val.z, val.vec4Val.w }; break;
+            case ShaderUniformType::Texture2D: item["value"] = val.textureUUID.ToString(); break;
+            }
+            uJson[name] = item;
+        }
+        j["customUniforms"] = uJson;
+    }
+
     std::ofstream file(path);
     if (!file)
     {
@@ -156,6 +181,34 @@ bool MaterialSerializer::Load(const Ref<MaterialAsset>& asset, const std::filesy
     {
         auto uv = j["UVOffset"];
         asset->UVOffset = glm::vec2(uv[0], uv[1]);
+    }
+
+    if (j.contains("customShader"))
+    {
+        asset->customShaderUUID = AssetUUID::FromString(j["customShader"].get<std::string>());
+    }
+    if (j.contains("customUniforms") && j["customUniforms"].is_object())
+    {
+        asset->customUniforms.clear();
+        for (auto& [name, item] : j["customUniforms"].items())
+        {
+            CustomUniformValue val;
+            val.type = static_cast<ShaderUniformType>(item.value("type", 0));
+            auto& v = item["value"];
+            switch (val.type)
+            {
+            case ShaderUniformType::Float: val.floatVal = v.get<float>(); break;
+            case ShaderUniformType::Int: val.intVal = v.get<int>(); break;
+            case ShaderUniformType::Bool: val.boolVal = v.get<bool>(); break;
+            case ShaderUniformType::Vec2: val.vec2Val = glm::vec2(v[0].get<float>(), v[1].get<float>()); break;
+            case ShaderUniformType::Vec3:
+            case ShaderUniformType::Color3: val.vec3Val = glm::vec3(v[0].get<float>(), v[1].get<float>(), v[2].get<float>()); break;
+            case ShaderUniformType::Vec4:
+            case ShaderUniformType::Color4: val.vec4Val = glm::vec4(v[0].get<float>(), v[1].get<float>(), v[2].get<float>(), v[3].get<float>()); break;
+            case ShaderUniformType::Texture2D: val.textureUUID = AssetUUID::FromString(v.get<std::string>()); break;
+            }
+            asset->customUniforms[name] = val;
+        }
     }
 
     return true;

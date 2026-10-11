@@ -14,6 +14,9 @@ Shader::Shader(Shader&& other) noexcept
     ID = other.ID;
     m_Name = std::move(other.m_Name);
     m_Path = std::move(other.m_Path);
+    m_Source = std::move(other.m_Source);
+    m_IncludeBasePath = std::move(other.m_IncludeBasePath);
+    m_LastCompileLog = std::move(other.m_LastCompileLog);
     m_ActiveDefines = std::move(other.m_ActiveDefines);
     m_DiscoveredDefines = std::move(other.m_DiscoveredDefines);
     uniformLocationCache = std::move(other.uniformLocationCache);
@@ -30,6 +33,9 @@ Shader& Shader::operator=(Shader&& other) noexcept
         ID = other.ID;
         m_Name = std::move(other.m_Name);
         m_Path = std::move(other.m_Path);
+        m_Source = std::move(other.m_Source);
+        m_IncludeBasePath = std::move(other.m_IncludeBasePath);
+        m_LastCompileLog = std::move(other.m_LastCompileLog);
         m_ActiveDefines = std::move(other.m_ActiveDefines);
         m_DiscoveredDefines = std::move(other.m_DiscoveredDefines);
         uniformLocationCache = std::move(other.uniformLocationCache);
@@ -47,6 +53,21 @@ bool Shader::Init(const std::string& name, const Path& shaderPath, const std::ve
 
     GLuint program = 0;
     if (!CompileInternal(shaderPath, program))
+        return false;
+
+    ID = program;
+    return true;
+}
+
+bool Shader::InitFromSource(const std::string& name, const std::string& source, const std::vector<std::string>& enabledDefines, const Path& includeBasePath)
+{
+    m_Name = name;
+    m_Source = source;
+    m_IncludeBasePath = includeBasePath.IsValid() ? includeBasePath : ENGINE_PATH("Shaders\\pbr.glsl");
+    m_ActiveDefines = std::unordered_set<std::string>(enabledDefines.begin(), enabledDefines.end());
+
+    GLuint program = 0;
+    if (!CompileSourceInternal(source, m_IncludeBasePath, program))
         return false;
 
     ID = program;
@@ -89,6 +110,7 @@ bool Shader::checkCompileErrors(unsigned int shader, const std::string& type)
         if (!success)
         {
             glGetShaderInfoLog(shader, 1024, NULL, infoLog);
+            m_LastCompileLog = std::string(infoLog);
             LOG_ERROR("ERROR::SHADER_COMPILATION_ERROR of type: {} \n {}", type, infoLog);
             return false;
         }
@@ -99,6 +121,7 @@ bool Shader::checkCompileErrors(unsigned int shader, const std::string& type)
         if (!success)
         {
             glGetProgramInfoLog(shader, 1024, NULL, infoLog);
+            m_LastCompileLog = std::string(infoLog);
             LOG_ERROR("ERROR::PROGRAM_LINKING_ERROR of type: {} \n {}", type, infoLog);
             return false;
         }
@@ -111,7 +134,32 @@ bool Shader::Recompile()
 {
     GLuint newProgram = 0;
 
-    if (!CompileInternal(m_Path, newProgram))
+    if (m_Path.IsValid() && m_Path.Exists())
+    {
+        if (!CompileInternal(m_Path, newProgram))
+            return false;
+    }
+    else if (!m_Source.empty())
+    {
+        if (!CompileSourceInternal(m_Source, m_IncludeBasePath, newProgram))
+            return false;
+    }
+    else
+    {
+        return false;
+    }
+
+    glDeleteProgram(ID);
+    ID = newProgram;
+    uniformLocationCache.clear();
+    return true;
+}
+
+bool Shader::RecompileFromSource(const std::string& source)
+{
+    m_Source = source;
+    GLuint newProgram = 0;
+    if (!CompileSourceInternal(m_Source, m_IncludeBasePath, newProgram))
         return false;
 
     glDeleteProgram(ID);
@@ -291,12 +339,18 @@ bool Shader::CompileInternal(const Path& path, GLuint& outProgram)
 
     std::stringstream buffer;
     buffer << shaderFile.rdbuf();
+    return CompileSourceInternal(buffer.str(), path, outProgram);
+}
+
+bool Shader::CompileSourceInternal(const std::string& source, const Path& basePath, GLuint& outProgram)
+{
+    Path effectivePath = basePath.IsValid() ? basePath : ENGINE_PATH("Shaders\\pbr.glsl");
 
     std::unordered_map<std::string, std::string> rawShaderSources;
     std::string currentType;
     std::stringstream currentSource;
 
-    std::istringstream stream(buffer.str());
+    std::istringstream stream(source);
     std::string line;
 
     while (std::getline(stream, line))
@@ -330,8 +384,9 @@ bool Shader::CompileInternal(const Path& path, GLuint& outProgram)
         std::string src = InjectActiveDefines(rawSrc);
 
         std::unordered_set<std::string> includedPaths;
-        includedPaths.insert(path.GetAbsoluteStr());
-        src = ProcessIncludes(src, path, includedPaths);
+        if (effectivePath.IsValid())
+            includedPaths.insert(effectivePath.GetAbsoluteStr());
+        src = ProcessIncludes(src, effectivePath, includedPaths);
 
         ParseDefines(src);
 

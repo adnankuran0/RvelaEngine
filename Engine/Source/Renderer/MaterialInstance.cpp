@@ -82,6 +82,33 @@ json MaterialInstance::SerializeOverrides() const
     if (IsOverridden(MatField::UseARMMap))
         j["useARMMap"] = m_UseARMMap;
 
+    if (IsOverridden(MatField::CustomShader))
+        j["customShader"] = m_CustomShaderUUID.ToString();
+
+    if (!m_CustomUniformOverrides.empty())
+    {
+        json uJson = json::object();
+        for (const auto& [name, val] : m_CustomUniformOverrides)
+        {
+            json item;
+            item["type"] = static_cast<int>(val.type);
+            switch (val.type)
+            {
+            case ShaderUniformType::Float: item["value"] = val.floatVal; break;
+            case ShaderUniformType::Int: item["value"] = val.intVal; break;
+            case ShaderUniformType::Bool: item["value"] = val.boolVal; break;
+            case ShaderUniformType::Vec2: item["value"] = { val.vec2Val.x, val.vec2Val.y }; break;
+            case ShaderUniformType::Vec3:
+            case ShaderUniformType::Color3: item["value"] = { val.vec3Val.x, val.vec3Val.y, val.vec3Val.z }; break;
+            case ShaderUniformType::Vec4:
+            case ShaderUniformType::Color4: item["value"] = { val.vec4Val.x, val.vec4Val.y, val.vec4Val.z, val.vec4Val.w }; break;
+            case ShaderUniformType::Texture2D: item["value"] = val.textureUUID.ToString(); break;
+            }
+            uJson[name] = item;
+        }
+        j["customUniformOverrides"] = uJson;
+    }
+
     return j;
 }
 
@@ -226,6 +253,51 @@ void MaterialInstance::DeserializeOverrides(const json& j)
         m_UseARMMap = j["useARMMap"].get<bool>();
         SetOverride(MatField::UseARMMap);
     }
+
+    if (j.contains("customShader"))
+    {
+        m_CustomShaderUUID = AssetUUID::FromString(j["customShader"].get<std::string>());
+        m_CustomShader = m_CustomShaderUUID.IsValid() ? mgr.GetAsset<ShaderAsset>(m_CustomShaderUUID) : nullptr;
+        SetOverride(MatField::CustomShader);
+    }
+
+    if (j.contains("customUniformOverrides") && j["customUniformOverrides"].is_object())
+    {
+        m_CustomUniformOverrides.clear();
+        for (auto& [name, item] : j["customUniformOverrides"].items())
+        {
+            CustomUniformValue val;
+            val.type = static_cast<ShaderUniformType>(item.value("type", 0));
+            auto& v = item["value"];
+            switch (val.type)
+            {
+            case ShaderUniformType::Float: val.floatVal = v.get<float>(); break;
+            case ShaderUniformType::Int: val.intVal = v.get<int>(); break;
+            case ShaderUniformType::Bool: val.boolVal = v.get<bool>(); break;
+            case ShaderUniformType::Vec2: val.vec2Val = glm::vec2(v[0].get<float>(), v[1].get<float>()); break;
+            case ShaderUniformType::Vec3:
+            case ShaderUniformType::Color3: val.vec3Val = glm::vec3(v[0].get<float>(), v[1].get<float>(), v[2].get<float>()); break;
+            case ShaderUniformType::Vec4:
+            case ShaderUniformType::Color4: val.vec4Val = glm::vec4(v[0].get<float>(), v[1].get<float>(), v[2].get<float>(), v[3].get<float>()); break;
+            case ShaderUniformType::Texture2D: val.textureUUID = AssetUUID::FromString(v.get<std::string>()); break;
+            }
+            m_CustomUniformOverrides[name] = val;
+        }
+    }
+}
+
+void MaterialInstance::SetCustomShader(const AssetUUID& uuid)
+{
+    m_CustomShaderUUID = uuid;
+    m_CustomShader = uuid.IsValid() ? AssetManager::Get().GetAsset<ShaderAsset>(uuid) : nullptr;
+    SetOverride(MatField::CustomShader);
+}
+
+void MaterialInstance::ClearCustomShader()
+{
+    m_CustomShaderUUID = AssetUUID::Invalid();
+    m_CustomShader = nullptr;
+    ClearOverride(MatField::CustomShader);
 }
 
 void MaterialInstance::RebuildCache()
@@ -239,4 +311,54 @@ void MaterialInstance::RebuildCache()
     m_CachedAOTex = m_SourceAsset->useAOMap ? mgr.GetAsset<TextureAsset>(m_SourceAsset->aoTextureUUID) : nullptr;
     m_CachedHeightTex = m_SourceAsset->useHeightMap ? mgr.GetAsset<TextureAsset>(m_SourceAsset->heightTextureUUID) : nullptr;
     m_CachedARMTex = m_SourceAsset->useARMMap ? mgr.GetAsset<TextureAsset>(m_SourceAsset->armTextureUUID) : nullptr;
+    m_CachedCustomShader = m_SourceAsset->customShaderUUID.IsValid() ? mgr.GetAsset<ShaderAsset>(m_SourceAsset->customShaderUUID) : nullptr;
+    m_CachedCustomUniforms = m_SourceAsset->customUniforms;
+}
+
+CustomUniformValue MaterialInstance::GetCustomUniform(const std::string& name) const
+{
+    auto itOver = m_CustomUniformOverrides.find(name);
+    if (itOver != m_CustomUniformOverrides.end())
+        return itOver->second;
+
+    auto itCached = m_CachedCustomUniforms.find(name);
+    if (itCached != m_CachedCustomUniforms.end())
+        return itCached->second;
+
+    // Check defaults from shader definition
+    auto shaderAsset = GetCustomShaderAsset();
+    if (shaderAsset)
+    {
+        const auto* def = shaderAsset->FindUniform(name);
+        if (def)
+        {
+            CustomUniformValue val;
+            val.type = def->type;
+            val.floatVal = def->floatVal;
+            val.intVal = def->intVal;
+            val.boolVal = def->boolVal;
+            val.vec2Val = def->vec2Val;
+            val.vec3Val = def->vec3Val;
+            val.vec4Val = def->vec4Val;
+            val.textureUUID = def->textureUUID;
+            return val;
+        }
+    }
+
+    return CustomUniformValue{};
+}
+
+void MaterialInstance::SetCustomUniform(const std::string& name, const CustomUniformValue& val)
+{
+    m_CustomUniformOverrides[name] = val;
+}
+
+void MaterialInstance::ClearCustomUniform(const std::string& name)
+{
+    m_CustomUniformOverrides.erase(name);
+}
+
+bool MaterialInstance::IsCustomUniformOverridden(const std::string& name) const
+{
+    return m_CustomUniformOverrides.find(name) != m_CustomUniformOverrides.end();
 }

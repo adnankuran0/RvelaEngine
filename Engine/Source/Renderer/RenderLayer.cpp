@@ -3,6 +3,7 @@
 #include "Core/Engine.h"
 #include "Light.h"
 #include "glm/gtx/norm.hpp"
+#include "Asset/Types/ShaderAsset.h"
 
 using namespace rv;
 
@@ -108,7 +109,17 @@ void RenderLayer::CollectRenderCommands(Scene* scene)
 		cmd.material = &scene->GetComponent<MaterialComponent>(entity);
 		cmd.entityID = entity;
 
-		if (matComp.GetTransparencyMode() == TransparencyMode::Alpha)
+		bool isTransparent = (matComp.GetTransparencyMode() == TransparencyMode::Alpha);
+		auto customShader = matComp.GetInstance().GetCustomShaderAsset();
+		if (customShader && customShader->IsValid())
+		{
+			if (customShader->renderModes.hasBlendMode || customShader->renderModes.depthDrawDisabled)
+			{
+				isTransparent = true;
+			}
+		}
+
+		if (isTransparent)
 		{
 			glm::vec3 objPos = glm::vec3(transform.GetWorldMatrix()[3]);
 			cmd.distanceToCamera = glm::length2(camPos - objPos);
@@ -153,7 +164,17 @@ void RenderLayer::CollectRenderCommands(Scene* scene)
 		cmd.entityID = entity;
 		cmd.skeleton = skeletonComp;
 
-		if (matComp.GetTransparencyMode() == TransparencyMode::Alpha)
+		bool isSkeletalTransparent = (matComp.GetTransparencyMode() == TransparencyMode::Alpha);
+		auto skeletalCustomShader = matComp.GetInstance().GetCustomShaderAsset();
+		if (skeletalCustomShader && skeletalCustomShader->IsValid())
+		{
+			if (skeletalCustomShader->renderModes.hasBlendMode || skeletalCustomShader->renderModes.depthDrawDisabled)
+			{
+				isSkeletalTransparent = true;
+			}
+		}
+
+		if (isSkeletalTransparent)
 		{
 			glm::vec3 objPos = glm::vec3(transform.GetWorldMatrix()[3]);
 			cmd.distanceToCamera = glm::length2(camPos - objPos);

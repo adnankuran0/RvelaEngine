@@ -288,7 +288,7 @@ void ModelImporter::ExtractTextures(
 
         if (needsImport)
         {
-            LOG_INFO("Importing texture: {}", texPath.filename().string());
+            //LOG_INFO("Importing texture: {}", texPath.filename().string());
 
             if (m_TextureImporter.Import(texPath, cachePath, meta.importerSettingsJson))
             {

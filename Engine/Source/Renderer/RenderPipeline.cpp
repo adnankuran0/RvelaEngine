@@ -33,8 +33,8 @@ RenderPipeline::RenderPipeline()
 	PushRenderPass(std::make_unique<LightingPass>());
 	PushRenderPass(std::make_unique<SkyboxPass>());
 	PushRenderPass(std::make_unique<DecalPass>());
-	PushRenderPass(std::make_unique<TransparentPass>());
 	PushRenderPass(std::make_unique<ParticlePass>());
+	PushRenderPass(std::make_unique<TransparentPass>());
 	PushRenderPass(std::make_unique<SSRPass>());
 	PushRenderPass(std::make_unique<BrightPass>());
 	PushRenderPass(std::make_unique<BloomPass>());

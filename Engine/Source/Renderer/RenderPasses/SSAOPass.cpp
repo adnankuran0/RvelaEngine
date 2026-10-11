@@ -59,6 +59,11 @@ void SSAOPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     ssaoShader.setInt("texNoise", 2);
 
     Renderer::DrawFullScreenQuad();
+
+    glBindTextureUnit(0, 0);
+    glBindTextureUnit(1, 0);
+    glBindTextureUnit(2, 0);
+
     Framebuffer::BindDefault();
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
 }

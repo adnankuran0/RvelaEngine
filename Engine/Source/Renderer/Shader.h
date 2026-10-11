@@ -22,7 +22,9 @@ public:
     ~Shader() { Destroy(); }
 
     bool Init(const std::string& name, const Path& shaderPath, const std::vector<std::string>& enabledDefines = {});
+    bool InitFromSource(const std::string& name, const std::string& source, const std::vector<std::string>& enabledDefines = {}, const Path& includeBasePath = Path{});
     bool Recompile();
+    bool RecompileFromSource(const std::string& source);
     void Destroy();
 
     void EnableDefine(const std::string& define);
@@ -36,6 +38,7 @@ public:
 
     inline const std::string& GetName() { return m_Name; }
     inline const Path& GetPath() { return m_Path; }
+    inline const std::string& GetLastCompileLog() const { return m_LastCompileLog; }
 
     inline void setBool(const std::string& name, bool value) const {
         glUniform1i(GetUniformLocation(name), (int)value);
@@ -70,10 +73,14 @@ public:
 private:
     std::string m_Name;
     Path m_Path;
+    std::string m_Source;
+    Path m_IncludeBasePath;
+    std::string m_LastCompileLog;
     std::unordered_set<std::string> m_DiscoveredDefines;
     std::unordered_set<std::string> m_ActiveDefines;
     bool checkCompileErrors(unsigned int shader, const std::string& type);
     bool CompileInternal(const Path& path, GLuint& outProgram);
+    bool CompileSourceInternal(const std::string& source, const Path& basePath, GLuint& outProgram);
     void ParseDefines(const std::string& source);
     std::string InjectActiveDefines(const std::string& source) const;
     static std::string ProcessIncludes(const std::string& source, const Path& shaderPath, std::unordered_set<std::string>& includedPaths);

@@ -4,6 +4,8 @@
 #include "Renderer/Sampler.h"
 #include <glm/glm.hpp>
 #include "Renderer/RenderTypes.h"
+#include "Renderer/CustomShaderGenerator.h"
+#include <unordered_map>
 
 namespace rv {
 
@@ -11,6 +13,9 @@ class MaterialAsset : public Asset
 {
 public:
     explicit MaterialAsset(AssetUUID uuid) : Asset(uuid) {}
+
+    AssetUUID customShaderUUID = AssetUUID::Invalid();
+    std::unordered_map<std::string, CustomUniformValue> customUniforms;
 
     AssetUUID albedoTextureUUID;
     AssetUUID normalTextureUUID;

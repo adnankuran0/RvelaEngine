@@ -23,6 +23,7 @@
 #include <Render/IconLibrary.h>
 #include "EditorSettings.h"
 #include "EditorSelection.h"
+#include "Asset/Types/ShaderAsset.h"
 
 using namespace rv;
 
@@ -95,6 +96,8 @@ void EditorLayer::OnUpdate()
     static_cast<SelectedEntityMaskPass*>(m_Engine->GetRenderLayer().GetRenderPass(m_SelectedEntityMaskPass))->SetSelectedEntities(EditorSelection::Get().GetSelectedEntities());
     static_cast<OutlinePass*>(m_Engine->GetRenderLayer().GetRenderPass(m_OutlinePass))->SetHasSelection(!EditorSelection::Get().IsEmpty());
    
+    ShaderAsset::CheckHotReload();
+
     HandleShortcuts();
 
     if (!ProjectManager::IsProjectLoaded())
