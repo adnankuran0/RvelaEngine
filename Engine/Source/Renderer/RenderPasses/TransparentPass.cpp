@@ -327,6 +327,9 @@ void TransparentPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             BindGlobalTexturesAndUniforms(staticShader);
             Shader* lastBoundShader = &staticShader;
 
+            if (ctx.wireframe)
+                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
             for (auto& command : commands) {
                 if (!ctx.camera->Intersects(command.mesh->worldAABB)) continue;
 
@@ -402,8 +405,8 @@ void TransparentPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
                 if (hasCustomShader)
                 {
-                    if (customShaderAsset->renderModes.wireframe)
-                        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+                    if (customShaderAsset->renderModes.wireframe || ctx.wireframe)
+                        glPolygonMode(GL_FRONT_AND_BACK, ctx.wireframe ? GL_LINE : GL_FILL);
                     if (customShaderAsset->renderModes.depthTestDisabled)
                         glEnable(GL_DEPTH_TEST);
                     if (customShaderAsset->renderModes.depthDrawAlways)
@@ -512,8 +515,8 @@ void TransparentPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
                 if (hasCustomShader)
                 {
-                    if (customShaderAsset->renderModes.wireframe)
-                        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+                    if (customShaderAsset->renderModes.wireframe || ctx.wireframe)
+                        glPolygonMode(GL_FRONT_AND_BACK, ctx.wireframe ? GL_LINE : GL_FILL);
                     if (customShaderAsset->renderModes.depthTestDisabled)
                         glEnable(GL_DEPTH_TEST);
                     if (customShaderAsset->renderModes.depthDrawAlways)
@@ -527,6 +530,9 @@ void TransparentPass::Execute(const RenderContext& ctx, RenderFrame& frame)
                 CleanupMaterialSamplers();
             }
         }
+
+        if (ctx.wireframe)
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         glDepthMask(GL_TRUE);
         glDisable(GL_BLEND);

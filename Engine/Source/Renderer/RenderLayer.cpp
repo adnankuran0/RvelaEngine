@@ -48,6 +48,7 @@ void RenderLayer::OnRender()
 	m_Context.viewportHeight = 1080;
 	m_Context.scene = &scene;
 	m_Context.environment = &scene.GetEnvironment();
+	m_Context.wireframe = m_Wireframe;
 	
 	m_RenderPipeline->EnsureInitialized(m_Context);
 	

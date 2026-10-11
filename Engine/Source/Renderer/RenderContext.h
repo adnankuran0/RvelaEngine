@@ -26,6 +26,7 @@ public:
 	Scene* scene{};
 	RenderProfile profile = RenderProfile::EDITOR;
 	Environment* environment{};
+	bool wireframe = false;
 
 	void Clear()
 	{

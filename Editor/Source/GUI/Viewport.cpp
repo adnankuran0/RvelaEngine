@@ -240,7 +240,6 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
 
                     if (m_CurrentGizmoMode == ImGuizmo::LOCAL)
                     {
-                        // Godot Local space: Each object rotates around its OWN pivot/origin!
                         glm::vec3 newPos = initTr.worldPos;
                         glm::quat newRot = deltaRot * initTr.worldRot;
                         glm::mat4 newWorld = glm::translate(glm::mat4(1.0f), newPos) * glm::mat4_cast(newRot) * glm::scale(glm::mat4(1.0f), initTr.worldScale);
@@ -248,7 +247,6 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
                     }
                     else
                     {
-                        // Godot World space: Objects rotate around the GROUP CENTER pivot!
                         glm::vec3 offset = initTr.worldPos - m_InitialGizmoPos;
                         glm::vec3 newPos = m_InitialGizmoPos + deltaRot * offset;
                         glm::quat newRot = deltaRot * initTr.worldRot;
@@ -265,7 +263,6 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
 
                     if (m_CurrentGizmoMode == ImGuizmo::LOCAL)
                     {
-                        // Godot Local space: Each object scales in place along its OWN local axes / pivot!
                         glm::vec3 newPos = initTr.worldPos;
                         glm::vec3 newScale = initTr.worldScale * scaleFactor;
                         glm::mat4 newWorld = glm::translate(glm::mat4(1.0f), newPos) * glm::mat4_cast(initTr.worldRot) * glm::scale(glm::mat4(1.0f), newScale);
@@ -273,7 +270,6 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
                     }
                     else
                     {
-                        // Godot World space: Objects scale relative to the GROUP CENTER!
                         glm::vec3 offset = initTr.worldPos - m_InitialGizmoPos;
                         glm::vec3 newPos = m_InitialGizmoPos + offset * scaleFactor;
                         glm::vec3 newScale = initTr.worldScale * scaleFactor;
@@ -473,6 +469,15 @@ void Viewport::DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySi
     {
         bool viewChanged = false;
 
+        ImGui::TextDisabled("Render Mode");
+        ImGui::Separator();
+        bool wireframePopup = engine->GetRenderLayer().GetWireframe();
+        if (ImGui::Checkbox("Wireframe Mode", &wireframePopup))
+        {
+            engine->GetRenderLayer().SetWireframe(wireframePopup);
+        }
+
+        ImGui::Spacing();
         ImGui::TextDisabled("Selection");
         ImGui::Separator();
         if (ImGui::Checkbox("Select Root Entity", &m_SelectRootEntity)) viewChanged = true;

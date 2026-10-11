@@ -659,7 +659,7 @@
                     0.9999991655349731
                 ]
             },
-            "UUID": 18041917450133973391
+            "UUID": 8264419027924578037
         },
         {
             "Material": {
@@ -1446,7 +1446,7 @@
                     1.0
                 ]
             },
-            "UUID": 9106370362046832226
+            "UUID": 15998501004140258111
         },
         {
             "ParentUUID": 0,
@@ -1628,17 +1628,9 @@
                     0.3500000238418579
                 ]
             },
-            "UUID": 11141740964970536366
+            "UUID": 14757677148157230958
         },
         {
-            "ConvexHullColliderComponent": {
-                "maxConvexRadius": 0.0,
-                "offset": [
-                    0.0,
-                    0.0,
-                    0.0
-                ]
-            },
             "Material": {
                 "material": "",
                 "overrides": {
@@ -1659,29 +1651,6 @@
                 "mesh": "1d2596bb-18d3-41a6-9848-a8a584870ce3"
             },
             "ParentUUID": 0,
-            "RigidbodyComponent": {
-                "allowSleep": 1,
-                "angularDamping": 0.05000000074505806,
-                "autoCalculateMass": 1,
-                "bodyType": 0,
-                "collisionLayer": 1,
-                "collisionMask": 4294967295,
-                "friction": 0.5,
-                "gravityFactor": 1.0,
-                "isSensor": false,
-                "linearDamping": 0.05000000074505806,
-                "lockRotationX": false,
-                "lockRotationY": false,
-                "lockRotationZ": false,
-                "lockTranslationX": false,
-                "lockTranslationY": false,
-                "lockTranslationZ": false,
-                "mass": 1.0,
-                "maxAngularVelocity": 50.0,
-                "maxLinearVelocity": 500.0,
-                "restitution": 0.0,
-                "useCCD": false
-            },
             "Tag": {
                 "isActive": true,
                 "tag": "Quad"
