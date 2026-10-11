@@ -16,31 +16,74 @@ void main()
 out vec4 FragColor;
 in vec2 TexCoords;
 
+#include "Common/Camera.glsl"
+#include "Common/Depth.glsl"
 #include "Common/Tonemapping.glsl"
 #include "Common/PostProcess.glsl"
 
 layout(binding = 0) uniform sampler2D screenTexture;
 layout(binding = 1) uniform sampler2D bloomTexture;
 layout(binding = 2) uniform sampler2D ssrTexture;
+layout(binding = 3) uniform sampler2D depthTexture;
 
 uniform float bloomIntensity;
 uniform float exposure;
+uniform float brightness;
+uniform float contrast;
+uniform float saturation;
 uniform float chromaticStrength;
 uniform float vignetteIntensity;
 uniform float vignetteSmoothness;
+
+uniform bool u_FogEnabled;
+uniform vec3 u_FogColor;
+uniform float u_FogDensity;
+uniform float u_FogStart;
+uniform float u_FogEnd;
+uniform int u_FogMode;
 
 void main()
 {
     vec3 hdrColor   = ChromaticAberration(screenTexture, TexCoords, chromaticStrength);
     vec3 bloomColor = texture(bloomTexture, TexCoords).rgb;
-    vec4 ssrSample  = texture(ssrTexture,  TexCoords);
+
+    if (u_FogEnabled)
+    {
+        float depth = texture(depthTexture, TexCoords).r;
+        if (depth < 0.99999)
+        {
+            vec3 viewPos = ReconstructViewPos(TexCoords, depth, invProjection);
+            float dist = length(viewPos);
+
+            float fogFactor = 0.0;
+            if (u_FogMode == 0) // Linear
+            {
+                fogFactor = (dist - u_FogStart) / max(u_FogEnd - u_FogStart, 0.001);
+            }
+            else if (u_FogMode == 1) // Exponential
+            {
+                float d = max(dist - u_FogStart, 0.0);
+                fogFactor = 1.0 - exp(-d * u_FogDensity);
+            }
+            else // Exponential Squared
+            {
+                float d = max(dist - u_FogStart, 0.0);
+                float expTerm = d * u_FogDensity;
+                fogFactor = 1.0 - exp(-(expTerm * expTerm));
+            }
+
+            fogFactor = clamp(fogFactor, 0.0, 1.0);
+            hdrColor = mix(hdrColor, u_FogColor, fogFactor);
+        }
+    }
 
     vec3 combined = hdrColor + bloomColor * bloomIntensity;
 
-    combined    = vec3(1.0) - exp(-combined * exposure);
-    vec3 mapped = ACESFilm(combined);
+    vec3 mapped = ACESFilm(combined * exposure);
 
     mapped = LinearToSRGB(mapped);
+
+    mapped = AdjustColor(mapped, brightness, contrast, saturation);
 
     mapped *= Vignette(TexCoords, vignetteIntensity, vignetteSmoothness);
 

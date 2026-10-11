@@ -19,6 +19,9 @@ std::string Project::Serialize() const
 	s["windowWidth"] = m_Settings.windowWidth;
 	s["windowHeight"] = m_Settings.windowHeight;
 	s["vsync"] = m_Settings.vsync;
+	s["msaaSamples"] = m_Settings.msaaSamples;
+	s["fxaaEnabled"] = m_Settings.fxaaEnabled;
+	s["shadowResolution"] = m_Settings.shadowResolution;
 	j["settings"] = s;
 
 	j["busLayout"] = AudioManager::Get().SaveBusLayout();
@@ -48,6 +51,9 @@ void Project::Deserialize(const std::string& jsonStr)
 		m_Settings.windowWidth = s.value("windowWidth", 1600u);
 		m_Settings.windowHeight = s.value("windowHeight", 900u);
 		m_Settings.vsync = s.value("vsync", true);
+		m_Settings.msaaSamples = s.value("msaaSamples", 2u);
+		m_Settings.fxaaEnabled = s.value("fxaaEnabled", false);
+		m_Settings.shadowResolution = s.value("shadowResolution", 2048u);
 	}
 
 	if (j.contains("busLayout"))

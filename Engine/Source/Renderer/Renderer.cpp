@@ -45,9 +45,12 @@ void Renderer::Init(GLFWwindow* window)
     ShaderManager::Add(Shader("Downsample", ENGINE_PATH("Shaders\\downsample.glsl")));
     ShaderManager::Add(Shader("Upsample", ENGINE_PATH("Shaders\\upsample.glsl")));
     ShaderManager::Add(Shader("SSAO", ENGINE_PATH("Shaders\\ssao.glsl")));
+    ShaderManager::Add(Shader("SSGI", ENGINE_PATH("Shaders\\ssgi.glsl")));
+    ShaderManager::Add(Shader("SSGIBlend", ENGINE_PATH("Shaders\\ssgiBlend.glsl")));
     ShaderManager::Add(Shader("SSR", ENGINE_PATH("Shaders\\ssr.glsl")));
     ShaderManager::Add(Shader("SSRBlend", ENGINE_PATH("Shaders\\ssrBlend.glsl")));
     ShaderManager::Add(Shader("Composite", ENGINE_PATH("Shaders\\composite.glsl")));
+    ShaderManager::Add(Shader("FXAA", ENGINE_PATH("Shaders\\fxaa.glsl")));
     ShaderManager::Add(Shader("Outline", ENGINE_PATH("Shaders\\outline.glsl")));
     ShaderManager::Add(Shader("ToCubemap", ENGINE_PATH("Shaders\\equirectangularToCubemap.glsl")));
     ShaderManager::Add(Shader("Irradiance", ENGINE_PATH("Shaders\\irradiance.glsl")));

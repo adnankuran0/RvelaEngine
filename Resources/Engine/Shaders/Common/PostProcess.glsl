@@ -32,4 +32,16 @@ float Vignette(vec2 uv, float intensity, float smoothness)
     return 1.0 - vignette * intensity;
 }
 
+vec3 AdjustColor(vec3 color, float brightness, float contrast, float saturation)
+{
+    color += brightness;
+
+    color = (color - 0.5) * contrast + 0.5;
+
+    vec3 luminance = vec3(dot(color, vec3(0.2126, 0.7152, 0.0722)));
+    color = mix(luminance, color, saturation);
+
+    return max(color, vec3(0.0));
+}
+
 #endif

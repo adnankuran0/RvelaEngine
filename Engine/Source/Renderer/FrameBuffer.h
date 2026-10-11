@@ -51,6 +51,8 @@ public:
     Framebuffer(Framebuffer&& other) noexcept;
     Framebuffer& operator=(Framebuffer&& other) noexcept;
     void Resize(uint32_t width, uint32_t height);
+    void SetSamples(uint32_t samples);
+    uint32_t GetSamples() const { return m_Desc.samples; }
     void Bind() const;
     void BindViewport() const;
     static void BindDefault();

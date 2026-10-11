@@ -10,7 +10,10 @@
     "name": "TestProject",
     "projectPath": "C:\\RvelaEngine\\Resources\\Editor\\TestProject",
     "settings": {
+        "fxaaEnabled": true,
+        "msaaSamples": 1,
         "name": "TestProject",
+        "shadowResolution": 2048,
         "startScene": "Assets\\Scenes\\PhysicsTest.rscene",
         "vsync": true,
         "windowHeight": 1080,

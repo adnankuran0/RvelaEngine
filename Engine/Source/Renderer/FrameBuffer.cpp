@@ -220,6 +220,16 @@ void Framebuffer::Resize(uint32_t width, uint32_t height)
     Invalidate();
 }
 
+void Framebuffer::SetSamples(uint32_t samples)
+{
+    uint32_t clamped = std::max(1u, samples);
+    if (clamped == m_Desc.samples)
+        return;
+
+    m_Desc.samples = clamped;
+    Invalidate();
+}
+
 void Framebuffer::Bind() const
 {
     glBindFramebuffer(GL_FRAMEBUFFER, m_ID);

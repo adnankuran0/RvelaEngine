@@ -5,6 +5,7 @@
 #include "Renderer/RenderFrame.h"
 #include "Renderer/ShaderManager.h"
 #include "Renderer/TextureCache.h"
+#include "Utils/ProjectManager.h"
 
 using namespace rv;
 
@@ -27,8 +28,8 @@ void ShadowPass::InitDirectionalShadowMap()
         GL_TEXTURE_2D_ARRAY,
         0,
         GL_DEPTH_COMPONENT32F,
-        SHADOW_WIDTH,
-        SHADOW_HEIGHT,
+        m_CurrentShadowResolution,
+        m_CurrentShadowResolution,
         NUM_SHADOW_CASCADES,
         0,
         GL_DEPTH_COMPONENT,
@@ -102,7 +103,7 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
     if (commands.empty() && skeletalCommands.empty()) return;
 
     glBindFramebuffer(GL_FRAMEBUFFER, dirShadowFBO);
-    glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+    glViewport(0, 0, m_CurrentShadowResolution, m_CurrentShadowResolution);
 
     glDepthMask(GL_TRUE);
     glEnable(GL_DEPTH_TEST);
@@ -371,8 +372,30 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
 }
 
+void ShadowPass::RecreateDirectionalShadowMap(uint32_t resolution, RenderFrame& frame)
+{
+    m_CurrentShadowResolution = resolution;
+
+    if (o_DirectionalShadowMap != 0)
+        glDeleteTextures(1, &o_DirectionalShadowMap);
+    if (dirShadowFBO != 0)
+        glDeleteFramebuffers(1, &dirShadowFBO);
+
+    InitDirectionalShadowMap();
+    frame.registry.Register("DirectionalShadowMap", { RenderResourceType::Texture, o_DirectionalShadowMap });
+}
+
 void ShadowPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
+    if (ProjectManager::IsProjectLoaded())
+    {
+        uint32_t targetRes = ProjectManager::GetActiveProject()->GetSettings().shadowResolution;
+        if (targetRes > 0 && targetRes != m_CurrentShadowResolution)
+        {
+            RecreateDirectionalShadowMap(targetRes, frame);
+        }
+    }
+
     if (frame.opaqueCommands.empty() && frame.skeletalOpaqueCommands.empty()) return;
 
     RenderDirectionalShadowMap(ctx, frame);

@@ -936,7 +936,7 @@ void InspectorPanel::Draw(Engine* engine)
 						pointLight.color = glm::vec3(color[0], color[1], color[2]);
 
 					UI::PropertyLabel("Intensity");
-					ImGui::SliderFloat("##Intensity", &pointLight.intensity, 0.0f, 20.0f, "%.2f");
+					ImGui::DragFloat("##Intensity", &pointLight.intensity, 0.1f, 0.0f, 100.0f, "%.2f");
 
 					UI::PropertyLabel("Radius");
 					ImGui::SliderFloat("##Radius", &pointLight.radius, 0.1f, 50.0f, "%.2f");
@@ -973,7 +973,7 @@ void InspectorPanel::Draw(Engine* engine)
 						dirLight.color = glm::vec3(color[0], color[1], color[2]);
 
 					UI::PropertyLabel("Intensity");
-					ImGui::SliderFloat("##DirIntensity", &dirLight.intensity, 0.0f, 10.0f, "%.2f");
+					ImGui::DragFloat("##DirIntensity", &dirLight.intensity, 0.05f, 0.0f, 50.0f, "%.2f");
 
 					UI::PropertyLabel("Cast Shadows");
 					ImGui::Checkbox("##DirCastShadows", &dirLight.castShadows);

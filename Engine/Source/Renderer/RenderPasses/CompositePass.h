@@ -14,6 +14,7 @@ public:
 
 private:
     Framebuffer m_Framebuffer;
+    Framebuffer m_FXAAFramebuffer;
 };
 
 }

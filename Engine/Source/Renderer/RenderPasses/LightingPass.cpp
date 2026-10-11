@@ -8,6 +8,7 @@
 #include "Scene/Environment.h"
 #include "Renderer/ShaderManager.h"
 #include "Renderer/TextureCache.h"
+#include "Utils/ProjectManager.h"
 #include "Core/Time.h"
 #include <glm/gtc/type_ptr.hpp>
 
@@ -61,6 +62,17 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     auto i_DirectionalShadowMap = resourceRegistry.Get("DirectionalShadowMap")->id;
     auto i_PointShadowMap = resourceRegistry.Get("PointShadowMap")->id;
     auto i_SSAO = resourceRegistry.Get("SSAOTexture")->id;
+    uint32_t targetSamples = 2;
+    if (ProjectManager::IsProjectLoaded())
+    {
+        targetSamples = ProjectManager::GetActiveProject()->GetSettings().msaaSamples;
+    }
+
+    if (m_ScreenFramebuffer.GetSamples() != targetSamples)
+    {
+        m_ScreenFramebuffer.SetSamples(targetSamples);
+        resourceRegistry.Register("ScreenBuffer", { RenderResourceType::Framebuffer, m_ScreenFramebuffer.GetID() });
+    }
 
     m_ScreenFramebuffer.BindViewport();
 

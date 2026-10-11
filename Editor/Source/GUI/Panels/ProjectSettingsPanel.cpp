@@ -77,7 +77,39 @@ void ProjectSettingsPanel::Draw(Engine* engine)
 
         if (ImGui::Checkbox("VSync", &settings.vsync))
         {
-            // Update vsync setting
+        }
+
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::TextColored(ImVec4(0.62f, 0.56f, 0.80f, 1.0f), "Rendering & Quality");
+        ImGui::Spacing();
+
+        const char* msaaOptions[] = { "Off (1x)", "2x MSAA", "4x MSAA", "8x MSAA" };
+        int currentMsaa = 0;
+        if (settings.msaaSamples == 2) currentMsaa = 1;
+        else if (settings.msaaSamples == 4) currentMsaa = 2;
+        else if (settings.msaaSamples == 8) currentMsaa = 3;
+
+        if (ImGui::Combo("MSAA", &currentMsaa, msaaOptions, IM_ARRAYSIZE(msaaOptions)))
+        {
+            if (currentMsaa == 0) settings.msaaSamples = 1;
+            else if (currentMsaa == 1) settings.msaaSamples = 2;
+            else if (currentMsaa == 2) settings.msaaSamples = 4;
+            else if (currentMsaa == 3) settings.msaaSamples = 8;
+        }
+
+        ImGui::Checkbox("FXAA", &settings.fxaaEnabled);
+
+        const char* shadowResOptions[] = { "Low (1024x1024)", "Medium (2048x2048)", "High (4096x4096)" };
+        int currentShadow = 1;
+        if (settings.shadowResolution == 1024) currentShadow = 0;
+        else if (settings.shadowResolution == 4096) currentShadow = 2;
+
+        if (ImGui::Combo("Shadow Resolution", &currentShadow, shadowResOptions, IM_ARRAYSIZE(shadowResOptions)))
+        {
+            if (currentShadow == 0) settings.shadowResolution = 1024;
+            else if (currentShadow == 1) settings.shadowResolution = 2048;
+            else if (currentShadow == 2) settings.shadowResolution = 4096;
         }
 
         ImGui::Spacing();

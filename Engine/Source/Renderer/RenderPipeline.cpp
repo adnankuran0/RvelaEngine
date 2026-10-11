@@ -12,6 +12,7 @@
 #include "Renderer/RenderPasses/BloomPass.h"
 #include "Renderer/RenderPasses/GeometryPass.h"
 #include "Renderer/RenderPasses/SSAOPass.h"
+#include "Renderer/RenderPasses/SSGIPass.h"
 #include "Renderer/RenderPasses/SSRPass.h"
 #include "Renderer/RenderPasses/EntityBufferPass.h"
 #include "Renderer/RenderPasses/DebugPass.h"
@@ -33,6 +34,7 @@ RenderPipeline::RenderPipeline()
 	PushRenderPass(std::make_unique<LightingPass>());
 	PushRenderPass(std::make_unique<SkyboxPass>());
 	PushRenderPass(std::make_unique<DecalPass>());
+	PushRenderPass(std::make_unique<SSGIPass>());
 	PushRenderPass(std::make_unique<SSRPass>());
 	PushRenderPass(std::make_unique<ParticlePass>());
 	PushRenderPass(std::make_unique<TransparentPass>());
