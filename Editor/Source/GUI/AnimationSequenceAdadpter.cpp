@@ -114,7 +114,7 @@ float AnimationSequenceAdapter::TimeToX(float time, const ImRect& rc) const
 {
     float kfFrame = time * SEQUENCE_FPS;
     float totalFrames = static_cast<float>(GetFrameMax() - frameMin + 2.0f);
-    float fraction = (kfFrame - frameMin + 0.5f) / totalFrames;
+    float fraction = (kfFrame - frameMin) / totalFrames;
     return rc.Min.x + fraction * rc.GetWidth();
 }
 
@@ -122,7 +122,7 @@ float AnimationSequenceAdapter::XToTime(float x, const ImRect& rc) const
 {
     float fraction = (x - rc.Min.x) / rc.GetWidth();
     float totalFrames = static_cast<float>(GetFrameMax() - frameMin + 2.0f);
-    float kfFrame = fraction * totalFrames + frameMin - 0.5f;
+    float kfFrame = fraction * totalFrames + frameMin;
     return kfFrame / SEQUENCE_FPS;
 }
 
@@ -140,7 +140,8 @@ void AnimationSequenceAdapter::SetupDragMode(float clickedTime)
         maxT = std::max(maxT, sk.time);
     }
 
-    if (maxT - minT > 0.001f) {
+    // Require Alt key to scale outer keys, otherwise always translate selected keys together
+    if (ImGui::GetIO().KeyAlt && (maxT - minT > 0.001f)) {
         if (std::abs(clickedTime - maxT) < 0.001f) {
             ctx.dragMode = DragMode::ScaleRight;
             ctx.scaleAnchorTime = minT;
@@ -165,9 +166,12 @@ void AnimationSequenceAdapter::CustomDrawCompact(int index, ImDrawList* draw_lis
     draw_list->PushClipRect(clippingRect.Min, clippingRect.Max, true);
     ImGuiIO& io = ImGui::GetIO();
 
-    bool isHoveringTrack = rc.Contains(io.MousePos);
-    if (ctx.isDragging && isHoveringTrack) {
+    if (ctx.isDragging) {
         ctx.currentDragDelta = XToTime(io.MousePos.x, rc) - ctx.dragStartMouseTime;
+    }
+
+    if (index == 0 && ctx.isBoxSelecting) {
+        ctx.selectedKeys = ctx.preBoxSelectedKeys;
     }
 
     if (index == 0) {
@@ -309,6 +313,7 @@ void AnimationSequenceAdapter::DrawEventTrack(ImDrawList* draw_list, const ImRec
                 }
                 ctx.isBoxSelecting = true;
                 ctx.boxSelectStart = io.MousePos;
+                ctx.preBoxSelectedKeys = (io.KeyShift || io.KeyCtrl) ? ctx.selectedKeys : std::vector<SelectedKey>{};
             }
         }
 
@@ -490,6 +495,7 @@ void AnimationSequenceAdapter::DrawTrackKeyframes(TrackType& track, ImU32 outlin
                 }
                 ctx.isBoxSelecting = true;
                 ctx.boxSelectStart = io.MousePos;
+                ctx.preBoxSelectedKeys = (io.KeyShift || io.KeyCtrl) ? ctx.selectedKeys : std::vector<SelectedKey>{};
             }
         }
 

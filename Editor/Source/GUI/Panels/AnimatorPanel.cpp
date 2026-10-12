@@ -198,11 +198,21 @@ void AnimatorPanel::Draw(Engine* engine)
 
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(6, 4));
 
+    static float s_SaveFeedbackTimer = 0.0f;
     if (ImGui::Button("Save Lib")) {
         auto path = AssetManager::Get().GetRegistry().GetPath(animator.libraryUUID);
         if (!path.empty()) {
             AnimationLibrarySerializer::Save(animator.library, path);
+            s_SaveFeedbackTimer = 2.0f;
         }
+        else {
+            LOG_WARN("Could not save Animation Library: path is empty.");
+        }
+    }
+    if (s_SaveFeedbackTimer > 0.0f) {
+        s_SaveFeedbackTimer -= ImGui::GetIO().DeltaTime;
+        ImGui::SameLine();
+        ImGui::TextColored(ImVec4(0.4f, 0.9f, 0.4f, 1.0f), "Saved!");
     }
     ImGui::SameLine();
 
@@ -238,16 +248,25 @@ void AnimatorPanel::Draw(Engine* engine)
     if (ImGui::BeginPopup("NewClipModal")) {
         static char newClipNameBuf[64] = "NewClip";
         ImGui::InputText("Clip Name", newClipNameBuf, sizeof(newClipNameBuf));
+        std::string candidateName = newClipNameBuf;
+        bool nameEmpty = candidateName.empty();
+        bool nameExists = animator.library->GetClips().find(candidateName) != animator.library->GetClips().end();
+        if (nameExists) {
+            ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "Clip name already exists!");
+        }
+
+        if (nameEmpty || nameExists) ImGui::BeginDisabled();
         if (ImGui::Button("Create", ImVec2(100, 0))) {
-            auto newClip = std::make_shared<Animation::AnimationClip>(newClipNameBuf);
+            auto newClip = std::make_shared<Animation::AnimationClip>(candidateName);
             newClip->duration = 1.0f;
             animator.library->AddClip(newClip);
-            animator.SetClip(newClipNameBuf);
+            animator.SetClip(candidateName);
             m_SeqContext.selectedKeys.clear();
             m_SeqContext.selectedTrack = -1;
             ApplyCurrentTimeToScene();
             ImGui::CloseCurrentPopup();
         }
+        if (nameEmpty || nameExists) ImGui::EndDisabled();
         ImGui::EndPopup();
     }
 
@@ -267,22 +286,28 @@ void AnimatorPanel::Draw(Engine* engine)
 
         ImGui::InputText("##RenameClip", renameBuf, sizeof(renameBuf));
         ImGui::SameLine();
-        if (ImGui::Button("Apply")) {
-            std::string newName = renameBuf;
-            if (!newName.empty() && newName != animator.currentClipName) {
-                std::string oldName = animator.currentClipName;
-                clip->name = newName;
-                animator.library->AddClip(clip);
-
-                auto& clipsMap = const_cast<std::unordered_map<std::string, std::shared_ptr<Animation::AnimationClip>>&>(animator.library->GetClips());
-                clipsMap.erase(oldName);
-
-                animator.SetClip(newName);
-                lastEditingClip = newName;
-                m_SeqContext.selectedTrack = -1;
-                ImGui::CloseCurrentPopup();
-            }
+        std::string newName = renameBuf;
+        bool renameEmpty = newName.empty();
+        bool renameExists = (newName != animator.currentClipName) && (animator.library->GetClips().find(newName) != animator.library->GetClips().end());
+        if (renameExists) {
+            ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "Name already exists!");
         }
+
+        if (renameEmpty || renameExists || newName == animator.currentClipName) ImGui::BeginDisabled();
+        if (ImGui::Button("Apply")) {
+            std::string oldName = animator.currentClipName;
+            clip->name = newName;
+            animator.library->AddClip(clip);
+
+            auto& clipsMap = const_cast<std::unordered_map<std::string, std::shared_ptr<Animation::AnimationClip>>&>(animator.library->GetClips());
+            clipsMap.erase(oldName);
+
+            animator.SetClip(newName);
+            lastEditingClip = newName;
+            m_SeqContext.selectedTrack = -1;
+            ImGui::CloseCurrentPopup();
+        }
+        if (renameEmpty || renameExists || newName == animator.currentClipName) ImGui::EndDisabled();
 
         ImGui::Separator();
         ImGui::TextDisabled("Duplicate Clip");
@@ -328,6 +353,12 @@ void AnimatorPanel::Draw(Engine* engine)
         }
         ImGui::PopStyleColor(3);
         ImGui::EndPopup();
+    }
+
+    if (!clip) {
+        ImGui::PopStyleVar();
+        ImGui::End();
+        return;
     }
 
     ImGui::SameLine();
@@ -434,6 +465,7 @@ void AnimatorPanel::Draw(Engine* engine)
             }
         }
         m_SeqContext.selectedTrack = -1;
+        visibleTracks = GetVisiblePropertyTracks(clip);
     }
     ImGui::PopStyleColor();
     if (!canDeleteTrack) ImGui::EndDisabled();
@@ -443,15 +475,78 @@ void AnimatorPanel::Draw(Engine* engine)
     ImGui::TextDisabled("|");
     ImGui::SameLine();
 
+    auto JumpToKeyframe = [&](bool next) {
+        float bestTime = next ? FLT_MAX : -FLT_MAX;
+        bool found = false;
+
+        auto checkTime = [&](float t) {
+            if (next) {
+                if (t > animator.currentTime + 0.001f && t < bestTime) {
+                    bestTime = t;
+                    found = true;
+                }
+            } else {
+                if (t < animator.currentTime - 0.001f && t > bestTime) {
+                    bestTime = t;
+                    found = true;
+                }
+            }
+        };
+
+        for (const auto& ev : clip->eventTrack) checkTime(ev.time);
+        for (const auto& kf : clip->positionTrack.keyframes) checkTime(kf.time);
+        for (const auto& kf : clip->rotationTrack.keyframes) checkTime(kf.time);
+        for (const auto& kf : clip->scaleTrack.keyframes) checkTime(kf.time);
+        for (const auto& pt : clip->propertyTracks) {
+            if (pt->GetType() == Animation::PropertyType::Float) {
+                auto t = std::static_pointer_cast<Animation::TypedPropertyTrack<float>>(pt);
+                for (const auto& kf : t->track.keyframes) checkTime(kf.time);
+            } else if (pt->GetType() == Animation::PropertyType::Vec3) {
+                auto t = std::static_pointer_cast<Animation::TypedPropertyTrack<glm::vec3>>(pt);
+                for (const auto& kf : t->track.keyframes) checkTime(kf.time);
+            } else if (pt->GetType() == Animation::PropertyType::Vec4) {
+                auto t = std::static_pointer_cast<Animation::TypedPropertyTrack<glm::vec4>>(pt);
+                for (const auto& kf : t->track.keyframes) checkTime(kf.time);
+            } else if (pt->GetType() == Animation::PropertyType::Quat) {
+                auto t = std::static_pointer_cast<Animation::TypedPropertyTrack<glm::quat>>(pt);
+                for (const auto& kf : t->track.keyframes) checkTime(kf.time);
+            } else if (pt->GetType() == Animation::PropertyType::Bool) {
+                auto t = std::static_pointer_cast<Animation::TypedPropertyTrack<bool>>(pt);
+                for (const auto& kf : t->track.keyframes) checkTime(kf.time);
+            }
+        }
+
+        if (found) {
+            animator.currentTime = std::clamp(bestTime, 0.0f, clip->duration);
+            m_CurrentFrame = static_cast<int>(std::round(animator.currentTime * SEQUENCE_FPS));
+            ApplyCurrentTimeToScene();
+        }
+    };
+
     ImTextureID playIcon = (ImTextureID)(intptr_t)IconLibrary::Get().GetIcon(EditorIcon::Play).GetID();
     ImTextureID pauseIcon = (ImTextureID)(intptr_t)IconLibrary::Get().GetIcon(EditorIcon::Pause).GetID();
     ImTextureID stopIcon = (ImTextureID)(intptr_t)IconLibrary::Get().GetIcon(EditorIcon::Stop).GetID();
 
-    ImVec2 animBtnSize(46.0f, 22.0f);
-    ImVec2 animIconSize(22.0f, 22.0f);
+    ImVec2 animBtnSize(42.0f, 22.0f);
+    ImVec2 animIconSize(20.0f, 20.0f);
     float padX = std::floor((animBtnSize.x - animIconSize.x) * 0.5f);
     float padY = std::floor((animBtnSize.y - animIconSize.y) * 0.5f);
 
+    ImVec2 navBtnSize(24.0f, 22.0f);
+    if (ImGui::Button("|<##JumpStart", navBtnSize)) {
+        animator.currentTime = 0.0f;
+        m_CurrentFrame = 0;
+        ApplyCurrentTimeToScene();
+    }
+    if (ImGui::IsItemHovered()) ImGui::SetTooltip("Jump to Start (Home)");
+
+    ImGui::SameLine();
+    if (ImGui::Button("<|##PrevKey", navBtnSize)) {
+        JumpToKeyframe(false);
+    }
+    if (ImGui::IsItemHovered()) ImGui::SetTooltip("Previous Keyframe (Alt+Left / PageUp / ,)");
+
+    ImGui::SameLine();
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(padX, padY));
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
 
@@ -477,7 +572,7 @@ void AnimatorPanel::Draw(Engine* engine)
     }
 
     if (ImGui::IsItemHovered())
-        ImGui::SetTooltip(animator.isPlaying ? "Pause Animation" : "Play Animation");
+        ImGui::SetTooltip(animator.isPlaying ? "Pause Animation (Space)" : "Play Animation (Space)");
 
     ImGui::SameLine();
 
@@ -496,14 +591,28 @@ void AnimatorPanel::Draw(Engine* engine)
     ImGui::PopStyleVar(2);
 
     ImGui::SameLine();
+    if (ImGui::Button("|>##NextKey", navBtnSize)) {
+        JumpToKeyframe(true);
+    }
+    if (ImGui::IsItemHovered()) ImGui::SetTooltip("Next Keyframe (Alt+Right / PageDown / .)");
+
+    ImGui::SameLine();
+    if (ImGui::Button(">|##JumpEnd", navBtnSize)) {
+        animator.currentTime = clip->duration;
+        m_CurrentFrame = static_cast<int>(std::round(clip->duration * SEQUENCE_FPS));
+        ApplyCurrentTimeToScene();
+    }
+    if (ImGui::IsItemHovered()) ImGui::SetTooltip("Jump to End (End)");
+
+    ImGui::SameLine();
     ImGui::TextDisabled("|");
     ImGui::SameLine();
 
     ImGui::AlignTextToFramePadding();
-    ImGui::TextUnformatted("Looping:");
+    ImGui::TextUnformatted("Loop:");
     ImGui::SameLine();
 
-    ImGui::SetNextItemWidth(95.0f);
+    ImGui::SetNextItemWidth(90.0f);
     const char* loopModes[] = { "None", "Linear", "PingPong" };
     int currentLoop = static_cast<int>(clip->loopMode);
     if (ImGui::Combo("##LoopMode", &currentLoop, loopModes, 3))
@@ -517,9 +626,23 @@ void AnimatorPanel::Draw(Engine* engine)
     ImGui::TextUnformatted("Duration:");
     ImGui::SameLine();
 
-    ImGui::SetNextItemWidth(65.0f);
+    ImGui::SetNextItemWidth(60.0f);
     if (ImGui::DragFloat("##Duration", &clip->duration, 0.1f, 0.1f, 100.0f, "%.2fs"))
         clip->duration = std::max(0.1f, clip->duration);
+
+    ImGui::SameLine();
+    ImGui::TextDisabled("|");
+    ImGui::SameLine();
+
+    ImGui::AlignTextToFramePadding();
+    ImGui::TextUnformatted("Speed:");
+    ImGui::SameLine();
+
+    ImGui::SetNextItemWidth(55.0f);
+    if (ImGui::DragFloat("##Speed", &animator.playbackSpeed, 0.05f, 0.05f, 5.0f, "%.2fx")) {
+        animator.playbackSpeed = std::max(0.01f, animator.playbackSpeed);
+    }
+    if (ImGui::IsItemHovered()) ImGui::SetTooltip("Playback speed multiplier (0.5x, 1x, 2x)");
 
     float snapBlockWidth = 430.0f;
     float currentPosX = ImGui::GetCursorPosX();
@@ -564,10 +687,29 @@ void AnimatorPanel::Draw(Engine* engine)
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(5, 0));
 
     ImGui::AlignTextToFramePadding();
-    if (m_SeqContext.timeMode == 0)
-        ImGui::TextDisabled("%d f", (int)std::round(animator.currentTime * SEQUENCE_FPS));
-    else
-        ImGui::TextDisabled("%.2fs", animator.currentTime);
+    if (m_SeqContext.timeMode == 0) {
+        int curF = (int)std::round(animator.currentTime * SEQUENCE_FPS);
+        ImGui::SetNextItemWidth(65.0f);
+        if (ImGui::DragInt("##CurFrameInput", &curF, 1.0f, 0, (int)std::round(clip->duration * SEQUENCE_FPS), "%d f")) {
+            curF = std::clamp(curF, 0, (int)std::round(clip->duration * SEQUENCE_FPS));
+            animator.currentTime = static_cast<float>(curF) / SEQUENCE_FPS;
+            m_CurrentFrame = curF;
+            animator.Pause();
+            ApplyCurrentTimeToScene();
+        }
+    }
+    else {
+        ImGui::SetNextItemWidth(65.0f);
+        float curSec = animator.currentTime;
+        if (ImGui::DragFloat("##CurSecInput", &curSec, 0.01f, 0.0f, clip->duration, "%.2fs")) {
+            curSec = std::clamp(curSec, 0.0f, clip->duration);
+            animator.currentTime = curSec;
+            m_CurrentFrame = (int)std::round(curSec * SEQUENCE_FPS);
+            animator.Pause();
+            ApplyCurrentTimeToScene();
+        }
+    }
+    if (ImGui::IsItemHovered()) ImGui::SetTooltip("Current playhead position (Click & drag or double-click to type)");
 
     ImGui::SameLine();
     ImGui::TextDisabled("|");
@@ -594,38 +736,57 @@ void AnimatorPanel::Draw(Engine* engine)
         auto RecordPos = [&]() {
             clip->positionTrack.AddKeyframe(animator.currentTime, tc.GetPosition());
             if (animator.currentTime > clip->duration) clip->duration = animator.currentTime;
-            };
+            m_SeqContext.selectedKeys.clear();
+            m_SeqContext.selectedKeys.push_back({ 1, animator.currentTime });
+        };
         auto RecordRot = [&]() {
             clip->rotationTrack.AddKeyframe(animator.currentTime, tc.GetRotation());
             if (animator.currentTime > clip->duration) clip->duration = animator.currentTime;
-            };
+            m_SeqContext.selectedKeys.clear();
+            m_SeqContext.selectedKeys.push_back({ 2, animator.currentTime });
+        };
         auto RecordScale = [&]() {
             clip->scaleTrack.AddKeyframe(animator.currentTime, tc.GetScale());
             if (animator.currentTime > clip->duration) clip->duration = animator.currentTime;
-            };
+            m_SeqContext.selectedKeys.clear();
+            m_SeqContext.selectedKeys.push_back({ 3, animator.currentTime });
+        };
 
         auto RecordAllProperties = [&]() {
-            RecordPos(); RecordRot(); RecordScale();
+            m_SeqContext.selectedKeys.clear();
+            clip->positionTrack.AddKeyframe(animator.currentTime, tc.GetPosition());
+            m_SeqContext.selectedKeys.push_back({ 1, animator.currentTime });
+
+            clip->rotationTrack.AddKeyframe(animator.currentTime, tc.GetRotation());
+            m_SeqContext.selectedKeys.push_back({ 2, animator.currentTime });
+
+            clip->scaleTrack.AddKeyframe(animator.currentTime, tc.GetScale());
+            m_SeqContext.selectedKeys.push_back({ 3, animator.currentTime });
+
             for (size_t p = 0; p < clip->propertyTracks.size(); ++p) {
                 auto pTrack = clip->propertyTracks[p];
                 entt::entity targetEntity = ResolvePathStatic(registry, selectedEntity, pTrack->targetPath);
                 if (targetEntity == entt::null || !registry.valid(targetEntity)) continue;
 
+                int pTrackIdx = 4 + static_cast<int>(p);
                 if (pTrack->propertyName == "TransformComponent.position" && registry.any_of<TransformComponent>(targetEntity)) {
                     auto t = std::static_pointer_cast<Animation::TypedPropertyTrack<glm::vec3>>(pTrack);
                     t->track.AddKeyframe(animator.currentTime, registry.get<TransformComponent>(targetEntity).GetPosition());
+                    m_SeqContext.selectedKeys.push_back({ pTrackIdx, animator.currentTime });
                 }
                 else if (pTrack->propertyName == "TransformComponent.rotation" && registry.any_of<TransformComponent>(targetEntity)) {
                     auto t = std::static_pointer_cast<Animation::TypedPropertyTrack<glm::quat>>(pTrack);
                     t->track.AddKeyframe(animator.currentTime, registry.get<TransformComponent>(targetEntity).GetRotation());
+                    m_SeqContext.selectedKeys.push_back({ pTrackIdx, animator.currentTime });
                 }
                 else if (pTrack->propertyName == "TransformComponent.scale" && registry.any_of<TransformComponent>(targetEntity)) {
                     auto t = std::static_pointer_cast<Animation::TypedPropertyTrack<glm::vec3>>(pTrack);
                     t->track.AddKeyframe(animator.currentTime, registry.get<TransformComponent>(targetEntity).GetScale());
+                    m_SeqContext.selectedKeys.push_back({ pTrackIdx, animator.currentTime });
                 }
             }
             if (animator.currentTime > clip->duration) clip->duration = animator.currentTime;
-            };
+        };
 
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.25f, 0.50f, 0.85f, 0.8f));
         if (ImGui::Button("Key All (K)")) {
@@ -797,6 +958,69 @@ void AnimatorPanel::Draw(Engine* engine)
                 }
             }
         }
+
+        ImGui::SameLine();
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.80f, 0.25f, 0.25f, 0.8f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.95f, 0.35f, 0.35f, 1.0f));
+        if (ImGui::Button("Del Key##ToolbarDel")) {
+            auto deleteFromTrack = [&](auto& trk, int tIdx) {
+                trk.keyframes.erase(std::remove_if(trk.keyframes.begin(), trk.keyframes.end(),
+                    [&](const auto& kf) {
+                        for (const auto& sk : m_SeqContext.selectedKeys) {
+                            if (sk.track == tIdx && std::abs(kf.time - sk.time) < 0.001f) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }),
+                    trk.keyframes.end());
+            };
+
+            deleteFromTrack(clip->positionTrack, 1);
+            deleteFromTrack(clip->rotationTrack, 2);
+            deleteFromTrack(clip->scaleTrack, 3);
+
+            for (size_t p = 0; p < visibleTracks.size(); ++p) {
+                int pTrackIdx = 4 + static_cast<int>(p);
+                auto pTrack = visibleTracks[p];
+                if (pTrack->GetType() == Animation::PropertyType::Float) {
+                    auto t = std::static_pointer_cast<Animation::TypedPropertyTrack<float>>(pTrack);
+                    deleteFromTrack(t->track, pTrackIdx);
+                }
+                else if (pTrack->GetType() == Animation::PropertyType::Vec3) {
+                    auto t = std::static_pointer_cast<Animation::TypedPropertyTrack<glm::vec3>>(pTrack);
+                    deleteFromTrack(t->track, pTrackIdx);
+                }
+                else if (pTrack->GetType() == Animation::PropertyType::Vec4) {
+                    auto t = std::static_pointer_cast<Animation::TypedPropertyTrack<glm::vec4>>(pTrack);
+                    deleteFromTrack(t->track, pTrackIdx);
+                }
+                else if (pTrack->GetType() == Animation::PropertyType::Quat) {
+                    auto t = std::static_pointer_cast<Animation::TypedPropertyTrack<glm::quat>>(pTrack);
+                    deleteFromTrack(t->track, pTrackIdx);
+                }
+                else if (pTrack->GetType() == Animation::PropertyType::Bool) {
+                    auto t = std::static_pointer_cast<Animation::TypedPropertyTrack<bool>>(pTrack);
+                    deleteFromTrack(t->track, pTrackIdx);
+                }
+            }
+
+            clip->eventTrack.erase(std::remove_if(clip->eventTrack.begin(), clip->eventTrack.end(),
+                [&](const auto& ev) {
+                    for (const auto& sk : m_SeqContext.selectedKeys) {
+                        if (sk.track == 0 && std::abs(ev.time - sk.time) < 0.001f) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }),
+                clip->eventTrack.end());
+
+            m_SeqContext.selectedKeys.clear();
+            ApplyCurrentTimeToScene();
+        }
+        ImGui::PopStyleColor(2);
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Delete selected keyframes (Hotkey: Delete)");
     }
 
     if (m_SeqContext.selectedKeys.size() == 1 && m_SeqContext.selectedKeys[0].track == 0) {
@@ -1056,6 +1280,87 @@ void AnimatorPanel::Draw(Engine* engine)
                 m_SeqContext.selectedKeys.push_back({ ck.track, t });
             }
             ApplyCurrentTimeToScene();
+        }
+
+        if (!ImGui::GetIO().WantTextInput) {
+            if (ImGui::IsKeyPressed(ImGuiKey_Space)) {
+                if (animator.isPlaying) animator.Pause();
+                else animator.Play();
+            }
+
+            if (ImGui::IsKeyPressed(ImGuiKey_Home)) {
+                animator.currentTime = 0.0f;
+                m_CurrentFrame = 0;
+                ApplyCurrentTimeToScene();
+            }
+
+            if (ImGui::IsKeyPressed(ImGuiKey_End)) {
+                animator.currentTime = clip->duration;
+                m_CurrentFrame = static_cast<int>(std::round(clip->duration * SEQUENCE_FPS));
+                ApplyCurrentTimeToScene();
+            }
+
+            if (ImGui::IsKeyPressed(ImGuiKey_LeftArrow)) {
+                if (io.KeyAlt) {
+                    JumpToKeyframe(false);
+                }
+                else {
+                    float step = 1.0f / SEQUENCE_FPS;
+                    animator.currentTime = std::max(0.0f, animator.currentTime - step);
+                    m_CurrentFrame = static_cast<int>(std::round(animator.currentTime * SEQUENCE_FPS));
+                    animator.Pause();
+                    ApplyCurrentTimeToScene();
+                }
+            }
+            if (ImGui::IsKeyPressed(ImGuiKey_RightArrow)) {
+                if (io.KeyAlt) {
+                    JumpToKeyframe(true);
+                }
+                else {
+                    float step = 1.0f / SEQUENCE_FPS;
+                    animator.currentTime = std::min(clip->duration, animator.currentTime + step);
+                    m_CurrentFrame = static_cast<int>(std::round(animator.currentTime * SEQUENCE_FPS));
+                    animator.Pause();
+                    ApplyCurrentTimeToScene();
+                }
+            }
+
+            if (ImGui::IsKeyPressed(ImGuiKey_Comma)) {
+                JumpToKeyframe(false);
+            }
+            if (ImGui::IsKeyPressed(ImGuiKey_Period)) {
+                JumpToKeyframe(true);
+            }
+
+            if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_A)) {
+                m_SeqContext.selectedKeys.clear();
+                for (const auto& ev : clip->eventTrack) {
+                    m_SeqContext.selectedKeys.push_back({ 0, ev.time });
+                }
+                for (const auto& kf : clip->positionTrack.keyframes) {
+                    m_SeqContext.selectedKeys.push_back({ 1, kf.time });
+                }
+                for (const auto& kf : clip->rotationTrack.keyframes) {
+                    m_SeqContext.selectedKeys.push_back({ 2, kf.time });
+                }
+                for (const auto& kf : clip->scaleTrack.keyframes) {
+                    m_SeqContext.selectedKeys.push_back({ 3, kf.time });
+                }
+                for (size_t p = 0; p < visibleTracks.size(); ++p) {
+                    int pTrackIdx = 4 + static_cast<int>(p);
+                    auto pTrack = visibleTracks[p];
+                    auto addFromTrack = [&](const auto& trk) {
+                        for (const auto& kf : trk.keyframes) {
+                            m_SeqContext.selectedKeys.push_back({ pTrackIdx, kf.time });
+                        }
+                    };
+                    if (pTrack->GetType() == Animation::PropertyType::Float) addFromTrack(std::static_pointer_cast<Animation::TypedPropertyTrack<float>>(pTrack)->track);
+                    else if (pTrack->GetType() == Animation::PropertyType::Vec3) addFromTrack(std::static_pointer_cast<Animation::TypedPropertyTrack<glm::vec3>>(pTrack)->track);
+                    else if (pTrack->GetType() == Animation::PropertyType::Vec4) addFromTrack(std::static_pointer_cast<Animation::TypedPropertyTrack<glm::vec4>>(pTrack)->track);
+                    else if (pTrack->GetType() == Animation::PropertyType::Quat) addFromTrack(std::static_pointer_cast<Animation::TypedPropertyTrack<glm::quat>>(pTrack)->track);
+                    else if (pTrack->GetType() == Animation::PropertyType::Bool) addFromTrack(std::static_pointer_cast<Animation::TypedPropertyTrack<bool>>(pTrack)->track);
+                }
+            }
         }
     }
 

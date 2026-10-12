@@ -83,6 +83,7 @@ struct SequencerContext {
 
     bool isBoxSelecting = false;
     ImVec2 boxSelectStart{ 0.0f, 0.0f };
+    std::vector<SelectedKey> preBoxSelectedKeys;
 
     bool IsKeySelected(int track, float time) const 
     {
