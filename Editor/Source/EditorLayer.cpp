@@ -23,6 +23,8 @@
 #include <Render/IconLibrary.h>
 #include "EditorSettings.h"
 #include "EditorSelection.h"
+#include "Commands/CommandHistory.h"
+#include "Commands/EntityLifecycleCommands.h"
 #include "Asset/Types/ShaderAsset.h"
 
 using namespace rv;
@@ -393,9 +395,21 @@ void EditorLayer::HandleShortcuts()
             {
                 EditorUtils::SaveSceneAs(*m_Engine);
             }
+            if (Input::IsKeyJustPressed(KeyCode::Z))
+            {
+                CommandHistory::Get().Redo();
+            }
         }
         else
         {
+            if (Input::IsKeyJustPressed(KeyCode::Z))
+            {
+                CommandHistory::Get().Undo();
+            }
+            if (Input::IsKeyJustPressed(KeyCode::Y))
+            {
+                CommandHistory::Get().Redo();
+            }
             if (Input::IsKeyJustPressed(KeyCode::S))
             {
                 EditorUtils::SaveScene(*m_Engine);
@@ -408,6 +422,7 @@ void EditorLayer::HandleShortcuts()
             if (Input::IsKeyJustPressed(KeyCode::N))
             {
                 EditorUtils::CreateScene(*m_Engine);
+                CommandHistory::Get().Clear();
             }
             if (Input::IsKeyJustPressed(KeyCode::D))
             {
@@ -448,6 +463,7 @@ void EditorLayer::HandleShortcuts()
 
                     if (!newSelection.empty())
                     {
+                        CommandHistory::Get().Execute(std::make_unique<DuplicateEntityCommand>(&scene, newSelection));
                         EditorSelection::Get().SetSelection(newSelection, newPrimary);
                     }
                 }
@@ -459,15 +475,12 @@ void EditorLayer::HandleShortcuts()
         if (Input::IsKeyJustPressed(KeyCode::Delete))
         {
             auto& scene = m_Engine->GetActiveScene();
-            auto& reg = scene.GetRegistry();
-            for (auto e : EditorSelection::Get().GetSelectedEntities())
+            const auto& selected = EditorSelection::Get().GetSelectedEntities();
+            if (!selected.empty())
             {
-                if (e != entt::null && reg.valid(e))
-                {
-                    scene.QueueDestroyEntity(e);
-                }
+                auto cmd = std::make_unique<DeleteEntityCommand>(&scene, selected);
+                CommandHistory::Get().Execute(std::move(cmd));
             }
-            EditorSelection::Get().Clear();
         }
 
         if (Input::IsKeyJustPressed(KeyCode::F))

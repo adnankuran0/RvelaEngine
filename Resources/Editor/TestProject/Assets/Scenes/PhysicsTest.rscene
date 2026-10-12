@@ -462,12 +462,12 @@
             },
             "Tag": {
                 "isActive": true,
-                "tag": "Cube"
+                "tag": "Block"
             },
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
-                    3.4213333129882813,
+                    2.737973690032959,
                     1.0026873350143433,
                     0.0
                 ],
@@ -553,7 +553,7 @@
                     10.0
                 ]
             },
-            "UUID": 2
+            "UUID": 13263635555421532442
         },
         {
             "BoxColliderComponent": {
@@ -632,7 +632,7 @@
                     5.102389335632324
                 ]
             },
-            "UUID": 9
+            "UUID": 2939111112539600747
         },
         {
             "ParentUUID": 0,
@@ -659,7 +659,7 @@
                     0.9999991655349731
                 ]
             },
-            "UUID": 2161228315186222738
+            "UUID": 723801751594349476
         },
         {
             "Material": {
@@ -832,73 +832,6 @@
                 ]
             },
             "UUID": 87
-        },
-        {
-            "Material": {
-                "material": "",
-                "overrides": {
-                    "metallic": 1.0,
-                    "roughness": 0.0
-                }
-            },
-            "Mesh": {
-                "mesh": "b6c7f2a2-cce2-4b68-be50-19a8f552e727"
-            },
-            "ParentUUID": 0,
-            "RigidbodyComponent": {
-                "allowSleep": 1,
-                "angularDamping": 0.05000000074505806,
-                "autoCalculateMass": 1,
-                "bodyType": 0,
-                "collisionLayer": 1,
-                "collisionMask": 4294967295,
-                "friction": 0.5,
-                "gravityFactor": 1.0,
-                "isSensor": false,
-                "linearDamping": 0.05000000074505806,
-                "lockRotationX": false,
-                "lockRotationY": false,
-                "lockRotationZ": false,
-                "lockTranslationX": false,
-                "lockTranslationY": false,
-                "lockTranslationZ": false,
-                "mass": 1.0,
-                "maxAngularVelocity": 50.0,
-                "maxLinearVelocity": 500.0,
-                "restitution": 0.0,
-                "useCCD": false
-            },
-            "SphereColliderComponent": {
-                "offset": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "radius": 0.5
-            },
-            "Tag": {
-                "isActive": true,
-                "tag": "Sphere"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    5.849568843841553,
-                    0.3585145175457001,
-                    0.9306256175041199
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scale": [
-                    1.0,
-                    1.0,
-                    1.0
-                ]
-            },
-            "UUID": 70
         },
         {
             "AnimatorComponent": {
@@ -1446,7 +1379,7 @@
                     1.0
                 ]
             },
-            "UUID": 1498974352116830674
+            "UUID": 10728803533660530985
         },
         {
             "ParentUUID": 0,
@@ -1587,50 +1520,6 @@
             "UUID": 4693669855968168650
         },
         {
-            "Overrides": [
-                {
-                    "op": "add",
-                    "path": "/0/PointLight/blurRadius",
-                    "value": 0.029999999329447746
-                },
-                {
-                    "op": "add",
-                    "path": "/0/PointLight/reverseCullFace",
-                    "value": true
-                },
-                {
-                    "op": "add",
-                    "path": "/0/PointLight/shadowBias",
-                    "value": 0.10000000149011612
-                }
-            ],
-            "ParentUUID": 0,
-            "Prefab": "342bca25-b578-45e3-bf44-c9ae419a8665",
-            "Tag": {
-                "isActive": true,
-                "tag": "Ball"
-            },
-            "Transform": {
-                "lockScaleRatio": false,
-                "position": [
-                    2.1740965843200684,
-                    1.7234071493148804,
-                    0.1875135898590088
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scale": [
-                    0.3500000238418579,
-                    0.3500000238418579,
-                    0.3500000238418579
-                ]
-            },
-            "UUID": 7128131665998223553
-        },
-        {
             "Material": {
                 "material": "",
                 "overrides": {
@@ -1674,6 +1563,117 @@
                 ]
             },
             "UUID": 4023841527513290583
+        },
+        {
+            "Material": {
+                "material": "",
+                "overrides": {
+                    "metallic": 1.0,
+                    "roughness": 0.0
+                }
+            },
+            "Mesh": {
+                "mesh": "b6c7f2a2-cce2-4b68-be50-19a8f552e727"
+            },
+            "ParentUUID": 0,
+            "RigidbodyComponent": {
+                "allowSleep": 1,
+                "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
+                "bodyType": 0,
+                "collisionLayer": 1,
+                "collisionMask": 4294967295,
+                "friction": 0.5,
+                "gravityFactor": 1.0,
+                "isSensor": false,
+                "linearDamping": 0.05000000074505806,
+                "lockRotationX": false,
+                "lockRotationY": false,
+                "lockRotationZ": false,
+                "lockTranslationX": false,
+                "lockTranslationY": false,
+                "lockTranslationZ": false,
+                "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
+                "restitution": 0.0,
+                "useCCD": false
+            },
+            "SphereColliderComponent": {
+                "offset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "radius": 0.5
+            },
+            "Tag": {
+                "isActive": true,
+                "tag": "Sphere"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    5.849568843841553,
+                    0.3585145175457001,
+                    0.9306256175041199
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 70
+        },
+        {
+            "Overrides": [
+                {
+                    "op": "add",
+                    "path": "/0/PointLight/blurRadius",
+                    "value": 0.029999999329447746
+                },
+                {
+                    "op": "add",
+                    "path": "/0/PointLight/reverseCullFace",
+                    "value": true
+                },
+                {
+                    "op": "add",
+                    "path": "/0/PointLight/shadowBias",
+                    "value": 0.10000000149011612
+                }
+            ],
+            "ParentUUID": 0,
+            "Prefab": "342bca25-b578-45e3-bf44-c9ae419a8665",
+            "Tag": {
+                "isActive": true,
+                "tag": "Ball"
+            },
+            "Transform": {
+                "lockScaleRatio": true,
+                "position": [
+                    2.1740965843200684,
+                    1.7234071493148804,
+                    0.1875135898590088
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    0.3500000238418579,
+                    0.3500000238418579,
+                    0.3500000238418579
+                ]
+            },
+            "UUID": 4782445788294806160
         }
     ],
     "Environment": {
@@ -1681,6 +1681,16 @@
         "Bloom_Intensity": 1.0,
         "Bloom_Knee": 0.0,
         "Bloom_Treshold": 1.0,
+        "Fog_Color": [
+            0.6499999761581421,
+            0.75,
+            0.8500000238418579
+        ],
+        "Fog_Density": 0.014999999664723873,
+        "Fog_Enabled": false,
+        "Fog_End": 80.0,
+        "Fog_Mode": 1,
+        "Fog_Start": 5.0,
         "HDR": "9336556f-443f-4c5f-a210-2c30fa69828f",
         "HDRPath": "Assets\\Textures\\skybox\\environment.hdr",
         "Lighting_AmbientColor": [
@@ -1691,14 +1701,21 @@
         "Lighting_AmbientIntensity": 0.10000000149011612,
         "Lighting_IBL": true,
         "Lighting_IBLIntensity": 0.10000000149011612,
+        "PostProcess_Brightness": 0.0,
         "PostProcess_ChromaticStrength": 0.009999999776482582,
+        "PostProcess_Contrast": 1.0,
         "PostProcess_Exposure": 1.0,
+        "PostProcess_Saturation": 1.0,
         "PostProcess_VignetteIntensity": 0.25,
         "PostProcess_VignetteSmoothness": 0.5,
         "SSAO": true,
         "SSAO_Bias": 0.02500000037252903,
         "SSAO_Intensity": 1.0,
         "SSAO_Radius": 1.0,
+        "SSGI": false,
+        "SSGI_Intensity": 1.0,
+        "SSGI_Radius": 3.0,
+        "SSGI_Steps": 16,
         "SSR": true,
         "SSR_EdgeFade": 0.15000000596046448,
         "SSR_MaxDistance": 25.0,

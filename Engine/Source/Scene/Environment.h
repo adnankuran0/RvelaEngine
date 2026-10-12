@@ -24,12 +24,12 @@ public:
 	float SSR_EdgeFade = 0.10f;
 	float SSR_MaxRoughness = 0.6f;
 
-	bool SSGI = false;
+	bool SSGI = true;
 	float SSGI_Intensity = 1.0f;
 	float SSGI_Radius = 3.0f;
 	int SSGI_Steps = 16;
 
-	bool Bloom = false;
+	bool Bloom = true;
 	float Bloom_Intensity = 1.0f;
 	float Bloom_Treshold = 1.0f;
 	float Bloom_Knee = 0.5f;
@@ -42,9 +42,9 @@ public:
 	float PostProcess_VignetteSmoothness = 0.5f;
 	float PostProcess_ChromaticStrength = 0.01f;
 
-	bool Fog_Enabled = false;
+	bool Fog_Enabled = true;
 	glm::vec3 Fog_Color = glm::vec3(0.65f, 0.75f, 0.85f);
-	float Fog_Density = 0.015f;
+	float Fog_Density = 0.002f;
 	float Fog_Start = 5.0f;
 	float Fog_End = 80.0f;
 	int Fog_Mode = 1; // 0: Linear, 1: Exponential, 2: Exponential Squared

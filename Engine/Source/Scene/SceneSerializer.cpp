@@ -178,6 +178,12 @@ void SceneSerializer::DeserializeScene(Scene& scene, const json& j)
         {
             auto& uuidComp = scene.GetComponent<UUIDComponent>(handle);
             uuidComp.Deserialize(entityJson["UUID"]);
+            if (scene.GetUUIDEntityMap().find(uuidComp.uuid) != scene.GetUUIDEntityMap().end())
+            {
+                LOG_WARN("Duplicate Entity UUID {} found during deserialization for entity '{}'! Generating new unique UUID.",
+                    uuidComp.uuid, entityJson.value("Tag", json::object()).value("tag", "Unnamed"));
+                uuidComp.uuid = EntityUUIDGenerator::GeneratePersistent();
+            }
             uuidToEntity[uuidComp.uuid] = handle;
             scene.GetUUIDEntityMap()[uuidComp.uuid] = handle;
         }

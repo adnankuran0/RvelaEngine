@@ -12,6 +12,7 @@
 #include "Panels/ProjectSettingsPanel.h"
 #include "Panels/ProjectSelectorPanel.h"
 #include "EditorSettings.h"
+#include "Commands/CommandHistory.h"
 
 using namespace rv;
 
@@ -114,8 +115,21 @@ void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter,
 
         if (ImGui::BeginMenu("Edit"))
         {
-            if (ImGui::MenuItem("Undo")) {}
-            if (ImGui::MenuItem("Redo")) {}
+            std::string undoLabel = "Undo";
+            if (CommandHistory::Get().CanUndo())
+                undoLabel += " " + CommandHistory::Get().GetUndoName();
+            if (ImGui::MenuItem(undoLabel.c_str(), "Ctrl+Z", false, CommandHistory::Get().CanUndo()))
+            {
+                CommandHistory::Get().Undo();
+            }
+
+            std::string redoLabel = "Redo";
+            if (CommandHistory::Get().CanRedo())
+                redoLabel += " " + CommandHistory::Get().GetRedoName();
+            if (ImGui::MenuItem(redoLabel.c_str(), "Ctrl+Y", false, CommandHistory::Get().CanRedo()))
+            {
+                CommandHistory::Get().Redo();
+            }
 
             ImGui::Separator();
 

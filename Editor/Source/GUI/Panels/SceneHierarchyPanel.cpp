@@ -16,6 +16,10 @@
 #include "Utils/FileUtils.h"
 #include "EditorSelection.h"
 #include "EditorUtils.h"
+#include "Commands/CommandHistory.h"
+#include "Commands/EntityLifecycleCommands.h"
+#include "Commands/ReparentCommand.h"
+#include "Commands/PrefabCommands.h"
 
 using namespace rv;
 
@@ -375,8 +379,11 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                 const bool commitRename = ImGui::InputText("##EntityRenameInput", m_RenameBuffer, sizeof(m_RenameBuffer), ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AutoSelectAll);
                 if (commitRename)
                 {
-                    if (m_RenameBuffer[0] != '\0')
+                    if (m_RenameBuffer[0] != '\0' && tagComponent.tag != m_RenameBuffer)
+                    {
+                        CommandHistory::Get().Execute(std::make_unique<RenameEntityCommand>(&scene, entity, tagComponent.tag, m_RenameBuffer));
                         tagComponent.tag = m_RenameBuffer;
+                    }
                     m_RenamingEntity = entt::null;
                 }
                 else if (ImGui::IsKeyPressed(ImGuiKey_Escape))
@@ -449,6 +456,7 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                 {
                     entt::entity child = scene.CreateEntity("New Entity");
                     scene.SetParent(child, entity);
+                    CommandHistory::Get().Execute(std::make_unique<CreateEntityCommand>(&scene, child));
                     selectSingle(child);
                 }
 
@@ -499,29 +507,41 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                     {
                         if (ImGui::MenuItem("Apply to Prefab"))
                         {
+                            auto cmd = std::make_unique<ApplyPrefabCommand>(&scene, entity);
                             PrefabImporter::ApplyPrefab(scene, entity);
+                            CommandHistory::Get().Execute(std::move(cmd));
                         }
 
                         if (ImGui::MenuItem("Revert to Prefab"))
                         {
+                            auto cmd = std::make_unique<RevertPrefabCommand>(&scene, entity);
                             PrefabImporter::RevertPrefab(scene, entity);
+                            cmd->CaptureAfter(EditorSelection::Get().GetPrimary());
+                            CommandHistory::Get().Execute(std::move(cmd));
                         }
 
                         if (ImGui::MenuItem("Unpack Prefab (Make Local)"))
                         {
+                            auto cmd = std::make_unique<UnpackPrefabCommand>(&scene, entity);
                             scene.RemoveComponent<PrefabComponent>(entity);
+                            CommandHistory::Get().Execute(std::move(cmd));
                         }
                     }
                     else
                     {
                         if (ImGui::MenuItem("Apply to Prefab Root"))
                         {
+                            auto cmd = std::make_unique<ApplyPrefabCommand>(&scene, prefabRoot);
                             PrefabImporter::ApplyPrefab(scene, prefabRoot);
+                            CommandHistory::Get().Execute(std::move(cmd));
                         }
 
                         if (ImGui::MenuItem("Revert to Prefab Root"))
                         {
+                            auto cmd = std::make_unique<RevertPrefabCommand>(&scene, prefabRoot);
                             PrefabImporter::RevertPrefab(scene, prefabRoot);
+                            cmd->CaptureAfter(EditorSelection::Get().GetPrimary());
+                            CommandHistory::Get().Execute(std::move(cmd));
                         }
 
                         if (ImGui::MenuItem("Select Prefab Root"))
@@ -565,6 +585,7 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                         }
                         if (!newSelection.empty())
                         {
+                            CommandHistory::Get().Execute(std::make_unique<DuplicateEntityCommand>(&scene, newSelection));
                             EditorSelection::Get().SetSelection(newSelection, newPrimary);
                         }
                     }
@@ -576,6 +597,7 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                         Entity duplicated = scene.DuplicateEntity(entity);
                         if (duplicated.GetHandle() != entt::null)
                         {
+                            CommandHistory::Get().Execute(std::make_unique<DuplicateEntityCommand>(&scene, std::vector<entt::entity>{ duplicated.GetHandle() }));
                             selectSingle(duplicated.GetHandle());
                         }
                     }
@@ -587,20 +609,20 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                 {
                     if (ImGui::MenuItem("Delete Selected Entities", "Del"))
                     {
-                        for (auto e : EditorSelection::Get().GetSelectedEntities())
+                        auto selected = EditorSelection::Get().GetSelectedEntities();
+                        if (!selected.empty())
                         {
-                            if (e != entt::null && registry.valid(e))
-                                scene.QueueDestroyEntity(e);
+                            auto cmd = std::make_unique<DeleteEntityCommand>(&scene, selected);
+                            CommandHistory::Get().Execute(std::move(cmd));
                         }
-                        EditorSelection::Get().Clear();
                     }
                 }
                 else
                 {
                     if (ImGui::MenuItem("Delete Entity", "Del"))
                     {
-                        scene.QueueDestroyEntity(entity);
-                        EditorSelection::Get().Clear();
+                        auto cmd = std::make_unique<DeleteEntityCommand>(&scene, std::vector<entt::entity>{ entity });
+                        CommandHistory::Get().Execute(std::move(cmd));
                     }
                 }
                 ImGui::EndPopup();
@@ -636,7 +658,9 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                             entt::entity dragged = *(entt::entity*)payload->Data;
                             if (dragged != entity && !isDescendantOf(dragged, entity, isDescendantOf))
                             {
+                                auto cmd = std::make_unique<ReorderEntityCommand>(&scene, dragged, entity, true);
                                 scene.MoveChildOrder(dragged, entity, true);
+                                CommandHistory::Get().Execute(std::move(cmd));
                             }
                         }
                     }
@@ -648,7 +672,9 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                             entt::entity dragged = *(entt::entity*)payload->Data;
                             if (dragged != entity && !isDescendantOf(dragged, entity, isDescendantOf))
                             {
+                                auto cmd = std::make_unique<ReorderEntityCommand>(&scene, dragged, entity, false);
                                 scene.MoveChildOrder(dragged, entity, false);
+                                CommandHistory::Get().Execute(std::move(cmd));
                             }
                         }
                     }
@@ -660,7 +686,7 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                             entt::entity dragged = *(entt::entity*)payload->Data;
                             if (dragged != entity && !isDescendantOf(dragged, entity, isDescendantOf))
                             {
-                                scene.SetParent(dragged, entity);
+                                CommandHistory::Get().Execute(std::make_unique<ReparentCommand>(&scene, dragged, entity));
                             }
                         }
                     }
@@ -722,7 +748,7 @@ void SceneHierarchyPanel::Draw(Engine* engine)
             {
                 if (targetMove != entt::null && registry.valid(targetMove) && !isDescendantOfAny(targetMove, toMove))
                 {
-                    scene.SetParent(targetMove, rootEntity);
+                    CommandHistory::Get().Execute(std::make_unique<ReparentCommand>(&scene, targetMove, rootEntity));
                 }
             }
         }
@@ -751,16 +777,24 @@ void SceneHierarchyPanel::Draw(Engine* engine)
 
     if (ImGui::BeginPopupContextWindow(nullptr, ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems))
     {
+        auto registerCreatedEntity = [&](entt::entity handle) {
+            if (handle != entt::null && registry.valid(handle))
+            {
+                CommandHistory::Get().Execute(std::make_unique<CreateEntityCommand>(&scene, handle));
+                selectSingle(handle);
+            }
+        };
+
         if (ImGui::MenuItem("Create Entity"))
         {
-            selectSingle(scene.CreateEntity("New Entity"));
+            registerCreatedEntity(scene.CreateEntity("New Entity"));
         }
 
         if (ImGui::MenuItem("Camera"))
         {
             entt::entity cam = scene.CreateEntity("Camera");
             scene.AddComponent<CameraComponent>(cam);
-            selectSingle(cam);
+            registerCreatedEntity(cam);
         }
 
         if (ImGui::MenuItem("Particle Emitter"))
@@ -775,36 +809,35 @@ void SceneHierarchyPanel::Draw(Engine* engine)
 
                 emitterEntity.GetComponent<TagComponent>().tag = "Particle Emitter";
                 emitterEntity.AddComponent<ParticleEmitterComponent>();
-                selectSingle(emitterEntity ? emitterEntity.GetHandle() : entt::null);
+                registerCreatedEntity(emitterEntity.GetHandle());
             }
         }
-
 
         if (ImGui::MenuItem("Audio Emitter"))
         {
             entt::entity audio = scene.CreateEntity("AudioEmitter");
             scene.AddComponent<AudioEmitterComponent>(audio);
-            selectSingle(audio);
+            registerCreatedEntity(audio);
         }
 
         if (ImGui::MenuItem("Decal"))
         {
             entt::entity decalEnt = scene.CreateEntity("Decal");
             scene.AddComponent<DecalComponent>(decalEnt);
-            selectSingle(decalEnt);
+            registerCreatedEntity(decalEnt);
         }
 
         if (ImGui::BeginMenu("Primitives"))
         {
-            if (ImGui::MenuItem("Cube")) selectSingle(LoadPrimitive(scene, "Cube"));
-            if (ImGui::MenuItem("Sphere")) selectSingle(LoadPrimitive(scene, "Sphere"));
-            if (ImGui::MenuItem("Cylinder")) selectSingle(LoadPrimitive(scene, "Cylinder"));
-            if (ImGui::MenuItem("Quad")) selectSingle(LoadPrimitive(scene, "Quad"));
-            if (ImGui::MenuItem("Cone")) selectSingle(LoadPrimitive(scene, "Cone"));
-            if (ImGui::MenuItem("Capsule")) selectSingle(LoadPrimitive(scene, "Capsule"));
-            if (ImGui::MenuItem("Torus")) selectSingle(LoadPrimitive(scene, "Torus"));
-            if (ImGui::MenuItem("Plane")) selectSingle(LoadPrimitive(scene, "Plane"));
-            if (ImGui::MenuItem("Monkey")) selectSingle(LoadPrimitive(scene, "Monkey"));
+            if (ImGui::MenuItem("Cube")) registerCreatedEntity(LoadPrimitive(scene, "Cube").GetHandle());
+            if (ImGui::MenuItem("Sphere")) registerCreatedEntity(LoadPrimitive(scene, "Sphere").GetHandle());
+            if (ImGui::MenuItem("Cylinder")) registerCreatedEntity(LoadPrimitive(scene, "Cylinder").GetHandle());
+            if (ImGui::MenuItem("Quad")) registerCreatedEntity(LoadPrimitive(scene, "Quad").GetHandle());
+            if (ImGui::MenuItem("Cone")) registerCreatedEntity(LoadPrimitive(scene, "Cone").GetHandle());
+            if (ImGui::MenuItem("Capsule")) registerCreatedEntity(LoadPrimitive(scene, "Capsule").GetHandle());
+            if (ImGui::MenuItem("Torus")) registerCreatedEntity(LoadPrimitive(scene, "Torus").GetHandle());
+            if (ImGui::MenuItem("Plane")) registerCreatedEntity(LoadPrimitive(scene, "Plane").GetHandle());
+            if (ImGui::MenuItem("Monkey")) registerCreatedEntity(LoadPrimitive(scene, "Monkey").GetHandle());
             ImGui::EndMenu();
         }
 
@@ -815,13 +848,13 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                 entt::entity light = scene.CreateEntity("DirectionalLight");
                 scene.GetComponent<TransformComponent>(light).SetEulerRotation(glm::vec3(-60.0f, -90.0f, 0.0f));
                 scene.AddComponent<DirectionalLightComponent>(light);
-                selectSingle(light);
+                registerCreatedEntity(light);
             }
             if (ImGui::MenuItem("Point Light"))
             {
                 entt::entity light = scene.CreateEntity("PointLight");
                 scene.AddComponent<PointLightComponent>(light);
-                selectSingle(light);
+                registerCreatedEntity(light);
             }
             ImGui::EndMenu();
         }
@@ -833,7 +866,7 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                 entt::entity canvas = scene.CreateEntity("Canvas");
                 scene.AddComponent<UICanvasComponent>(canvas);
                 scene.AddComponent<RectTransformComponent>(canvas);
-                selectSingle(canvas);
+                registerCreatedEntity(canvas);
             }
             if (ImGui::MenuItem("UI Text"))
             {
@@ -845,7 +878,7 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                 {
                     scene.SetParent(text, parent);
                 }
-                selectSingle(text);
+                registerCreatedEntity(text);
             }
             if (ImGui::MenuItem("UI Button"))
             {
@@ -857,7 +890,7 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                 {
                     scene.SetParent(button, parent);
                 }
-                selectSingle(button);
+                registerCreatedEntity(button);
             }
             if (ImGui::MenuItem("UI Image"))
             {
@@ -869,7 +902,7 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                 {
                     scene.SetParent(img, parent);
                 }
-                selectSingle(img);
+                registerCreatedEntity(img);
             }
             if (ImGui::MenuItem("UI Slider"))
             {
@@ -881,7 +914,7 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                 {
                     scene.SetParent(slider, parent);
                 }
-                selectSingle(slider);
+                registerCreatedEntity(slider);
             }
             if (ImGui::MenuItem("UI Progress Bar"))
             {
@@ -893,7 +926,7 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                 {
                     scene.SetParent(pbar, parent);
                 }
-                selectSingle(pbar);
+                registerCreatedEntity(pbar);
             }
             if (ImGui::MenuItem("UI Checkbox"))
             {
@@ -905,7 +938,7 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                 {
                     scene.SetParent(cb, parent);
                 }
-                selectSingle(cb);
+                registerCreatedEntity(cb);
             }
             ImGui::EndMenu();
         }

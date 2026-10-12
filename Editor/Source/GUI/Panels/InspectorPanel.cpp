@@ -21,8 +21,34 @@
 #include <cstring>
 #include <string>
 #include <type_traits>
+#include "Commands/CommandHistory.h"
+#include "Commands/ComponentCommands.h"
+#include "Commands/PrefabCommands.h"
 
 using namespace rv;
+
+static Scene* s_CurrentScene = nullptr;
+static entt::entity s_CurrentEntity = entt::null;
+
+template<typename Func>
+static void ApplyEntityChange(entt::entity entity, const std::string& actionName, Func&& func)
+{
+	if (!s_CurrentScene || entity == entt::null || !s_CurrentScene->GetRegistry().valid(entity))
+	{
+		func();
+		return;
+	}
+
+	json before = SceneSerializer::SerializeEntity(*s_CurrentScene, entity, false);
+	func();
+	json after = SceneSerializer::SerializeEntity(*s_CurrentScene, entity, false);
+
+	if (before != after)
+	{
+		CommandHistory::Get().Execute(std::make_unique<EntitySnapshotCommand>(
+			s_CurrentScene, entity, before, after, actionName));
+	}
+}
 
 struct TransformClipboardData
 {
@@ -380,7 +406,9 @@ namespace UI
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
 			{
 				std::string pathStr((const char*)payload->Data);
-				onDropAsset(pathStr);
+				ApplyEntityChange(s_CurrentEntity, std::string("Assign Asset: ") + hintText, [&]() {
+					onDropAsset(pathStr);
+				});
 			}
 			ImGui::EndDragDropTarget();
 		}
@@ -504,7 +532,14 @@ static void DrawComponent(const std::string& name, entt::registry& registry, ent
 	}
 
 	if (isRemoved)
+	{
+		if (s_CurrentScene)
+		{
+			auto cmd = std::make_unique<ComponentCommand<T>>(s_CurrentScene, entity, ComponentCommand<T>::Action::Remove, name);
+			CommandHistory::Get().Execute(std::move(cmd));
+		}
 		registry.remove<T>(entity);
+	}
 
 	ImGui::PopID();
 }
@@ -543,6 +578,11 @@ static void DrawAddComponentEntry(const char* label, const char* searchFilter, e
 				registry.emplace<RectTransformComponent>(entity);
 			}
 		}
+		if (s_CurrentScene)
+		{
+			auto cmd = std::make_unique<ComponentCommand<T>>(s_CurrentScene, entity, ComponentCommand<T>::Action::Add, label);
+			CommandHistory::Get().Execute(std::move(cmd));
+		}
 		ImGui::CloseCurrentPopup();
 	}
 }
@@ -553,6 +593,8 @@ void InspectorPanel::Draw(Engine* engine)
 	const auto& selectedEntities = EditorSelection::Get().GetSelectedEntities();
 
 	Scene& scene = engine->GetActiveScene();
+	s_CurrentScene = &scene;
+	s_CurrentEntity = selectedEntity;
 	entt::registry& registry = scene.GetRegistry();
 
 	ImGui::Begin("Inspector", nullptr, ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse);
@@ -665,7 +707,9 @@ void InspectorPanel::Draw(Engine* engine)
 			float btnWidth = (ImGui::GetContentRegionAvail().x - 16.0f) / 3.0f;
 			if (ImGui::Button("Apply", ImVec2(btnWidth, 24.0f)))
 			{
+				auto cmd = std::make_unique<ApplyPrefabCommand>(&scene, selectedEntity);
 				PrefabImporter::ApplyPrefab(scene, selectedEntity);
+				CommandHistory::Get().Execute(std::move(cmd));
 				s_ForceOverridesRefresh = true;
 			}
 			if (ImGui::IsItemHovered())
@@ -674,7 +718,10 @@ void InspectorPanel::Draw(Engine* engine)
 			ImGui::SameLine();
 			if (ImGui::Button("Revert", ImVec2(btnWidth, 24.0f)))
 			{
+				auto cmd = std::make_unique<RevertPrefabCommand>(&scene, selectedEntity);
 				PrefabImporter::RevertPrefab(scene, selectedEntity);
+				cmd->CaptureAfter(EditorSelection::Get().GetPrimary());
+				CommandHistory::Get().Execute(std::move(cmd));
 				s_ForceOverridesRefresh = true;
 				// selectedEntity might have been replaced
 				ImGui::PopStyleColor();
@@ -687,7 +734,9 @@ void InspectorPanel::Draw(Engine* engine)
 			ImGui::SameLine();
 			if (ImGui::Button("Unpack", ImVec2(btnWidth, 24.0f)))
 			{
+				auto cmd = std::make_unique<UnpackPrefabCommand>(&scene, selectedEntity);
 				scene.RemoveComponent<PrefabComponent>(selectedEntity);
+				CommandHistory::Get().Execute(std::move(cmd));
 				s_CachedPrefabEntity = entt::null;
 			}
 			if (ImGui::IsItemHovered())
@@ -723,7 +772,9 @@ void InspectorPanel::Draw(Engine* engine)
 			ImGui::SameLine();
 			if (ImGui::Button("Apply Prefab", ImVec2(btnWidth, 24.0f)))
 			{
+				auto cmd = std::make_unique<ApplyPrefabCommand>(&scene, prefabRoot);
 				PrefabImporter::ApplyPrefab(scene, prefabRoot);
+				CommandHistory::Get().Execute(std::move(cmd));
 			}
 			if (ImGui::IsItemHovered())
 				ImGui::SetTooltip("Save changes back to the .rprefab file");
@@ -1197,7 +1248,7 @@ void InspectorPanel::Draw(Engine* engine)
 				}
 			});
 
-		DrawComponent<MaterialComponent>("Material", registry, selectedEntity, [](MaterialComponent& material)
+		DrawComponent<MaterialComponent>("Material", registry, selectedEntity, [selectedEntity](MaterialComponent& material)
 			{
 				const MaterialInstance& inst = material.GetInstance();
 
@@ -1222,7 +1273,12 @@ void InspectorPanel::Draw(Engine* engine)
 						if (pathStr.ends_with(".rmat"))
 						{
 							AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
-							if (uuid.IsValid()) material.SetMaterial(uuid);
+							if (uuid.IsValid())
+							{
+								ApplyEntityChange(selectedEntity, "Assign Material", [&]() {
+									material.SetMaterial(uuid);
+								});
+							}
 							else LOG_ERROR("Could not find UUID for material: {}", pathStr);
 						}
 					}
@@ -1277,16 +1333,23 @@ void InspectorPanel::Draw(Engine* engine)
 					ImGui::SameLine();
 					if (ImGui::Button("X##matclear", ImVec2(clearBtnWidth - 4.0f, 24.0f)))
 					{
-						material.SetMaterial(AssetUUID::Invalid());
+						ApplyEntityChange(selectedEntity, "Clear Material", [&]() {
+							material.SetMaterial(AssetUUID::Invalid());
+						});
 					}
 				}
 
 				ImGui::Spacing();
 
-				auto RevertButton = [](const char* id, auto clearFn) {
+				auto RevertButton = [&](const char* id, auto clearFn) {
 					ImGui::SameLine();
-					if (ImGui::Button(id, ImVec2(22, 22))) clearFn();
-					};
+					if (ImGui::Button(id, ImVec2(22, 22)))
+					{
+						ApplyEntityChange(selectedEntity, "Revert Material Texture", [&]() {
+							clearFn();
+						});
+					}
+				};
 
 				auto TextureSlot = [&](const char* label, const char* idSuffix, bool overridden, Ref<TextureAsset> currentTex, auto setTexFn, auto clearTexFn) {
 					UI::PropertyLabel(label);
@@ -1309,7 +1372,12 @@ void InspectorPanel::Draw(Engine* engine)
 							if (isImage)
 							{
 								AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
-								if (uuid.IsValid()) setTexFn(uuid);
+								if (uuid.IsValid())
+								{
+									ApplyEntityChange(selectedEntity, "Assign Texture", [&]() {
+										setTexFn(uuid);
+									});
+								}
 								else LOG_ERROR("Could not find UUID for texture: {}", pathStr);
 							}
 						}
@@ -1318,7 +1386,7 @@ void InspectorPanel::Draw(Engine* engine)
 					if (overridden) {
 						RevertButton((std::string("R##") + idSuffix).c_str(), clearTexFn);
 					}
-					};
+				};
 
 				if (UI::BeginPropertyTable("CustomShaderTable"))
 				{
@@ -1345,7 +1413,12 @@ void InspectorPanel::Draw(Engine* engine)
 							if (pathStr.ends_with(".rshader"))
 							{
 								AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
-								if (uuid.IsValid()) material.SetCustomShader(uuid);
+								if (uuid.IsValid())
+								{
+									ApplyEntityChange(selectedEntity, "Assign Shader", [&]() {
+										material.SetCustomShader(uuid);
+									});
+								}
 								else LOG_ERROR("Could not find UUID for shader: {}", pathStr);
 							}
 						}
@@ -1356,7 +1429,9 @@ void InspectorPanel::Draw(Engine* engine)
 						ImGui::SameLine();
 						if (ImGui::Button("X##customshaderclear", ImVec2(sClearWidth - 4.0f, 22.0f)))
 						{
-							material.ClearCustomShader();
+							ApplyEntityChange(selectedEntity, "Clear Shader", [&]() {
+								material.ClearCustomShader();
+							});
 						}
 					}
 					UI::EndPropertyTable();
@@ -1505,13 +1580,17 @@ void InspectorPanel::Draw(Engine* engine)
 
 									if (changed)
 									{
-										material.SetCustomUniform(uDef.name, uVal);
+										ApplyEntityChange(selectedEntity, "Change Custom Uniform: " + uDef.name, [&]() {
+											material.SetCustomUniform(uDef.name, uVal);
+										});
 									}
 
 									if (isOver)
 									{
 										RevertButton(("R##revert_" + uDef.name).c_str(), [&]() {
-											material.ClearCustomUniform(uDef.name);
+											ApplyEntityChange(selectedEntity, "Revert Custom Uniform: " + uDef.name, [&]() {
+												material.ClearCustomUniform(uDef.name);
+											});
 										});
 									}
 								}
@@ -2108,9 +2187,11 @@ void InspectorPanel::Draw(Engine* engine)
 
 								if (droppedUUID.IsValid())
 								{
-									scriptComp.propertyValues[prop.name] = droppedUUID.ToString();
-									if (scriptComp.luaInstance.valid())
-										scriptComp.luaInstance[prop.name] = droppedUUID;
+									ApplyEntityChange(selectedEntity, "Set Script Property: " + prop.name, [&]() {
+										scriptComp.propertyValues[prop.name] = droppedUUID.ToString();
+										if (scriptComp.luaInstance.valid())
+											scriptComp.luaInstance[prop.name] = droppedUUID;
+									});
 								}
 							}
 							ImGui::EndDragDropTarget();
@@ -2120,9 +2201,11 @@ void InspectorPanel::Draw(Engine* engine)
 						std::string clearId = "X##" + prop.name;
 						if (ImGui::Button(clearId.c_str(), ImVec2(clearBtnW, 22.0f)))
 						{
-							scriptComp.propertyValues[prop.name] = AssetUUID{}.ToString();
-							if (scriptComp.luaInstance.valid())
-								scriptComp.luaInstance[prop.name] = AssetUUID{};
+							ApplyEntityChange(selectedEntity, "Clear Script Property: " + prop.name, [&]() {
+								scriptComp.propertyValues[prop.name] = AssetUUID{}.ToString();
+								if (scriptComp.luaInstance.valid())
+									scriptComp.luaInstance[prop.name] = AssetUUID{};
+							});
 						}
 						break;
 					}
@@ -2173,10 +2256,12 @@ void InspectorPanel::Draw(Engine* engine)
 
 						if (value.uuid != originalUUID)
 						{
-							scriptComp.propertyValues[prop.name] = value.IsValid() ? std::to_string(value.uuid) : std::string{};
-							Entity resolved = value.Resolve(scene);
-							if (scriptComp.luaInstance.valid())
-								scriptComp.luaInstance[prop.name] = resolved;
+							ApplyEntityChange(selectedEntity, "Set Entity Property: " + prop.name, [&]() {
+								scriptComp.propertyValues[prop.name] = value.IsValid() ? std::to_string(value.uuid) : std::string{};
+								Entity resolved = value.Resolve(scene);
+								if (scriptComp.luaInstance.valid())
+									scriptComp.luaInstance[prop.name] = resolved;
+							});
 						}
 						break;
 					}
@@ -2499,7 +2584,9 @@ void InspectorPanel::Draw(Engine* engine)
 				{
 					if (ImGui::Button("Clear Texture", ImVec2(-FLT_MIN, 22)))
 					{
-						decal.ClearTexture();
+						ApplyEntityChange(selectedEntity, "Clear Decal Texture", [&]() {
+							decal.ClearTexture();
+						});
 					}
 				}
 
@@ -2699,9 +2786,11 @@ void InspectorPanel::Draw(Engine* engine)
 							if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
 							{
 								std::string pathStr((const char*)payload->Data);
-								img.texturePath = pathStr;
-								AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
-								if (uuid.IsValid()) img.textureUUID = uuid;
+								ApplyEntityChange(selectedEntity, "Assign UI Image Texture", [&]() {
+									img.texturePath = pathStr;
+									AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
+									if (uuid.IsValid()) img.textureUUID = uuid;
+								});
 							}
 							ImGui::EndDragDropTarget();
 						}
@@ -2975,6 +3064,42 @@ void InspectorPanel::Draw(Engine* engine)
 	if ((ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) || ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows)) && GImGui && GImGui->ActiveIdHasBeenEditedThisFrame)
 	{
 		scene.SetDirty(true);
+	}
+
+	static entt::entity s_TrackingEntity = entt::null;
+	static ImGuiID s_LastActiveId = 0;
+	static json s_BeforeSnapshot;
+
+	ImGuiWindow* inspectorWindow = ImGui::GetCurrentWindow();
+	ImGuiID activeId = GImGui ? GImGui->ActiveId : 0;
+	ImGuiWindow* activeWindow = GImGui ? GImGui->ActiveIdWindow : nullptr;
+
+	bool activeInInspector = (activeWindow && inspectorWindow && (activeWindow == inspectorWindow || activeWindow->RootWindow == inspectorWindow->RootWindow));
+
+	if (s_LastActiveId != 0 && (activeId != s_LastActiveId || !activeInInspector))
+	{
+		if (s_TrackingEntity != entt::null && registry.valid(s_TrackingEntity))
+		{
+			json afterSnapshot = SceneSerializer::SerializeEntity(scene, s_TrackingEntity, false);
+			if (!s_BeforeSnapshot.is_null() && !s_BeforeSnapshot.empty() && s_BeforeSnapshot != afterSnapshot)
+			{
+				auto cmd = std::make_unique<EntitySnapshotCommand>(&scene, s_TrackingEntity, s_BeforeSnapshot, afterSnapshot, "Edit Property");
+				CommandHistory::Get().Execute(std::move(cmd));
+			}
+		}
+		s_LastActiveId = 0;
+		s_TrackingEntity = entt::null;
+		s_BeforeSnapshot.clear();
+	}
+
+	if (activeId != 0 && activeInInspector && s_LastActiveId == 0)
+	{
+		s_TrackingEntity = selectedEntity;
+		s_LastActiveId = activeId;
+		if (s_TrackingEntity != entt::null && registry.valid(s_TrackingEntity))
+		{
+			s_BeforeSnapshot = SceneSerializer::SerializeEntity(scene, s_TrackingEntity, false);
+		}
 	}
 
 	ImGui::End();

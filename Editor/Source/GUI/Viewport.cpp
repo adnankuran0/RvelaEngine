@@ -15,6 +15,8 @@
 #include "EditorUtils.h"
 #include "Scene/Entity.h"
 #include "Scene/Components/PrefabComponent.h"
+#include "Commands/CommandHistory.h"
+#include "Commands/TransformCommand.h"
 
 using namespace rv;
 
@@ -172,6 +174,11 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
                     InitialTransform initTr;
                     initTr.worldMatrix = eTc.GetWorldMatrix();
                     glm::decompose(initTr.worldMatrix, initTr.worldScale, initTr.worldRot, initTr.worldPos, sk, p);
+                    initTr.localPos = eTc.GetPosition();
+                    initTr.localRot = eTc.GetRotation();
+                    initTr.localScale = eTc.GetScale();
+                    if (reg.any_of<UUIDComponent>(e))
+                        initTr.uuid = reg.get<UUIDComponent>(e).uuid;
                     m_InitialTransforms[e] = initTr;
                 }
             }
@@ -284,7 +291,39 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
     {
         if (m_WasGizmoUsing)
         {
-            engine->GetActiveScene().SetDirty(true);
+            Scene& activeScene = engine->GetActiveScene();
+            auto& currentReg = activeScene.GetRegistry();
+
+            std::vector<EntityTransformRecord> beforeRecords;
+            std::vector<EntityTransformRecord> afterRecords;
+
+            for (const auto& [entityHandle, initTr] : m_InitialTransforms)
+            {
+                if (initTr.uuid != 0 && currentReg.valid(entityHandle) && currentReg.any_of<TransformComponent>(entityHandle))
+                {
+                    auto& curTc = currentReg.get<TransformComponent>(entityHandle);
+
+                    // Check if transform actually changed
+                    bool changed = (curTc.GetPosition() != initTr.localPos) ||
+                                   (curTc.GetRotation() != initTr.localRot) ||
+                                   (curTc.GetScale() != initTr.localScale);
+
+                    if (changed)
+                    {
+                        beforeRecords.push_back({ initTr.uuid, entityHandle, initTr.localPos, initTr.localRot, initTr.localScale });
+                        afterRecords.push_back({ initTr.uuid, entityHandle, curTc.GetPosition(), curTc.GetRotation(), curTc.GetScale() });
+                    }
+                }
+            }
+
+            if (!beforeRecords.empty())
+            {
+                // Create command with both before and after but dont reexecute
+                auto cmd = std::make_unique<TransformCommand>(&activeScene, beforeRecords, afterRecords);
+                CommandHistory::Get().Execute(std::move(cmd));
+            }
+
+            activeScene.SetDirty(true);
         }
         m_WasGizmoUsing = false;
         m_InitialTransforms.clear();

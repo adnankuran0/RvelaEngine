@@ -7,6 +7,7 @@
 #include <vector>
 #include <unordered_map>
 #include "glm/gtc/quaternion.hpp"
+#include "Scene/EntityUUID.h"
 
 namespace rv {
 
@@ -53,6 +54,10 @@ private:
 		glm::vec3 worldPos{ 0.0f };
 		glm::quat worldRot{ 1.0f, 0.0f, 0.0f, 0.0f };
 		glm::vec3 worldScale{ 1.0f };
+		glm::vec3 localPos{ 0.0f };
+		glm::quat localRot{ 1.0f, 0.0f, 0.0f, 0.0f };
+		glm::vec3 localScale{ 1.0f };
+		EntityUUID uuid{ 0 };
 	};
 
 	bool m_WasGizmoUsing = false;
