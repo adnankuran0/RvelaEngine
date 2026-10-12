@@ -4,12 +4,14 @@
 #include "Entity.h"
 #include "Core/Time.h"
 #include "Core/Log.h"
+#include "Core/Engine.h"
 #include "Utils/Serializer.h"
 #include "Utils/ProjectManager.h"
 #include "EntityUUID.h"
 #include "Asset/Types/PrefabAsset.h"
 #include "Asset/AssetManager.h"
 #include <glm/gtx/matrix_decompose.hpp>
+#include "Renderer/RenderLayer.h"
 
 using namespace rv;
 
@@ -80,12 +82,23 @@ void Scene::OnUpdate(float dt)
 {
     m_ScriptSystem.OnUpdate(dt);
     
-    const bool inputEnabled = Input::IsGameplayInputEnabled();
-    glm::vec2 mousePos = inputEnabled ? Input::GetViewportMousePosition(1920.0f, 1080.0f) : glm::vec2(-1.0f);
+    const bool inputEnabled = Input::IsGameplayInputEnabled() && !Input::IsMouseCaptured();
+    float vpW = 1920.0f;
+    float vpH = 1080.0f;
+    if (Engine::Get())
+    {
+        const auto& rCtx = Engine::Get()->GetRenderLayer().GetRenderContext();
+        if (rCtx.viewportWidth > 0 && rCtx.viewportHeight > 0)
+        {
+            vpW = static_cast<float>(rCtx.viewportWidth);
+            vpH = static_cast<float>(rCtx.viewportHeight);
+        }
+    }
+    glm::vec2 mousePos = inputEnabled ? Input::GetViewportMousePosition(vpW, vpH) : glm::vec2(-10000.0f);
     bool pressed = inputEnabled && Input::IsMouseButtonJustPressed(MouseCode::ButtonLeft);
     bool held = inputEnabled && Input::IsMouseButtonPressed(MouseCode::ButtonLeft);
     bool released = inputEnabled && Input::IsMouseButtonJustReleased(MouseCode::ButtonLeft);
-    m_UISystem.Update(this, dt, glm::vec2(1920.0f, 1080.0f), mousePos, pressed, held, released);
+    m_UISystem.Update(this, dt, glm::vec2(vpW, vpH), mousePos, pressed, held, released);
 
     JPH::BodyManager::DrawSettings settings;
     settings.mDrawBoundingBox = true;

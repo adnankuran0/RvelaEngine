@@ -2,6 +2,7 @@
 #include "Core/Engine.h"
 #include "Utils/ProjectManager.h"
 #include "GUI/Dialogs.h"
+#include "Core/Time.h"
 #include <imgui.h>
 #include <filesystem>
 
@@ -46,7 +47,7 @@ void ProjectSettingsPanel::Draw(Engine* engine)
         }
 
         ImGui::Spacing();
-        ImGui::Text("Start Scene (Relative to project root):");
+        ImGui::Text("Start Scene:");
         if (ImGui::InputText("##StartScene", m_StartSceneBuf, sizeof(m_StartSceneBuf)))
         {
             settings.startScene = m_StartSceneBuf;
@@ -65,18 +66,103 @@ void ProjectSettingsPanel::Draw(Engine* engine)
 
         ImGui::Spacing();
         ImGui::Separator();
-        ImGui::TextColored(ImVec4(0.62f, 0.56f, 0.80f, 1.0f), "Display & Window");
+        ImGui::TextColored(ImVec4(0.62f, 0.56f, 0.80f, 1.0f), "Viewport");
         ImGui::Spacing();
 
-        int res[2] = { static_cast<int>(settings.windowWidth), static_cast<int>(settings.windowHeight) };
-        if (ImGui::DragInt2("Default Resolution", res, 1.0f, 640, 7680))
+        int viewRes[2] = { static_cast<int>(settings.viewportWidth), static_cast<int>(settings.viewportHeight) };
+        if (ImGui::DragInt2("Viewport Resolution", viewRes, 1.0f, 160, 7680))
         {
-            settings.windowWidth = static_cast<uint32_t>(res[0]);
-            settings.windowHeight = static_cast<uint32_t>(res[1]);
+            settings.viewportWidth = static_cast<uint32_t>(std::max(1, viewRes[0]));
+            settings.viewportHeight = static_cast<uint32_t>(std::max(1, viewRes[1]));
         }
+
+        const char* stretchModeOptions[] = {
+            "Disabled",
+            "CanvasItems",
+            "Viewport"
+        };
+        int currentStretch = static_cast<int>(settings.stretchMode);
+        if (ImGui::Combo("Stretch Mode", &currentStretch, stretchModeOptions, IM_ARRAYSIZE(stretchModeOptions)))
+        {
+            settings.stretchMode = static_cast<StretchMode>(currentStretch);
+        }
+
+        const char* stretchAspectOptions[] = {
+            "Ignore (Stretch to fit)",
+            "Keep (Letterbox)",
+            "Keep Width",
+            "Keep Height",
+            "Expand"
+        };
+        int currentAspect = static_cast<int>(settings.stretchAspect);
+        if (ImGui::Combo("Stretch Aspect", &currentAspect, stretchAspectOptions, IM_ARRAYSIZE(stretchAspectOptions)))
+        {
+            settings.stretchAspect = static_cast<StretchAspect>(currentAspect);
+        }
+
+        const char* scalingFilterOptions[] = {
+            "Linear",
+            "Nearest"
+        };
+        int currentFilter = static_cast<int>(settings.scalingFilter);
+        if (ImGui::Combo("Scaling Filter", &currentFilter, scalingFilterOptions, IM_ARRAYSIZE(scalingFilterOptions)))
+        {
+            settings.scalingFilter = static_cast<ScalingFilter>(currentFilter);
+        }
+
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::TextColored(ImVec4(0.62f, 0.56f, 0.80f, 1.0f), "Window");
+        ImGui::Spacing();
+
+        int winSize[2] = { static_cast<int>(settings.windowWidth), static_cast<int>(settings.windowHeight) };
+        if (ImGui::DragInt2("Window Size", winSize, 1.0f, 320, 7680))
+        {
+            settings.windowWidth = static_cast<uint32_t>(std::max(1, winSize[0]));
+            settings.windowHeight = static_cast<uint32_t>(std::max(1, winSize[1]));
+        }
+
+        const char* windowModeOptions[] = { "Windowed", "Minimized", "Maximized", "Fullscreen" };
+        int currentWinMode = static_cast<int>(settings.windowMode);
+        if (ImGui::Combo("Window Mode", &currentWinMode, windowModeOptions, IM_ARRAYSIZE(windowModeOptions)))
+        {
+            settings.windowMode = static_cast<WindowMode>(currentWinMode);
+        }
+
+        ImGui::Checkbox("Resizable", &settings.resizable);
+        ImGui::SameLine(180.0f);
+        ImGui::Checkbox("Borderless", &settings.borderless);
 
         if (ImGui::Checkbox("VSync", &settings.vsync))
         {
+            if (engine)
+            {
+                engine->GetWindow().SetVSync(settings.vsync);
+            }
+        }
+
+        ImGui::Spacing();
+        if (ImGui::SliderInt("Max FPS", &settings.maxFPS, 1,999))
+        {
+            settings.maxFPS = std::max(0, settings.maxFPS);
+            Time::SetMaxFPS(settings.maxFPS);
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Uncapped")) { settings.maxFPS = 0; Time::SetMaxFPS(0); }
+       
+
+        ImGui::Spacing();
+        ImGui::TextColored(ImVec4(0.9f, 0.7f, 0.2f, 1.0f), "Window Size Override:");
+        ImGui::Checkbox("Override Window Size", &settings.overrideWindowSize);
+
+        if (settings.overrideWindowSize)
+        {
+            int overWin[2] = { static_cast<int>(settings.windowOverrideWidth), static_cast<int>(settings.windowOverrideHeight) };
+            if (ImGui::DragInt2("Override Window Size", overWin, 1.0f, 160, 7680))
+            {
+                settings.windowOverrideWidth = static_cast<uint32_t>(std::max(1, overWin[0]));
+                settings.windowOverrideHeight = static_cast<uint32_t>(std::max(1, overWin[1]));
+            }
         }
 
         ImGui::Spacing();

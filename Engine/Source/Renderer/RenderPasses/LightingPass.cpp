@@ -53,6 +53,19 @@ void LightingPass::Init(const RenderContext& ctx, RenderFrame& frame)
     frame.registry.Register("IntermediateBuffer", { RenderResourceType::Framebuffer, m_IntermediateFramebuffer.GetID() });
 }
 
+void LightingPass::OnResize(uint32_t width, uint32_t height, RenderFrame& frame)
+{
+    if (m_ScreenFramebuffer.GetWidth() == width && m_ScreenFramebuffer.GetHeight() == height)
+        return;
+
+    m_ScreenFramebuffer.Resize(width, height);
+    m_IntermediateFramebuffer.Resize(width, height);
+
+    frame.registry.Register("ScreenTexture", { RenderResourceType::Texture, m_IntermediateFramebuffer.GetColorAttachment(0) });
+    frame.registry.Register("ScreenBuffer", { RenderResourceType::Framebuffer, m_ScreenFramebuffer.GetID() });
+    frame.registry.Register("IntermediateBuffer", { RenderResourceType::Framebuffer, m_IntermediateFramebuffer.GetID() });
+}
+
 void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
     auto& staticCommands = frame.opaqueCommands;

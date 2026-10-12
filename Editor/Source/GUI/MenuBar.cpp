@@ -133,14 +133,6 @@ void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter,
 
             ImGui::Separator();
 
-            bool selectRoot = EditorSettings::Get().ViewportSettings.SelectRootEntity;
-            if (ImGui::MenuItem("Select Root Entity on Click", nullptr, &selectRoot))
-            {
-                EditorSettings::Get().ViewportSettings.SelectRootEntity = selectRoot;
-                EditorSettings::Get().Save();
-            }
-
-            ImGui::Separator();
 
             if (ImGui::MenuItem("Project Settings..."))
             {

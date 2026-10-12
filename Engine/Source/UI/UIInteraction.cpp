@@ -17,6 +17,25 @@ void UIInteraction::UpdateInteractions(Scene* scene, float dt, const glm::vec2& 
 {
     if (!scene) return;
 
+    if (Input::IsMouseCaptured())
+    {
+        auto buttonView = scene->GetRegistry().view<UIButtonComponent>();
+        for (auto entity : buttonView)
+        {
+            auto& button = buttonView.get<UIButtonComponent>(entity);
+            button.isHovered = false;
+            button.isPressed = false;
+        }
+
+        auto sliderView = scene->GetRegistry().view<UISliderComponent>();
+        for (auto entity : sliderView)
+        {
+            auto& slider = sliderView.get<UISliderComponent>(entity);
+            slider.isDragging = false;
+        }
+        return;
+    }
+
     // Convert to ortho UI canvas space
     glm::vec2 uiMousePos;
     uiMousePos.x = mousePos.x;

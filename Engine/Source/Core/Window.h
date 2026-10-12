@@ -3,8 +3,10 @@
 #include "glm/fwd.hpp"
 struct GLFWwindow;
 
-
 namespace rv { 
+
+enum class WindowMode;
+struct ProjectSettings;
 
 struct WindowSize
 {
@@ -56,10 +58,20 @@ public:
 	void Maximize();
 	void Restore();
 	void Shutdown() const;
+
+	void SetVSync(bool vsync);
+	bool IsVSync() const noexcept { return m_VSync; }
+	void SetResizable(bool resizable);
+	void SetBorderless(bool borderless);
+	void SetWindowMode(WindowMode mode);
+	void ApplySettings(const ProjectSettings& settings);
 	
 private:
 	GLFWwindow* m_Window{};
 	WindowData m_WindowData;
+	bool m_VSync = true;
+	bool m_Borderless = false;
+	bool m_Resizable = true;
 
 	void SetCallbacks() noexcept;
 

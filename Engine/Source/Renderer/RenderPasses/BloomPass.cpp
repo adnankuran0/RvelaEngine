@@ -80,6 +80,23 @@ void BloomPass::Upsample(const RenderContext& ctx, RenderFrame& frame)
     }
 }
 
+void BloomPass::OnResize(uint32_t width, uint32_t height, RenderFrame& frame)
+{
+    if (m_DownsampleFBOs.empty())
+        return;
+
+    if (m_DownsampleFBOs[0].GetWidth() == width && m_DownsampleFBOs[0].GetHeight() == height)
+        return;
+
+    for (int i = 0; i < s_MipLevels; ++i)
+    {
+        uint32_t w = std::max(1u, width >> i);
+        uint32_t h = std::max(1u, height >> i);
+        m_DownsampleFBOs[i].Resize(w, h);
+    }
+    frame.registry.Register("BloomTexture", { RenderResourceType::Texture, m_DownsampleFBOs[0].GetColorAttachment(0) });
+}
+
 void BloomPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
     if (!ctx.environment->Bloom) return;
@@ -87,13 +104,7 @@ void BloomPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     if (!m_DownsampleFBOs.empty() &&
         (m_DownsampleFBOs[0].GetWidth() != ctx.viewportWidth || m_DownsampleFBOs[0].GetHeight() != ctx.viewportHeight))
     {
-        for (int i = 0; i < s_MipLevels; ++i)
-        {
-            uint32_t w = std::max(1u, ctx.viewportWidth >> i);
-            uint32_t h = std::max(1u, ctx.viewportHeight >> i);
-            m_DownsampleFBOs[i].Resize(w, h);
-        }
-        frame.registry.Register("BloomTexture", { RenderResourceType::Texture, m_DownsampleFBOs[0].GetColorAttachment(0) });
+        OnResize(ctx.viewportWidth, ctx.viewportHeight, frame);
     }
 
     Downsample(ctx, frame);

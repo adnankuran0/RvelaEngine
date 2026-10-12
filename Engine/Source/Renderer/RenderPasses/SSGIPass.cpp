@@ -23,6 +23,18 @@ void SSGIPass::Init(const RenderContext& ctx, RenderFrame& frame)
     frame.registry.Register("SSGITexture", { RenderResourceType::Texture, m_SSGIFBO.GetColorAttachment(0) });
 }
 
+void SSGIPass::OnResize(uint32_t width, uint32_t height, RenderFrame& frame)
+{
+    uint32_t targetWidth = std::max(1u, width / 2);
+    uint32_t targetHeight = std::max(1u, height / 2);
+
+    if (m_SSGIFBO.GetWidth() == targetWidth && m_SSGIFBO.GetHeight() == targetHeight)
+        return;
+
+    m_SSGIFBO.Resize(targetWidth, targetHeight);
+    frame.registry.Register("SSGITexture", { RenderResourceType::Texture, m_SSGIFBO.GetColorAttachment(0) });
+}
+
 SSGIPass::~SSGIPass()
 {
 }

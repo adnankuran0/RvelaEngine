@@ -646,8 +646,11 @@ void Viewport::HandleSelection(Engine* engine, ImVec2& displayPos, ImVec2& displ
         float fboWidth = context.viewportWidth;
         float fboHeight = context.viewportHeight;
 
-        uint32_t fboX = static_cast<uint32_t>(mouseViewportPos.x * fboWidth / displaySize.x);
-        uint32_t fboY = static_cast<uint32_t>(fboHeight - ((displaySize.y - mouseViewportPos.y) * fboHeight / displaySize.y));
+        float normX = std::clamp(mouseViewportPos.x / displaySize.x, 0.0f, 1.0f);
+        float normY = std::clamp(mouseViewportPos.y / displaySize.y, 0.0f, 1.0f);
+
+        uint32_t fboX = static_cast<uint32_t>(normX * (fboWidth - 1));
+        uint32_t fboY = static_cast<uint32_t>((1.0f - normY) * (fboHeight - 1));
 
         uint32_t pickedID = engine->Selection.Pick(fboX, fboY);
 
@@ -717,19 +720,99 @@ void Viewport::Draw(Engine* engine, bool orbitDragActive)
         Input::SetGameplayInputEnabled(isPlaying && (viewportHasFocus || capturedGameplayKeepsFocus));
 
         ImVec2 viewportSize = ImGui::GetContentRegionAvail();
+        viewportSize.x = std::max(viewportSize.x, 1.0f);
+        viewportSize.y = std::max(viewportSize.y, 1.0f);
 
-        const float textureWidth = 1920.0f;
-        const float textureHeight = 1080.0f;
+        StretchMode stretchMode = StretchMode::Viewport;
+        StretchAspect stretchAspect = StretchAspect::Keep;
+        uint32_t vpW = 1920;
+        uint32_t vpH = 1080;
+
+        if (ProjectManager::IsProjectLoaded())
+        {
+            const auto& settings = ProjectManager::GetActiveProject()->GetSettings();
+            stretchMode = settings.stretchMode;
+            stretchAspect = settings.stretchAspect;
+            vpW = settings.viewportWidth > 0 ? settings.viewportWidth : 1920;
+            vpH = settings.viewportHeight > 0 ? settings.viewportHeight : 1080;
+        }
+
+        uint32_t targetRenderW = vpW;
+        uint32_t targetRenderH = vpH;
+
+        if (stretchMode == StretchMode::Disabled || stretchMode == StretchMode::CanvasItems)
+        {
+            targetRenderW = static_cast<uint32_t>(viewportSize.x);
+            targetRenderH = static_cast<uint32_t>(viewportSize.y);
+        }
+        else //Viewport
+        {
+            if (stretchAspect == StretchAspect::Expand)
+            {
+                float winAspect = viewportSize.x / viewportSize.y;
+                float vpAspect = static_cast<float>(vpW) / static_cast<float>(vpH);
+                if (winAspect > vpAspect)
+                {
+                    targetRenderW = static_cast<uint32_t>(std::max(1.0f, std::round(static_cast<float>(vpH) * winAspect)));
+                    targetRenderH = vpH;
+                }
+                else
+                {
+                    targetRenderW = vpW;
+                    targetRenderH = static_cast<uint32_t>(std::max(1.0f, std::round(static_cast<float>(vpW) / winAspect)));
+                }
+            }
+            else if (stretchAspect == StretchAspect::KeepWidth)
+            {
+                targetRenderW = vpW;
+                float aspect = viewportSize.x / viewportSize.y;
+                targetRenderH = static_cast<uint32_t>(std::max(1.0f, std::round(static_cast<float>(vpW) / aspect)));
+            }
+            else if (stretchAspect == StretchAspect::KeepHeight)
+            {
+                targetRenderH = vpH;
+                float aspect = viewportSize.x / viewportSize.y;
+                targetRenderW = static_cast<uint32_t>(std::max(1.0f, std::round(static_cast<float>(vpH) * aspect)));
+            }
+            else
+            {
+                targetRenderW = vpW;
+                targetRenderH = vpH;
+            }
+        }
+
+        engine->GetRenderLayer().SetTargetResolution(targetRenderW, targetRenderH);
+
+        const float textureWidth = static_cast<float>(targetRenderW);
+        const float textureHeight = static_cast<float>(targetRenderH);
         const float textureAspect = textureWidth / textureHeight;
 
-        ImVec2 displaySize;
-        if (viewportSize.x / viewportSize.y > textureAspect) {
-            displaySize.y = viewportSize.y;
-            displaySize.x = viewportSize.y * textureAspect;
+        ImVec2 displaySize = viewportSize;
+        if (stretchMode == StretchMode::Disabled)
+        {
+            displaySize = ImVec2(textureWidth, textureHeight);
         }
-        else {
-            displaySize.x = viewportSize.x;
-            displaySize.y = viewportSize.x / textureAspect;
+        else if (stretchMode == StretchMode::Viewport)
+        {
+            if (stretchAspect == StretchAspect::Ignore || stretchAspect == StretchAspect::Expand)
+            {
+                displaySize = viewportSize;
+            }
+            else
+            {
+                if (viewportSize.x / viewportSize.y > textureAspect) {
+                    displaySize.y = viewportSize.y;
+                    displaySize.x = viewportSize.y * textureAspect;
+                }
+                else {
+                    displaySize.x = viewportSize.x;
+                    displaySize.y = viewportSize.x / textureAspect;
+                }
+            }
+        }
+        else // CanvasItems
+        {
+            displaySize = viewportSize;
         }
 
         ImVec2 displayPos = ImGui::GetCursorScreenPos();
@@ -752,7 +835,7 @@ void Viewport::Draw(Engine* engine, bool orbitDragActive)
         {
             float normX = (mousePos.x - displayPos.x) / displaySize.x;
             float normY = (mousePos.y - displayPos.y) / displaySize.y;
-            Input::SetViewportMousePos(glm::vec2(normX * 1920.0f, normY * 1080.0f));
+            Input::SetViewportMousePos(glm::vec2(normX * textureWidth, normY * textureHeight));
         }
 
         const bool altHeld = ImGui::IsKeyDown(ImGuiKey_LeftAlt) || ImGui::IsKeyDown(ImGuiKey_RightAlt);

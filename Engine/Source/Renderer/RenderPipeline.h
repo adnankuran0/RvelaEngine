@@ -26,6 +26,7 @@ public:
 	void EnsureInitialized(const RenderContext& ctx);
 	RenderPassHandle PushRenderPass(std::unique_ptr<RenderPass> pass);
 	RenderPass* GetRenderPass(RenderPassHandle id);
+	void OnResize(uint32_t width, uint32_t height);
 	void Execute(const RenderContext& ctx);
 
 	[[nodiscard]] inline GLuint GetFinalTexture() noexcept { return m_RenderFrame.registry.Get("FinalTexture")->id; }
@@ -42,6 +43,8 @@ private:
 
 	bool isPipelineDirty = true;
 	bool isInitialized = false;
+	uint32_t m_CurrentWidth = 0;
+	uint32_t m_CurrentHeight = 0;
 	std::vector<PassEntry> m_RenderPasses;
 	RenderPassHandle m_NextID = 1;
 

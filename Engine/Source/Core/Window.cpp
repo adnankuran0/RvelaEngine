@@ -10,6 +10,7 @@
 #include "Event/WindowEvents.h"
 #include "Utils/FileUtils.h"
 #include "glm/vec2.hpp"
+#include "Core/ProjectSettings.h"
 
 using namespace rv;
 
@@ -79,6 +80,8 @@ void Window::Init()
 
     const GLubyte* glVersion = glGetString(GL_VERSION);
     LOG_INFO("OpenGL Version: {}", (glVersion ? reinterpret_cast<const char*>(glVersion) : "Unknown"));
+
+    glfwSwapInterval(m_VSync ? 1 : 0);
 
     SetCallbacks();
 }
@@ -213,5 +216,99 @@ void Window::Restore()
 void Window::Shutdown() const
 {
     glfwDestroyWindow(m_Window);
+}
+
+void Window::SetVSync(bool vsync)
+{
+    m_VSync = vsync;
+    if (m_Window)
+    {
+        glfwSwapInterval(vsync ? 1 : 0);
+    }
+}
+
+void Window::SetResizable(bool resizable)
+{
+    m_Resizable = resizable;
+    if (m_Window)
+    {
+        glfwSetWindowAttrib(m_Window, GLFW_RESIZABLE, resizable ? GLFW_TRUE : GLFW_FALSE);
+    }
+}
+
+void Window::SetBorderless(bool borderless)
+{
+    m_Borderless = borderless;
+    if (m_Window)
+    {
+        glfwSetWindowAttrib(m_Window, GLFW_DECORATED, borderless ? GLFW_FALSE : GLFW_TRUE);
+    }
+}
+
+void Window::SetWindowMode(WindowMode mode)
+{
+    if (!m_Window) return;
+
+    switch (mode)
+    {
+    case WindowMode::Fullscreen:
+    {
+        GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+        if (monitor)
+        {
+            const GLFWvidmode* vidMode = glfwGetVideoMode(monitor);
+            if (vidMode)
+            {
+                glfwSetWindowMonitor(m_Window, monitor, 0, 0, vidMode->width, vidMode->height, vidMode->refreshRate);
+            }
+        }
+        break;
+    }
+    case WindowMode::Maximized:
+    {
+        GLFWmonitor* curMonitor = glfwGetWindowMonitor(m_Window);
+        if (curMonitor)
+        {
+            glfwSetWindowMonitor(m_Window, nullptr, 100, 100, m_WindowData.size.width, m_WindowData.size.height, 0);
+        }
+        glfwMaximizeWindow(m_Window);
+        break;
+    }
+    case WindowMode::Minimized:
+    {
+        glfwIconifyWindow(m_Window);
+        break;
+    }
+    case WindowMode::Windowed:
+    default:
+    {
+        GLFWmonitor* curMonitor = glfwGetWindowMonitor(m_Window);
+        if (curMonitor)
+        {
+            glfwSetWindowMonitor(m_Window, nullptr, 100, 100, m_WindowData.size.width, m_WindowData.size.height, 0);
+            CenterOnMonitor();
+        }
+        glfwRestoreWindow(m_Window);
+        break;
+    }
+    }
+}
+
+void Window::ApplySettings(const ProjectSettings& settings)
+{
+    if (!m_Window) return;
+
+    uint32_t targetW = settings.overrideWindowSize ? settings.windowOverrideWidth : settings.windowWidth;
+    uint32_t targetH = settings.overrideWindowSize ? settings.windowOverrideHeight : settings.windowHeight;
+    if (targetW > 0 && targetH > 0)
+    {
+        SetSize(static_cast<int>(targetW), static_cast<int>(targetH));
+        CenterOnMonitor();
+    }
+
+    SetResizable(settings.resizable);
+    SetBorderless(settings.borderless);
+    SetWindowMode(settings.windowMode);
+    SetVSync(settings.vsync);
 }
 

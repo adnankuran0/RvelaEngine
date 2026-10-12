@@ -30,7 +30,29 @@ void SSRPass::Init(const RenderContext& ctx, RenderFrame& frame)
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         LOG_WARN("SSR framebuffer not complete!");
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    m_CurrentWidth = std::max(1u, ctx.viewportWidth / 2);
+    m_CurrentHeight = std::max(1u, ctx.viewportHeight / 2);
+
+    frame.registry.Register("SSRTexture", { RenderResourceType::Texture, o_SsrTexture });
+}
+
+void SSRPass::OnResize(uint32_t width, uint32_t height, RenderFrame& frame)
+{
+    uint32_t w = std::max(1u, width / 2);
+    uint32_t h = std::max(1u, height / 2);
+
+    if (w == m_CurrentWidth && h == m_CurrentHeight)
+        return;
+
+    m_CurrentWidth = w;
+    m_CurrentHeight = h;
+
+    if (o_SsrTexture != 0)
+    {
+        glBindTexture(GL_TEXTURE_2D, o_SsrTexture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, w, h, 0, GL_RGBA, GL_FLOAT, NULL);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
 
     frame.registry.Register("SSRTexture", { RenderResourceType::Texture, o_SsrTexture });
 }

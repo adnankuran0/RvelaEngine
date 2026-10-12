@@ -26,12 +26,24 @@ void CompositePass::Init(const RenderContext& ctx, RenderFrame& frame)
     frame.registry.Register("FinalFramebuffer", { RenderResourceType::Framebuffer, m_Framebuffer.GetID() });
 }
 
+void CompositePass::OnResize(uint32_t width, uint32_t height, RenderFrame& frame)
+{
+    if (m_Framebuffer.GetWidth() == width && m_Framebuffer.GetHeight() == height)
+        return;
+
+    m_Framebuffer.Resize(width, height);
+    m_FXAAFramebuffer.Resize(width, height);
+
+    frame.registry.Register("CompositeTexture", { RenderResourceType::Texture, m_Framebuffer.GetColorAttachment(0) });
+    frame.registry.Register("FinalTexture", { RenderResourceType::Texture, m_Framebuffer.GetColorAttachment(0) });
+    frame.registry.Register("FinalFramebuffer", { RenderResourceType::Framebuffer, m_Framebuffer.GetID() });
+}
+
 void CompositePass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
     if (m_Framebuffer.GetWidth() != ctx.viewportWidth || m_Framebuffer.GetHeight() != ctx.viewportHeight)
     {
-        m_Framebuffer.Resize(ctx.viewportWidth, ctx.viewportHeight);
-        m_FXAAFramebuffer.Resize(ctx.viewportWidth, ctx.viewportHeight);
+        OnResize(ctx.viewportWidth, ctx.viewportHeight, frame);
     }
 
     auto& env = *ctx.environment;
@@ -105,6 +117,18 @@ void CompositePass::Execute(const RenderContext& ctx, RenderFrame& frame)
         frame.registry.Register("FinalTexture", { RenderResourceType::Texture, m_Framebuffer.GetColorAttachment(0) });
         frame.registry.Register("FinalFramebuffer", { RenderResourceType::Framebuffer, m_Framebuffer.GetID() });
     }
+
+    GLuint finalTex = useFXAA ? m_FXAAFramebuffer.GetColorAttachment(0) : m_Framebuffer.GetColorAttachment(0);
+    GLenum filterMode = GL_NEAREST;
+    if (ProjectManager::IsProjectLoaded())
+    {
+        if (ProjectManager::GetActiveProject()->GetSettings().scalingFilter == ScalingFilter::Linear)
+            filterMode = GL_LINEAR;
+        else
+            filterMode = GL_NEAREST;
+    }
+    glTextureParameteri(finalTex, GL_TEXTURE_MIN_FILTER, filterMode);
+    glTextureParameteri(finalTex, GL_TEXTURE_MAG_FILTER, filterMode);
 
     glEnable(GL_DEPTH_TEST);
     Framebuffer::BindDefault();

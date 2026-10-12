@@ -1,4 +1,4 @@
-﻿#include "rvelapch.h"
+#include "rvelapch.h"
 #include "BrightPass.h"
 #include "Renderer/RenderContext.h"
 #include "Renderer/RenderFrame.h"
@@ -23,16 +23,26 @@ void BrightPass::Init(const RenderContext& ctx, RenderFrame& frame)
     frame.registry.Register("BrightTexture", { RenderResourceType::Texture, m_Framebuffer.GetColorAttachment(0) });
 }
 
+void BrightPass::OnResize(uint32_t width, uint32_t height, RenderFrame& frame)
+{
+    uint32_t targetWidth = std::max(1u, width / 2);
+    uint32_t targetHeight = std::max(1u, height / 2);
+    if (m_Framebuffer.GetWidth() == targetWidth && m_Framebuffer.GetHeight() == targetHeight)
+        return;
+
+    m_Framebuffer.Resize(targetWidth, targetHeight);
+    frame.registry.Register("BrightTexture", { RenderResourceType::Texture, m_Framebuffer.GetColorAttachment(0) });
+}
+
 void BrightPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
     if (!ctx.environment->Bloom) return;
 
-    uint32_t targetWidth = ctx.viewportWidth / 2;
-    uint32_t targetHeight = ctx.viewportHeight / 2;
+    uint32_t targetWidth = std::max(1u, ctx.viewportWidth / 2);
+    uint32_t targetHeight = std::max(1u, ctx.viewportHeight / 2);
     if (m_Framebuffer.GetWidth() != targetWidth || m_Framebuffer.GetHeight() != targetHeight)
     {
-        m_Framebuffer.Resize(targetWidth, targetHeight);
-        frame.registry.Register("BrightTexture", { RenderResourceType::Texture, m_Framebuffer.GetColorAttachment(0) });
+        OnResize(ctx.viewportWidth, ctx.viewportHeight, frame);
     }
 
     auto i_ScreenTexture = frame.registry.Get("ScreenTexture")->id;

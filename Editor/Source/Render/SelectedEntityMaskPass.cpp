@@ -31,6 +31,27 @@ void SelectedEntityMaskPass::Init(const RenderContext& ctx, RenderFrame& frame) 
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    m_CurrentWidth = ctx.viewportWidth;
+    m_CurrentHeight = ctx.viewportHeight;
+
+    frame.registry.Register("SelectedEntityMask", { RenderResourceType::Texture, o_MaskTexture });
+    frame.registry.Register("SelectedEntityMaskFBO", { RenderResourceType::Framebuffer, m_Framebuffer });
+}
+
+void SelectedEntityMaskPass::OnResize(uint32_t width, uint32_t height, RenderFrame& frame) {
+    if (width == m_CurrentWidth && height == m_CurrentHeight)
+        return;
+
+    m_CurrentWidth = width;
+    m_CurrentHeight = height;
+
+    if (o_MaskTexture != 0) {
+        glBindTexture(GL_TEXTURE_2D, o_MaskTexture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height,
+            0, GL_RED, GL_UNSIGNED_BYTE, nullptr);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
     frame.registry.Register("SelectedEntityMask", { RenderResourceType::Texture, o_MaskTexture });
     frame.registry.Register("SelectedEntityMaskFBO", { RenderResourceType::Framebuffer, m_Framebuffer });
 }

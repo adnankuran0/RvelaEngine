@@ -71,6 +71,7 @@ int main(int argc, char** argv)
 	if (activeProj)
 	{
 		engine.GetWindow().SetTitle(activeProj->name);
+		engine.GetWindow().ApplySettings(activeProj->GetSettings());
 	}
 
 	engine.GetActiveScene().SetState(rv::SceneState::PLAY);

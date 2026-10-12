@@ -27,6 +27,16 @@ void EntityBufferPass::Init(const RenderContext& ctx, RenderFrame& frame)
     frame.registry.Register("EntityTexture", { RenderResourceType::Texture, m_Framebuffer.GetColorAttachment(0) });
 }
 
+void EntityBufferPass::OnResize(uint32_t width, uint32_t height, RenderFrame& frame)
+{
+    if (m_Framebuffer.GetWidth() == width && m_Framebuffer.GetHeight() == height)
+        return;
+
+    m_Framebuffer.Resize(width, height);
+    frame.registry.Register("EntityBuffer", { RenderResourceType::Framebuffer, m_Framebuffer.GetID() });
+    frame.registry.Register("EntityTexture", { RenderResourceType::Texture, m_Framebuffer.GetColorAttachment(0) });
+}
+
 void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
     auto& opaqueCommands = frame.opaqueCommands;

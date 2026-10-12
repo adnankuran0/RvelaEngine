@@ -456,6 +456,52 @@ _G.Input = Input
 
 
 -------------------------------------------------------------------------------
+-- TIME SYSTEM
+-------------------------------------------------------------------------------
+
+---@class Time
+---@field fps number Current frames per second
+---@field deltaTime number Delta time of the last frame in seconds
+---@field timeScale number Time scaling factor (e.g. for slow-motion)
+---@field time number Total elapsed time since game start in seconds
+Time = {}
+
+---Returns the current frames per second (FPS).
+---@return number
+function Time.GetFPS() end
+
+---Returns the time difference between current and last frame in seconds.
+---@return number
+function Time.GetDeltaTime() end
+
+---Returns the fixed delta time used for physics updates.
+---@return number
+function Time.GetFixedDeltaTime() end
+
+---Returns the current time scale factor.
+---@return number
+function Time.GetTimeScale() end
+
+---Sets the time scale factor (e.g. 0.5 for half speed slow-motion).
+---@param scale number
+function Time.SetTimeScale(scale) end
+
+---Returns the total elapsed time in seconds.
+---@return number
+function Time.GetTime() end
+
+---Returns the maximum target FPS (0 = unlimited / uncapped).
+---@return integer
+function Time.GetMaxFPS() end
+
+---Sets the maximum target FPS (0 = unlimited / uncapped).
+---@param maxFPS integer
+function Time.SetMaxFPS(maxFPS) end
+
+_G.Time = Time
+
+
+-------------------------------------------------------------------------------
 -- PHYSICS SYSTEM
 -------------------------------------------------------------------------------
 

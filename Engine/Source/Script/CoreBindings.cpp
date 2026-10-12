@@ -9,6 +9,7 @@
 #include "ComponentHandle.h"
 #include "Asset/AssetManager.h"
 #include "Asset/AssetUUID.h"
+#include "Core/Time.h"
 #include <vector>
 
 using namespace rv;
@@ -279,4 +280,23 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             return sol::nil;
         }
     );
+
+    auto timeTable = lua.create_named_table("Time");
+    timeTable["GetFPS"] = &Time::GetFPS;
+    timeTable["GetDeltaTime"] = &Time::GetDeltaTime;
+    timeTable["GetFixedDeltaTime"] = &Time::GetFixedDeltaTime;
+    timeTable["GetTimeScale"] = &Time::GetTimeScale;
+    timeTable["SetTimeScale"] = &Time::SetTimeScale;
+    timeTable["GetMaxFPS"] = &Time::GetMaxFPS;
+    timeTable["SetMaxFPS"] = &Time::SetMaxFPS;
+
+    sol::table timeMeta = lua.create_table();
+    timeMeta[sol::meta_function::index] = [](sol::table t, const std::string& key) -> sol::object {
+        if (key == "fps") return sol::make_object(t.lua_state(), Time::GetFPS());
+        if (key == "deltaTime") return sol::make_object(t.lua_state(), Time::GetDeltaTime());
+        if (key == "timeScale") return sol::make_object(t.lua_state(), Time::GetTimeScale());
+        if (key == "time") return sol::make_object(t.lua_state(), static_cast<float>(Time::GetCurrentTime()));
+        return sol::nil;
+    };
+    timeTable[sol::metatable_key] = timeMeta;
 }

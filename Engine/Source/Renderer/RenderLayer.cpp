@@ -44,11 +44,44 @@ void RenderLayer::OnRender()
 	m_Context.camera = camera;
 	m_Context.pointLights = lightSystem.CollectPointLights();
 	m_Context.directionalLight = lightSystem.CollectDirectionalLight(camera);
-	m_Context.viewportWidth = 1920;
-	m_Context.viewportHeight = 1080;
+
+	uint32_t renderW = 1920;
+	uint32_t renderH = 1080;
+
+	if (ProjectManager::IsProjectLoaded())
+	{
+		const auto& settings = ProjectManager::GetActiveProject()->GetSettings();
+		if (m_TargetWidth > 0 && m_TargetHeight > 0)
+		{
+			renderW = m_TargetWidth;
+			renderH = m_TargetHeight;
+		}
+		else if (settings.viewportWidth > 0 && settings.viewportHeight > 0)
+		{
+			renderW = settings.viewportWidth;
+			renderH = settings.viewportHeight;
+		}
+	}
+	else
+	{
+		if (m_TargetWidth > 0 && m_TargetHeight > 0)
+		{
+			renderW = m_TargetWidth;
+			renderH = m_TargetHeight;
+		}
+	}
+
+	m_Context.viewportWidth = renderW;
+	m_Context.viewportHeight = renderH;
 	m_Context.scene = &scene;
 	m_Context.environment = &scene.GetEnvironment();
 	m_Context.wireframe = m_Wireframe;
+
+	if (camera)
+	{
+		camera->width = static_cast<int>(renderW);
+		camera->height = static_cast<int>(renderH);
+	}
 	
 	m_RenderPipeline->EnsureInitialized(m_Context);
 	

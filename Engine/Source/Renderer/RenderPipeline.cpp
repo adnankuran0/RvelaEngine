@@ -48,6 +48,9 @@ void RenderPipeline::EnsureInitialized(const RenderContext& ctx)
 {
 	if (!isInitialized)
 	{
+		m_CurrentWidth = ctx.viewportWidth;
+		m_CurrentHeight = ctx.viewportHeight;
+
 		for (auto& [id, pass] : m_RenderPasses)
 			pass->Init(ctx, m_RenderFrame);
 
@@ -55,9 +58,33 @@ void RenderPipeline::EnsureInitialized(const RenderContext& ctx)
 	}
 }
 
+void RenderPipeline::OnResize(uint32_t width, uint32_t height)
+{
+	if (width == 0 || height == 0)
+		return;
+
+	if (width == m_CurrentWidth && height == m_CurrentHeight)
+		return;
+
+	m_CurrentWidth = width;
+	m_CurrentHeight = height;
+
+	for (auto& [id, pass] : m_RenderPasses)
+	{
+		pass->OnResize(width, height, m_RenderFrame);
+	}
+}
+
 RenderPassHandle RenderPipeline::PushRenderPass(std::unique_ptr<RenderPass> pass)
 {
 	RenderPassHandle id = m_NextID++;
+	if (isInitialized)
+	{
+		RenderContext ctx;
+		ctx.viewportWidth = m_CurrentWidth;
+		ctx.viewportHeight = m_CurrentHeight;
+		pass->Init(ctx, m_RenderFrame);
+	}
 	m_RenderPasses.push_back({ id, std::move(pass) });
 	return id;
 }
@@ -140,6 +167,12 @@ void RenderPipeline::UpdateUBOs(const RenderContext& ctx)
 
 void RenderPipeline::Execute(const RenderContext& ctx)
 {
+	if (ctx.viewportWidth > 0 && ctx.viewportHeight > 0 &&
+		(ctx.viewportWidth != m_CurrentWidth || ctx.viewportHeight != m_CurrentHeight))
+	{
+		OnResize(ctx.viewportWidth, ctx.viewportHeight);
+	}
+
 	UpdateUBOs(ctx);
 
 	for (auto& [id, pass] : m_RenderPasses)

@@ -82,7 +82,8 @@ bool Engine::OpenProject(const std::string& projectFilePath)
 		std::string title = "Rvela Engine - [" + activeProj->name + "] - " + activeSceneName;
 		m_Window.SetTitle(title);
 
-		glfwSwapInterval(settings.vsync ? 1 : 0);
+		m_Window.SetVSync(settings.vsync);
+		Time::SetMaxFPS(settings.maxFPS);
 	}
 
 	return true;

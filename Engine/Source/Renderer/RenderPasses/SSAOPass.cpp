@@ -27,6 +27,18 @@ void SSAOPass::Init(const RenderContext& ctx, RenderFrame& frame)
     frame.registry.Register("SSAOTexture", { RenderResourceType::Texture, m_Framebuffer.GetColorAttachment(0) });
 }
 
+void SSAOPass::OnResize(uint32_t width, uint32_t height, RenderFrame& frame)
+{
+    uint32_t targetWidth = std::max(1u, width / 2);
+    uint32_t targetHeight = std::max(1u, height / 2);
+
+    if (m_Framebuffer.GetWidth() == targetWidth && m_Framebuffer.GetHeight() == targetHeight)
+        return;
+
+    m_Framebuffer.Resize(targetWidth, targetHeight);
+    frame.registry.Register("SSAOTexture", { RenderResourceType::Texture, m_Framebuffer.GetColorAttachment(0) });
+}
+
 SSAOPass::~SSAOPass()
 {
     glDeleteTextures(1, &noiseTexture);
