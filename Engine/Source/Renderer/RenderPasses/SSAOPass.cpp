@@ -55,6 +55,8 @@ void SSAOPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     Shader& ssaoShader = ShaderManager::Get("SSAO");
 
     m_Framebuffer.BindViewport();
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
     glClear(GL_COLOR_BUFFER_BIT);
 
     ssaoShader.use();

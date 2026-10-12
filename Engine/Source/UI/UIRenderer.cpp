@@ -153,17 +153,28 @@ void UIRenderer::Flush()
 
     GLsizeiptr size = (uint8_t*)s_BufferPtr - (uint8_t*)s_BufferBase;
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    bool isCustomShader = (s_CurrentShader && s_CurrentShader != s_UIShader);
+    if (!isCustomShader)
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+    else
+    {
+        glDisable(GL_BLEND);
+    }
     glDisable(GL_CULL_FACE);
 
     auto activeShader = s_CurrentShader ? s_CurrentShader : s_UIShader;
     activeShader->use();
     activeShader->setMat4("u_Projection", s_ProjectionMatrix);
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, s_ActiveTextureID);
-    s_UIShader->setInt("u_Texture", 0);
+    if (activeShader == s_UIShader)
+    {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, s_ActiveTextureID);
+        s_UIShader->setInt("u_Texture", 0);
+    }
 
     glBindVertexArray(s_VAO);
     glBindBuffer(GL_ARRAY_BUFFER, s_VBO);
@@ -172,6 +183,10 @@ void UIRenderer::Flush()
     glDrawElements(GL_TRIANGLES, s_IndexCount, GL_UNSIGNED_INT, nullptr);
 
     glBindVertexArray(0);
+    if (activeShader == s_UIShader)
+    {
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
 
     s_BufferPtr = s_BufferBase;
     s_IndexCount = 0;

@@ -116,9 +116,9 @@ void EnvironmentPanel::Draw(Engine* engine)
     if (ImGui::CollapsingHeader("SSAO"))
     {
         ImGui::Checkbox("Use SSAO", &env.SSAO);
-        ImGui::SliderFloat("Intensity", &env.SSAO_Intensity, 0.0f, 10.0f);
-        ImGui::SliderFloat("Radius", &env.SSAO_Radius, 0.0f, 10.0f);
-        ImGui::SliderFloat("Bias", &env.SSAO_Bias, 0.0f, 0.1f);
+        ImGui::SliderFloat("Intensity##SSAO", &env.SSAO_Intensity, 0.0f, 10.0f);
+        ImGui::SliderFloat("Radius##SSAO", &env.SSAO_Radius, 0.0f, 10.0f);
+        ImGui::SliderFloat("Bias##SSAO", &env.SSAO_Bias, 0.0f, 0.1f);
     }
 
     if (ImGui::CollapsingHeader("SSR"))
@@ -148,9 +148,9 @@ void EnvironmentPanel::Draw(Engine* engine)
     if (ImGui::CollapsingHeader("Bloom"))
     {
         ImGui::Checkbox("Use Bloom", &env.Bloom);
-        ImGui::SliderFloat("Intensity", &env.Bloom_Intensity, 0.0f, 1.0f);
-        ImGui::SliderFloat("Treshold", &env.Bloom_Treshold, 0.0f, 1.0f);
-        ImGui::SliderFloat("Knee", &env.Bloom_Knee, 0.0f, 1.0f);
+        ImGui::SliderFloat("Intensity##Bloom", &env.Bloom_Intensity, 0.0f, 1.0f);
+        ImGui::SliderFloat("Treshold##Bloom", &env.Bloom_Treshold, 0.0f, 1.0f);
+        ImGui::SliderFloat("Knee##Bloom", &env.Bloom_Knee, 0.0f, 1.0f);
     }
 
     if (ImGui::CollapsingHeader("Fog"))

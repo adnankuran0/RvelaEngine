@@ -165,7 +165,13 @@ void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         ctx.scene->GetUISystem().RenderEntityIDs(ctx.scene, static_cast<float>(ctx.viewportWidth), static_cast<float>(ctx.viewportHeight));
     }
 
+    glDisable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    glDepthMask(GL_TRUE);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
+    glBindVertexArray(0);
+    glUseProgram(0);
     Framebuffer::BindDefault();
 }

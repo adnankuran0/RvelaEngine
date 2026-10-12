@@ -659,7 +659,7 @@
                     0.9999991655349731
                 ]
             },
-            "UUID": 15489993879662027390
+            "UUID": 429756890916966687
         },
         {
             "Material": {
@@ -1379,7 +1379,7 @@
                     1.0
                 ]
             },
-            "UUID": 15382823071067074684
+            "UUID": 7754618762061687024
         },
         {
             "ParentUUID": 0,
@@ -1673,7 +1673,7 @@
                     0.3500000238418579
                 ]
             },
-            "UUID": 9401579167372002718
+            "UUID": 12178685745310299118
         }
     ],
     "Environment": {
@@ -1691,8 +1691,8 @@
         "Fog_End": 80.0,
         "Fog_Mode": 1,
         "Fog_Start": 5.0,
-        "HDR": "9336556f-443f-4c5f-a210-2c30fa69828f",
-        "HDRPath": "Assets\\Textures\\skybox\\environment.hdr",
+        "HDR": "27eefd09-33f2-4818-a0d7-9b0641e4eb5e",
+        "HDRPath": "Assets\\Textures\\skybox\\environment3.hdr",
         "Lighting_AmbientColor": [
             1.0,
             1.0,

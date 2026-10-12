@@ -124,6 +124,12 @@ void UIRenderPass::RenderEntityIDs(Scene* scene, float viewportWidth, float view
 
     Camera* camera = Engine::Get() ? Engine::Get()->GetCamera() : nullptr;
 
+    GLboolean blendWasEnabled = glIsEnabled(GL_BLEND);
+    GLboolean depthTestWasEnabled = glIsEnabled(GL_DEPTH_TEST);
+    GLboolean depthMaskWasEnabled = GL_TRUE;
+    glGetBooleanv(GL_DEPTH_WRITEMASK, &depthMaskWasEnabled);
+    GLboolean cullFaceWasEnabled = glIsEnabled(GL_CULL_FACE);
+
     struct CanvasEntry {
         entt::entity entity;
         int sortOrder;
@@ -141,32 +147,68 @@ void UIRenderPass::RenderEntityIDs(Scene* scene, float viewportWidth, float view
         return a.sortOrder < b.sortOrder;
     });
 
-    s_UIEntityShader->use();
+    glDisable(GL_BLEND);
 
-    for (const auto& canvasEntry : canvases)
+    if (canvases.empty())
     {
-        entt::entity canvasEntity = canvasEntry.entity;
-        const auto& canvas = scene->GetComponent<UICanvasComponent>(canvasEntity);
-
-        glm::mat4 customProjMatrix(1.0f);
-        bool isWorldSpace = (canvas.mode == CanvasMode::WorldSpace && camera != nullptr);
-
-        if (isWorldSpace)
+        glDisable(GL_DEPTH_TEST);
+        glDepthMask(GL_FALSE);
+        UIRenderer::Begin(viewportWidth, viewportHeight, glm::mat4(1.0f), s_UIEntityShader);
+        auto rectView = scene->GetRegistry().view<RectTransformComponent>();
+        for (auto entity : rectView)
         {
-            glm::mat4 canvasWorldMatrix = UILayout::CalculateWorldSpaceCanvasMatrix(scene, canvasEntity, canvas, camera);
-
-            glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.01f, 0.01f, 0.01f));
-            glm::mat4 viewProj = camera->GetProjectionMatrix() * camera->GetViewMatrix();
-            customProjMatrix = viewProj * canvasWorldMatrix * scaleMatrix;
+            entt::entity parent = scene->GetParent(entity);
+            if (parent == entt::null || !scene->HasComponent<RectTransformComponent>(parent))
+            {
+                RenderEntityIDRecursively(scene, entity, s_UIEntityShader);
+            }
         }
-        else
-        {
-            customProjMatrix = glm::ortho(0.0f, viewportWidth, 0.0f, viewportHeight, -100.0f, 100.0f);
-        }
-
-        UIRenderer::Begin(viewportWidth, viewportHeight, customProjMatrix, s_UIEntityShader);
-        RenderEntityIDRecursively(scene, canvasEntity, s_UIEntityShader);
+        UIRenderer::End();
     }
+    else
+    {
+        for (const auto& canvasEntry : canvases)
+        {
+            entt::entity canvasEntity = canvasEntry.entity;
+            const auto& canvas = scene->GetComponent<UICanvasComponent>(canvasEntity);
+
+            glm::mat4 customProjMatrix(1.0f);
+            bool isWorldSpace = (canvas.mode == CanvasMode::WorldSpace && camera != nullptr);
+
+            if (isWorldSpace)
+            {
+                glm::mat4 canvasWorldMatrix = UILayout::CalculateWorldSpaceCanvasMatrix(scene, canvasEntity, canvas, camera);
+
+                glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.01f, 0.01f, 0.01f));
+                glm::mat4 viewProj = camera->GetProjectionMatrix() * camera->GetViewMatrix();
+                customProjMatrix = viewProj * canvasWorldMatrix * scaleMatrix;
+
+                if (canvas.depthTest) {
+                    glEnable(GL_DEPTH_TEST);
+                    glDepthMask(GL_TRUE);
+                } else {
+                    glDisable(GL_DEPTH_TEST);
+                    glDepthMask(GL_FALSE);
+                }
+            }
+            else
+            {
+                glDisable(GL_DEPTH_TEST);
+                glDepthMask(GL_FALSE);
+                customProjMatrix = glm::ortho(0.0f, viewportWidth, 0.0f, viewportHeight, -100.0f, 100.0f);
+            }
+
+            UIRenderer::Begin(viewportWidth, viewportHeight, customProjMatrix, s_UIEntityShader);
+            RenderEntityIDRecursively(scene, canvasEntity, s_UIEntityShader);
+            UIRenderer::End();
+        }
+    }
+
+    // Restore GL states
+    if (blendWasEnabled) glEnable(GL_BLEND); else glDisable(GL_BLEND);
+    if (depthTestWasEnabled) glEnable(GL_DEPTH_TEST); else glDisable(GL_DEPTH_TEST);
+    glDepthMask(depthMaskWasEnabled);
+    if (cullFaceWasEnabled) glEnable(GL_CULL_FACE); else glDisable(GL_CULL_FACE);
 }
 
 void UIRenderPass::RenderSelectionMask(Scene* scene, entt::entity selectedEntity, float viewportWidth, float viewportHeight)
@@ -207,10 +249,21 @@ void UIRenderPass::RenderSelectionMask(Scene* scene, entt::entity selectedEntity
         customProjMatrix = glm::ortho(0.0f, viewportWidth, 0.0f, viewportHeight, -100.0f, 100.0f);
     }
 
+    GLboolean blendWasEnabled = glIsEnabled(GL_BLEND);
+    GLboolean depthTestWasEnabled = glIsEnabled(GL_DEPTH_TEST);
+    GLboolean depthMaskWasEnabled = GL_TRUE;
+    glGetBooleanv(GL_DEPTH_WRITEMASK, &depthMaskWasEnabled);
+    GLboolean cullFaceWasEnabled = glIsEnabled(GL_CULL_FACE);
+
     const auto& rect = scene->GetComponent<RectTransformComponent>(selectedEntity);
     UIRenderer::Begin(viewportWidth, viewportHeight, customProjMatrix);
     UIRenderer::DrawQuadRotated(rect.computedScreenRect, rect.computedRotation, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
     UIRenderer::End();
+
+    if (blendWasEnabled) glEnable(GL_BLEND); else glDisable(GL_BLEND);
+    if (depthTestWasEnabled) glEnable(GL_DEPTH_TEST); else glDisable(GL_DEPTH_TEST);
+    glDepthMask(depthMaskWasEnabled);
+    if (cullFaceWasEnabled) glEnable(GL_CULL_FACE); else glDisable(GL_CULL_FACE);
 }
 
 void UIRenderPass::RenderEntityRecursively(Scene* scene, entt::entity entity)
