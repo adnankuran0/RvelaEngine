@@ -14,18 +14,15 @@ The engine is built around an ECS architecture and focuses on keeping systems mo
 
 ## Features
 
-- Graphics API: OpenGL  
-- PBR rendering pipeline  
-- ECS architecture  
-- Asset system and import pipeline
-  - Texture compression
-  - Mesh optimization
-- Material system  
-- Scene hierarchy and serialization  
-- Logging  
-- Lua scripting  
-- Physics  
-- Audio system  
+- **Rendering**: OpenGL PBR pipeline, Cascaded Shadows , Screenspace effects (SSR, SSGI, SSAO, FXAA)
+- **Materials & Shaders**: Custom shader support, ARM textures, Decals
+- **ECS & Prefabs**: EnTT architecture, Prefab system
+- **Physics**: Rigid bodies, character controller and colliders - Jolt Physics
+- **Animation**: Skeletal mesh skinning, animation playback and libraries
+- **Scripting**: Lua scripting with hot reload
+- **Audio**: 3D spatial audio - miniaudio
+- **UI System**: Canvas and interactive UI elements (Images, Text, Buttons, Sliders)
+- **Asset Pipeline**: Texture compression - DirectXTex, mesh optimization - meshoptimizer
 
 ## Used Dependencies
 - [ImGui](https://github.com/ocornut/imgui)  
@@ -37,7 +34,7 @@ The engine is built around an ECS architecture and focuses on keeping systems mo
 - [GLFW](https://www.glfw.org/)  
 - [GLM](https://github.com/g-truc/glm)  
 - [stb_image](https://github.com/nothings/stb)  
-- [JolyPhysics](https://github.com/jrouwe/JoltPhysics)  
+- [JoltPhysics](https://github.com/jrouwe/JoltPhysics)  
 - [Lua](https://github.com/lua/lua)  
 - [Sol2](https://github.com/ThePhD/sol2)  
 - [meshoptimizer](https://github.com/zeux/meshoptimizer)  
