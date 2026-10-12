@@ -825,30 +825,324 @@ void InspectorPanel::Draw(Engine* engine)
 
 	DrawComponent<MeshComponent>("Mesh", registry, selectedEntity, [](MeshComponent& mesh)
 			{
+				static std::vector<SubAssetEntry> s_DroppedModelMeshSubs;
+				static std::string s_DroppedModelName;
+				static bool s_OpenDroppedModelPopup = false;
+
 				std::string meshName = EditorUtils::GetAssetFileName(mesh.GetMeshID());
-				UI::DrawFullWidthAssetDropSlot("Mesh Slot", meshName, [&](const std::string& pathStr)
+				std::string displayText = meshName.empty() ? "None (Mesh Slot)" : meshName;
+
+				float btnHeight = 24.0f;
+				float pickBtnW = 26.0f;
+				float clearBtnW = mesh.GetMeshID().IsValid() ? 26.0f : 0.0f;
+				float mainSlotW = ImGui::GetContentRegionAvail().x - pickBtnW - (clearBtnW > 0 ? (clearBtnW + 4.0f) : 0.0f) - 4.0f;
+
+				if (ImGui::Button(displayText.c_str(), ImVec2(mainSlotW, btnHeight)))
+				{
+					ImGui::OpenPopup("SelectMeshPopup");
+				}
+
+				if (ImGui::BeginDragDropTarget())
+				{
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
 					{
-						if (pathStr.ends_with(".obj") || pathStr.ends_with(".fbx") || pathStr.ends_with(".gltf") || pathStr.ends_with(".glb") || pathStr.ends_with(".rmesh"))
+						std::string pathStr((const char*)payload->Data);
+						if (pathStr.ends_with(".obj") || pathStr.ends_with(".fbx") || pathStr.ends_with(".gltf") || pathStr.ends_with(".glb") || pathStr.ends_with(".rmesh") || pathStr.find('#') != std::string::npos)
 						{
-							AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
-							if (uuid.IsValid()) mesh.SetMesh(uuid);
-							else LOG_ERROR("Could not find UUID for mesh: {}", pathStr);
+							ApplyEntityChange(s_CurrentEntity, "Assign Mesh", [&]() {
+								AssetUUID directUUID = EditorUtils::ReadUUIDFromMeta(pathStr);
+								if (pathStr.find('#') != std::string::npos && directUUID.IsValid())
+								{
+									mesh.SetMesh(directUUID);
+									EditorUtils::ClearAssetFileNameCache();
+									return;
+								}
+
+								auto metaPath = AssetMeta::GetMetaPath(pathStr);
+								AssetMeta meta;
+								if (meta.LoadFromFile(metaPath))
+								{
+									std::vector<SubAssetEntry> meshSubs;
+									for (const auto& sub : meta.subAssets)
+									{
+										if (sub.uuid.IsValid() && sub.type == "Mesh")
+											meshSubs.push_back(sub);
+									}
+									if (!meshSubs.empty())
+									{
+										mesh.SetMesh(meshSubs[0].uuid);
+										EditorUtils::ClearAssetFileNameCache();
+										if (meshSubs.size() > 1)
+										{
+											s_DroppedModelMeshSubs = meshSubs;
+											s_DroppedModelName = std::filesystem::path(pathStr).filename().string();
+											s_OpenDroppedModelPopup = true;
+										}
+									}
+									else
+									{
+										if (directUUID.IsValid()) mesh.SetMesh(directUUID);
+									}
+								}
+								else
+								{
+									if (directUUID.IsValid()) mesh.SetMesh(directUUID);
+								}
+							});
 						}
-					});
+					}
+					ImGui::EndDragDropTarget();
+				}
+
+
+				if (clearBtnW > 0)
+				{
+					ImGui::SameLine(0, 4.0f);
+					if (ImGui::Button("X##ClearMesh", ImVec2(clearBtnW, btnHeight)))
+					{
+						ApplyEntityChange(s_CurrentEntity, "Clear Mesh", [&]() {
+							mesh.SetMesh(AssetUUID::Invalid());
+							EditorUtils::ClearAssetFileNameCache();
+						});
+					}
+					if (ImGui::IsItemHovered()) ImGui::SetTooltip("Clear Mesh");
+				}
+
+				if (s_OpenDroppedModelPopup)
+				{
+					ImGui::OpenPopup("SelectDroppedSubmeshPopup");
+					s_OpenDroppedModelPopup = false;
+				}
+
+				if (ImGui::BeginPopup("SelectDroppedSubmeshPopup"))
+				{
+					ImGui::TextDisabled("Select Part from '%s'", s_DroppedModelName.c_str());
+					ImGui::Separator();
+					for (const auto& sub : s_DroppedModelMeshSubs)
+					{
+						bool isSelected = (mesh.GetMeshID() == sub.uuid);
+						std::string partName = sub.name.empty() ? ("Mesh " + std::to_string(sub.index)) : sub.name;
+						if (ImGui::Selectable(partName.c_str(), isSelected))
+						{
+							ApplyEntityChange(s_CurrentEntity, "Select Submesh", [&]() {
+								mesh.SetMesh(sub.uuid);
+								EditorUtils::ClearAssetFileNameCache();
+							});
+							ImGui::CloseCurrentPopup();
+						}
+					}
+					ImGui::EndPopup();
+				}
+
+				if (ImGui::BeginPopup("SelectMeshPopup"))
+				{
+					static char filterText[128] = "";
+					ImGui::TextDisabled("Select Mesh");
+					ImGui::Separator();
+					if (ImGui::IsWindowAppearing())
+					{
+						ImGui::SetKeyboardFocusHere();
+						filterText[0] = '\0';
+					}
+					ImGui::SetNextItemWidth(300.0f);
+					ImGui::InputTextWithHint("##MeshSearchInput", "Search mesh...", filterText, sizeof(filterText));
+					ImGui::Separator();
+
+					auto meshList = EditorUtils::GetAvailableMeshAssets(false);
+					std::string filterStr = filterText;
+					std::transform(filterStr.begin(), filterStr.end(), filterStr.begin(), ::tolower);
+
+					ImGui::BeginChild("MeshListScroll", ImVec2(300.0f, 220.0f), true);
+					for (const auto& item : meshList)
+					{
+						std::string itemLower = item.fullName;
+						std::transform(itemLower.begin(), itemLower.end(), itemLower.begin(), ::tolower);
+						if (!filterStr.empty() && itemLower.find(filterStr) == std::string::npos)
+							continue;
+
+						bool isSelected = (mesh.GetMeshID() == item.uuid);
+						if (ImGui::Selectable(item.fullName.c_str(), isSelected))
+						{
+							ApplyEntityChange(s_CurrentEntity, "Select Mesh", [&]() {
+								mesh.SetMesh(item.uuid);
+								EditorUtils::ClearAssetFileNameCache();
+							});
+							ImGui::CloseCurrentPopup();
+						}
+						if (isSelected)
+							ImGui::SetItemDefaultFocus();
+					}
+					ImGui::EndChild();
+
+					if (ImGui::Button("Cancel", ImVec2(-FLT_MIN, 22.0f)))
+						ImGui::CloseCurrentPopup();
+
+					ImGui::EndPopup();
+				}
 			});
 
 		DrawComponent<SkeletalMeshComponent>("Skeletal Mesh", registry, selectedEntity, [](SkeletalMeshComponent& mesh)
 			{
+				static std::vector<SubAssetEntry> s_DroppedSkelModelMeshSubs;
+				static std::string s_DroppedSkelModelName;
+				static bool s_OpenDroppedSkelModelPopup = false;
+
 				std::string skelMeshName = EditorUtils::GetAssetFileName(mesh.GetMeshID());
-				UI::DrawFullWidthAssetDropSlot("Skeletal mesh Slot", skelMeshName, [&](const std::string& pathStr)
+				std::string displayText = skelMeshName.empty() ? "None (Skeletal Mesh Slot)" : skelMeshName;
+
+				float btnHeight = 24.0f;
+				float pickBtnW = 26.0f;
+				float clearBtnW = mesh.GetMeshID().IsValid() ? 26.0f : 0.0f;
+				float mainSlotW = ImGui::GetContentRegionAvail().x - pickBtnW - (clearBtnW > 0 ? (clearBtnW + 4.0f) : 0.0f) - 4.0f;
+
+				if (ImGui::Button(displayText.c_str(), ImVec2(mainSlotW, btnHeight)))
+				{
+					ImGui::OpenPopup("SelectSkelMeshPopup");
+				}
+
+				if (ImGui::BeginDragDropTarget())
+				{
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
 					{
-						if (pathStr.ends_with(".obj") || pathStr.ends_with(".fbx") || pathStr.ends_with(".gltf") || pathStr.ends_with(".glb") || pathStr.ends_with(".rskmesh"))
+						std::string pathStr((const char*)payload->Data);
+						if (pathStr.ends_with(".obj") || pathStr.ends_with(".fbx") || pathStr.ends_with(".gltf") || pathStr.ends_with(".glb") || pathStr.ends_with(".rskmesh") || pathStr.find('#') != std::string::npos)
 						{
-							AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
-							if (uuid.IsValid()) mesh.SetMesh(uuid);
-							else LOG_ERROR("Could not find UUID for mesh: {}", pathStr);
+							ApplyEntityChange(s_CurrentEntity, "Assign Skeletal Mesh", [&]() {
+								AssetUUID directUUID = EditorUtils::ReadUUIDFromMeta(pathStr);
+								if (pathStr.find('#') != std::string::npos && directUUID.IsValid())
+								{
+									mesh.SetMesh(directUUID);
+									EditorUtils::ClearAssetFileNameCache();
+									return;
+								}
+
+								auto metaPath = AssetMeta::GetMetaPath(pathStr);
+								AssetMeta meta;
+								if (meta.LoadFromFile(metaPath))
+								{
+									std::vector<SubAssetEntry> meshSubs;
+									for (const auto& sub : meta.subAssets)
+									{
+										if (sub.uuid.IsValid() && sub.type == "SkeletalMesh")
+											meshSubs.push_back(sub);
+									}
+									if (!meshSubs.empty())
+									{
+										mesh.SetMesh(meshSubs[0].uuid);
+										EditorUtils::ClearAssetFileNameCache();
+										if (meshSubs.size() > 1)
+										{
+											s_DroppedSkelModelMeshSubs = meshSubs;
+											s_DroppedSkelModelName = std::filesystem::path(pathStr).filename().string();
+											s_OpenDroppedSkelModelPopup = true;
+										}
+									}
+									else
+									{
+										if (directUUID.IsValid()) mesh.SetMesh(directUUID);
+									}
+								}
+								else
+								{
+									if (directUUID.IsValid()) mesh.SetMesh(directUUID);
+								}
+							});
 						}
-					});
+					}
+					ImGui::EndDragDropTarget();
+				}
+
+				ImGui::SameLine(0, 4.0f);
+				if (ImGui::Button("...##PickSkelBtn", ImVec2(pickBtnW, btnHeight)))
+				{
+					ImGui::OpenPopup("SelectSkelMeshPopup");
+				}
+				if (ImGui::IsItemHovered()) ImGui::SetTooltip("Browse / Search Skeletal Mesh");
+
+				if (clearBtnW > 0)
+				{
+					ImGui::SameLine(0, 4.0f);
+					if (ImGui::Button("X##ClearSkelMesh", ImVec2(clearBtnW, btnHeight)))
+					{
+						ApplyEntityChange(s_CurrentEntity, "Clear Skeletal Mesh", [&]() {
+							mesh.SetMesh(AssetUUID::Invalid());
+							EditorUtils::ClearAssetFileNameCache();
+						});
+					}
+					if (ImGui::IsItemHovered()) ImGui::SetTooltip("Clear Skeletal Mesh");
+				}
+
+				if (s_OpenDroppedSkelModelPopup)
+				{
+					ImGui::OpenPopup("SelectDroppedSkelSubmeshPopup");
+					s_OpenDroppedSkelModelPopup = false;
+				}
+
+				if (ImGui::BeginPopup("SelectDroppedSkelSubmeshPopup"))
+				{
+					ImGui::TextDisabled("Select Part from '%s'", s_DroppedSkelModelName.c_str());
+					ImGui::Separator();
+					for (const auto& sub : s_DroppedSkelModelMeshSubs)
+					{
+						bool isSelected = (mesh.GetMeshID() == sub.uuid);
+						std::string partName = sub.name.empty() ? ("Mesh " + std::to_string(sub.index)) : sub.name;
+						if (ImGui::Selectable(partName.c_str(), isSelected))
+						{
+							ApplyEntityChange(s_CurrentEntity, "Select Skeletal Submesh", [&]() {
+								mesh.SetMesh(sub.uuid);
+								EditorUtils::ClearAssetFileNameCache();
+							});
+							ImGui::CloseCurrentPopup();
+						}
+					}
+					ImGui::EndPopup();
+				}
+
+				if (ImGui::BeginPopup("SelectSkelMeshPopup"))
+				{
+					static char filterText[128] = "";
+					ImGui::TextDisabled("Select Skeletal Mesh");
+					ImGui::Separator();
+					if (ImGui::IsWindowAppearing())
+					{
+						ImGui::SetKeyboardFocusHere();
+						filterText[0] = '\0';
+					}
+					ImGui::SetNextItemWidth(300.0f);
+					ImGui::InputTextWithHint("##SkelSearchInput", "Search skeletal mesh...", filterText, sizeof(filterText));
+					ImGui::Separator();
+
+					auto meshList = EditorUtils::GetAvailableMeshAssets(true);
+					std::string filterStr = filterText;
+					std::transform(filterStr.begin(), filterStr.end(), filterStr.begin(), ::tolower);
+
+					ImGui::BeginChild("SkelMeshListScroll", ImVec2(300.0f, 220.0f), true);
+					for (const auto& item : meshList)
+					{
+						std::string itemLower = item.fullName;
+						std::transform(itemLower.begin(), itemLower.end(), itemLower.begin(), ::tolower);
+						if (!filterStr.empty() && itemLower.find(filterStr) == std::string::npos)
+							continue;
+
+						bool isSelected = (mesh.GetMeshID() == item.uuid);
+						if (ImGui::Selectable(item.fullName.c_str(), isSelected))
+						{
+							ApplyEntityChange(s_CurrentEntity, "Select Skeletal Mesh", [&]() {
+								mesh.SetMesh(item.uuid);
+								EditorUtils::ClearAssetFileNameCache();
+							});
+							ImGui::CloseCurrentPopup();
+						}
+						if (isSelected)
+							ImGui::SetItemDefaultFocus();
+					}
+					ImGui::EndChild();
+
+					if (ImGui::Button("Cancel", ImVec2(-FLT_MIN, 22.0f)))
+						ImGui::CloseCurrentPopup();
+
+					ImGui::EndPopup();
+				}
 			});
 
 		DrawComponent<SkeletonComponent>("Skeleton", registry, selectedEntity, [&](SkeletonComponent& skelComp)
@@ -1312,15 +1606,20 @@ void InspectorPanel::Draw(Engine* engine)
 
 				float saveBtnWidth = inst.GetSourceAsset() ? 65.0f : 0.0f;
 				float clearBtnWidth = inst.GetSourceAsset() ? 26.0f : 0.0f;
-				float slotWidth = inst.GetSourceAsset() ? ImGui::GetContentRegionAvail().x - saveBtnWidth - clearBtnWidth : -FLT_MIN;
+				float pickBtnWidth = 26.0f;
+				float slotWidth = ImGui::GetContentRegionAvail().x - pickBtnWidth - (saveBtnWidth > 0 ? (saveBtnWidth + 4.0f) : 0.0f) - (clearBtnWidth > 0 ? (clearBtnWidth + 4.0f) : 0.0f) - 4.0f;
 
-				ImGui::Button(matBtnLabel.c_str(), ImVec2(slotWidth, 24.0f));
+				if (ImGui::Button(matBtnLabel.c_str(), ImVec2(slotWidth, 24.0f)))
+				{
+					ImGui::OpenPopup("SelectMaterialPopup");
+				}
+
 				if (ImGui::BeginDragDropTarget())
 				{
 					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
 					{
 						std::string pathStr((const char*)payload->Data);
-						if (pathStr.ends_with(".rmat"))
+						if (pathStr.ends_with(".rmat") || pathStr.find('#') != std::string::npos)
 						{
 							AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
 							if (uuid.IsValid())
@@ -1335,9 +1634,55 @@ void InspectorPanel::Draw(Engine* engine)
 					ImGui::EndDragDropTarget();
 				}
 
+				if (ImGui::BeginPopup("SelectMaterialPopup"))
+				{
+					static char filterText[128] = "";
+					ImGui::TextDisabled("Select Material");
+					ImGui::Separator();
+					if (ImGui::IsWindowAppearing())
+					{
+						ImGui::SetKeyboardFocusHere();
+						filterText[0] = '\0';
+					}
+					ImGui::SetNextItemWidth(300.0f);
+					ImGui::InputTextWithHint("##MatSearchInput", "Search material...", filterText, sizeof(filterText));
+					ImGui::Separator();
+
+					auto matList = EditorUtils::GetAvailableMaterialAssets();
+					std::string filterStr = filterText;
+					std::transform(filterStr.begin(), filterStr.end(), filterStr.begin(), ::tolower);
+
+					ImGui::BeginChild("MatListScroll", ImVec2(300.0f, 220.0f), true);
+					for (const auto& item : matList)
+					{
+						std::string itemLower = item.name + " " + item.path;
+						std::transform(itemLower.begin(), itemLower.end(), itemLower.begin(), ::tolower);
+						if (!filterStr.empty() && itemLower.find(filterStr) == std::string::npos)
+							continue;
+
+						bool isSelected = (inst.GetSourceUUID() == item.uuid);
+						std::string displayLabel = item.name + " (" + item.path + ")";
+						if (ImGui::Selectable(displayLabel.c_str(), isSelected))
+						{
+							ApplyEntityChange(selectedEntity, "Select Material", [&]() {
+								material.SetMaterial(item.uuid);
+							});
+							ImGui::CloseCurrentPopup();
+						}
+						if (isSelected)
+							ImGui::SetItemDefaultFocus();
+					}
+					ImGui::EndChild();
+
+					if (ImGui::Button("Cancel", ImVec2(-FLT_MIN, 22.0f)))
+						ImGui::CloseCurrentPopup();
+
+					ImGui::EndPopup();
+				}
+
 				if (inst.GetSourceAsset())
 				{
-					ImGui::SameLine();
+					ImGui::SameLine(0, 4.0f);
 					if (ImGui::Button("Save##matsave", ImVec2(saveBtnWidth - 6.0f, 24.0f)))
 					{
 						auto asset = inst.GetSourceAsset();

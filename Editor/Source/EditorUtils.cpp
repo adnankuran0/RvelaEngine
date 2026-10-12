@@ -84,12 +84,52 @@ bool EditorUtils::SaveSceneAs(Engine& engine)
     return false;
 }
 
+static bool IsValidUUIDFormat(const std::string& str)
+{
+    if (str.length() != 36) return false;
+    for (size_t i = 0; i < 36; ++i)
+    {
+        if (i == 8 || i == 13 || i == 18 || i == 23)
+        {
+            if (str[i] != '-') return false;
+        }
+        else
+        {
+            if (!std::isxdigit(static_cast<unsigned char>(str[i]))) return false;
+        }
+    }
+    return true;
+}
+
 AssetUUID EditorUtils::ReadUUIDFromMeta(const std::string& assetPath)
 {
+    if (assetPath.empty())
+        return AssetUUID::Invalid();
+
+    auto hashPos = assetPath.find('#');
+    if (hashPos != std::string::npos)
+    {
+        std::string subUuidStr = assetPath.substr(hashPos + 1);
+        if (IsValidUUIDFormat(subUuidStr))
+        {
+            AssetUUID subUUID = AssetUUID::FromString(subUuidStr);
+            if (subUUID.IsValid())
+                return subUUID;
+        }
+    }
+
+    std::filesystem::path p(assetPath);
+    std::string stemStr = p.stem().string();
+    if (IsValidUUIDFormat(stemStr))
+    {
+        AssetUUID directUUID = AssetUUID::FromString(stemStr);
+        if (directUUID.IsValid())
+            return directUUID;
+    }
+
     auto metaPath = assetPath + ".rmeta";
     if (!std::filesystem::exists(metaPath))
     {
-        LOG_WARN("No .rmeta found for: {}", assetPath);
         return AssetUUID::Invalid();
     }
 
@@ -150,7 +190,10 @@ std::string EditorUtils::GetAssetFileName(const AssetUUID& uuid)
                     for (const auto& sub : meta.subAssets)
                     {
                         if (sub.uuid.IsValid())
-                            s_FileNameCache[sub.uuid] = fn;
+                        {
+                            std::string displayName = sub.name.empty() ? fn : (fn + " : " + sub.name);
+                            s_FileNameCache[sub.uuid] = displayName;
+                        }
                     }
                 }
             }
@@ -164,4 +207,100 @@ std::string EditorUtils::GetAssetFileName(const AssetUUID& uuid)
     // Cache empty string to avoid rescanning filesystem for nonexistent assets
     s_FileNameCache[uuid] = "";
     return "";
+}
+
+std::vector<EditorUtils::MeshAssetInfo> EditorUtils::GetAvailableMeshAssets(bool skeletal)
+{
+    std::vector<MeshAssetInfo> results;
+    const auto& assetDir = AssetManager::Get().GetRegistry().GetAssetDir();
+    if (assetDir.empty() || !std::filesystem::exists(assetDir))
+        return results;
+
+    std::string targetType = skeletal ? "SkeletalMesh" : "Mesh";
+    std::string targetExt = skeletal ? ".rskmesh" : ".rmesh";
+
+    for (const auto& entry : std::filesystem::recursive_directory_iterator(assetDir))
+    {
+        if (!entry.is_regular_file()) continue;
+        if (entry.path().string().find(".cache") != std::string::npos) continue;
+
+        if (entry.path().extension() == ".rmeta")
+        {
+            AssetMeta meta;
+            if (meta.LoadFromFile(entry.path()))
+            {
+                auto srcPath = entry.path();
+                srcPath.replace_extension("");
+                std::string modelName = srcPath.filename().string();
+
+                for (const auto& sub : meta.subAssets)
+                {
+                    if (sub.uuid.IsValid() && sub.type == targetType)
+                    {
+                        MeshAssetInfo info;
+                        info.uuid = sub.uuid;
+                        info.modelName = modelName;
+                        info.meshName = sub.name.empty() ? modelName : sub.name;
+                        info.fullName = modelName + " : " + info.meshName;
+                        results.push_back(info);
+                    }
+                }
+            }
+        }
+        else if (entry.path().extension() == targetExt)
+        {
+            AssetUUID uuid = ReadUUIDFromMeta(entry.path().string());
+            if (uuid.IsValid())
+            {
+                std::string fn = entry.path().filename().string();
+                MeshAssetInfo info;
+                info.uuid = uuid;
+                info.modelName = fn;
+                info.meshName = fn;
+                info.fullName = fn;
+                results.push_back(info);
+            }
+        }
+    }
+
+    std::sort(results.begin(), results.end(), [](const MeshAssetInfo& a, const MeshAssetInfo& b) {
+        return a.fullName < b.fullName;
+    });
+
+    return results;
+}
+
+std::vector<EditorUtils::MaterialAssetInfo> EditorUtils::GetAvailableMaterialAssets()
+{
+    std::vector<MaterialAssetInfo> results;
+    const auto& assetDir = AssetManager::Get().GetRegistry().GetAssetDir();
+    if (assetDir.empty() || !std::filesystem::exists(assetDir))
+        return results;
+
+    std::error_code ec;
+    for (const auto& entry : std::filesystem::recursive_directory_iterator(assetDir, ec))
+    {
+        if (ec || !entry.is_regular_file()) continue;
+        if (entry.path().string().find(".cache") != std::string::npos) continue;
+
+        if (entry.path().extension() == ".rmat")
+        {
+            AssetUUID uuid = ReadUUIDFromMeta(entry.path().string());
+            if (uuid.IsValid())
+            {
+                MaterialAssetInfo info;
+                info.uuid = uuid;
+                info.name = entry.path().stem().string();
+                auto rel = std::filesystem::relative(entry.path(), assetDir, ec);
+                info.path = ec ? entry.path().filename().string() : rel.string();
+                results.push_back(info);
+            }
+        }
+    }
+
+    std::sort(results.begin(), results.end(), [](const MaterialAssetInfo& a, const MaterialAssetInfo& b) {
+        return a.name < b.name;
+    });
+
+    return results;
 }

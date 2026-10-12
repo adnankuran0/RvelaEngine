@@ -50,9 +50,17 @@ struct BrowserItem
     std::string stem;
     std::string extension;
     bool isDirectory = false;
+    bool isSubAsset = false;
+    int subAssetCount = 0;
     uintmax_t fileSize = 0;
     ImTextureID icon = 0;
 };
+
+static bool IsModelFile(const std::filesystem::path& path)
+{
+    std::string ext = path.extension().string();
+    return ext == ".fbx" || ext == ".obj" || ext == ".gltf" || ext == ".glb";
+}
 
 static std::filesystem::path s_CurrentDirectory;
 static std::filesystem::path s_SelectedItemPath;
@@ -569,16 +577,16 @@ static ImTextureID ResolveFileIcon(const std::string& extension, bool isDirector
     if (extension == ".rscene") return lib.GetIcon(EditorIcon::Scene).GetID();
     if (extension == ".rprefab") return lib.GetIcon(EditorIcon::Prefab).GetID();
     if (extension == ".rtex" || extension == ".png" || extension == ".jpeg" ||
-        extension == ".jpg" || extension == ".tga" || extension == ".hdr")
+        extension == ".jpg" || extension == ".tga" || extension == ".hdr" || extension == ".Texture")
         return lib.GetIcon(EditorIcon::Texture).GetID();
-    if (extension == ".mp3" || extension == ".ogg" || extension == ".wav")
+    if (extension == ".mp3" || extension == ".ogg" || extension == ".wav" || extension == ".Audio")
         return lib.GetIcon(EditorIcon::Audio).GetID();
-    if (extension == ".rmat") return lib.GetIcon(EditorIcon::Material).GetID();
-    if (extension == ".rmesh" || extension == ".glb" || extension == ".fbx" || extension == ".obj")
+    if (extension == ".rmat" || extension == ".Material") return lib.GetIcon(EditorIcon::Material).GetID();
+    if (extension == ".rmesh" || extension == ".glb" || extension == ".fbx" || extension == ".obj" || extension == ".gltf" || extension == ".Mesh")
         return lib.GetIcon(EditorIcon::Mesh).GetID();
-    if (extension == ".ranimlib") return lib.GetIcon(EditorIcon::AnimLib).GetID();
-    if (extension == ".rskmesh") return lib.GetIcon(EditorIcon::Skinned).GetID();
-    if (extension == ".rskeleton") return lib.GetIcon(EditorIcon::Skeleton).GetID();
+    if (extension == ".ranimlib" || extension == ".Animation") return lib.GetIcon(EditorIcon::AnimLib).GetID();
+    if (extension == ".rskmesh" || extension == ".SkeletalMesh") return lib.GetIcon(EditorIcon::Skinned).GetID();
+    if (extension == ".rskeleton" || extension == ".Skeleton") return lib.GetIcon(EditorIcon::Skeleton).GetID();
     if (extension == ".lua" || extension == ".glsl" || extension == ".rshader")
         return lib.GetIcon(EditorIcon::Script).GetID();
 
@@ -640,6 +648,31 @@ static void RefreshAssets(const std::filesystem::path& directory)
 
     try
     {
+        if (IsModelFile(directory))
+        {
+            auto metaPath = AssetMeta::GetMetaPath(directory);
+            AssetMeta meta;
+            if (meta.LoadFromFile(metaPath))
+            {
+                for (const auto& sub : meta.subAssets)
+                {
+                    if (!sub.uuid.IsValid()) continue;
+                    BrowserItem item;
+                    item.path = directory.string() + "#" + sub.uuid.ToString();
+                    item.filename = sub.name.empty() ? (sub.type + "_" + std::to_string(sub.index)) : sub.name;
+                    item.stem = item.filename;
+                    item.extension = "." + sub.type;
+                    item.isDirectory = false;
+                    item.isSubAsset = true;
+                    item.fileSize = 0;
+                    item.icon = ResolveFileIcon(item.extension, false);
+                    s_CachedItems.emplace_back(std::move(item));
+                }
+            }
+            s_NeedsRefresh = false;
+            return;
+        }
+
         std::error_code ec;
         for (const auto& entry : std::filesystem::directory_iterator(directory, ec))
         {
@@ -660,6 +693,16 @@ static void RefreshAssets(const std::filesystem::path& directory)
             item.isDirectory = isDir;
             item.fileSize = isDir ? 0 : entry.file_size(ec);
             item.icon = ResolveFileIcon(ext, isDir);
+
+            if (!isDir && IsModelFile(entry.path()))
+            {
+                auto metaPath = AssetMeta::GetMetaPath(entry.path());
+                AssetMeta meta;
+                if (meta.LoadFromFile(metaPath))
+                {
+                    item.subAssetCount = (int)meta.subAssets.size();
+                }
+            }
 
             s_CachedItems.emplace_back(std::move(item));
         }
@@ -1222,10 +1265,34 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
             }
         }
 
+        if (item.subAssetCount > 0)
+        {
+            std::string badgeText = std::to_string(item.subAssetCount);
+            ImVec2 badgeTextSize = ImGui::CalcTextSize(badgeText.c_str());
+            float badgeW = badgeTextSize.x + 8.0f;
+            float badgeH = 16.0f;
+            float badgeX = cellPos.x + cardWidth - badgeW - 3.0f;
+            float badgeY = cellPos.y + 3.0f;
+            drawList->AddRectFilled(ImVec2(badgeX, badgeY), ImVec2(badgeX + badgeW, badgeY + badgeH), IM_COL32(30, 110, 220, 220), 4.0f);
+            drawList->AddText(ImVec2(badgeX + 4.0f, badgeY + 1.0f), IM_COL32(255, 255, 255, 255), badgeText.c_str());
+        }
+
         if (isItemHovered)
         {
-            ImGui::SetTooltip("%s\n%s", item.filename.c_str(),
-                item.isDirectory ? "Folder" : FormatFileSize(item.fileSize).c_str());
+            if (item.subAssetCount > 0)
+            {
+                ImGui::SetTooltip("%s\nModel (%d sub-assets)\nDouble-click to view parts", item.filename.c_str(), item.subAssetCount);
+            }
+            else if (item.isSubAsset)
+            {
+                std::string typeName = item.extension.size() > 1 ? item.extension.substr(1) : "Sub-Asset";
+                ImGui::SetTooltip("%s\n%s\nDrag to scene or inspector slot", item.filename.c_str(), typeName.c_str());
+            }
+            else
+            {
+                ImGui::SetTooltip("%s\n%s", item.filename.c_str(),
+                    item.isDirectory ? "Folder" : FormatFileSize(item.fileSize).c_str());
+            }
         }
 
         if (isClicked)
@@ -1245,6 +1312,33 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
             if (item.isDirectory)
             {
                 NavigateTo(item.path);
+            }
+            else if (IsModelFile(item.path) && item.subAssetCount > 0)
+            {
+                NavigateTo(item.path);
+            }
+            else if (item.isSubAsset && (item.extension == ".Mesh" || item.extension == ".SkeletalMesh"))
+            {
+                AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(item.path.string());
+                if (uuid.IsValid())
+                {
+                    glm::vec3 spawnPos(0.0f);
+                    if (auto* cam = engine->GetEditorCamera())
+                        spawnPos = cam->Position + cam->Front * 5.0f;
+                    Entity e = engine->GetActiveScene().CreateEntity(item.stem);
+                    e.GetComponent<TransformComponent>().SetPosition(spawnPos);
+                    if (item.extension == ".Mesh")
+                    {
+                        e.AddComponent<MeshComponent>().SetMesh(uuid);
+                        e.AddComponent<MeshRendererComponent>();
+                    }
+                    else
+                    {
+                        e.AddComponent<SkeletalMeshComponent>().SetMesh(uuid);
+                        e.AddComponent<SkeletalMeshRendererComponent>();
+                    }
+                    EditorSelection::Get().Select(e.GetHandle());
+                }
             }
             else if (item.extension == ".rscene")
             {

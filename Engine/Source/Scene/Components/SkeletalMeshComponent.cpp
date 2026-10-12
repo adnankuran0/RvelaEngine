@@ -9,7 +9,8 @@ void SkeletalMeshComponent::Load(const AssetUUID& uuid)
 {
     if (!uuid.IsValid())
     {
-        LOG_WARN("SkeletalMesh UUID is not valid!");
+        meshUUID = AssetUUID::Invalid();
+        mesh.Reset();
         return;
     }
     meshUUID = uuid;

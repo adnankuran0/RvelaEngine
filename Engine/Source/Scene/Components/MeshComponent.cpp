@@ -8,7 +8,8 @@ void MeshComponent::Load(const AssetUUID& uuid)
 {
     if (!uuid.IsValid())
     {
-        LOG_WARN("Material UUID is not valid!");
+        meshUUID = AssetUUID::Invalid();
+        mesh.Reset();
         return;
     }
     meshUUID = uuid;
