@@ -64,6 +64,8 @@ static bool IsModelFile(const std::filesystem::path& path)
 
 static std::filesystem::path s_CurrentDirectory;
 static std::filesystem::path s_SelectedItemPath;
+static bool s_SelectedIsDir = false;
+static uintmax_t s_SelectedFileSize = 0;
 static std::vector<std::filesystem::path> s_NavHistory;
 static int s_NavHistoryIndex = -1;
 
@@ -74,6 +76,8 @@ static std::vector<DirNode> s_DirectoryTree;
 
 static bool s_NeedsRefresh = true;
 static bool s_DirectoryTreeDirty = true;
+static bool s_BreadcrumbsDirty = true;
+static std::vector<std::pair<std::string, std::filesystem::path>> s_CachedBreadcrumbs;
 static float s_ThumbnailSize = 56.0f;
 
 static bool s_RenamingActive = false;
@@ -115,6 +119,7 @@ static void NavigateTo(const std::filesystem::path& path)
     s_SearchBuffer[0] = '\0';
     s_SelectedItemPath.clear();
     s_NeedsRefresh = true;
+    s_BreadcrumbsDirty = true;
 }
 
 static void NavigateBack()
@@ -126,6 +131,7 @@ static void NavigateBack()
         s_SearchBuffer[0] = '\0';
         s_SelectedItemPath.clear();
         s_NeedsRefresh = true;
+        s_BreadcrumbsDirty = true;
     }
 }
 
@@ -138,6 +144,7 @@ static void NavigateForward()
         s_SearchBuffer[0] = '\0';
         s_SelectedItemPath.clear();
         s_NeedsRefresh = true;
+        s_BreadcrumbsDirty = true;
     }
 }
 
@@ -930,10 +937,14 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
         s_DirectoryTreeDirty = false;
     }
 
-    ImGui::Begin("Asset Browser", nullptr,
+    if (!ImGui::Begin("Asset Browser", nullptr,
         ImGuiWindowFlags_NoFocusOnAppearing |
         ImGuiWindowFlags_NoBringToFrontOnFocus |
-        ImGuiWindowFlags_NoCollapse);
+        ImGuiWindowFlags_NoCollapse))
+    {
+        ImGui::End();
+        return;
+    }
 
     constexpr float leftPanelWidth = 200.0f;
     ImGui::Columns(2);
@@ -1023,21 +1034,26 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
         ImGui::SameLine();
 
         // Breadcrumb trail
-        std::vector<std::pair<std::string, std::filesystem::path>> breadcrumbs;
-        breadcrumbs.push_back({ rootName, rootDirectory });
-
-        std::error_code ec;
-        auto relPath = std::filesystem::relative(s_CurrentDirectory, rootDirectory, ec);
-        if (!ec && !relPath.empty() && relPath != ".")
+        if (s_BreadcrumbsDirty)
         {
-            std::filesystem::path accum = rootDirectory;
-            for (const auto& part : relPath)
+            s_CachedBreadcrumbs.clear();
+            s_CachedBreadcrumbs.push_back({ rootName, rootDirectory });
+
+            std::error_code ec;
+            auto relPath = std::filesystem::relative(s_CurrentDirectory, rootDirectory, ec);
+            if (!ec && !relPath.empty() && relPath != ".")
             {
-                accum /= part;
-                breadcrumbs.push_back({ part.string(), accum });
+                std::filesystem::path accum = rootDirectory;
+                for (const auto& part : relPath)
+                {
+                    accum /= part;
+                    s_CachedBreadcrumbs.push_back({ part.string(), accum });
+                }
             }
+            s_BreadcrumbsDirty = false;
         }
 
+        const auto& breadcrumbs = s_CachedBreadcrumbs;
         for (size_t i = 0; i < breadcrumbs.size(); ++i)
         {
             const auto& [label, path] = breadcrumbs[i];
@@ -1155,6 +1171,12 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
     const float cardHeight = thumbnailSize + padTop + padLabel + lineHeight * 2.0f + 4.0f;
     const float cardSpacing = 6.0f;
 
+    const float scrollY = ImGui::GetScrollY();
+    const float windowVisibleHeight = ImGui::GetWindowHeight();
+    const float clipMinY = scrollY - cardHeight;
+    const float clipMaxY = scrollY + windowVisibleHeight + cardHeight;
+    const ImVec2 childScreenPos = ImGui::GetCursorScreenPos();
+
     for (size_t i = 0; i < itemsToShow.size(); ++i)
     {
         const auto& item = itemsToShow[i];
@@ -1163,6 +1185,9 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
         ImGui::BeginGroup();
 
         const ImVec2 cellPos = ImGui::GetCursorScreenPos();
+        const float itemRelativeY = cellPos.y - childScreenPos.y + scrollY;
+        const bool isVisible = (itemRelativeY >= clipMinY && itemRelativeY <= clipMaxY);
+
         const bool isSelected = (s_SelectedItemPath == item.path);
 
         ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0, 0, 0, 0));
@@ -1170,6 +1195,25 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
         ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0, 0, 0, 0));
         ImGui::Selectable("##card", isSelected, ImGuiSelectableFlags_AllowDoubleClick, ImVec2(cardWidth, cardHeight));
         ImGui::PopStyleColor(3);
+
+        if (!isVisible)
+        {
+            ImGui::EndGroup();
+            ImGui::PopID();
+
+            if (i + 1 < itemsToShow.size())
+            {
+                const float lastRight = ImGui::GetItemRectMax().x;
+                const float nextRight = lastRight + cardSpacing + cardWidth;
+                const float windowMaxX = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
+
+                if (nextRight <= windowMaxX)
+                {
+                    ImGui::SameLine(0.0f, cardSpacing);
+                }
+            }
+            continue;
+        }
 
         const bool isItemHovered = ImGui::IsItemHovered();
         const bool isClicked = ImGui::IsItemClicked(ImGuiMouseButton_Left);
@@ -1298,11 +1342,15 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
         if (isClicked)
         {
             s_SelectedItemPath = item.path;
+            s_SelectedIsDir = item.isDirectory;
+            s_SelectedFileSize = item.fileSize;
         }
 
         if (isRightClicked)
         {
             s_SelectedItemPath = item.path;
+            s_SelectedIsDir = item.isDirectory;
+            s_SelectedFileSize = item.fileSize;
             ImGui::OpenPopup(("##ItemMenu_" + item.filename).c_str());
         }
         DrawItemContextMenu(item.path, importPipeline);
@@ -1446,21 +1494,19 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
     {
         ImGui::TextDisabled("%d item%s", (int)itemsToShow.size(), itemsToShow.size() == 1 ? "" : "s");
 
-        if (!s_SelectedItemPath.empty() && std::filesystem::exists(s_SelectedItemPath))
+        if (!s_SelectedItemPath.empty())
         {
             ImGui::SameLine();
             ImGui::TextDisabled("|");
             ImGui::SameLine();
             std::string selName = s_SelectedItemPath.filename().string();
-            if (std::filesystem::is_directory(s_SelectedItemPath))
+            if (s_SelectedIsDir)
             {
                 ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s (Folder)", selName.c_str());
             }
             else
             {
-                std::error_code ec;
-                auto sz = std::filesystem::file_size(s_SelectedItemPath, ec);
-                ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s (%s)", selName.c_str(), FormatFileSize(sz).c_str());
+                ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s (%s)", selName.c_str(), FormatFileSize(s_SelectedFileSize).c_str());
             }
         }
     }

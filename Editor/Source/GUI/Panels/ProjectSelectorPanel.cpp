@@ -8,10 +8,27 @@
 
 using namespace rv;
 
+void ProjectSelectorPanel::RefreshRecents()
+{
+    m_CachedRecents = ProjectManager::GetRecentProjects();
+    m_RecentsLoaded = true;
+}
+
+void ProjectSelectorPanel::Open()
+{
+    m_IsOpen = true;
+    RefreshRecents();
+}
+
 bool ProjectSelectorPanel::Draw(Engine* engine)
 {
     if (!m_IsOpen)
         return false;
+
+    if (!m_RecentsLoaded)
+    {
+        RefreshRecents();
+    }
 
     bool projectSelected = false;
 
@@ -57,7 +74,7 @@ bool ProjectSelectorPanel::Draw(Engine* engine)
             if (ImGui::BeginTabItem("Recent Projects"))
             {
                 ImGui::Spacing();
-                std::vector<std::string> recents = ProjectManager::GetRecentProjects();
+                const auto& recents = m_CachedRecents;
 
                 if (recents.empty())
                 {
@@ -129,6 +146,7 @@ bool ProjectSelectorPanel::Draw(Engine* engine)
                     if (!projectToRemove.empty())
                     {
                         ProjectManager::RemoveRecentProject(projectToRemove);
+                        RefreshRecents();
                     }
                 }
 

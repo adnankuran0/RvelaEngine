@@ -331,10 +331,14 @@ void EditorLayer::Render()
 
     ImGuiViewport* viewport = ImGui::GetMainViewport();
 
-    bool projectSelected = m_ProjectSelectorPanel.Draw(m_Engine);
-    if (projectSelected)
+    bool projectSelected = false;
+    if (m_ProjectSelectorPanel.IsOpen())
     {
-        EditorSelection::Get().Clear();
+        projectSelected = m_ProjectSelectorPanel.Draw(m_Engine);
+        if (projectSelected)
+        {
+            EditorSelection::Get().Clear();
+        }
     }
 
     if (ProjectManager::IsProjectLoaded())
