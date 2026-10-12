@@ -143,6 +143,7 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             else if (type == "Camera") return e.HasComponent<CameraComponent>();
             else if (type == "DirectionalLight") return e.HasComponent<DirectionalLightComponent>();
             else if (type == "PointLight") return e.HasComponent<PointLightComponent>();
+            else if (type == "SpotLight") return e.HasComponent<SpotLightComponent>();
             else if (type == "MeshRenderer") return e.HasComponent<MeshRendererComponent>();
             else if (type == "Material") return e.HasComponent<MaterialComponent>();
             else if (type == "Rigidbody") return e.HasComponent<RigidbodyComponent>();
@@ -172,6 +173,9 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             }
             else if (type == "PointLight") {
                 return sol::make_object(lua, ComponentHandle<PointLightComponent>{ e });
+            }
+            else if (type == "SpotLight") {
+                return sol::make_object(lua, ComponentHandle<SpotLightComponent>{ e });
             }
             else if (type == "MeshRenderer") {
                 return sol::make_object(lua, ComponentHandle<MeshRendererComponent>{ e });
@@ -224,6 +228,10 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             if (typeName == "PointLight") {
                 if (!e.HasComponent<PointLightComponent>()) e.AddComponent<PointLightComponent>();
                 return sol::make_object(lua, ComponentHandle<PointLightComponent>{ e });
+            }
+            else if (typeName == "SpotLight") {
+                if (!e.HasComponent<SpotLightComponent>()) e.AddComponent<SpotLightComponent>();
+                return sol::make_object(lua, ComponentHandle<SpotLightComponent>{ e });
             }
             else if (typeName == "DirectionalLight") {
                 if (!e.HasComponent<DirectionalLightComponent>()) e.AddComponent<DirectionalLightComponent>();

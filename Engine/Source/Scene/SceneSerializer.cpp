@@ -305,6 +305,9 @@ json SceneSerializer::SerializeEntity(Scene& scene, entt::entity e, bool seriali
     if (scene.HasComponent<DirectionalLightComponent>(e))
         j["DirectionalLight"] = scene.GetComponent<DirectionalLightComponent>(e).Serialize();
 
+    if (scene.HasComponent<SpotLightComponent>(e))
+        j["SpotLight"] = scene.GetComponent<SpotLightComponent>(e).Serialize();
+
     if (scene.HasComponent<CameraComponent>(e))
         j["CameraComponent"] = scene.GetComponent<CameraComponent>(e).Serialize();
 
@@ -420,6 +423,9 @@ void SceneSerializer::DeserializeEntityComponents(Scene& scene, entt::entity han
 
     if (entityJson.contains("DirectionalLight"))
         scene.AddComponent<DirectionalLightComponent>(handle).Deserialize(entityJson["DirectionalLight"]);
+
+    if (entityJson.contains("SpotLight"))
+        scene.AddComponent<SpotLightComponent>(handle).Deserialize(entityJson["SpotLight"]);
 
     if (entityJson.contains("CameraComponent"))
         scene.AddComponent<CameraComponent>(handle).Deserialize(entityJson["CameraComponent"]);

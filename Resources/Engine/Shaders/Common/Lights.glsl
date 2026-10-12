@@ -2,6 +2,7 @@
 #define LIGHTS_GLSL
 
 #define MAX_POINT_LIGHTS 20
+#define MAX_SPOT_LIGHTS 8
 #define NUM_CASCADES 4
 
 struct PointLight {
@@ -13,8 +14,16 @@ struct PointLight {
     int shadowIndex;
 };
 
+struct SpotLight {
+    vec4 position;          // xyz: pos, w: radius
+    vec4 direction;         // xyz: dir, w: shadowIndex
+    vec4 colorIntensity;    // rgb: color, w: intensity
+    vec4 cutoffs;           // x: innerCutoff, y: outerCutoff, z: shadowBias, w: blurRadius
+    mat4 lightSpaceMatrix;  // for shadow mapping
+};
+
 struct DirectionalLight {
-    vec4 direction;      // xyz: dir, w: castShadows (1.0/0.0)
+    vec4 direction;      // xyz: dir, w: castShadows
     vec4 colorIntensity; // rgb: color, w: intensity
     float shadowBias;
     float blurRadius;
@@ -25,11 +34,13 @@ struct DirectionalLight {
 layout(std140, binding = 1) uniform LightData {
     DirectionalLight directionalLight;
     PointLight pointLights[MAX_POINT_LIGHTS];
+    SpotLight spotLights[MAX_SPOT_LIGHTS];
     mat4 cascadeMatrices[NUM_CASCADES];
     vec4 cascadeSplits;
     int pointLightCount;
+    int spotLightCount;
     int hasDirectionalLight;
-    vec2 lightPadding;
+    float lightPadding;
 };
 
 #endif

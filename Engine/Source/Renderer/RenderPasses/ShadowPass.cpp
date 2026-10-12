@@ -13,9 +13,11 @@ void ShadowPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
     InitDirectionalShadowMap();
     InitPointShadowMap();
+    InitSpotShadowMap();
 
     frame.registry.Register("DirectionalShadowMap", { RenderResourceType::Texture, o_DirectionalShadowMap });
     frame.registry.Register("PointShadowMap", { RenderResourceType::Texture, o_PointShadowMap });
+    frame.registry.Register("SpotShadowMap", { RenderResourceType::Texture, o_SpotShadowMap });
 }
 
 void ShadowPass::InitDirectionalShadowMap()
@@ -91,6 +93,46 @@ void ShadowPass::InitPointShadowMap()
 
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void ShadowPass::InitSpotShadowMap()
+{
+    glGenFramebuffers(1, &spotFBO);
+
+    glGenTextures(1, &o_SpotShadowMap);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, o_SpotShadowMap);
+    glTexImage3D(
+        GL_TEXTURE_2D_ARRAY,
+        0,
+        GL_DEPTH_COMPONENT32F,
+        SPOT_SHADOW_WIDTH,
+        SPOT_SHADOW_HEIGHT,
+        MaxSpotLights,
+        0,
+        GL_DEPTH_COMPONENT,
+        GL_FLOAT,
+        nullptr
+    );
+
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, spotFBO);
+    for (int layer = 0; layer < MaxSpotLights; ++layer) {
+        glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, o_SpotShadowMap, 0, layer);
+    }
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE) {
+        LOG_ERROR("Spot shadow framebuffer not complete! Status: {:#x}", status);
+    }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -372,6 +414,147 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
 }
 
+void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& frame)
+{
+    if (ctx.spotLights.empty()) return;
+    auto& commands = frame.opaqueCommands;
+    auto& skeletalCommands = frame.skeletalOpaqueCommands;
+    if (commands.empty() && skeletalCommands.empty()) return;
+
+    bool hasShadowCasters = false;
+    for (const auto& light : ctx.spotLights) {
+        if (light.castShadows && light.shadowIndex >= 0) {
+            hasShadowCasters = true;
+            break;
+        }
+    }
+    if (!hasShadowCasters) return;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, spotFBO);
+    glViewport(0, 0, SPOT_SHADOW_WIDTH, SPOT_SHADOW_HEIGHT);
+
+    glDepthMask(GL_TRUE);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    glDisable(GL_SCISSOR_TEST);
+
+    glEnable(GL_POLYGON_OFFSET_FILL);
+    glPolygonOffset(1.5f, 4.0f);
+
+    auto BindMaterial = [](Shader& shader, MaterialComponent* material) {
+        shader.setInt("transparencyMode", static_cast<int>(material->GetTransparencyMode()));
+        shader.setFloat("alphaCutoff", material->GetAlphaCutoff());
+        shader.setVec4("albedoColor", material->GetAlbedoColor());
+        shader.setVec2("UVScale", material->GetUVScale());
+        shader.setVec2("UVOffset", material->GetUVOffset());
+
+        bool useAlb = material->IsUsingAlbedoMap() && material->GetAlbedoTexture();
+        shader.setBool("useAlbedoMap", useAlb);
+        if (useAlb) {
+            shader.setInt("albedoMap", 0);
+            TextureCache::Get().GetOrCreate(material->GetAlbedoTexture()).Bind(0);
+            material->GetSampler().Bind(0);
+        }
+        else {
+            glBindSampler(0, 0);
+            glBindTextureUnit(0, 0);
+        }
+        return useAlb;
+    };
+
+    Shader& shadowShader = ShaderManager::Get("DirectionalShadow");
+    Shader& skeletalShadowShader = ShaderManager::Get("DirectionalShadow_Skeletal");
+
+    for (const auto& light : ctx.spotLights)
+    {
+        if (!light.castShadows || light.shadowIndex < 0 || light.shadowIndex >= MaxSpotLights)
+            continue;
+
+        glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, o_SpotShadowMap, 0, light.shadowIndex);
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+        bool reverseCull = light.reverseCullFace;
+        auto ApplyCull = [&](CullMode mode) {
+            if (mode == CullMode::Disabled) {
+                glDisable(GL_CULL_FACE);
+            }
+            else {
+                glEnable(GL_CULL_FACE);
+                if (reverseCull)
+                    glCullFace(mode == CullMode::Back ? GL_FRONT : GL_BACK);
+                else
+                    glCullFace(mode == CullMode::Back ? GL_BACK : GL_FRONT);
+            }
+        };
+
+        const glm::mat4& lightSpace = light.lightSpaceMatrix;
+
+        if (!commands.empty())
+        {
+            shadowShader.use();
+            shadowShader.setMat4("lightSpaceMatrix", lightSpace);
+            shadowShader.setInt("billboardMode", 0);
+
+            for (auto& command : commands) {
+                if (!command.mesh || command.mesh->indexCount == 0) continue;
+                if (!command.mesh->IsCastShadow()) continue;
+
+                auto& material = command.material;
+                ApplyCull(material->GetCullMode());
+                shadowShader.setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
+
+                bool useAlb = BindMaterial(shadowShader, material);
+
+                shadowShader.setMat4("model", command.transform->GetWorldMatrix());
+                command.mesh->VAO.Bind();
+                glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+
+                if (useAlb) glBindSampler(0, 0);
+            }
+        }
+
+        if (!skeletalCommands.empty())
+        {
+            skeletalShadowShader.use();
+            skeletalShadowShader.setMat4("lightSpaceMatrix", lightSpace);
+            GLint boneLoc = glGetUniformLocation(skeletalShadowShader.ID, "u_BoneMatrices");
+
+            for (auto& command : skeletalCommands) {
+                if (!command.mesh || command.mesh->indexCount == 0) continue;
+                if (!command.mesh->IsCastShadow()) continue;
+
+                auto& material = command.material;
+                ApplyCull(material->GetCullMode());
+
+                bool useAlb = BindMaterial(skeletalShadowShader, material);
+
+                skeletalShadowShader.setMat4("model", command.transform->GetWorldMatrix());
+
+                if (boneLoc != -1 && command.skeleton && !command.skeleton->skinningPalette.empty())
+                {
+                    glUniformMatrix4fv(
+                        boneLoc,
+                        static_cast<GLsizei>(command.skeleton->skinningPalette.size()),
+                        GL_FALSE,
+                        glm::value_ptr(command.skeleton->skinningPalette[0])
+                    );
+                }
+
+                command.mesh->VAO.Bind();
+                glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+
+                if (useAlb) glBindSampler(0, 0);
+            }
+        }
+    }
+
+    glDisable(GL_POLYGON_OFFSET_FILL);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
+}
+
 void ShadowPass::RecreateDirectionalShadowMap(uint32_t resolution, RenderFrame& frame)
 {
     m_CurrentShadowResolution = resolution;
@@ -400,6 +583,7 @@ void ShadowPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     RenderDirectionalShadowMap(ctx, frame);
     RenderPointShadowMap(ctx, frame);
+    RenderSpotShadowMap(ctx, frame);
 }
 
 ShadowPass::~ShadowPass()
@@ -408,4 +592,6 @@ ShadowPass::~ShadowPass()
     glDeleteFramebuffers(1, &dirShadowFBO);
     glDeleteTextures(1, &o_PointShadowMap);
     glDeleteFramebuffers(1, &pointFBO);
+    glDeleteTextures(1, &o_SpotShadowMap);
+    glDeleteFramebuffers(1, &spotFBO);
 }

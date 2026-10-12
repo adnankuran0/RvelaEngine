@@ -74,6 +74,8 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     auto i_DirectionalShadowMap = resourceRegistry.Get("DirectionalShadowMap")->id;
     auto i_PointShadowMap = resourceRegistry.Get("PointShadowMap")->id;
+    auto* spotRes = resourceRegistry.Get("SpotShadowMap");
+    GLuint i_SpotShadowMap = spotRes ? spotRes->id : 0;
     auto i_SSAO = resourceRegistry.Get("SSAOTexture")->id;
     uint32_t targetSamples = 2;
     if (ProjectManager::IsProjectLoaded())
@@ -97,6 +99,7 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     constexpr int POINT_SHADOW_MAP_SLOT = 7;
     constexpr int SSAO_SLOT = 11;
     constexpr int ARM_MAP_SLOT = 12;
+    constexpr int SPOT_SHADOW_MAP_SLOT = 13;
 
     auto& env = *ctx.environment;
     auto& skybox = env.GetSkybox();
@@ -109,6 +112,9 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
         shader.setInt("pointShadowMap", POINT_SHADOW_MAP_SLOT);
         glBindTextureUnit(POINT_SHADOW_MAP_SLOT, i_PointShadowMap);
+
+        shader.setInt("spotShadowMap", SPOT_SHADOW_MAP_SLOT);
+        glBindTextureUnit(SPOT_SHADOW_MAP_SLOT, i_SpotShadowMap);
 
         shader.setInt("irradianceMap", 8);
         shader.setInt("prefilterMap", 9);
@@ -231,7 +237,7 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         for (int slot = 0; slot < 6; ++slot)
             glBindSampler(slot, 0);
         glBindSampler(ARM_MAP_SLOT, 0);
-        for (int slot = 13; slot < 28; ++slot)
+        for (int slot = 17; slot < 28; ++slot)
         {
             glBindSampler(slot, 0);
             glBindTextureUnit(slot, 0);

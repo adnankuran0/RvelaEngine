@@ -9,6 +9,7 @@ using TransformHandle = ComponentHandle<TransformComponent>;
 using CameraHandle = ComponentHandle<CameraComponent>;
 using DirectionalLightHandle = ComponentHandle<DirectionalLightComponent>;
 using PointLightHandle = ComponentHandle<PointLightComponent>;
+using SpotLightHandle = ComponentHandle<SpotLightComponent>;
 using MeshRendererHandle = ComponentHandle<MeshRendererComponent>;
 using MaterialHandle = ComponentHandle<MaterialComponent>;
 using ParticleEmitterHandle = ComponentHandle<ParticleEmitterComponent>;
@@ -114,6 +115,56 @@ void LuaBindings::RegisterComponents(sol::state& lua)
         "blurRadius", sol::property(
             [](PointLightHandle& h) { return h.Get() ? h.Get()->blurRadius : 0.0f; },
             [](PointLightHandle& h, float v) { if (auto* c = h.Get()) c->blurRadius = v; }
+        )
+    );
+
+    lua.new_usertype<SpotLightHandle>("SpotLightComponent",
+        "IsValid", &SpotLightHandle::IsValid,
+        "color", sol::property(
+            [](SpotLightHandle& h) { return h.Get() ? h.Get()->color : glm::vec3(0.0f); },
+            [](SpotLightHandle& h, const glm::vec3& v) { if (auto* c = h.Get()) c->color = v; }
+        ),
+        "intensity", sol::property(
+            [](SpotLightHandle& h) { return h.Get() ? h.Get()->intensity : 0.0f; },
+            [](SpotLightHandle& h, float v) { if (auto* c = h.Get()) c->intensity = v; }
+        ),
+        "radius", sol::property(
+            [](SpotLightHandle& h) { return h.Get() ? h.Get()->radius : 0.0f; },
+            [](SpotLightHandle& h, float v) { if (auto* c = h.Get()) c->radius = v; }
+        ),
+        "innerAngle", sol::property(
+            [](SpotLightHandle& h) { return h.Get() ? h.Get()->innerAngle : 0.0f; },
+            [](SpotLightHandle& h, float v) {
+                if (auto* c = h.Get()) {
+                    c->innerAngle = v;
+                    c->UpdateCutoffs();
+                }
+            }
+        ),
+        "outerAngle", sol::property(
+            [](SpotLightHandle& h) { return h.Get() ? h.Get()->outerAngle : 0.0f; },
+            [](SpotLightHandle& h, float v) {
+                if (auto* c = h.Get()) {
+                    c->outerAngle = v;
+                    c->UpdateCutoffs();
+                }
+            }
+        ),
+        "castShadows", sol::property(
+            [](SpotLightHandle& h) { return h.Get() ? h.Get()->castShadows : false; },
+            [](SpotLightHandle& h, bool v) { if (auto* c = h.Get()) c->castShadows = v; }
+        ),
+        "reverseCullFace", sol::property(
+            [](SpotLightHandle& h) { return h.Get() ? h.Get()->reverseCullFace : false; },
+            [](SpotLightHandle& h, bool v) { if (auto* c = h.Get()) c->reverseCullFace = v; }
+        ),
+        "shadowBias", sol::property(
+            [](SpotLightHandle& h) { return h.Get() ? h.Get()->shadowBias : 0.0f; },
+            [](SpotLightHandle& h, float v) { if (auto* c = h.Get()) c->shadowBias = v; }
+        ),
+        "blurRadius", sol::property(
+            [](SpotLightHandle& h) { return h.Get() ? h.Get()->blurRadius : 0.0f; },
+            [](SpotLightHandle& h, float v) { if (auto* c = h.Get()) c->blurRadius = v; }
         )
     );
 

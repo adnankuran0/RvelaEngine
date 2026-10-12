@@ -155,6 +155,7 @@ uniform bool receiveShadows;
 
 layout(binding = 6) uniform sampler2DArray shadowMap;
 layout(binding = 7) uniform samplerCubeArray pointShadowMap;
+layout(binding = 13) uniform sampler2DArray spotShadowMap;
 
 layout(binding = 8) uniform samplerCube irradianceMap;
 layout(binding = 9) uniform samplerCube prefilterMap;
@@ -433,6 +434,51 @@ void main()
         bool castShadows = light.shadowIndex >= 0;
         float shadow = (castShadows && receiveShadows) ? 
             calculatePointLightShadow(pointShadowMap, light.shadowIndex, FragPos, light.position.xyz, light.radius, Nmap, light.shadowBias, light.blurRadius) : 0.0;
+
+        vec3 radiance = light.colorIntensity.rgb * light.colorIntensity.a * attenuation;
+        Lo += (1.0 - shadow) * (kD * albedo / PI + specular) * radiance * NdotL;
+    }
+
+    for (int i = 0; i < spotLightCount; ++i)
+    {
+        SpotLight light = spotLights[i];
+        vec3 L_vec = light.position.xyz - FragPos;
+        float dist2 = dot(L_vec, L_vec);
+        float radius2 = light.position.w * light.position.w;
+
+        if (dist2 > radius2) continue;
+
+        float distance = sqrt(dist2);
+        vec3 L = L_vec / distance;
+
+        float theta = dot(L, normalize(-light.direction.xyz));
+        float innerCutoff = light.cutoffs.x;
+        float outerCutoff = light.cutoffs.y;
+
+        if (theta < outerCutoff) continue;
+
+        float epsilon = innerCutoff - outerCutoff;
+        float spotFactor = clamp((theta - outerCutoff) / max(0.0001, epsilon), 0.0, 1.0);
+
+        float num = clamp(1.0 - (dist2 / radius2) * (dist2 / radius2), 0.0, 1.0);
+        float attenuation = (num * num) / (dist2 + 1.0) * spotFactor;
+
+        vec3 H = normalize(V + L);
+        float NDF = DistributionGGX(Nmap, H, roughness);
+        float G = GeometrySmith(Nmap, V, L, roughness);
+        vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+
+        vec3 kS = F;
+        vec3 kD = (vec3(1.0) - kS) * (1.0 - metallic);
+
+        vec3 numerator = NDF * G * F;
+        float denominator = 4.0 * max(dot(Nmap, V), 0.0) * max(dot(Nmap, L), 0.0) + 0.0001;
+        vec3 specular = (numerator / denominator) * specularIntensity;
+        float NdotL = max(dot(Nmap, L), 0.0);
+
+        int sIndex = int(light.direction.w);
+        float shadow = (sIndex >= 0 && receiveShadows) ?
+            calculateSpotLightShadow(spotShadowMap, sIndex, FragPos, light.lightSpaceMatrix, Nmap, light.cutoffs.z, light.cutoffs.w) : 0.0;
 
         vec3 radiance = light.colorIntensity.rgb * light.colorIntensity.a * attenuation;
         Lo += (1.0 - shadow) * (kD * albedo / PI + specular) * radiance * NdotL;

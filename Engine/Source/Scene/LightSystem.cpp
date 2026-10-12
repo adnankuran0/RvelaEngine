@@ -3,6 +3,9 @@
 #include "Scene/Scene.h"
 #include "Renderer/RenderTypes.h"
 #include "Renderer/Camera.h"
+#include "Asset/AssetManager.h"
+#include "Asset/Types/TextureAsset.h"
+#include "Renderer/TextureCache.h"
 #include <limits>
 #include <cmath>
 
@@ -56,6 +59,48 @@ std::vector<PointLight> LightSystem::CollectPointLights() noexcept {
 		data.normalBias = light.shadowBias * 0.1f;
 		data.reverseCullFace = light.reverseCullFace;
 		data.blurRadius = light.blurRadius;
+		lights.push_back(data);
+	}
+	return lights;
+}
+
+std::vector<SpotLight> LightSystem::CollectSpotLights() noexcept {
+	std::vector<SpotLight> lights;
+	lights.reserve(rv::MaxSpotLights);
+	int nextShadowIndex = 0;
+	auto view = m_Scene.GetRegistry().view<SpotLightComponent, TransformComponent>();
+	for (auto e : view) {
+		if (!m_Scene.IsEntityActive(e))
+			continue;
+		if (lights.size() >= rv::MaxSpotLights)
+			break;
+
+		auto& light = m_Scene.GetComponent<SpotLightComponent>(e);
+		auto& t = m_Scene.GetComponent<TransformComponent>(e);
+		SpotLight data;
+		data.position = t.GetWorldPosition();
+		data.direction = glm::normalize(t.GetForward());
+		data.color = light.color;
+		data.intensity = light.intensity;
+		data.radius = light.radius;
+		light.UpdateCutoffs();
+		data.innerCutoff = light.innerCutoff;
+		data.outerCutoff = light.outerCutoff;
+		data.castShadows = light.castShadows && nextShadowIndex < rv::MaxSpotLights;
+		data.shadowIndex = data.castShadows ? nextShadowIndex++ : -1;
+		data.shadowBias = light.shadowBias;
+		data.normalBias = light.shadowBias * 0.1f;
+		data.reverseCullFace = light.reverseCullFace;
+		data.blurRadius = light.blurRadius;
+
+		float fovDeg = std::min(170.0f, std::max(1.0f, light.outerAngle * 2.0f));
+		glm::mat4 lightProj = glm::perspective(glm::radians(fovDeg), 1.0f, 0.1f, std::max(0.5f, light.radius));
+		glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+		if (std::abs(glm::dot(up, data.direction)) > 0.99f)
+			up = glm::vec3(0.0f, 0.0f, 1.0f);
+		glm::mat4 lightView = glm::lookAt(data.position, data.position + data.direction, up);
+		data.lightSpaceMatrix = lightProj * lightView;
+
 		lights.push_back(data);
 	}
 	return lights;

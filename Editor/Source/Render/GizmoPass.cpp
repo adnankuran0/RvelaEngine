@@ -47,6 +47,7 @@ void GizmoPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     DrawCameraFrustum(ctx, frame);
     DrawDirectionalLightArrow(ctx, frame);
+    DrawSpotLightCone(ctx, frame);
     DrawDecalGizmo(ctx, frame);
 
     DrawEditorIconsVisual(ctx, frame);
@@ -213,20 +214,25 @@ void GizmoPass::DrawCameraFrustum(const RenderContext& ctx, RenderFrame& frame)
     DebugRenderer::Get().BeginFrame();
 
     auto& registry = ctx.scene->GetRegistry();
+    entt::entity selectedEntity = EditorSelection::Get().GetPrimary();
+
     for (auto e : registry.view<TransformComponent, CameraComponent>())
     {
+        bool isSelected = (e == selectedEntity || EditorSelection::Get().IsSelected(e));
         auto& tc = registry.get<TransformComponent>(e);
 
         glm::mat4 targetCameraView = glm::inverse(tc.GetWorldMatrix());
-
         glm::mat4 invTargetViewProj = glm::inverse(m_CameraFrustumProj * targetCameraView);
 
-        DebugRenderer::Get().DrawFrustum(invTargetViewProj, glm::vec4(1.0f, 0.75f, 0.1f, 1.0f));
+        glm::vec4 frustumColor = isSelected
+            ? glm::vec4(1.0f, 0.55f, 0.1f, 1.0f)
+            : glm::vec4(0.7f, 0.7f, 0.7f, 0.4f);
+
+        DebugRenderer::Get().DrawFrustum(invTargetViewProj, frustumColor);
     }
 
     glm::mat4 editorViewProj = ctx.camera->GetProjectionMatrix() * ctx.camera->GetViewMatrix();
     DebugRenderer::Get().EndFrame(editorViewProj);
-
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -245,13 +251,15 @@ void GizmoPass::DrawDirectionalLightArrow(const RenderContext& ctx, RenderFrame&
     DebugRenderer::Get().BeginFrame();
 
     auto& registry = ctx.scene->GetRegistry();
-    const glm::vec4 arrowColor = glm::vec4(1.0f, 0.75f, 0.1f, 1.0f);
+    entt::entity selectedEntity = EditorSelection::Get().GetPrimary();
 
     for (auto e : registry.view<TransformComponent, DirectionalLightComponent>())
     {
+        bool isSelected = (e == selectedEntity || EditorSelection::Get().IsSelected(e));
         auto& tc = registry.get<TransformComponent>(e);
-        glm::mat4 worldMat = tc.GetWorldMatrix();
+        auto& dirLight = registry.get<DirectionalLightComponent>(e);
 
+        glm::mat4 worldMat = tc.GetWorldMatrix();
         glm::vec3 pos = tc.GetWorldPosition();
 
         glm::vec3 forward = -glm::normalize(glm::vec3(worldMat[2]));
@@ -264,6 +272,10 @@ void GizmoPass::DrawDirectionalLightArrow(const RenderContext& ctx, RenderFrame&
 
         glm::vec3 endPos = pos + (forward * arrowLength);
         glm::vec3 basePos = endPos - (forward * headLength);
+
+        glm::vec4 arrowColor = isSelected
+            ? glm::vec4(1.0f, 0.55f, 0.1f, 1.0f)
+            : glm::vec4(dirLight.color * 0.75f, 0.45f);
 
         DebugRenderer::Get().DrawLine(pos, endPos, arrowColor);
 
@@ -281,6 +293,109 @@ void GizmoPass::DrawDirectionalLightArrow(const RenderContext& ctx, RenderFrame&
         DebugRenderer::Get().DrawLine(pUp, pLeft, arrowColor);
         DebugRenderer::Get().DrawLine(pLeft, pDown, arrowColor);
         DebugRenderer::Get().DrawLine(pDown, pRight, arrowColor);
+    }
+
+    glm::mat4 editorViewProj = ctx.camera->GetProjectionMatrix() * ctx.camera->GetViewMatrix();
+    DebugRenderer::Get().EndFrame(editorViewProj);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void GizmoPass::DrawSpotLightCone(const RenderContext& ctx, RenderFrame& frame)
+{
+    auto* finalFboRes = frame.registry.Get("FinalFramebuffer");
+    auto* depthTexRes = frame.registry.Get("DepthTexture");
+    if (!finalFboRes || !depthTexRes) return;
+
+    auto& registry = ctx.scene->GetRegistry();
+    entt::entity selectedEntity = EditorSelection::Get().GetPrimary();
+
+    bool hasSpotToDraw = false;
+    for (auto e : registry.view<TransformComponent, SpotLightComponent>())
+    {
+        hasSpotToDraw = true;
+        break;
+    }
+    if (!hasSpotToDraw) return;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, finalFboRes->id);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexRes->id, 0);
+    glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
+
+    DebugRenderer::Get().BeginFrame();
+
+    for (auto e : registry.view<TransformComponent, SpotLightComponent>())
+    {
+        bool isSelected = (e == selectedEntity || EditorSelection::Get().IsSelected(e));
+
+        auto& tc = registry.get<TransformComponent>(e);
+        auto& sl = registry.get<SpotLightComponent>(e);
+
+        glm::vec3 pos = tc.GetWorldPosition();
+        glm::vec3 forward = tc.GetForward();
+        glm::vec3 up = tc.GetUp();
+        glm::vec3 right = tc.GetRight();
+
+        float length = std::max(0.5f, sl.radius);
+        float outerAngleRad = glm::radians(std::min(89.0f, std::max(1.0f, sl.outerAngle)));
+        float outerRadius = length * std::tan(outerAngleRad);
+
+        glm::vec3 endCenter = pos + forward * length;
+
+        glm::vec4 color = isSelected
+            ? glm::vec4(1.0f, 0.55f, 0.1f, 1.0f)
+            : glm::vec4(sl.color * 0.8f, 0.5f);
+
+        DebugRenderer::Get().DrawLine(pos, endCenter, color * 0.7f);
+
+        constexpr int segments = 16;
+        glm::vec3 prevPoint(0.0f);
+        glm::vec3 firstPoint(0.0f);
+
+        for (int i = 0; i <= segments; ++i)
+        {
+            float angle = (static_cast<float>(i) / static_cast<float>(segments)) * glm::two_pi<float>();
+            glm::vec3 offset = (right * std::cos(angle) + up * std::sin(angle)) * outerRadius;
+            glm::vec3 currentPoint = endCenter + offset;
+
+            if (i == 0)
+            {
+                firstPoint = currentPoint;
+            }
+            else
+            {
+                DebugRenderer::Get().DrawLine(prevPoint, currentPoint, color);
+            }
+
+            if (i % (segments / 4) == 0 && i < segments)
+            {
+                DebugRenderer::Get().DrawLine(pos, currentPoint, color);
+            }
+
+            prevPoint = currentPoint;
+        }
+
+        if (isSelected && sl.innerAngle < sl.outerAngle)
+        {
+            float innerAngleRad = glm::radians(std::min(89.0f, std::max(1.0f, sl.innerAngle)));
+            float innerRadius = length * std::tan(innerAngleRad);
+            glm::vec4 innerColor = glm::vec4(1.0f, 1.0f, 1.0f, 0.4f);
+
+            glm::vec3 prevInnerPoint(0.0f);
+            for (int i = 0; i <= segments; ++i)
+            {
+                float angle = (static_cast<float>(i) / static_cast<float>(segments)) * glm::two_pi<float>();
+                glm::vec3 offset = (right * std::cos(angle) + up * std::sin(angle)) * innerRadius;
+                glm::vec3 currentPoint = endCenter + offset;
+
+                if (i > 0)
+                {
+                    DebugRenderer::Get().DrawLine(prevInnerPoint, currentPoint, innerColor);
+                }
+                prevInnerPoint = currentPoint;
+            }
+        }
     }
 
     glm::mat4 editorViewProj = ctx.camera->GetProjectionMatrix() * ctx.camera->GetViewMatrix();

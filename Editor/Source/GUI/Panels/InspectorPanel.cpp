@@ -1048,6 +1048,56 @@ void InspectorPanel::Draw(Engine* engine)
 				}
 			});
 
+		DrawComponent<SpotLightComponent>("Spot Light", registry, selectedEntity, [](SpotLightComponent& spotLight)
+			{
+				if (UI::BeginPropertyTable("SpotLightTable"))
+				{
+					UI::PropertyLabel("Color");
+					float color[3] = { spotLight.color.r, spotLight.color.g, spotLight.color.b };
+					if (ImGui::ColorEdit3("##SpotLightColor", color, ImGuiColorEditFlags_NoInputs))
+						spotLight.color = glm::vec3(color[0], color[1], color[2]);
+
+					UI::PropertyLabel("Intensity");
+					ImGui::DragFloat("##SpotIntensity", &spotLight.intensity, 0.1f, 0.0f, 100.0f, "%.2f");
+
+					UI::PropertyLabel("Radius");
+					ImGui::SliderFloat("##SpotRadius", &spotLight.radius, 0.1f, 100.0f, "%.2f");
+
+					UI::PropertyLabel("Inner Angle");
+					if (ImGui::SliderFloat("##InnerAngle", &spotLight.innerAngle, 0.1f, 89.0f, "%.1f deg"))
+					{
+						if (spotLight.innerAngle > spotLight.outerAngle)
+							spotLight.outerAngle = spotLight.innerAngle;
+						spotLight.UpdateCutoffs();
+					}
+
+					UI::PropertyLabel("Outer Angle");
+					if (ImGui::SliderFloat("##OuterAngle", &spotLight.outerAngle, 0.1f, 89.0f, "%.1f deg"))
+					{
+						if (spotLight.outerAngle < spotLight.innerAngle)
+							spotLight.innerAngle = spotLight.outerAngle;
+						spotLight.UpdateCutoffs();
+					}
+
+					UI::PropertyLabel("Cast Shadows");
+					ImGui::Checkbox("##SpotCastShadows", &spotLight.castShadows);
+
+					if (spotLight.castShadows)
+					{
+						UI::PropertyLabel("Shadow Bias");
+						ImGui::SliderFloat("##SpotShadowBias", &spotLight.shadowBias, 0.0f, 0.05f, "%.4f");
+
+						UI::PropertyLabel("Blur Radius");
+						ImGui::SliderFloat("##SpotBlurRadius", &spotLight.blurRadius, 0.0f, 3.0f, "%.3f");
+
+						UI::PropertyLabel("Reverse Cull Face");
+						ImGui::Checkbox("##SpotReverseCullFace", &spotLight.reverseCullFace);
+					}
+
+					UI::EndPropertyTable();
+				}
+			});
+
 		DrawComponent<RigidbodyComponent>("Rigidbody", registry, selectedEntity, [](RigidbodyComponent& rb)
 			{
 				if (UI::BeginPropertyTable("RigidbodyTable"))
@@ -3033,6 +3083,7 @@ void InspectorPanel::Draw(Engine* engine)
 		DrawAddComponentEntry<SkeletalMeshRendererComponent>("Skeletal Mesh Renderer", filterBuf, registry, selectedEntity);
 		DrawAddComponentEntry<PointLightComponent>("Point Light", filterBuf, registry, selectedEntity);
 		DrawAddComponentEntry<DirectionalLightComponent>("Directional Light", filterBuf, registry, selectedEntity);
+		DrawAddComponentEntry<SpotLightComponent>("Spot Light", filterBuf, registry, selectedEntity);
 		DrawAddComponentEntry<RigidbodyComponent>("Rigidbody", filterBuf, registry, selectedEntity);
 		DrawAddComponentEntry<CharacterBodyComponent>("CharacterBody", filterBuf, registry, selectedEntity);
 		DrawAddComponentEntry<BoxColliderComponent>("Box Collider", filterBuf, registry, selectedEntity);

@@ -4,6 +4,7 @@
 namespace rv {
 
 inline constexpr int MaxPointLights = 20;
+inline constexpr int MaxSpotLights = 8;
 
 enum class ShadingMode : uint8_t
 {
@@ -72,14 +73,24 @@ struct DirectionalLightUBOData {
     int cascadeCount;
 };
 
+struct SpotLightUBOData {
+    glm::vec4 position;
+    glm::vec4 direction;
+    glm::vec4 colorIntensity;
+    glm::vec4 cutoffs;
+    glm::mat4 lightSpaceMatrix;
+};
+
 struct LightUBOData {
     DirectionalLightUBOData dirLight;
     PointLightUBOData pointLights[MaxPointLights];
+    SpotLightUBOData spotLights[MaxSpotLights];
     glm::mat4 cascadeMatrices[4];
     glm::vec4 cascadeSplits;
     int pointLightCount;
+    int spotLightCount;
     int hasDirLight;
-    glm::vec2 padding;
+    float padding;
 };
 
 }

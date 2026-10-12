@@ -856,6 +856,13 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                 scene.AddComponent<PointLightComponent>(light);
                 registerCreatedEntity(light);
             }
+            if (ImGui::MenuItem("Spot Light"))
+            {
+                entt::entity light = scene.CreateEntity("SpotLight");
+                scene.GetComponent<TransformComponent>(light).SetEulerRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
+                scene.AddComponent<SpotLightComponent>(light);
+                registerCreatedEntity(light);
+            }
             ImGui::EndMenu();
         }
 

@@ -114,4 +114,33 @@ float calculatePointLightShadow(samplerCubeArray pointShadowMap, int index, vec3
     return shadow / 16.0;
 }
 
+float calculateSpotLightShadow(sampler2DArray spotShadowMap, int shadowIndex, vec3 worldPos, mat4 lightSpaceMatrix, vec3 normal, float shadowBias, float blurRadius)
+{
+    vec3 normalOffset = normal * (shadowBias * 0.5);
+    vec4 fragPosLightSpace = lightSpaceMatrix * vec4(worldPos + normalOffset, 1.0);
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    projCoords = projCoords * 0.5 + 0.5;
+
+    if (projCoords.z < 0.0 || projCoords.z > 1.0 || any(lessThan(projCoords.xy, vec2(0.0))) || any(greaterThan(projCoords.xy, vec2(1.0))))
+        return 0.0;
+
+    float currentDepth = projCoords.z - shadowBias;
+
+    if (blurRadius <= 0.0) {
+        float d = texture(spotShadowMap, vec3(projCoords.xy, float(shadowIndex))).r;
+        return (currentDepth > d) ? 1.0 : 0.0;
+    }
+
+    vec2 texelSize = blurRadius / vec2(textureSize(spotShadowMap, 0).xy);
+    float shadow = 0.0;
+
+    for (int i = 0; i < 16; ++i) {
+        vec2 offset = POISSON_DISK[i] * texelSize;
+        float pcfDepth = texture(spotShadowMap, vec3(projCoords.xy + offset, float(shadowIndex))).r;
+        shadow += (currentDepth > pcfDepth) ? 1.0 : 0.0;
+    }
+
+    return shadow / 16.0;
+}
+
 #endif

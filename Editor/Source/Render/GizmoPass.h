@@ -34,6 +34,7 @@ public:
 private:
     void DrawCameraFrustum(const RenderContext& ctx, RenderFrame& frame);
     void DrawDirectionalLightArrow(const RenderContext& ctx, RenderFrame& frame);
+    void DrawSpotLightCone(const RenderContext& ctx, RenderFrame& frame);
     void DrawDecalGizmo(const RenderContext& ctx, RenderFrame& frame);
 
 

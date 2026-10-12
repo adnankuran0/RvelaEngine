@@ -671,6 +671,18 @@ function TransformComponent:LookAt(target, up) end
 ---@field shadowBias number Shadow depth bias
 ---@field blurRadius number Shadow blur radius
 
+---@class SpotLightComponent : ComponentHandle
+---@field IsValid fun(self: ComponentHandle): boolean
+---@field color Vec3 Light color (RGB)
+---@field intensity number Light intensity
+---@field radius number Light reach distance in world units
+---@field innerAngle number Inner cone angle in degrees
+---@field outerAngle number Outer cone angle in degrees
+---@field castShadows boolean Whether spot light casts shadows
+---@field reverseCullFace boolean Shadow reverse culling
+---@field shadowBias number Shadow depth bias
+---@field blurRadius number Shadow blur radius
+
 ---@class MeshRendererComponent : ComponentHandle
 ---@field IsValid fun(self: ComponentHandle): boolean
 ---@field castShadow boolean Whether mesh casts shadow
@@ -919,6 +931,7 @@ function UICheckboxComponent:OnValueChanged(callback) end
 ---| '"Camera"'
 ---| '"DirectionalLight"'
 ---| '"PointLight"'
+---| '"SpotLight"'
 ---| '"MeshRenderer"'
 ---| '"Material"'
 ---| '"Rigidbody"'
@@ -1020,6 +1033,7 @@ function Entity:HasComponent(typeName) end
 ---@overload fun(self: Entity, typeName: '"Camera"'): CameraComponent
 ---@overload fun(self: Entity, typeName: '"DirectionalLight"'): DirectionalLightComponent
 ---@overload fun(self: Entity, typeName: '"PointLight"'): PointLightComponent
+---@overload fun(self: Entity, typeName: '"SpotLight"'): SpotLightComponent
 ---@overload fun(self: Entity, typeName: '"MeshRenderer"'): MeshRendererComponent
 ---@overload fun(self: Entity, typeName: '"Material"'): MaterialComponent
 ---@overload fun(self: Entity, typeName: '"Rigidbody"'): RigidbodyComponent
@@ -1043,6 +1057,7 @@ function Entity:GetComponent(typeName) end
 ---@param typeName `T`
 ---@return T
 ---@overload fun(self: Entity, typeName: '"PointLight"'): PointLightComponent
+---@overload fun(self: Entity, typeName: '"SpotLight"'): SpotLightComponent
 ---@overload fun(self: Entity, typeName: '"DirectionalLight"'): DirectionalLightComponent
 ---@overload fun(self: Entity, typeName: '"Camera"'): CameraComponent
 ---@overload fun(self: Entity, typeName: '"Rigidbody"'): RigidbodyComponent

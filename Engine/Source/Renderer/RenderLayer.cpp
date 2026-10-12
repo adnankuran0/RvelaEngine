@@ -43,6 +43,7 @@ void RenderLayer::OnRender()
 
 	m_Context.camera = camera;
 	m_Context.pointLights = lightSystem.CollectPointLights();
+	m_Context.spotLights = lightSystem.CollectSpotLights();
 	m_Context.directionalLight = lightSystem.CollectDirectionalLight(camera);
 
 	uint32_t renderW = 1920;

@@ -159,6 +159,19 @@ void RenderPipeline::UpdateUBOs(const RenderContext& ctx)
 		lightData.pointLights[i].shadowIndex = pl.castShadows ? pl.shadowIndex : -1;
 	}
 
+	int spotCount = std::min(static_cast<int>(ctx.spotLights.size()), MaxSpotLights);
+	lightData.spotLightCount = spotCount;
+
+	for (int i = 0; i < spotCount; ++i)
+	{
+		const auto& sl = ctx.spotLights[i];
+		lightData.spotLights[i].position = glm::vec4(sl.position, sl.radius);
+		lightData.spotLights[i].direction = glm::vec4(sl.direction, sl.castShadows ? static_cast<float>(sl.shadowIndex) : -1.0f);
+		lightData.spotLights[i].colorIntensity = glm::vec4(sl.color, sl.intensity);
+		lightData.spotLights[i].cutoffs = glm::vec4(sl.innerCutoff, sl.outerCutoff, sl.shadowBias, sl.blurRadius);
+		lightData.spotLights[i].lightSpaceMatrix = sl.lightSpaceMatrix;
+	}
+
 	m_LightUBO->SetData(0, sizeof(LightUBOData), &lightData);
 
 	// TODO: environment UBO

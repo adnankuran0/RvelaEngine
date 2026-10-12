@@ -20,6 +20,7 @@ public:
 	RenderContext() = default;
 	Camera* camera{};
 	std::vector<PointLight> pointLights{};
+	std::vector<SpotLight> spotLights{};
 	std::optional<DirectionalLight> directionalLight{};
 	unsigned int viewportWidth{};
 	unsigned int viewportHeight{};
@@ -32,6 +33,7 @@ public:
 	{
 		camera = nullptr;
 		pointLights.clear();
+		spotLights.clear();
 		directionalLight.reset();
 		scene = nullptr;
 		environment = nullptr;

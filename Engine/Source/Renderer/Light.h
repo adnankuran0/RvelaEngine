@@ -2,6 +2,7 @@
 #include "glm/glm.hpp"
 #include "Scene/Components/PointLightComponent.h"
 #include "Scene/Components/DirectionalLightComponent.h"
+#include "Scene/Components/SpotLightComponent.h"
 
 namespace rv {
 
@@ -19,6 +20,23 @@ struct PointLight {
     float blurRadius;
     float shadowBias;
     float normalBias;
+};
+
+struct SpotLight {
+    glm::vec3 position;
+    glm::vec3 direction;
+    glm::vec3 color;
+    float intensity;
+    float radius;
+    float innerCutoff;
+    float outerCutoff;
+    bool castShadows;
+    int shadowIndex;
+    bool reverseCullFace;
+    float blurRadius;
+    float shadowBias;
+    float normalBias;
+    glm::mat4 lightSpaceMatrix;
 };
 
 struct DirectionalLight {
