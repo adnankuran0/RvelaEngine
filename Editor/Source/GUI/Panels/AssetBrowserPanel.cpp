@@ -461,10 +461,16 @@ static void RenamePathWithMeta(const std::filesystem::path& oldPath, const std::
 
     auto oldMeta = std::filesystem::path(oldPath.string() + ".rmeta");
     auto newMeta = std::filesystem::path(newPath.string() + ".rmeta");
+    auto& reg = AssetManager::Get().GetRegistry();
+
     if (std::filesystem::exists(oldMeta))
     {
         std::filesystem::rename(oldMeta, newMeta, ec);
         if (ec) LOG_WARN("Meta rename failed: {}", ec.message());
+    }
+    else if (!std::filesystem::is_directory(newPath))
+    {
+        reg.GetOrCreateMeta(newPath);
     }
 
     if (newPath.extension() == ".lua")
@@ -480,7 +486,12 @@ static void RenamePathWithMeta(const std::filesystem::path& oldPath, const std::
             CreateEmptyTextFile(newPath, MakeLuaTemplate(newPath.stem().string()));
     }
 
-    auto& reg = AssetManager::Get().GetRegistry();
+    AssetUUID assetUuid = EditorUtils::ReadUUIDFromMeta(newPath.string());
+    if (assetUuid.IsValid())
+    {
+        reg.RegisterPath(assetUuid, newPath);
+    }
+
     reg.Scan(reg.GetAssetDir());
     EditorUtils::ClearAssetFileNameCache();
 
@@ -805,6 +816,7 @@ static void DrawBackgroundContextMenu(Engine* engine, const std::filesystem::pat
                 auto newPath = MakeUniquePath(currentDir, "NewScene", ".rscene");
                 auto scene = engine->GetSceneManager().CreateScene("NewScene");
                 engine->GetSceneManager().SaveScene(*scene, newPath.string());
+                assetReg.GetOrCreateMeta(newPath);
                 assetReg.Scan(assetReg.GetAssetDir());
                 BeginRenameForNew(newPath);
             }
@@ -813,6 +825,8 @@ static void DrawBackgroundContextMenu(Engine* engine, const std::filesystem::pat
             {
                 auto newPath = MakeUniquePath(currentDir, "NewScript", ".lua");
                 CreateEmptyTextFile(newPath, MakeLuaTemplate(newPath.stem().string()));
+                assetReg.GetOrCreateMeta(newPath);
+                assetReg.Scan(assetReg.GetAssetDir());
                 BeginRenameForNew(newPath);
             }
 
@@ -820,6 +834,7 @@ static void DrawBackgroundContextMenu(Engine* engine, const std::filesystem::pat
             {
                 auto newPath = MakeUniquePath(currentDir, "NewShader", ".rshader");
                 CreateEmptyTextFile(newPath, MakeShaderTemplate());
+                assetReg.GetOrCreateMeta(newPath);
                 assetReg.Scan(assetReg.GetAssetDir());
                 BeginRenameForNew(newPath);
             }
@@ -831,6 +846,9 @@ static void DrawBackgroundContextMenu(Engine* engine, const std::filesystem::pat
 
         if (ImGui::MenuItem("Refresh"))
         {
+            auto& reg = AssetManager::Get().GetRegistry();
+            reg.Scan(reg.GetAssetDir());
+            EditorUtils::ClearAssetFileNameCache();
             s_NeedsRefresh = true;
             s_DirectoryTreeDirty = true;
         }

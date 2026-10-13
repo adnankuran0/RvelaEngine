@@ -2,6 +2,7 @@
 #include "AssetRegistry.h"
 #include "Asset/CacheTypes/TextureCacheHeader.h"
 #include "Core/Log.h"
+#include "Utils/ProjectManager.h"
 #include <fstream>
 #include <algorithm>
 #include <cctype>
@@ -18,23 +19,29 @@ void AssetRegistry::Clear()
 
 void AssetRegistry::Scan(const std::filesystem::path& assetDir)
 {
+    std::filesystem::path targetDir = assetDir;
+    if (targetDir.empty())
+        targetDir = m_AssetDir;
+    if (targetDir.empty() && ProjectManager::IsProjectLoaded())
+        targetDir = ProjectManager::GetAssetDirectory();
+
     Clear();
-    m_AssetDir = assetDir;
+    m_AssetDir = targetDir;
 
     std::error_code ec;
-    if (assetDir.empty() || !std::filesystem::exists(assetDir, ec) || !std::filesystem::is_directory(assetDir, ec))
+    if (m_AssetDir.empty() || !std::filesystem::exists(m_AssetDir, ec) || !std::filesystem::is_directory(m_AssetDir, ec))
     {
-        LOG_WARN("[AssetRegistry::Scan] Directory does not exist or is not a directory: {}", assetDir.string());
+        LOG_WARN("[AssetRegistry::Scan] Directory does not exist or is not a directory: {}", m_AssetDir.string());
         return;
     }
 
-    auto cacheRoot = assetDir / ".cache";
+    auto cacheRoot = m_AssetDir / ".cache";
 
     static const std::unordered_set<std::string> s_TrackOnlyExtensions = {
-        ".rscene", ".lua", ".mp3", ".wav", ".rshader"
+        ".rscene", ".lua", ".mp3", ".wav", ".rshader", ".rmat", ".ranimlib", ".rprefab"
     };
 
-    for (auto& entry : std::filesystem::recursive_directory_iterator(assetDir, std::filesystem::directory_options::skip_permission_denied, ec))
+    for (auto& entry : std::filesystem::recursive_directory_iterator(m_AssetDir, std::filesystem::directory_options::skip_permission_denied, ec))
     {
         if (ec)
         {
@@ -42,10 +49,10 @@ void AssetRegistry::Scan(const std::filesystem::path& assetDir)
             break;
         }
         if (!entry.is_regular_file()) continue;
-        auto path = entry.path();
+        auto path = entry.path().lexically_normal();
 
         if (path.extension() == ".rmeta") continue;
-        if (path.string().find((assetDir / ".cache").string()) != std::string::npos)
+        if (path.string().find((m_AssetDir / ".cache").string()) != std::string::npos)
             continue;
 
         auto metaPath = AssetMeta::GetMetaPath(path);
@@ -57,11 +64,18 @@ void AssetRegistry::Scan(const std::filesystem::path& assetDir)
                 AssetMeta meta;
                 meta.uuid = AssetUUID{};
                 meta.importerID = "";
-                meta.lastWriteTime = 0;
+                std::error_code lwtEc;
+                auto lastWrite = std::filesystem::last_write_time(path, lwtEc);
+                if (!lwtEc)
+                {
+                    meta.lastWriteTime = std::chrono::duration_cast<std::chrono::seconds>(
+                        lastWrite.time_since_epoch()).count();
+                }
                 meta.SaveToFile(metaPath);
 
                 m_UUIDToPath[meta.uuid] = path;
                 m_PathToUUID[path.string()] = meta.uuid;
+                m_PathToUUID[path.generic_string()] = meta.uuid;
                 m_Metas[meta.uuid] = meta;
             }
             continue;
@@ -82,9 +96,9 @@ void AssetRegistry::Scan(const std::filesystem::path& assetDir)
        
         if (meta.lastWriteTime == 0)
         {
-            std::error_code ec;
-            auto lastWrite = std::filesystem::last_write_time(path, ec);
-            if (!ec)
+            std::error_code lwtEc;
+            auto lastWrite = std::filesystem::last_write_time(path, lwtEc);
+            if (!lwtEc)
             {
                 meta.lastWriteTime = std::chrono::duration_cast<std::chrono::seconds>(
                     lastWrite.time_since_epoch()).count();
@@ -94,6 +108,7 @@ void AssetRegistry::Scan(const std::filesystem::path& assetDir)
 
         m_UUIDToPath[meta.uuid] = path;
         m_PathToUUID[path.string()] = meta.uuid;
+        m_PathToUUID[path.generic_string()] = meta.uuid;
         m_Metas[meta.uuid] = meta;
 
         for (auto& sub : meta.subAssets)
@@ -236,7 +251,11 @@ AssetMeta AssetRegistry::GetMeta(const AssetUUID& uuid) const
 
 AssetMeta AssetRegistry::GetOrCreateMeta(const std::filesystem::path& path)
 {
-    auto pathIt = m_PathToUUID.find(path.string());
+    auto normalPath = path.lexically_normal();
+    auto pathIt = m_PathToUUID.find(normalPath.string());
+    if (pathIt == m_PathToUUID.end())
+        pathIt = m_PathToUUID.find(normalPath.generic_string());
+
     if (pathIt != m_PathToUUID.end())
     {
         auto metaIt = m_Metas.find(pathIt->second);
@@ -244,7 +263,7 @@ AssetMeta AssetRegistry::GetOrCreateMeta(const std::filesystem::path& path)
             return metaIt->second;
     }
 
-    auto metaPath = AssetMeta::GetMetaPath(path);
+    auto metaPath = AssetMeta::GetMetaPath(normalPath);
     if (std::filesystem::exists(metaPath))
     {
         AssetMeta meta;
@@ -253,7 +272,7 @@ AssetMeta AssetRegistry::GetOrCreateMeta(const std::filesystem::path& path)
             if (meta.lastWriteTime == 0)
             {
                 std::error_code ec;
-                auto lastWrite = std::filesystem::last_write_time(path, ec);
+                auto lastWrite = std::filesystem::last_write_time(normalPath, ec);
                 if (!ec)
                 {
                     meta.lastWriteTime = std::chrono::duration_cast<std::chrono::seconds>(
@@ -262,8 +281,9 @@ AssetMeta AssetRegistry::GetOrCreateMeta(const std::filesystem::path& path)
                 }
             }
 
-            m_UUIDToPath[meta.uuid] = path;
-            m_PathToUUID[path.string()] = meta.uuid;
+            m_UUIDToPath[meta.uuid] = normalPath;
+            m_PathToUUID[normalPath.string()] = meta.uuid;
+            m_PathToUUID[normalPath.generic_string()] = meta.uuid;
             m_Metas[meta.uuid] = meta;
             for (auto& sub : meta.subAssets)
             {
@@ -278,10 +298,11 @@ AssetMeta AssetRegistry::GetOrCreateMeta(const std::filesystem::path& path)
                     auto cachePath = GetCacheDir() / (sub.uuid.ToString() + subExt);
                     m_UUIDToPath[sub.uuid] = cachePath;
                     m_PathToUUID[cachePath.string()] = sub.uuid;
+                    m_PathToUUID[cachePath.generic_string()] = sub.uuid;
                 }
                 else if (!m_UUIDToPath.contains(sub.uuid))
                 {
-                    m_UUIDToPath[sub.uuid] = path;
+                    m_UUIDToPath[sub.uuid] = normalPath;
                 }
             }
             return meta;
@@ -295,8 +316,9 @@ AssetMeta AssetRegistry::GetOrCreateMeta(const std::filesystem::path& path)
 
     meta.SaveToFile(metaPath);
 
-    m_UUIDToPath[meta.uuid] = path;
-    m_PathToUUID[path.string()] = meta.uuid;
+    m_UUIDToPath[meta.uuid] = normalPath;
+    m_PathToUUID[normalPath.string()] = meta.uuid;
+    m_PathToUUID[normalPath.generic_string()] = meta.uuid;
     m_Metas[meta.uuid] = meta;
 
     return meta;
@@ -304,12 +326,14 @@ AssetMeta AssetRegistry::GetOrCreateMeta(const std::filesystem::path& path)
 
 void AssetRegistry::SaveMeta(const std::filesystem::path& path, const AssetMeta& meta)
 {
-    auto metaPath = AssetMeta::GetMetaPath(path);
+    auto normalPath = path.lexically_normal();
+    auto metaPath = AssetMeta::GetMetaPath(normalPath);
     meta.SaveToFile(metaPath);
 
     m_Metas[meta.uuid] = meta;
-    m_UUIDToPath[meta.uuid] = path;
-    m_PathToUUID[path.string()] = meta.uuid;
+    m_UUIDToPath[meta.uuid] = normalPath;
+    m_PathToUUID[normalPath.string()] = meta.uuid;
+    m_PathToUUID[normalPath.generic_string()] = meta.uuid;
 
     for (auto& sub : meta.subAssets)
     {
@@ -324,10 +348,11 @@ void AssetRegistry::SaveMeta(const std::filesystem::path& path, const AssetMeta&
             auto cachePath = GetCacheDir() / (sub.uuid.ToString() + subExt);
             m_UUIDToPath[sub.uuid] = cachePath;
             m_PathToUUID[cachePath.string()] = sub.uuid;
+            m_PathToUUID[cachePath.generic_string()] = sub.uuid;
         }
         else if (!m_UUIDToPath.contains(sub.uuid))
         {
-            m_UUIDToPath[sub.uuid] = path;
+            m_UUIDToPath[sub.uuid] = normalPath;
         }
 
         if (!m_Metas.contains(sub.uuid))
@@ -361,13 +386,18 @@ std::filesystem::path AssetRegistry::GetPath(const AssetUUID& uuid) const
 
 AssetUUID AssetRegistry::GetUUID(const std::filesystem::path& path) const
 {
-    std::string pathStr = path.string();
+    auto normalPath = path.lexically_normal();
+    std::string pathStr = normalPath.string();
 
     auto it = m_PathToUUID.find(pathStr);
     if (it != m_PathToUUID.end())
         return it->second;
 
-    std::string genericStr = path.generic_string();
+    std::string genericStr = normalPath.generic_string();
+    it = m_PathToUUID.find(genericStr);
+    if (it != m_PathToUUID.end())
+        return it->second;
+
     std::string relativeToAssets = genericStr;
     if (relativeToAssets.starts_with("Assets/"))
         relativeToAssets = relativeToAssets.substr(7);
@@ -411,6 +441,8 @@ std::vector<AssetUUID> AssetRegistry::GetDependencies(const AssetUUID& uuid) con
 
 void AssetRegistry::RegisterPath(const AssetUUID& uuid, const std::filesystem::path& path)
 {
-    m_UUIDToPath[uuid] = path;
-    m_PathToUUID[path.string()] = uuid;
+    auto normalPath = path.lexically_normal();
+    m_UUIDToPath[uuid] = normalPath;
+    m_PathToUUID[normalPath.string()] = uuid;
+    m_PathToUUID[normalPath.generic_string()] = uuid;
 }

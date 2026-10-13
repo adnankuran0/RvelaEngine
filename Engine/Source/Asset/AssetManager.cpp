@@ -52,6 +52,18 @@ Ref<Asset> AssetManager::GetAssetInternal(const AssetUUID& uuid)
 
     if (!m_Registry->Exists(uuid))
     {
+        auto assetDir = m_Registry->GetAssetDir();
+        if (assetDir.empty() && ProjectManager::IsProjectLoaded())
+            assetDir = ProjectManager::GetAssetDirectory();
+
+        if (!assetDir.empty() && std::filesystem::exists(assetDir))
+        {
+            m_Registry->Scan(assetDir);
+        }
+    }
+
+    if (!m_Registry->Exists(uuid))
+    {
         LOG_ERROR("UUID not found: {}", uuid.ToString()); 
         return nullptr;
     }

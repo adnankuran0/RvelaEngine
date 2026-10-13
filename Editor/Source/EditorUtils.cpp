@@ -127,17 +127,30 @@ AssetUUID EditorUtils::ReadUUIDFromMeta(const std::string& assetPath)
             return directUUID;
     }
 
-    auto metaPath = assetPath + ".rmeta";
-    if (!std::filesystem::exists(metaPath))
+    auto& reg = AssetManager::Get().GetRegistry();
+    AssetUUID regUUID = reg.GetUUID(p);
+    if (regUUID.IsValid())
+        return regUUID;
+
+    auto metaPath = AssetMeta::GetMetaPath(p);
+    if (std::filesystem::exists(metaPath))
     {
-        return AssetUUID::Invalid();
+        AssetMeta meta;
+        if (meta.LoadFromFile(metaPath) && meta.uuid.IsValid())
+        {
+            reg.RegisterPath(meta.uuid, p);
+            return meta.uuid;
+        }
     }
 
-    AssetMeta meta;
-    if (!meta.LoadFromFile(metaPath))
-        return AssetUUID::Invalid();
+    if (std::filesystem::exists(p) && std::filesystem::is_regular_file(p))
+    {
+        AssetMeta meta = reg.GetOrCreateMeta(p);
+        if (meta.uuid.IsValid())
+            return meta.uuid;
+    }
 
-    return meta.uuid;
+    return AssetUUID::Invalid();
 }
 
 static tsl::robin_map<AssetUUID, std::string> s_FileNameCache;
