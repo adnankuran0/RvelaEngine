@@ -407,8 +407,16 @@ void UIRenderPass::RenderEntityRecursively(Scene* scene, entt::entity entity)
                 pos.x = screenRect.z;
             }
 
+            if (textComp.verticalAlignment == TextVerticalAlignment::Top) {
+                pos.y = screenRect.w;
+            } else if (textComp.verticalAlignment == TextVerticalAlignment::Bottom) {
+                pos.y = screenRect.y;
+            } else {
+                pos.y = rectCenter.y;
+            }
+
             float maxW = textComp.wordWrap ? (screenRect.z - screenRect.x) : 0.0f;
-            UIRenderer::DrawTextString(textComp.text, pos, textComp.fontSize, textComp.color, textComp.alignment, rect.computedRotation, rectCenter, nullptr, textComp.isBold, textComp.isOutline, textComp.outlineSize, textComp.outlineColor, maxW, textComp.lineSpacing, textComp.characterSpacing);
+            UIRenderer::DrawTextString(textComp.text, pos, textComp.fontSize, textComp.color, textComp.alignment, rect.computedRotation, rectCenter, nullptr, textComp.isBold, textComp.isOutline, textComp.outlineSize, textComp.outlineColor, maxW, textComp.lineSpacing, textComp.characterSpacing, textComp.verticalAlignment);
         }
     }
 

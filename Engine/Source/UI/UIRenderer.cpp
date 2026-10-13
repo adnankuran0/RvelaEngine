@@ -357,7 +357,7 @@ static void AppendUTF8Char(std::string& str, uint32_t cp)
     }
 }
 
-void UIRenderer::DrawTextString(const std::string& text, const glm::vec2& position, float fontSize, const glm::vec4& color, TextAlignment align, float rotationDegrees, const glm::vec2& pivotPoint, std::shared_ptr<Font> font, bool isBold, bool isOutline, float outlineSize, const glm::vec4& outlineColor, float maxWidth, float lineSpacing, float characterSpacing)
+void UIRenderer::DrawTextString(const std::string& text, const glm::vec2& position, float fontSize, const glm::vec4& color, TextAlignment align, float rotationDegrees, const glm::vec2& pivotPoint, std::shared_ptr<Font> font, bool isBold, bool isOutline, float outlineSize, const glm::vec4& outlineColor, float maxWidth, float lineSpacing, float characterSpacing, TextVerticalAlignment vAlign)
 {
     if (text.empty()) return;
 
@@ -471,7 +471,14 @@ void UIRenderer::DrawTextString(const std::string& text, const glm::vec2& positi
         float boldOffset = isBold ? 0.08f : 0.0f;
 
         float lineCenterAboveBaseline = (asc + dsc) * 0.5f;
-        float firstLineY = basePos.y + (((float)lines.size() - 1.0f) * lineOffsetStep * 0.5f) - lineCenterAboveBaseline;
+        float firstLineY = 0.0f;
+        if (vAlign == TextVerticalAlignment::Top) {
+            firstLineY = basePos.y - asc;
+        } else if (vAlign == TextVerticalAlignment::Bottom) {
+            firstLineY = basePos.y - dsc + (((float)lines.size() - 1.0f) * lineOffsetStep);
+        } else { // Middle
+            firstLineY = basePos.y + (((float)lines.size() - 1.0f) * lineOffsetStep * 0.5f) - lineCenterAboveBaseline;
+        }
 
         for (size_t lineIdx = 0; lineIdx < lines.size(); ++lineIdx)
         {

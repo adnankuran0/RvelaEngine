@@ -81,7 +81,17 @@ void LuaBindings::RegisterUIComponents(sol::state& lua)
         "color", sol::property(
             [](UIImageHandle& h) { return h.Get() ? h.Get()->color : glm::vec4(1.0f); },
             [](UIImageHandle& h, const glm::vec4& col) { if (auto* c = h.Get()) c->color = col; }
-        )
+        ),
+        "textureUUID", sol::property(
+            [](UIImageHandle& h) { return h.Get() ? h.Get()->textureUUID : AssetUUID::Invalid(); },
+            [](UIImageHandle& h, const AssetUUID& u) { if (auto* c = h.Get()) c->textureUUID = u; }
+        ),
+        "SetTexture", [](UIImageHandle& h, const AssetUUID& u) {
+            if (auto* c = h.Get()) c->SetTexture(u);
+        },
+        "ClearTexture", [](UIImageHandle& h) {
+            if (auto* c = h.Get()) c->ClearTexture();
+        }
     );
 
     lua.new_usertype<UITextHandle>("UITextComponent",
@@ -97,6 +107,14 @@ void LuaBindings::RegisterUIComponents(sol::state& lua)
         "fontSize", sol::property(
             [](UITextHandle& h) { return h.Get() ? h.Get()->fontSize : 18.0f; },
             [](UITextHandle& h, float size) { if (auto* c = h.Get()) c->fontSize = size; }
+        ),
+        "alignment", sol::property(
+            [](UITextHandle& h) { return h.Get() ? static_cast<int>(h.Get()->alignment) : 0; },
+            [](UITextHandle& h, int a) { if (auto* c = h.Get()) c->alignment = static_cast<TextAlignment>(a); }
+        ),
+        "verticalAlignment", sol::property(
+            [](UITextHandle& h) { return h.Get() ? static_cast<int>(h.Get()->verticalAlignment) : 1; },
+            [](UITextHandle& h, int va) { if (auto* c = h.Get()) c->verticalAlignment = static_cast<TextVerticalAlignment>(va); }
         ),
         "isBold", sol::property(
             [](UITextHandle& h) { return h.Get() ? h.Get()->isBold : false; },
@@ -270,4 +288,16 @@ void LuaBindings::RegisterUIComponents(sol::state& lua)
             }
         }
     );
+
+    lua.new_enum<TextAlignment>("TextAlignment", {
+        { "Left", TextAlignment::Left },
+        { "Center", TextAlignment::Center },
+        { "Right", TextAlignment::Right }
+    });
+
+    lua.new_enum<TextVerticalAlignment>("TextVerticalAlignment", {
+        { "Top", TextVerticalAlignment::Top },
+        { "Middle", TextVerticalAlignment::Middle },
+        { "Bottom", TextVerticalAlignment::Bottom }
+    });
 }

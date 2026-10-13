@@ -36,7 +36,7 @@ public:
     static void DrawQuadRotated(const glm::vec4& rect, float rotationDegrees, const glm::vec4& color, uint32_t textureID = 0, float cornerRadius = 0.0f, const glm::vec2& customCenter = glm::vec2(0.0f));
     static void DrawNineSlice(const glm::vec4& rect, const glm::vec4& color, float borderSize, uint32_t textureID = 0);
     
-    static void DrawTextString(const std::string& text, const glm::vec2& position, float fontSize, const glm::vec4& color, TextAlignment align = TextAlignment::Left, float rotationDegrees = 0.0f, const glm::vec2& pivotPoint = glm::vec2(0.0f), std::shared_ptr<Font> font = nullptr, bool isBold = false, bool isOutline = false, float outlineSize = 1.0f, const glm::vec4& outlineColor = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), float maxWidth = 0.0f, float lineSpacing = 1.2f, float characterSpacing = 0.0f);
+    static void DrawTextString(const std::string& text, const glm::vec2& position, float fontSize, const glm::vec4& color, TextAlignment align = TextAlignment::Left, float rotationDegrees = 0.0f, const glm::vec2& pivotPoint = glm::vec2(0.0f), std::shared_ptr<Font> font = nullptr, bool isBold = false, bool isOutline = false, float outlineSize = 1.0f, const glm::vec4& outlineColor = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), float maxWidth = 0.0f, float lineSpacing = 1.2f, float characterSpacing = 0.0f, TextVerticalAlignment vAlign = TextVerticalAlignment::Middle);
 
     static void SetScissor(int x, int y, int width, int height);
     static void ResetScissor();

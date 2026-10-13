@@ -30,6 +30,13 @@ enum class TextAlignment
     Right
 };
 
+enum class TextVerticalAlignment
+{
+    Top,
+    Middle,
+    Bottom
+};
+
 struct UICanvasComponent
 {
     CanvasMode mode = CanvasMode::ScreenSpaceOverlay;
@@ -71,9 +78,11 @@ struct UIImageComponent
 {
     glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
     AssetUUID textureUUID = AssetUUID::Invalid();
-    std::string texturePath;
     ImageType imageType = ImageType::Simple;
     float cornerRadius = 0.0f;
+
+    void SetTexture(const AssetUUID& uuid) { textureUUID = uuid; }
+    void ClearTexture() { textureUUID = AssetUUID::Invalid(); }
 
     json Serialize() const;
     void Deserialize(const json& j);
@@ -85,6 +94,7 @@ struct UITextComponent
     glm::vec4 color = { 1.0f, 1.0f, 1.0f, 1.0f };
     float fontSize = 24.0f;
     TextAlignment alignment = TextAlignment::Left;
+    TextVerticalAlignment verticalAlignment = TextVerticalAlignment::Middle;
     std::string fontPath;
     AssetUUID fontUUID = AssetUUID::Invalid();
 

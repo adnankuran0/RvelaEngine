@@ -1,5 +1,7 @@
 #include "rvelapch.h"
 #include "UIComponents.h"
+#include "Asset/AssetManager.h"
+#include "Asset/AssetRegistry.h"
 
 namespace rv {
 
@@ -79,7 +81,6 @@ json UIImageComponent::Serialize() const
     json j;
     j["color"] = { color.r, color.g, color.b, color.a };
     j["textureUUID"] = textureUUID.ToString();
-    j["texturePath"] = texturePath;
     j["imageType"] = static_cast<int>(imageType);
     j["cornerRadius"] = cornerRadius;
     return j;
@@ -90,8 +91,12 @@ void UIImageComponent::Deserialize(const json& j)
     if (j.contains("color")) {
         color.r = j["color"][0]; color.g = j["color"][1]; color.b = j["color"][2]; color.a = j["color"][3];
     }
-    if (j.contains("textureUUID")) textureUUID = AssetUUID::FromString(j["textureUUID"].get<std::string>());
-    if (j.contains("texturePath")) texturePath = j["texturePath"].get<std::string>();
+    if (j.contains("textureUUID")) {
+        textureUUID = AssetUUID::FromString(j["textureUUID"].get<std::string>());
+    } else if (j.contains("texturePath")) {
+        std::string tp = j["texturePath"].get<std::string>();
+        if (!tp.empty()) textureUUID = AssetManager::Get().GetRegistry().GetUUID(tp);
+    }
     if (j.contains("imageType")) imageType = static_cast<ImageType>(j["imageType"].get<int>());
     if (j.contains("cornerRadius")) cornerRadius = j["cornerRadius"];
 }
@@ -103,6 +108,7 @@ json UITextComponent::Serialize() const
     j["color"] = { color.r, color.g, color.b, color.a };
     j["fontSize"] = fontSize;
     j["alignment"] = static_cast<int>(alignment);
+    j["verticalAlignment"] = static_cast<int>(verticalAlignment);
     j["fontPath"] = fontPath;
     j["fontUUID"] = fontUUID.ToString();
     j["isBold"] = isBold;
@@ -123,6 +129,7 @@ void UITextComponent::Deserialize(const json& j)
     }
     if (j.contains("fontSize")) fontSize = j["fontSize"];
     if (j.contains("alignment")) alignment = static_cast<TextAlignment>(j["alignment"].get<int>());
+    if (j.contains("verticalAlignment")) verticalAlignment = static_cast<TextVerticalAlignment>(j["verticalAlignment"].get<int>());
     if (j.contains("fontPath")) fontPath = j["fontPath"].get<std::string>();
     if (j.contains("fontUUID")) fontUUID = AssetUUID::FromString(j["fontUUID"].get<std::string>());
     if (j.contains("isBold")) isBold = j["isBold"];

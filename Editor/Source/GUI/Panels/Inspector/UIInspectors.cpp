@@ -93,24 +93,43 @@ void UIInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 			UI::PropertyLabel("Color");
 			ImGui::ColorEdit4("##Color", &img.color.r);
 
-			UI::PropertyLabel("Texture Path");
-			char buf[256];
-			strncpy(buf, img.texturePath.c_str(), sizeof(buf));
-			if (ImGui::InputText("##TexPath", buf, sizeof(buf)))
-				img.texturePath = buf;
+			UI::PropertyLabel("Texture");
+			std::string texName = "None (Texture)";
+			if (img.textureUUID.IsValid())
+			{
+				std::string fn = EditorUtils::GetAssetFileName(img.textureUUID);
+				texName = fn.empty() ? "Texture Asset" : fn;
+			}
 
+			float clearBtnWidth = img.textureUUID.IsValid() ? 24.0f : 0.0f;
+			float slotWidth = img.textureUUID.IsValid() ? (ImGui::GetContentRegionAvail().x - clearBtnWidth - 4.0f) : -FLT_MIN;
+
+			ImGui::Button(texName.c_str(), ImVec2(slotWidth, 22.0f));
 			if (ImGui::BeginDragDropTarget())
 			{
 				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
 				{
 					std::string pathStr((const char*)payload->Data);
-					InspectorContext::ApplyEntityChange(selectedEntity, "Assign UI Image Texture", [&]() {
-						img.texturePath = pathStr;
-						AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
-						if (uuid.IsValid()) img.textureUUID = uuid;
-					});
+					AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
+					if (uuid.IsValid())
+					{
+						InspectorContext::ApplyEntityChange(selectedEntity, "Assign UI Image Texture", [&]() {
+							img.textureUUID = uuid;
+						});
+					}
 				}
 				ImGui::EndDragDropTarget();
+			}
+
+			if (img.textureUUID.IsValid())
+			{
+				ImGui::SameLine();
+				if (ImGui::Button("X##ClearUIImageTex", ImVec2(clearBtnWidth, 22.0f)))
+				{
+					InspectorContext::ApplyEntityChange(selectedEntity, "Clear UI Image Texture", [&]() {
+						img.textureUUID = AssetUUID::Invalid();
+					});
+				}
 			}
 
 			UI::PropertyLabel("Corner Radius");
@@ -147,6 +166,12 @@ void UIInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 			int currentAlign = static_cast<int>(textComp.alignment);
 			if (ImGui::Combo("##Align", &currentAlign, aligns, 3))
 				textComp.alignment = static_cast<TextAlignment>(currentAlign);
+
+			UI::PropertyLabel("Vertical Alignment");
+			const char* vAligns[] = { "Top", "Middle", "Bottom" };
+			int currentVAlign = static_cast<int>(textComp.verticalAlignment);
+			if (ImGui::Combo("##VAlign", &currentVAlign, vAligns, 3))
+				textComp.verticalAlignment = static_cast<TextVerticalAlignment>(currentVAlign);
 
 			UI::PropertyLabel("Word Wrap");
 			ImGui::Checkbox("##WordWrap", &textComp.wordWrap);
