@@ -1244,4 +1244,219 @@ function ScriptInstance:OnAnimationLooped(clipName) end
 ---Called when audio playback completes on this entity's AudioEmitterComponent.
 function ScriptInstance:OnAudioFinished() end
 
+
+-------------------------------------------------------------------------------
+-- TWEEN & EASING
+-------------------------------------------------------------------------------
+
+---@enum EaseType
+local Ease = {
+    Linear = 0,
+    InQuad = 1,
+    OutQuad = 2,
+    InOutQuad = 3,
+    InCubic = 4,
+    OutCubic = 5,
+    InOutCubic = 6,
+    InQuart = 7,
+    OutQuart = 8,
+    InOutQuart = 9,
+    InQuint = 10,
+    OutQuint = 11,
+    InOutQuint = 12,
+    InSine = 13,
+    OutSine = 14,
+    InOutSine = 15,
+    InExpo = 16,
+    OutExpo = 17,
+    InOutExpo = 18,
+    InCirc = 19,
+    OutCirc = 20,
+    InOutCirc = 21,
+    InElastic = 22,
+    OutElastic = 23,
+    InOutElastic = 24,
+    InBack = 25,
+    OutBack = 26,
+    InOutBack = 27,
+    InBounce = 28,
+    OutBounce = 29,
+    InOutBounce = 30,
+}
+
+_G.Ease = Ease
+
+---@class TweenInstance
+local TweenInstance = {}
+
+---Sets the easing curve for this tween.
+---@param ease EaseType|string Can be Ease.OutQuad or string like "OutQuad", "out_bounce", "InOutCubic"
+---@return TweenInstance self
+function TweenInstance:SetEase(ease) end
+
+---Sets an initial delay in seconds before the tween starts.
+---@param delay number Seconds to delay
+---@return TweenInstance self
+function TweenInstance:SetDelay(delay) end
+
+---Sets loop count and optional yoyo (ping-pong) mode.
+---@param loops integer Number of iterations (-1 for infinite)
+---@param yoyo? boolean If true, reverses direction on each iteration
+---@return TweenInstance self
+function TweenInstance:SetLoops(loops, yoyo) end
+
+---Sets playback speed multiplier.
+---@param speed number Multiplier (default 1.0)
+---@return TweenInstance self
+function TweenInstance:SetSpeed(speed) end
+
+---Registers a callback invoked every frame the tween updates.
+---@param callback fun(currentValue: any)
+---@return TweenInstance self
+function TweenInstance:OnUpdate(callback) end
+
+---Registers a callback invoked when the tween completes all loops.
+---@param callback fun()
+---@return TweenInstance self
+function TweenInstance:OnComplete(callback) end
+
+---Registers a callback invoked when a loop iteration finishes.
+---@param callback fun(loopIndex: integer)
+---@return TweenInstance self
+function TweenInstance:OnLoop(callback) end
+
+---Pauses this tween.
+function TweenInstance:Pause() end
+
+---Resumes this tween.
+function TweenInstance:Resume() end
+
+---Cancels and destroys this tween immediately.
+function TweenInstance:Cancel() end
+
+---Alias for Cancel.
+function TweenInstance:Kill() end
+
+---Instantly completes the tween, applying the final value and triggering OnComplete.
+function TweenInstance:Complete() end
+
+---Returns true if the tween is actively playing.
+---@return boolean
+function TweenInstance:IsPlaying() end
+
+---Returns true if the tween is paused.
+---@return boolean
+function TweenInstance:IsPaused() end
+
+---Returns normalized progress between 0.0 and 1.0.
+---@return number
+function TweenInstance:GetProgress() end
+
+---Returns the unique ID of this tween.
+---@return integer
+function TweenInstance:GetId() end
+
+_G.TweenInstance = TweenInstance
+
+---@class Tween
+local Tween = {}
+
+---Interpolates a value (number, Vec2, Vec3, Vec4, Quat) over duration.
+---@param from number|Vec2|Vec3|Vec4|Quat
+---@param to number|Vec2|Vec3|Vec4|Quat
+---@param duration number Duration in seconds
+---@param onUpdate? fun(currentVal: any)
+---@return TweenInstance
+function Tween.Value(from, to, duration, onUpdate) end
+
+---Tweens an entity's transform position to target.
+---@param entity Entity|table|TransformComponent Entity or ScriptInstance self
+---@param target Vec3 Target world/local position
+---@param duration number Duration in seconds
+---@return TweenInstance
+function Tween.Position(entity, target, duration) end
+
+---Tweens an entity's transform rotation to target euler or quaternion.
+---@param entity Entity|table|TransformComponent Entity or ScriptInstance self
+---@param target Vec3|Quat Target euler angles or quaternion
+---@param duration number Duration in seconds
+---@return TweenInstance
+function Tween.Rotation(entity, target, duration) end
+
+---Tweens an entity's transform scale to target.
+---@param entity Entity|table|TransformComponent Entity or ScriptInstance self
+---@param target Vec3 Target scale
+---@param duration number Duration in seconds
+---@return TweenInstance
+function Tween.Scale(entity, target, duration) end
+
+---Tweens fields of a target table or object towards target values.
+---@param target table Target table to animate
+---@param properties table Table of destination property values
+---@param duration number Duration in seconds
+---@return TweenInstance
+function Tween.To(target, properties, duration) end
+
+---Cancels a tween by instance or ID.
+---@param tweenOrId TweenInstance|integer
+function Tween.Cancel(tweenOrId) end
+
+---Alias for Cancel.
+---@param tweenOrId TweenInstance|integer
+function Tween.Kill(tweenOrId) end
+
+---Cancels all active tweens across the scene.
+function Tween.CancelAll() end
+
+---Alias for CancelAll.
+function Tween.KillAll() end
+
+---Pauses all active tweens.
+function Tween.PauseAll() end
+
+---Resumes all paused tweens.
+function Tween.ResumeAll() end
+
+---Returns whether the given tween or ID is actively playing.
+---@param tweenOrId TweenInstance|integer
+---@return boolean
+function Tween.IsPlaying(tweenOrId) end
+
+_G.Tween = Tween
+
+---Tweens this entity's transform position.
+---@param target Vec3 Target position
+---@param duration number Duration in seconds
+---@return TweenInstance
+function ScriptInstance:TweenPosition(target, duration) end
+
+---Tweens this entity's transform rotation.
+---@param target Vec3|Quat Target euler angles or quaternion
+---@param duration number Duration in seconds
+---@return TweenInstance
+function ScriptInstance:TweenRotation(target, duration) end
+
+---Tweens this entity's transform scale.
+---@param target Vec3 Target scale
+---@param duration number Duration in seconds
+---@return TweenInstance
+function ScriptInstance:TweenScale(target, duration) end
+
+---Interpolates a value tied to this script instance.
+---@param from number|Vec2|Vec3|Vec4|Quat
+---@param to number|Vec2|Vec3|Vec4|Quat
+---@param duration number Duration in seconds
+---@param onUpdate? fun(currentVal: any)
+---@return TweenInstance
+function ScriptInstance:TweenValue(from, to, duration, onUpdate) end
+
+---Tweens fields of this script instance.
+---@param properties table Target properties
+---@param duration number Duration in seconds
+---@return TweenInstance
+function ScriptInstance:Tween(properties, duration) end
+
+---Cancels all active tweens created for this entity.
+function ScriptInstance:CancelTweens() end
+
 _G.ScriptInstance = ScriptInstance

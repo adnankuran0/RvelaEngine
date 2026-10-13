@@ -22,7 +22,7 @@
                 "bodyType": 2,
                 "collisionLayer": 1,
                 "collisionMask": 4294967295,
-                "friction": 0.5,
+                "friction": 1.0,
                 "gravityFactor": 1.0,
                 "isSensor": false,
                 "linearDamping": 0.05000000074505806,
@@ -32,7 +32,7 @@
                 "lockTranslationX": false,
                 "lockTranslationY": false,
                 "lockTranslationZ": false,
-                "mass": 50.0,
+                "mass": 70.0,
                 "maxAngularVelocity": 50.0,
                 "maxLinearVelocity": 500.0,
                 "restitution": 0.0,
@@ -60,7 +60,7 @@
                     0.9999991655349731
                 ]
             },
-            "UUID": 10,
+            "UUID": 13437039528452367590,
             "_isRoot": true
         }
     ]

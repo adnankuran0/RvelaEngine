@@ -9,3 +9,4 @@
 #include "AudioBindings.h"
 #include "AnimationBindings.h"
 #include "UIBindings.h"
+#include "TweenBindings.h"

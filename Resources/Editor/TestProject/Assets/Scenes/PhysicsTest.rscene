@@ -659,7 +659,7 @@
                     0.9999991655349731
                 ]
             },
-            "UUID": 429756890916966687
+            "UUID": 13018081069788102078
         },
         {
             "Material": {
@@ -1379,7 +1379,7 @@
                     1.0
                 ]
             },
-            "UUID": 7754618762061687024
+            "UUID": 2978543815696586660
         },
         {
             "ParentUUID": 0,
@@ -1630,50 +1630,6 @@
                 ]
             },
             "UUID": 70
-        },
-        {
-            "Overrides": [
-                {
-                    "op": "add",
-                    "path": "/0/PointLight/blurRadius",
-                    "value": 0.029999999329447746
-                },
-                {
-                    "op": "add",
-                    "path": "/0/PointLight/reverseCullFace",
-                    "value": true
-                },
-                {
-                    "op": "add",
-                    "path": "/0/PointLight/shadowBias",
-                    "value": 0.10000000149011612
-                }
-            ],
-            "ParentUUID": 0,
-            "Prefab": "342bca25-b578-45e3-bf44-c9ae419a8665",
-            "Tag": {
-                "isActive": true,
-                "tag": "Ball"
-            },
-            "Transform": {
-                "lockScaleRatio": true,
-                "position": [
-                    2.1740965843200684,
-                    1.7234071493148804,
-                    0.1875135898590088
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
-                ],
-                "scale": [
-                    0.3500000238418579,
-                    0.3500000238418579,
-                    0.3500000238418579
-                ]
-            },
-            "UUID": 12178685745310299118
         }
     ],
     "Environment": {

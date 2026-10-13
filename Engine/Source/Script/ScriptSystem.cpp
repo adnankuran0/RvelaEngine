@@ -16,6 +16,7 @@ using namespace rv;
 
 ScriptSystem::ScriptSystem(Scene& scene) : m_Scene(scene)
 {
+    m_TweenManager.SetScene(&m_Scene);
     m_ScriptEngine.Init();
 }
 
@@ -114,6 +115,28 @@ void ScriptSystem::BindLuaScript(ScriptComponent& sc, entt::entity e)
     sc.luaInstance["CancelTimer"] = [this, e](sol::table, uint64_t timerId)
     {
         return CancelTimer(e, timerId);
+    };
+
+    sc.luaInstance["TweenPosition"] = [this, e](sol::table, const glm::vec3& target, float duration) {
+        return m_TweenManager.CreatePositionTween(e, target, duration);
+    };
+    sc.luaInstance["TweenRotation"] = [this, e](sol::table, sol::object target, float duration) {
+        return m_TweenManager.CreateRotationTween(e, target, duration);
+    };
+    sc.luaInstance["TweenScale"] = [this, e](sol::table, const glm::vec3& target, float duration) {
+        return m_TweenManager.CreateScaleTween(e, target, duration);
+    };
+    sc.luaInstance["TweenValue"] = [this, e](sol::table, sol::object from, sol::object to, float duration, sol::optional<sol::protected_function> onUpdate) {
+        TweenValue tvFrom = TweenValue::FromLua(from);
+        TweenValue tvTo = TweenValue::FromLua(to);
+        sol::protected_function cb = onUpdate.has_value() ? onUpdate.value() : sol::protected_function();
+        return m_TweenManager.CreateValueTween(e, tvFrom, tvTo, duration, cb);
+    };
+    sc.luaInstance["Tween"] = [this, e](sol::table selfTable, sol::table props, float duration) {
+        return m_TweenManager.CreateTableTween(e, selfTable, props, duration);
+    };
+    sc.luaInstance["CancelTweens"] = [this, e](sol::table) {
+        m_TweenManager.CancelEntity(e);
     };
 
     // Defaults
@@ -453,6 +476,7 @@ void ScriptSystem::OnEntityDestroyed(entt::entity entity)
     {
         DisconnectSignalsForEntity(entity);
 		ClearScheduledTasksForEntity(entity);
+        m_TweenManager.CancelEntity(entity);
         return;
     }
     if (!sc->runtimeInitialized || sc->runtimeDestroying)
@@ -460,6 +484,7 @@ void ScriptSystem::OnEntityDestroyed(entt::entity entity)
         if (!sc->runtimeDestroying)
             DisconnectSignalsForEntity(entity);
 		ClearScheduledTasksForEntity(entity);
+        m_TweenManager.CancelEntity(entity);
         return;
     }
 
@@ -477,6 +502,7 @@ void ScriptSystem::OnEntityDestroyed(entt::entity entity)
     sc->runtimeDestroying = false;
     DisconnectSignalsForEntity(entity);
 	ClearScheduledTasksForEntity(entity);
+        m_TweenManager.CancelEntity(entity);
 }
 
 uint64_t ScriptSystem::ConnectSignal(entt::entity source, const std::string& signalName, entt::entity target, const std::string& methodName)
@@ -578,6 +604,7 @@ void ScriptSystem::ClearSignals()
 
 void ScriptSystem::OnScenePaused()
 {
+    m_TweenManager.PauseAll();
     auto view = m_Scene.GetRegistry().view<ScriptComponent>();
     for (auto entity : view)
     {
@@ -592,6 +619,7 @@ void ScriptSystem::OnScenePaused()
 
 void ScriptSystem::OnSceneResumed()
 {
+    m_TweenManager.ResumeAll();
     auto view = m_Scene.GetRegistry().view<ScriptComponent>();
     for (auto entity : view)
     {
@@ -642,6 +670,7 @@ void ScriptSystem::OnUpdate(float dt)
     DispatchAnimationEvents();
     DispatchAudioEvents();
 	AdvanceScheduledTasks(dt);
+    m_TweenManager.Update(dt);
 
     auto view = m_Scene.GetRegistry().view<ScriptComponent>();
 
@@ -756,6 +785,7 @@ void ScriptSystem::OnStop()
 	ClearSignals();
 	m_Coroutines.clear();
 	m_Timers.clear();
+    m_TweenManager.CancelAll();
 
 }
 

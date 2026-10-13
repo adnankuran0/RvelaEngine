@@ -40,6 +40,7 @@ void ScriptEngine::Init()
     LuaBindings::RegisterAudioAPI(m_State);
     LuaBindings::RegisterAnimationAPI(m_State);
     LuaBindings::RegisterUIComponents(m_State);
+    LuaBindings::RegisterTweenAPI(m_State);
 
 }
 

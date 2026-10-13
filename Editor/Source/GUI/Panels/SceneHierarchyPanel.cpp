@@ -823,6 +823,7 @@ void SceneHierarchyPanel::Draw(Engine* engine)
         if (ImGui::MenuItem("Decal"))
         {
             entt::entity decalEnt = scene.CreateEntity("Decal");
+            scene.GetComponent<TransformComponent>(decalEnt).SetEulerRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
             scene.AddComponent<DecalComponent>(decalEnt);
             registerCreatedEntity(decalEnt);
         }

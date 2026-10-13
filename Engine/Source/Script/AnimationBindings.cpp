@@ -19,13 +19,13 @@ void rv::LuaBindings::RegisterAnimationAPI(sol::state& lua)
         { "PingPong", LoopMode::PINGPONG }
         });
 
-    lua.new_enum<EaseType>("EaseType", {
-        { "Linear",    EaseType::Linear      },
-        { "EaseIn",    EaseType::EaseIn     },
-        { "EaseOut",   EaseType::EaseOut    },
-        { "EaseInOut", EaseType::EaseInOut },
-        { "EaseOutIn", EaseType::EaseOutIn },
-        { "Zero",      EaseType::Zero        }
+    lua.new_enum<rv::Animation::EaseType>("EaseType", {
+        { "Linear",    rv::Animation::EaseType::Linear      },
+        { "EaseIn",    rv::Animation::EaseType::EaseIn     },
+        { "EaseOut",   rv::Animation::EaseType::EaseOut    },
+        { "EaseInOut", rv::Animation::EaseType::EaseInOut },
+        { "EaseOutIn", rv::Animation::EaseType::EaseOutIn },
+        { "Zero",      rv::Animation::EaseType::Zero        }
         });
 
     lua.new_usertype<AnimatorHandle>("AnimatorComponent",

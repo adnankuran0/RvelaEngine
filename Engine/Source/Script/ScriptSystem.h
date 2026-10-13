@@ -2,6 +2,7 @@
 #include "sol/sol.hpp"
 #include "entt/entt.h"
 #include "ScriptEngine.h"
+#include "Tween.h"
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -80,6 +81,7 @@ private:
 	};
 	
 	ScriptEngine m_ScriptEngine;
+	TweenManager m_TweenManager;
 	Scene& m_Scene;
 	bool m_IsRunning = false;
 	bool m_IsReady = false;
