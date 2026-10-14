@@ -111,7 +111,7 @@ ModelImportResult ModelImporter::ImportModel(
     MergeAndSaveSubAssets(scene, sourcePath, registry, result);
 
     if (settings.generatePrefab)
-        result.prefabUUID = ConstructPrefab(scene, sourcePath, registry, result);
+        result.prefabUUID = ConstructPrefab(scene, sourcePath, registry, result, settings);
 
     return result;
 }
@@ -250,6 +250,11 @@ const aiScene* ModelImporter::LoadScene(
         aiProcess_JoinIdenticalVertices |
         aiProcess_ImproveCacheLocality |
         aiProcess_GenBoundingBoxes;
+
+    if (settings.scale != 1.0f)
+    {
+        flags |= aiProcess_GlobalScale;
+    }
 
     const aiScene* scene = m_Importer.ReadFile(path.string(), flags);
 
@@ -761,7 +766,8 @@ AssetUUID ModelImporter::ConstructPrefab(
     const aiScene* scene,
     const std::filesystem::path& modelPath,
     AssetRegistry& registry,
-    const ModelImportResult& result)
+    const ModelImportResult& result,
+    const ModelImportSettings& settings)
 {
     Scene prefabScene;
 
@@ -784,23 +790,19 @@ AssetUUID ModelImporter::ConstructPrefab(
         prefabScene.AddComponent<AnimatorComponent>(rootEntity, result.animLibUUID);
     }
 
-    if (scene->mRootNode->mNumMeshes == 1)
-    {
-        AttachMeshToEntity(0, scene->mRootNode, scene, prefabScene, rootEntity, result);
-    }
-    else if (scene->mRootNode->mNumMeshes > 1)
-    {
-        for (unsigned int i = 0; i < scene->mRootNode->mNumMeshes; ++i)
-        {
-            entt::entity child = prefabScene.CreateEntity(rootName + "_" + std::to_string(i)).GetHandle();
-            AttachMeshToEntity(i, scene->mRootNode, scene, prefabScene, child, result);
-            prefabScene.SetParent(child, rootEntity);
-        }
-    }
+    ProcessNode(scene->mRootNode, scene, rootEntity, prefabScene, result, boneNames);
 
-    for (unsigned int i = 0; i < scene->mRootNode->mNumChildren; ++i)
+    std::string ext = modelPath.extension().string();
+    std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+    if (ext == ".fbx")
     {
-        ProcessNode(scene->mRootNode->mChildren[i], scene, rootEntity, prefabScene, result, boneNames);
+        auto& tc = prefabScene.GetComponent<TransformComponent>(rootEntity);
+        tc.SetScale(glm::vec3(0.01f * settings.scale));
+    }
+    else if (settings.scale != 1.0f)
+    {
+        auto& tc = prefabScene.GetComponent<TransformComponent>(rootEntity);
+        tc.SetScale(glm::vec3(settings.scale));
     }
 
     prefabScene.GetTransformSystem().Update();
@@ -841,6 +843,8 @@ entt::entity ModelImporter::ProcessNode(
     const std::unordered_set<std::string>& boneNames)
 {
     std::string nodeName = node->mName.C_Str();
+    if (nodeName.empty())
+        nodeName = "Node";
 
     if (boneNames.contains(nodeName) && node->mNumMeshes == 0)
     {
@@ -851,7 +855,7 @@ entt::entity ModelImporter::ProcessNode(
     SetTransformForEntity(node, scene, e);
 
     if (parent != entt::null)
-        scene.SetParent(e, parent);
+        scene.SetParentKeepLocal(e, parent);
 
     if (node->mNumMeshes == 1)
     {
@@ -862,15 +866,15 @@ entt::entity ModelImporter::ProcessNode(
         for (unsigned int i = 0; i < node->mNumMeshes; i++)
         {
             entt::entity child = scene.CreateEntity(nodeName + "_" + std::to_string(i)).GetHandle();
-            SetTransformForEntity(node, scene, child);
             AttachMeshToEntity(i, node, modelScene, scene, child, result);
-            scene.SetParent(child, e);
+            scene.SetParentKeepLocal(child, e);
         }
     }
 
+    entt::entity parentForChildren = (e != entt::null) ? e : parent;
     for (unsigned int i = 0; i < node->mNumChildren; i++)
     {
-        ProcessNode(node->mChildren[i], modelScene, e, scene, result, boneNames);
+        ProcessNode(node->mChildren[i], modelScene, parentForChildren, scene, result, boneNames);
     }
 
     return e;
@@ -918,10 +922,10 @@ void ModelImporter::SetTransformForEntity(
 {
     auto& tc = scene.GetComponent<TransformComponent>(e);
     glm::mat4 transform = math::ConvertToGlmMatrix(node->mTransformation);
-    glm::vec3 pos, scale, rotDeg;
-    math::DecomposeToEulerAngles(transform, scale, rotDeg, pos);
+    glm::vec3 pos, scale;
+    glm::quat rotation;
+    math::DecomposeToQuat(transform, scale, rotation, pos);
     tc.SetPosition(pos);
     tc.SetScale(scale);
-    tc.SetEulerRotation(rotDeg);
-    scene.GetTransformSystem().Update();
+    tc.SetRotation(rotation);
 }

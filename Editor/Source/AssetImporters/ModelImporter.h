@@ -105,7 +105,8 @@ private:
         const aiScene* scene,
         const std::filesystem::path& modelPath,
         AssetRegistry& registry,
-        const ModelImportResult& result);
+        const ModelImportResult& result,
+        const ModelImportSettings& settings);
 
     entt::entity ProcessNode(
         aiNode* node,
