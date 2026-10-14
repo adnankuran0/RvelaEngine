@@ -48,6 +48,10 @@ void ShadowPass::InitDirectionalShadowMap()
     glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, borderColor);
 
     glBindFramebuffer(GL_FRAMEBUFFER, dirShadowFBO);
+    for (int cascade = 0; cascade < NUM_SHADOW_CASCADES; ++cascade) {
+        glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, o_DirectionalShadowMap, 0, cascade);
+        glClear(GL_DEPTH_BUFFER_BIT);
+    }
     glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, o_DirectionalShadowMap, 0, 0);
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
@@ -86,6 +90,7 @@ void ShadowPass::InitPointShadowMap()
     glBindFramebuffer(GL_FRAMEBUFFER, pointFBO);
     for (int layer = 0; layer < 6 * MaxPointLights; ++layer) {
         glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, o_PointShadowMap, 0, layer);
+        glClear(GL_DEPTH_BUFFER_BIT);
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
             LOG_ERROR("Point shadow framebuffer layer {} not complete!", layer);
         }
@@ -126,6 +131,7 @@ void ShadowPass::InitSpotShadowMap()
     glBindFramebuffer(GL_FRAMEBUFFER, spotFBO);
     for (int layer = 0; layer < MaxSpotLights; ++layer) {
         glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, o_SpotShadowMap, 0, layer);
+        glClear(GL_DEPTH_BUFFER_BIT);
     }
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
@@ -142,7 +148,6 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
     auto& skeletalCommands = frame.skeletalOpaqueCommands;
 
     if (!ctx.directionalLight || !ctx.directionalLight->castShadows) return;
-    if (commands.empty() && skeletalCommands.empty()) return;
 
     glBindFramebuffer(GL_FRAMEBUFFER, dirShadowFBO);
     glViewport(0, 0, m_CurrentShadowResolution, m_CurrentShadowResolution);
@@ -213,6 +218,9 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
                 if (command.mesh->worldAABB.IsValid() && !ctx.camera->Intersects(cascadeMatrix, command.mesh->worldAABB)) continue;
 
                 auto& material = command.material;
+
+                if (material->GetTransparencyMode() == TransparencyMode::Alpha) continue;
+
                 ApplyCull(material->GetCullMode());
                 shadowShader.setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
 
@@ -419,7 +427,6 @@ void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& fram
     if (ctx.spotLights.empty()) return;
     auto& commands = frame.opaqueCommands;
     auto& skeletalCommands = frame.skeletalOpaqueCommands;
-    if (commands.empty() && skeletalCommands.empty()) return;
 
     bool hasShadowCasters = false;
     for (const auto& light : ctx.spotLights) {
@@ -578,8 +585,6 @@ void ShadowPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             RecreateDirectionalShadowMap(targetRes, frame);
         }
     }
-
-    if (frame.opaqueCommands.empty() && frame.skeletalOpaqueCommands.empty()) return;
 
     RenderDirectionalShadowMap(ctx, frame);
     RenderPointShadowMap(ctx, frame);

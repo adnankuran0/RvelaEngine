@@ -146,6 +146,9 @@ vec4 sampleTriplanar(sampler2D tex, vec3 p, vec3 weights)
 
 void main()
 {
+    if (transparencyMode == 1)
+        discard;
+
     if (useTriplanar)
     {
         vec3 triPos = useWorldTriplanar ? WorldPos : LocalPos;

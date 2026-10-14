@@ -17,11 +17,13 @@
 #include "Math/RvelaMath.h"
 #include <Assimp/scene.h>
 #include <Assimp/postprocess.h>
+#include <Assimp/GltfMaterial.h>
 #include <nlohmann/json.hpp>
 #include "MaterialSerializer.h"
 #include <fstream>
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb/stb_image_write.h"
+#include "stb/stb_image.h"
 
 using namespace rv;
 using json = nlohmann::json;
@@ -684,6 +686,146 @@ void ModelImporter::ExtractMaterials(
         {
             asset->UVScale = { uvTransform.mScaling.x,     uvTransform.mScaling.y };
             asset->UVOffset = { uvTransform.mTranslation.x, uvTransform.mTranslation.y };
+        }
+
+        // Transparency / Alpha Detection
+        bool hasAlpha = false;
+
+        // A. glTF alphaMode / alphaCutoff
+        aiString alphaMode;
+        if (aiMat->Get(AI_MATKEY_GLTF_ALPHAMODE, alphaMode) == AI_SUCCESS)
+        {
+            std::string modeStr = alphaMode.C_Str();
+            if (modeStr == "BLEND")
+            {
+                asset->transparencyMode = TransparencyMode::Alpha;
+                hasAlpha = true;
+            }
+            else if (modeStr == "MASK")
+            {
+                asset->transparencyMode = TransparencyMode::AlphaScissor;
+                hasAlpha = true;
+                ai_real cutoff = 0.5f;
+                if (aiGetMaterialFloat(aiMat, AI_MATKEY_GLTF_ALPHACUTOFF, &cutoff) == AI_SUCCESS)
+                {
+                    asset->alphaCutoff = static_cast<float>(cutoff);
+                }
+            }
+        }
+
+        // B. Opacity / Transparency Factors (FBX, OBJ, Collada, etc.)
+        if (!hasAlpha)
+        {
+            ai_real opacity = 1.0f;
+            if (aiGetMaterialFloat(aiMat, AI_MATKEY_OPACITY, &opacity) == AI_SUCCESS && opacity < 0.999f)
+            {
+                asset->transparencyMode = TransparencyMode::Alpha;
+                asset->albedoColor.a = static_cast<float>(opacity);
+                hasAlpha = true;
+            }
+        }
+
+        if (!hasAlpha)
+        {
+            ai_real transFactor = 0.0f;
+            if (aiGetMaterialFloat(aiMat, AI_MATKEY_TRANSPARENCYFACTOR, &transFactor) == AI_SUCCESS && transFactor > 0.001f)
+            {
+                asset->transparencyMode = TransparencyMode::Alpha;
+                asset->albedoColor.a = 1.0f - static_cast<float>(transFactor);
+                hasAlpha = true;
+            }
+        }
+
+        if (!hasAlpha)
+        {
+            ai_real transmission = 0.0f;
+            if (aiGetMaterialFloat(aiMat, AI_MATKEY_TRANSMISSION_FACTOR, &transmission) == AI_SUCCESS && transmission > 0.001f)
+            {
+                asset->transparencyMode = TransparencyMode::Alpha;
+                hasAlpha = true;
+            }
+        }
+
+        // C. Opacity map texture (aiTextureType_OPACITY)
+        if (!hasAlpha && aiMat->GetTextureCount(aiTextureType_OPACITY) > 0)
+        {
+            asset->transparencyMode = TransparencyMode::Alpha;
+            hasAlpha = true;
+        }
+
+        // D. Texture Flags (aiTextureFlags_UseAlpha)
+        if (!hasAlpha)
+        {
+            int texFlags = 0;
+            if (aiMat->Get(AI_MATKEY_TEXFLAGS(aiTextureType_DIFFUSE, 0), texFlags) == AI_SUCCESS ||
+                aiMat->Get(AI_MATKEY_TEXFLAGS(aiTextureType_BASE_COLOR, 0), texFlags) == AI_SUCCESS)
+            {
+                if (texFlags & aiTextureFlags_UseAlpha)
+                {
+                    asset->transparencyMode = TransparencyMode::Alpha;
+                    hasAlpha = true;
+                }
+            }
+        }
+
+        // E. Diffuse / Base color factor alpha
+        if (!hasAlpha && asset->albedoColor.a < 0.999f)
+        {
+            asset->transparencyMode = TransparencyMode::Alpha;
+            hasAlpha = true;
+        }
+
+        // F. Check if the albedo texture file contains actual alpha pixels
+        if (!hasAlpha && asset->useAlbedoMap && albedoUUID.IsValid())
+        {
+            std::filesystem::path texFilePath = registry.GetPath(albedoUUID);
+            if (texFilePath.empty() || !std::filesystem::exists(texFilePath))
+            {
+                for (const auto& [key, uuid] : result.textureUUIDs)
+                {
+                    if (uuid == albedoUUID && std::filesystem::exists(key))
+                    {
+                        texFilePath = key;
+                        break;
+                    }
+                }
+            }
+
+            if (!texFilePath.empty() && std::filesystem::exists(texFilePath))
+            {
+                int tw = 0, th = 0, tc = 0;
+                if (stbi_info(texFilePath.string().c_str(), &tw, &th, &tc) && tc == 4)
+                {
+                    uint8_t* pix = stbi_load(texFilePath.string().c_str(), &tw, &th, &tc, 4);
+                    if (pix)
+                    {
+                        for (int p = 0; p < tw * th; ++p)
+                        {
+                            if (pix[p * 4 + 3] < 250)
+                            {
+                                asset->transparencyMode = TransparencyMode::Alpha;
+                                hasAlpha = true;
+                                break;
+                            }
+                        }
+                        stbi_image_free(pix);
+                    }
+                }
+            }
+        }
+
+        // Blend Mode & Two-Sided (Cull Mode)
+        int blendFunc = 0;
+        if (aiGetMaterialInteger(aiMat, AI_MATKEY_BLEND_FUNC, &blendFunc) == AI_SUCCESS)
+        {
+            if (blendFunc == aiBlendMode_Additive)
+                asset->blendMode = BlendMode::Add;
+        }
+
+        int twoSided = 0;
+        if (aiGetMaterialInteger(aiMat, AI_MATKEY_TWOSIDED, &twoSided) == AI_SUCCESS && twoSided != 0)
+        {
+            asset->cullMode = CullMode::Disabled;
         }
 
         if (!MaterialSerializer::Save(asset, matFilePath))
