@@ -71,6 +71,7 @@ public:
 
     std::string GetDefaultSettings() const override;
     static ModelImportSettings ParseSettings(const std::string& settingsJson);
+    static std::string SanitizeFilename(const std::string& name);
 
 private:
     const aiScene* LoadScene(
@@ -138,8 +139,6 @@ private:
     std::filesystem::path ResolveRelativePath(
         const std::string& texPath,
         const std::filesystem::path& modelPath) const;
-
-    static std::string SanitizeFilename(const std::string& name);
 
     MeshImporter m_MeshImporter;
     SkeletalMeshImporter m_SkeletalMeshImporter;

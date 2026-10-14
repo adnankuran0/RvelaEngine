@@ -1593,3 +1593,9 @@ void AssetBrowserPanel::RequestRename(const std::filesystem::path& path)
     s_SelectedItemPath = path;
     BeginRenameForNew(path);
 }
+
+void AssetBrowserPanel::RequestRefresh()
+{
+    s_NeedsRefresh = true;
+    s_DirectoryTreeDirty = true;
+}

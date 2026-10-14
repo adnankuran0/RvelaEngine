@@ -1,10 +1,12 @@
-﻿#include "rvelapch.h"
+#include "rvelapch.h"
 #include "AssetImportPipeline.h"
 #include "AssetRegistry.h"
 #include "AssetMeta.h"
 #include "IAssetImporter.h"
 #include "Core/Log.h"
 #include "Asset/AssetManager.h"
+#include <fstream>
+#include <chrono>
 
 using namespace rv;
 
@@ -13,7 +15,7 @@ void AssetImportPipeline::RegisterImporter(std::unique_ptr<IAssetImporter> impor
     m_Importers.push_back(std::move(importer));
 }
 
-bool AssetImportPipeline::ImportAsset(const std::filesystem::path& sourcePath, AssetRegistry& registry)
+bool AssetImportPipeline::ImportAsset(const std::filesystem::path& sourcePath, AssetRegistry& registry, bool force)
 {
     auto ext = sourcePath.extension().string();
 
@@ -36,7 +38,7 @@ bool AssetImportPipeline::ImportAsset(const std::filesystem::path& sourcePath, A
         registry.SaveMeta(sourcePath, meta);
     }
 
-    if (!NeedsReimport(sourcePath, meta))
+    if (!force && !NeedsReimport(sourcePath, meta))
     {
         return true;
     }
@@ -71,6 +73,7 @@ bool AssetImportPipeline::ImportAsset(const std::filesystem::path& sourcePath, A
     updatedMeta.importerVersion = importer->GetImporterVersion(sourcePath);
     registry.SaveMeta(sourcePath, updatedMeta);
     registry.RegisterPath(updatedMeta.uuid, cachePath);
+    AssetManager::Get().Unload(updatedMeta.uuid);
 
     return true;
 }
@@ -92,7 +95,7 @@ void AssetImportPipeline::ReimportAll(AssetRegistry& registry)
         IAssetImporter* importer = FindImporter(ext);
         if (!importer) continue;
 
-        if (ImportAsset(path, registry))
+        if (ImportAsset(path, registry, /*force=*/true))
             ++success;
         else
             ++failed;
@@ -107,7 +110,59 @@ void AssetImportPipeline::Reimport(const std::filesystem::path& sourcePath, Asse
     IAssetImporter* importer = FindImporter(sourcePath.extension().string());
     if (!importer) return;
 
-    ImportAsset(sourcePath, registry);
+    ImportAsset(sourcePath, registry, /*force=*/true);
+}
+
+bool AssetImportPipeline::CheckAndReimportModifiedAssets(AssetRegistry& registry)
+{
+    static auto s_LastCheckTime = std::chrono::steady_clock::now();
+    auto now = std::chrono::steady_clock::now();
+    if (std::chrono::duration_cast<std::chrono::milliseconds>(now - s_LastCheckTime).count() < 1000)
+        return false;
+    s_LastCheckTime = now;
+
+    if (registry.GetAssetDir().empty())
+        return false;
+
+    std::error_code ec;
+    if (!std::filesystem::exists(registry.GetAssetDir(), ec))
+        return false;
+
+    bool anyReimported = false;
+    for (auto& entry : std::filesystem::recursive_directory_iterator(
+        registry.GetAssetDir(),
+        std::filesystem::directory_options::skip_permission_denied, ec))
+    {
+        if (ec) break;
+        if (!entry.is_regular_file()) continue;
+
+        auto path = entry.path().lexically_normal();
+        auto ext = path.extension().string();
+        if (ext == ".rmeta" || ext.empty()) continue;
+        if (path.string().find(".cache") != std::string::npos) continue;
+
+        IAssetImporter* importer = FindImporter(ext);
+        if (!importer) continue;
+
+        AssetMeta meta = registry.GetOrCreateMeta(path);
+        if (NeedsReimport(path, meta))
+        {
+            // Verify file is not currently locked by an external exporter
+            {
+                std::ifstream test(path, std::ios::binary);
+                if (!test.is_open())
+                    continue;
+            }
+
+            LOG_INFO("[AssetImportPipeline] Auto-reimporting modified asset: {}", path.filename().string());
+            if (ImportAsset(path, registry, /*force=*/true))
+            {
+                anyReimported = true;
+            }
+        }
+    }
+
+    return anyReimported;
 }
 
 bool AssetImportPipeline::NeedsReimport(const std::filesystem::path& sourcePath, const AssetMeta& meta) const

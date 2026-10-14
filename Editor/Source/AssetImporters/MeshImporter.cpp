@@ -1,10 +1,11 @@
-﻿#include "rvelapch.h"
+#include "rvelapch.h"
 #include "MeshImporter.h"
 #include "Asset/CacheTypes/MeshCacheHeader.h"
 #include "Asset/AssetMeta.h"
 #include "Asset/AssetRegistry.h"
 #include "Renderer/AABB.h"
 #include "Core/Log.h"
+#include "Asset/AssetManager.h"
 #include <fstream>
 #include <Assimp/Importer.hpp>
 #include <Assimp/scene.h>
@@ -65,56 +66,54 @@ bool MeshImporter::ImportFromScene(
     const aiScene* scene,
     const std::filesystem::path& sourcePath,
     AssetRegistry& registry,
-    std::unordered_map<unsigned int, AssetUUID>& outMeshMap)
+    std::unordered_map<unsigned int, AssetUUID>& outMeshMap,
+    const std::vector<std::string>& meshNames)
 {
     if (scene->mNumMeshes == 0) return false;
 
     auto cacheRoot = registry.GetAssetDir() / ".cache";
     std::filesystem::create_directories(cacheRoot);
 
-    AssetMeta parentMeta = registry.GetOrCreateMeta(sourcePath);
-
-    std::unordered_map<uint32_t, SubAssetEntry> existingByIndex;
-    for (auto& sub : parentMeta.subAssets)
-        if (sub.type == "Mesh")
-            existingByIndex[sub.index] = sub;
-
     for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
     {
         aiMesh* mesh = scene->mMeshes[i];
         if (mesh->mNumBones > 0) continue;
 
-        std::string meshName = mesh->mName.C_Str();
-        if (meshName.empty()) meshName = "Mesh_" + std::to_string(i);
+        std::string meshName;
+        if (i < meshNames.size() && !meshNames[i].empty())
+            meshName = meshNames[i];
+        else
+        {
+            meshName = mesh->mName.C_Str();
+            if (meshName.empty()) meshName = "Mesh_" + std::to_string(i);
+        }
 
         AssetUUID meshUUID;
-        auto existIt = existingByIndex.find(i);
-        if (existIt != existingByIndex.end())
-            meshUUID = existIt->second.uuid;
+        auto existIt = outMeshMap.find(i);
+        if (existIt != outMeshMap.end() && existIt->second.IsValid())
+            meshUUID = existIt->second;
         else
+        {
             meshUUID = AssetUUID{};
+            outMeshMap[i] = meshUUID;
+        }
 
         auto cachePath = cacheRoot / (meshUUID.ToString() + ".rmesh");
 
-        bool needsImport = !std::filesystem::exists(cachePath);
+        auto vertices = ProcessVertices(mesh);
+        auto indices = ProcessIndices(mesh);
+        OptimizeMesh(vertices, indices);
+        aiVector3D mn = mesh->mAABB.mMin, mx = mesh->mAABB.mMax;
+        AABB aabb(glm::vec3(mn.x, mn.y, mn.z), glm::vec3(mx.x, mx.y, mx.z));
 
-        if (needsImport)
+        if (!WriteMeshCache(cachePath, meshName, vertices, indices, aabb))
         {
-            auto vertices = ProcessVertices(mesh);
-            auto indices = ProcessIndices(mesh);
-            OptimizeMesh(vertices, indices);
-            aiVector3D mn = mesh->mAABB.mMin, mx = mesh->mAABB.mMax;
-            AABB aabb(glm::vec3(mn.x, mn.y, mn.z), glm::vec3(mx.x, mx.y, mx.z));
-
-            if (!WriteMeshCache(cachePath, meshName, vertices, indices, aabb))
-            {
-                LOG_ERROR("Failed to write cache for mesh {}", i);
-                continue;
-            }
+            LOG_ERROR("Failed to write cache for mesh {}", i);
+            continue;
         }
 
         registry.RegisterSubAsset(meshUUID, cachePath, "MeshImporter");
-        outMeshMap[i] = meshUUID;
+        AssetManager::Get().Unload(meshUUID);
     }
 
     return true;

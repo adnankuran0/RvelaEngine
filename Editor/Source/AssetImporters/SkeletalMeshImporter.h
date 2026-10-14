@@ -18,7 +18,8 @@ public:
         const std::filesystem::path& sourcePath,
         AssetRegistry& registry,
         const std::unordered_map<std::string, int32_t>& boneNameToIndex,
-        std::unordered_map<unsigned int, AssetUUID>& outSkeletalMeshMap);
+        std::unordered_map<unsigned int, AssetUUID>& outSkeletalMeshMap,
+        const std::vector<std::string>& meshNames = {});
 
 private:
     struct BoneWeight { int32_t boneIndex; float weight; };

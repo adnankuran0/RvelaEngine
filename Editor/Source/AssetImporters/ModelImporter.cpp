@@ -13,6 +13,8 @@
 #include "Scene/Components/SkeletonComponent.h"
 #include "Scene/Components/SkeletalMeshComponent.h"
 #include "Scene/Components/SkeletalMeshRendererComponent.h"
+#include "Scene/Components/PrefabComponent.h"
+#include "Core/Engine.h"
 #include "Core/Log.h"
 #include "Math/RvelaMath.h"
 #include <Assimp/scene.h>
@@ -21,6 +23,7 @@
 #include <nlohmann/json.hpp>
 #include "MaterialSerializer.h"
 #include <fstream>
+#include <functional>
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb/stb_image_write.h"
 #include "stb/stb_image.h"
@@ -36,6 +39,79 @@ std::string ModelImporter::SanitizeFilename(const std::string& name)
             c == '*' || c == '"' || c == '<' || c == '>' || c == '|')
             c = '_';
     return result;
+}
+
+static std::vector<std::string> GenerateCanonicalMeshNames(const aiScene* scene, const std::filesystem::path& modelPath)
+{
+    std::vector<std::string> names(scene->mNumMeshes);
+    std::unordered_map<std::string, uint32_t> nameCounts;
+
+    for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
+    {
+        std::string rawName = scene->mMeshes[i]->mName.C_Str();
+        if (rawName.empty())
+        {
+            std::function<void(const aiNode*)> findNode = [&](const aiNode* node) {
+                if (!rawName.empty()) return;
+                for (unsigned int m = 0; m < node->mNumMeshes; ++m)
+                {
+                    if (node->mMeshes[m] == i && node->mName.length > 0)
+                    {
+                        rawName = node->mName.C_Str();
+                        return;
+                    }
+                }
+                for (unsigned int c = 0; c < node->mNumChildren; ++c)
+                    findNode(node->mChildren[c]);
+            };
+            if (scene->mRootNode)
+                findNode(scene->mRootNode);
+        }
+
+        if (rawName.empty())
+        {
+            rawName = "Mesh";
+        }
+
+        std::string clean = ModelImporter::SanitizeFilename(rawName);
+        if (clean.empty()) clean = "Mesh";
+
+        uint32_t count = nameCounts[clean]++;
+        if (count == 0)
+            names[i] = clean;
+        else
+            names[i] = clean + "_" + std::to_string(count);
+    }
+
+    return names;
+}
+
+static std::vector<std::string> GenerateCanonicalMaterialNames(const aiScene* scene, const std::filesystem::path& modelPath)
+{
+    std::vector<std::string> names(scene->mNumMaterials);
+    std::unordered_map<std::string, uint32_t> nameCounts;
+
+    for (unsigned int i = 0; i < scene->mNumMaterials; ++i)
+    {
+        aiMaterial* aiMat = scene->mMaterials[i];
+        aiString aiName;
+        std::string rawName;
+        if (aiMat->Get(AI_MATKEY_NAME, aiName) == AI_SUCCESS && aiName.length > 0)
+        {
+            rawName = ModelImporter::SanitizeFilename(aiName.C_Str());
+        }
+        if (rawName.empty() || rawName == "DefaultMaterial")
+        {
+            rawName = "Mat" + std::to_string(i);
+        }
+
+        uint32_t count = nameCounts[rawName]++;
+        if (count == 0)
+            names[i] = rawName;
+        else
+            names[i] = rawName + "_" + std::to_string(count);
+    }
+    return names;
 }
 
 std::filesystem::path ModelImporter::ResolveRelativePath(
@@ -115,6 +191,63 @@ ModelImportResult ModelImporter::ImportModel(
     if (settings.generatePrefab)
         result.prefabUUID = ConstructPrefab(scene, sourcePath, registry, result, settings);
 
+    if (result.prefabUUID.IsValid())
+        AssetManager::Get().Unload(result.prefabUUID);
+    if (result.skeletonUUID.IsValid())
+        AssetManager::Get().Unload(result.skeletonUUID);
+    if (result.animLibUUID.IsValid())
+        AssetManager::Get().Unload(result.animLibUUID);
+
+    if (Engine::Get())
+    {
+        Scene& activeScene = Engine::Get()->GetActiveScene();
+
+        if (result.prefabUUID.IsValid())
+        {
+            std::vector<entt::entity> prefabInstances;
+            auto pView = activeScene.GetRegistry().view<PrefabComponent>();
+            for (auto e : pView)
+            {
+                if (pView.get<PrefabComponent>(e).GetPrefabID() == result.prefabUUID)
+                {
+                    prefabInstances.push_back(e);
+                }
+            }
+            for (auto inst : prefabInstances)
+            {
+                PrefabImporter::RevertPrefab(activeScene, inst, true);
+            }
+        }
+
+        auto meshView = activeScene.GetRegistry().view<MeshComponent>();
+        for (auto e : meshView)
+        {
+            auto& mc = meshView.get<MeshComponent>(e);
+            for (const auto& [idx, uuid] : result.meshUUIDs)
+            {
+                if (mc.GetMeshID() == uuid)
+                {
+                    mc.SetMesh(uuid);
+                    break;
+                }
+            }
+        }
+
+        auto skelMeshView = activeScene.GetRegistry().view<SkeletalMeshComponent>();
+        for (auto e : skelMeshView)
+        {
+            auto& sc = skelMeshView.get<SkeletalMeshComponent>(e);
+            for (const auto& [idx, uuid] : result.skeletalMeshUUIDs)
+            {
+                if (sc.GetMeshID() == uuid)
+                {
+                    sc.SetMesh(uuid);
+                    break;
+                }
+            }
+        }
+    }
+
     return result;
 }
 
@@ -173,40 +306,53 @@ void ModelImporter::MergeAndSaveSubAssets(
     const ModelImportResult& result)
 {
     AssetMeta parentMeta = registry.GetOrCreateMeta(modelPath);
+    parentMeta.subAssets.clear();
 
-    auto ensureSubAsset = [&](const SubAssetEntry& entry) {
-        for (auto& sub : parentMeta.subAssets)
-            if (sub.type == entry.type && sub.index == entry.index)
-            {
-                sub.uuid = entry.uuid;
-                sub.hasCache = entry.hasCache;
-                return;
-            }
-        parentMeta.subAssets.push_back(entry);
-        };
+    std::vector<std::string> meshNames = GenerateCanonicalMeshNames(scene, modelPath);
+    std::vector<std::string> matNames = GenerateCanonicalMaterialNames(scene, modelPath);
 
     for (auto& [meshIndex, meshUUID] : result.meshUUIDs)
     {
         SubAssetEntry entry;
         entry.uuid = meshUUID;
-        entry.name = scene->mMeshes[meshIndex]->mName.C_Str();
-        if (entry.name.empty())
-            entry.name = modelPath.stem().string() + "_Mesh" + std::to_string(meshIndex);
+        entry.name = (meshIndex < meshNames.size()) ? meshNames[meshIndex] : (modelPath.stem().string() + "_Mesh" + std::to_string(meshIndex));
         entry.type = "Mesh";
         entry.index = meshIndex;
         entry.hasCache = true;
-        ensureSubAsset(entry);
+        parentMeta.subAssets.push_back(entry);
+    }
+
+    for (auto& [meshIndex, meshUUID] : result.skeletalMeshUUIDs)
+    {
+        SubAssetEntry entry;
+        entry.uuid = meshUUID;
+        entry.name = (meshIndex < meshNames.size()) ? meshNames[meshIndex] : (modelPath.stem().string() + "_SkeletalMesh" + std::to_string(meshIndex));
+        entry.type = "SkeletalMesh";
+        entry.index = meshIndex;
+        entry.hasCache = true;
+        parentMeta.subAssets.push_back(entry);
     }
 
     for (auto& [matIndex, matUUID] : result.materialUUIDs)
     {
         SubAssetEntry entry;
         entry.uuid = matUUID;
-        entry.name = modelPath.stem().string() + "_Mat" + std::to_string(matIndex);
+        entry.name = (matIndex < matNames.size()) ? matNames[matIndex] : (modelPath.stem().string() + "_Mat" + std::to_string(matIndex));
         entry.type = "Material";
         entry.index = matIndex;
         entry.hasCache = false;
-        ensureSubAsset(entry);
+        parentMeta.subAssets.push_back(entry);
+    }
+
+    if (result.skeletonUUID.IsValid())
+    {
+        SubAssetEntry entry;
+        entry.uuid = result.skeletonUUID;
+        entry.name = modelPath.stem().string() + "_Skeleton";
+        entry.type = "Skeleton";
+        entry.index = 0;
+        entry.hasCache = false;
+        parentMeta.subAssets.push_back(entry);
     }
 
     if (result.animLibUUID.IsValid())
@@ -217,20 +363,7 @@ void ModelImporter::MergeAndSaveSubAssets(
         entry.type = "AnimationLib";
         entry.index = 0;
         entry.hasCache = false;
-        ensureSubAsset(entry);
-    }
-    else
-    {
-        std::erase_if(parentMeta.subAssets, [](const SubAssetEntry& sub) {
-            return sub.type == "AnimationLib";
-        });
-    }
-
-    if (!result.skeletonUUID.IsValid())
-    {
-        std::erase_if(parentMeta.subAssets, [](const SubAssetEntry& sub) {
-            return sub.type == "Skeleton";
-        });
+        parentMeta.subAssets.push_back(entry);
     }
 
     registry.SaveMeta(modelPath, parentMeta);
@@ -302,6 +435,7 @@ void ModelImporter::ExtractTextures(
                 meta.importerID = m_TextureImporter.GetImporterID();
                 meta.lastWriteTime = currentTimeStamp;
                 registry.SaveMeta(texPath, meta);
+                AssetManager::Get().Unload(meta.uuid);
             }
             else
             {
@@ -314,7 +448,7 @@ void ModelImporter::ExtractTextures(
         return meta.uuid;
     };
 
-    // 1. Extract all embedded textures (GLB, embedded FBX, etc.)
+    // Extract all embedded textures
     if (scene->mNumTextures > 0)
     {
         auto texturesDir = modelPath.parent_path() / (modelPath.stem().string() + "_Textures");
@@ -364,7 +498,29 @@ void ModelImporter::ExtractTextures(
             auto outFilePath = texturesDir / (stemName + "." + ext);
 
             bool writeOk = true;
-            if (!std::filesystem::exists(outFilePath))
+            bool shouldWrite = !std::filesystem::exists(outFilePath);
+            if (!shouldWrite && embedded->mHeight == 0)
+            {
+                std::error_code ec;
+                uintmax_t existingSize = std::filesystem::file_size(outFilePath, ec);
+                if (ec || existingSize != embedded->mWidth)
+                {
+                    shouldWrite = true;
+                }
+                else
+                {
+                    std::ifstream in(outFilePath, std::ios::binary);
+                    if (in)
+                    {
+                        std::vector<char> buf(embedded->mWidth);
+                        in.read(buf.data(), embedded->mWidth);
+                        if (memcmp(buf.data(), embedded->pcData, embedded->mWidth) != 0)
+                            shouldWrite = true;
+                    }
+                }
+            }
+
+            if (shouldWrite)
             {
                 if (embedded->mHeight == 0)
                 {
@@ -414,7 +570,7 @@ void ModelImporter::ExtractTextures(
         }
     }
 
-    // 2. Collect external textures from materials
+    // Collect external textures from materials
     std::unordered_map<std::string, std::filesystem::path> externalTextures;
 
     for (uint32_t i = 0; i < scene->mNumMaterials; ++i)
@@ -531,25 +687,69 @@ void ModelImporter::ExtractMaterials(
                lower.find("roughnessmetallic") != std::string::npos;
     };
 
+    std::vector<std::string> matNames = GenerateCanonicalMaterialNames(scene, modelPath);
+    std::unordered_set<AssetUUID> claimedMatUUIDs;
+    std::vector<AssetUUID> assignedMatUUIDs(scene->mNumMaterials);
+
+    // match by subtype and canonical subname
+    for (uint32_t i = 0; i < scene->mNumMaterials; ++i)
+    {
+        for (const auto& sub : parentMeta.subAssets)
+        {
+            if (sub.type == "Material" && sub.name == matNames[i] && !claimedMatUUIDs.contains(sub.uuid))
+            {
+                assignedMatUUIDs[i] = sub.uuid;
+                claimedMatUUIDs.insert(sub.uuid);
+                break;
+            }
+        }
+    }
+
+    // fallback
+    for (uint32_t i = 0; i < scene->mNumMaterials; ++i)
+    {
+        if (assignedMatUUIDs[i].IsValid()) continue;
+        for (const auto& sub : parentMeta.subAssets)
+        {
+            if (sub.type == "Material" && sub.index == i && !claimedMatUUIDs.contains(sub.uuid))
+            {
+                assignedMatUUIDs[i] = sub.uuid;
+                claimedMatUUIDs.insert(sub.uuid);
+                break;
+            }
+        }
+    }
+
+    // new UUIDs
+    for (uint32_t i = 0; i < scene->mNumMaterials; ++i)
+    {
+        if (!assignedMatUUIDs[i].IsValid())
+        {
+            assignedMatUUIDs[i] = AssetUUID{};
+        }
+    }
+
     for (uint32_t i = 0; i < scene->mNumMaterials; ++i)
     {
         aiMaterial* aiMat = scene->mMaterials[i];
 
-        std::string matFileName = modelPath.stem().string()
-            + "_Mat" + std::to_string(i) + ".rmat";
+        std::string matFileName = modelPath.stem().string() + "_" + matNames[i] + ".rmat";
         auto matFilePath = modelPath.parent_path() / matFileName;
+        auto legacyPath = modelPath.parent_path() / (modelPath.stem().string() + "_Mat" + std::to_string(i) + ".rmat");
+        if (!std::filesystem::exists(matFilePath) && std::filesystem::exists(legacyPath))
+            matFilePath = legacyPath;
+
+        AssetUUID matUUID = assignedMatUUIDs[i];
 
         AssetMeta meta = registry.GetOrCreateMeta(matFilePath);
-        if (meta.importerID.empty())
-        {
-            meta.importerID = "MaterialLoader";
-            registry.SaveMeta(matFilePath, meta);
-        }
+        meta.uuid = matUUID;
+        meta.importerID = "MaterialLoader";
+        registry.SaveMeta(matFilePath, meta);
 
         auto asset = CreateRef<MaterialAsset>(meta.uuid);
         ai_real value;
 
-        // 1. Albedo / Base Color
+        // Albedo
         auto [albedoPath, albedoUUID] = GetTextureInfo(aiMat, aiTextureType_DIFFUSE);
         if (!albedoUUID.IsValid())
             std::tie(albedoPath, albedoUUID) = GetTextureInfo(aiMat, aiTextureType_BASE_COLOR);
@@ -574,7 +774,7 @@ void ModelImporter::ExtractMaterials(
             }
         }
 
-        // 2. Normal
+        // Normal
         auto [normalPath, normalUUID] = GetTextureInfo(aiMat, aiTextureType_NORMALS);
         if (!normalUUID.IsValid())
             std::tie(normalPath, normalUUID) = GetTextureInfo(aiMat, aiTextureType_HEIGHT);
@@ -585,7 +785,7 @@ void ModelImporter::ExtractMaterials(
             asset->useNormalMap = true;
         }
 
-        // 3. Metallic, Roughness, AO & ARM Detection
+        // Metallic, Roughness, AO & ARM
         auto [metalPath, metalUUID] = GetTextureInfo(aiMat, aiTextureType_METALNESS);
 
         auto [roughPath, roughUUID] = GetTextureInfo(aiMat, aiTextureType_DIFFUSE_ROUGHNESS);
@@ -688,10 +888,10 @@ void ModelImporter::ExtractMaterials(
             asset->UVOffset = { uvTransform.mTranslation.x, uvTransform.mTranslation.y };
         }
 
-        // Transparency / Alpha Detection
+        // Transparency
         bool hasAlpha = false;
 
-        // A. glTF alphaMode / alphaCutoff
+        // glTF alphaMode
         aiString alphaMode;
         if (aiMat->Get(AI_MATKEY_GLTF_ALPHAMODE, alphaMode) == AI_SUCCESS)
         {
@@ -713,7 +913,7 @@ void ModelImporter::ExtractMaterials(
             }
         }
 
-        // B. Opacity / Transparency Factors (FBX, OBJ, Collada, etc.)
+        // Opacity
         if (!hasAlpha)
         {
             ai_real opacity = 1.0f;
@@ -746,14 +946,14 @@ void ModelImporter::ExtractMaterials(
             }
         }
 
-        // C. Opacity map texture (aiTextureType_OPACITY)
+        // Opacity map texture
         if (!hasAlpha && aiMat->GetTextureCount(aiTextureType_OPACITY) > 0)
         {
             asset->transparencyMode = TransparencyMode::Alpha;
             hasAlpha = true;
         }
 
-        // D. Texture Flags (aiTextureFlags_UseAlpha)
+        // Texture Flags
         if (!hasAlpha)
         {
             int texFlags = 0;
@@ -768,14 +968,14 @@ void ModelImporter::ExtractMaterials(
             }
         }
 
-        // E. Diffuse / Base color factor alpha
+        // Diffuse
         if (!hasAlpha && asset->albedoColor.a < 0.999f)
         {
             asset->transparencyMode = TransparencyMode::Alpha;
             hasAlpha = true;
         }
 
-        // F. Check if the albedo texture file contains actual alpha pixels
+        // Check if the albedo texture file contains actual alpha pixels
         if (!hasAlpha && asset->useAlbedoMap && albedoUUID.IsValid())
         {
             std::filesystem::path texFilePath = registry.GetPath(albedoUUID);
@@ -814,7 +1014,7 @@ void ModelImporter::ExtractMaterials(
             }
         }
 
-        // Blend Mode & Two-Sided (Cull Mode)
+        // Blend Mode & Two-Sided
         int blendFunc = 0;
         if (aiGetMaterialInteger(aiMat, AI_MATKEY_BLEND_FUNC, &blendFunc) == AI_SUCCESS)
         {
@@ -834,25 +1034,18 @@ void ModelImporter::ExtractMaterials(
             continue;
         }
 
+        AssetManager::Get().Unload(meta.uuid);
         result.materialUUIDs[i] = meta.uuid;
-
-        bool exists = false;
-        for (auto& sub : parentMeta.subAssets)
-            if (sub.type == "Material" && sub.index == i) { exists = true; break; }
-
-        if (!exists)
-        {
-            SubAssetEntry entry;
-            entry.uuid = meta.uuid;
-            entry.name = modelPath.stem().string() + "_Mat" + std::to_string(i);
-            entry.type = "Material";
-            entry.index = i;
-            entry.hasCache = false;
-            parentMeta.subAssets.push_back(entry);
-        }
     }
 
-    registry.SaveMeta(modelPath, parentMeta);
+    // Unload any deleted materials
+    for (const auto& sub : parentMeta.subAssets)
+    {
+        if (sub.type == "Material" && !claimedMatUUIDs.contains(sub.uuid))
+        {
+            AssetManager::Get().Unload(sub.uuid);
+        }
+    }
 }
 
 void ModelImporter::ExtractMeshes(
@@ -861,47 +1054,80 @@ void ModelImporter::ExtractMeshes(
     AssetRegistry& registry,
     ModelImportResult& result)
 {
-    m_MeshImporter.ImportFromScene(scene, modelPath, registry, result.meshUUIDs);
+    if (!scene || scene->mNumMeshes == 0)
+        return;
+
+    std::vector<std::string> meshNames = GenerateCanonicalMeshNames(scene, modelPath);
+    AssetMeta parentMeta = registry.GetOrCreateMeta(modelPath);
+
+    std::unordered_set<AssetUUID> claimedUUIDs;
+    std::vector<AssetUUID> assignedUUIDs(scene->mNumMeshes);
+
+    for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
+    {
+        aiMesh* mesh = scene->mMeshes[i];
+        std::string expectedType = (mesh->mNumBones > 0 && !result.boneNameToIndex.empty()) ? "SkeletalMesh" : "Mesh";
+        for (const auto& sub : parentMeta.subAssets)
+        {
+            if (sub.type == expectedType && sub.name == meshNames[i] && !claimedUUIDs.contains(sub.uuid))
+            {
+                assignedUUIDs[i] = sub.uuid;
+                claimedUUIDs.insert(sub.uuid);
+                break;
+            }
+        }
+    }
+
+    for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
+    {
+        if (assignedUUIDs[i].IsValid()) continue;
+        aiMesh* mesh = scene->mMeshes[i];
+        std::string expectedType = (mesh->mNumBones > 0 && !result.boneNameToIndex.empty()) ? "SkeletalMesh" : "Mesh";
+        for (const auto& sub : parentMeta.subAssets)
+        {
+            if (sub.type == expectedType && sub.index == i && !claimedUUIDs.contains(sub.uuid))
+            {
+                assignedUUIDs[i] = sub.uuid;
+                claimedUUIDs.insert(sub.uuid);
+                break;
+            }
+        }
+    }
+
+    for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
+    {
+        if (!assignedUUIDs[i].IsValid())
+        {
+            assignedUUIDs[i] = AssetUUID{};
+        }
+        aiMesh* mesh = scene->mMeshes[i];
+        if (mesh->mNumBones > 0 && !result.boneNameToIndex.empty())
+            result.skeletalMeshUUIDs[i] = assignedUUIDs[i];
+        else
+            result.meshUUIDs[i] = assignedUUIDs[i];
+    }
+
+    for (const auto& sub : parentMeta.subAssets)
+    {
+        if ((sub.type == "Mesh" || sub.type == "SkeletalMesh") && !claimedUUIDs.contains(sub.uuid))
+        {
+            auto cachePath = registry.GetPath(sub.uuid);
+            if (!cachePath.empty() && std::filesystem::exists(cachePath))
+            {
+                std::error_code ec;
+                std::filesystem::remove(cachePath, ec);
+            }
+            AssetManager::Get().Unload(sub.uuid);
+        }
+    }
+
+    m_MeshImporter.ImportFromScene(scene, modelPath, registry, result.meshUUIDs, meshNames);
 
     if (!result.boneNameToIndex.empty())
     {
         m_SkeletalMeshImporter.ImportFromScene(
-            scene, modelPath, registry, result.boneNameToIndex, result.skeletalMeshUUIDs);
+            scene, modelPath, registry, result.boneNameToIndex, result.skeletalMeshUUIDs, meshNames);
     }
-
-    AssetMeta parentMeta = registry.GetOrCreateMeta(modelPath);
-
-    auto ensureMeshSub = [&](const std::string& type, unsigned int meshIndex, AssetUUID uuid, bool hasCache)
-        {
-            SubAssetEntry* existing = nullptr;
-            for (auto& sub : parentMeta.subAssets)
-                if (sub.type == type && sub.index == meshIndex) { existing = &sub; break; }
-
-            if (existing)
-            {
-                existing->uuid = uuid;
-            }
-            else
-            {
-                SubAssetEntry entry;
-                entry.uuid = uuid;
-                entry.name = scene->mMeshes[meshIndex]->mName.C_Str();
-                if (entry.name.empty())
-                    entry.name = modelPath.stem().string() + "_" + type + std::to_string(meshIndex);
-                entry.type = type;
-                entry.index = meshIndex;
-                entry.hasCache = hasCache;
-                parentMeta.subAssets.push_back(entry);
-            }
-        };
-
-    for (auto& [meshIndex, meshUUID] : result.meshUUIDs)
-        ensureMeshSub("Mesh", meshIndex, meshUUID, true);
-
-    for (auto& [meshIndex, meshUUID] : result.skeletalMeshUUIDs)
-        ensureMeshSub("SkeletalMesh", meshIndex, meshUUID, true);
-
-    registry.SaveMeta(modelPath, parentMeta);
 }
 
 AssetUUID ModelImporter::ConstructPrefab(

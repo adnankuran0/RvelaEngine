@@ -34,7 +34,8 @@ public:
         const aiScene* scene,
         const std::filesystem::path& sourcePath,
         AssetRegistry& registry,
-        std::unordered_map<unsigned int, AssetUUID>& outMeshMap);
+        std::unordered_map<unsigned int, AssetUUID>& outMeshMap,
+        const std::vector<std::string>& meshNames = {});
 
     std::string GetDefaultSettings() const override { return ""; }
 

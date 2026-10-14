@@ -3,6 +3,7 @@
 #include "Asset/CacheTypes/SkeletalMeshCacheHeader.h"
 #include "Asset/AssetMeta.h"
 #include "Asset/AssetRegistry.h"
+#include "Asset/AssetManager.h"
 #include "Renderer/AABB.h"
 #include "Core/Log.h"
 #include <fstream>
@@ -188,19 +189,13 @@ bool SkeletalMeshImporter::ImportFromScene(
     const std::filesystem::path& sourcePath,
     AssetRegistry& registry,
     const std::unordered_map<std::string, int32_t>& boneNameToIndex,
-    std::unordered_map<unsigned int, AssetUUID>& outSkeletalMeshMap)
+    std::unordered_map<unsigned int, AssetUUID>& outSkeletalMeshMap,
+    const std::vector<std::string>& meshNames)
 {
     if (scene->mNumMeshes == 0 || boneNameToIndex.empty()) return false;
 
     auto cacheRoot = registry.GetAssetDir() / ".cache";
     std::filesystem::create_directories(cacheRoot);
-
-    AssetMeta parentMeta = registry.GetOrCreateMeta(sourcePath);
-
-    std::unordered_map<uint32_t, SubAssetEntry> existingByIndex;
-    for (auto& sub : parentMeta.subAssets)
-        if (sub.type == "SkeletalMesh")
-            existingByIndex[sub.index] = sub;
 
     bool any = false;
     for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
@@ -208,37 +203,42 @@ bool SkeletalMeshImporter::ImportFromScene(
         aiMesh* mesh = scene->mMeshes[i];
         if (mesh->mNumBones == 0) continue;
 
-        std::string meshName = mesh->mName.C_Str();
-        if (meshName.empty()) meshName = "SkeletalMesh_" + std::to_string(i);
+        std::string meshName;
+        if (i < meshNames.size() && !meshNames[i].empty())
+            meshName = meshNames[i];
+        else
+        {
+            meshName = mesh->mName.C_Str();
+            if (meshName.empty()) meshName = "SkeletalMesh_" + std::to_string(i);
+        }
 
         AssetUUID meshUUID;
-        auto existIt = existingByIndex.find(i);
-        if (existIt != existingByIndex.end())
-            meshUUID = existIt->second.uuid;
+        auto existIt = outSkeletalMeshMap.find(i);
+        if (existIt != outSkeletalMeshMap.end() && existIt->second.IsValid())
+            meshUUID = existIt->second;
         else
+        {
             meshUUID = AssetUUID{};
+            outSkeletalMeshMap[i] = meshUUID;
+        }
 
         auto cachePath = cacheRoot / (meshUUID.ToString() + ".rskmesh");
-        bool needsImport = !std::filesystem::exists(cachePath);
 
-        if (needsImport)
+        auto vertices = ProcessVertices(mesh, boneNameToIndex);
+        auto indices = ProcessIndices(mesh);
+        OptimizeMesh(vertices, indices);
+
+        aiVector3D mn = mesh->mAABB.mMin, mx = mesh->mAABB.mMax;
+        AABB aabb(glm::vec3(mn.x, mn.y, mn.z), glm::vec3(mx.x, mx.y, mx.z));
+
+        if (!WriteMeshCache(cachePath, meshName, vertices, indices, aabb))
         {
-            auto vertices = ProcessVertices(mesh, boneNameToIndex);
-            auto indices = ProcessIndices(mesh);
-            OptimizeMesh(vertices, indices);
-
-            aiVector3D mn = mesh->mAABB.mMin, mx = mesh->mAABB.mMax;
-            AABB aabb(glm::vec3(mn.x, mn.y, mn.z), glm::vec3(mx.x, mx.y, mx.z));
-
-            if (!WriteMeshCache(cachePath, meshName, vertices, indices, aabb))
-            {
-                LOG_ERROR("Failed to write skeletal mesh cache for mesh {}", i);
-                continue;
-            }
+            LOG_ERROR("Failed to write skeletal mesh cache for mesh {}", i);
+            continue;
         }
 
         registry.RegisterSubAsset(meshUUID, cachePath, "SkeletalMeshImporter");
-        outSkeletalMeshMap[i] = meshUUID;
+        AssetManager::Get().Unload(meshUUID);
         any = true;
     }
 

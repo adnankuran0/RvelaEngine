@@ -100,6 +100,14 @@ void EditorLayer::OnUpdate()
    
     ShaderAsset::CheckHotReload();
 
+    if (ProjectManager::IsProjectLoaded() && m_Engine->GetActiveScene().GetState() == SceneState::EDIT)
+    {
+        if (m_AssetImportPipeline.CheckAndReimportModifiedAssets(AssetManager::Get().GetRegistry()))
+        {
+            AssetBrowserPanel::RequestRefresh();
+        }
+    }
+
     HandleShortcuts();
 
     if (!ProjectManager::IsProjectLoaded())
