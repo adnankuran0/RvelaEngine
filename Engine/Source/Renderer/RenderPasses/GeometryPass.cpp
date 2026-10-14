@@ -61,6 +61,7 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         };
 
     auto BindMaterialGBuffer = [](Shader& shader, MaterialComponent* material) {
+        shader.setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
         shader.setVec2("UVScale", material->GetUVScale());
         shader.setVec2("UVOffset", material->GetUVOffset());
         shader.setBool("useTriplanar", material->GetUseTriplanar());

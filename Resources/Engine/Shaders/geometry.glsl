@@ -5,17 +5,15 @@ layout(location = 0) in vec3 aPos;
 layout(location = 1) in vec3 aNormal;
 layout(location = 2) in vec3 aTangent;
 
-#ifdef SKELETAL
 layout(location = 3) in vec2 aTexCoords;
+
+#ifdef SKELETAL
 layout(location = 4) in uvec4 aBoneIDs;
 layout(location = 5) in vec4 aWeights;
 
 const int MAX_BONES = 100;
 uniform mat4 u_BoneMatrices[MAX_BONES];
 #else
-layout(location = 3) in vec3 aBitangent;
-layout(location = 4) in vec2 aTexCoords;
-
 #include "Common/Billboard.glsl"
 uniform int billboardMode;
 #endif
@@ -155,7 +153,7 @@ void main()
         vec3 triP = vec3(triPos.x * UVScale.x, triPos.y * UVScale.y, triPos.z * UVScale.x) + vec3(UVOffset.x, UVOffset.y, 0.0);
         vec3 triWeights = getTriplanarWeights(triGeomNormal, triplanarSharpness);
 
-        if (transparencyMode == 2)
+        if (transparencyMode == 2 || transparencyMode == 3)
         {
             float alpha = (useAlbedoMap ? sampleTriplanar(albedoMap, triP, triWeights).a : 1.0) * albedoColor.a;
             if (alpha < alphaCutoff)
@@ -170,7 +168,7 @@ void main()
     }
     else
     {
-        if (transparencyMode == 2)
+        if (transparencyMode == 2 || transparencyMode == 3)
         {
             float alpha = (useAlbedoMap ? texture(albedoMap, TexCoords).a : 1.0) * albedoColor.a;
             if (alpha < alphaCutoff)

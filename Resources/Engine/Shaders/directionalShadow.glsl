@@ -63,7 +63,7 @@ uniform float alphaCutoff;
 
 void main() 
 {
-    if (transparencyMode == 2) 
+    if (transparencyMode == 2 || transparencyMode == 3) 
     {
         float alpha = (useAlbedoMap ? texture(albedoMap, TexCoords).a : 1.0) * albedoColor.a;
         if (alpha < alphaCutoff)

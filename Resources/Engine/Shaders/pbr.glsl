@@ -356,7 +356,7 @@ void main()
     float alpha = fullAlbedo.a;
 
     if (transparencyMode == 0) alpha = 1.0;
-    else if (transparencyMode == 2) {
+    else if (transparencyMode == 2 || transparencyMode == 3) {
         if (alpha < alphaCutoff) discard;
         alpha = 1.0;
     }

@@ -439,7 +439,7 @@ void MaterialInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 					material.SetTransparencyMode(static_cast<TransparencyMode>(currentTransMode));
 				if (inst.IsOverridden(MatField::TransparencyMode)) RevertButton("R##tmode", [&]() { material.ClearTransparencyMode(); });
 
-				if (material.GetTransparencyMode() == TransparencyMode::AlphaScissor)
+				if (material.GetTransparencyMode() == TransparencyMode::AlphaScissor || material.GetTransparencyMode() == TransparencyMode::DepthPrepass)
 				{
 					UI::PropertyLabel("Alpha Cutoff");
 					float cutoff = material.GetAlphaCutoff();
