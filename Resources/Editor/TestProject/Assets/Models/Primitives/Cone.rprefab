@@ -2,12 +2,13 @@
     "Entities": [
         {
             "Material": {
-                "material": "f49d135b-9a56-4137-ad0c-aad770dee627"
+                "material": "72f7966d-60fc-486e-a0d3-54a379194564"
             },
             "Mesh": {
                 "mesh": "92ffc5c9-9f6f-4332-ad83-e1d03b046a53"
             },
             "Tag": {
+                "isActive": true,
                 "tag": "Cone"
             },
             "Transform": {
@@ -28,7 +29,8 @@
                     1.0
                 ]
             },
-            "UUID": 6
+            "UUID": 5814295263701880444,
+            "_isRoot": true
         }
     ]
 }

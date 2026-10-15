@@ -41,6 +41,20 @@ std::string ModelImporter::SanitizeFilename(const std::string& name)
     return result;
 }
 
+static bool SubtreeHasMesh(const aiNode* node)
+{
+    if (!node)
+        return false;
+    if (node->mNumMeshes > 0)
+        return true;
+    for (unsigned int i = 0; i < node->mNumChildren; ++i)
+    {
+        if (SubtreeHasMesh(node->mChildren[i]))
+            return true;
+    }
+    return false;
+}
+
 static std::vector<std::string> GenerateCanonicalMeshNames(const aiScene* scene, const std::filesystem::path& modelPath)
 {
     std::vector<std::string> names(scene->mNumMeshes);
@@ -1151,14 +1165,37 @@ AssetUUID ModelImporter::ConstructPrefab(
     if (result.skeletonUUID.IsValid())
     {
         prefabScene.AddComponent<SkeletonComponent>(rootEntity, result.skeletonUUID);
+        if (result.animLibUUID.IsValid())
+            prefabScene.AddComponent<AnimatorComponent>(rootEntity, result.animLibUUID);
+        else
+            prefabScene.AddComponent<AnimatorComponent>(rootEntity);
     }
-
-    if (result.animLibUUID.IsValid())
+    else if (result.animLibUUID.IsValid())
     {
         prefabScene.AddComponent<AnimatorComponent>(rootEntity, result.animLibUUID);
     }
 
-    ProcessNode(scene->mRootNode, scene, rootEntity, prefabScene, result, boneNames);
+    if (scene->mRootNode)
+    {
+        if (scene->mRootNode->mNumMeshes == 1)
+        {
+            AttachMeshToEntity(0, scene->mRootNode, scene, prefabScene, rootEntity, result);
+        }
+        else if (scene->mRootNode->mNumMeshes > 1)
+        {
+            for (unsigned int i = 0; i < scene->mRootNode->mNumMeshes; ++i)
+            {
+                entt::entity child = prefabScene.CreateEntity(rootName + "_" + std::to_string(i)).GetHandle();
+                AttachMeshToEntity(i, scene->mRootNode, scene, prefabScene, child, result);
+                prefabScene.SetParentKeepLocal(child, rootEntity);
+            }
+        }
+
+        for (unsigned int i = 0; i < scene->mRootNode->mNumChildren; ++i)
+        {
+            ProcessNode(scene->mRootNode->mChildren[i], scene, rootEntity, prefabScene, result, boneNames);
+        }
+    }
 
     std::string ext = modelPath.extension().string();
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
@@ -1210,12 +1247,24 @@ entt::entity ModelImporter::ProcessNode(
     const ModelImportResult& result,
     const std::unordered_set<std::string>& boneNames)
 {
+    if (!node)
+        return entt::null;
+
     std::string nodeName = node->mName.C_Str();
     if (nodeName.empty())
         nodeName = "Node";
 
     if (boneNames.contains(nodeName) && node->mNumMeshes == 0)
     {
+        if (!SubtreeHasMesh(node))
+        {
+            return entt::null;
+        }
+
+        for (unsigned int i = 0; i < node->mNumChildren; i++)
+        {
+            ProcessNode(node->mChildren[i], modelScene, parent, scene, result, boneNames);
+        }
         return entt::null;
     }
 
@@ -1267,18 +1316,24 @@ void ModelImporter::AttachMeshToEntity(
     auto skelMeshIt = result.skeletalMeshUUIDs.find(globalMeshIndex);
     if (skelMeshIt != result.skeletalMeshUUIDs.end())
     {
-        scene.AddComponent<SkeletalMeshComponent>(e, skelMeshIt->second);
+        auto& smc = scene.AddComponent<SkeletalMeshComponent>(e, skelMeshIt->second);
+        scene.AddComponent<SkeletalMeshRendererComponent>(e, smc.GetMesh());
         if (matUUID.IsValid())
             scene.AddComponent<MaterialComponent>(e, matUUID);
+        else
+            scene.AddComponent<MaterialComponent>(e);
         return;
     }
 
     auto meshIt = result.meshUUIDs.find(globalMeshIndex);
     if (meshIt != result.meshUUIDs.end())
     {
-        scene.AddComponent<MeshComponent>(e, meshIt->second);
+        auto& mc = scene.AddComponent<MeshComponent>(e, meshIt->second);
+        scene.AddComponent<MeshRendererComponent>(e, mc.GetMesh());
         if (matUUID.IsValid())
             scene.AddComponent<MaterialComponent>(e, matUUID);
+        else
+            scene.AddComponent<MaterialComponent>(e);
         return;
     }
 }

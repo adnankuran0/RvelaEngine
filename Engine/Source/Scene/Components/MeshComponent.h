@@ -16,6 +16,7 @@ public:
     MeshComponent(const AssetUUID& uuid)
     {
         Load(uuid);
+        isDirty = true;
     }
 
     inline Ref<MeshAsset> GetMesh() { return mesh; }

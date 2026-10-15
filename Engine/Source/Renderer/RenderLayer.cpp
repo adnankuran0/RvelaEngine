@@ -129,9 +129,10 @@ void RenderLayer::CollectRenderCommands(Scene* scene)
 			continue;
 
 		MeshComponent& meshComp = scene->GetComponent<MeshComponent>(entity);
-		if (meshComp.IsDirty())
+		auto& meshRenderer = scene->GetComponent<MeshRendererComponent>(entity);
+		if (meshComp.IsDirty() || meshRenderer.indexCount == 0)
 		{
-			scene->GetComponent<MeshRendererComponent>(entity).RecreateFromMesh(meshComp.GetMesh());
+			meshRenderer.RecreateFromMesh(meshComp.GetMesh());
 			meshComp.SetDirty(false);
 		}
 		
@@ -180,9 +181,10 @@ void RenderLayer::CollectRenderCommands(Scene* scene)
 			continue;
 
 		SkeletalMeshComponent& meshComp = scene->GetComponent<SkeletalMeshComponent>(entity);
-		if (meshComp.IsDirty())
+		auto& skelRenderer = scene->GetComponent<SkeletalMeshRendererComponent>(entity);
+		if (meshComp.IsDirty() || skelRenderer.indexCount == 0)
 		{
-			scene->GetComponent<SkeletalMeshRendererComponent>(entity).RecreateFromMesh(meshComp.GetMesh());
+			skelRenderer.RecreateFromMesh(meshComp.GetMesh());
 			meshComp.SetDirty(false);
 		}
 

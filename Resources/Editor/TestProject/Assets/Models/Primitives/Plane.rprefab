@@ -2,12 +2,13 @@
     "Entities": [
         {
             "Material": {
-                "material": "fdea0b55-b65e-44c3-92ff-69700022b263"
+                "material": "33f27fea-ce2d-4e6e-87f0-139ca119db4b"
             },
             "Mesh": {
                 "mesh": "077f6760-e8d5-44b4-895c-5d88be2db952"
             },
             "Tag": {
+                "isActive": true,
                 "tag": "Plane"
             },
             "Transform": {
@@ -23,12 +24,13 @@
                     0.0
                 ],
                 "scale": [
-                    0.5,
-                    0.5,
-                    0.5
+                    1.0,
+                    1.0,
+                    1.0
                 ]
             },
-            "UUID": 19
+            "UUID": 4642279215772465800,
+            "_isRoot": true
         }
     ]
 }

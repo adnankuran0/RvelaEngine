@@ -2,13 +2,14 @@
     "Entities": [
         {
             "Material": {
-                "material": "ab90d890-0861-4c4c-809b-98515bf111db"
+                "material": "be46fcc8-d8c8-452f-96f9-43fb7c46cb36"
             },
             "Mesh": {
                 "mesh": "d5b8e68a-8170-4b1a-b439-62ae98d391f8"
             },
             "Tag": {
-                "tag": "Suzanne"
+                "isActive": true,
+                "tag": "Monkey"
             },
             "Transform": {
                 "lockScaleRatio": false,
@@ -28,7 +29,8 @@
                     1.0
                 ]
             },
-            "UUID": 16
+            "UUID": 561095263916508983,
+            "_isRoot": true
         }
     ]
 }

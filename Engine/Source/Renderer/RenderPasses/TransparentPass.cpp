@@ -502,9 +502,10 @@ void TransparentPass::Execute(const RenderContext& ctx, RenderFrame& frame)
                 GLint boneLoc = hasCustomShader ? glGetUniformLocation(currentShader->ID, "u_BoneMatrices") : defaultBoneLoc;
                 if (boneLoc != -1 && command.skeleton && !command.skeleton->skinningPalette.empty())
                 {
+                    GLsizei uploadCount = static_cast<GLsizei>(std::min(command.skeleton->skinningPalette.size(), MAX_BONES));
                     glUniformMatrix4fv(
                         boneLoc,
-                        static_cast<GLsizei>(command.skeleton->skinningPalette.size()),
+                        uploadCount,
                         GL_FALSE,
                         glm::value_ptr(command.skeleton->skinningPalette[0])
                     );

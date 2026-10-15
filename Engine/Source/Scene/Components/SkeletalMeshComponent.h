@@ -15,6 +15,7 @@ public:
     SkeletalMeshComponent(const AssetUUID& uuid)
     {
         Load(uuid);
+        isDirty = true;
     }
 
     inline Ref<SkeletalMeshAsset> GetMesh() { return mesh; }

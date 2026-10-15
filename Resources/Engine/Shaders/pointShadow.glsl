@@ -11,7 +11,7 @@ layout (location = 3) in vec2 aTexCoords;
 layout (location = 4) in uvec4 aBoneIDs;
 layout (location = 5) in vec4 aWeights;
 
-const int MAX_BONES = 100;
+const int MAX_BONES = 200;
 uniform mat4 u_BoneMatrices[MAX_BONES];
 #else
 #include "Common/Camera.glsl"
@@ -40,8 +40,11 @@ void main()
     for (int i = 0; i < 4; ++i)
     {
         if (aWeights[i] <= 0.0) continue;
-        skinMatrix += u_BoneMatrices[aBoneIDs[i]] * aWeights[i];
-        totalWeight += aWeights[i];
+        if (aBoneIDs[i] < MAX_BONES)
+        {
+            skinMatrix += u_BoneMatrices[aBoneIDs[i]] * aWeights[i];
+            totalWeight += aWeights[i];
+        }
     }
 
     if (totalWeight <= 0.0001)

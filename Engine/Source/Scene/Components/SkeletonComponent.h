@@ -9,6 +9,8 @@
 
 namespace rv {
 
+constexpr size_t MAX_BONES = 200;
+
 using json = nlohmann::json;
 
 struct SkeletonComponent

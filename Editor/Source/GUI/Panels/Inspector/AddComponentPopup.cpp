@@ -2,6 +2,7 @@
 #include "InspectorUIUtils.h"
 #include "ImGui/imgui.h"
 #include "Scene/Entity.h"
+#include "Scene/Components/SkeletonComponent.h"
 
 namespace rv {
 
@@ -43,6 +44,7 @@ void AddComponentPopup::Draw(Scene& scene, entt::entity selectedEntity)
 		UI::DrawAddComponentEntry<AudioEmitterComponent>("Audio Emitter", filterBuf, registry, selectedEntity);
 		UI::DrawAddComponentEntry<ParticleEmitterComponent>("Particle Emitter", filterBuf, registry, selectedEntity);
 		UI::DrawAddComponentEntry<DecalComponent>("Decal", filterBuf, registry, selectedEntity);
+		UI::DrawAddComponentEntry<SkeletonComponent>("Skeleton", filterBuf, registry, selectedEntity);
 		UI::DrawAddComponentEntry<AnimatorComponent>("Animator", filterBuf, registry, selectedEntity);
 
 		UI::DrawAddComponentEntry<UICanvasComponent>("UI Canvas", filterBuf, registry, selectedEntity);

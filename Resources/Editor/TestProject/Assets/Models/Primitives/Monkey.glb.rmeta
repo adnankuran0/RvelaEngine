@@ -10,21 +10,22 @@
         "importUVs": true,
         "scale": 1.0
     },
-    "lastWriteTime": 13415805292,
+    "importerVersion": 0,
+    "lastWriteTime": 13431796854,
     "subAssets": [
-        {
-            "hasCache": false,
-            "index": 0,
-            "name": "Monkey_Mat0",
-            "type": "Material",
-            "uuid": "ab90d890-0861-4c4c-809b-98515bf111db"
-        },
         {
             "hasCache": true,
             "index": 0,
             "name": "Suzanne",
             "type": "Mesh",
             "uuid": "d5b8e68a-8170-4b1a-b439-62ae98d391f8"
+        },
+        {
+            "hasCache": false,
+            "index": 0,
+            "name": "Mat0",
+            "type": "Material",
+            "uuid": "be46fcc8-d8c8-452f-96f9-43fb7c46cb36"
         }
     ],
     "uuid": "b731d965-2d99-4a74-ae09-4243f445e178"

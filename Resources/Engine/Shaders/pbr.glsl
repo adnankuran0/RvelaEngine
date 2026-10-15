@@ -10,7 +10,7 @@ layout(location = 3) in vec2 aTexCoords;
 layout(location = 4) in uvec4 aBoneIDs;
 layout(location = 5) in vec4 aWeights;
 
-const int MAX_BONES = 100;
+const int MAX_BONES = 200;
 uniform mat4 u_BoneMatrices[MAX_BONES];
 #endif
 
@@ -40,11 +40,21 @@ void main()
     vec3 N, T, B;
 
 #ifdef SKELETAL
-    mat4 skinMatrix = 
-        u_BoneMatrices[aBoneIDs[0]] * aWeights[0] +
-        u_BoneMatrices[aBoneIDs[1]] * aWeights[1] +
-        u_BoneMatrices[aBoneIDs[2]] * aWeights[2] +
-        u_BoneMatrices[aBoneIDs[3]] * aWeights[3];
+    mat4 skinMatrix = mat4(0.0);
+    float totalWeight = 0.0;
+
+    for (int i = 0; i < 4; ++i)
+    {
+        if (aWeights[i] <= 0.0) continue;
+        if (aBoneIDs[i] < MAX_BONES)
+        {
+            skinMatrix += u_BoneMatrices[aBoneIDs[i]] * aWeights[i];
+            totalWeight += aWeights[i];
+        }
+    }
+
+    if (totalWeight <= 0.0001)
+        skinMatrix = mat4(1.0);
 
     vec4 localPos     = skinMatrix * vec4(aPos, 1.0);
     mat3 skinMatrixIT = mat3(skinMatrix);

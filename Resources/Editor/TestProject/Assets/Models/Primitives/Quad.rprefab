@@ -2,12 +2,13 @@
     "Entities": [
         {
             "Material": {
-                "material": "bd963caf-9a6b-4c16-9b6d-960f28126914"
+                "material": "8bdca83e-b4f4-4af1-923d-4b952aa8cb7c"
             },
             "Mesh": {
                 "mesh": "1d2596bb-18d3-41a6-9848-a8a584870ce3"
             },
             "Tag": {
+                "isActive": true,
                 "tag": "Quad"
             },
             "Transform": {
@@ -28,7 +29,8 @@
                     1.0
                 ]
             },
-            "UUID": 3
+            "UUID": 1403267432422205609,
+            "_isRoot": true
         }
     ]
 }

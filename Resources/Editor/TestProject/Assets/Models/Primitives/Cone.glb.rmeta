@@ -10,21 +10,22 @@
         "importUVs": true,
         "scale": 1.0
     },
-    "lastWriteTime": 13415805096,
+    "importerVersion": 0,
+    "lastWriteTime": 13431796854,
     "subAssets": [
-        {
-            "hasCache": false,
-            "index": 0,
-            "name": "Cone_Mat0",
-            "type": "Material",
-            "uuid": "f49d135b-9a56-4137-ad0c-aad770dee627"
-        },
         {
             "hasCache": true,
             "index": 0,
             "name": "Cone",
             "type": "Mesh",
             "uuid": "92ffc5c9-9f6f-4332-ad83-e1d03b046a53"
+        },
+        {
+            "hasCache": false,
+            "index": 0,
+            "name": "Mat0",
+            "type": "Material",
+            "uuid": "72f7966d-60fc-486e-a0d3-54a379194564"
         }
     ],
     "uuid": "e2161cf9-02ab-47c4-8be8-50f205e9248f"

@@ -10,21 +10,22 @@
         "importUVs": true,
         "scale": 1.0
     },
-    "lastWriteTime": 13415805042,
+    "importerVersion": 0,
+    "lastWriteTime": 13431796854,
     "subAssets": [
-        {
-            "hasCache": false,
-            "index": 0,
-            "name": "Cylinder_Mat0",
-            "type": "Material",
-            "uuid": "a7b6cf4f-3e75-4a4b-b8e9-ab246feea70d"
-        },
         {
             "hasCache": true,
             "index": 0,
             "name": "Cylinder",
             "type": "Mesh",
             "uuid": "2c4d9b01-fea1-4eec-b741-bb054229ba61"
+        },
+        {
+            "hasCache": false,
+            "index": 0,
+            "name": "Mat0",
+            "type": "Material",
+            "uuid": "6fb6c572-d617-4653-a0c0-762108fb9e5a"
         }
     ],
     "uuid": "826d0393-145f-4d59-a755-da9caf72e54c"

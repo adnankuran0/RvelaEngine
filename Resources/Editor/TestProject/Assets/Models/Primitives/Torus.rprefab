@@ -2,12 +2,13 @@
     "Entities": [
         {
             "Material": {
-                "material": "3814bb3f-5522-4d10-944c-17147f860100"
+                "material": "0a0204c1-f716-4fe2-9191-e43efefe7341"
             },
             "Mesh": {
                 "mesh": "db65917a-cf92-4335-addb-f30e2608d318"
             },
             "Tag": {
+                "isActive": true,
                 "tag": "Torus"
             },
             "Transform": {
@@ -28,7 +29,8 @@
                     1.0
                 ]
             },
-            "UUID": 25
+            "UUID": 17021782620274611092,
+            "_isRoot": true
         }
     ]
 }

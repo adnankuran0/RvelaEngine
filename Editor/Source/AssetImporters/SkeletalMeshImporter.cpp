@@ -76,6 +76,12 @@ std::vector<SkeletalVertex> SkeletalMeshImporter::ProcessVertices(
     uint32_t unweightedCount = 0;
     for (uint32_t i = 0; i < mesh->mNumVertices; ++i)
     {
+        for (size_t k = 0; k < 4; ++k)
+        {
+            vertices[i].boneIDs[k] = 0;
+            vertices[i].weights[k] = 0.0f;
+        }
+
         auto& infl = influences[i];
 
         if (infl.empty())

@@ -33,6 +33,7 @@
     "specular": 1.0,
     "transparencyMode": 0,
     "useAOMap": false,
+    "useARMMap": false,
     "useAlbedoMap": false,
     "useHeightMap": false,
     "useMetallicMap": false,
