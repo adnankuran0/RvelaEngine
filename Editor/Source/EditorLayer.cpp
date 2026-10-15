@@ -398,10 +398,18 @@ void EditorLayer::HandleShortcuts()
 
     bool isCtrl = Input::IsKeyPressed(KeyCode::LeftControl) || Input::IsKeyPressed(KeyCode::RightControl);
     bool isShift = Input::IsKeyPressed(KeyCode::LeftShift) || Input::IsKeyPressed(KeyCode::RightShift);
+    bool isAlt = Input::IsKeyPressed(KeyCode::LeftAlt) || Input::IsKeyPressed(KeyCode::RightAlt);
 
     if (isCtrl)
     {
-        if (isShift)
+        if (isAlt)
+        {
+            if (Input::IsKeyJustPressed(KeyCode::M))
+            {
+                EditorUtils::AlignSelectedWithView(*m_Engine);
+            }
+        }
+        else if (isShift)
         {
             if (Input::IsKeyJustPressed(KeyCode::S))
             {

@@ -143,6 +143,17 @@ void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter,
             ImGui::EndMenu();
         }
 
+        if (ImGui::BeginMenu("View"))
+        {
+            const bool hasTransformSelection = EditorUtils::HasTransformSelection(*engine);
+            if (ImGui::MenuItem("Align Transform with View", "", false, hasTransformSelection))
+            {
+                EditorUtils::AlignSelectedWithView(*engine);
+            }
+
+            ImGui::EndMenu();
+        }
+
         ImGui::EndMainMenuBar();
     }
 }

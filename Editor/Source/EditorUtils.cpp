@@ -7,6 +7,14 @@
 #include "Utils/ProjectManager.h"
 #include <cstdlib>
 #include <filesystem>
+#include "EditorSelection.h"
+#include "Commands/CommandHistory.h"
+#include "Commands/TransformCommand.h"
+#include "Renderer/EditorCamera.h"
+#include "Scene/Components/TransformComponent.h"
+#include "Scene/Components/SceneTreeComponent.h"
+#include "Scene/Components/UUIDComponent.h"
+#include <glm/gtc/quaternion.hpp>
 
 using namespace rv;
 
@@ -316,4 +324,128 @@ std::vector<EditorUtils::MaterialAssetInfo> EditorUtils::GetAvailableMaterialAss
     });
 
     return results;
+}
+
+bool EditorUtils::HasTransformSelection(Engine& engine)
+{
+    if (EditorSelection::Get().IsEmpty())
+        return false;
+
+    Scene& scene = engine.GetActiveScene();
+    if (scene.GetState() != SceneState::EDIT)
+        return false;
+
+    auto& reg = scene.GetRegistry();
+    for (auto e : EditorSelection::Get().GetSelectedEntities())
+    {
+        if (e != entt::null && reg.valid(e) && reg.any_of<TransformComponent>(e) && e != scene.GetRootEntity())
+            return true;
+    }
+    return false;
+}
+
+void EditorUtils::AlignSelectedWithView(Engine& engine)
+{
+    EditorCamera* cam = engine.GetEditorCamera();
+    if (!cam)
+        return;
+
+    Scene& scene = engine.GetActiveScene();
+    if (scene.GetState() != SceneState::EDIT)
+        return;
+
+    auto& reg = scene.GetRegistry();
+    const auto& selectedEntities = EditorSelection::Get().GetSelectedEntities();
+    if (selectedEntities.empty())
+        return;
+
+    auto isAncestorSelected = [&](entt::entity candidate) -> bool {
+        entt::entity cur = candidate;
+        while (cur != entt::null && reg.valid(cur) && scene.HasComponent<SceneTreeComponent>(cur))
+        {
+            entt::entity parent = scene.GetComponent<SceneTreeComponent>(cur).parent;
+            if (parent == entt::null || parent == scene.GetRootEntity()) break;
+            if (std::find(selectedEntities.begin(), selectedEntities.end(), parent) != selectedEntities.end())
+                return true;
+            cur = parent;
+        }
+        return false;
+    };
+
+    glm::vec3 camWorldPos = cam->Position;
+    glm::mat3 camBasis(cam->Right, cam->Up, -cam->Front);
+    glm::quat camWorldRot = glm::normalize(glm::quat_cast(camBasis));
+
+    std::vector<EntityTransformRecord> beforeRecords;
+    std::vector<EntityTransformRecord> afterRecords;
+
+    for (auto e : selectedEntities)
+    {
+        if (e == entt::null || !reg.valid(e) || !reg.any_of<TransformComponent>(e))
+            continue;
+
+        if (e == scene.GetRootEntity())
+            continue;
+
+        if (isAncestorSelected(e))
+            continue;
+
+        auto& tc = reg.get<TransformComponent>(e);
+        EntityUUID uuid = 0;
+        if (reg.any_of<UUIDComponent>(e))
+            uuid = reg.get<UUIDComponent>(e).uuid;
+
+        EntityTransformRecord beforeRec;
+        beforeRec.uuid = uuid;
+        beforeRec.entity = e;
+        beforeRec.position = tc.GetPosition();
+        beforeRec.rotation = tc.GetRotation();
+        beforeRec.scale = tc.GetScale();
+
+        glm::mat4 parentWorld(1.0f);
+        glm::quat parentWorldRot(1.0f, 0.0f, 0.0f, 0.0f);
+        bool hasParent = false;
+        if (scene.HasComponent<SceneTreeComponent>(e))
+        {
+            auto& node = reg.get<SceneTreeComponent>(e);
+            if (node.parent != entt::null && reg.valid(node.parent) && node.parent != scene.GetRootEntity() && reg.any_of<TransformComponent>(node.parent))
+            {
+                auto& parentTc = reg.get<TransformComponent>(node.parent);
+                parentWorld = parentTc.GetWorldMatrix();
+                parentWorldRot = parentTc.GetWorldRotation();
+                hasParent = true;
+            }
+        }
+
+        if (!hasParent)
+        {
+            tc.SetPosition(camWorldPos);
+            tc.SetRotation(camWorldRot);
+        }
+        else
+        {
+            glm::mat4 invParentWorld = glm::inverse(parentWorld);
+            tc.SetPosition(glm::vec3(invParentWorld * glm::vec4(camWorldPos, 1.0f)));
+            tc.SetRotation(glm::normalize(glm::inverse(parentWorldRot) * camWorldRot));
+        }
+
+        tc.SetDirty(true);
+
+        EntityTransformRecord afterRec;
+        afterRec.uuid = uuid;
+        afterRec.entity = e;
+        afterRec.position = tc.GetPosition();
+        afterRec.rotation = tc.GetRotation();
+        afterRec.scale = tc.GetScale();
+
+        beforeRecords.push_back(beforeRec);
+        afterRecords.push_back(afterRec);
+    }
+
+    if (!beforeRecords.empty())
+    {
+        auto cmd = std::make_unique<TransformCommand>(&scene, beforeRecords, afterRecords, "Align Transform with View");
+        CommandHistory::Get().Execute(std::move(cmd));
+        scene.SetDirty(true);
+    }
 }

@@ -16,7 +16,7 @@
         "drawInfiniteGrid": true,
         "enableSnap": false,
         "gizmoMode": 0,
-        "selectRootEntity": false,
+        "selectRootEntity": true,
         "snapRotate": 15.0,
         "snapScale": 0.5,
         "snapTranslate": 1.0

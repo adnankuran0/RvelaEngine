@@ -18,6 +18,8 @@ public:
 	static AssetUUID ReadUUIDFromMeta(const std::string& assetPath);
 	static std::string GetAssetFileName(const AssetUUID& uuid);
 	static void ClearAssetFileNameCache();
+	static void AlignSelectedWithView(Engine& engine);
+	static bool HasTransformSelection(Engine& engine);
 
 	struct MeshAssetInfo
 	{

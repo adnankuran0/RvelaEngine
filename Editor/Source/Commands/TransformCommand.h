@@ -20,8 +20,8 @@ struct EntityTransformRecord
 class TransformCommand : public Command
 {
 public:
-    TransformCommand(Scene* scene, const std::vector<EntityTransformRecord>& before, const std::vector<EntityTransformRecord>& after)
-        : m_Scene(scene), m_Before(before), m_After(after), m_FirstExecute(true)
+    TransformCommand(Scene* scene, const std::vector<EntityTransformRecord>& before, const std::vector<EntityTransformRecord>& after, const std::string& customName = "")
+        : m_Scene(scene), m_Before(before), m_After(after), m_FirstExecute(true), m_CustomName(customName)
     {
     }
 
@@ -43,6 +43,8 @@ public:
 
     std::string GetName() const override
     {
+        if (!m_CustomName.empty())
+            return m_CustomName;
         return m_Before.size() > 1 ? "Transform Multiple Entities" : "Transform Entity";
     }
 
@@ -84,6 +86,7 @@ private:
     std::vector<EntityTransformRecord> m_Before;
     std::vector<EntityTransformRecord> m_After;
     bool m_FirstExecute = false;
+    std::string m_CustomName;
 };
 
 }

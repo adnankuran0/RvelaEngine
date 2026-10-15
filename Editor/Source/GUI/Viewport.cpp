@@ -419,6 +419,16 @@ void Viewport::DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySi
         ImGui::OpenPopup("CameraSettingsPopup");
     if (ImGui::IsItemHovered()) ImGui::SetTooltip("Camera Settings (FOV, Speed, Clips)");
 
+    ImGui::SameLine();
+    ImGui::TextDisabled("|");
+    ImGui::SameLine();
+
+    if (ModeButton("View", false, ImVec2(42.0f, 24.0f)))
+        ImGui::OpenPopup("ViewportSettingsPopup");
+    if (ImGui::IsItemHovered()) ImGui::SetTooltip("Viewport & View Settings");
+
+    ImGui::PopStyleVar(2);
+
     if (cam && ImGui::BeginPopup("CameraSettingsPopup"))
     {
         ImGui::TextDisabled("Camera Settings");
@@ -496,17 +506,53 @@ void Viewport::DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySi
         ImGui::EndPopup();
     }
 
-    ImGui::SameLine();
-    ImGui::TextDisabled("|");
-    ImGui::SameLine();
-
-    if (ModeButton("View", false, ImVec2(42.0f, 24.0f)))
-        ImGui::OpenPopup("ViewportSettingsPopup");
-
     auto& debugSettings = DebugRenderer::Get().GetSettings();
     if (ImGui::BeginPopup("ViewportSettingsPopup"))
     {
         bool viewChanged = false;
+
+        const bool hasTransformSelection = EditorUtils::HasTransformSelection(*engine);
+
+        ImGui::TextDisabled("View Actions");
+        ImGui::Separator();
+        ImGui::Spacing();
+
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10.0f, 6.0f));
+        ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
+
+        const float btnWidth = 270.0f;
+        const float btnHeight = 30.0f;
+
+        auto DrawActionButton = [&](const char* label, const char* shortcut, bool enabled, auto onClick) {
+            if (!enabled)
+                ImGui::BeginDisabled();
+
+            ImVec2 p0 = ImGui::GetCursorScreenPos();
+            if (ImGui::Button(label, ImVec2(btnWidth, btnHeight)))
+            {
+                onClick();
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImVec2 textSize = ImGui::CalcTextSize(shortcut);
+            ImDrawList* dl = ImGui::GetWindowDrawList();
+            ImVec2 shortcutPos = ImVec2(p0.x + btnWidth - textSize.x - 12.0f, p0.y + (btnHeight - textSize.y) * 0.5f);
+            dl->AddText(shortcutPos, IM_COL32(160, 165, 175, enabled ? 230 : 110), shortcut);
+
+            if (!enabled)
+                ImGui::EndDisabled();
+        };
+
+        DrawActionButton("Align Transform with View", "", hasTransformSelection, [&]() {
+            EditorUtils::AlignSelectedWithView(*engine);
+        });
+
+        ImGui::PopStyleVar(3);
+
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::Spacing();
 
         ImGui::TextDisabled("Render Mode");
         ImGui::Separator();
@@ -550,8 +596,6 @@ void Viewport::DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySi
 
         ImGui::EndPopup();
     }
-
-    ImGui::PopStyleVar(2);
 }
 
 void Viewport::DrawOverlayStats(Engine* engine, ImVec2& displayPos, ImVec2& displaySize)
@@ -619,6 +663,13 @@ void Viewport::DrawOrientationGizmo(Engine* engine, ImVec2& displayPos, ImVec2& 
 void Viewport::HandleSelection(Engine* engine, ImVec2& displayPos, ImVec2& displaySize)
 {
     if (engine->GetActiveScene().GetState() != SceneState::EDIT) return;
+
+    if (ImGui::IsPopupOpen((const char*)nullptr, ImGuiPopupFlags_AnyPopupId))
+        return;
+    if (GImGui && GImGui->HoveredWindow && GImGui->HoveredWindow != ImGui::GetCurrentWindow())
+        return;
+    if (ImGui::IsAnyItemHovered() || ImGui::IsAnyItemActive())
+        return;
 
     ImVec2 mousePos = ImGui::GetIO().MousePos;
     bool isMouseInViewport = mousePos.x >= displayPos.x && mousePos.x <= (displayPos.x + displaySize.x) &&
@@ -849,14 +900,14 @@ void Viewport::Draw(Engine* engine, bool orbitDragActive)
         {
             DrawGizmos(engine, displayPos, displaySize);
         }
-        if (!suppressViewportEditing)
-            HandleSelection(engine, displayPos, displaySize);
-
         if(engine->GetActiveScene().GetState() == SceneState::EDIT)
         {
             DrawToolbar(engine, displayPos, displaySize);
             DrawOrientationGizmo(engine, displayPos, displaySize);
         }
+
+        if (!suppressViewportEditing)
+            HandleSelection(engine, displayPos, displaySize);
         DrawOverlayStats(engine, displayPos, displaySize);
 
         if (ImGui::BeginDragDropTargetCustom(ImGui::GetCurrentWindow()->Rect(), ImGui::GetID("ViewportDropTarget")))
