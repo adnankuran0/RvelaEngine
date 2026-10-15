@@ -2,6 +2,7 @@
 #include "Utils/FileUtils.h"
 #include "Core/Log.h"
 #include "Renderer/DebugRenderer.h"
+#include "Render/GizmoPass.h"
 #include <nlohmann/json.hpp>
 #include <fstream>
 
@@ -60,6 +61,8 @@ void EditorSettings::Load()
             if (v.contains("drawBoundingBoxes")) ViewportSettings.DrawBoundingBoxes = v["drawBoundingBoxes"].get<bool>();
             if (v.contains("drawInfiniteGrid")) ViewportSettings.DrawInfiniteGrid = v["drawInfiniteGrid"].get<bool>();
             if (v.contains("selectRootEntity")) ViewportSettings.SelectRootEntity = v["selectRootEntity"].get<bool>();
+            if (v.contains("drawTransformGizmo")) ViewportSettings.DrawTransformGizmo = v["drawTransformGizmo"].get<bool>();
+            if (v.contains("drawSceneGizmos")) ViewportSettings.DrawSceneGizmos = v["drawSceneGizmos"].get<bool>();
         }
     }
     catch (const std::exception& e)
@@ -96,7 +99,9 @@ void EditorSettings::Save()
         { "drawColliders", ViewportSettings.DrawColliders },
         { "drawBoundingBoxes", ViewportSettings.DrawBoundingBoxes },
         { "drawInfiniteGrid", ViewportSettings.DrawInfiniteGrid },
-        { "selectRootEntity", ViewportSettings.SelectRootEntity }
+        { "selectRootEntity", ViewportSettings.SelectRootEntity },
+        { "drawTransformGizmo", ViewportSettings.DrawTransformGizmo },
+        { "drawSceneGizmos", ViewportSettings.DrawSceneGizmos }
     };
 
     std::ofstream file(filePath);
@@ -146,6 +151,8 @@ void EditorSettings::ApplyToViewport(Viewport& viewport) const
     debugSettings.drawBoundingBoxes = ViewportSettings.DrawBoundingBoxes;
     debugSettings.drawInfiniteGrid = ViewportSettings.DrawInfiniteGrid;
     viewport.SetSelectRootEntity(ViewportSettings.SelectRootEntity);
+    viewport.SetDrawGizmos(ViewportSettings.DrawTransformGizmo);
+    GizmoPass::s_Enabled = ViewportSettings.DrawSceneGizmos;
 }
 
 void EditorSettings::UpdateFromViewport(const Viewport& viewport)
@@ -161,4 +168,6 @@ void EditorSettings::UpdateFromViewport(const Viewport& viewport)
     ViewportSettings.DrawBoundingBoxes = debugSettings.drawBoundingBoxes;
     ViewportSettings.DrawInfiniteGrid = debugSettings.drawInfiniteGrid;
     ViewportSettings.SelectRootEntity = viewport.GetSelectRootEntity();
+    ViewportSettings.DrawTransformGizmo = viewport.GetDrawGizmos();
+    ViewportSettings.DrawSceneGizmos = GizmoPass::s_Enabled;
 }

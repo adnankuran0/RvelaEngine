@@ -14,6 +14,8 @@
         "drawBoundingBoxes": false,
         "drawColliders": false,
         "drawInfiniteGrid": true,
+        "drawSceneGizmos": true,
+        "drawTransformGizmo": true,
         "enableSnap": false,
         "gizmoMode": 0,
         "selectRootEntity": true,

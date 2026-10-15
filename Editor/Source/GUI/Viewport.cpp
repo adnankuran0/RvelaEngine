@@ -10,6 +10,7 @@
 #include "Renderer/DebugRenderer.h"
 #include "Input/Input.h"
 #include "Renderer/EditorCamera.h"
+#include "Render/GizmoPass.h"
 #include "EditorSettings.h"
 #include "EditorSelection.h"
 #include "EditorUtils.h"
@@ -35,7 +36,8 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
     entt::entity selectedEntity = EditorSelection::Get().GetPrimary();
     const auto& selectedEntities = EditorSelection::Get().GetSelectedEntities();
 
-    bool canDrawGizmo = selectedEntity != entt::null &&
+    bool canDrawGizmo = m_DrawGizmos &&
+        selectedEntity != entt::null &&
         engine->GetActiveScene().GetRegistry().valid(selectedEntity) &&
         engine->GetActiveScene().GetRegistry().any_of<TransformComponent>(selectedEntity) &&
         engine->GetActiveScene().GetState() == SceneState::EDIT;
@@ -108,19 +110,7 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
     glm::mat4 view = engine->GetCamera()->GetViewMatrix();
     glm::mat4 projection = engine->GetCamera()->GetProjectionMatrix();
 
-    if (ImGui::IsWindowFocused() || ImGui::IsWindowHovered())
-    {
-        if (!ImGui::GetIO().WantTextInput && !ImGui::IsMouseDown(ImGuiMouseButton_Right) && !ImGuizmo::IsUsing())
-        {
-            if (ImGui::IsKeyPressed(ImGuiKey_T))
-                m_CurrentGizmoMode = (m_CurrentGizmoMode == ImGuizmo::WORLD) ? ImGuizmo::LOCAL : ImGuizmo::WORLD;
 
-            if (ImGui::IsKeyPressed(ImGuiKey_Q)) m_CurrentGizmoOperation = static_cast<ImGuizmo::OPERATION>(-1);
-            if (ImGui::IsKeyPressed(ImGuiKey_W)) m_CurrentGizmoOperation = ImGuizmo::TRANSLATE;
-            if (ImGui::IsKeyPressed(ImGuiKey_E)) m_CurrentGizmoOperation = ImGuizmo::ROTATE;
-            if (ImGui::IsKeyPressed(ImGuiKey_R)) m_CurrentGizmoOperation = ImGuizmo::SCALE;
-        }
-    }
 
     ImGuizmo::GetStyle().RotationLineThickness = 3.0f;
     ImGuizmo::GetStyle().ScaleLineCircleSize = 5.0f;
@@ -333,18 +323,24 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
 void Viewport::DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySize)
 {
     ImDrawList* drawList = ImGui::GetWindowDrawList();
-    ImVec2 toolbarPos = ImVec2(displayPos.x + 10.0f, displayPos.y + 10.0f);
-    ImVec2 toolbarSize = ImVec2(350.0f, 32.0f);
 
-    drawList->AddRectFilled(toolbarPos, ImVec2(toolbarPos.x + toolbarSize.x, toolbarPos.y + toolbarSize.y),
+    const ImVec2 leftToolbarPos = ImVec2(displayPos.x + 10.0f, displayPos.y + 10.0f);
+    const ImVec2 leftToolbarSize = ImVec2(308.0f, 32.0f);
+
+    drawList->AddRectFilled(leftToolbarPos, ImVec2(leftToolbarPos.x + leftToolbarSize.x, leftToolbarPos.y + leftToolbarSize.y),
         IM_COL32(24, 26, 30, 230), 6.0f);
-    drawList->AddRect(toolbarPos, ImVec2(toolbarPos.x + toolbarSize.x, toolbarPos.y + toolbarSize.y),
+    drawList->AddRect(leftToolbarPos, ImVec2(leftToolbarPos.x + leftToolbarSize.x, leftToolbarPos.y + leftToolbarSize.y),
         IM_COL32(50, 54, 62, 255), 6.0f, 0, 1.0f);
 
-    ImGui::SetCursorScreenPos(ImVec2(toolbarPos.x + 4.0f, toolbarPos.y + 4.0f));
+    const float cubeSize = 96.0f;
+    const float margin = 10.0f;
+    const ImVec2 rightToolbarSize = ImVec2(196.0f, 32.0f);
+    const ImVec2 rightToolbarPos = ImVec2(displayPos.x + displaySize.x - margin - cubeSize - 8.0f - rightToolbarSize.x, displayPos.y + margin);
 
-    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.0f);
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(3.0f, 0.0f));
+    drawList->AddRectFilled(rightToolbarPos, ImVec2(rightToolbarPos.x + rightToolbarSize.x, rightToolbarPos.y + rightToolbarSize.y),
+        IM_COL32(24, 26, 30, 230), 6.0f);
+    drawList->AddRect(rightToolbarPos, ImVec2(rightToolbarPos.x + rightToolbarSize.x, rightToolbarPos.y + rightToolbarSize.y),
+        IM_COL32(50, 54, 62, 255), 6.0f, 0, 1.0f);
 
     auto ModeButton = [&](const char* label, bool active, const ImVec2& size = ImVec2(24.0f, 24.0f)) -> bool {
         if (active)
@@ -363,7 +359,12 @@ void Viewport::DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySi
         bool pressed = ImGui::Button(label, size);
         ImGui::PopStyleColor(3);
         return pressed;
-        };
+    };
+
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(3.0f, 0.0f));
+
+    ImGui::SetCursorScreenPos(ImVec2(leftToolbarPos.x + 4.0f, leftToolbarPos.y + 4.0f));
 
     if (ModeButton("P", m_CurrentGizmoOperation == static_cast<ImGuizmo::OPERATION>(-1)))
         m_CurrentGizmoOperation = static_cast<ImGuizmo::OPERATION>(-1);
@@ -401,34 +402,209 @@ void Viewport::DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySi
     ImGui::TextDisabled("|");
     ImGui::SameLine();
 
-    if (ModeButton("Snap", m_EnableSnap, ImVec2(44.0f, 24.0f)))
+    if (ModeButton("Snap", m_EnableSnap, ImVec2(42.0f, 24.0f)))
     {
         m_EnableSnap = !m_EnableSnap;
         EditorSettings::Get().UpdateFromViewport(*this);
         EditorSettings::Get().Save();
     }
-    if (ImGui::IsItemHovered()) ImGui::SetTooltip("Toggle Snapping (Ctrl)");
+    if (ImGui::IsItemHovered()) ImGui::SetTooltip("Toggle Snapping (Ctrl)\nRight-click for Snap Settings");
+    if (ImGui::BeginPopupContextItem("SnapContext"))
+    {
+        ImGui::OpenPopup("SnapSettingsPopup");
+        ImGui::EndPopup();
+    }
+
+    ImGui::SameLine(0, 2.0f);
+    if (ModeButton("##SnapArrow", false, ImVec2(16.0f, 24.0f)))
+        ImGui::OpenPopup("SnapSettingsPopup");
+    {
+        ImVec2 pMin = ImGui::GetItemRectMin();
+        ImVec2 pMax = ImGui::GetItemRectMax();
+        ImVec2 center = ImVec2((pMin.x + pMax.x) * 0.5f, (pMin.y + pMax.y) * 0.5f);
+        drawList->AddTriangleFilled(
+            ImVec2(center.x - 3.5f, center.y - 1.5f),
+            ImVec2(center.x + 3.5f, center.y - 1.5f),
+            ImVec2(center.x, center.y + 2.5f),
+            IM_COL32(180, 185, 195, 240)
+        );
+    }
+    if (ImGui::IsItemHovered()) ImGui::SetTooltip("Snap Settings");
 
     ImGui::SameLine();
     ImGui::TextDisabled("|");
     ImGui::SameLine();
 
-    EditorCamera* cam = engine->GetEditorCamera();
+    if (ModeButton("View", false, ImVec2(46.0f, 24.0f)))
+        ImGui::OpenPopup("ViewportViewPopup");
+    if (ImGui::IsItemHovered()) ImGui::SetTooltip("Viewport Actions & Selection");
 
-    if (ModeButton("Cam", false, ImVec2(38.0f, 24.0f)))
+    ImGui::SetCursorScreenPos(ImVec2(rightToolbarPos.x + 4.0f, rightToolbarPos.y + 4.0f));
+
+    if (ModeButton("Gizmo", m_DrawGizmos, ImVec2(48.0f, 24.0f)))
+    {
+        m_DrawGizmos = !m_DrawGizmos;
+        GizmoPass::s_Enabled = m_DrawGizmos;
+        EditorSettings::Get().UpdateFromViewport(*this);
+        EditorSettings::Get().Save();
+    }
+    if (ImGui::IsItemHovered()) ImGui::SetTooltip("Toggle Gizmos (G)\nRight-click for Gizmo options");
+    if (ImGui::BeginPopupContextItem("GizmoContext"))
+    {
+        ImGui::OpenPopup("GizmoSettingsPopup");
+        ImGui::EndPopup();
+    }
+
+    ImGui::SameLine();
+    ImGui::TextDisabled("|");
+    ImGui::SameLine();
+
+    if (ModeButton("Overlays", false, ImVec2(66.0f, 24.0f)))
+        ImGui::OpenPopup("OverlaysPopup");
+    if (ImGui::IsItemHovered()) ImGui::SetTooltip("Grid, Colliders, Wireframe & Visual Overlays");
+
+    ImGui::SameLine();
+    ImGui::TextDisabled("|");
+    ImGui::SameLine();
+
+    if (ModeButton("Cam", false, ImVec2(42.0f, 24.0f)))
         ImGui::OpenPopup("CameraSettingsPopup");
     if (ImGui::IsItemHovered()) ImGui::SetTooltip("Camera Settings (FOV, Speed, Clips)");
 
-    ImGui::SameLine();
-    ImGui::TextDisabled("|");
-    ImGui::SameLine();
-
-    if (ModeButton("View", false, ImVec2(42.0f, 24.0f)))
-        ImGui::OpenPopup("ViewportSettingsPopup");
-    if (ImGui::IsItemHovered()) ImGui::SetTooltip("Viewport & View Settings");
-
     ImGui::PopStyleVar(2);
 
+
+    if (ImGui::BeginPopup("SnapSettingsPopup"))
+    {
+        bool snapChanged = false;
+        ImGui::TextDisabled("Snapping Values");
+        ImGui::Separator();
+        ImGui::Spacing();
+
+        ImGui::SetNextItemWidth(90);
+        if (ImGui::DragFloat("Translate (m)", &m_snapTranslate, 0.05f, 0.01f, 100.0f, "%.2f")) snapChanged = true;
+
+        ImGui::SetNextItemWidth(90);
+        if (ImGui::DragFloat("Rotate (deg)", &m_snapRotate, 1.0f, 0.1f, 180.0f, "%.1f")) snapChanged = true;
+
+        ImGui::SetNextItemWidth(90);
+        if (ImGui::DragFloat("Scale", &m_snapScale, 0.05f, 0.01f, 10.0f, "%.2f")) snapChanged = true;
+
+        if (snapChanged)
+        {
+            EditorSettings::Get().UpdateFromViewport(*this);
+            EditorSettings::Get().Save();
+        }
+
+        ImGui::EndPopup();
+    }
+
+    if (ImGui::BeginPopup("ViewportViewPopup"))
+    {
+        bool viewChanged = false;
+        const bool hasTransformSelection = EditorUtils::HasTransformSelection(*engine);
+
+        ImGui::TextDisabled("View Actions");
+        ImGui::Separator();
+        ImGui::Spacing();
+
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10.0f, 6.0f));
+        ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
+
+        const float btnWidth = 270.0f;
+        const float btnHeight = 30.0f;
+
+        auto DrawActionButton = [&](const char* label, const char* shortcut, bool enabled, auto onClick) {
+            if (!enabled)
+                ImGui::BeginDisabled();
+
+            ImVec2 p0 = ImGui::GetCursorScreenPos();
+            if (ImGui::Button(label, ImVec2(btnWidth, btnHeight)))
+            {
+                onClick();
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImVec2 textSize = ImGui::CalcTextSize(shortcut);
+            ImDrawList* dl = ImGui::GetWindowDrawList();
+            ImVec2 shortcutPos = ImVec2(p0.x + btnWidth - textSize.x - 12.0f, p0.y + (btnHeight - textSize.y) * 0.5f);
+            dl->AddText(shortcutPos, IM_COL32(160, 165, 175, enabled ? 230 : 110), shortcut);
+
+            if (!enabled)
+                ImGui::EndDisabled();
+        };
+
+        DrawActionButton("Align Transform with View", "Ctrl+Alt+M", hasTransformSelection, [&]() {
+            EditorUtils::AlignSelectedWithView(*engine);
+        });
+
+        ImGui::PopStyleVar(3);
+
+        ImGui::Spacing();
+        ImGui::TextDisabled("Selection");
+        ImGui::Separator();
+        if (ImGui::Checkbox("Select Root Entity", &m_SelectRootEntity)) viewChanged = true;
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("When clicking an entity in the viewport, automatically select the root entity of the tree.");
+
+        if (viewChanged)
+        {
+            EditorSettings::Get().UpdateFromViewport(*this);
+            EditorSettings::Get().Save();
+        }
+
+        ImGui::EndPopup();
+    }
+
+    if (ImGui::BeginPopup("GizmoSettingsPopup"))
+    {
+        bool gizmoChanged = false;
+        ImGui::TextDisabled("Gizmo Settings");
+        ImGui::Separator();
+        ImGui::Spacing();
+
+        if (ImGui::Checkbox("Show Transform Gizmo", &m_DrawGizmos)) gizmoChanged = true;
+        if (ImGui::Checkbox("Show Scene Gizmos (Icons/Frustums)", &GizmoPass::s_Enabled)) gizmoChanged = true;
+
+        if (gizmoChanged)
+        {
+            EditorSettings::Get().UpdateFromViewport(*this);
+            EditorSettings::Get().Save();
+        }
+
+        ImGui::EndPopup();
+    }
+
+    if (ImGui::BeginPopup("OverlaysPopup"))
+    {
+        bool overlaysChanged = false;
+
+        ImGui::TextDisabled("Render Mode");
+        ImGui::Separator();
+        bool wireframePopup = engine->GetRenderLayer().GetWireframe();
+        if (ImGui::Checkbox("Wireframe Mode", &wireframePopup))
+        {
+            engine->GetRenderLayer().SetWireframe(wireframePopup);
+        }
+
+        ImGui::Spacing();
+        ImGui::TextDisabled("Visual Overlays");
+        ImGui::Separator();
+        auto& debugSettings = DebugRenderer::Get().GetSettings();
+        if (ImGui::Checkbox("Infinite Grid", &debugSettings.drawInfiniteGrid)) overlaysChanged = true;
+        if (ImGui::Checkbox("Draw Colliders", &debugSettings.drawColliders)) overlaysChanged = true;
+        if (ImGui::Checkbox("Draw Bounding Boxes", &debugSettings.drawBoundingBoxes)) overlaysChanged = true;
+
+        if (overlaysChanged)
+        {
+            EditorSettings::Get().UpdateFromViewport(*this);
+            EditorSettings::Get().Save();
+        }
+
+        ImGui::EndPopup();
+    }
+
+    EditorCamera* cam = engine->GetEditorCamera();
     if (cam && ImGui::BeginPopup("CameraSettingsPopup"))
     {
         ImGui::TextDisabled("Camera Settings");
@@ -500,97 +676,6 @@ void Viewport::DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySi
         if (camChanged)
         {
             EditorSettings::Get().UpdateFromCamera(*cam);
-            EditorSettings::Get().Save();
-        }
-
-        ImGui::EndPopup();
-    }
-
-    auto& debugSettings = DebugRenderer::Get().GetSettings();
-    if (ImGui::BeginPopup("ViewportSettingsPopup"))
-    {
-        bool viewChanged = false;
-
-        const bool hasTransformSelection = EditorUtils::HasTransformSelection(*engine);
-
-        ImGui::TextDisabled("View Actions");
-        ImGui::Separator();
-        ImGui::Spacing();
-
-        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.0f);
-        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10.0f, 6.0f));
-        ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
-
-        const float btnWidth = 270.0f;
-        const float btnHeight = 30.0f;
-
-        auto DrawActionButton = [&](const char* label, const char* shortcut, bool enabled, auto onClick) {
-            if (!enabled)
-                ImGui::BeginDisabled();
-
-            ImVec2 p0 = ImGui::GetCursorScreenPos();
-            if (ImGui::Button(label, ImVec2(btnWidth, btnHeight)))
-            {
-                onClick();
-                ImGui::CloseCurrentPopup();
-            }
-
-            ImVec2 textSize = ImGui::CalcTextSize(shortcut);
-            ImDrawList* dl = ImGui::GetWindowDrawList();
-            ImVec2 shortcutPos = ImVec2(p0.x + btnWidth - textSize.x - 12.0f, p0.y + (btnHeight - textSize.y) * 0.5f);
-            dl->AddText(shortcutPos, IM_COL32(160, 165, 175, enabled ? 230 : 110), shortcut);
-
-            if (!enabled)
-                ImGui::EndDisabled();
-        };
-
-        DrawActionButton("Align Transform with View", "", hasTransformSelection, [&]() {
-            EditorUtils::AlignSelectedWithView(*engine);
-        });
-
-        ImGui::PopStyleVar(3);
-
-        ImGui::Spacing();
-        ImGui::Separator();
-        ImGui::Spacing();
-
-        ImGui::TextDisabled("Render Mode");
-        ImGui::Separator();
-        bool wireframePopup = engine->GetRenderLayer().GetWireframe();
-        if (ImGui::Checkbox("Wireframe Mode", &wireframePopup))
-        {
-            engine->GetRenderLayer().SetWireframe(wireframePopup);
-        }
-
-        ImGui::Spacing();
-        ImGui::TextDisabled("Selection");
-        ImGui::Separator();
-        if (ImGui::Checkbox("Select Root Entity", &m_SelectRootEntity)) viewChanged = true;
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("When clicking an entity in the viewport, automatically select the root entity of the tree.");
-
-        ImGui::Spacing();
-        ImGui::TextDisabled("Debug Visuals");
-        ImGui::Separator();
-        if (ImGui::Checkbox("Infinite Grid", &debugSettings.drawInfiniteGrid)) viewChanged = true;
-        if (ImGui::Checkbox("Draw Colliders", &debugSettings.drawColliders)) viewChanged = true;
-        if (ImGui::Checkbox("Draw Bounding Boxes", &debugSettings.drawBoundingBoxes)) viewChanged = true;
-
-        ImGui::Spacing();
-        ImGui::TextDisabled("Snapping Values");
-        ImGui::Separator();
-
-        ImGui::SetNextItemWidth(80);
-        if (ImGui::DragFloat("Translate (m)", &m_snapTranslate, 0.05f, 0.01f, 100.0f, "%.2f")) viewChanged = true;
-
-        ImGui::SetNextItemWidth(80);
-        if (ImGui::DragFloat("Rotate (deg)", &m_snapRotate, 1.0f, 0.1f, 180.0f, "%.1f")) viewChanged = true;
-
-        ImGui::SetNextItemWidth(80);
-        if (ImGui::DragFloat("Scale", &m_snapScale, 0.05f, 0.01f, 10.0f, "%.2f")) viewChanged = true;
-
-        if (viewChanged)
-        {
-            EditorSettings::Get().UpdateFromViewport(*this);
             EditorSettings::Get().Save();
         }
 
@@ -682,14 +767,24 @@ void Viewport::HandleSelection(Engine* engine, ImVec2& displayPos, ImVec2& displ
         mousePos.y >= (displayPos.y + margin) &&
         mousePos.y <= (displayPos.y + margin + gizmoSize);
 
-    bool isOverToolbar = mousePos.x >= (displayPos.x + 10.0f) &&
-        mousePos.x <= (displayPos.x + 360.0f) &&
+    const float leftToolbarWidth = 308.0f;
+    const float leftToolbarHeight = 32.0f;
+    bool isOverLeftToolbar = mousePos.x >= (displayPos.x + 10.0f) &&
+        mousePos.x <= (displayPos.x + 10.0f + leftToolbarWidth) &&
         mousePos.y >= (displayPos.y + 10.0f) &&
-        mousePos.y <= (displayPos.y + 42.0f);
+        mousePos.y <= (displayPos.y + 10.0f + leftToolbarHeight);
+
+    const float rightToolbarWidth = 196.0f;
+    const float rightToolbarHeight = 32.0f;
+    float rightToolbarX = displayPos.x + displaySize.x - margin - gizmoSize - 8.0f - rightToolbarWidth;
+    bool isOverRightToolbar = mousePos.x >= rightToolbarX &&
+        mousePos.x <= (rightToolbarX + rightToolbarWidth) &&
+        mousePos.y >= (displayPos.y + margin) &&
+        mousePos.y <= (displayPos.y + margin + rightToolbarHeight);
 
     if (isMouseInViewport && ImGui::IsMouseClicked(ImGuiMouseButton_Left) &&
         !ImGuizmo::IsUsing() && !ImGuizmo::IsOver() &&
-        !isOverOrientationGizmo && !isOverToolbar)
+        !isOverOrientationGizmo && !isOverLeftToolbar && !isOverRightToolbar)
     {
         glm::vec2 mouseViewportPos = { mousePos.x - displayPos.x, mousePos.y - displayPos.y };
 
@@ -898,6 +993,32 @@ void Viewport::Draw(Engine* engine, bool orbitDragActive)
         }
         else
         {
+            if (engine->GetActiveScene().GetState() == SceneState::EDIT)
+            {
+                if (ImGui::IsWindowFocused() || ImGui::IsWindowHovered())
+                {
+                    if (!ImGui::GetIO().WantTextInput && !ImGui::IsMouseDown(ImGuiMouseButton_Right) && !ImGuizmo::IsUsing())
+                    {
+                        if (ImGui::IsKeyPressed(ImGuiKey_T))
+                        {
+                            m_CurrentGizmoMode = (m_CurrentGizmoMode == ImGuizmo::WORLD) ? ImGuizmo::LOCAL : ImGuizmo::WORLD;
+                            EditorSettings::Get().UpdateFromViewport(*this);
+                            EditorSettings::Get().Save();
+                        }
+                        if (ImGui::IsKeyPressed(ImGuiKey_Q)) m_CurrentGizmoOperation = static_cast<ImGuizmo::OPERATION>(-1);
+                        if (ImGui::IsKeyPressed(ImGuiKey_W)) m_CurrentGizmoOperation = ImGuizmo::TRANSLATE;
+                        if (ImGui::IsKeyPressed(ImGuiKey_E)) m_CurrentGizmoOperation = ImGuizmo::ROTATE;
+                        if (ImGui::IsKeyPressed(ImGuiKey_R)) m_CurrentGizmoOperation = ImGuizmo::SCALE;
+                        if (ImGui::IsKeyPressed(ImGuiKey_G))
+                        {
+                            m_DrawGizmos = !m_DrawGizmos;
+                            GizmoPass::s_Enabled = m_DrawGizmos;
+                            EditorSettings::Get().UpdateFromViewport(*this);
+                            EditorSettings::Get().Save();
+                        }
+                    }
+                }
+            }
             DrawGizmos(engine, displayPos, displaySize);
         }
         if(engine->GetActiveScene().GetState() == SceneState::EDIT)

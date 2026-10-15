@@ -536,6 +536,15 @@ void EditorLayer::HandleShortcuts()
             }
         }
 
+        if (Input::IsKeyJustPressed(KeyCode::G))
+        {
+            bool newState = !m_Viewport.GetDrawGizmos();
+            m_Viewport.SetDrawGizmos(newState);
+            GizmoPass::s_Enabled = newState;
+            EditorSettings::Get().UpdateFromViewport(m_Viewport);
+            EditorSettings::Get().Save();
+        }
+
         if (Input::IsKeyJustPressed(KeyCode::Escape))
         {
             EditorSelection::Get().Clear();

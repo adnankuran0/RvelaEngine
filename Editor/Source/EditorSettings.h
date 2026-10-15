@@ -31,6 +31,8 @@ struct ViewportGizmoSettings
     bool DrawBoundingBoxes = false;
     bool DrawInfiniteGrid = true;
     bool SelectRootEntity = true;
+    bool DrawTransformGizmo = true;
+    bool DrawSceneGizmos = true;
 };
 
 class EditorSettings

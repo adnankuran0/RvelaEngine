@@ -24,6 +24,8 @@ struct GizmoInfo
 class GizmoPass : public RenderPass
 {
 public:
+    static inline bool s_Enabled = true;
+
     void Init(const RenderContext& ctx, RenderFrame& frame) override;
     void Execute(const RenderContext& ctx, RenderFrame& frame) override;
 

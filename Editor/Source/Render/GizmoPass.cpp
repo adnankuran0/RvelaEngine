@@ -45,6 +45,9 @@ void GizmoPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     if (ctx.scene->GetState() != SceneState::EDIT)
         return;
 
+    if (!s_Enabled)
+        return;
+
     DrawCameraFrustum(ctx, frame);
     DrawDirectionalLightArrow(ctx, frame);
     DrawSpotLightCone(ctx, frame);

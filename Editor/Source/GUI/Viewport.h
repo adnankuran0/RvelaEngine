@@ -31,6 +31,8 @@ public:
 	void SetGizmoMode(ImGuizmo::MODE m) { m_CurrentGizmoMode = m; }
 	bool GetSelectRootEntity() const { return m_SelectRootEntity; }
 	void SetSelectRootEntity(bool v) { m_SelectRootEntity = v; }
+	bool GetDrawGizmos() const { return m_DrawGizmos; }
+	void SetDrawGizmos(bool v) { m_DrawGizmos = v; }
 
 private:
 	void DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySize);
@@ -45,6 +47,7 @@ private:
 	float m_snapScale = 0.5f;
 	bool m_EnableSnap = false;
 	bool m_SelectRootEntity = true;
+	bool m_DrawGizmos = true;
 
 	ImGuizmo::OPERATION m_CurrentGizmoOperation = ImGuizmo::TRANSLATE;
 	ImGuizmo::MODE m_CurrentGizmoMode = ImGuizmo::WORLD;
