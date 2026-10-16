@@ -58,6 +58,10 @@ public:
     void OnLateUpdate(float dt);
     void OnStop();
 
+    bool IsAutoloadEntity(entt::entity entity);
+    bool IsChangingScene() const noexcept { return m_IsChangingScene; }
+    void SetChangingScene(bool changing) noexcept { m_IsChangingScene = changing; }
+
     bool isLoading = false;
 
     Entity CreateEntity(const std::string& name);
@@ -180,6 +184,7 @@ private:
     friend class Entity;
     SceneState m_State = SceneState::EDIT;
     bool m_IsDirty = false;
+    bool m_IsChangingScene = false;
     std::string m_SceneName;
     std::string m_ScenePath;
     std::unordered_map<EntityUUID, entt::entity> m_EntityMap;

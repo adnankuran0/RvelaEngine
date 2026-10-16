@@ -34,6 +34,7 @@ void IconLibrary::Init()
     lib.LoadIcon(EditorIcon::Probe, "Icons\\probe.png");
     lib.LoadIcon(EditorIcon::Scene, "Icons\\scene.png");
     lib.LoadIcon(EditorIcon::Script, "Icons\\script.png");
+    lib.LoadIcon(EditorIcon::Shader, "Icons\\shader.png");
     lib.LoadIcon(EditorIcon::SpotLight, "Icons\\spotlight.png");
     lib.LoadIcon(EditorIcon::Texture, "Icons\\texture.png");
     lib.LoadIcon(EditorIcon::Audio, "Icons\\audio.png");

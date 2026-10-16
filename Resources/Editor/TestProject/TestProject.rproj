@@ -10,13 +10,7 @@
     "name": "TestProject",
     "projectPath": "C:\\RvelaEngine\\Resources\\Editor\\TestProject",
     "settings": {
-        "autoloads": [
-            {
-                "enabled": true,
-                "name": "SingletonTest",
-                "path": "Assets/Scripts/SingletonTest.lua"
-            }
-        ],
+        "autoloads": [],
         "borderless": false,
         "fxaaEnabled": true,
         "maxFPS": 0,

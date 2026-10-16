@@ -666,6 +666,11 @@ void ScriptSystem::OnStart()
         if (m_Scene.HasComponent<ScriptComponent>(entity))
         {
             auto& sc = m_Scene.GetComponent<ScriptComponent>(entity);
+            if (sc.runtimeReady)
+            {
+                continue;
+            }
+
             EnsureScriptInitialized(sc, entity);
             if (sc.luaInstance.valid())
             {
@@ -678,6 +683,10 @@ void ScriptSystem::OnStart()
         }
         else
         {
+            if (lua[ac.name].valid())
+            {
+                continue;
+            }
             lua[ac.name] = Entity(entity, &m_Scene);
         }
         LOG_INFO("[Autoload] Registered global Lua singleton: '{}'", ac.name);
@@ -803,6 +812,9 @@ void ScriptSystem::OnStop()
     auto scView = m_Scene.GetRegistry().view<ScriptComponent>();
     for (auto entity : scView)
     {
+        if (m_Scene.IsChangingScene() && m_Scene.IsAutoloadEntity(entity))
+            continue;
+
         auto& sc = scView.get<ScriptComponent>(entity);
 
         OnEntityDestroyed(entity);

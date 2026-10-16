@@ -21,6 +21,7 @@ enum class EditorIcon
 	Probe,
 	Scene,
 	Script,
+	Shader,
 	SpotLight,
 	Texture,
 	Audio,

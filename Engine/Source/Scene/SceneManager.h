@@ -38,6 +38,10 @@ public:
     void Update();
     void FixedUpdate();
     void LateUpdate();
+
+    void CaptureAutoloadStates(Scene& scene);
+    void RestoreAutoloadStates(Scene& scene);
+
 private:
     std::string m_PendingScenePath = "";
     bool m_HasPendingScene = false; 
@@ -50,8 +54,6 @@ private:
     std::string m_SnapshotSceneName = "";
     bool m_SnapshotIsDirty = false;
 
-    void CaptureAutoloadStates(Scene& scene);
-    void RestoreAutoloadStates(Scene& scene);
     std::unordered_map<std::string, json> m_AutoloadStates;
 };
 

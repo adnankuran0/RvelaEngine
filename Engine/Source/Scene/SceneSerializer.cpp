@@ -10,14 +10,7 @@ using namespace rv;
 
 static bool IsAutoloadEntity(Scene& scene, entt::entity e)
 {
-    entt::entity cur = e;
-    while (cur != entt::null && scene.GetRegistry().valid(cur) && cur != scene.GetRootEntity())
-    {
-        if (scene.HasComponent<AutoloadComponent>(cur))
-            return true;
-        cur = scene.GetParent(cur);
-    }
-    return false;
+    return scene.IsAutoloadEntity(e);
 }
 
 void SceneSerializer::SerializeHierarchyRecursively(Scene& scene, entt::entity current, json& outEntitiesArray, const std::unordered_set<entt::entity>& prefabChildren)

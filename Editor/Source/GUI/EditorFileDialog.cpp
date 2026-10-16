@@ -23,7 +23,9 @@ static ImTextureID ResolveFileIcon(const std::string& extension, bool isDirector
     if (extension == ".rscene") return (ImTextureID)(intptr_t)lib.GetIcon(EditorIcon::Scene).GetID();
     if (extension == ".rprefab") return (ImTextureID)(intptr_t)lib.GetIcon(EditorIcon::Prefab).GetID();
     if (extension == ".rmat" || extension == ".Material") return (ImTextureID)(intptr_t)lib.GetIcon(EditorIcon::Material).GetID();
-    if (extension == ".lua" || extension == ".glsl" || extension == ".rshader")
+    if (extension == ".rshader" || extension == ".glsl")
+        return (ImTextureID)(intptr_t)lib.GetIcon(EditorIcon::Shader).GetID();
+    if (extension == ".lua")
         return (ImTextureID)(intptr_t)lib.GetIcon(EditorIcon::Script).GetID();
     if (extension == ".rmesh" || extension == ".glb" || extension == ".fbx" || extension == ".obj")
         return (ImTextureID)(intptr_t)lib.GetIcon(EditorIcon::Mesh).GetID();

@@ -1,5 +1,6 @@
 #include "rvelapch.h"
 #include "Scene.h"
+#include "SceneManager.h"
 #include "SceneSerializer.h"
 #include "Entity.h"
 #include "Core/Time.h"
@@ -146,9 +147,25 @@ void Scene::InstantiateAutoloads()
     }
 }
 
+bool Scene::IsAutoloadEntity(entt::entity entity)
+{
+    entt::entity cur = entity;
+    while (cur != entt::null && m_Registry.valid(cur) && cur != m_RootEntity)
+    {
+        if (m_Registry.any_of<AutoloadComponent>(cur))
+            return true;
+        cur = GetParent(cur);
+    }
+    return false;
+}
+
 void Scene::OnStart()
 {
     InstantiateAutoloads();
+    if (Engine::Get())
+    {
+        Engine::Get()->GetSceneManager().RestoreAutoloadStates(*this);
+    }
     m_PhysicsSystem.OnStart();
     m_ScriptSystem.OnStart();
     m_AudioSystem.OnStart();
@@ -200,6 +217,7 @@ void Scene::OnStop()
     m_ScriptSystem.OnStop();
     m_AudioSystem.OnStop();
     m_PhysicsSystem.OnStop();
+    m_IsChangingScene = false;
 }
 
 Entity Scene::CreateEntityRaw()

@@ -1,5 +1,6 @@
 #include "rvelapch.h"
 #include "SceneManager.h"
+#include "Entity.h"
 #include "json.hpp"
 #include "EntityUUID.h"  
 #include "Core/Log.h"
@@ -8,6 +9,7 @@
 #include "Asset/AssetManager.h"
 #include "Components/AutoloadComponent.h"
 #include "Components/ScriptComponent.h"
+#include "Components/TransformComponent.h"
 #include "Script/ScriptUtils.h"
 #include <filesystem>
 
@@ -189,23 +191,24 @@ void SceneManager::Update()
 			return;
 
 		const SceneState previousState = m_CurrentScene ? m_CurrentScene->GetState() : SceneState::EDIT;
-		if (m_CurrentScene && previousState == SceneState::PLAY)
+		if (m_CurrentScene && (previousState == SceneState::PLAY || previousState == SceneState::PAUSE))
 		{
 			CaptureAutoloadStates(*m_CurrentScene);
 		}
 		if (m_CurrentScene && previousState != SceneState::EDIT)
+		{
+			m_CurrentScene->SetChangingScene(true);
 			m_CurrentScene->SetState(SceneState::EDIT);
+		}
 
 		SetActiveScene(std::move(scenePtr));
 		if (previousState == SceneState::PLAY)
 		{
 			m_CurrentScene->SetState(SceneState::PLAY);
-			RestoreAutoloadStates(*m_CurrentScene);
 		}
 		else if (previousState == SceneState::PAUSE)
 		{
 			m_CurrentScene->SetState(SceneState::PLAY);
-			RestoreAutoloadStates(*m_CurrentScene);
 			m_CurrentScene->SetState(SceneState::PAUSE);
 		}
     }
@@ -227,7 +230,38 @@ void SceneManager::CaptureAutoloadStates(Scene& scene)
 				state["lua"] = ScriptUtils::SerializeLuaInstanceData(sc.luaInstance);
 			}
 		}
+		if (scene.HasComponent<TransformComponent>(e))
+		{
+			const auto& tc = scene.GetComponent<TransformComponent>(e);
+			const auto& pos = tc.GetPosition();
+			const auto& rot = tc.GetEulerRotation();
+			const auto& scl = tc.GetScale();
+			state["transform"] = {
+				{ "position", { pos.x, pos.y, pos.z } },
+				{ "rotation", { rot.x, rot.y, rot.z } },
+				{ "scale", { scl.x, scl.y, scl.z } }
+			};
+		}
 		m_AutoloadStates[ac.name] = state;
+	}
+}
+
+static void MarkAutoloadDescendantsReady(Scene& scene, entt::entity parent)
+{
+	if (!scene.HasComponent<SceneTreeComponent>(parent)) return;
+	const auto& children = scene.GetComponent<SceneTreeComponent>(parent).children;
+	for (entt::entity child : children)
+	{
+		if (scene.HasComponent<ScriptComponent>(child))
+		{
+			auto& sc = scene.GetComponent<ScriptComponent>(child);
+			if (!sc.luaInstance.valid())
+				scene.GetScriptSystem().BindLuaScript(sc, child);
+			sc.runtimeInitialized = true;
+			sc.runtimeEnabled = true;
+			sc.runtimeReady = true;
+		}
+		MarkAutoloadDescendantsReady(scene, child);
 	}
 }
 
@@ -242,14 +276,45 @@ void SceneManager::RestoreAutoloadStates(Scene& scene)
 		if (it == m_AutoloadStates.end()) continue;
 
 		const json& state = it->second;
-		if (state.contains("lua") && scene.HasComponent<ScriptComponent>(e))
+		if (state.contains("transform") && scene.HasComponent<TransformComponent>(e))
+		{
+			auto& tc = scene.GetComponent<TransformComponent>(e);
+			const auto& t = state["transform"];
+			if (t.contains("position")) tc.SetPosition(glm::vec3(t["position"][0], t["position"][1], t["position"][2]));
+			if (t.contains("rotation")) tc.SetEulerRotation(glm::vec3(t["rotation"][0], t["rotation"][1], t["rotation"][2]));
+			if (t.contains("scale")) tc.SetScale(glm::vec3(t["scale"][0], t["scale"][1], t["scale"][2]));
+		}
+
+		if (scene.HasComponent<ScriptComponent>(e))
 		{
 			auto& sc = scene.GetComponent<ScriptComponent>(e);
-			if (sc.luaInstance.valid())
+			if (!sc.luaInstance.valid())
+			{
+				scene.GetScriptSystem().BindLuaScript(sc, e);
+			}
+
+			if (state.contains("lua") && sc.luaInstance.valid())
 			{
 				ScriptUtils::DeserializeLuaInstanceData(state["lua"], sc.luaInstance);
 			}
+
+			sc.runtimeInitialized = true;
+			sc.runtimeEnabled = true;
+			sc.runtimeReady = true;
+
+			sol::state& lua = scene.GetScriptSystem().GetLuaState();
+			if (sc.luaInstance.valid())
+				lua[ac.name] = sc.luaInstance;
+			else
+				lua[ac.name] = Entity(e, &scene);
 		}
+		else
+		{
+			sol::state& lua = scene.GetScriptSystem().GetLuaState();
+			lua[ac.name] = Entity(e, &scene);
+		}
+
+		MarkAutoloadDescendantsReady(scene, e);
 	}
 }
 

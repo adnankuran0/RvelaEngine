@@ -113,6 +113,34 @@ static std::vector<BrowserItem> s_CachedItems;
 static std::vector<BrowserItem> s_SearchItemResults;
 static std::vector<DirNode> s_DirectoryTree;
 
+static void SetSingleSelection(const std::filesystem::path& path)
+{
+    if (path.empty())
+    {
+        ClearSelectionInternal();
+        return;
+    }
+
+    s_SelectedPaths.clear();
+    s_SelectedPaths.push_back(path);
+    s_SelectedItemPath = path;
+
+    std::error_code ec;
+    s_SelectedIsDir = std::filesystem::is_directory(path, ec);
+    s_SelectedFileSize = s_SelectedIsDir ? 0 : std::filesystem::file_size(path, ec);
+    s_LastSelectedIndex = -1;
+    for (size_t i = 0; i < s_CachedItems.size(); ++i)
+    {
+        if (s_CachedItems[i].path == path)
+        {
+            s_LastSelectedIndex = (int)i;
+            break;
+        }
+    }
+    s_DeselectOthersOnMouseRelease = false;
+    s_DeselectTargetIndex = -1;
+}
+
 static bool s_NeedsRefresh = true;
 static bool s_DirectoryTreeDirty = true;
 static bool s_BreadcrumbsDirty = true;
@@ -120,6 +148,7 @@ static std::vector<std::pair<std::string, std::filesystem::path>> s_CachedBreadc
 static float s_ThumbnailSize = 56.0f;
 
 static bool s_RenamingActive = false;
+static bool s_RenameJustCommitted = false;
 static std::filesystem::path s_RenamingPath;
 static char s_RenameBuffer[256] = "";
 static std::string s_RenameExtension;
@@ -556,26 +585,41 @@ static void BeginRenameForNew(const std::filesystem::path& path)
     const std::string initial = isDir ? path.filename().string() : path.stem().string();
     strncpy_s(s_RenameBuffer, sizeof(s_RenameBuffer), initial.c_str(), _TRUNCATE);
     s_SearchBuffer[0] = '\0';
+    SetSingleSelection(path);
     s_NeedsRefresh = true;
     s_DirectoryTreeDirty = true;
 }
 
 static void RenamePathWithMeta(const std::filesystem::path& oldPath, const std::string& newName)
 {
-    if (newName.empty()) return;
+    if (newName.empty())
+    {
+        SetSingleSelection(oldPath);
+        return;
+    }
 
     auto newPath = oldPath.parent_path() / newName;
-    if (newPath == oldPath) return;
+    if (newPath == oldPath)
+    {
+        SetSingleSelection(newPath);
+        return;
+    }
 
     if (std::filesystem::exists(newPath))
     {
         LOG_WARN("Rename skipped, already exists: {}", newName);
+        SetSingleSelection(oldPath);
         return;
     }
 
     std::error_code ec;
     std::filesystem::rename(oldPath, newPath, ec);
-    if (ec) { LOG_ERROR("Rename failed: {}", ec.message()); return; }
+    if (ec)
+    {
+        LOG_ERROR("Rename failed: {}", ec.message());
+        SetSingleSelection(oldPath);
+        return;
+    }
 
     auto oldMeta = std::filesystem::path(oldPath.string() + ".rmeta");
     auto newMeta = std::filesystem::path(newPath.string() + ".rmeta");
@@ -613,12 +657,7 @@ static void RenamePathWithMeta(const std::filesystem::path& oldPath, const std::
     reg.Scan(reg.GetAssetDir());
     EditorUtils::ClearAssetFileNameCache();
 
-    auto it = std::find(s_SelectedPaths.begin(), s_SelectedPaths.end(), oldPath);
-    if (it != s_SelectedPaths.end())
-        *it = newPath;
-
-    if (s_SelectedItemPath == oldPath)
-        s_SelectedItemPath = newPath;
+    SetSingleSelection(newPath);
 
     s_NeedsRefresh = true;
     s_DirectoryTreeDirty = true;
@@ -727,7 +766,9 @@ static ImTextureID ResolveFileIcon(const std::string& extension, bool isDirector
     if (extension == ".ranimlib" || extension == ".Animation") return lib.GetIcon(EditorIcon::AnimLib).GetID();
     if (extension == ".rskmesh" || extension == ".SkeletalMesh") return lib.GetIcon(EditorIcon::Skinned).GetID();
     if (extension == ".rskeleton" || extension == ".Skeleton") return lib.GetIcon(EditorIcon::Skeleton).GetID();
-    if (extension == ".lua" || extension == ".glsl" || extension == ".rshader")
+    if (extension == ".rshader" || extension == ".glsl")
+        return lib.GetIcon(EditorIcon::Shader).GetID();
+    if (extension == ".lua")
         return lib.GetIcon(EditorIcon::Script).GetID();
 
     return lib.GetIcon(EditorIcon::Script).GetID();
@@ -873,6 +914,20 @@ static void RefreshAssets(const std::filesystem::path& directory)
     if (!IsSelected(s_SelectedItemPath))
         s_SelectedItemPath = s_SelectedPaths.empty() ? std::filesystem::path() : s_SelectedPaths.back();
 
+    if (!s_SelectedItemPath.empty())
+    {
+        for (size_t i = 0; i < s_CachedItems.size(); ++i)
+        {
+            if (s_CachedItems[i].path == s_SelectedItemPath)
+            {
+                s_SelectedIsDir = s_CachedItems[i].isDirectory;
+                s_SelectedFileSize = s_CachedItems[i].fileSize;
+                s_LastSelectedIndex = (int)i;
+                break;
+            }
+        }
+    }
+
     s_NeedsRefresh = false;
 }
 
@@ -912,6 +967,75 @@ static void OpenInVSCode(const std::filesystem::path& targetPath)
         cmd = "code \"" + targetPath.string() + "\"";
     }
     std::system(cmd.c_str());
+}
+
+static void OpenBrowserItem(const BrowserItem& item, Engine* engine)
+{
+    if (item.isDirectory)
+    {
+        NavigateTo(item.path);
+    }
+    else if (IsModelFile(item.path) && item.subAssetCount > 0)
+    {
+        NavigateTo(item.path);
+    }
+    else if (item.isSubAsset && (item.extension == ".Mesh" || item.extension == ".SkeletalMesh"))
+    {
+        AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(item.path.string());
+        if (uuid.IsValid() && engine)
+        {
+            glm::vec3 spawnPos(0.0f);
+            if (auto* cam = engine->GetEditorCamera())
+                spawnPos = cam->Position + cam->Front * 5.0f;
+            Entity e = engine->GetActiveScene().CreateEntity(item.stem);
+            e.GetComponent<TransformComponent>().SetPosition(spawnPos);
+            if (item.extension == ".Mesh")
+            {
+                e.AddComponent<MeshComponent>().SetMesh(uuid);
+                e.AddComponent<MeshRendererComponent>();
+            }
+            else
+            {
+                e.AddComponent<SkeletalMeshComponent>().SetMesh(uuid);
+                e.AddComponent<SkeletalMeshRendererComponent>();
+            }
+            EditorSelection::Get().Select(e.GetHandle());
+        }
+    }
+    else if (item.extension == ".rscene")
+    {
+        if (engine)
+            engine->GetSceneManager().LoadScene(item.path.string());
+    }
+    else if (item.extension == ".rprefab")
+    {
+        AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(item.path.string());
+        if (uuid.IsValid() && engine)
+        {
+            glm::vec3 spawnPos(0.0f);
+            if (auto* cam = engine->GetEditorCamera())
+                spawnPos = cam->Position + cam->Front * 5.0f;
+            Entity inst = engine->GetActiveScene().Instantiate(uuid, spawnPos);
+            if (inst.GetHandle() != entt::null)
+                EditorSelection::Get().Select(inst.GetHandle());
+        }
+    }
+    else if (item.extension == ".glsl" || item.extension == ".lua" || item.extension == ".rshader")
+    {
+        if (item.extension == ".lua")
+            OpenInVSCode(item.path);
+        else
+        {
+            std::string command = "code \"" + item.path.string() + "\"";
+            std::system(command.c_str());
+        }
+    }
+    else if (item.extension == ".png" || item.extension == ".jpeg" ||
+             item.extension == ".jpg" || item.extension == ".tga")
+    {
+        std::string command = "\"" + item.path.string() + "\"";
+        std::system(command.c_str());
+    }
 }
 
 static void DrawBackgroundContextMenu(Engine* engine, const std::filesystem::path& currentDir)
@@ -1153,6 +1277,8 @@ static void DrawItemContextMenu(const std::filesystem::path& itemPath, AssetImpo
 
 void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDirectory, AssetImportPipeline& importPipeline)
 {
+    s_RenameJustCommitted = false;
+
     if (s_CurrentDirectory.empty() || !std::filesystem::exists(s_CurrentDirectory))
     {
         s_CurrentDirectory = rootDirectory;
@@ -1451,7 +1577,12 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
 
         const ImVec2 cellPos = ImGui::GetCursorScreenPos();
         const float itemRelativeY = cellPos.y - childScreenPos.y + scrollY;
-        const bool isVisible = (itemRelativeY >= clipMinY && itemRelativeY <= clipMaxY);
+        const bool isRenamingThisItem = (s_RenamingActive && s_RenamingPath == item.path);
+        if (isRenamingThisItem)
+        {
+            ImGui::SetScrollHereY(0.5f);
+        }
+        const bool isVisible = isRenamingThisItem || (itemRelativeY >= clipMinY && itemRelativeY <= clipMaxY);
 
         const ImVec2 cardMin = cellPos;
         const ImVec2 cardMax = ImVec2(cellPos.x + cardWidth, cellPos.y + cardHeight);
@@ -1589,10 +1720,12 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
             {
                 RenamePathWithMeta(s_RenamingPath, std::string(s_RenameBuffer) + s_RenameExtension);
                 s_RenamingActive = false;
+                s_RenameJustCommitted = true;
             }
             if (ImGui::IsKeyPressed(ImGuiKey_Escape))
             {
                 s_RenamingActive = false;
+                SetSingleSelection(s_RenamingPath);
             }
         }
         else
@@ -1649,6 +1782,12 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
 
         if (isClicked)
         {
+            if (s_RenamingActive && item.path != s_RenamingPath)
+            {
+                RenamePathWithMeta(s_RenamingPath, std::string(s_RenameBuffer) + s_RenameExtension);
+                s_RenamingActive = false;
+            }
+
             if (io.KeyCtrl)
             {
                 auto it = std::find(s_SelectedPaths.begin(), s_SelectedPaths.end(), item.path);
@@ -1743,70 +1882,7 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
 
         if (isDoubleClicked)
         {
-            if (item.isDirectory)
-            {
-                NavigateTo(item.path);
-            }
-            else if (IsModelFile(item.path) && item.subAssetCount > 0)
-            {
-                NavigateTo(item.path);
-            }
-            else if (item.isSubAsset && (item.extension == ".Mesh" || item.extension == ".SkeletalMesh"))
-            {
-                AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(item.path.string());
-                if (uuid.IsValid())
-                {
-                    glm::vec3 spawnPos(0.0f);
-                    if (auto* cam = engine->GetEditorCamera())
-                        spawnPos = cam->Position + cam->Front * 5.0f;
-                    Entity e = engine->GetActiveScene().CreateEntity(item.stem);
-                    e.GetComponent<TransformComponent>().SetPosition(spawnPos);
-                    if (item.extension == ".Mesh")
-                    {
-                        e.AddComponent<MeshComponent>().SetMesh(uuid);
-                        e.AddComponent<MeshRendererComponent>();
-                    }
-                    else
-                    {
-                        e.AddComponent<SkeletalMeshComponent>().SetMesh(uuid);
-                        e.AddComponent<SkeletalMeshRendererComponent>();
-                    }
-                    EditorSelection::Get().Select(e.GetHandle());
-                }
-            }
-            else if (item.extension == ".rscene")
-            {
-                engine->GetSceneManager().LoadScene(item.path.string());
-            }
-            else if (item.extension == ".rprefab")
-            {
-                AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(item.path.string());
-                if (uuid.IsValid())
-                {
-                    glm::vec3 spawnPos(0.0f);
-                    if (auto* cam = engine->GetEditorCamera())
-                        spawnPos = cam->Position + cam->Front * 5.0f;
-                    Entity inst = engine->GetActiveScene().Instantiate(uuid, spawnPos);
-                    if (inst.GetHandle() != entt::null)
-                        EditorSelection::Get().Select(inst.GetHandle());
-                }
-            }
-            else if (item.extension == ".glsl" || item.extension == ".lua" || item.extension == ".rshader")
-            {
-                if (item.extension == ".lua")
-                    OpenInVSCode(item.path);
-                else
-                {
-                    std::string command = "code \"" + item.path.string() + "\"";
-                    std::system(command.c_str());
-                }
-            }
-            else if (item.extension == ".png" || item.extension == ".jpeg" ||
-                     item.extension == ".jpg" || item.extension == ".tga")
-            {
-                std::string command = "\"" + item.path.string() + "\"";
-                std::system(command.c_str());
-            }
+            OpenBrowserItem(item, engine);
         }
 
         ImGui::EndGroup();
@@ -1948,6 +2024,28 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
             BeginRenameForNew(s_SelectedItemPath);
         }
 
+        const bool enterPressed = ImGui::IsKeyPressed(ImGuiKey_Enter) || ImGui::IsKeyPressed(ImGuiKey_KeypadEnter);
+        if (enterPressed && !s_RenamingActive && !s_RenameJustCommitted && !io.WantTextInput && !s_SelectedItemPath.empty())
+        {
+            auto it = std::find_if(itemsToShow.begin(), itemsToShow.end(),
+                [](const BrowserItem& bi) { return bi.path == s_SelectedItemPath; });
+            if (it != itemsToShow.end())
+            {
+                OpenBrowserItem(*it, engine);
+            }
+            else
+            {
+                BrowserItem tempItem;
+                tempItem.path = s_SelectedItemPath;
+                tempItem.filename = s_SelectedItemPath.filename().string();
+                tempItem.stem = s_SelectedItemPath.stem().string();
+                tempItem.extension = s_SelectedItemPath.extension().string();
+                std::error_code ec;
+                tempItem.isDirectory = std::filesystem::is_directory(s_SelectedItemPath, ec);
+                OpenBrowserItem(tempItem, engine);
+            }
+        }
+
         if (ImGui::IsKeyPressed(ImGuiKey_Delete) && !s_SelectedPaths.empty() && !s_RenamingActive)
         {
             DeleteSelectedPathsWithMeta();
@@ -2069,6 +2167,9 @@ void AssetBrowserPanel::HandleFileDrop(FileDroppedEvent& event, AssetImportPipel
 
     for (const auto& path : toImport)
         importPipeline.ImportAsset(path, AssetManager::Get().GetRegistry());
+
+    if (!toImport.empty())
+        SetSingleSelection(toImport.back());
 
     s_NeedsRefresh = true;
     s_DirectoryTreeDirty = true;
