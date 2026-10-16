@@ -61,6 +61,7 @@ void Renderer::Init(GLFWwindow* window)
     ShaderManager::Add(Shader("Decal", ENGINE_PATH("Shaders\\decal.glsl")));
     ShaderManager::Add(Shader("Gizmo", ENGINE_PATH("Shaders\\gizmo.glsl")));
     ShaderManager::Add(Shader("UI", ENGINE_PATH("Shaders\\ui.glsl")));
+    ShaderManager::Add(Shader("DebugBuffer", ENGINE_PATH("Shaders\\debugBuffer.glsl")));
 
     m_ScreenQuad.Init();
 }

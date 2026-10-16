@@ -4,6 +4,7 @@
 #include "RenderCommand.h"
 #include "RenderFrame.h"
 #include "UniformBuffer.h"
+#include "RenderTypes.h"
 
 namespace rv {
 
@@ -29,10 +30,25 @@ public:
 	void OnResize(uint32_t width, uint32_t height);
 	void Execute(const RenderContext& ctx);
 
-	[[nodiscard]] inline GLuint GetFinalTexture() noexcept { return m_RenderFrame.registry.Get("FinalTexture")->id; }
-	[[nodiscard]] inline GLuint GetFinalFramebuffer() noexcept { return m_RenderFrame.registry.Get("FinalFramebuffer")->id; }
-	[[nodiscard]] inline GLuint GetEntityBuffer() noexcept { return m_RenderFrame.registry.Get("EntityBuffer")->id; }
+	[[nodiscard]] inline GLuint GetFinalTexture() noexcept
+	{
+		if (m_DebugBufferMode != DebugBufferMode::None)
+		{
+			auto r = m_RenderFrame.registry.Get("DebugBufferTexture");
+			if (r && r->id != 0)
+				return r->id;
+		}
+		auto r = m_RenderFrame.registry.Get("FinalTexture");
+		return r ? r->id : 0;
+	}
+	[[nodiscard]] inline GLuint GetFinalFramebuffer() noexcept { auto r = m_RenderFrame.registry.Get("FinalFramebuffer"); return r ? r->id : 0; }
+	[[nodiscard]] inline GLuint GetEntityBuffer() noexcept { auto r = m_RenderFrame.registry.Get("EntityBuffer"); return r ? r->id : 0; }
 	[[nodiscard]] inline GLuint GetDepthTexture() noexcept { auto r = m_RenderFrame.registry.Get("DepthTexture"); return r ? r->id : 0; }
+
+	void SetDebugBufferMode(DebugBufferMode mode) noexcept { m_DebugBufferMode = mode; }
+	[[nodiscard]] DebugBufferMode GetDebugBufferMode() const noexcept { return m_DebugBufferMode; }
+	void SetDebugBufferLayer(int layer) noexcept { m_DebugBufferLayer = layer; }
+	[[nodiscard]] int GetDebugBufferLayer() const noexcept { return m_DebugBufferLayer; }
 
 private:
 	void UpdateUBOs(const RenderContext& ctx);
@@ -50,6 +66,9 @@ private:
 
 	std::unique_ptr<UniformBuffer> m_CameraUBO;
 	std::unique_ptr<UniformBuffer> m_LightUBO;
+
+	DebugBufferMode m_DebugBufferMode = DebugBufferMode::None;
+	int m_DebugBufferLayer = 0;
 };
 
 }

@@ -13,6 +13,7 @@
 #include "Panels/ProjectSelectorPanel.h"
 #include "EditorSettings.h"
 #include "Commands/CommandHistory.h"
+#include "Renderer/RenderLayer.h"
 
 using namespace rv;
 
@@ -149,6 +150,38 @@ void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter,
             if (ImGui::MenuItem("Align Transform with View", "", false, hasTransformSelection))
             {
                 EditorUtils::AlignSelectedWithView(*engine);
+            }
+
+            ImGui::Separator();
+            if (ImGui::BeginMenu("Debug Buffers"))
+            {
+                DebugBufferMode curMode = engine->GetRenderLayer().GetDebugBufferMode();
+                auto BufferMenuItem = [&](const char* label, DebugBufferMode targetMode) {
+                    if (ImGui::MenuItem(label, nullptr, curMode == targetMode))
+                    {
+                        engine->GetRenderLayer().SetDebugBufferMode(targetMode);
+                    }
+                };
+
+                BufferMenuItem("Default", DebugBufferMode::None);
+                ImGui::Separator();
+                BufferMenuItem("Normal", DebugBufferMode::Normal);
+                BufferMenuItem("Depth", DebugBufferMode::Depth);
+                BufferMenuItem("Roughness", DebugBufferMode::Roughness);
+                BufferMenuItem("Metallic", DebugBufferMode::Metallic);
+                ImGui::Separator();
+                BufferMenuItem("Directional Shadow Map", DebugBufferMode::DirectionalShadow);
+                BufferMenuItem("Spot Shadow Map", DebugBufferMode::SpotShadow);
+                ImGui::Separator();
+                BufferMenuItem("SSAO", DebugBufferMode::SSAO);
+                BufferMenuItem("SSGI", DebugBufferMode::SSGI);
+                BufferMenuItem("SSR", DebugBufferMode::SSR);
+                ImGui::Separator();
+                BufferMenuItem("Bloom", DebugBufferMode::Bloom);
+                BufferMenuItem("Bright", DebugBufferMode::BrightPass);
+                BufferMenuItem("Screen Color", DebugBufferMode::ScreenColor);
+                BufferMenuItem("Entity ID Buffer", DebugBufferMode::EntityID);
+                ImGui::EndMenu();
             }
 
             ImGui::EndMenu();

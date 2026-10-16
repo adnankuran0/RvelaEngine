@@ -6,6 +6,24 @@ namespace rv {
 inline constexpr int MaxPointLights = 20;
 inline constexpr int MaxSpotLights = 8;
 
+enum class DebugBufferMode : uint8_t
+{
+    None = 0,
+    Normal,
+    Depth,
+    Roughness,
+    Metallic,
+    SSAO,
+    SSGI,
+    SSR,
+    DirectionalShadow,
+    SpotShadow,
+    Bloom,
+    BrightPass,
+    EntityID,
+    ScreenColor
+};
+
 enum class ShadingMode : uint8_t
 {
     Lit = 0,

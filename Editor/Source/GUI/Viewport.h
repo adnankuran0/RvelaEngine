@@ -39,6 +39,7 @@ private:
 	void DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySize);
 	void DrawOverlayStats(Engine* engine, ImVec2& displayPos, ImVec2& displaySize);
 	void DrawOrientationGizmo(Engine* engine, ImVec2& displayPos, ImVec2& displaySize);
+	void DrawDebugBufferBadge(Engine* engine, ImVec2& displayPos, ImVec2& displaySize);
 	void HandleSelection(Engine* engine, ImVec2& displayPos, ImVec2& displaySize);
 
 private:

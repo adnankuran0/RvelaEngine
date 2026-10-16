@@ -19,6 +19,7 @@
 #include "Renderer/RenderPasses/TransparentPass.h"
 #include "Renderer/RenderPasses/ParticlePass.h"
 #include "Renderer/RenderPasses/DecalPass.h"
+#include "Renderer/RenderPasses/DebugBufferPass.h"
 
 using namespace rv;
 
@@ -42,6 +43,7 @@ RenderPipeline::RenderPipeline()
 	PushRenderPass(std::make_unique<BloomPass>());
 	PushRenderPass(std::make_unique<CompositePass>());
 	PushRenderPass(std::make_unique<DebugPass>());
+	PushRenderPass(std::make_unique<DebugBufferPass>(this));
 }
 
 void RenderPipeline::EnsureInitialized(const RenderContext& ctx)

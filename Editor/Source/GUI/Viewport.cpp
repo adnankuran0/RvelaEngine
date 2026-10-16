@@ -441,27 +441,37 @@ void Viewport::DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySi
 
     ImGui::SetCursorScreenPos(ImVec2(rightToolbarPos.x + 4.0f, rightToolbarPos.y + 4.0f));
 
-    if (ModeButton("Gizmo", m_DrawGizmos, ImVec2(48.0f, 24.0f)))
+    DebugBufferMode curDebugMode = engine->GetRenderLayer().GetDebugBufferMode();
+    const char* bufBtnLabel = "Display";
+    float bufBtnWidth = 56.0f;
+    switch (curDebugMode)
     {
-        m_DrawGizmos = !m_DrawGizmos;
-        GizmoPass::s_Enabled = m_DrawGizmos;
-        EditorSettings::Get().UpdateFromViewport(*this);
-        EditorSettings::Get().Save();
+    case DebugBufferMode::Normal: bufBtnLabel = "Normal"; bufBtnWidth = 58.0f; break;
+    case DebugBufferMode::Depth: bufBtnLabel = "Depth"; bufBtnWidth = 52.0f; break;
+    case DebugBufferMode::Roughness: bufBtnLabel = "Roughness"; bufBtnWidth = 72.0f; break;
+    case DebugBufferMode::Metallic: bufBtnLabel = "Metallic"; bufBtnWidth = 62.0f; break;
+    case DebugBufferMode::SSAO: bufBtnLabel = "SSAO"; bufBtnWidth = 50.0f; break;
+    case DebugBufferMode::SSGI: bufBtnLabel = "SSGI"; bufBtnWidth = 48.0f; break;
+    case DebugBufferMode::SSR: bufBtnLabel = "SSR"; bufBtnWidth = 46.0f; break;
+    case DebugBufferMode::DirectionalShadow: bufBtnLabel = "Shadow"; bufBtnWidth = 60.0f; break;
+    case DebugBufferMode::SpotShadow: bufBtnLabel = "SpotShad"; bufBtnWidth = 66.0f; break;
+    case DebugBufferMode::Bloom: bufBtnLabel = "Bloom"; bufBtnWidth = 52.0f; break;
+    case DebugBufferMode::BrightPass: bufBtnLabel = "Bright"; bufBtnWidth = 54.0f; break;
+    case DebugBufferMode::EntityID: bufBtnLabel = "EntityID"; bufBtnWidth = 62.0f; break;
+    case DebugBufferMode::ScreenColor: bufBtnLabel = "Screen"; bufBtnWidth = 56.0f; break;
+    default: break;
     }
-    if (ImGui::IsItemHovered()) ImGui::SetTooltip("Toggle Gizmos (G)\nRight-click for Gizmo options");
-    if (ImGui::BeginPopupContextItem("GizmoContext"))
-    {
-        ImGui::OpenPopup("GizmoSettingsPopup");
-        ImGui::EndPopup();
-    }
+
+    bool isDebugActive = (curDebugMode != DebugBufferMode::None);
+    if (ModeButton(bufBtnLabel, isDebugActive, ImVec2(bufBtnWidth, 24.0f)))
+        ImGui::OpenPopup("BufferSettingsPopup");
 
     ImGui::SameLine();
     ImGui::TextDisabled("|");
     ImGui::SameLine();
 
-    if (ModeButton("Overlays", false, ImVec2(66.0f, 24.0f)))
+    if (ModeButton("Overlay", false, ImVec2(66.0f, 24.0f)))
         ImGui::OpenPopup("OverlaysPopup");
-    if (ImGui::IsItemHovered()) ImGui::SetTooltip("Grid, Colliders, Wireframe & Visual Overlays");
 
     ImGui::SameLine();
     ImGui::TextDisabled("|");
@@ -469,10 +479,75 @@ void Viewport::DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySi
 
     if (ModeButton("Cam", false, ImVec2(42.0f, 24.0f)))
         ImGui::OpenPopup("CameraSettingsPopup");
-    if (ImGui::IsItemHovered()) ImGui::SetTooltip("Camera Settings (FOV, Speed, Clips)");
 
     ImGui::PopStyleVar(2);
 
+    if (ImGui::BeginPopup("BufferSettingsPopup"))
+    {
+        DebugBufferMode curMode = engine->GetRenderLayer().GetDebugBufferMode();
+
+        auto ModeItem = [&](const char* label, DebugBufferMode targetMode) {
+            bool isSelected = (curMode == targetMode);
+            if (ImGui::Selectable(label, isSelected))
+            {
+                engine->GetRenderLayer().SetDebugBufferMode(targetMode);
+            }
+        };
+        
+        ImGui::Separator();
+        ImGui::Spacing();
+
+        ModeItem("Default", DebugBufferMode::None);
+        ImGui::Spacing();
+
+        ImGui::TextDisabled("Geometry Buffers");
+        ImGui::Separator();
+        ModeItem("Normal", DebugBufferMode::Normal);
+        ModeItem("Depth", DebugBufferMode::Depth);
+        ModeItem("Roughness", DebugBufferMode::Roughness);
+        ModeItem("Metallic", DebugBufferMode::Metallic);
+        ImGui::Spacing();
+
+        ImGui::TextDisabled("Lighting & Shadows");
+        ImGui::Separator();
+        ModeItem("Directional Shadow Map", DebugBufferMode::DirectionalShadow);
+        if (curMode == DebugBufferMode::DirectionalShadow)
+        {
+            ImGui::Indent(16.0f);
+            int curLayer = engine->GetRenderLayer().GetDebugBufferLayer();
+            ImGui::Text("Cascade:");
+            ImGui::SameLine();
+            for (int c = 0; c < 4; ++c)
+            {
+                char cLabel[8];
+                snprintf(cLabel, sizeof(cLabel), "%d", c);
+                if (c > 0) ImGui::SameLine();
+                if (ImGui::RadioButton(cLabel, curLayer == c))
+                {
+                    engine->GetRenderLayer().SetDebugBufferLayer(c);
+                }
+            }
+            ImGui::Unindent(16.0f);
+        }
+        ModeItem("Spot Shadow Map", DebugBufferMode::SpotShadow);
+        ImGui::Spacing();
+
+        ImGui::TextDisabled("Screen Space Effects");
+        ImGui::Separator();
+        ModeItem("SSAO", DebugBufferMode::SSAO);
+        ModeItem("SSGI", DebugBufferMode::SSGI);
+        ModeItem("SSR", DebugBufferMode::SSR);
+        ImGui::Spacing();
+
+        ImGui::TextDisabled("Post Processing");
+        ImGui::Separator();
+        ModeItem("Bloom Buffer", DebugBufferMode::Bloom);
+        ModeItem("Bright Pass", DebugBufferMode::BrightPass);
+        ModeItem("Screen Color", DebugBufferMode::ScreenColor);
+        ModeItem("Entity ID Buffer", DebugBufferMode::EntityID);
+
+        ImGui::EndPopup();
+    }
 
     if (ImGui::BeginPopup("SnapSettingsPopup"))
     {
@@ -556,25 +631,6 @@ void Viewport::DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySi
         ImGui::EndPopup();
     }
 
-    if (ImGui::BeginPopup("GizmoSettingsPopup"))
-    {
-        bool gizmoChanged = false;
-        ImGui::TextDisabled("Gizmo Settings");
-        ImGui::Separator();
-        ImGui::Spacing();
-
-        if (ImGui::Checkbox("Show Transform Gizmo", &m_DrawGizmos)) gizmoChanged = true;
-        if (ImGui::Checkbox("Show Scene Gizmos (Icons/Frustums)", &GizmoPass::s_Enabled)) gizmoChanged = true;
-
-        if (gizmoChanged)
-        {
-            EditorSettings::Get().UpdateFromViewport(*this);
-            EditorSettings::Get().Save();
-        }
-
-        ImGui::EndPopup();
-    }
-
     if (ImGui::BeginPopup("OverlaysPopup"))
     {
         bool overlaysChanged = false;
@@ -590,6 +646,15 @@ void Viewport::DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySi
         ImGui::Spacing();
         ImGui::TextDisabled("Visual Overlays");
         ImGui::Separator();
+        bool drawGizmos = m_DrawGizmos;
+        if (ImGui::Checkbox("Draw Gizmos", &drawGizmos))
+        {
+            m_DrawGizmos = drawGizmos;
+            GizmoPass::s_Enabled = drawGizmos;
+            overlaysChanged = true;
+        }
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Toggle Gizmos (G)");
+
         auto& debugSettings = DebugRenderer::Get().GetSettings();
         if (ImGui::Checkbox("Infinite Grid", &debugSettings.drawInfiniteGrid)) overlaysChanged = true;
         if (ImGui::Checkbox("Draw Colliders", &debugSettings.drawColliders)) overlaysChanged = true;
@@ -699,7 +764,8 @@ void Viewport::DrawOverlayStats(Engine* engine, ImVec2& displayPos, ImVec2& disp
 
         char buf[64];
         snprintf(buf, sizeof(buf), label, val);
-        ImVec2 textPos = ImVec2(displayPos.x + 12.0f, displayPos.y + 48.0f);
+        float snapY = (engine->GetRenderLayer().GetDebugBufferMode() != DebugBufferMode::None) ? 78.0f : 48.0f;
+        ImVec2 textPos = ImVec2(displayPos.x + 12.0f, displayPos.y + snapY);
         ImVec2 snapTextSize = ImGui::CalcTextSize(buf);
         drawList->AddRectFilled(ImVec2(textPos.x - 4, textPos.y - 2), ImVec2(textPos.x + snapTextSize.x + 6, textPos.y + snapTextSize.y + 4), IM_COL32(18, 20, 24, 200), 4.0f);
         drawList->AddText(textPos, IM_COL32(245, 195, 65, 255), buf);
@@ -713,6 +779,82 @@ void Viewport::DrawOverlayStats(Engine* engine, ImVec2& displayPos, ImVec2& disp
     drawList->AddRectFilled(ImVec2(statPos.x - 6.0f, statPos.y - 4.0f), ImVec2(statPos.x + statTextSize.x + 6.0f, statPos.y + statTextSize.y + 4.0f),
         IM_COL32(18, 20, 24, 180), 4.0f);
     drawList->AddText(statPos, IM_COL32(160, 165, 175, 255), statBuf);
+}
+
+void Viewport::DrawDebugBufferBadge(Engine* engine, ImVec2& displayPos, ImVec2& displaySize)
+{
+    DebugBufferMode mode = engine->GetRenderLayer().GetDebugBufferMode();
+    if (mode == DebugBufferMode::None)
+        return;
+
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    const char* modeName = "";
+    switch (mode)
+    {
+    case DebugBufferMode::Normal: modeName = "Normal"; break;
+    case DebugBufferMode::Depth: modeName = "Depth"; break;
+    case DebugBufferMode::Roughness: modeName = "Roughness"; break;
+    case DebugBufferMode::Metallic: modeName = "Metallic"; break;
+    case DebugBufferMode::SSAO: modeName = "SSAO"; break;
+    case DebugBufferMode::SSGI: modeName = "SSGI"; break;
+    case DebugBufferMode::SSR: modeName = "SSR"; break;
+    case DebugBufferMode::DirectionalShadow: modeName = "Directional Shadow Map"; break;
+    case DebugBufferMode::SpotShadow: modeName = "Spot Shadow Map"; break;
+    case DebugBufferMode::Bloom: modeName = "Bloom"; break;
+    case DebugBufferMode::BrightPass: modeName = "Bright Pass"; break;
+    case DebugBufferMode::EntityID: modeName = "Entity ID Buffer"; break;
+    case DebugBufferMode::ScreenColor: modeName = "Screen Color"; break;
+    default: break;
+    }
+
+    bool isEffectDisabled = false;
+    const char* disableWarning = nullptr;
+    auto& env = engine->GetActiveScene().GetEnvironment();
+    if (mode == DebugBufferMode::SSAO && !env.SSAO)
+    {
+        isEffectDisabled = true;
+        disableWarning = " [SSAO is OFF in Environment]";
+    }
+    else if (mode == DebugBufferMode::SSGI && !env.SSGI)
+    {
+        isEffectDisabled = true;
+        disableWarning = " [SSGI is OFF in Environment]";
+    }
+
+    char titleBuf[160];
+    if (isEffectDisabled && disableWarning)
+        snprintf(titleBuf, sizeof(titleBuf), "Debug View: %s%s", modeName, disableWarning);
+    else if (mode == DebugBufferMode::DirectionalShadow)
+        snprintf(titleBuf, sizeof(titleBuf), "Debug View: %s (Cascade %d)", modeName, engine->GetRenderLayer().GetDebugBufferLayer());
+    else
+        snprintf(titleBuf, sizeof(titleBuf), "Debug View: %s", modeName);
+
+    ImVec2 badgePos = ImVec2(displayPos.x + 12.0f, displayPos.y + 48.0f);
+    ImVec2 textSize = ImGui::CalcTextSize(titleBuf);
+    float badgeW = textSize.x + 64.0f;
+    float badgeH = 26.0f;
+
+    ImU32 bgCol = isEffectDisabled ? IM_COL32(55, 25, 20, 230) : IM_COL32(20, 32, 50, 230);
+    ImU32 borderCol = isEffectDisabled ? IM_COL32(230, 80, 50, 255) : IM_COL32(50, 140, 230, 255);
+
+    drawList->AddRectFilled(badgePos, ImVec2(badgePos.x + badgeW, badgePos.y + badgeH), bgCol, 5.0f);
+    drawList->AddRect(badgePos, ImVec2(badgePos.x + badgeW, badgePos.y + badgeH), borderCol, 5.0f, 0, 1.5f);
+
+    ImVec2 textPos = ImVec2(badgePos.x + 8.0f, badgePos.y + (badgeH - textSize.y) * 0.5f);
+    ImU32 textCol = isEffectDisabled ? IM_COL32(255, 130, 100, 255) : IM_COL32(110, 200, 255, 255);
+    drawList->AddText(textPos, textCol, titleBuf);
+
+    ImGui::SetCursorScreenPos(ImVec2(badgePos.x + badgeW - 52.0f, badgePos.y + 2.0f));
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.35f, 0.12f, 0.12f, 0.8f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.65f, 0.2f, 0.2f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.85f, 0.25f, 0.25f, 1.0f));
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 3.0f);
+    if (ImGui::Button("Reset##DebugReset", ImVec2(48.0f, 22.0f)))
+    {
+        engine->GetRenderLayer().SetDebugBufferMode(DebugBufferMode::None);
+    }
+    ImGui::PopStyleVar();
+    ImGui::PopStyleColor(3);
 }
 
 void Viewport::DrawOrientationGizmo(Engine* engine, ImVec2& displayPos, ImVec2& displaySize)
@@ -1030,6 +1172,7 @@ void Viewport::Draw(Engine* engine, bool orbitDragActive)
         if (!suppressViewportEditing)
             HandleSelection(engine, displayPos, displaySize);
         DrawOverlayStats(engine, displayPos, displaySize);
+        DrawDebugBufferBadge(engine, displayPos, displaySize);
 
         if (ImGui::BeginDragDropTargetCustom(ImGui::GetCurrentWindow()->Rect(), ImGui::GetID("ViewportDropTarget")))
         {

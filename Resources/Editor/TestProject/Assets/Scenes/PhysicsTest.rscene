@@ -500,6 +500,7 @@
             "Material": {
                 "material": "117abcf2-653c-4baa-b1ef-78ccd02c4fa6",
                 "overrides": {
+                    "normalScale": 1.0,
                     "useTriplanar": true,
                     "useWorldTriplanar": true
                 }
@@ -659,7 +660,7 @@
                     0.9999991655349731
                 ]
             },
-            "UUID": 13018081069788102078
+            "UUID": 15860959599125131896
         },
         {
             "Material": {
@@ -1379,7 +1380,7 @@
                     1.0
                 ]
             },
-            "UUID": 2978543815696586660
+            "UUID": 15337156771022164867
         },
         {
             "ParentUUID": 0,
@@ -1648,7 +1649,7 @@
         "Fog_Mode": 1,
         "Fog_Start": 5.0,
         "HDR": "27eefd09-33f2-4818-a0d7-9b0641e4eb5e",
-        "HDRPath": "Assets\\Textures\\skybox\\environment3.hdr",
+        "HDRPath": "Assets\\.cache\\27eefd09-33f2-4818-a0d7-9b0641e4eb5e.rtex",
         "Lighting_AmbientColor": [
             1.0,
             1.0,
