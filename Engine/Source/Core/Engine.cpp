@@ -17,6 +17,12 @@ using namespace rv;
 Engine* Engine::s_Instance = nullptr;
 
 Engine::Engine()
+	: Engine(WindowData{})
+{
+}
+
+Engine::Engine(const WindowData& windowData)
+	: m_Window(windowData)
 {
 	RvelaLog::Init("log.txt");
 

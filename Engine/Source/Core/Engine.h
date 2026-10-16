@@ -17,6 +17,7 @@ class Engine
 {
 public:
 	Engine();
+	Engine(const WindowData& windowData);
 	~Engine();
 
 	void Run();

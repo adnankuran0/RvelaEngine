@@ -30,6 +30,12 @@
 
 using namespace rv;
 
+EditorLayer::EditorLayer(rv::Engine* engine)
+    : m_Engine(engine)
+{
+    m_LauncherMode = !ProjectManager::IsProjectLoaded();
+}
+
 EditorLayer::~EditorLayer()
 {
 }

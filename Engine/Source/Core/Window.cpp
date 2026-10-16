@@ -18,10 +18,14 @@ Window::Window() noexcept
 {
 }
 
-Window::Window(const std::string& title, int width, int height) noexcept
-    :m_WindowData(title, width, height)
+Window::Window(const WindowData& data) noexcept
+    : m_WindowData(data)
 {
-	Init();
+}
+
+Window::Window(const std::string& title, int width, int height, bool maximized) noexcept
+    : m_WindowData(title, width, height, maximized)
+{
 }
 
 Window::~Window()
@@ -47,7 +51,8 @@ void Window::Init()
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-    glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+    glfwWindowHint(GLFW_MAXIMIZED, m_WindowData.maximized ? GLFW_TRUE : GLFW_FALSE);
+    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     m_Window = glfwCreateWindow(m_WindowData.size.width, m_WindowData.size.height, m_WindowData.title.c_str(), nullptr, nullptr);
@@ -56,6 +61,11 @@ void Window::Init()
         LOG_ERROR("Failed to create GLFW window");
         glfwTerminate();
         throw std::runtime_error("Failed to create GLFW window");
+    }
+
+    if (!m_WindowData.maximized)
+    {
+        CenterOnMonitor();
     }
 
     GLFWimage images[1];
@@ -84,16 +94,22 @@ void Window::Init()
     glfwSwapInterval(m_VSync ? 1 : 0);
 
     SetCallbacks();
+
+    glfwShowWindow(m_Window);
 }
 
 Window Window::Create() noexcept
 {
-    return Window{};
+    Window win;
+    win.Init();
+    return win;
 }
 
-Window Window::Create(const std::string& title, int width, int height) noexcept
+Window Window::Create(const std::string& title, int width, int height, bool maximized) noexcept
 {
-    return Window{ title, width, height };
+    Window win{ title, width, height, maximized };
+    win.Init();
+    return win;
 }
 
 void Window::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) noexcept

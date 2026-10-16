@@ -26,9 +26,7 @@ class Engine;
 class EditorLayer : public Layer
 {
 public:
-    EditorLayer(rv::Engine* engine) : m_Engine(engine)
-    {
-    }
+    EditorLayer(rv::Engine* engine);
     ~EditorLayer();
 
     void OnAttach() override;
@@ -73,8 +71,8 @@ private:
     bool m_ShowGrid = true;
     EditorCamera::NavigationMode m_EditorCameraNavigation = EditorCamera::NavigationMode::None;
 
-    bool m_LauncherMode = false;
-    bool m_SavedMaximized = false;
+    bool m_LauncherMode = true;
+    bool m_SavedMaximized = true;
     int  m_SavedX = 100, m_SavedY = 100;
     int  m_SavedW = 1600, m_SavedH = 900;
     std::string m_LastWindowTitle;

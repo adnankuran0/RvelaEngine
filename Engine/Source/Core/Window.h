@@ -22,20 +22,23 @@ struct WindowData
 {
 	std::string title;
 	WindowSize size;
+	bool maximized = true;
 
-	WindowData() noexcept : title("Rvela Engine"), size(1920,1080) {}
-	WindowData(const std::string& title, int width, int height) noexcept : title(title), size(width,height) {}
+	WindowData() noexcept : title("Rvela Engine"), size(1920, 1080), maximized(true) {}
+	WindowData(const std::string& title, int width, int height, bool maximized = true) noexcept
+		: title(title), size(width, height), maximized(maximized) {}
 };
 
 class Window
 {
 public:
 	Window() noexcept;
-	Window(const std::string& title, int width,int height) noexcept;
+	Window(const WindowData& data) noexcept;
+	Window(const std::string& title, int width, int height, bool maximized = true) noexcept;
 	~Window();
 
 	static Window Create() noexcept;
-	static Window Create(const std::string& title, int width, int height) noexcept;
+	static Window Create(const std::string& title, int width, int height, bool maximized = true) noexcept;
 	void Init();
 
 	GLFWwindow* GetGLFWWindow() const noexcept
