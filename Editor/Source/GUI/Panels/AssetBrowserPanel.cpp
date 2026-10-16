@@ -66,6 +66,45 @@ static std::filesystem::path s_CurrentDirectory;
 static std::filesystem::path s_SelectedItemPath;
 static bool s_SelectedIsDir = false;
 static uintmax_t s_SelectedFileSize = 0;
+static std::vector<std::filesystem::path> s_SelectedPaths;
+static int s_LastSelectedIndex = -1;
+
+static bool s_IsBoxSelecting = false;
+static ImVec2 s_BoxSelectStartPos(0.0f, 0.0f);
+static ImVec2 s_BoxSelectStartScroll(0.0f, 0.0f);
+static ImVec2 s_BoxSelectStartWindowPos(0.0f, 0.0f);
+static bool s_BoxSelectCtrl = false;
+static bool s_BoxSelectShift = false;
+static std::vector<std::filesystem::path> s_PreBoxSelectedPaths;
+static bool s_DeselectOthersOnMouseRelease = false;
+static int s_DeselectTargetIndex = -1;
+
+static bool IsSelected(const std::filesystem::path& path)
+{
+    return std::find(s_SelectedPaths.begin(), s_SelectedPaths.end(), path) != s_SelectedPaths.end();
+}
+
+static void ClearSelectionInternal()
+{
+    s_SelectedPaths.clear();
+    s_SelectedItemPath.clear();
+    s_SelectedIsDir = false;
+    s_SelectedFileSize = 0;
+    s_LastSelectedIndex = -1;
+    s_DeselectOthersOnMouseRelease = false;
+    s_DeselectTargetIndex = -1;
+}
+
+const std::vector<std::filesystem::path>& AssetBrowserPanel::GetSelectedPaths()
+{
+    return s_SelectedPaths;
+}
+
+void AssetBrowserPanel::ClearSelection()
+{
+    ClearSelectionInternal();
+}
+
 static std::vector<std::filesystem::path> s_NavHistory;
 static int s_NavHistoryIndex = -1;
 
@@ -117,7 +156,7 @@ static void NavigateTo(const std::filesystem::path& path)
     s_NavHistoryIndex = (int)s_NavHistory.size() - 1;
     s_CurrentDirectory = path;
     s_SearchBuffer[0] = '\0';
-    s_SelectedItemPath.clear();
+    ClearSelectionInternal();
     s_NeedsRefresh = true;
     s_BreadcrumbsDirty = true;
 }
@@ -129,7 +168,7 @@ static void NavigateBack()
         s_NavHistoryIndex--;
         s_CurrentDirectory = s_NavHistory[s_NavHistoryIndex];
         s_SearchBuffer[0] = '\0';
-        s_SelectedItemPath.clear();
+        ClearSelectionInternal();
         s_NeedsRefresh = true;
         s_BreadcrumbsDirty = true;
     }
@@ -142,7 +181,7 @@ static void NavigateForward()
         s_NavHistoryIndex++;
         s_CurrentDirectory = s_NavHistory[s_NavHistoryIndex];
         s_SearchBuffer[0] = '\0';
-        s_SelectedItemPath.clear();
+        ClearSelectionInternal();
         s_NeedsRefresh = true;
         s_BreadcrumbsDirty = true;
     }
@@ -239,7 +278,7 @@ static void DrawReimportWindow(AssetImportPipeline& importPipeline)
     ImGui::End();
 }
 
-static void DeletePathWithMeta(const std::filesystem::path& path)
+static void DeleteSinglePathWithMeta(const std::filesystem::path& path)
 {
     std::error_code ec;
 
@@ -262,18 +301,58 @@ static void DeletePathWithMeta(const std::filesystem::path& path)
         }
     }
 
+    auto it = std::find(s_SelectedPaths.begin(), s_SelectedPaths.end(), path);
+    if (it != s_SelectedPaths.end())
+        s_SelectedPaths.erase(it);
+
+    if (s_SelectedItemPath == path)
+        s_SelectedItemPath = s_SelectedPaths.empty() ? std::filesystem::path() : s_SelectedPaths.back();
+}
+
+static void DeleteSelectedPathsWithMeta()
+{
+    if (s_SelectedPaths.empty())
+    {
+        if (!s_SelectedItemPath.empty())
+            DeleteSinglePathWithMeta(s_SelectedItemPath);
+    }
+    else
+    {
+        auto pathsToDelete = s_SelectedPaths;
+        for (const auto& path : pathsToDelete)
+        {
+            DeleteSinglePathWithMeta(path);
+        }
+    }
+
     auto& reg = AssetManager::Get().GetRegistry();
     reg.Scan(reg.GetAssetDir());
     EditorUtils::ClearAssetFileNameCache();
 
-    if (s_SelectedItemPath == path)
-        s_SelectedItemPath.clear();
+    ClearSelectionInternal();
+    s_NeedsRefresh = true;
+    s_DirectoryTreeDirty = true;
+}
+
+static void DeletePathWithMeta(const std::filesystem::path& path)
+{
+    if (s_SelectedPaths.size() > 1 && IsSelected(path))
+    {
+        DeleteSelectedPathsWithMeta();
+        return;
+    }
+
+    DeleteSinglePathWithMeta(path);
+
+    auto& reg = AssetManager::Get().GetRegistry();
+    reg.Scan(reg.GetAssetDir());
+    EditorUtils::ClearAssetFileNameCache();
 
     s_NeedsRefresh = true;
     s_DirectoryTreeDirty = true;
 }
 
-static bool MoveAssetToDirectory(const std::filesystem::path& sourcePath, const std::filesystem::path& targetDir)
+static bool MoveSingleAsset(const std::filesystem::path& sourcePath, const std::filesystem::path& targetDir)
 {
     if (sourcePath.empty() || targetDir.empty())
         return false;
@@ -341,16 +420,55 @@ static bool MoveAssetToDirectory(const std::filesystem::path& sourcePath, const 
         }
     }
 
+    auto it = std::find(s_SelectedPaths.begin(), s_SelectedPaths.end(), sourcePath);
+    if (it != s_SelectedPaths.end())
+    {
+        if (destPath.parent_path() == s_CurrentDirectory)
+            *it = destPath;
+        else
+            s_SelectedPaths.erase(it);
+    }
+
     if (s_SelectedItemPath == sourcePath)
-        s_SelectedItemPath = destPath;
+    {
+        if (destPath.parent_path() == s_CurrentDirectory)
+            s_SelectedItemPath = destPath;
+        else
+            s_SelectedItemPath = s_SelectedPaths.empty() ? std::filesystem::path() : s_SelectedPaths.back();
+    }
 
-    auto& reg = AssetManager::Get().GetRegistry();
-    reg.Scan(reg.GetAssetDir());
-    EditorUtils::ClearAssetFileNameCache();
-
-    s_NeedsRefresh = true;
-    s_DirectoryTreeDirty = true;
     return true;
+}
+
+static bool MoveAssetToDirectory(const std::filesystem::path& sourcePath, const std::filesystem::path& targetDir)
+{
+    bool anyMoved = false;
+
+    if (s_SelectedPaths.size() > 1 && IsSelected(sourcePath))
+    {
+        auto pathsToMove = s_SelectedPaths;
+        for (const auto& p : pathsToMove)
+        {
+            if (MoveSingleAsset(p, targetDir))
+                anyMoved = true;
+        }
+    }
+    else
+    {
+        anyMoved = MoveSingleAsset(sourcePath, targetDir);
+    }
+
+    if (anyMoved)
+    {
+        auto& reg = AssetManager::Get().GetRegistry();
+        reg.Scan(reg.GetAssetDir());
+        EditorUtils::ClearAssetFileNameCache();
+
+        s_NeedsRefresh = true;
+        s_DirectoryTreeDirty = true;
+    }
+
+    return anyMoved;
 }
 
 static void HandleReimport(const std::filesystem::path& path, AssetImportPipeline& importPipeline)
@@ -494,6 +612,10 @@ static void RenamePathWithMeta(const std::filesystem::path& oldPath, const std::
 
     reg.Scan(reg.GetAssetDir());
     EditorUtils::ClearAssetFileNameCache();
+
+    auto it = std::find(s_SelectedPaths.begin(), s_SelectedPaths.end(), oldPath);
+    if (it != s_SelectedPaths.end())
+        *it = newPath;
 
     if (s_SelectedItemPath == oldPath)
         s_SelectedItemPath = newPath;
@@ -735,6 +857,22 @@ static void RefreshAssets(const std::filesystem::path& directory)
     }
     catch (...) {}
 
+    s_SelectedPaths.erase(
+        std::remove_if(s_SelectedPaths.begin(), s_SelectedPaths.end(),
+            [](const std::filesystem::path& p) {
+                std::error_code ec;
+                std::string pStr = p.string();
+                size_t hashPos = pStr.find('#');
+                if (hashPos != std::string::npos)
+                    return !std::filesystem::exists(pStr.substr(0, hashPos), ec);
+                return !std::filesystem::exists(p, ec);
+            }),
+        s_SelectedPaths.end()
+    );
+
+    if (!IsSelected(s_SelectedItemPath))
+        s_SelectedItemPath = s_SelectedPaths.empty() ? std::filesystem::path() : s_SelectedPaths.back();
+
     s_NeedsRefresh = false;
 }
 
@@ -874,12 +1012,22 @@ static void DrawItemContextMenu(const std::filesystem::path& itemPath, AssetImpo
 
     if (ImGui::BeginPopup(popupId.c_str()))
     {
-        ImGui::TextDisabled("%s", itemPath.filename().string().c_str());
+        if (s_SelectedPaths.size() > 1)
+        {
+            ImGui::TextDisabled("%d items selected", (int)s_SelectedPaths.size());
+        }
+        else
+        {
+            ImGui::TextDisabled("%s", itemPath.filename().string().c_str());
+        }
         ImGui::Separator();
 
-        if (ImGui::MenuItem("Rename", "F2"))
+        if (s_SelectedPaths.size() <= 1)
         {
-            BeginRenameForNew(itemPath);
+            if (ImGui::MenuItem("Rename", "F2"))
+            {
+                BeginRenameForNew(itemPath);
+            }
         }
 
         if (ImGui::MenuItem("Delete", "Del"))
@@ -889,47 +1037,114 @@ static void DrawItemContextMenu(const std::filesystem::path& itemPath, AssetImpo
 
         ImGui::Separator();
 
-        if (ImGui::MenuItem("Copy Path"))
-            ImGui::SetClipboardText(itemPath.string().c_str());
-
-        if (ImGui::MenuItem("Copy Relative Path"))
+        if (s_SelectedPaths.size() <= 1)
         {
-            std::error_code ec;
-            auto rel = std::filesystem::relative(itemPath, ProjectManager::GetAssetDirectory(), ec);
-            if (!ec) ImGui::SetClipboardText(rel.string().c_str());
-        }
+            if (ImGui::MenuItem("Copy Path"))
+                ImGui::SetClipboardText(itemPath.string().c_str());
 
-        ImGui::Separator();
-
-        if (ImGui::MenuItem("Open in Explorer"))
-        {
-            auto dir = std::filesystem::is_directory(itemPath)
-                ? itemPath
-                : itemPath.parent_path();
-            std::string cmd = "explorer \"" + dir.string() + "\"";
-            std::system(cmd.c_str());
-        }
-
-        if (std::filesystem::is_directory(itemPath))
-        {
-            if (ImGui::MenuItem("Open in VS Code"))
+            if (ImGui::MenuItem("Copy Relative Path"))
             {
-                OpenInVSCode(itemPath);
+                std::error_code ec;
+                auto rel = std::filesystem::relative(itemPath, ProjectManager::GetAssetDirectory(), ec);
+                if (!ec) ImGui::SetClipboardText(rel.string().c_str());
             }
         }
         else
         {
-            auto ext = itemPath.extension();
-            if (ext == ".glsl" || ext == ".lua")
+            if (ImGui::MenuItem("Copy Paths"))
+            {
+                std::string allPaths;
+                for (size_t i = 0; i < s_SelectedPaths.size(); ++i)
+                {
+                    if (i > 0) allPaths += "\n";
+                    allPaths += s_SelectedPaths[i].string();
+                }
+                ImGui::SetClipboardText(allPaths.c_str());
+            }
+
+            if (ImGui::MenuItem("Copy Relative Paths"))
+            {
+                std::string allRel;
+                std::error_code ec;
+                for (size_t i = 0; i < s_SelectedPaths.size(); ++i)
+                {
+                    if (i > 0) allRel += "\n";
+                    auto rel = std::filesystem::relative(s_SelectedPaths[i], ProjectManager::GetAssetDirectory(), ec);
+                    if (!ec) allRel += rel.string();
+                    else allRel += s_SelectedPaths[i].string();
+                }
+                ImGui::SetClipboardText(allRel.c_str());
+            }
+        }
+
+        ImGui::Separator();
+
+        if (s_SelectedPaths.size() <= 1)
+        {
+            if (ImGui::MenuItem("Open in Explorer"))
+            {
+                auto dir = std::filesystem::is_directory(itemPath)
+                    ? itemPath
+                    : itemPath.parent_path();
+                std::string cmd = "explorer \"" + dir.string() + "\"";
+                std::system(cmd.c_str());
+            }
+
+            if (std::filesystem::is_directory(itemPath))
             {
                 if (ImGui::MenuItem("Open in VS Code"))
                 {
                     OpenInVSCode(itemPath);
                 }
             }
+            else
+            {
+                auto ext = itemPath.extension();
+                if (ext == ".glsl" || ext == ".lua")
+                {
+                    if (ImGui::MenuItem("Open in VS Code"))
+                    {
+                        OpenInVSCode(itemPath);
+                    }
+                }
 
-            if (ImGui::MenuItem("Reimport"))
-                HandleReimport(itemPath, importPipeline);
+                if (ImGui::MenuItem("Reimport"))
+                    HandleReimport(itemPath, importPipeline);
+            }
+        }
+        else
+        {
+            if (ImGui::MenuItem("Open in Explorer"))
+            {
+                auto dir = std::filesystem::is_directory(itemPath)
+                    ? itemPath
+                    : itemPath.parent_path();
+                std::string cmd = "explorer \"" + dir.string() + "\"";
+                std::system(cmd.c_str());
+            }
+
+            bool anyReimportable = false;
+            for (const auto& p : s_SelectedPaths)
+            {
+                if (!std::filesystem::is_directory(p))
+                {
+                    auto metaP = std::filesystem::path(p.string() + ".rmeta");
+                    if (std::filesystem::exists(metaP))
+                    {
+                        anyReimportable = true;
+                        break;
+                    }
+                }
+            }
+
+            if (anyReimportable && ImGui::MenuItem("Reimport All"))
+            {
+                for (const auto& p : s_SelectedPaths)
+                {
+                    if (!std::filesystem::is_directory(p))
+                        HandleReimport(p, importPipeline);
+                }
+            }
         }
 
         ImGui::EndPopup();
@@ -1170,9 +1385,11 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
 
     ImGui::BeginChild("FilesGridArea", ImVec2(0.0f, -24.0f), false);
 
-    if (ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows) && ImGui::GetIO().KeyCtrl)
+    ImGuiIO& io = ImGui::GetIO();
+
+    if (ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows) && io.KeyCtrl)
     {
-        float wheel = ImGui::GetIO().MouseWheel;
+        float wheel = io.MouseWheel;
         if (wheel != 0.0f)
         {
             s_ThumbnailSize = std::clamp(s_ThumbnailSize + wheel * 6.0f, 28.0f, 128.0f);
@@ -1195,6 +1412,36 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
     const float clipMaxY = scrollY + windowVisibleHeight + cardHeight;
     const ImVec2 childScreenPos = ImGui::GetCursorScreenPos();
 
+    bool isDraggingBox = s_IsBoxSelecting && ImGui::IsMouseDragging(ImGuiMouseButton_Left, 3.0f);
+
+    if (isDraggingBox)
+    {
+        const float autoScrollMargin = 25.0f;
+        const float autoScrollSpeed = 8.0f;
+        const float winMinY = childScreenPos.y;
+        const float winMaxY = childScreenPos.y + windowVisibleHeight;
+
+        if (io.MousePos.y < winMinY + autoScrollMargin && ImGui::GetScrollY() > 0.0f)
+        {
+            ImGui::SetScrollY(std::max(0.0f, ImGui::GetScrollY() - autoScrollSpeed));
+        }
+        else if (io.MousePos.y > winMaxY - autoScrollMargin && ImGui::GetScrollY() < ImGui::GetScrollMaxY())
+        {
+            ImGui::SetScrollY(std::min(ImGui::GetScrollMaxY(), ImGui::GetScrollY() + autoScrollSpeed));
+        }
+    }
+
+    ImVec2 boxStartScreen(
+        s_BoxSelectStartPos.x + (s_BoxSelectStartScroll.x - ImGui::GetScrollX()) + (childScreenPos.x - s_BoxSelectStartWindowPos.x),
+        s_BoxSelectStartPos.y + (s_BoxSelectStartScroll.y - ImGui::GetScrollY()) + (childScreenPos.y - s_BoxSelectStartWindowPos.y)
+    );
+    ImVec2 boxMin = ImMin(boxStartScreen, io.MousePos);
+    ImVec2 boxMax = ImMax(boxStartScreen, io.MousePos);
+
+    std::vector<std::filesystem::path> currentFrameSelected;
+    if (isDraggingBox)
+        currentFrameSelected.reserve(itemsToShow.size());
+
     for (size_t i = 0; i < itemsToShow.size(); ++i)
     {
         const auto& item = itemsToShow[i];
@@ -1206,7 +1453,38 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
         const float itemRelativeY = cellPos.y - childScreenPos.y + scrollY;
         const bool isVisible = (itemRelativeY >= clipMinY && itemRelativeY <= clipMaxY);
 
-        const bool isSelected = (s_SelectedItemPath == item.path);
+        const ImVec2 cardMin = cellPos;
+        const ImVec2 cardMax = ImVec2(cellPos.x + cardWidth, cellPos.y + cardHeight);
+
+        bool inBox = false;
+        if (isDraggingBox)
+        {
+            inBox = (boxMin.x <= cardMax.x && boxMax.x >= cardMin.x &&
+                     boxMin.y <= cardMax.y && boxMax.y >= cardMin.y);
+        }
+
+        bool isSelected = false;
+        if (isDraggingBox)
+        {
+            if (s_BoxSelectCtrl || s_BoxSelectShift)
+            {
+                bool wasPreSelected = std::find(s_PreBoxSelectedPaths.begin(), s_PreBoxSelectedPaths.end(), item.path) != s_PreBoxSelectedPaths.end();
+                isSelected = wasPreSelected || inBox;
+            }
+            else
+            {
+                isSelected = inBox;
+            }
+
+            if (isSelected)
+            {
+                currentFrameSelected.push_back(item.path);
+            }
+        }
+        else
+        {
+            isSelected = IsSelected(item.path);
+        }
 
         ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0, 0, 0, 0));
         ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0, 0, 0, 0));
@@ -1234,12 +1512,16 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
         }
 
         const bool isItemHovered = ImGui::IsItemHovered();
-        const bool isClicked = ImGui::IsItemClicked(ImGuiMouseButton_Left);
+        bool isClicked = ImGui::IsItemClicked(ImGuiMouseButton_Left);
         const bool isRightClicked = ImGui::IsItemClicked(ImGuiMouseButton_Right);
         const bool isDoubleClicked = isItemHovered && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left);
 
+        if (s_IsBoxSelecting)
+            isClicked = false;
+
         if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
         {
+            s_DeselectOthersOnMouseRelease = false;
             auto pathStr = item.path.string();
             ImGui::SetDragDropPayload("ASSET_PATH", pathStr.c_str(), pathStr.size() + 1);
             if (item.icon)
@@ -1247,7 +1529,15 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
                 ImGui::Image(item.icon, ImVec2(20.0f, 20.0f));
                 ImGui::SameLine();
             }
-            ImGui::TextUnformatted(item.filename.c_str());
+            if (s_SelectedPaths.size() > 1 && IsSelected(item.path))
+            {
+                std::string dragLabel = item.filename + " (+" + std::to_string(s_SelectedPaths.size() - 1) + " items)";
+                ImGui::TextUnformatted(dragLabel.c_str());
+            }
+            else
+            {
+                ImGui::TextUnformatted(item.filename.c_str());
+            }
             ImGui::EndDragDropSource();
         }
 
@@ -1359,16 +1649,94 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
 
         if (isClicked)
         {
-            s_SelectedItemPath = item.path;
-            s_SelectedIsDir = item.isDirectory;
-            s_SelectedFileSize = item.fileSize;
+            if (io.KeyCtrl)
+            {
+                auto it = std::find(s_SelectedPaths.begin(), s_SelectedPaths.end(), item.path);
+                if (it != s_SelectedPaths.end())
+                {
+                    s_SelectedPaths.erase(it);
+                    if (s_SelectedItemPath == item.path)
+                    {
+                        s_SelectedItemPath = s_SelectedPaths.empty() ? std::filesystem::path() : s_SelectedPaths.back();
+                    }
+                }
+                else
+                {
+                    s_SelectedPaths.push_back(item.path);
+                    s_SelectedItemPath = item.path;
+                    s_SelectedIsDir = item.isDirectory;
+                    s_SelectedFileSize = item.fileSize;
+                }
+                s_LastSelectedIndex = (int)i;
+                s_DeselectOthersOnMouseRelease = false;
+            }
+            else if (io.KeyShift)
+            {
+                if (s_LastSelectedIndex >= 0 && s_LastSelectedIndex < (int)itemsToShow.size())
+                {
+                    int startIdx = std::min(s_LastSelectedIndex, (int)i);
+                    int endIdx = std::max(s_LastSelectedIndex, (int)i);
+                    s_SelectedPaths.clear();
+                    for (int k = startIdx; k <= endIdx; ++k)
+                    {
+                        s_SelectedPaths.push_back(itemsToShow[k].path);
+                    }
+                }
+                else
+                {
+                    s_SelectedPaths.clear();
+                    s_SelectedPaths.push_back(item.path);
+                    s_LastSelectedIndex = (int)i;
+                }
+                s_SelectedItemPath = item.path;
+                s_SelectedIsDir = item.isDirectory;
+                s_SelectedFileSize = item.fileSize;
+                s_DeselectOthersOnMouseRelease = false;
+            }
+            else
+            {
+                if (!IsSelected(item.path))
+                {
+                    s_SelectedPaths.clear();
+                    s_SelectedPaths.push_back(item.path);
+                    s_SelectedItemPath = item.path;
+                    s_SelectedIsDir = item.isDirectory;
+                    s_SelectedFileSize = item.fileSize;
+                    s_LastSelectedIndex = (int)i;
+                    s_DeselectOthersOnMouseRelease = false;
+                }
+                else
+                {
+                    if (s_SelectedPaths.size() > 1)
+                    {
+                        s_DeselectOthersOnMouseRelease = true;
+                        s_DeselectTargetIndex = (int)i;
+                    }
+                    else
+                    {
+                        s_LastSelectedIndex = (int)i;
+                    }
+                }
+            }
         }
 
         if (isRightClicked)
         {
-            s_SelectedItemPath = item.path;
-            s_SelectedIsDir = item.isDirectory;
-            s_SelectedFileSize = item.fileSize;
+            if (!IsSelected(item.path))
+            {
+                s_SelectedPaths.clear();
+                s_SelectedPaths.push_back(item.path);
+                s_SelectedItemPath = item.path;
+                s_SelectedIsDir = item.isDirectory;
+                s_SelectedFileSize = item.fileSize;
+                s_LastSelectedIndex = (int)i;
+            }
+            else
+            {
+                s_SelectedItemPath = item.path;
+                s_SelectedIsDir = item.isDirectory;
+                s_SelectedFileSize = item.fileSize;
+            }
             ImGui::OpenPopup(("##ItemMenu_" + item.filename).c_str());
         }
         DrawItemContextMenu(item.path, importPipeline);
@@ -1457,10 +1825,79 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
         }
     }
 
+    if (isDraggingBox)
+    {
+        s_SelectedPaths = std::move(currentFrameSelected);
+        if (!s_SelectedPaths.empty())
+        {
+            s_SelectedItemPath = s_SelectedPaths.back();
+            auto itLead = std::find_if(itemsToShow.begin(), itemsToShow.end(),
+                [](const BrowserItem& bi) { return bi.path == s_SelectedItemPath; });
+            if (itLead != itemsToShow.end())
+            {
+                s_SelectedIsDir = itLead->isDirectory;
+                s_SelectedFileSize = itLead->fileSize;
+                s_LastSelectedIndex = (int)std::distance(itemsToShow.begin(), itLead);
+            }
+        }
+        else
+        {
+            s_SelectedItemPath.clear();
+            s_SelectedIsDir = false;
+            s_SelectedFileSize = 0;
+            s_LastSelectedIndex = -1;
+        }
+    }
+
+    if (s_DeselectOthersOnMouseRelease)
+    {
+        if (ImGui::IsMouseDragging(ImGuiMouseButton_Left, 3.0f))
+        {
+            s_DeselectOthersOnMouseRelease = false;
+            s_DeselectTargetIndex = -1;
+        }
+        else if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+        {
+            if (s_DeselectTargetIndex >= 0 && s_DeselectTargetIndex < (int)itemsToShow.size())
+            {
+                const auto& tgt = itemsToShow[s_DeselectTargetIndex];
+                s_SelectedPaths.clear();
+                s_SelectedPaths.push_back(tgt.path);
+                s_SelectedItemPath = tgt.path;
+                s_SelectedIsDir = tgt.isDirectory;
+                s_SelectedFileSize = tgt.fileSize;
+                s_LastSelectedIndex = s_DeselectTargetIndex;
+            }
+            s_DeselectOthersOnMouseRelease = false;
+            s_DeselectTargetIndex = -1;
+        }
+    }
+
+    if (isDraggingBox)
+    {
+        ImDrawList* dl = ImGui::GetWindowDrawList();
+        ImVec2 gridMin = childScreenPos;
+        ImVec2 gridMax = ImVec2(childScreenPos.x + ImGui::GetWindowWidth(), childScreenPos.y + windowVisibleHeight);
+        ImVec2 clampedMin(std::clamp(boxMin.x, gridMin.x, gridMax.x), std::clamp(boxMin.y, gridMin.y, gridMax.y));
+        ImVec2 clampedMax(std::clamp(boxMax.x, gridMin.x, gridMax.x), std::clamp(boxMax.y, gridMin.y, gridMax.y));
+
+        if (clampedMax.x > clampedMin.x && clampedMax.y > clampedMin.y)
+        {
+            dl->AddRectFilled(clampedMin, clampedMax, IM_COL32(66, 133, 244, 45));
+            dl->AddRect(clampedMin, clampedMax, IM_COL32(90, 155, 255, 200), 0.0f, 0, 1.5f);
+        }
+    }
+
+    if (s_IsBoxSelecting && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+    {
+        s_IsBoxSelecting = false;
+    }
+
     if (ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows) &&
         ImGui::IsMouseClicked(ImGuiMouseButton_Right) &&
         !ImGui::IsAnyItemHovered())
     {
+        ClearSelectionInternal();
         ImGui::OpenPopup("##BrowserBgMenu");
     }
     DrawBackgroundContextMenu(engine, s_CurrentDirectory);
@@ -1469,20 +1906,51 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
         ImGui::IsMouseClicked(ImGuiMouseButton_Left) &&
         !ImGui::IsAnyItemHovered())
     {
-        s_SelectedItemPath.clear();
+        s_IsBoxSelecting = true;
+        s_BoxSelectStartPos = io.MousePos;
+        s_BoxSelectStartScroll = ImVec2(ImGui::GetScrollX(), ImGui::GetScrollY());
+        s_BoxSelectStartWindowPos = childScreenPos;
+        s_BoxSelectCtrl = io.KeyCtrl;
+        s_BoxSelectShift = io.KeyShift;
+        s_PreBoxSelectedPaths = (s_BoxSelectCtrl || s_BoxSelectShift) ? s_SelectedPaths : std::vector<std::filesystem::path>{};
+        if (!s_BoxSelectCtrl && !s_BoxSelectShift)
+        {
+            ClearSelectionInternal();
+        }
     }
 
     if (ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows))
     {
+        if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_A) && !s_RenamingActive)
+        {
+            s_SelectedPaths.clear();
+            for (const auto& itm : itemsToShow)
+            {
+                s_SelectedPaths.push_back(itm.path);
+            }
+            if (!s_SelectedPaths.empty())
+            {
+                s_SelectedItemPath = s_SelectedPaths.front();
+                s_SelectedIsDir = itemsToShow.front().isDirectory;
+                s_SelectedFileSize = itemsToShow.front().fileSize;
+                s_LastSelectedIndex = 0;
+            }
+        }
+
+        if (ImGui::IsKeyPressed(ImGuiKey_Escape) && !s_RenamingActive)
+        {
+            s_IsBoxSelecting = false;
+            ClearSelectionInternal();
+        }
+
         if (ImGui::IsKeyPressed(ImGuiKey_F2) && !s_SelectedItemPath.empty() && !s_RenamingActive)
         {
             BeginRenameForNew(s_SelectedItemPath);
         }
 
-        if (ImGui::IsKeyPressed(ImGuiKey_Delete) && !s_SelectedItemPath.empty() && !s_RenamingActive)
+        if (ImGui::IsKeyPressed(ImGuiKey_Delete) && !s_SelectedPaths.empty() && !s_RenamingActive)
         {
-            DeletePathWithMeta(s_SelectedItemPath);
-            s_SelectedItemPath.clear();
+            DeleteSelectedPathsWithMeta();
         }
 
         if (ImGui::IsKeyPressed(ImGuiKey_Backspace) && !s_RenamingActive)
@@ -1512,19 +1980,39 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
     {
         ImGui::TextDisabled("%d item%s", (int)itemsToShow.size(), itemsToShow.size() == 1 ? "" : "s");
 
-        if (!s_SelectedItemPath.empty())
+        if (!s_SelectedPaths.empty())
         {
             ImGui::SameLine();
             ImGui::TextDisabled("|");
             ImGui::SameLine();
-            std::string selName = s_SelectedItemPath.filename().string();
-            if (s_SelectedIsDir)
+            if (s_SelectedPaths.size() == 1)
             {
-                ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s (Folder)", selName.c_str());
+                std::string selName = s_SelectedPaths[0].filename().string();
+                if (s_SelectedIsDir)
+                {
+                    ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s (Folder)", selName.c_str());
+                }
+                else
+                {
+                    ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s (%s)", selName.c_str(), FormatFileSize(s_SelectedFileSize).c_str());
+                }
             }
             else
             {
-                ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s (%s)", selName.c_str(), FormatFileSize(s_SelectedFileSize).c_str());
+                uintmax_t totalSize = 0;
+                for (const auto& p : s_SelectedPaths)
+                {
+                    std::error_code ec;
+                    if (!std::filesystem::is_directory(p, ec))
+                    {
+                        totalSize += std::filesystem::file_size(p, ec);
+                    }
+                }
+
+                std::string info = std::to_string(s_SelectedPaths.size()) + " items selected";
+                if (totalSize > 0)
+                    info += " (" + FormatFileSize(totalSize) + ")";
+                ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s", info.c_str());
             }
         }
     }
@@ -1590,6 +2078,8 @@ void AssetBrowserPanel::RequestRename(const std::filesystem::path& path)
 {
     if (path.has_parent_path())
         NavigateTo(path.parent_path());
+    s_SelectedPaths.clear();
+    s_SelectedPaths.push_back(path);
     s_SelectedItemPath = path;
     BeginRenameForNew(path);
 }

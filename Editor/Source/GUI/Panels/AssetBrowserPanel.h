@@ -1,5 +1,6 @@
 #pragma once
 #include <filesystem>
+#include <vector>
 #include "Renderer/Texture.h"
 #include <Asset/AssetImportPipeline.h>
 #include "Event/WindowEvents.h"
@@ -15,6 +16,8 @@ public:
 	void HandleFileDrop(FileDroppedEvent& event, AssetImportPipeline& importPipeline);
 	static void RequestRename(const std::filesystem::path& path);
 	static void RequestRefresh();
+	static const std::vector<std::filesystem::path>& GetSelectedPaths();
+	static void ClearSelection();
 };
 
 }
