@@ -11,6 +11,7 @@
 #include <Render/GizmoPass.h>
 #include "Input/Input.h"
 #include "EditorUtils.h"
+#include "GUI/EditorFileDialog.h"
 #include "Scene/Components/TransformComponent.h"
 #include "AssetImporters/PrefabImporter.h"
 #include "AssetImporters/ModelImporter.h"
@@ -375,6 +376,8 @@ void EditorLayer::Render()
 
         m_Viewport.Draw(m_Engine, m_EditorCameraNavigation == EditorCamera::NavigationMode::Orbit);
     }
+
+    EditorFileDialog::Draw();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

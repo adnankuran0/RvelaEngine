@@ -2,6 +2,7 @@
 #include "Core/Engine.h"
 #include "Utils/ProjectManager.h"
 #include "GUI/Dialogs.h"
+#include "GUI/EditorFileDialog.h"
 #include "Core/Time.h"
 #include <imgui.h>
 #include <filesystem>
@@ -52,16 +53,44 @@ void ProjectSettingsPanel::Draw(Engine* engine)
         {
             settings.startScene = m_StartSceneBuf;
         }
+
+        if (ImGui::BeginDragDropTarget())
+        {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
+            {
+                std::filesystem::path droppedPath = (const char*)payload->Data;
+                if (droppedPath.extension() == ".rscene")
+                {
+                    std::error_code ec;
+                    std::filesystem::path rel = std::filesystem::relative(droppedPath, ProjectManager::GetProjectPath(), ec);
+                    std::string relStr = (!ec && !rel.empty()) ? rel.generic_string() : droppedPath.generic_string();
+                    settings.startScene = relStr;
+                    strncpy_s(m_StartSceneBuf, relStr.c_str(), sizeof(m_StartSceneBuf) - 1);
+                }
+            }
+            ImGui::EndDragDropTarget();
+        }
+
         ImGui::SameLine();
         if (ImGui::Button("Browse##Scene"))
         {
-            std::string scene = Dialogs::OpenSceneDialog();
-            if (!scene.empty())
-            {
-                std::filesystem::path rel = std::filesystem::relative(scene, ProjectManager::GetProjectPath());
-                settings.startScene = rel.string();
-                strncpy_s(m_StartSceneBuf, settings.startScene.c_str(), sizeof(m_StartSceneBuf) - 1);
-            }
+            std::filesystem::path startDir = ProjectManager::GetAssetDirectory();
+            if (std::filesystem::exists(startDir / "Scenes"))
+                startDir /= "Scenes";
+
+            EditorFileDialog::Open(
+                "Select Start Scene",
+                FileDialogMode::OpenFile,
+                { ".rscene" },
+                startDir,
+                [this, activeProj](const std::filesystem::path& chosen) {
+                    std::error_code ec;
+                    std::filesystem::path rel = std::filesystem::relative(chosen, ProjectManager::GetProjectPath(), ec);
+                    std::string relStr = (!ec && !rel.empty()) ? rel.generic_string() : chosen.generic_string();
+                    activeProj->GetSettings().startScene = relStr;
+                    strncpy_s(m_StartSceneBuf, relStr.c_str(), sizeof(m_StartSceneBuf) - 1);
+                }
+            );
         }
 
         ImGui::Spacing();

@@ -5,6 +5,7 @@
 #include "AssetImporters/MaterialSerializer.h"
 #include <imgui.h>
 #include "Dialogs.h"
+#include "EditorFileDialog.h"
 #include "EditorUtils.h"
 #include "tinyfiledialogs.h"
 #include "Asset/AssetManager.h"
@@ -63,8 +64,11 @@ void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter,
                     "*.png", "*.jpeg", "*.jpg", "*.tga",
                     "*.fbx", "*.gltf", "*.obj", "*.glb"
                 };
+                std::string defaultPath = ProjectManager::IsProjectLoaded()
+                    ? ProjectManager::GetProjectPath().string()
+                    : "";
                 const char* selected = tinyfd_openFileDialog(
-                    "Select assets to import", "", 8, filterPatterns, NULL, 1);
+                    "Select assets to import", defaultPath.c_str(), 8, filterPatterns, NULL, 1);
 
                 if (selected)
                 {
@@ -94,16 +98,21 @@ void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter,
 
             if (ImGui::MenuItem("Create Material"))
             {
-                const char* filterPatterns[] = { "*.rmat" };
-                const char* filePath = tinyfd_saveFileDialog(
-                    "Create material as", "material.rmat", 1, filterPatterns, NULL);
+                std::filesystem::path initialDir = ProjectManager::GetAssetDirectory();
+                if (std::filesystem::exists(initialDir / "Materials"))
+                    initialDir /= "Materials";
 
-                if (filePath)
-                {
-                    std::filesystem::path matPath = filePath;
-                    MaterialSerializer::CreateNew(matPath, registry);
-                    registry.Scan(registry.GetAssetDir());
-                }
+                EditorFileDialog::Open(
+                    "Create Material",
+                    FileDialogMode::SaveFile,
+                    { ".rmat" },
+                    initialDir,
+                    [&registry](const std::filesystem::path& chosen) {
+                        MaterialSerializer::CreateNew(chosen, registry);
+                        registry.Scan(registry.GetAssetDir());
+                    },
+                    "NewMaterial.rmat"
+                );
             }
 
             ImGui::Separator();

@@ -1,5 +1,6 @@
 #include "EditorUtils.h"
 #include "GUI/Dialogs.h"
+#include "GUI/EditorFileDialog.h"
 #include <fstream>
 #include "Core/Engine.h"
 #include "Asset/AssetManager.h"
@@ -40,11 +41,22 @@ void EditorUtils::CreateScene(Engine& engine)
 
 void EditorUtils::OpenScene(Engine& engine)
 {
-    std::string file = Dialogs::OpenSceneDialog();
-    if (!file.empty())
-    {
-        engine.GetSceneManager().LoadScene(file);
-    }
+    std::filesystem::path startDir = ProjectManager::IsProjectLoaded()
+        ? ProjectManager::GetAssetDirectory()
+        : std::filesystem::current_path();
+
+    if (std::filesystem::exists(startDir / "Scenes"))
+        startDir /= "Scenes";
+
+    EditorFileDialog::Open(
+        "Open Scene",
+        FileDialogMode::OpenFile,
+        { ".rscene" },
+        startDir,
+        [&engine](const std::filesystem::path& chosen) {
+            engine.GetSceneManager().LoadScene(chosen.string());
+        }
+    );
 }
 
 bool EditorUtils::SaveScene(Engine& engine)
@@ -75,21 +87,38 @@ bool EditorUtils::SaveSceneAs(Engine& engine)
         LOG_WARN("Scene can only be saved in EDIT mode.");
         return false;
     }
-    std::string file = Dialogs::SaveSceneDialog();
-    if (!file.empty())
-    {
-        std::ofstream ofs(file);
-        if (ofs.is_open())
-        {
-            ofs.close();
-            std::filesystem::path p(file);
-            activeScene.SetName(p.stem().string());
-            engine.GetSceneManager().SaveScene(file);
-            activeScene.SetDirty(false);
-            return true;
-        }
-    }
-    return false;
+
+    std::filesystem::path startDir = ProjectManager::IsProjectLoaded()
+        ? ProjectManager::GetAssetDirectory()
+        : std::filesystem::current_path();
+
+    if (std::filesystem::exists(startDir / "Scenes"))
+        startDir /= "Scenes";
+
+    std::string defaultName = activeScene.GetName().empty() ? "NewScene.rscene" : (activeScene.GetName() + ".rscene");
+    if (!defaultName.ends_with(".rscene"))
+        defaultName += ".rscene";
+
+    EditorFileDialog::Open(
+        "Save Scene As",
+        FileDialogMode::SaveFile,
+        { ".rscene" },
+        startDir,
+        [&engine](const std::filesystem::path& chosen) {
+            std::string file = chosen.string();
+            std::ofstream ofs(file);
+            if (ofs.is_open())
+            {
+                ofs.close();
+                Scene& scene = engine.GetActiveScene();
+                scene.SetName(chosen.stem().string());
+                engine.GetSceneManager().SaveScene(file);
+                scene.SetDirty(false);
+            }
+        },
+        defaultName
+    );
+    return true;
 }
 
 static bool IsValidUUIDFormat(const std::string& str)

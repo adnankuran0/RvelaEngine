@@ -1,7 +1,6 @@
 #include "SceneHierarchyPanel.h"
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_internal.h"
-#include <ImGui/tinyfiledialogs.h>
 #include "AssetImporters/PrefabImporter.h"
 #include "Core/Engine.h"
 #include "Scene/Entity.h"
