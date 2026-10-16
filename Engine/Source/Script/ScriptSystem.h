@@ -36,6 +36,7 @@ public:
 	bool EmitSignal(entt::entity source, const std::string& signalName, const std::vector<sol::object>& args);
 
 	void BindLuaScript(ScriptComponent& sc, entt::entity e);
+	sol::state& GetLuaState() { return m_ScriptEngine.GetState(); }
 
 private:
 	void DispatchCollisionEvents();

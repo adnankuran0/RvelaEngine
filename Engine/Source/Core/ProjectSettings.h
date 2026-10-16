@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <vector>
 #include <cstdint>
 
 namespace rv {
@@ -34,6 +35,13 @@ enum class ScalingFilter
 	Nearest = 1
 };
 
+struct AutoloadEntry
+{
+	std::string name;
+	std::string path;
+	bool enabled = true;
+};
+
 struct ProjectSettings
 {
 	static constexpr const char* AssetDirectory = "Assets";
@@ -64,6 +72,8 @@ struct ProjectSettings
 	uint32_t msaaSamples = 1;
 	bool fxaaEnabled = true;
 	uint32_t shadowResolution = 2048;
+
+	std::vector<AutoloadEntry> autoloads;
 };
 
 }

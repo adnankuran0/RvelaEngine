@@ -7,6 +7,8 @@
 #include "Asset/AssetManager.h"
 #include "Asset/AssetUUID.h"
 #include <glm/gtc/quaternion.hpp>
+#include "Scene/Components/AutoloadComponent.h"
+#include "Scene/Components/ScriptComponent.h"
 
 using namespace rv;
 
@@ -104,6 +106,25 @@ void LuaBindings::RegisterSceneAPI(sol::state& lua, SceneManager* sceneManager)
         return false;
     };
 
+    lua["SceneManager"]["GetAutoload"] = [sceneManager](sol::this_state s, const std::string& name) -> sol::object {
+        if (!sceneManager) return sol::nil;
+        Scene& scene = sceneManager->GetActiveScene();
+        auto view = scene.GetRegistry().view<AutoloadComponent>();
+        for (auto e : view)
+        {
+            if (view.get<AutoloadComponent>(e).name == name)
+            {
+                if (scene.HasComponent<ScriptComponent>(e))
+                {
+                    auto& sc = scene.GetComponent<ScriptComponent>(e);
+                    if (sc.luaInstance.valid()) return sc.luaInstance;
+                }
+                return sol::make_object(s, Entity(e, &scene));
+            }
+        }
+        return sol::nil;
+    };
+
     lua.new_usertype<Scene>("Scene",
         "IsValid", [](Scene& scene) { return true; },
         "CreateEntity", &Scene::CreateEntity,
@@ -111,6 +132,22 @@ void LuaBindings::RegisterSceneAPI(sol::state& lua, SceneManager* sceneManager)
         "FindEntityByName", &Scene::GetEntityByName,
         "Instantiate", [](Scene& scene, sol::object prefabObj, sol::optional<sol::object> posObj, sol::optional<sol::object> rotObj, sol::optional<sol::object> parentObj) {
             return InstantiatePrefabHelper(scene, prefabObj, posObj, rotObj, parentObj);
+        },
+        "GetAutoload", [](Scene& scene, sol::this_state s, const std::string& name) -> sol::object {
+            auto view = scene.GetRegistry().view<AutoloadComponent>();
+            for (auto e : view)
+            {
+                if (view.get<AutoloadComponent>(e).name == name)
+                {
+                    if (scene.HasComponent<ScriptComponent>(e))
+                    {
+                        auto& sc = scene.GetComponent<ScriptComponent>(e);
+                        if (sc.luaInstance.valid()) return sc.luaInstance;
+                    }
+                    return sol::make_object(s, Entity(e, &scene));
+                }
+            }
+            return sol::nil;
         }
     );
 }

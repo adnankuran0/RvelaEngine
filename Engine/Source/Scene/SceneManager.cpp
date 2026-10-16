@@ -6,6 +6,9 @@
 #include <Utils/Serializer.h>
 #include "Renderer/TextureCache.h"
 #include "Asset/AssetManager.h"
+#include "Components/AutoloadComponent.h"
+#include "Components/ScriptComponent.h"
+#include "Script/ScriptUtils.h"
 #include <filesystem>
 
 using namespace rv;
@@ -102,6 +105,7 @@ void SceneManager::StopScene()
 {
 	m_HasPendingScene = false;
 	m_PendingScenePath.clear();
+	m_AutoloadStates.clear();
     if (!m_CurrentScene) return;
 
     if (m_CurrentScene->GetState() == SceneState::PLAY || m_CurrentScene->GetState() == SceneState::PAUSE)
@@ -185,18 +189,68 @@ void SceneManager::Update()
 			return;
 
 		const SceneState previousState = m_CurrentScene ? m_CurrentScene->GetState() : SceneState::EDIT;
+		if (m_CurrentScene && previousState == SceneState::PLAY)
+		{
+			CaptureAutoloadStates(*m_CurrentScene);
+		}
 		if (m_CurrentScene && previousState != SceneState::EDIT)
 			m_CurrentScene->SetState(SceneState::EDIT);
 
 		SetActiveScene(std::move(scenePtr));
 		if (previousState == SceneState::PLAY)
+		{
 			m_CurrentScene->SetState(SceneState::PLAY);
+			RestoreAutoloadStates(*m_CurrentScene);
+		}
 		else if (previousState == SceneState::PAUSE)
 		{
 			m_CurrentScene->SetState(SceneState::PLAY);
+			RestoreAutoloadStates(*m_CurrentScene);
 			m_CurrentScene->SetState(SceneState::PAUSE);
 		}
     }
+}
+
+void SceneManager::CaptureAutoloadStates(Scene& scene)
+{
+	m_AutoloadStates.clear();
+	auto view = scene.GetRegistry().view<AutoloadComponent>();
+	for (auto e : view)
+	{
+		const auto& ac = view.get<AutoloadComponent>(e);
+		json state = json::object();
+		if (scene.HasComponent<ScriptComponent>(e))
+		{
+			auto& sc = scene.GetComponent<ScriptComponent>(e);
+			if (sc.luaInstance.valid())
+			{
+				state["lua"] = ScriptUtils::SerializeLuaInstanceData(sc.luaInstance);
+			}
+		}
+		m_AutoloadStates[ac.name] = state;
+	}
+}
+
+void SceneManager::RestoreAutoloadStates(Scene& scene)
+{
+	if (m_AutoloadStates.empty()) return;
+	auto view = scene.GetRegistry().view<AutoloadComponent>();
+	for (auto e : view)
+	{
+		const auto& ac = view.get<AutoloadComponent>(e);
+		auto it = m_AutoloadStates.find(ac.name);
+		if (it == m_AutoloadStates.end()) continue;
+
+		const json& state = it->second;
+		if (state.contains("lua") && scene.HasComponent<ScriptComponent>(e))
+		{
+			auto& sc = scene.GetComponent<ScriptComponent>(e);
+			if (sc.luaInstance.valid())
+			{
+				ScriptUtils::DeserializeLuaInstanceData(state["lua"], sc.luaInstance);
+			}
+		}
+	}
 }
 
 void SceneManager::FixedUpdate()

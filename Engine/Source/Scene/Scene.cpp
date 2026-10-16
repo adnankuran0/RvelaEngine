@@ -12,6 +12,8 @@
 #include "Asset/AssetManager.h"
 #include <glm/gtx/matrix_decompose.hpp>
 #include "Renderer/RenderLayer.h"
+#include "Components/AutoloadComponent.h"
+#include "Components/ScriptComponent.h"
 
 using namespace rv;
 
@@ -69,8 +71,84 @@ void Scene::SetState(SceneState newState)
 
 #include "Input/Input.h"
 
+void Scene::InstantiateAutoloads()
+{
+    if (!ProjectManager::IsProjectLoaded()) return;
+    auto activeProj = ProjectManager::GetActiveProject();
+    if (!activeProj) return;
+
+    const auto& autoloads = activeProj->GetSettings().autoloads;
+    if (autoloads.empty()) return;
+
+    for (const auto& entry : autoloads)
+    {
+        if (!entry.enabled || entry.name.empty() || entry.path.empty())
+            continue;
+
+        bool alreadyExists = false;
+        auto view = m_Registry.view<AutoloadComponent>();
+        for (auto existingHandle : view)
+        {
+            if (view.get<AutoloadComponent>(existingHandle).name == entry.name)
+            {
+                alreadyExists = true;
+                break;
+            }
+        }
+        if (alreadyExists) continue;
+
+        std::filesystem::path p(entry.path);
+        std::string ext = p.extension().string();
+        bool isPrefab = (ext == ".rprefab" || ext == ".prefab");
+
+        AssetUUID assetUUID = AssetManager::Get().GetRegistry().GetUUID(entry.path);
+        if (!assetUUID.IsValid() && p.is_relative())
+        {
+            auto projPath = ProjectManager::GetProjectPath();
+            if (!projPath.empty())
+                assetUUID = AssetManager::Get().GetRegistry().GetUUID((projPath / p).lexically_normal());
+        }
+        if (!assetUUID.IsValid() && p.is_relative())
+        {
+            auto assetDir = ProjectManager::GetAssetDirectory();
+            if (!assetDir.empty())
+                assetUUID = AssetManager::Get().GetRegistry().GetUUID((assetDir / p).lexically_normal());
+        }
+
+        if (isPrefab)
+        {
+            if (!assetUUID.IsValid())
+            {
+                LOG_ERROR("[Autoload] Could not resolve prefab asset: {}", entry.path);
+                continue;
+            }
+
+            Entity root = Instantiate(assetUUID);
+            if (root.IsValid())
+            {
+                root.GetComponent<TagComponent>().tag = entry.name;
+                root.AddComponent<AutoloadComponent>(entry.name, entry.path, true);
+            }
+        }
+        else
+        {
+            if (!assetUUID.IsValid())
+            {
+                LOG_ERROR("[Autoload] Could not resolve script asset: {}", entry.path);
+                continue;
+            }
+
+            Entity e = CreateEntity(entry.name);
+            e.AddComponent<AutoloadComponent>(entry.name, entry.path, false);
+            auto& sc = e.AddComponent<ScriptComponent>();
+            sc.scriptAssetUUID = assetUUID;
+        }
+    }
+}
+
 void Scene::OnStart()
 {
+    InstantiateAutoloads();
     m_PhysicsSystem.OnStart();
     m_ScriptSystem.OnStart();
     m_AudioSystem.OnStart();

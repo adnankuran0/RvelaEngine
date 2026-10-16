@@ -4,8 +4,21 @@
 #include "Audio/AudioManager.h"
 #include "Asset/Types/PrefabAsset.h"
 #include "Asset/AssetManager.h"
+#include "Components/AutoloadComponent.h"
 
 using namespace rv;
+
+static bool IsAutoloadEntity(Scene& scene, entt::entity e)
+{
+    entt::entity cur = e;
+    while (cur != entt::null && scene.GetRegistry().valid(cur) && cur != scene.GetRootEntity())
+    {
+        if (scene.HasComponent<AutoloadComponent>(cur))
+            return true;
+        cur = scene.GetParent(cur);
+    }
+    return false;
+}
 
 void SceneSerializer::SerializeHierarchyRecursively(Scene& scene, entt::entity current, json& outEntitiesArray, const std::unordered_set<entt::entity>& prefabChildren)
 {
@@ -13,7 +26,7 @@ void SceneSerializer::SerializeHierarchyRecursively(Scene& scene, entt::entity c
 
     if (current != scene.GetRootEntity())
     {
-        if (prefabChildren.count(current) == 0)
+        if (prefabChildren.count(current) == 0 && !IsAutoloadEntity(scene, current))
         {
             outEntitiesArray.push_back(SceneSerializer::SerializeEntity(scene, current));
         }
@@ -52,7 +65,7 @@ json SceneSerializer::SerializeScene(Scene& scene)
     auto allEntitiesView = scene.GetRegistry().view<UUIDComponent, SceneTreeComponent>();
     for (auto e : allEntitiesView)
     {
-        if (e == root || prefabChildren.count(e)) continue;
+        if (e == root || prefabChildren.count(e) || IsAutoloadEntity(scene, e)) continue;
 
         EntityUUID uuid = scene.GetComponent<UUIDComponent>(e).uuid;
         bool alreadySaved = false;

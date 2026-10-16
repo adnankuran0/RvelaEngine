@@ -37,6 +37,18 @@ std::string Project::Serialize() const
 	s["msaaSamples"] = m_Settings.msaaSamples;
 	s["fxaaEnabled"] = m_Settings.fxaaEnabled;
 	s["shadowResolution"] = m_Settings.shadowResolution;
+
+	json autoArr = json::array();
+	for (const auto& a : m_Settings.autoloads)
+	{
+		json item;
+		item["name"] = a.name;
+		item["path"] = a.path;
+		item["enabled"] = a.enabled;
+		autoArr.push_back(item);
+	}
+	s["autoloads"] = autoArr;
+
 	j["settings"] = s;
 
 	j["busLayout"] = AudioManager::Get().SaveBusLayout();
@@ -105,6 +117,20 @@ void Project::Deserialize(const std::string& jsonStr)
 		m_Settings.msaaSamples = s.value("msaaSamples", 1u);
 		m_Settings.fxaaEnabled = s.value("fxaaEnabled", true);
 		m_Settings.shadowResolution = s.value("shadowResolution", 2048u);
+
+		m_Settings.autoloads.clear();
+		if (s.contains("autoloads") && s["autoloads"].is_array())
+		{
+			for (const auto& item : s["autoloads"])
+			{
+				AutoloadEntry entry;
+				entry.name = item.value("name", "");
+				entry.path = item.value("path", "");
+				entry.enabled = item.value("enabled", true);
+				if (!entry.name.empty() && !entry.path.empty())
+					m_Settings.autoloads.push_back(entry);
+			}
+		}
 	}
 
 	if (j.contains("busLayout"))

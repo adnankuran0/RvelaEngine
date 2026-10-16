@@ -34,12 +34,17 @@ void ProjectSettingsPanel::Draw(Engine* engine)
         m_Initialized = true;
     }
 
-    ImGui::SetNextWindowSize(ImVec2(520, 360), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(640, 520), ImGuiCond_FirstUseEver);
     if (ImGui::Begin("Project Settings", &m_IsOpen))
     {
-        ImGui::TextColored(ImVec4(0.62f, 0.56f, 0.80f, 1.0f), "General Settings");
-        ImGui::Separator();
-        ImGui::Spacing();
+        if (ImGui::BeginTabBar("ProjectSettingsTabs"))
+        {
+            if (ImGui::BeginTabItem("General"))
+            {
+                ImGui::Spacing();
+                ImGui::TextColored(ImVec4(0.62f, 0.56f, 0.80f, 1.0f), "General Settings");
+                ImGui::Separator();
+                ImGui::Spacing();
 
         if (ImGui::InputText("Project Name", m_NameBuf, sizeof(m_NameBuf)))
         {
@@ -226,6 +231,175 @@ void ProjectSettingsPanel::Draw(Engine* engine)
             else if (currentShadow == 1) settings.shadowResolution = 2048;
             else if (currentShadow == 2) settings.shadowResolution = 4096;
         }
+
+        ImGui::EndTabItem();
+        }
+
+        if (ImGui::BeginTabItem("Globals"))
+        {
+            ImGui::Spacing();
+            ImGui::TextColored(ImVec4(0.62f, 0.56f, 0.80f, 1.0f), "Autoload");
+            ImGui::Separator();
+            ImGui::Spacing();
+
+            ImGui::Text("Path (.lua or .rprefab):");
+            ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - 100.0f);
+            ImGui::InputText("##AutoloadPath", m_AutoloadPathBuf, sizeof(m_AutoloadPathBuf));
+
+            if (ImGui::BeginDragDropTarget())
+            {
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
+                {
+                    std::filesystem::path droppedPath = (const char*)payload->Data;
+                    std::string ext = droppedPath.extension().string();
+                    if (ext == ".lua" || ext == ".rprefab")
+                    {
+                        std::error_code ec;
+                        std::filesystem::path rel = std::filesystem::relative(droppedPath, ProjectManager::GetProjectPath(), ec);
+                        std::string relStr = (!ec && !rel.empty()) ? rel.generic_string() : droppedPath.generic_string();
+                        strncpy_s(m_AutoloadPathBuf, relStr.c_str(), sizeof(m_AutoloadPathBuf) - 1);
+                        if (m_AutoloadNameBuf[0] == '\0')
+                        {
+                            std::string stem = droppedPath.stem().string();
+                            strncpy_s(m_AutoloadNameBuf, stem.c_str(), sizeof(m_AutoloadNameBuf) - 1);
+                        }
+                    }
+                }
+                ImGui::EndDragDropTarget();
+            }
+
+            ImGui::SameLine();
+            if (ImGui::Button("Browse##Autoload"))
+            {
+                EditorFileDialog::Open(
+                    "Select Autoload Script or Prefab",
+                    FileDialogMode::OpenFile,
+                    { ".lua", ".rprefab" },
+                    ProjectManager::GetAssetDirectory(),
+                    [this](const std::filesystem::path& chosen) {
+                        std::error_code ec;
+                        std::filesystem::path rel = std::filesystem::relative(chosen, ProjectManager::GetProjectPath(), ec);
+                        std::string relStr = (!ec && !rel.empty()) ? rel.generic_string() : chosen.generic_string();
+                        strncpy_s(m_AutoloadPathBuf, relStr.c_str(), sizeof(m_AutoloadPathBuf) - 1);
+                        if (m_AutoloadNameBuf[0] == '\0')
+                        {
+                            std::string stem = chosen.stem().string();
+                            strncpy_s(m_AutoloadNameBuf, stem.c_str(), sizeof(m_AutoloadNameBuf) - 1);
+                        }
+                    }
+                );
+            }
+
+            ImGui::Text("Singleton Name:");
+            ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - 100.0f);
+            ImGui::InputText("##AutoloadName", m_AutoloadNameBuf, sizeof(m_AutoloadNameBuf));
+            ImGui::SameLine();
+            if (ImGui::Button("Add##AutoloadBtn", ImVec2(90.0f, 0.0f)))
+            {
+                std::string name = m_AutoloadNameBuf;
+                std::string path = m_AutoloadPathBuf;
+                if (!name.empty() && !path.empty())
+                {
+                    bool exists = false;
+                    for (const auto& a : settings.autoloads)
+                    {
+                        if (a.name == name) { exists = true; break; }
+                    }
+                    if (!exists)
+                    {
+                        settings.autoloads.push_back(AutoloadEntry{ name, path, true });
+                        m_AutoloadNameBuf[0] = '\0';
+                        m_AutoloadPathBuf[0] = '\0';
+                        m_AutoloadError.clear();
+                    }
+                    else
+                    {
+                        m_AutoloadError = "An autoload with this name already exists!";
+                    }
+                }
+                else
+                {
+                    m_AutoloadError = "Name and Path cannot be empty!";
+                }
+            }
+
+            if (!m_AutoloadError.empty())
+            {
+                ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "%s", m_AutoloadError.c_str());
+            }
+
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::Spacing();
+            ImGui::Text("Registered Autoloads (%zu):", settings.autoloads.size());
+
+            if (settings.autoloads.empty())
+            {
+                ImGui::TextDisabled("No autoload singletons defined yet.");
+            }
+            else
+            {
+                if (ImGui::BeginTable("AutoloadTable", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp))
+                {
+                    ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, 140.0f);
+                    ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_WidthFixed, 75.0f);
+                    ImGui::TableSetupColumn("Path", ImGuiTableColumnFlags_WidthStretch);
+                    ImGui::TableSetupColumn("Enabled", ImGuiTableColumnFlags_WidthFixed, 65.0f);
+                    ImGui::TableSetupColumn("Action", ImGuiTableColumnFlags_WidthFixed, 65.0f);
+                    ImGui::TableHeadersRow();
+
+                    int toDelete = -1;
+                    for (int i = 0; i < static_cast<int>(settings.autoloads.size()); ++i)
+                    {
+                        auto& entry = settings.autoloads[i];
+                        ImGui::TableNextRow();
+
+                        // Name
+                        ImGui::TableSetColumnIndex(0);
+                        ImGui::TextUnformatted(entry.name.c_str());
+
+                        // Type
+                        ImGui::TableSetColumnIndex(1);
+                        std::string ext = std::filesystem::path(entry.path).extension().string();
+                        if (ext == ".rprefab" || ext == ".prefab")
+                            ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "Prefab");
+                        else if (ext == ".lua")
+                            ImGui::TextColored(ImVec4(0.4f, 1.0f, 0.6f, 1.0f), "Script");
+                        else
+                            ImGui::TextDisabled("Unknown");
+
+                        // Path
+                        ImGui::TableSetColumnIndex(2);
+                        ImGui::TextUnformatted(entry.path.c_str());
+
+                        // Enabled
+                        ImGui::TableSetColumnIndex(3);
+                        std::string enableId = "##en_" + std::to_string(i);
+                        ImGui::Checkbox(enableId.c_str(), &entry.enabled);
+
+                        // Delete button
+                        ImGui::TableSetColumnIndex(4);
+                        std::string delId = "Delete##del_" + std::to_string(i);
+                        if (ImGui::Button(delId.c_str()))
+                        {
+                            toDelete = i;
+                        }
+                    }
+
+                    if (toDelete >= 0 && toDelete < static_cast<int>(settings.autoloads.size()))
+                    {
+                        settings.autoloads.erase(settings.autoloads.begin() + toDelete);
+                    }
+
+                    ImGui::EndTable();
+                }
+            }
+
+            ImGui::EndTabItem();
+        }
+
+        ImGui::EndTabBar();
+    }
 
         ImGui::Spacing();
         ImGui::Separator();

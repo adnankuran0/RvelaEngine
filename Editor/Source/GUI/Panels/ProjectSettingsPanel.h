@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 namespace rv {
 
@@ -20,6 +21,9 @@ private:
     bool m_IsOpen = false;
     char m_NameBuf[128] = "";
     char m_StartSceneBuf[256] = "";
+    char m_AutoloadNameBuf[128] = "";
+    char m_AutoloadPathBuf[256] = "";
+    std::string m_AutoloadError;
     bool m_Initialized = false;
 };
 

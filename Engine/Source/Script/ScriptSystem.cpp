@@ -1,6 +1,7 @@
 #include "rvelapch.h"
 #include "ScriptSystem.h"
 #include "Scene/Components/ScriptComponent.h"
+#include "Scene/Components/AutoloadComponent.h"
 #include "Scene/Components/MaterialComponent.h"
 #include "Scene/Entity.h"
 #include "Physics/CollisionInfo.h"
@@ -238,6 +239,12 @@ void ScriptSystem::BindLuaScript(ScriptComponent& sc, entt::entity e)
     sc.OnAnimationFinished = sc.luaInstance["OnAnimationFinished"];
     sc.OnAnimationLooped = sc.luaInstance["OnAnimationLooped"];
     sc.OnAudioFinished = sc.luaInstance["OnAudioFinished"];
+
+    if (m_Scene.HasComponent<AutoloadComponent>(e))
+    {
+        const auto& ac = m_Scene.GetComponent<AutoloadComponent>(e);
+        m_ScriptEngine.GetState()[ac.name] = sc.luaInstance;
+    }
 }
 
 void ScriptSystem::InvokeLifecycleCallback(ScriptComponent& sc, sol::protected_function& callback, const char* callbackName)
@@ -649,6 +656,31 @@ void ScriptSystem::OnStart()
             sc.runtimeEnabled = true;
             InvokeLifecycleCallback(sc, sc.OnEnabled, "OnEnabled");
         }
+    }
+
+    auto autoloadView = m_Scene.GetRegistry().view<AutoloadComponent>();
+    for (auto entity : autoloadView)
+    {
+        const auto& ac = autoloadView.get<AutoloadComponent>(entity);
+        sol::state& lua = m_ScriptEngine.GetState();
+        if (m_Scene.HasComponent<ScriptComponent>(entity))
+        {
+            auto& sc = m_Scene.GetComponent<ScriptComponent>(entity);
+            EnsureScriptInitialized(sc, entity);
+            if (sc.luaInstance.valid())
+            {
+                lua[ac.name] = sc.luaInstance;
+            }
+            else
+            {
+                lua[ac.name] = Entity(entity, &m_Scene);
+            }
+        }
+        else
+        {
+            lua[ac.name] = Entity(entity, &m_Scene);
+        }
+        LOG_INFO("[Autoload] Registered global Lua singleton: '{}'", ac.name);
     }
 
     m_IsReady = true;

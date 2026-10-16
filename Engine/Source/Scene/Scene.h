@@ -52,6 +52,7 @@ public:
     }
 
     void OnStart();
+    void InstantiateAutoloads();
     void OnUpdate(float dt);
     void OnFixedUpdate(float dt);
     void OnLateUpdate(float dt);
