@@ -15,6 +15,8 @@ void main()
 #shader fragment
 #version 460 core
 
+#include "Common/Camera.glsl"
+
 in vec2 TexCoords;
 out vec4 FragColor;
 
@@ -41,7 +43,7 @@ void main()
     {
         FragColor = texture(u_Texture2D, TexCoords);
     }
-    // Mode 1: Normal Buffer ([-1, 1] mapped to [0, 1])
+    // Mode 1: Normal Buffer (World Space Normal [-1, 1] mapped to [0, 1])
     else if (u_Mode == 1)
     {
         vec3 n = texture(u_Texture2D, TexCoords).xyz;
@@ -51,7 +53,8 @@ void main()
         }
         else
         {
-            vec3 visualNormal = normalize(n) * 0.5 + 0.5;
+            vec3 worldNormal = normalize(mat3(invView) * n);
+            vec3 visualNormal = worldNormal * 0.5 + 0.5;
             FragColor = vec4(visualNormal, 1.0);
         }
     }

@@ -114,12 +114,32 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             glBindSampler(2, 0);
             glBindTextureUnit(2, 0);
         }
+
+        bool useNorm = material->IsUsingNormalMap() && material->GetNormalTexture();
+        shader.setBool("useNormalMap", useNorm);
+        shader.setFloat("normalScale", material->GetNormalScale());
+        if (useNorm)
+        {
+            shader.setInt("normalMap", 3);
+            TextureCache::Get().GetOrCreate(material->GetNormalTexture()).Bind(3);
+            material->GetSampler().Bind(3);
+        }
+        else
+        {
+            glBindSampler(3, 0);
+            glBindTextureUnit(3, 0);
+        }
         };
 
     auto CleanupSamplers = []() {
         glBindSampler(0, 0);
         glBindSampler(1, 0);
         glBindSampler(2, 0);
+        glBindSampler(3, 0);
+        glBindTextureUnit(0, 0);
+        glBindTextureUnit(1, 0);
+        glBindTextureUnit(2, 0);
+        glBindTextureUnit(3, 0);
         };
 
     if (!staticCommands.empty())
