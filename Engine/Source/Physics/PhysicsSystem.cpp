@@ -12,8 +12,11 @@
 #include <cstdarg>
 #include <thread>
 #include <functional>
+#include <chrono>
 #include "Scene/Scene.h"
 #include <Scene/Components/RigidbodyComponent.h>
+#include <Scene/Components/CharacterBodyComponent.h>
+#include <Scene/Components/ColliderComponents.h>
 #include <Scene/Components/SceneTreeComponent.h>
 #include <Scene/Components/TagComponent.h>
 
@@ -50,6 +53,8 @@ PhysicsSystem::PhysicsSystem(Scene& scene) :
 
 void PhysicsSystem::Step(float dt)
 {
+	auto startTime = std::chrono::high_resolution_clock::now();
+
 	BuildBodies();
 
 	if (m_Scene.GetState() == SceneState::PLAY)
@@ -60,6 +65,46 @@ void PhysicsSystem::Step(float dt)
 	m_PhysicsSystem.Update(dt, cCollisionSteps, &m_TempAllocator, &m_JobSystem);
 
 	SyncTransforms();
+
+	auto endTime = std::chrono::high_resolution_clock::now();
+	m_StepTimeMs = std::chrono::duration<float, std::milli>(endTime - startTime).count();
+}
+
+PhysicsStats PhysicsSystem::GetStats()
+{
+	PhysicsStats stats;
+	stats.stepTimeMs = m_StepTimeMs;
+
+	auto& reg = m_Scene.GetRegistry();
+	auto rbView = reg.view<RigidbodyComponent>();
+	for (auto e : rbView)
+	{
+		stats.totalBodies++;
+		const auto& rb = rbView.get<RigidbodyComponent>(e);
+		if (rb.bodyType == Physics::MotionType::STATIC)
+			stats.staticBodies++;
+		else if (rb.bodyType == Physics::MotionType::DYNAMIC)
+			stats.dynamicBodies++;
+		else if (rb.bodyType == Physics::MotionType::KINEMATIC)
+			stats.kinematicBodies++;
+	}
+
+	auto cbView = reg.view<CharacterBodyComponent>();
+	stats.characterBodies = static_cast<uint32_t>(cbView.size());
+
+	stats.totalColliders += static_cast<uint32_t>(reg.view<BoxColliderComponent>().size());
+	stats.totalColliders += static_cast<uint32_t>(reg.view<SphereColliderComponent>().size());
+	stats.totalColliders += static_cast<uint32_t>(reg.view<CapsuleColliderComponent>().size());
+	stats.totalColliders += static_cast<uint32_t>(reg.view<CylinderColliderComponent>().size());
+	stats.totalColliders += static_cast<uint32_t>(reg.view<MeshColliderComponent>().size());
+	stats.totalColliders += static_cast<uint32_t>(reg.view<ConvexHullColliderComponent>().size());
+
+	if (m_Scene.GetState() == SceneState::PLAY)
+	{
+		stats.activeBodies = m_PhysicsSystem.GetNumActiveBodies(JPH::EBodyType::RigidBody);
+	}
+
+	return stats;
 }
 
 void PhysicsSystem::DebugDraw()
@@ -148,6 +193,7 @@ void PhysicsSystem::OnStop()
 	}
 
 	m_ColliderHierarchyCache.clear();
+	m_StepTimeMs = 0.0f;
 }
 
 void PhysicsSystem::BindCallbacks()

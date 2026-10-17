@@ -2,6 +2,7 @@
 #include "RenderPipeline.h"
 #include "Utils/GPUTimer.h"
 #include "Core/Engine.h"
+#include "Renderer/Camera.h"
 #include "RenderContext.h"
 #include "Renderer/RenderTypes.h"
 #include "Renderer/RenderPasses/LightingPass.h"
@@ -198,6 +199,73 @@ void RenderPipeline::Execute(const RenderContext& ctx)
 		pass->Execute(ctx, m_RenderFrame);
 	GLenum afterErr = glGetError();
 
-	m_RenderFrame.Reset();
+	m_Stats = {};
+	for (const auto& cmd : m_RenderFrame.opaqueCommands)
+	{
+		if (cmd.mesh)
+		{
+			if (ctx.camera && !ctx.camera->Intersects(cmd.mesh->worldAABB))
+				continue;
 
+			m_Stats.drawCalls++;
+			m_Stats.meshCount++;
+			m_Stats.triangles += cmd.mesh->indexCount / 3;
+			m_Stats.vertices += cmd.mesh->indexCount;
+		}
+	}
+	for (const auto& cmd : m_RenderFrame.transparentCommands)
+	{
+		if (cmd.mesh)
+		{
+			if (ctx.camera && !ctx.camera->Intersects(cmd.mesh->worldAABB))
+				continue;
+
+			m_Stats.drawCalls++;
+			m_Stats.meshCount++;
+			m_Stats.triangles += cmd.mesh->indexCount / 3;
+			m_Stats.vertices += cmd.mesh->indexCount;
+		}
+	}
+	for (const auto& cmd : m_RenderFrame.skeletalOpaqueCommands)
+	{
+		if (cmd.mesh)
+		{
+			if (ctx.camera && cmd.mesh->worldAABB.IsValid() && !ctx.camera->Intersects(cmd.mesh->worldAABB))
+				continue;
+
+			m_Stats.drawCalls++;
+			m_Stats.skeletalMeshCount++;
+			m_Stats.triangles += cmd.mesh->indexCount / 3;
+			m_Stats.vertices += cmd.mesh->indexCount;
+		}
+	}
+	for (const auto& cmd : m_RenderFrame.skeletalTransparentCommands)
+	{
+		if (cmd.mesh)
+		{
+			if (ctx.camera && cmd.mesh->worldAABB.IsValid() && !ctx.camera->Intersects(cmd.mesh->worldAABB))
+				continue;
+
+			m_Stats.drawCalls++;
+			m_Stats.skeletalMeshCount++;
+			m_Stats.triangles += cmd.mesh->indexCount / 3;
+			m_Stats.vertices += cmd.mesh->indexCount;
+		}
+	}
+	for (const auto& cmd : m_RenderFrame.particleCommands)
+	{
+		m_Stats.drawCalls++;
+		m_Stats.particleCount += cmd.instanceCount;
+		m_Stats.triangles += (cmd.indexCount / 3) * cmd.instanceCount;
+		m_Stats.vertices += cmd.indexCount * cmd.instanceCount;
+	}
+	for (const auto& cmd : m_RenderFrame.decalCommands)
+	{
+		m_Stats.drawCalls++;
+		m_Stats.decalCount++;
+		m_Stats.triangles += 12;
+		m_Stats.vertices += 36;
+	}
+
+	m_RenderFrame.Reset();
 }

@@ -701,6 +701,12 @@ void Viewport::DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySi
         if (ImGui::Checkbox("Draw Colliders", &debugSettings.drawColliders)) overlaysChanged = true;
         if (ImGui::Checkbox("Draw Bounding Boxes", &debugSettings.drawBoundingBoxes)) overlaysChanged = true;
 
+        ImGui::Spacing();
+        ImGui::TextDisabled("Statistics");
+        ImGui::Separator();
+        if (ImGui::Checkbox("Show Statistics", &m_ShowStatistics)) overlaysChanged = true;
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Toggle performance and scene statistics overlay");
+
         if (overlaysChanged)
         {
             EditorSettings::Get().UpdateFromViewport(*this);
@@ -812,14 +818,177 @@ void Viewport::DrawOverlayStats(Engine* engine, ImVec2& displayPos, ImVec2& disp
         drawList->AddText(textPos, IM_COL32(245, 195, 65, 255), buf);
     }
 
-    char statBuf[128];
-    snprintf(statBuf, sizeof(statBuf), "%.0f FPS (%.2f ms)", ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
-    ImVec2 statTextSize = ImGui::CalcTextSize(statBuf);
-    ImVec2 statPos = ImVec2(displayPos.x + displaySize.x - statTextSize.x - 14.0f, displayPos.y + 115.0f);
+    if (m_ShowStatistics)
+    {
+        float framerate = ImGui::GetIO().Framerate;
+        float frameTimeMs = (framerate > 0.0f) ? (1000.0f / framerate) : 0.0f;
 
-    drawList->AddRectFilled(ImVec2(statPos.x - 6.0f, statPos.y - 4.0f), ImVec2(statPos.x + statTextSize.x + 6.0f, statPos.y + statTextSize.y + 4.0f),
-        IM_COL32(18, 20, 24, 180), 4.0f);
-    drawList->AddText(statPos, IM_COL32(160, 165, 175, 255), statBuf);
+        char fpsBuf[64];
+        snprintf(fpsBuf, sizeof(fpsBuf), "%.0f FPS (%.2f ms)", framerate, frameTimeMs);
+
+        ImU32 fpsColor = IM_COL32(90, 220, 120, 255);
+        if (framerate < 30.0f)
+            fpsColor = IM_COL32(240, 80, 80, 255);
+        else if (framerate < 50.0f)
+            fpsColor = IM_COL32(245, 200, 65, 255);
+
+        auto& ctx = engine->GetRenderLayer().GetRenderContext();
+        uint32_t resW = ctx.viewportWidth > 0 ? ctx.viewportWidth : static_cast<uint32_t>(displaySize.x);
+        uint32_t resH = ctx.viewportHeight > 0 ? ctx.viewportHeight : static_cast<uint32_t>(displaySize.y);
+        char resBuf[64];
+        snprintf(resBuf, sizeof(resBuf), "%u x %u", resW, resH);
+
+        const auto& stats = engine->GetRenderLayer().GetRenderStats();
+
+        char drawCallBuf[32];
+        snprintf(drawCallBuf, sizeof(drawCallBuf), "%u", stats.drawCalls);
+
+        auto FormatStatNum = [](uint32_t val) -> std::string {
+            std::string s = std::to_string(val);
+            int n = static_cast<int>(s.length()) - 3;
+            while (n > 0)
+            {
+                s.insert(n, ",");
+                n -= 3;
+            }
+            return s;
+        };
+
+        std::string triStr = FormatStatNum(stats.triangles);
+        std::string vertStr = FormatStatNum(stats.vertices);
+
+        auto& scene = engine->GetActiveScene();
+        auto& reg = scene.GetRegistry();
+        uint32_t entityCount = static_cast<uint32_t>(reg.storage<entt::entity>().free_list());
+        if (entityCount > 0 && reg.valid(scene.GetRootEntity()))
+            entityCount--;
+        char entBuf[32];
+        snprintf(entBuf, sizeof(entBuf), "%u", entityCount);
+
+        uint32_t totalMeshes = stats.meshCount + stats.skeletalMeshCount;
+        char meshBuf[64];
+        if (stats.skeletalMeshCount > 0)
+            snprintf(meshBuf, sizeof(meshBuf), "%u (%u skel)", totalMeshes, stats.skeletalMeshCount);
+        else
+            snprintf(meshBuf, sizeof(meshBuf), "%u", totalMeshes);
+
+        uint32_t dirLights = ctx.directionalLight.has_value() ? 1 : 0;
+        uint32_t pointLights = static_cast<uint32_t>(ctx.pointLights.size());
+        uint32_t spotLights = static_cast<uint32_t>(ctx.spotLights.size());
+        uint32_t totalLights = dirLights + pointLights + spotLights;
+        char lightBuf[64];
+        if (totalLights > 0)
+            snprintf(lightBuf, sizeof(lightBuf), "%u (%uD/%uP/%uS)", totalLights, dirLights, pointLights, spotLights);
+        else
+            snprintf(lightBuf, sizeof(lightBuf), "0");
+
+        PhysicsStats physStats = scene.GetPhysicsSystem().GetStats();
+
+        char bodiesBuf[64];
+        bool isPlayState = (engine->GetActiveScene().GetState() == SceneState::PLAY);
+        if (isPlayState)
+        {
+            snprintf(bodiesBuf, sizeof(bodiesBuf), "%u (%u act)", 
+                physStats.totalBodies + physStats.characterBodies, 
+                physStats.activeBodies);
+        }
+        else
+        {
+            if (physStats.characterBodies > 0)
+            {
+                snprintf(bodiesBuf, sizeof(bodiesBuf), "%u (%uD/%uS/%uC)", 
+                    physStats.totalBodies + physStats.characterBodies,
+                    physStats.dynamicBodies, 
+                    physStats.staticBodies,
+                    physStats.characterBodies);
+            }
+            else
+            {
+                snprintf(bodiesBuf, sizeof(bodiesBuf), "%u (%uD/%uS)", 
+                    physStats.totalBodies, 
+                    physStats.dynamicBodies, 
+                    physStats.staticBodies);
+            }
+        }
+
+        char collidersBuf[32];
+        snprintf(collidersBuf, sizeof(collidersBuf), "%u", physStats.totalColliders);
+
+        char physStepBuf[32];
+        snprintf(physStepBuf, sizeof(physStepBuf), "%.2f ms", physStats.stepTimeMs);
+
+        struct StatRow
+        {
+            const char* label;
+            std::string value;
+            ImU32 valueColor;
+        };
+
+        std::vector<StatRow> rows = {
+            { "FPS", fpsBuf, fpsColor },
+            { "Resolution", resBuf, IM_COL32(225, 230, 240, 255) },
+            { "Draw Calls", drawCallBuf, IM_COL32(225, 230, 240, 255) },
+            { "Triangles", triStr, IM_COL32(225, 230, 240, 255) },
+            { "Vertices", vertStr, IM_COL32(225, 230, 240, 255) },
+            { "Entities", entBuf, IM_COL32(225, 230, 240, 255) },
+            { "Meshes", meshBuf, IM_COL32(225, 230, 240, 255) },
+            { "Lights", lightBuf, IM_COL32(225, 230, 240, 255) },
+            { "Bodies", bodiesBuf, IM_COL32(225, 230, 240, 255) },
+            { "Colliders", collidersBuf, IM_COL32(225, 230, 240, 255) }
+        };
+
+        if (isPlayState)
+        {
+            ImU32 stepColor = IM_COL32(90, 220, 120, 255);
+            if (physStats.stepTimeMs > 8.0f)
+                stepColor = IM_COL32(240, 80, 80, 255);
+            else if (physStats.stepTimeMs > 4.0f)
+                stepColor = IM_COL32(245, 200, 65, 255);
+
+            rows.push_back({ "Phys Step", physStepBuf, stepColor });
+        }
+
+        const float padX = 10.0f;
+        const float padY = 8.0f;
+        const float rowHeight = 17.0f;
+        const float headerHeight = 22.0f;
+        const size_t numRows = rows.size();
+
+        float maxLabelW = 0.0f;
+        float maxValW = 0.0f;
+        for (const auto& r : rows)
+        {
+            maxLabelW = std::max(maxLabelW, ImGui::CalcTextSize(r.label).x);
+            maxValW = std::max(maxValW, ImGui::CalcTextSize(r.value.c_str()).x);
+        }
+
+        float panelWidth = std::max(220.0f, maxLabelW + maxValW + padX * 3.0f + 16.0f);
+        float panelHeight = headerHeight + padY * 2.0f + static_cast<float>(numRows) * rowHeight;
+
+        bool isEditState = (engine->GetActiveScene().GetState() == SceneState::EDIT);
+        float startY = isEditState ? 115.0f : 14.0f;
+        ImVec2 panelPos = ImVec2(displayPos.x + displaySize.x - panelWidth - 14.0f, displayPos.y + startY);
+
+        drawList->AddRectFilled(panelPos, ImVec2(panelPos.x + panelWidth, panelPos.y + panelHeight), IM_COL32(18, 20, 24, 215), 5.0f);
+        drawList->AddRect(panelPos, ImVec2(panelPos.x + panelWidth, panelPos.y + panelHeight), IM_COL32(50, 54, 62, 200), 5.0f, 0, 1.0f);
+
+        drawList->AddText(ImVec2(panelPos.x + padX, panelPos.y + 6.0f), IM_COL32(245, 195, 65, 255), "STATISTICS");
+
+        float sepY = panelPos.y + headerHeight + 2.0f;
+        drawList->AddLine(ImVec2(panelPos.x + 8.0f, sepY), ImVec2(panelPos.x + panelWidth - 8.0f, sepY), IM_COL32(55, 60, 70, 180), 1.0f);
+
+        float curY = sepY + 5.0f;
+        for (const auto& r : rows)
+        {
+            drawList->AddText(ImVec2(panelPos.x + padX, curY), IM_COL32(150, 155, 165, 255), r.label);
+
+            ImVec2 valSize = ImGui::CalcTextSize(r.value.c_str());
+            float valX = panelPos.x + panelWidth - padX - valSize.x;
+            drawList->AddText(ImVec2(valX, curY), r.valueColor, r.value.c_str());
+
+            curY += rowHeight;
+        }
+    }
 }
 
 void Viewport::DrawDebugBufferBadge(Engine* engine, ImVec2& displayPos, ImVec2& displaySize)
@@ -987,9 +1156,22 @@ void Viewport::HandleSelection(Engine* engine, ImVec2& displayPos, ImVec2& displ
         mousePos.y >= (displayPos.y + margin) &&
         mousePos.y <= (displayPos.y + margin + rightToolbarHeight);
 
+    bool isOverStats = false;
+    if (m_ShowStatistics)
+    {
+        const float statsW = 240.0f;
+        const float statsH = 260.0f;
+        float statsY = (engine->GetActiveScene().GetState() == SceneState::EDIT) ? 115.0f : 14.0f;
+        isOverStats = mousePos.x >= (displayPos.x + displaySize.x - statsW - 14.0f) &&
+            mousePos.x <= (displayPos.x + displaySize.x - 14.0f) &&
+            mousePos.y >= (displayPos.y + statsY) &&
+            mousePos.y <= (displayPos.y + statsY + statsH);
+    }
+
     if (isMouseInViewport && ImGui::IsMouseClicked(ImGuiMouseButton_Left) &&
         !ImGuizmo::IsUsing() && !ImGuizmo::IsOver() &&
-        !isOverOrientationGizmo && !isOverLeftToolbar && !isOverRightToolbar)
+        !isOverOrientationGizmo && !isOverLeftToolbar && !isOverRightToolbar &&
+        !isOverStats)
     {
         glm::vec2 mouseViewportPos = { mousePos.x - displayPos.x, mousePos.y - displayPos.y };
 

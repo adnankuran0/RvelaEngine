@@ -23,6 +23,18 @@ class Scene;
 struct RigidbodyComponent;
 struct CharacterBodyComponent;
 
+struct PhysicsStats
+{
+	uint32_t totalBodies = 0;
+	uint32_t activeBodies = 0;
+	uint32_t staticBodies = 0;
+	uint32_t dynamicBodies = 0;
+	uint32_t kinematicBodies = 0;
+	uint32_t characterBodies = 0;
+	uint32_t totalColliders = 0;
+	float stepTimeMs = 0.0f;
+};
+
 class PhysicsSystem
 {
 public:
@@ -31,6 +43,7 @@ public:
 	void OnStop();
 	void Step(float dt);
 	void Update();
+	PhysicsStats GetStats();
 	inline Physics::PhysicsWorld& GetPhysicsWorld() { return m_PhysicsWorld; }
 	std::vector<Physics::CollisionEvent> FlushEvents()
 	{
@@ -113,6 +126,7 @@ private:
 	};
 
 	std::unordered_map<entt::entity, std::vector<ColliderTransformSnapshot>> m_ColliderHierarchyCache;
+	float m_StepTimeMs = 0.0f;
 };
 
 }

@@ -24,6 +24,7 @@ public:
 	RenderPipeline& GetRenderPipeline() { return *m_RenderPipeline; }
 	RenderPassHandle PushRenderPass(std::unique_ptr<RenderPass> pass) { return m_RenderPipeline->PushRenderPass(std::move(pass)); }
 	RenderPass* GetRenderPass(RenderPassHandle id) { return m_RenderPipeline->GetRenderPass(id); };
+	[[nodiscard]] const RenderStats& GetRenderStats() const noexcept { return m_RenderPipeline->GetStats(); }
 
 	[[nodiscard]] bool GetWireframe() const noexcept { return m_Wireframe; }
 	void SetWireframe(bool enabled) noexcept { m_Wireframe = enabled; }

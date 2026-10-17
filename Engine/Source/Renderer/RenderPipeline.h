@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <cstdint>
 #include "RenderPass.h"
 #include "RenderCommand.h"
 #include "RenderFrame.h"
@@ -13,6 +14,17 @@ struct RenderContext;
 class RenderLayer;
 
 using RenderPassHandle = uint32_t;
+
+struct RenderStats
+{
+	uint32_t drawCalls = 0;
+	uint32_t triangles = 0;
+	uint32_t vertices = 0;
+	uint32_t meshCount = 0;
+	uint32_t skeletalMeshCount = 0;
+	uint32_t particleCount = 0;
+	uint32_t decalCount = 0;
+};
 
 struct PassEntry
 {
@@ -29,6 +41,8 @@ public:
 	RenderPass* GetRenderPass(RenderPassHandle id);
 	void OnResize(uint32_t width, uint32_t height);
 	void Execute(const RenderContext& ctx);
+
+	[[nodiscard]] const RenderStats& GetStats() const noexcept { return m_Stats; }
 
 	[[nodiscard]] inline GLuint GetFinalTexture() noexcept
 	{
@@ -72,6 +86,8 @@ private:
 	DebugBufferMode m_DebugBufferMode = DebugBufferMode::None;
 	int m_DebugBufferLayer = 0;
 	int m_DebugBufferFace = -1;
+
+	RenderStats m_Stats;
 };
 
 }

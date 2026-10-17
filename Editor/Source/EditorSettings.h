@@ -33,6 +33,7 @@ struct ViewportGizmoSettings
     bool SelectRootEntity = true;
     bool DrawTransformGizmo = true;
     bool DrawSceneGizmos = true;
+    bool ShowStatistics = true;
 };
 
 class EditorSettings

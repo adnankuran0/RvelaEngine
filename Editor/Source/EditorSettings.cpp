@@ -63,6 +63,7 @@ void EditorSettings::Load()
             if (v.contains("selectRootEntity")) ViewportSettings.SelectRootEntity = v["selectRootEntity"].get<bool>();
             if (v.contains("drawTransformGizmo")) ViewportSettings.DrawTransformGizmo = v["drawTransformGizmo"].get<bool>();
             if (v.contains("drawSceneGizmos")) ViewportSettings.DrawSceneGizmos = v["drawSceneGizmos"].get<bool>();
+            if (v.contains("showStatistics")) ViewportSettings.ShowStatistics = v["showStatistics"].get<bool>();
         }
     }
     catch (const std::exception& e)
@@ -101,7 +102,8 @@ void EditorSettings::Save()
         { "drawInfiniteGrid", ViewportSettings.DrawInfiniteGrid },
         { "selectRootEntity", ViewportSettings.SelectRootEntity },
         { "drawTransformGizmo", ViewportSettings.DrawTransformGizmo },
-        { "drawSceneGizmos", ViewportSettings.DrawSceneGizmos }
+        { "drawSceneGizmos", ViewportSettings.DrawSceneGizmos },
+        { "showStatistics", ViewportSettings.ShowStatistics }
     };
 
     std::ofstream file(filePath);
@@ -152,6 +154,7 @@ void EditorSettings::ApplyToViewport(Viewport& viewport) const
     debugSettings.drawInfiniteGrid = ViewportSettings.DrawInfiniteGrid;
     viewport.SetSelectRootEntity(ViewportSettings.SelectRootEntity);
     viewport.SetDrawGizmos(ViewportSettings.DrawTransformGizmo);
+    viewport.SetShowStatistics(ViewportSettings.ShowStatistics);
     GizmoPass::s_Enabled = ViewportSettings.DrawSceneGizmos;
 }
 
@@ -169,5 +172,6 @@ void EditorSettings::UpdateFromViewport(const Viewport& viewport)
     ViewportSettings.DrawInfiniteGrid = debugSettings.drawInfiniteGrid;
     ViewportSettings.SelectRootEntity = viewport.GetSelectRootEntity();
     ViewportSettings.DrawTransformGizmo = viewport.GetDrawGizmos();
+    ViewportSettings.ShowStatistics = viewport.GetShowStatistics();
     ViewportSettings.DrawSceneGizmos = GizmoPass::s_Enabled;
 }
