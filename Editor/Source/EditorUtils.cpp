@@ -15,7 +15,15 @@
 #include "Scene/Components/TransformComponent.h"
 #include "Scene/Components/SceneTreeComponent.h"
 #include "Scene/Components/UUIDComponent.h"
+#include "Scene/Components/MeshRendererComponent.h"
+#include "Scene/Components/ColliderComponents.h"
+#include "Physics/PhysicsSystem.h"
+#include "Physics/PhysicsWorld.h"
 #include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/norm.hpp>
+#include <glm/gtc/constants.hpp>
+#include <functional>
+#include <algorithm>
 
 using namespace rv;
 
@@ -478,6 +486,326 @@ void EditorUtils::AlignSelectedWithView(Engine& engine)
     if (!beforeRecords.empty())
     {
         auto cmd = std::make_unique<TransformCommand>(&scene, beforeRecords, afterRecords, "Align Transform with View");
+        CommandHistory::Get().Execute(std::move(cmd));
+        scene.SetDirty(true);
+    }
+}
+
+static glm::quat RotationBetweenVectors(glm::vec3 start, glm::vec3 dest)
+{
+    start = glm::normalize(start);
+    dest = glm::normalize(dest);
+
+    float cosTheta = glm::dot(start, dest);
+    glm::vec3 rotationAxis;
+
+    if (cosTheta < -1.0f + 0.001f)
+    {
+        rotationAxis = glm::cross(glm::vec3(0.0f, 0.0f, 1.0f), start);
+        if (glm::length2(rotationAxis) < 0.01f)
+            rotationAxis = glm::cross(glm::vec3(1.0f, 0.0f, 0.0f), start);
+        rotationAxis = glm::normalize(rotationAxis);
+        return glm::angleAxis(glm::pi<float>(), rotationAxis);
+    }
+
+    if (cosTheta > 1.0f - 0.0001f)
+    {
+        return glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+    }
+
+    rotationAxis = glm::cross(start, dest);
+    float s = std::sqrt((1.0f + cosTheta) * 2.0f);
+    float invs = 1.0f / s;
+
+    return glm::normalize(glm::quat(
+        s * 0.5f,
+        rotationAxis.x * invs,
+        rotationAxis.y * invs,
+        rotationAxis.z * invs
+    ));
+}
+
+void EditorUtils::SnapSelectedToFloor(Engine& engine, bool alignWithNormal)
+{
+    Scene& scene = engine.GetActiveScene();
+    if (scene.GetState() != SceneState::EDIT)
+        return;
+
+    auto& reg = scene.GetRegistry();
+    const auto& selectedEntities = EditorSelection::Get().GetSelectedEntities();
+    if (selectedEntities.empty())
+        return;
+
+    scene.GetTransformSystem().Update();
+    scene.GetPhysicsSystem().Update();
+
+    auto isAncestorSelected = [&](entt::entity candidate) -> bool {
+        entt::entity cur = candidate;
+        while (cur != entt::null && reg.valid(cur) && scene.HasComponent<SceneTreeComponent>(cur))
+        {
+            entt::entity parent = scene.GetComponent<SceneTreeComponent>(cur).parent;
+            if (parent == entt::null || parent == scene.GetRootEntity()) break;
+            if (std::find(selectedEntities.begin(), selectedEntities.end(), parent) != selectedEntities.end())
+                return true;
+            cur = parent;
+        }
+        return false;
+    };
+
+    std::vector<entt::entity> ignoredEntities;
+    std::function<void(entt::entity)> collectDescendants = [&](entt::entity parent) {
+        if (!scene.HasComponent<SceneTreeComponent>(parent)) return;
+        const auto& children = scene.GetComponent<SceneTreeComponent>(parent).children;
+        for (auto child : children)
+        {
+            if (child != entt::null && reg.valid(child))
+            {
+                ignoredEntities.push_back(child);
+                collectDescendants(child);
+            }
+        }
+    };
+
+    for (auto sel : selectedEntities)
+    {
+        if (sel != entt::null && reg.valid(sel))
+        {
+            ignoredEntities.push_back(sel);
+            collectDescendants(sel);
+        }
+    }
+
+    auto computeBottomOffset = [&](entt::entity rootEntity, const glm::quat& newRot, const glm::vec3& scale) -> float {
+        float minOffsetY = 0.0f;
+        bool found = false;
+
+        glm::mat4 candidateRoot = glm::mat4_cast(newRot) * glm::scale(glm::mat4(1.0f), scale);
+
+        auto checkEntityMesh = [&](entt::entity e, const glm::mat4& relTransform) {
+            if (reg.any_of<MeshRendererComponent>(e))
+            {
+                auto& mrc = reg.get<MeshRendererComponent>(e);
+                if (mrc.localAABB.IsValid())
+                {
+                    glm::mat4 fullMatrix = candidateRoot * relTransform;
+                    AABB transformed = mrc.localAABB.CalculateWorldAABB(fullMatrix);
+                    if (!found)
+                    {
+                        minOffsetY = transformed.min.y;
+                        found = true;
+                    }
+                    else
+                    {
+                        minOffsetY = glm::min(minOffsetY, transformed.min.y);
+                    }
+                }
+            }
+        };
+
+        checkEntityMesh(rootEntity, glm::mat4(1.0f));
+
+        if (scene.HasComponent<SceneTreeComponent>(rootEntity))
+        {
+            glm::mat4 invRootWorld = glm::inverse(reg.get<TransformComponent>(rootEntity).GetWorldMatrix());
+            std::function<void(entt::entity)> visitChildren = [&](entt::entity cur) {
+                if (!scene.HasComponent<SceneTreeComponent>(cur)) return;
+                const auto& children = scene.GetComponent<SceneTreeComponent>(cur).children;
+                for (auto child : children)
+                {
+                    if (child != entt::null && reg.valid(child) && reg.any_of<TransformComponent>(child))
+                    {
+                        glm::mat4 childWorld = reg.get<TransformComponent>(child).GetWorldMatrix();
+                        glm::mat4 rel = invRootWorld * childWorld;
+                        checkEntityMesh(child, rel);
+                        visitChildren(child);
+                    }
+                }
+            };
+            visitChildren(rootEntity);
+        }
+
+        if (!found)
+        {
+            if (reg.any_of<BoxColliderComponent>(rootEntity))
+            {
+                auto& box = reg.get<BoxColliderComponent>(rootEntity);
+                glm::vec3 halfSize = box.GetSize() * 0.5f * scale;
+                glm::vec3 offset = box.GetOffset() * scale;
+                AABB boxAABB(offset - halfSize, offset + halfSize);
+                AABB transformed = boxAABB.CalculateWorldAABB(candidateRoot);
+                minOffsetY = transformed.min.y;
+                found = true;
+            }
+            else if (reg.any_of<SphereColliderComponent>(rootEntity))
+            {
+                auto& sphere = reg.get<SphereColliderComponent>(rootEntity);
+                float maxS = glm::max(scale.x, glm::max(scale.y, scale.z));
+                float r = sphere.GetRadius() * maxS;
+                minOffsetY = (sphere.GetOffset().y * scale.y) - r;
+                found = true;
+            }
+            else if (reg.any_of<CapsuleColliderComponent>(rootEntity))
+            {
+                auto& cap = reg.get<CapsuleColliderComponent>(rootEntity);
+                float totalH = (cap.GetHalfHeight() + cap.GetRadius()) * scale.y;
+                minOffsetY = (cap.GetOffset().y * scale.y) - totalH;
+                found = true;
+            }
+        }
+
+        return found ? minOffsetY : 0.0f;
+    };
+
+    std::vector<EntityTransformRecord> beforeRecords;
+    std::vector<EntityTransformRecord> afterRecords;
+
+    for (auto e : selectedEntities)
+    {
+        if (e == entt::null || !reg.valid(e) || !reg.any_of<TransformComponent>(e))
+            continue;
+
+        if (e == scene.GetRootEntity())
+            continue;
+
+        if (isAncestorSelected(e))
+            continue;
+
+        auto& tc = reg.get<TransformComponent>(e);
+        EntityUUID uuid = 0;
+        if (reg.any_of<UUIDComponent>(e))
+            uuid = reg.get<UUIDComponent>(e).uuid;
+
+        EntityTransformRecord beforeRec;
+        beforeRec.uuid = uuid;
+        beforeRec.entity = e;
+        beforeRec.position = tc.GetPosition();
+        beforeRec.rotation = tc.GetRotation();
+        beforeRec.scale = tc.GetScale();
+
+        glm::mat4 curWorldMatrix = tc.GetWorldMatrix();
+        glm::vec3 curWorldPos = tc.GetWorldPosition();
+        glm::quat curWorldRot = tc.GetWorldRotation();
+        glm::vec3 curWorldScale = tc.GetWorldScale();
+
+        float initialBottomOffset = computeBottomOffset(e, curWorldRot, curWorldScale);
+
+        float rayNudgeY = glm::max(0.1f, -initialBottomOffset + 0.1f);
+        glm::vec3 rayStart = curWorldPos + glm::vec3(0.0f, rayNudgeY, 0.0f);
+        float rayDistance = 5000.0f;
+
+        Physics::RaycastResult hitResult = scene.GetPhysicsSystem().GetPhysicsWorld().Raycast(
+            rayStart,
+            glm::vec3(0.0f, -1.0f, 0.0f),
+            rayDistance,
+            false,
+            ignoredEntities
+        );
+
+        bool hitFound = false;
+        glm::vec3 hitPoint(0.0f);
+        glm::vec3 hitNormal(0.0f, 1.0f, 0.0f);
+
+        if (hitResult.hit)
+        {
+            hitFound = true;
+            hitPoint = hitResult.point;
+            hitNormal = hitResult.normal;
+        }
+        else
+        {
+            float bestY = -FLT_MAX;
+            auto meshView = reg.view<MeshRendererComponent, TransformComponent>();
+            for (auto other : meshView)
+            {
+                if (std::find(ignoredEntities.begin(), ignoredEntities.end(), other) != ignoredEntities.end())
+                    continue;
+
+                const auto& otherMesh = meshView.get<MeshRendererComponent>(other);
+                if (!otherMesh.worldAABB.IsValid()) continue;
+
+                if (rayStart.x >= otherMesh.worldAABB.min.x && rayStart.x <= otherMesh.worldAABB.max.x &&
+                    rayStart.z >= otherMesh.worldAABB.min.z && rayStart.z <= otherMesh.worldAABB.max.z)
+                {
+                    if (otherMesh.worldAABB.max.y <= rayStart.y + 0.1f && otherMesh.worldAABB.max.y > bestY)
+                    {
+                        bestY = otherMesh.worldAABB.max.y;
+                        hitFound = true;
+                        hitPoint = glm::vec3(rayStart.x, bestY, rayStart.z);
+                        hitNormal = glm::vec3(0.0f, 1.0f, 0.0f);
+                    }
+                }
+            }
+
+            if (!hitFound)
+            {
+                hitFound = true;
+                hitPoint = glm::vec3(rayStart.x, 0.0f, rayStart.z);
+                hitNormal = glm::vec3(0.0f, 1.0f, 0.0f);
+            }
+        }
+
+        if (glm::length(hitNormal) > 0.001f)
+            hitNormal = glm::normalize(hitNormal);
+        else
+            hitNormal = glm::vec3(0.0f, 1.0f, 0.0f);
+
+        glm::quat newWorldRot = curWorldRot;
+        if (alignWithNormal && hitNormal.y > 0.1f)
+        {
+            glm::vec3 curUp = glm::normalize(glm::vec3(curWorldMatrix[1]));
+            glm::quat deltaRot = RotationBetweenVectors(curUp, hitNormal);
+            newWorldRot = glm::normalize(deltaRot * curWorldRot);
+        }
+
+        float finalBottomOffset = alignWithNormal ? computeBottomOffset(e, newWorldRot, curWorldScale) : initialBottomOffset;
+
+        glm::vec3 newWorldPos = glm::vec3(curWorldPos.x, hitPoint.y - finalBottomOffset, curWorldPos.z);
+
+        glm::mat4 parentWorld(1.0f);
+        glm::quat parentWorldRot(1.0f, 0.0f, 0.0f, 0.0f);
+        bool hasParent = false;
+        if (scene.HasComponent<SceneTreeComponent>(e))
+        {
+            auto& node = reg.get<SceneTreeComponent>(e);
+            if (node.parent != entt::null && reg.valid(node.parent) && node.parent != scene.GetRootEntity() && reg.any_of<TransformComponent>(node.parent))
+            {
+                auto& parentTc = reg.get<TransformComponent>(node.parent);
+                parentWorld = parentTc.GetWorldMatrix();
+                parentWorldRot = parentTc.GetWorldRotation();
+                hasParent = true;
+            }
+        }
+
+        if (!hasParent)
+        {
+            tc.SetPosition(newWorldPos);
+            if (alignWithNormal)
+                tc.SetRotation(newWorldRot);
+        }
+        else
+        {
+            glm::mat4 invParentWorld = glm::inverse(parentWorld);
+            tc.SetPosition(glm::vec3(invParentWorld * glm::vec4(newWorldPos, 1.0f)));
+            if (alignWithNormal)
+                tc.SetRotation(glm::normalize(glm::inverse(parentWorldRot) * newWorldRot));
+        }
+
+        tc.SetDirty(true);
+
+        EntityTransformRecord afterRec;
+        afterRec.uuid = uuid;
+        afterRec.entity = e;
+        afterRec.position = tc.GetPosition();
+        afterRec.rotation = tc.GetRotation();
+        afterRec.scale = tc.GetScale();
+
+        beforeRecords.push_back(beforeRec);
+        afterRecords.push_back(afterRec);
+    }
+
+    if (!beforeRecords.empty())
+    {
+        auto cmd = std::make_unique<TransformCommand>(&scene, beforeRecords, afterRecords, "Snap to Floor");
         CommandHistory::Get().Execute(std::move(cmd));
         scene.SetDirty(true);
     }

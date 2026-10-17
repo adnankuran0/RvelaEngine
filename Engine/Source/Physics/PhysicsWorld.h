@@ -4,6 +4,7 @@
 #include "Jolt/Physics/PhysicsSystem.h"
 #include "MotionType.h"
 #include "RaycastResult.h"
+#include <vector>
 
 namespace rv {
 struct RigidbodyComponent;
@@ -85,7 +86,8 @@ public:
 	RaycastResult Raycast(const glm::vec3& rayOrigin,
 		const glm::vec3& rayDirection,
 		float maxDistance,
-		bool hitInside = false);
+		bool hitInside = false,
+		const std::vector<entt::entity>& ignoredEntities = {});
 
 private:
 	inline JPH::BodyInterface& BodyInterface() { return m_PhysicsSystem->GetBodyInterface(); }

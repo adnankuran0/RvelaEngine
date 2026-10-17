@@ -350,7 +350,8 @@ glm::vec3 PhysicsWorld::GetCharacterGroundPosition(CharacterBodyComponent* comp)
 RaycastResult PhysicsWorld::Raycast(const glm::vec3& rayOrigin,
 	const glm::vec3& rayDirection,
 	float maxDistance,
-	bool hitInside)
+	bool hitInside,
+	const std::vector<entt::entity>& ignoredEntities)
 {
 	RaycastResult result;
 	glm::vec3 dir = glm::normalize(rayDirection);
@@ -374,6 +375,21 @@ RaycastResult PhysicsWorld::Raycast(const glm::vec3& rayOrigin,
 	for (const auto& hit : collector.mHits)
 	{
 		if (!hitInside && hit.mFraction <= 0.0001f) continue; // skip if inside
+
+		if (!ignoredEntities.empty())
+		{
+			const JPH::BodyLockRead lock(m_PhysicsSystem->GetBodyLockInterface(), hit.mBodyID);
+			if (lock.Succeeded())
+			{
+				const JPH::Body& body = lock.GetBody();
+				auto* userData = reinterpret_cast<UserData*>(body.GetUserData());
+				if (userData && std::find(ignoredEntities.begin(), ignoredEntities.end(), userData->entity) != ignoredEntities.end())
+				{
+					continue;
+				}
+			}
+		}
+
 		if (hit.mFraction < bestFraction)
 		{
 			bestFraction = hit.mFraction;

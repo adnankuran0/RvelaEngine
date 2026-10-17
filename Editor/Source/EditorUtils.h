@@ -19,6 +19,7 @@ public:
 	static std::string GetAssetFileName(const AssetUUID& uuid);
 	static void ClearAssetFileNameCache();
 	static void AlignSelectedWithView(Engine& engine);
+	static void SnapSelectedToFloor(Engine& engine, bool alignWithNormal = false);
 	static bool HasTransformSelection(Engine& engine);
 
 	struct MeshAssetInfo

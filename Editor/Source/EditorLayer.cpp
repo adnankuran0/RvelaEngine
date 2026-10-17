@@ -560,6 +560,11 @@ void EditorLayer::HandleShortcuts()
         {
             EditorSelection::Get().Clear();
         }
+
+        if (isEditMode && Input::IsKeyJustPressed(KeyCode::PageDown))
+        {
+            EditorUtils::SnapSelectedToFloor(*m_Engine, false);
+        }
     }
 
     

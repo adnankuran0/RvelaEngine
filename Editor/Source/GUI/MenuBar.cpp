@@ -160,9 +160,13 @@ void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter,
         if (ImGui::BeginMenu("View"))
         {
             const bool hasTransformSelection = EditorUtils::HasTransformSelection(*engine);
-            if (ImGui::MenuItem("Align Transform with View", "", false, hasTransformSelection))
+            if (ImGui::MenuItem("Align Transform with View", "Ctrl+Alt+M", false, hasTransformSelection))
             {
                 EditorUtils::AlignSelectedWithView(*engine);
+            }
+            if (ImGui::MenuItem("Snap to Floor", "PageDown", false, hasTransformSelection))
+            {
+                EditorUtils::SnapSelectedToFloor(*engine, false);
             }
 
             ImGui::EndMenu();

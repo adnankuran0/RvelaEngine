@@ -654,6 +654,9 @@ void Viewport::DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySi
         DrawActionButton("Align Transform with View", "Ctrl+Alt+M", hasTransformSelection, [&]() {
             EditorUtils::AlignSelectedWithView(*engine);
         });
+        DrawActionButton("Snap to Floor", "PageDown", hasTransformSelection, [&]() {
+            EditorUtils::SnapSelectedToFloor(*engine, false);
+        });
 
         ImGui::PopStyleVar(3);
 
