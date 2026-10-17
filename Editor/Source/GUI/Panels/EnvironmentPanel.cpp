@@ -121,6 +121,19 @@ void EnvironmentPanel::Draw(Engine* engine)
         ImGui::SliderFloat("Bias##SSAO", &env.SSAO_Bias, 0.0f, 0.1f);
     }
 
+    if (ImGui::CollapsingHeader("Contact Shadows"))
+    {
+        ImGui::Checkbox("Use Contact Shadows", &env.ContactShadows);
+        if (env.ContactShadows)
+        {
+            ImGui::SliderFloat("Distance##ContactShadows", &env.ContactShadows_Distance, 0.01f, 2.0f, "%.2f m");
+            ImGui::SliderFloat("Thickness##ContactShadows", &env.ContactShadows_Thickness, 0.001f, 0.5f, "%.3f m");
+            ImGui::SliderFloat("Bias##ContactShadows", &env.ContactShadows_Bias, 0.0001f, 0.05f, "%.4f");
+            ImGui::SliderFloat("Intensity##ContactShadows", &env.ContactShadows_Intensity, 0.0f, 2.0f, "%.2f");
+            ImGui::SliderInt("Steps##ContactShadows", &env.ContactShadows_Steps, 4, 64);
+        }
+    }
+
     if (ImGui::CollapsingHeader("SSR"))
     {
         ImGui::Checkbox("Use SSR", &env.SSR);

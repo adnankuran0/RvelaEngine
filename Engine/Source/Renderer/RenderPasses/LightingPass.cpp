@@ -77,6 +77,8 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     auto* spotRes = resourceRegistry.Get("SpotShadowMap");
     GLuint i_SpotShadowMap = spotRes ? spotRes->id : 0;
     auto i_SSAO = resourceRegistry.Get("SSAOTexture")->id;
+    auto* contactShadowRes = resourceRegistry.Get("ContactShadowTexture");
+    GLuint i_ContactShadow = contactShadowRes ? contactShadowRes->id : 0;
     uint32_t targetSamples = 2;
     if (ProjectManager::IsProjectLoaded())
     {
@@ -105,6 +107,7 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     constexpr int SSAO_SLOT = 11;
     constexpr int ARM_MAP_SLOT = 12;
     constexpr int SPOT_SHADOW_MAP_SLOT = 13;
+    constexpr int CONTACT_SHADOW_SLOT = 17;
 
     auto& env = *ctx.environment;
     auto& skybox = env.GetSkybox();
@@ -136,6 +139,11 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         shader.setBool("useSSAO", ctx.environment->SSAO);
         shader.setInt("ssaoTexture", SSAO_SLOT);
         glBindTextureUnit(SSAO_SLOT, i_SSAO);
+
+        bool useContactShadows = ctx.environment->ContactShadows && (i_ContactShadow != 0);
+        shader.setBool("useContactShadows", useContactShadows);
+        shader.setInt("contactShadowTexture", CONTACT_SHADOW_SLOT);
+        glBindTextureUnit(CONTACT_SHADOW_SLOT, i_ContactShadow);
 
         auto* screenRes = resourceRegistry.Get("ScreenTexture");
         if (screenRes && screenRes->id != 0)
@@ -242,7 +250,7 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         for (int slot = 0; slot < 6; ++slot)
             glBindSampler(slot, 0);
         glBindSampler(ARM_MAP_SLOT, 0);
-        for (int slot = 17; slot < 28; ++slot)
+        for (int slot = 18; slot < 28; ++slot)
         {
             glBindSampler(slot, 0);
             glBindTextureUnit(slot, 0);
@@ -250,7 +258,7 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         };
 
     auto BindCustomShaderUniforms = [](Shader& shader, const MaterialInstance& inst, const ShaderAsset& shaderAsset) {
-        int nextTextureSlot = 17;
+        int nextTextureSlot = 18;
         const auto& overrides = inst.GetCustomUniformOverrides();
         const auto& cached = inst.GetCachedCustomUniforms();
 

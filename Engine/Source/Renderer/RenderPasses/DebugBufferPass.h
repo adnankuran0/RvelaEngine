@@ -25,6 +25,7 @@ private:
     GLuint m_DummyTex2D = 0;
     GLuint m_DummyTexArray = 0;
     GLuint m_DummyTexUInt = 0;
+    GLuint m_DummyTexCubeArray = 0;
 };
 
 }

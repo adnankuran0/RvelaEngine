@@ -1,0 +1,116 @@
+{
+    "Entities": [
+        {
+            "AudioEmitterComponent": {
+                "attenuationModel": 1,
+                "audioClip": "3f43714a-126a-4ce9-8473-299ff303f1cb",
+                "busID": 0,
+                "doppler": true,
+                "dopplerFactor": 1.0,
+                "loop": false,
+                "maxDistance": 40.0,
+                "minDistance": 1.0,
+                "pitch": 1.0,
+                "playOnCreate": false,
+                "rolloff": 2.0,
+                "spatial": true,
+                "volume": 1.0
+            },
+            "Material": {
+                "material": "",
+                "overrides": {
+                    "albedoColor": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        0.34117648005485535
+                    ],
+                    "billboardMode": 1,
+                    "receiveShadows": true,
+                    "shadingMode": 0,
+                    "transparencyMode": 1
+                }
+            },
+            "Mesh": {
+                "mesh": "1d2596bb-18d3-41a6-9848-a8a584870ce3"
+            },
+            "ParticleEmitterComponent": {
+                "amount": 15,
+                "angularVelocityMax": 0.0,
+                "angularVelocityMin": 0.0,
+                "dampingMax": 0.0,
+                "dampingMin": 0.0,
+                "direction": [
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "emitterShape": 0,
+                "emitting": false,
+                "endColor": [
+                    1.0,
+                    1.0,
+                    1.0,
+                    0.0
+                ],
+                "explosiveness": 1.0,
+                "gravity": [
+                    0.0,
+                    -9.800000190734863,
+                    0.0
+                ],
+                "lifetime": 0.800000011920929,
+                "lifetimeRandomness": 0.20000000298023224,
+                "linearAccelMax": 0.0,
+                "linearAccelMin": 0.0,
+                "linearVelocityMax": 3.0,
+                "linearVelocityMin": 2.0,
+                "localCoords": false,
+                "oneShot": true,
+                "randomness": 0.0,
+                "rotationMax": 276.5,
+                "rotationMin": 0.0,
+                "scaleEnd": 0.0,
+                "scaleMax": 0.05000000074505806,
+                "scaleMin": 0.05000000074505806,
+                "shapeDimensions": [
+                    1.0,
+                    1.0,
+                    1.0
+                ],
+                "speedScale": 1.0,
+                "spread": 30.0,
+                "startColor": [
+                    0.4313725531101227,
+                    0.4313725531101227,
+                    0.4313725531101227,
+                    0.19607843458652496
+                ]
+            },
+            "Tag": {
+                "isActive": true,
+                "tag": "WallParticle"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    0.9999993443489075,
+                    0.9999993443489075,
+                    1.0
+                ]
+            },
+            "UUID": 5228465694115830899,
+            "_isRoot": true
+        }
+    ]
+}

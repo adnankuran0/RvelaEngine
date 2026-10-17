@@ -76,6 +76,10 @@ void LuaBindings::RegisterComponents(sol::state& lua)
             [](DirectionalLightHandle& h) { return h.Get() ? h.Get()->castShadows : false; },
             [](DirectionalLightHandle& h, bool v) { if (auto* c = h.Get()) c->castShadows = v; }
         ),
+        "contactShadows", sol::property(
+            [](DirectionalLightHandle& h) { return h.Get() ? h.Get()->contactShadows : false; },
+            [](DirectionalLightHandle& h, bool v) { if (auto* c = h.Get()) c->contactShadows = v; }
+        ),
         "reverseCullFace", sol::property(
             [](DirectionalLightHandle& h) { return h.Get() ? h.Get()->reverseCullFace : false; },
             [](DirectionalLightHandle& h, bool v) { if (auto* c = h.Get()) c->reverseCullFace = v; }

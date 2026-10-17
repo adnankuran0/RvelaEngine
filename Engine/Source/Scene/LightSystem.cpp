@@ -122,6 +122,7 @@ std::optional<DirectionalLight> LightSystem::CollectDirectionalLight(Camera* cam
 		data.shadowBias = light.shadowBias;
 		data.normalBias = light.normalBias;
 		data.castShadows = light.castShadows;
+		data.contactShadows = light.contactShadows;
 		data.reverseCullFace = light.reverseCullFace;
 		data.blurRadius = light.blurRadius;
 

@@ -22,12 +22,14 @@ out vec4 FragColor;
 
 uniform int u_Mode;
 uniform int u_Layer;
+uniform int u_Face;
 uniform float u_Near;
 uniform float u_Far;
 
 layout(binding = 0) uniform sampler2D u_Texture2D;
 layout(binding = 1) uniform sampler2DArray u_TextureArray;
 layout(binding = 2) uniform usampler2D u_TextureUInt;
+layout(binding = 3) uniform samplerCubeArray u_TextureCubeArray;
 
 float LinearizeDepth(float depth, float near, float far)
 {
@@ -147,6 +149,65 @@ void main()
     {
         vec3 col = texture(u_Texture2D, TexCoords).rgb;
         FragColor = vec4(col, 1.0);
+    }
+    // Mode 14: Contact Shadows
+    else if (u_Mode == 14)
+    {
+        float cs = texture(u_Texture2D, TexCoords).r;
+        FragColor = vec4(vec3(cs), 1.0);
+    }
+    // Mode 15: Point Shadow Map
+    else if (u_Mode == 15)
+    {
+        vec3 dir = vec3(0.0);
+        bool isBorder = false;
+
+        if (u_Face < 0)
+        {
+            float colF = TexCoords.x * 3.0;
+            float rowF = TexCoords.y * 2.0;
+            int col = clamp(int(colF), 0, 2);
+            int row = clamp(int(rowF), 0, 1);
+
+            vec2 cellUV = vec2(fract(colF), fract(rowF));
+
+            if (cellUV.x < 0.015 || cellUV.x > 0.985 || cellUV.y < 0.02 || cellUV.y > 0.98)
+            {
+                isBorder = true;
+            }
+
+            int face = row * 3 + col;
+            vec2 uv = cellUV * 2.0 - 1.0;
+
+            if (face == 0)      dir = vec3(1.0, -uv.y, -uv.x);
+            else if (face == 1) dir = vec3(-1.0, -uv.y, uv.x);
+            else if (face == 2) dir = vec3(uv.x, 1.0, uv.y);
+            else if (face == 3) dir = vec3(uv.x, -1.0, -uv.y);
+            else if (face == 4) dir = vec3(uv.x, -uv.y, 1.0);
+            else                dir = vec3(-uv.x, -uv.y, -1.0);
+        }
+        else
+        {
+            vec2 uv = TexCoords * 2.0 - 1.0;
+            int face = clamp(u_Face, 0, 5);
+
+            if (face == 0)      dir = vec3(1.0, -uv.y, -uv.x);
+            else if (face == 1) dir = vec3(-1.0, -uv.y, uv.x);
+            else if (face == 2) dir = vec3(uv.x, 1.0, uv.y);
+            else if (face == 3) dir = vec3(uv.x, -1.0, -uv.y);
+            else if (face == 4) dir = vec3(uv.x, -uv.y, 1.0);
+            else                dir = vec3(-uv.x, -uv.y, -1.0);
+        }
+
+        if (isBorder)
+        {
+            FragColor = vec4(0.2, 0.2, 0.25, 1.0);
+        }
+        else
+        {
+            float shadowDepth = texture(u_TextureCubeArray, vec4(dir, float(u_Layer))).r;
+            FragColor = vec4(vec3(shadowDepth), 1.0);
+        }
     }
     else
     {

@@ -17,6 +17,13 @@ public:
 	float SSAO_Bias = 0.025f;
 	float SSAO_Intensity = 1.0f;
 
+	bool ContactShadows = true;
+	float ContactShadows_Distance = 0.3f;
+	float ContactShadows_Thickness = 0.05f;
+	float ContactShadows_Bias = 0.005f;
+	float ContactShadows_Intensity = 1.0f;
+	int ContactShadows_Steps = 16;
+
 	bool SSR = true;
 	int SSR_MaxSteps = 64;
 	float SSR_MaxDistance = 10.0f;

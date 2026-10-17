@@ -32,6 +32,8 @@ public:
 	[[nodiscard]] DebugBufferMode GetDebugBufferMode() const noexcept { return m_RenderPipeline->GetDebugBufferMode(); }
 	void SetDebugBufferLayer(int layer) noexcept { m_RenderPipeline->SetDebugBufferLayer(layer); }
 	[[nodiscard]] int GetDebugBufferLayer() const noexcept { return m_RenderPipeline->GetDebugBufferLayer(); }
+	void SetDebugBufferFace(int face) noexcept { m_RenderPipeline->SetDebugBufferFace(face); }
+	[[nodiscard]] int GetDebugBufferFace() const noexcept { return m_RenderPipeline->GetDebugBufferFace(); }
 
 	void SetTargetResolution(uint32_t width, uint32_t height) { m_TargetWidth = width; m_TargetHeight = height; }
 	[[nodiscard]] uint32_t GetTargetWidth() const noexcept { return m_TargetWidth; }

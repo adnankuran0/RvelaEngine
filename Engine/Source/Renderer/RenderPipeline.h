@@ -49,6 +49,8 @@ public:
 	[[nodiscard]] DebugBufferMode GetDebugBufferMode() const noexcept { return m_DebugBufferMode; }
 	void SetDebugBufferLayer(int layer) noexcept { m_DebugBufferLayer = layer; }
 	[[nodiscard]] int GetDebugBufferLayer() const noexcept { return m_DebugBufferLayer; }
+	void SetDebugBufferFace(int face) noexcept { m_DebugBufferFace = face; }
+	[[nodiscard]] int GetDebugBufferFace() const noexcept { return m_DebugBufferFace; }
 
 private:
 	void UpdateUBOs(const RenderContext& ctx);
@@ -69,6 +71,7 @@ private:
 
 	DebugBufferMode m_DebugBufferMode = DebugBufferMode::None;
 	int m_DebugBufferLayer = 0;
+	int m_DebugBufferFace = -1;
 };
 
 }

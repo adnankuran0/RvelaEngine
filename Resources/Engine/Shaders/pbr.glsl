@@ -174,6 +174,9 @@ layout(binding = 10) uniform sampler2D brdfLUT;
 layout(binding = 11) uniform sampler2D ssaoTexture;
 uniform bool useSSAO;
 
+layout(binding = 17) uniform sampler2D contactShadowTexture;
+uniform bool useContactShadows;
+
 uniform bool useIBL;
 uniform float iblIntensity;
 
@@ -406,6 +409,13 @@ void main()
         float viewDepth = abs((view * vec4(FragPos, 1.0)).z);
         float shadow = (castShadows && receiveShadows) ?   
             calculateDirectionalShadow(shadowMap, FragPos, Nmap, L, viewDepth, directionalLight.shadowBias, directionalLight.normalBias, directionalLight.blurRadius) : 0.0;
+
+        if (useContactShadows && receiveShadows)
+        {
+            vec2 screenUV = gl_FragCoord.xy / windowSize;
+            float contactShadow = texture(contactShadowTexture, screenUV).r;
+            shadow = max(shadow, contactShadow);
+        }
 
         vec3 lightColor = directionalLight.colorIntensity.rgb;
         float lightIntensity = directionalLight.colorIntensity.a;

@@ -45,6 +45,8 @@ void Renderer::Init(GLFWwindow* window)
     ShaderManager::Add(Shader("Downsample", ENGINE_PATH("Shaders\\downsample.glsl")));
     ShaderManager::Add(Shader("Upsample", ENGINE_PATH("Shaders\\upsample.glsl")));
     ShaderManager::Add(Shader("SSAO", ENGINE_PATH("Shaders\\ssao.glsl")));
+    ShaderManager::Add(Shader("ContactShadow", ENGINE_PATH("Shaders\\contactShadow.glsl")));
+    ShaderManager::Add(Shader("ContactShadowBlur", ENGINE_PATH("Shaders\\contactShadowBlur.glsl")));
     ShaderManager::Add(Shader("SSGI", ENGINE_PATH("Shaders\\ssgi.glsl")));
     ShaderManager::Add(Shader("SSGIBlend", ENGINE_PATH("Shaders\\ssgiBlend.glsl")));
     ShaderManager::Add(Shader("SSR", ENGINE_PATH("Shaders\\ssr.glsl")));

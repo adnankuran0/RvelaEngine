@@ -18,6 +18,7 @@ public:
     float normalBias = 0.008f;
     float blurRadius = 1.0f;
     bool castShadows = true;
+    bool contactShadows = true;
     bool reverseCullFace = false;
 
     json Serialize() const;

@@ -47,6 +47,7 @@ struct DirectionalLight {
     float cascadeSplits[NUM_SHADOW_CASCADES];
     float intensity;
     bool castShadows;
+    bool contactShadows = true;
     bool reverseCullFace;
     float blurRadius;
     float shadowBias;

@@ -459,6 +459,8 @@ void Viewport::DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySi
     case DebugBufferMode::BrightPass: bufBtnLabel = "Bright"; bufBtnWidth = 54.0f; break;
     case DebugBufferMode::EntityID: bufBtnLabel = "EntityID"; bufBtnWidth = 62.0f; break;
     case DebugBufferMode::ScreenColor: bufBtnLabel = "Screen"; bufBtnWidth = 56.0f; break;
+    case DebugBufferMode::ContactShadows: bufBtnLabel = "ContactShad"; bufBtnWidth = 84.0f; break;
+    case DebugBufferMode::PointShadow: bufBtnLabel = "PointShad"; bufBtnWidth = 74.0f; break;
     default: break;
     }
 
@@ -529,12 +531,49 @@ void Viewport::DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySi
             }
             ImGui::Unindent(16.0f);
         }
+        ModeItem("Point Shadow Map", DebugBufferMode::PointShadow);
+        if (curMode == DebugBufferMode::PointShadow)
+        {
+            ImGui::Indent(16.0f);
+            int curLayer = engine->GetRenderLayer().GetDebugBufferLayer();
+            ImGui::Text("Light Index:");
+            ImGui::SameLine();
+            for (int l = 0; l < 4; ++l)
+            {
+                char lLabel[8];
+                snprintf(lLabel, sizeof(lLabel), "%d", l);
+                if (l > 0) ImGui::SameLine();
+                if (ImGui::RadioButton(lLabel, curLayer == l))
+                {
+                    engine->GetRenderLayer().SetDebugBufferLayer(l);
+                }
+            }
+
+            int curFace = engine->GetRenderLayer().GetDebugBufferFace();
+            ImGui::Text("Face:");
+            ImGui::SameLine();
+            if (ImGui::RadioButton("All", curFace < 0))
+            {
+                engine->GetRenderLayer().SetDebugBufferFace(-1);
+            }
+            const char* faceNames[] = { "+X", "-X", "+Y", "-Y", "+Z", "-Z" };
+            for (int f = 0; f < 6; ++f)
+            {
+                ImGui::SameLine();
+                if (ImGui::RadioButton(faceNames[f], curFace == f))
+                {
+                    engine->GetRenderLayer().SetDebugBufferFace(f);
+                }
+            }
+            ImGui::Unindent(16.0f);
+        }
         ModeItem("Spot Shadow Map", DebugBufferMode::SpotShadow);
         ImGui::Spacing();
 
         ImGui::TextDisabled("Screen Space Effects");
         ImGui::Separator();
         ModeItem("SSAO", DebugBufferMode::SSAO);
+        ModeItem("Contact Shadows", DebugBufferMode::ContactShadows);
         ModeItem("SSGI", DebugBufferMode::SSGI);
         ModeItem("SSR", DebugBufferMode::SSR);
         ImGui::Spacing();
@@ -804,6 +843,8 @@ void Viewport::DrawDebugBufferBadge(Engine* engine, ImVec2& displayPos, ImVec2& 
     case DebugBufferMode::BrightPass: modeName = "Bright Pass"; break;
     case DebugBufferMode::EntityID: modeName = "Entity ID Buffer"; break;
     case DebugBufferMode::ScreenColor: modeName = "Screen Color"; break;
+    case DebugBufferMode::ContactShadows: modeName = "Contact Shadows"; break;
+    case DebugBufferMode::PointShadow: modeName = "Point Shadow Map"; break;
     default: break;
     }
 
@@ -814,6 +855,11 @@ void Viewport::DrawDebugBufferBadge(Engine* engine, ImVec2& displayPos, ImVec2& 
     {
         isEffectDisabled = true;
         disableWarning = " [SSAO is OFF in Environment]";
+    }
+    else if (mode == DebugBufferMode::ContactShadows && !env.ContactShadows)
+    {
+        isEffectDisabled = true;
+        disableWarning = " [Contact Shadows is OFF in Environment]";
     }
     else if (mode == DebugBufferMode::SSGI && !env.SSGI)
     {
@@ -826,6 +872,15 @@ void Viewport::DrawDebugBufferBadge(Engine* engine, ImVec2& displayPos, ImVec2& 
         snprintf(titleBuf, sizeof(titleBuf), "Debug View: %s%s", modeName, disableWarning);
     else if (mode == DebugBufferMode::DirectionalShadow)
         snprintf(titleBuf, sizeof(titleBuf), "Debug View: %s (Cascade %d)", modeName, engine->GetRenderLayer().GetDebugBufferLayer());
+    else if (mode == DebugBufferMode::PointShadow)
+    {
+        int curFace = engine->GetRenderLayer().GetDebugBufferFace();
+        const char* faceNames[] = { "+X", "-X", "+Y", "-Y", "+Z", "-Z" };
+        if (curFace >= 0 && curFace < 6)
+            snprintf(titleBuf, sizeof(titleBuf), "Debug View: %s (Light %d, Face %s)", modeName, engine->GetRenderLayer().GetDebugBufferLayer(), faceNames[curFace]);
+        else
+            snprintf(titleBuf, sizeof(titleBuf), "Debug View: %s (Light %d, All Faces)", modeName, engine->GetRenderLayer().GetDebugBufferLayer());
+    }
     else
         snprintf(titleBuf, sizeof(titleBuf), "Debug View: %s", modeName);
 

@@ -110,6 +110,9 @@ void LightInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 
 				UI::PropertyLabel("Reverse Cull Face");
 				ImGui::Checkbox("##DirReverseCullFace", &dirLight.reverseCullFace);
+
+				UI::PropertyLabel("Contact Shadows");
+				ImGui::Checkbox("##DirContactShadows", &dirLight.contactShadows);
 			}
 
 			UI::EndPropertyTable();

@@ -21,7 +21,9 @@ enum class DebugBufferMode : uint8_t
     Bloom,
     BrightPass,
     EntityID,
-    ScreenColor
+    ScreenColor,
+    ContactShadows,
+    PointShadow
 };
 
 enum class ShadingMode : uint8_t

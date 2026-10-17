@@ -179,10 +179,13 @@ uniform float iblIntensity;
 layout(binding = 14) uniform sampler2D u_EngineScreenTexture;
 layout(binding = 15) uniform sampler2D u_EngineDepthTexture;
 layout(binding = 16) uniform sampler2D u_EngineNormalTexture;
+layout(binding = 17) uniform sampler2D contactShadowTexture;
+uniform bool useContactShadows;
 
 #define SCREEN_TEXTURE u_EngineScreenTexture
 #define DEPTH_TEXTURE u_EngineDepthTexture
 #define NORMAL_TEXTURE u_EngineNormalTexture
+#define CONTACT_SHADOW_TEXTURE contactShadowTexture
 
 float sampleSSAO()
 {
@@ -263,6 +266,11 @@ void main()
         float viewDepth = abs((view * vec4(FragPos, 1.0)).z);
         float shadow = (castShadows && receiveShadows) ?
             calculateDirectionalShadow(shadowMap, FragPos, Nmap, L, viewDepth, directionalLight.shadowBias, directionalLight.normalBias, directionalLight.blurRadius) : 0.0;
+        if (useContactShadows && receiveShadows) {
+            vec2 screenUV = gl_FragCoord.xy / windowSize;
+            float contactShadow = texture(contactShadowTexture, screenUV).r;
+            shadow = max(shadow, contactShadow);
+        }
         vec3 lightColor = directionalLight.colorIntensity.rgb;
         float lightIntensity = directionalLight.colorIntensity.a;
         Lo += (1.0 - shadow) * (kD * ALBEDO / PI + spec) * lightColor * lightIntensity * NdotL;

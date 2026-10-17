@@ -22,6 +22,13 @@ json Environment::Serialize()
     j["SSAO_Bias"] = SSAO_Bias;
     j["SSAO_Intensity"] = SSAO_Intensity;
 
+    j["ContactShadows"] = ContactShadows;
+    j["ContactShadows_Distance"] = ContactShadows_Distance;
+    j["ContactShadows_Thickness"] = ContactShadows_Thickness;
+    j["ContactShadows_Bias"] = ContactShadows_Bias;
+    j["ContactShadows_Intensity"] = ContactShadows_Intensity;
+    j["ContactShadows_Steps"] = ContactShadows_Steps;
+
     j["SSR"] = SSR;
     j["SSR_MaxSteps"] = SSR_MaxSteps;
     j["SSR_MaxDistance"] = SSR_MaxDistance;
@@ -88,6 +95,19 @@ void Environment::Deserialize(const json& j)
 
     if (j.contains("SSAO_Intensity"))
         SSAO_Intensity = j["SSAO_Intensity"];
+
+    if (j.contains("ContactShadows"))
+        ContactShadows = j["ContactShadows"];
+    if (j.contains("ContactShadows_Distance"))
+        ContactShadows_Distance = j["ContactShadows_Distance"];
+    if (j.contains("ContactShadows_Thickness"))
+        ContactShadows_Thickness = j["ContactShadows_Thickness"];
+    if (j.contains("ContactShadows_Bias"))
+        ContactShadows_Bias = j["ContactShadows_Bias"];
+    if (j.contains("ContactShadows_Intensity"))
+        ContactShadows_Intensity = j["ContactShadows_Intensity"];
+    if (j.contains("ContactShadows_Steps"))
+        ContactShadows_Steps = j["ContactShadows_Steps"];
 
     if (j.contains("SSR"))
         SSR = j["SSR"];

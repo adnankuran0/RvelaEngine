@@ -51,6 +51,15 @@ void DebugBufferPass::CreateDummyTextures()
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     }
 
+    if (m_DummyTexCubeArray == 0)
+    {
+        glGenTextures(1, &m_DummyTexCubeArray);
+        glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, m_DummyTexCubeArray);
+        glTexImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 0, GL_DEPTH_COMPONENT32F, 1, 1, 6, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    }
+
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -70,6 +79,11 @@ void DebugBufferPass::DestroyDummyTextures()
     {
         glDeleteTextures(1, &m_DummyTexUInt);
         m_DummyTexUInt = 0;
+    }
+    if (m_DummyTexCubeArray != 0)
+    {
+        glDeleteTextures(1, &m_DummyTexCubeArray);
+        m_DummyTexCubeArray = 0;
     }
 }
 
@@ -116,20 +130,24 @@ void DebugBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     shader.setInt("u_Mode", static_cast<int>(mode));
     shader.setInt("u_Layer", m_Pipeline->GetDebugBufferLayer());
+    shader.setInt("u_Face", m_Pipeline->GetDebugBufferFace());
     shader.setFloat("u_Near", ctx.camera ? ctx.camera->NearClip : 0.1f);
     shader.setFloat("u_Far", ctx.camera ? ctx.camera->FarClip : 1000.0f);
 
     shader.setInt("u_Texture2D", 0);
     shader.setInt("u_TextureArray", 1);
     shader.setInt("u_TextureUInt", 2);
+    shader.setInt("u_TextureCubeArray", 3);
 
     glBindTextureUnit(0, m_DummyTex2D);
     glBindTextureUnit(1, m_DummyTexArray);
     glBindTextureUnit(2, m_DummyTexUInt);
+    glBindTextureUnit(3, m_DummyTexCubeArray);
 
     GLuint tex2D = 0;
     GLuint texArray = 0;
     GLuint texUInt = 0;
+    GLuint texCubeArray = 0;
 
     switch (mode)
     {
@@ -172,6 +190,12 @@ void DebugBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     case DebugBufferMode::ScreenColor:
         if (auto* r = frame.registry.Get("ScreenTexture")) tex2D = r->id;
         break;
+    case DebugBufferMode::ContactShadows:
+        if (auto* r = frame.registry.Get("ContactShadowTexture")) tex2D = r->id;
+        break;
+    case DebugBufferMode::PointShadow:
+        if (auto* r = frame.registry.Get("PointShadowMap")) texCubeArray = r->id;
+        break;
     default:
         break;
     }
@@ -182,6 +206,8 @@ void DebugBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         glBindTextureUnit(1, texArray);
     if (texUInt != 0)
         glBindTextureUnit(2, texUInt);
+    if (texCubeArray != 0)
+        glBindTextureUnit(3, texCubeArray);
 
     m_Framebuffer.BindViewport();
     glDisable(GL_DEPTH_TEST);
@@ -194,6 +220,7 @@ void DebugBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     glBindTextureUnit(0, 0);
     glBindTextureUnit(1, 0);
     glBindTextureUnit(2, 0);
+    glBindTextureUnit(3, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     frame.registry.Register("DebugBufferTexture", { RenderResourceType::Texture, m_Framebuffer.GetColorAttachment(0) });

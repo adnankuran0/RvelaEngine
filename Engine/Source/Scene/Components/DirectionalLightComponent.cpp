@@ -9,6 +9,7 @@ json DirectionalLightComponent::Serialize() const
     j["color"] = { color.r, color.g, color.b };
     j["intensity"] = intensity;
     j["castShadows"] = castShadows;
+    j["contactShadows"] = contactShadows;
     j["reverseCullFace"] = reverseCullFace;
     j["shadowBias"] = shadowBias;
     j["normalBias"] = normalBias;
@@ -22,6 +23,7 @@ void DirectionalLightComponent::Deserialize(const json& j)
     color = glm::vec3(colorData[0], colorData[1], colorData[2]);
     intensity = j["intensity"];
     castShadows = j["castShadows"];
+    if (j.contains("contactShadows")) contactShadows = j["contactShadows"];
     reverseCullFace = j["reverseCullFace"];
     if (j.contains("shadowBias")) shadowBias = j["shadowBias"];
     if (j.contains("normalBias")) normalBias = j["normalBias"];
