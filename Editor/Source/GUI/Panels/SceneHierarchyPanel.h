@@ -20,6 +20,11 @@ private:
 	entt::entity m_RenamingEntity = entt::null;
 	char m_RenameBuffer[256] = {};
 	bool m_FocusRenameInput = false;
+
+	entt::entity m_SelectionAnchor = entt::null;
+	entt::entity m_PendingSingleSelect = entt::null;
+	entt::entity m_PendingShiftSelect = entt::null;
+	std::vector<entt::entity> m_VisibleEntities;
 };
 
 }

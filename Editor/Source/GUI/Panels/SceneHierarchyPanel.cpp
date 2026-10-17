@@ -283,6 +283,12 @@ void SceneHierarchyPanel::Draw(Engine* engine)
 
     if (m_RenamingEntity != entt::null && !registry.valid(m_RenamingEntity))
         m_RenamingEntity = entt::null;
+    if (m_SelectionAnchor != entt::null && !registry.valid(m_SelectionAnchor))
+        m_SelectionAnchor = entt::null;
+    if (m_PendingSingleSelect != entt::null && !registry.valid(m_PendingSingleSelect))
+        m_PendingSingleSelect = entt::null;
+    if (m_PendingShiftSelect != entt::null && !registry.valid(m_PendingShiftSelect))
+        m_PendingShiftSelect = entt::null;
 
     ImGuiIO& hierarchyIO = ImGui::GetIO();
     if (ImGui::IsWindowFocused() && !hierarchyIO.WantTextInput && ImGui::IsKeyPressed(ImGuiKey_F2))
@@ -394,53 +400,49 @@ void SceneHierarchyPanel::Draw(Engine* engine)
             if (colorPushes > 0)
                 ImGui::PopStyleColor(colorPushes);
 
-            // Select on release so starting a drag from the hierarchy does not
-            // change the Inspector target before the drag reaches its drop slot.
-            if (!isRoot && !isRenaming && ImGui::IsItemDeactivated() && ImGui::IsItemHovered() && !ImGui::IsDragDropActive())
+            if (!isRoot && !isRenaming)
             {
-                ImGuiIO& io = ImGui::GetIO();
-                if (io.KeyCtrl)
+                if (ImGui::IsItemClicked(ImGuiMouseButton_Left) && !ImGui::IsItemToggledOpen())
                 {
-                    EditorSelection::Get().Toggle(entity);
-                }
-                else if (io.KeyShift)
-                {
-                    entt::entity primary = EditorSelection::Get().GetPrimary();
-                    if (primary != entt::null && !EditorSelection::Get().IsEmpty())
+                    ImGuiIO& io = ImGui::GetIO();
+                    if (io.KeyCtrl)
                     {
-                        auto itA = std::find(visibleOrder.begin(), visibleOrder.end(), primary);
-                        auto itB = std::find(visibleOrder.begin(), visibleOrder.end(), entity);
-                        if (itA != visibleOrder.end() && itB != visibleOrder.end())
-                        {
-                            size_t idxA = std::distance(visibleOrder.begin(), itA);
-                            size_t idxB = std::distance(visibleOrder.begin(), itB);
-                            size_t start = std::min(idxA, idxB);
-                            size_t end = std::max(idxA, idxB);
-                            std::vector<entt::entity> range;
-                            for (size_t i = start; i <= end; ++i)
-                                range.push_back(visibleOrder[i]);
-                            EditorSelection::Get().SelectRange(range, entity);
-                        }
-                        else
-                        {
-                            EditorSelection::Get().Select(entity);
-                        }
+                        EditorSelection::Get().Toggle(entity);
+                        m_SelectionAnchor = entity;
+                        m_PendingSingleSelect = entt::null;
+                    }
+                    else if (io.KeyShift)
+                    {
+                        m_PendingShiftSelect = entity;
+                        m_PendingSingleSelect = entt::null;
                     }
                     else
                     {
-                        EditorSelection::Get().Select(entity);
+                        if (!EditorSelection::Get().IsSelected(entity))
+                        {
+                            EditorSelection::Get().Select(entity);
+                            m_SelectionAnchor = entity;
+                            m_PendingSingleSelect = entt::null;
+                        }
+                        else if (EditorSelection::Get().GetCount() > 1)
+                        {
+                            m_PendingSingleSelect = entity;
+                        }
+                        else
+                        {
+                            m_SelectionAnchor = entity;
+                            m_PendingSingleSelect = entt::null;
+                        }
                     }
                 }
-                else
+                else if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
                 {
-                    EditorSelection::Get().Select(entity);
-                }
-            }
-            else if (!isRoot && ImGui::IsItemClicked(ImGuiMouseButton_Right))
-            {
-                if (!EditorSelection::Get().IsSelected(entity))
-                {
-                    EditorSelection::Get().Select(entity);
+                    if (!EditorSelection::Get().IsSelected(entity))
+                    {
+                        EditorSelection::Get().Select(entity);
+                        m_SelectionAnchor = entity;
+                        m_PendingSingleSelect = entt::null;
+                    }
                 }
             }
 
@@ -449,6 +451,8 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                 if (!EditorSelection::Get().IsSelected(entity))
                 {
                     EditorSelection::Get().Select(entity);
+                    m_SelectionAnchor = entity;
+                    m_PendingSingleSelect = entt::null;
                 }
 
                 if (ImGui::MenuItem("Create Child Entity"))
@@ -554,10 +558,21 @@ void SceneHierarchyPanel::Draw(Engine* engine)
 
                 if (ImGui::MenuItem("Detach from parent"))
                 {
-                    for (auto e : EditorSelection::Get().GetSelectedEntities())
+                    auto compoundCmd = std::make_unique<CompoundCommand>("Detach from Parent");
+                    const auto& selected = EditorSelection::Get().GetSelectedEntities();
+                    for (auto e : selected)
                     {
-                        if (e != entt::null && registry.valid(e))
-                            scene.RemoveParent(e);
+                        if (e != entt::null && registry.valid(e) && !isDescendantOfAny(e, selected))
+                        {
+                            if (scene.GetParent(e) != rootEntity)
+                            {
+                                compoundCmd->Add(std::make_unique<ReparentCommand>(&scene, e, rootEntity));
+                            }
+                        }
+                    }
+                    if (!compoundCmd->IsEmpty())
+                    {
+                        CommandHistory::Get().Execute(std::move(compoundCmd));
                     }
                 }
 
@@ -629,9 +644,23 @@ void SceneHierarchyPanel::Draw(Engine* engine)
 
             if (!isRoot && ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
             {
+                m_PendingSingleSelect = entt::null;
+                if (!EditorSelection::Get().IsSelected(entity))
+                {
+                    EditorSelection::Get().Select(entity);
+                    m_SelectionAnchor = entity;
+                }
                 entt::entity e = entity;
                 ImGui::SetDragDropPayload("ENTITY_DRAG", &e, sizeof(entt::entity));
-                ImGui::Text("%s", tagComponent.tag.c_str());
+                size_t count = EditorSelection::Get().GetCount();
+                if (count > 1)
+                {
+                    ImGui::Text("%s (+ %d others)", tagComponent.tag.c_str(), (int)(count - 1));
+                }
+                else
+                {
+                    ImGui::Text("%s", tagComponent.tag.c_str());
+                }
                 ImGui::EndDragDropSource();
             }
 
@@ -649,43 +678,134 @@ void SceneHierarchyPanel::Draw(Engine* engine)
 
                     ImDrawList* drawList = ImGui::GetWindowDrawList();
 
+                    entt::entity dragged = *(entt::entity*)payload->Data;
+                    bool draggedInSelection = EditorSelection::Get().IsSelected(dragged);
+                    std::vector<entt::entity> toMove = (draggedInSelection && EditorSelection::Get().GetCount() > 1)
+                        ? EditorSelection::Get().GetSelectedEntities()
+                        : std::vector<entt::entity>{ dragged };
+
                     if (mousePosY < topBorder)
                     {
-                        drawList->AddLine(ImVec2(itemMin.x, itemMin.y), ImVec2(itemMax.x, itemMin.y), IM_COL32(255, 204, 0, 255), 2.0f);
-                        if (payload->IsDelivery())
+                        bool canReorder = false;
+                        for (auto targetMove : toMove)
                         {
-                            entt::entity dragged = *(entt::entity*)payload->Data;
-                            if (dragged != entity && !isDescendantOf(dragged, entity, isDescendantOf))
+                            if (targetMove != entt::null && registry.valid(targetMove) && targetMove != entity)
                             {
-                                auto cmd = std::make_unique<ReorderEntityCommand>(&scene, dragged, entity, true);
-                                scene.MoveChildOrder(dragged, entity, true);
-                                CommandHistory::Get().Execute(std::move(cmd));
+                                if (!isDescendantOf(targetMove, entity, isDescendantOf) && !isDescendantOfAny(targetMove, toMove))
+                                {
+                                    canReorder = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (canReorder)
+                        {
+                            drawList->AddLine(ImVec2(itemMin.x, itemMin.y), ImVec2(itemMax.x, itemMin.y), IM_COL32(255, 204, 0, 255), 2.0f);
+                            if (payload->IsDelivery())
+                            {
+                                auto compoundCmd = std::make_unique<CompoundCommand>("Reorder Entities");
+                                for (auto targetMove : toMove)
+                                {
+                                    if (targetMove != entt::null && registry.valid(targetMove) && targetMove != entity)
+                                    {
+                                        if (!isDescendantOf(targetMove, entity, isDescendantOf) && !isDescendantOfAny(targetMove, toMove))
+                                        {
+                                            auto cmd = std::make_unique<ReorderEntityCommand>(&scene, targetMove, entity, true);
+                                            scene.MoveChildOrder(targetMove, entity, true);
+                                            compoundCmd->Add(std::move(cmd));
+                                        }
+                                    }
+                                }
+                                if (!compoundCmd->IsEmpty())
+                                {
+                                    CommandHistory::Get().Execute(std::move(compoundCmd));
+                                }
                             }
                         }
                     }
                     else if (mousePosY > bottomBorder)
                     {
-                        drawList->AddLine(ImVec2(itemMin.x, itemMax.y), ImVec2(itemMax.x, itemMax.y), IM_COL32(255, 204, 0, 255), 2.0f);
-                        if (payload->IsDelivery())
+                        bool canReorder = false;
+                        for (auto targetMove : toMove)
                         {
-                            entt::entity dragged = *(entt::entity*)payload->Data;
-                            if (dragged != entity && !isDescendantOf(dragged, entity, isDescendantOf))
+                            if (targetMove != entt::null && registry.valid(targetMove) && targetMove != entity)
                             {
-                                auto cmd = std::make_unique<ReorderEntityCommand>(&scene, dragged, entity, false);
-                                scene.MoveChildOrder(dragged, entity, false);
-                                CommandHistory::Get().Execute(std::move(cmd));
+                                if (!isDescendantOf(targetMove, entity, isDescendantOf) && !isDescendantOfAny(targetMove, toMove))
+                                {
+                                    canReorder = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (canReorder)
+                        {
+                            drawList->AddLine(ImVec2(itemMin.x, itemMax.y), ImVec2(itemMax.x, itemMax.y), IM_COL32(255, 204, 0, 255), 2.0f);
+                            if (payload->IsDelivery())
+                            {
+                                auto compoundCmd = std::make_unique<CompoundCommand>("Reorder Entities");
+                                for (auto it = toMove.rbegin(); it != toMove.rend(); ++it)
+                                {
+                                    auto targetMove = *it;
+                                    if (targetMove != entt::null && registry.valid(targetMove) && targetMove != entity)
+                                    {
+                                        if (!isDescendantOf(targetMove, entity, isDescendantOf) && !isDescendantOfAny(targetMove, toMove))
+                                        {
+                                            auto cmd = std::make_unique<ReorderEntityCommand>(&scene, targetMove, entity, false);
+                                            scene.MoveChildOrder(targetMove, entity, false);
+                                            compoundCmd->Add(std::move(cmd));
+                                        }
+                                    }
+                                }
+                                if (!compoundCmd->IsEmpty())
+                                {
+                                    CommandHistory::Get().Execute(std::move(compoundCmd));
+                                }
                             }
                         }
                     }
                     else
                     {
-                        drawList->AddRect(itemMin, itemMax, IM_COL32(0, 180, 255, 255), 0.0f, 0, 1.5f);
-                        if (payload->IsDelivery())
+                        bool canReparent = false;
+                        for (auto targetMove : toMove)
                         {
-                            entt::entity dragged = *(entt::entity*)payload->Data;
-                            if (dragged != entity && !isDescendantOf(dragged, entity, isDescendantOf))
+                            if (targetMove != entt::null && registry.valid(targetMove) && targetMove != entity)
                             {
-                                CommandHistory::Get().Execute(std::make_unique<ReparentCommand>(&scene, dragged, entity));
+                                if (!isDescendantOf(targetMove, entity, isDescendantOf) && !isDescendantOfAny(targetMove, toMove))
+                                {
+                                    if (scene.GetParent(targetMove) != entity)
+                                    {
+                                        canReparent = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (canReparent)
+                        {
+                            drawList->AddRect(itemMin, itemMax, IM_COL32(0, 180, 255, 255), 0.0f, 0, 1.5f);
+                            if (payload->IsDelivery())
+                            {
+                                auto compoundCmd = std::make_unique<CompoundCommand>("Reparent Entities");
+                                for (auto targetMove : toMove)
+                                {
+                                    if (targetMove != entt::null && registry.valid(targetMove) && targetMove != entity)
+                                    {
+                                        if (!isDescendantOf(targetMove, entity, isDescendantOf) && !isDescendantOfAny(targetMove, toMove))
+                                        {
+                                            if (scene.GetParent(targetMove) != entity)
+                                            {
+                                                compoundCmd->Add(std::make_unique<ReparentCommand>(&scene, targetMove, entity));
+                                            }
+                                        }
+                                    }
+                                }
+                                if (!compoundCmd->IsEmpty())
+                                {
+                                    CommandHistory::Get().Execute(std::move(compoundCmd));
+                                }
                             }
                         }
                     }
@@ -730,6 +850,64 @@ void SceneHierarchyPanel::Draw(Engine* engine)
         DrawEntityNode(entity);
     }
 
+    if (m_PendingSingleSelect != entt::null)
+    {
+        if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+        {
+            if (!ImGui::IsDragDropActive())
+            {
+                EditorSelection::Get().Select(m_PendingSingleSelect);
+                m_SelectionAnchor = m_PendingSingleSelect;
+            }
+            m_PendingSingleSelect = entt::null;
+        }
+        else if (ImGui::IsDragDropActive())
+        {
+            m_PendingSingleSelect = entt::null;
+        }
+    }
+
+    if (m_PendingShiftSelect != entt::null)
+    {
+        entt::entity anchor = m_SelectionAnchor;
+        if (anchor == entt::null || !registry.valid(anchor) || !EditorSelection::Get().IsSelected(anchor))
+        {
+            anchor = EditorSelection::Get().GetPrimary();
+        }
+        if (anchor == entt::null || !registry.valid(anchor))
+        {
+            anchor = m_PendingShiftSelect;
+        }
+
+        auto itA = std::find(visibleOrder.begin(), visibleOrder.end(), anchor);
+        auto itB = std::find(visibleOrder.begin(), visibleOrder.end(), m_PendingShiftSelect);
+
+        if (itA != visibleOrder.end() && itB != visibleOrder.end())
+        {
+            size_t idxA = std::distance(visibleOrder.begin(), itA);
+            size_t idxB = std::distance(visibleOrder.begin(), itB);
+            size_t start = std::min(idxA, idxB);
+            size_t end = std::max(idxA, idxB);
+
+            std::vector<entt::entity> range;
+            range.reserve(end - start + 1);
+            for (size_t i = start; i <= end; ++i)
+            {
+                range.push_back(visibleOrder[i]);
+            }
+            EditorSelection::Get().SelectRange(range, m_PendingShiftSelect);
+            m_SelectionAnchor = anchor;
+        }
+        else
+        {
+            EditorSelection::Get().Select(m_PendingShiftSelect);
+            m_SelectionAnchor = m_PendingShiftSelect;
+        }
+        m_PendingShiftSelect = entt::null;
+    }
+
+    m_VisibleEntities = visibleOrder;
+
     if (searchFilter[0] != '\0' && visibleOrder.empty())
         ImGui::TextDisabled("No entities found");
 
@@ -743,12 +921,20 @@ void SceneHierarchyPanel::Draw(Engine* engine)
             entt::entity dragged = *(entt::entity*)payload->Data;
             bool draggedInSelection = EditorSelection::Get().IsSelected(dragged);
             std::vector<entt::entity> toMove = (draggedInSelection && EditorSelection::Get().GetCount() > 1) ? EditorSelection::Get().GetSelectedEntities() : std::vector<entt::entity>{ dragged };
+            auto compoundCmd = std::make_unique<CompoundCommand>("Detach from Parent");
             for (auto targetMove : toMove)
             {
                 if (targetMove != entt::null && registry.valid(targetMove) && !isDescendantOfAny(targetMove, toMove))
                 {
-                    CommandHistory::Get().Execute(std::make_unique<ReparentCommand>(&scene, targetMove, rootEntity));
+                    if (scene.GetParent(targetMove) != rootEntity)
+                    {
+                        compoundCmd->Add(std::make_unique<ReparentCommand>(&scene, targetMove, rootEntity));
+                    }
                 }
+            }
+            if (!compoundCmd->IsEmpty())
+            {
+                CommandHistory::Get().Execute(std::move(compoundCmd));
             }
         }
 
@@ -769,9 +955,11 @@ void SceneHierarchyPanel::Draw(Engine* engine)
         ImGui::EndDragDropTarget();
     }
 
-    if (ImGui::IsMouseDown(ImGuiMouseButton_Left) && ImGui::IsWindowHovered() && !ImGui::IsAnyItemHovered())
+    if (!hierarchyIO.KeyCtrl && !hierarchyIO.KeyShift && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows) && !ImGui::IsAnyItemHovered())
     {
         EditorSelection::Get().Clear();
+        m_SelectionAnchor = entt::null;
+        m_PendingSingleSelect = entt::null;
     }
 
     if (ImGui::BeginPopupContextWindow(nullptr, ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems))
