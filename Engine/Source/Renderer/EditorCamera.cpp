@@ -56,6 +56,7 @@ void EditorCamera::Focus(const glm::vec3& focusPoint, float distance)
     orbitDistance = std::max(distance, 0.1f);
     targetPosition = focusPoint - Front * distance;
     Position = targetPosition;
+    ResetMotion();
 }
 
 void EditorCamera::SetOrbitTarget(const glm::vec3& focusPoint)
@@ -63,6 +64,7 @@ void EditorCamera::SetOrbitTarget(const glm::vec3& focusPoint)
     orbitTarget = focusPoint;
     orbitDistance = std::max(glm::length(Position - focusPoint), 0.1f);
     targetPosition = Position;
+    ResetMotion();
 }
 
 void EditorCamera::SetDirection(const glm::vec3& direction, const glm::vec3* focusPoint)
@@ -83,6 +85,7 @@ void EditorCamera::SetDirection(const glm::vec3& direction, const glm::vec3* foc
     Pitch = glm::degrees(asin(std::clamp(normDir.y, -0.999f, 0.999f)));
     Yaw = glm::degrees(atan2(normDir.z, normDir.x));
     UpdateCameraVectors();
+    ResetMotion();
 }
 
 void EditorCamera::ProcessKeyboard()

@@ -166,6 +166,17 @@ void EnvironmentPanel::Draw(Engine* engine)
         ImGui::SliderFloat("Knee##Bloom", &env.Bloom_Knee, 0.0f, 1.0f);
     }
 
+    if (ImGui::CollapsingHeader("Motion Blur"))
+    {
+        ImGui::Checkbox("Use Motion Blur", &env.MotionBlur);
+        if (env.MotionBlur)
+        {
+            ImGui::SliderFloat("Intensity##MotionBlur", &env.MotionBlur_Intensity, 0.0f, 2.0f, "%.2f");
+            ImGui::SliderInt("Samples##MotionBlur", &env.MotionBlur_Samples, 4, 16);
+            ImGui::SliderFloat("Max Velocity##MotionBlur", &env.MotionBlur_MaxVelocity, 0.005f, 0.15f, "%.3f");
+        }
+    }
+
     if (ImGui::CollapsingHeader("Fog"))
     {
         ImGui::Checkbox("Enable Fog", &env.Fog_Enabled);

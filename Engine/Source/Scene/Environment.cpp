@@ -46,6 +46,11 @@ json Environment::Serialize()
     j["Bloom_Treshold"] = Bloom_Treshold;
     j["Bloom_Knee"] = Bloom_Knee;
 
+    j["MotionBlur"] = MotionBlur;
+    j["MotionBlur_Intensity"] = MotionBlur_Intensity;
+    j["MotionBlur_Samples"] = MotionBlur_Samples;
+    j["MotionBlur_MaxVelocity"] = MotionBlur_MaxVelocity;
+
     j["PostProcess_Exposure"] = PostProcess_Exposure;
     j["PostProcess_Brightness"] = PostProcess_Brightness;
     j["PostProcess_Contrast"] = PostProcess_Contrast;
@@ -142,6 +147,18 @@ void Environment::Deserialize(const json& j)
 
     if (j.contains("Bloom_Knee"))
         Bloom_Knee = j["Bloom_Knee"];
+
+    if (j.contains("MotionBlur"))
+        MotionBlur = j["MotionBlur"];
+
+    if (j.contains("MotionBlur_Intensity"))
+        MotionBlur_Intensity = j["MotionBlur_Intensity"];
+
+    if (j.contains("MotionBlur_Samples"))
+        MotionBlur_Samples = j["MotionBlur_Samples"];
+
+    if (j.contains("MotionBlur_MaxVelocity"))
+        MotionBlur_MaxVelocity = j["MotionBlur_MaxVelocity"];
 
     if (j.contains("PostProcess_Exposure"))
         PostProcess_Exposure = j["PostProcess_Exposure"];

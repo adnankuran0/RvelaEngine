@@ -461,6 +461,7 @@ void Viewport::DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySi
     case DebugBufferMode::ScreenColor: bufBtnLabel = "Screen"; bufBtnWidth = 56.0f; break;
     case DebugBufferMode::ContactShadows: bufBtnLabel = "ContactShad"; bufBtnWidth = 84.0f; break;
     case DebugBufferMode::PointShadow: bufBtnLabel = "PointShad"; bufBtnWidth = 74.0f; break;
+    case DebugBufferMode::MotionBlur: bufBtnLabel = "MotionBlur"; bufBtnWidth = 80.0f; break;
     default: break;
     }
 
@@ -582,6 +583,7 @@ void Viewport::DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySi
         ImGui::Separator();
         ModeItem("Bloom Buffer", DebugBufferMode::Bloom);
         ModeItem("Bright Pass", DebugBufferMode::BrightPass);
+        ModeItem("Motion Blur Buffer", DebugBufferMode::MotionBlur);
         ModeItem("Screen Color", DebugBufferMode::ScreenColor);
         ModeItem("Entity ID Buffer", DebugBufferMode::EntityID);
 
@@ -845,6 +847,7 @@ void Viewport::DrawDebugBufferBadge(Engine* engine, ImVec2& displayPos, ImVec2& 
     case DebugBufferMode::ScreenColor: modeName = "Screen Color"; break;
     case DebugBufferMode::ContactShadows: modeName = "Contact Shadows"; break;
     case DebugBufferMode::PointShadow: modeName = "Point Shadow Map"; break;
+    case DebugBufferMode::MotionBlur: modeName = "Motion Blur Buffer"; break;
     default: break;
     }
 
@@ -855,6 +858,11 @@ void Viewport::DrawDebugBufferBadge(Engine* engine, ImVec2& displayPos, ImVec2& 
     {
         isEffectDisabled = true;
         disableWarning = " [SSAO is OFF in Environment]";
+    }
+    else if (mode == DebugBufferMode::MotionBlur && !env.MotionBlur)
+    {
+        isEffectDisabled = true;
+        disableWarning = " [Motion Blur is OFF in Environment]";
     }
     else if (mode == DebugBufferMode::ContactShadows && !env.ContactShadows)
     {

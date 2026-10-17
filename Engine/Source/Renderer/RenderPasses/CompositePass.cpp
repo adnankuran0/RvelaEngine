@@ -48,7 +48,8 @@ void CompositePass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     auto& env = *ctx.environment;
 
-    auto i_ScreenTexture = frame.registry.Get("ScreenTexture")->id;
+    auto* mbRes = frame.registry.Get("MotionBlurTexture");
+    auto i_ScreenTexture = (mbRes && mbRes->id != 0) ? mbRes->id : frame.registry.Get("ScreenTexture")->id;
     auto i_BloomBlurTexture = frame.registry.Get("BloomTexture")->id;
     auto i_SsrTexture = frame.registry.Get("SSRTexture")->id;
 

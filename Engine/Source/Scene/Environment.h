@@ -41,6 +41,11 @@ public:
 	float Bloom_Treshold = 1.0f;
 	float Bloom_Knee = 0.5f;
 
+	bool MotionBlur = true;
+	float MotionBlur_Intensity = 1.0f;
+	int MotionBlur_Samples = 16;
+	float MotionBlur_MaxVelocity = 0.08f;
+
 	float PostProcess_Exposure = 1.0f;
 	float PostProcess_Brightness = 0.0f;
 	float PostProcess_Contrast = 1.0f;

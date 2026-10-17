@@ -196,6 +196,9 @@ void DebugBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     case DebugBufferMode::PointShadow:
         if (auto* r = frame.registry.Get("PointShadowMap")) texCubeArray = r->id;
         break;
+    case DebugBufferMode::MotionBlur:
+        if (auto* r = frame.registry.Get("MotionBlurTexture")) tex2D = r->id;
+        break;
     default:
         break;
     }

@@ -23,7 +23,8 @@ enum class DebugBufferMode : uint8_t
     EntityID,
     ScreenColor,
     ContactShadows,
-    PointShadow
+    PointShadow,
+    MotionBlur
 };
 
 enum class ShadingMode : uint8_t
