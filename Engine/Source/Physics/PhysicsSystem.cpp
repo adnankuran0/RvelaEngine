@@ -11,8 +11,11 @@
 #include <iostream>
 #include <cstdarg>
 #include <thread>
+#include <functional>
 #include "Scene/Scene.h"
 #include <Scene/Components/RigidbodyComponent.h>
+#include <Scene/Components/SceneTreeComponent.h>
+#include <Scene/Components/TagComponent.h>
 
 #include "Math/RvelaMath.h"
 #include <glm/gtx/component_wise.hpp>
@@ -143,6 +146,8 @@ void PhysicsSystem::OnStop()
 		std::lock_guard lock(m_CollisionEventMutex);
 		m_CollisionEventQueue.clear();
 	}
+
+	m_ColliderHierarchyCache.clear();
 }
 
 void PhysicsSystem::BindCallbacks()
@@ -182,18 +187,15 @@ void PhysicsSystem::RebuildDirtyShapes()
 		auto& rb = m_Scene.GetRegistry().get<RigidbodyComponent>(e);
 		if (rb.RuntimeBodyID.IsInvalid()) continue;
 
-		auto& tc = m_Scene.GetRegistry().get<TransformComponent>(e);
-		glm::vec3 worldScale = tc.GetWorldScale();
+		CheckAndUpdateHierarchyTransformsDirty(e, false);
 
-		CheckAndUpdateScaleDirty(e, rb.worldScaleCache, false);
-
-		bool dirty = rb.IsShapeDirty() || IsAnyColliderDirty(e);
+		bool dirty = rb.IsShapeDirty() || IsAnyColliderInHierarchyDirty(e);
 		if (!dirty) continue;
 
 		JPH::ShapeRefC newShape = m_ShapeBuilder.BuildShape(m_Scene.GetRegistry(), e);
 		BodyInterface().SetShape(rb.RuntimeBodyID, newShape, false, JPH::EActivation::Activate);
 
-		ClearColliderDirtyFlags(e);
+		ClearColliderDirtyFlagsInHierarchy(e);
 
 		rb.ClearShapeDirty();
 
@@ -205,9 +207,9 @@ void PhysicsSystem::RebuildDirtyShapes()
 		auto& cb = m_Scene.GetRegistry().get<CharacterBodyComponent>(e);
 		if (!cb.character) continue;
 
-		CheckAndUpdateScaleDirty(e,cb.worldScaleCache,true);
+		CheckAndUpdateHierarchyTransformsDirty(e, true);
 
-		bool dirty = cb.IsShapeDirty() || IsAnyColliderDirty(e);
+		bool dirty = cb.IsShapeDirty() || IsAnyColliderInHierarchyDirty(e);
 		if (!dirty) continue;
 
 		JPH::ShapeRefC newShape = m_ShapeBuilder.BuildShape(m_Scene.GetRegistry(), e);
@@ -220,12 +222,10 @@ void PhysicsSystem::RebuildDirtyShapes()
 			m_TempAllocator
 		);
 
-		ClearColliderDirtyFlags(e);
+		ClearColliderDirtyFlagsInHierarchy(e);
 
 		cb.ClearShapeDirty();
 	}
-
-	
 }
 
 void PhysicsSystem::BuildRigidbodies()
@@ -255,7 +255,9 @@ void PhysicsSystem::BuildRigidbodies()
 		rb.previousPosition = rb.currentPosition;
 		rb.previousRotation = rb.currentRotation;
 		rb.interpolationReady = true;
+		rb.worldScaleCache = transform.GetWorldScale();
 
+		CheckAndUpdateHierarchyTransformsDirty(e, false);
 	}
 }
 
@@ -297,6 +299,8 @@ void PhysicsSystem::BuildCharacterBodies()
 		cb.interpolationReady = true;
 
 		cb.worldScaleCache = transform.GetWorldScale();
+
+		CheckAndUpdateHierarchyTransformsDirty(e, true);
 	}
 }
 
@@ -479,6 +483,8 @@ void rv::PhysicsSystem::UpdateCharacters(float dt)
 
 void PhysicsSystem::OnRigidbodyDestroyed(entt::registry& reg, entt::entity e)
 {
+	m_ColliderHierarchyCache.erase(e);
+
 	auto& rb = reg.get<RigidbodyComponent>(e);
 	if (rb.RuntimeBodyID.IsInvalid()) return;
 
@@ -491,6 +497,8 @@ void PhysicsSystem::OnRigidbodyDestroyed(entt::registry& reg, entt::entity e)
 
 void PhysicsSystem::OnCharacterBodyDestroyed(entt::registry& reg, entt::entity e)
 {
+	m_ColliderHierarchyCache.erase(e);
+
 	auto& cb = reg.get<CharacterBodyComponent>(e);
 	if (!cb.character) return;
 
@@ -502,11 +510,15 @@ void PhysicsSystem::OnCharacterBodyDestroyed(entt::registry& reg, entt::entity e
 
 void PhysicsSystem::OnShapeChanged(entt::registry& reg, entt::entity e)
 {
-	if (auto* rb = reg.try_get<RigidbodyComponent>(e))
-		rb->SetShapeDirty();
+	entt::entity bodyEntity = FindAttachedBodyEntity(reg, e);
+	if (bodyEntity != entt::null)
+	{
+		if (auto* rb = reg.try_get<RigidbodyComponent>(bodyEntity))
+			rb->SetShapeDirty();
 
-	if (auto* cb = reg.try_get<CharacterBodyComponent>(e))
-		cb->SetShapeDirty();
+		if (auto* cb = reg.try_get<CharacterBodyComponent>(bodyEntity))
+			cb->SetShapeDirty();
+	}
 }
 
 bool PhysicsSystem::IsAnyColliderDirty(entt::entity e)
@@ -549,4 +561,208 @@ void PhysicsSystem::CheckAndUpdateScaleDirty(entt::entity e, glm::vec3& scaleCac
 		auto& rb = m_Scene.GetRegistry().get<RigidbodyComponent>(e);
 		rb.SetShapeDirty();
 	}
+}
+
+bool PhysicsSystem::HasAnyCollider(entt::registry& reg, entt::entity e)
+{
+	if (e == entt::null || !reg.valid(e)) return false;
+	return reg.any_of<
+		BoxColliderComponent,
+		SphereColliderComponent,
+		CapsuleColliderComponent,
+		CylinderColliderComponent,
+		MeshColliderComponent,
+		ConvexHullColliderComponent
+	>(e);
+}
+
+entt::entity PhysicsSystem::FindAttachedBodyEntity(entt::registry& reg, entt::entity e)
+{
+	entt::entity current = e;
+	while (current != entt::null && reg.valid(current))
+	{
+		if (reg.any_of<RigidbodyComponent, CharacterBodyComponent>(current))
+			return current;
+
+		if (!reg.any_of<SceneTreeComponent>(current))
+			break;
+
+		current = reg.get<SceneTreeComponent>(current).parent;
+	}
+	return entt::null;
+}
+
+bool PhysicsSystem::IsAnyColliderInHierarchyDirty(entt::entity root)
+{
+	auto& reg = m_Scene.GetRegistry();
+	if (root == entt::null || !reg.valid(root)) return false;
+
+	bool anyDirty = false;
+	std::function<void(entt::entity)> check = [&](entt::entity curr)
+	{
+		if (anyDirty || curr == entt::null || !reg.valid(curr))
+			return;
+
+		if (curr != root && reg.any_of<RigidbodyComponent, CharacterBodyComponent>(curr))
+			return;
+
+		if (IsAnyColliderDirty(curr))
+		{
+			anyDirty = true;
+			return;
+		}
+
+		if (reg.any_of<SceneTreeComponent>(curr))
+		{
+			for (entt::entity child : reg.get<SceneTreeComponent>(curr).children)
+			{
+				check(child);
+			}
+		}
+	};
+
+	check(root);
+	return anyDirty;
+}
+
+void PhysicsSystem::ClearColliderDirtyFlagsInHierarchy(entt::entity root)
+{
+	auto& reg = m_Scene.GetRegistry();
+	if (root == entt::null || !reg.valid(root)) return;
+
+	std::function<void(entt::entity)> clear = [&](entt::entity curr)
+	{
+		if (curr == entt::null || !reg.valid(curr))
+			return;
+
+		if (curr != root && reg.any_of<RigidbodyComponent, CharacterBodyComponent>(curr))
+			return;
+
+		ClearColliderDirtyFlags(curr);
+
+		if (reg.any_of<SceneTreeComponent>(curr))
+		{
+			for (entt::entity child : reg.get<SceneTreeComponent>(curr).children)
+			{
+				clear(child);
+			}
+		}
+	};
+
+	clear(root);
+}
+
+bool PhysicsSystem::CheckAndUpdateHierarchyTransformsDirty(entt::entity root, bool isCharacter)
+{
+	auto& reg = m_Scene.GetRegistry();
+	if (root == entt::null || !reg.valid(root)) return false;
+
+	auto& rootTransform = reg.get<TransformComponent>(root);
+	const glm::vec3 rootWorldPos = rootTransform.GetWorldPosition();
+	const glm::quat rootWorldRot = rootTransform.GetWorldRotation();
+	const glm::vec3 rootWorldScale = rootTransform.GetWorldScale();
+	const glm::quat invRootRot = glm::inverse(rootWorldRot);
+
+	std::vector<ColliderTransformSnapshot> currentSnapshots;
+
+	std::function<void(entt::entity)> gather = [&](entt::entity curr)
+	{
+		if (curr == entt::null || !reg.valid(curr))
+			return;
+
+		if (auto* tag = reg.try_get<TagComponent>(curr))
+		{
+			if (!tag->isActive)
+				return;
+		}
+
+		if (HasAnyCollider(reg, curr))
+		{
+			auto& currTransform = reg.get<TransformComponent>(curr);
+			const glm::vec3 currWorldPos = currTransform.GetWorldPosition();
+			const glm::quat currWorldRot = currTransform.GetWorldRotation();
+			const glm::vec3 currWorldScale = currTransform.GetWorldScale();
+
+			ColliderTransformSnapshot snap;
+			snap.entity = curr;
+			snap.relPos = invRootRot * (currWorldPos - rootWorldPos);
+			snap.relRot = invRootRot * currWorldRot;
+			snap.relScale = currWorldScale;
+			currentSnapshots.push_back(snap);
+		}
+
+		if (reg.any_of<SceneTreeComponent>(curr))
+		{
+			for (entt::entity child : reg.get<SceneTreeComponent>(curr).children)
+			{
+				if (child == entt::null || !reg.valid(child))
+					continue;
+
+				if (reg.any_of<RigidbodyComponent, CharacterBodyComponent>(child))
+					continue;
+
+				gather(child);
+			}
+		}
+	};
+
+	gather(root);
+
+	bool changed = false;
+
+	glm::vec3& scaleCache = isCharacter
+		? reg.get<CharacterBodyComponent>(root).worldScaleCache
+		: reg.get<RigidbodyComponent>(root).worldScaleCache;
+
+	if (!glm::all(glm::epsilonEqual(rootWorldScale, scaleCache, 0.0001f)))
+	{
+		scaleCache = rootWorldScale;
+		changed = true;
+	}
+
+	auto it = m_ColliderHierarchyCache.find(root);
+	if (it == m_ColliderHierarchyCache.end())
+	{
+		m_ColliderHierarchyCache[root] = std::move(currentSnapshots);
+		return changed;
+	}
+
+	const auto& cached = it->second;
+
+	if (cached.size() != currentSnapshots.size())
+	{
+		changed = true;
+	}
+	else
+	{
+		for (size_t i = 0; i < cached.size(); ++i)
+		{
+			if (cached[i].entity != currentSnapshots[i].entity ||
+				!glm::all(glm::epsilonEqual(cached[i].relPos, currentSnapshots[i].relPos, 0.0001f)) ||
+				!glm::all(glm::epsilonEqual(cached[i].relScale, currentSnapshots[i].relScale, 0.0001f)) ||
+				std::abs(glm::dot(cached[i].relRot, currentSnapshots[i].relRot)) < 0.9999f)
+			{
+				changed = true;
+				break;
+			}
+		}
+	}
+
+	if (changed)
+	{
+		m_ColliderHierarchyCache[root] = std::move(currentSnapshots);
+		if (isCharacter)
+		{
+			auto& cb = reg.get<CharacterBodyComponent>(root);
+			cb.SetShapeDirty();
+		}
+		else
+		{
+			auto& rb = reg.get<RigidbodyComponent>(root);
+			rb.SetShapeDirty();
+		}
+		return true;
+	}
+
+	return false;
 }

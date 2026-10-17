@@ -21,7 +21,9 @@ private:
 	{
 		entt::registry* registry;
 		entt::entity entity;
-		TransformComponent* transformComponent;
+		glm::vec3 relPos;
+		glm::quat relRot;
+		glm::vec3 relScale;
 		MeshComponent* meshComponent;
 		JPH::StaticCompoundShapeSettings* compoundSettings;
 	};

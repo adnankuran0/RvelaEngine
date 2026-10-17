@@ -3,6 +3,10 @@
 #include <Scene/Components/TransformComponent.h>
 #include <Scene/Components/MeshComponent.h>
 #include "Scene/Components/ColliderComponents.h"
+#include "Scene/Components/SceneTreeComponent.h"
+#include "Scene/Components/TagComponent.h"
+#include "Scene/Components/RigidbodyComponent.h"
+#include "Scene/Components/CharacterBodyComponent.h"
 #include <Jolt/Physics/Collision/Shape/EmptyShape.h>
 #include <Jolt/Physics/Collision/Shape/BoxShape.h>
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
@@ -11,30 +15,73 @@
 #include <Jolt/Physics/Collision/Shape/ConvexHullShape.h>
 #include <Jolt/Physics/Collision/Shape/MeshShape.h>
 #include <Core/Ref.h>
+#include "Math/RvelaMath.h"
+#include <functional>
 
 using namespace rv::Physics;
 
 JPH::ShapeRefC ShapeBuilder::BuildShape(entt::registry& registry, entt::entity e)
 {
-	JPH::StaticCompoundShapeSettings compound; // TODO: do not use compound shape for single shapes
+	JPH::StaticCompoundShapeSettings compound;
 
-	ShapeBuildParams params;
-	params.registry = &registry;
-	params.transformComponent = &registry.get<TransformComponent>(e);
-	params.meshComponent = registry.try_get<MeshComponent>(e);
-	params.compoundSettings = &compound;
-	params.entity = e;
-
-	const glm::vec3 worldScale = params.transformComponent->GetWorldScale();
+	auto& rootTransform = registry.get<TransformComponent>(e);
+	const glm::vec3 rootWorldPos = rootTransform.GetWorldPosition();
+	const glm::quat rootWorldRot = rootTransform.GetWorldRotation();
+	const glm::quat invRootRot = glm::inverse(rootWorldRot);
 
 	size_t colliderCount = 0;
-	colliderCount += TryAddBoxShape(params);
-	colliderCount += TryAddSphereShape(params);
-	colliderCount += TryAddCapsuleShape(params);
-	colliderCount += TryAddCylinderShape(params);
-	// TODO: cache shapes per MeshAsset to avoid duplicates
-	colliderCount += TryAddMeshShape(params); 
-	colliderCount += TryAddConvexHullShape(params);
+
+	std::function<void(entt::entity)> traverse = [&](entt::entity curr)
+	{
+		if (curr == entt::null || !registry.valid(curr))
+			return;
+
+		if (auto* tag = registry.try_get<TagComponent>(curr))
+		{
+			if (!tag->isActive)
+				return;
+		}
+
+		auto& currTransform = registry.get<TransformComponent>(curr);
+		const glm::vec3 currWorldPos = currTransform.GetWorldPosition();
+		const glm::quat currWorldRot = currTransform.GetWorldRotation();
+		const glm::vec3 currWorldScale = currTransform.GetWorldScale();
+
+		ShapeBuildParams params;
+		params.registry = &registry;
+		params.entity = curr;
+		params.meshComponent = registry.try_get<MeshComponent>(curr);
+		params.compoundSettings = &compound;
+		params.relPos = invRootRot * (currWorldPos - rootWorldPos);
+		params.relRot = invRootRot * currWorldRot;
+		params.relScale = currWorldScale;
+
+		colliderCount += TryAddBoxShape(params);
+		colliderCount += TryAddSphereShape(params);
+		colliderCount += TryAddCapsuleShape(params);
+		colliderCount += TryAddCylinderShape(params);
+		// TODO: cache shapes per MeshAsset to avoid duplicates
+		colliderCount += TryAddMeshShape(params);
+		colliderCount += TryAddConvexHullShape(params);
+
+		if (registry.any_of<SceneTreeComponent>(curr))
+		{
+			const auto& tree = registry.get<SceneTreeComponent>(curr);
+			for (entt::entity child : tree.children)
+			{
+				if (child == entt::null || !registry.valid(child))
+					continue;
+
+				// Stop at subbodies
+				if (registry.any_of<RigidbodyComponent, CharacterBodyComponent>(child))
+					continue;
+
+				traverse(child);
+			}
+		}
+	};
+
+	traverse(e);
 
 	if (colliderCount == 0)
 	{
@@ -43,18 +90,21 @@ JPH::ShapeRefC ShapeBuilder::BuildShape(entt::registry& registry, entt::entity e
 		return settings.Create().Get();
 	}
 
-	JPH::ShapeRefC compoundShape = compound.Create().Get();
-	return TryApplyScale(compoundShape, worldScale);
-	
+	return compound.Create().Get();
 }
 
 bool ShapeBuilder::TryAddBoxShape(ShapeBuildParams& params)
 {
 	if (auto* box = params.registry->try_get<BoxColliderComponent>(params.entity))
 	{
-		JPH::BoxShapeSettings boxSettings(math::ToJoltVec3(box->GetSize()));
+		glm::vec3 scaledSize = glm::max(glm::abs(box->GetSize() * params.relScale), glm::vec3(0.001f));
+		JPH::BoxShapeSettings boxSettings(math::ToJoltVec3(scaledSize));
 		JPH::ShapeRefC shape = boxSettings.Create().Get();
-		params.compoundSettings->AddShape(math::ToJoltVec3(box->GetOffset()), JPH::Quat::sIdentity(), shape);
+
+		glm::vec3 posInBody = params.relPos + params.relRot * (params.relScale * box->GetOffset());
+		glm::quat rotInBody = params.relRot;
+
+		params.compoundSettings->AddShape(math::ToJoltVec3(posInBody), math::ToJoltQuat(rotInBody), shape, (JPH::uint32)params.entity);
 		return true;
 	}
 	return false;
@@ -66,7 +116,12 @@ bool ShapeBuilder::TryAddSphereShape(ShapeBuildParams& params)
 	{
 		JPH::SphereShapeSettings sphereSettings(sphere->GetRadius());
 		JPH::ShapeRefC shape = sphereSettings.Create().Get();
-		params.compoundSettings->AddShape(math::ToJoltVec3(sphere->GetOffset()), JPH::Quat::sIdentity(), shape);
+		shape = TryApplyScale(shape, params.relScale);
+
+		glm::vec3 posInBody = params.relPos + params.relRot * (params.relScale * sphere->GetOffset());
+		glm::quat rotInBody = params.relRot;
+
+		params.compoundSettings->AddShape(math::ToJoltVec3(posInBody), math::ToJoltQuat(rotInBody), shape, (JPH::uint32)params.entity);
 		return true;
 	}
 	return false;
@@ -78,7 +133,12 @@ bool ShapeBuilder::TryAddCapsuleShape(ShapeBuildParams& params)
 	{
 		JPH::CapsuleShapeSettings capsuleSettings(capsule->GetHalfHeight(), capsule->GetRadius());
 		JPH::ShapeRefC shape = capsuleSettings.Create().Get();
-		params.compoundSettings->AddShape(math::ToJoltVec3(capsule->GetOffset()), JPH::Quat::sIdentity(), shape);
+		shape = TryApplyScale(shape, params.relScale);
+
+		glm::vec3 posInBody = params.relPos + params.relRot * (params.relScale * capsule->GetOffset());
+		glm::quat rotInBody = params.relRot;
+
+		params.compoundSettings->AddShape(math::ToJoltVec3(posInBody), math::ToJoltQuat(rotInBody), shape, (JPH::uint32)params.entity);
 		return true;
 	}
 	return false;
@@ -90,7 +150,12 @@ bool ShapeBuilder::TryAddCylinderShape(ShapeBuildParams& params)
 	{
 		JPH::CylinderShapeSettings cylinderSettings(cylinder->GetHalfHeight(), cylinder->GetRadius());
 		JPH::ShapeRefC shape = cylinderSettings.Create().Get();
-		params.compoundSettings->AddShape(math::ToJoltVec3(cylinder->GetOffset()), JPH::Quat::sIdentity(), shape);
+		shape = TryApplyScale(shape, params.relScale);
+
+		glm::vec3 posInBody = params.relPos + params.relRot * (params.relScale * cylinder->GetOffset());
+		glm::quat rotInBody = params.relRot;
+
+		params.compoundSettings->AddShape(math::ToJoltVec3(posInBody), math::ToJoltQuat(rotInBody), shape, (JPH::uint32)params.entity);
 		return true;
 	}
 	return false;
@@ -102,6 +167,7 @@ bool ShapeBuilder::TryAddMeshShape(ShapeBuildParams& params)
 	{
 		if (!params.meshComponent) return false;
 		Ref<MeshAsset> mesh = params.meshComponent->GetMesh();
+		if (!mesh) return false;
 
 		JPH::Array<JPH::Float3> joltVertices;
 		joltVertices.reserve(mesh->GetVertices().size());
@@ -130,7 +196,12 @@ bool ShapeBuilder::TryAddMeshShape(ShapeBuildParams& params)
 		meshSettings.mMaxTrianglesPerLeaf = meshCollider->GetMaxTrianglesPerLeaf();
 
 		JPH::ShapeRefC shape = meshSettings.Create().Get();
-		params.compoundSettings->AddShape(math::ToJoltVec3(meshCollider->GetOffset()), JPH::Quat::sIdentity(), shape);
+		shape = TryApplyScale(shape, params.relScale);
+
+		glm::vec3 posInBody = params.relPos + params.relRot * (params.relScale * meshCollider->GetOffset());
+		glm::quat rotInBody = params.relRot;
+
+		params.compoundSettings->AddShape(math::ToJoltVec3(posInBody), math::ToJoltQuat(rotInBody), shape, (JPH::uint32)params.entity);
 		return true;
 	}
 	return false;
@@ -138,11 +209,11 @@ bool ShapeBuilder::TryAddMeshShape(ShapeBuildParams& params)
 
 bool ShapeBuilder::TryAddConvexHullShape(ShapeBuildParams& params)
 {
-
 	if (auto* convexHullCollider = params.registry->try_get<ConvexHullColliderComponent>(params.entity))
 	{
 		if (!params.meshComponent) return false;
 		Ref<MeshAsset> mesh = params.meshComponent->GetMesh();
+		if (!mesh) return false;
 
 		JPH::Array<JPH::Vec3> points;
 		points.reserve(mesh->GetVertices().size());
@@ -155,7 +226,12 @@ bool ShapeBuilder::TryAddConvexHullShape(ShapeBuildParams& params)
 		JPH::ConvexHullShapeSettings convexHullSettings(points);
 		convexHullSettings.mMaxConvexRadius = convexHullCollider->GetMaxConvexRadius();
 		JPH::ShapeRefC shape = convexHullSettings.Create().Get();
-		params.compoundSettings->AddShape(math::ToJoltVec3(convexHullCollider->GetOffset()), JPH::Quat::sIdentity(), shape);
+		shape = TryApplyScale(shape, params.relScale);
+
+		glm::vec3 posInBody = params.relPos + params.relRot * (params.relScale * convexHullCollider->GetOffset());
+		glm::quat rotInBody = params.relRot;
+
+		params.compoundSettings->AddShape(math::ToJoltVec3(posInBody), math::ToJoltQuat(rotInBody), shape, (JPH::uint32)params.entity);
 		return true;
 	}
 	return false;
@@ -163,12 +239,19 @@ bool ShapeBuilder::TryAddConvexHullShape(ShapeBuildParams& params)
 
 JPH::ShapeRefC ShapeBuilder::TryApplyScale(JPH::ShapeRefC shape, const glm::vec3& scale)
 {
+	if (!shape)
+		return shape;
+
 	static constexpr glm::vec3 identity(1.0f);
 	if (glm::all(glm::epsilonEqual(scale, identity, 0.0001f)))
 		return shape;
 
-	JPH::Shape::ShapeResult shapeResult = shape->ScaleShape(math::ToJoltVec3(scale));
+	glm::vec3 safeScale = glm::max(glm::abs(scale), glm::vec3(0.001f));
+	if (scale.x < 0.0f) safeScale.x = -safeScale.x;
+	if (scale.y < 0.0f) safeScale.y = -safeScale.y;
+	if (scale.z < 0.0f) safeScale.z = -safeScale.z;
+
+	JPH::Shape::ShapeResult shapeResult = shape->ScaleShape(math::ToJoltVec3(safeScale));
 
 	return shapeResult.IsValid() ? shapeResult.Get() : shape;
-
 }

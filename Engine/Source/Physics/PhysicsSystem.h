@@ -7,6 +7,8 @@
 #include "ObjectVsBroadPhaseLayerFilter.h"
 #include <memory>
 #include <mutex>
+#include <unordered_map>
+#include <vector>
 #include "ContactListener.h"
 #include "CharacterContactListener.h"
 #include "BodyActivationListener.h"
@@ -56,9 +58,14 @@ private:
 	void UpdateCharacters(float dt); // TODO: think about seperate MoveAndSlide function
 	inline JPH::BodyInterface& BodyInterface() { return m_PhysicsSystem.GetBodyInterface(); }
 
+	bool HasAnyCollider(entt::registry& reg, entt::entity e);
+	entt::entity FindAttachedBodyEntity(entt::registry& reg, entt::entity e);
 	bool IsAnyColliderDirty(entt::entity e);
+	bool IsAnyColliderInHierarchyDirty(entt::entity root);
 	void ClearColliderDirtyFlags(entt::entity e);
+	void ClearColliderDirtyFlagsInHierarchy(entt::entity root);
 	void CheckAndUpdateScaleDirty(entt::entity e, glm::vec3& scaleCache,bool isCharacter);
+	bool CheckAndUpdateHierarchyTransformsDirty(entt::entity root, bool isCharacter);
 
 	void OnRigidbodyDestroyed(entt::registry& reg, entt::entity e);
 	void OnCharacterBodyDestroyed(entt::registry& reg, entt::entity e);
@@ -96,8 +103,16 @@ private:
 	std::vector<Physics::CollisionEvent> m_CollisionEventQueue;
 
 	JoltDebugRenderer m_DebugRenderer;
-	
 
+	struct ColliderTransformSnapshot
+	{
+		entt::entity entity = entt::null;
+		glm::vec3 relPos{ 0.0f };
+		glm::quat relRot{ 1.0f, 0.0f, 0.0f, 0.0f };
+		glm::vec3 relScale{ 1.0f };
+	};
+
+	std::unordered_map<entt::entity, std::vector<ColliderTransformSnapshot>> m_ColliderHierarchyCache;
 };
 
 }
