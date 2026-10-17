@@ -409,51 +409,53 @@ void EditorLayer::HandleShortcuts()
     bool isShift = Input::IsKeyPressed(KeyCode::LeftShift) || Input::IsKeyPressed(KeyCode::RightShift);
     bool isAlt = Input::IsKeyPressed(KeyCode::LeftAlt) || Input::IsKeyPressed(KeyCode::RightAlt);
 
+    const bool isEditMode = (m_Engine->GetActiveScene().GetState() == SceneState::EDIT);
+
     if (isCtrl)
     {
         if (isAlt)
         {
-            if (Input::IsKeyJustPressed(KeyCode::M))
+            if (isEditMode && Input::IsKeyJustPressed(KeyCode::M))
             {
                 EditorUtils::AlignSelectedWithView(*m_Engine);
             }
         }
         else if (isShift)
         {
-            if (Input::IsKeyJustPressed(KeyCode::S))
+            if (isEditMode && Input::IsKeyJustPressed(KeyCode::S))
             {
                 EditorUtils::SaveSceneAs(*m_Engine);
             }
-            if (Input::IsKeyJustPressed(KeyCode::Z))
+            if (isEditMode && Input::IsKeyJustPressed(KeyCode::Z))
             {
                 CommandHistory::Get().Redo();
             }
         }
         else
         {
-            if (Input::IsKeyJustPressed(KeyCode::Z))
+            if (isEditMode && Input::IsKeyJustPressed(KeyCode::Z))
             {
                 CommandHistory::Get().Undo();
             }
-            if (Input::IsKeyJustPressed(KeyCode::Y))
+            if (isEditMode && Input::IsKeyJustPressed(KeyCode::Y))
             {
                 CommandHistory::Get().Redo();
             }
-            if (Input::IsKeyJustPressed(KeyCode::S))
+            if (isEditMode && Input::IsKeyJustPressed(KeyCode::S))
             {
                 EditorUtils::SaveScene(*m_Engine);
                 m_Engine->GetProjectManager().SaveActiveProject();
             }
-            if (Input::IsKeyJustPressed(KeyCode::O))
+            if (isEditMode && Input::IsKeyJustPressed(KeyCode::O))
             {
                 EditorUtils::OpenScene(*m_Engine);
             }
-            if (Input::IsKeyJustPressed(KeyCode::N))
+            if (isEditMode && Input::IsKeyJustPressed(KeyCode::N))
             {
                 EditorUtils::CreateScene(*m_Engine);
                 CommandHistory::Get().Clear();
             }
-            if (Input::IsKeyJustPressed(KeyCode::D))
+            if (isEditMode && Input::IsKeyJustPressed(KeyCode::D))
             {
                 if (!EditorSelection::Get().IsEmpty())
                 {

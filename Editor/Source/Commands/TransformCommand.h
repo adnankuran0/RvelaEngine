@@ -1,5 +1,6 @@
 #pragma once
 #include "Command.h"
+#include "Core/Engine.h"
 #include "Scene/Scene.h"
 #include "Scene/Components.h"
 #include "Scene/EntityUUID.h"
@@ -23,6 +24,11 @@ public:
     TransformCommand(Scene* scene, const std::vector<EntityTransformRecord>& before, const std::vector<EntityTransformRecord>& after, const std::string& customName = "")
         : m_Scene(scene), m_Before(before), m_After(after), m_FirstExecute(true), m_CustomName(customName)
     {
+    }
+
+    void SetScene(Scene* scene) override
+    {
+        m_Scene = scene;
     }
 
     void Execute() override
@@ -51,6 +57,9 @@ public:
 private:
     void ApplyTransforms(const std::vector<EntityTransformRecord>& records)
     {
+        if (!m_Scene && Engine::Get())
+            m_Scene = &Engine::Get()->GetActiveScene();
+
         if (!m_Scene) return;
 
         auto& uuidMap = m_Scene->GetUUIDEntityMap();

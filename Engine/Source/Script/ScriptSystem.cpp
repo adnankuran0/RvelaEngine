@@ -205,9 +205,39 @@ void ScriptSystem::BindLuaScript(ScriptComponent& sc, entt::entity e)
             case ScriptPropertyType::Entity:
                 if (val.is_string())
                 {
-                    EntityHandle handle;
-                    handle.uuid = std::stoull(val.get<std::string>());
+                    const std::string& str = val.get<std::string>();
+                    if (str.empty())
+                    {
+                        sc.luaInstance[def.name] = Entity{};
+                    }
+                    else
+                    {
+                        try
+                        {
+                            EntityHandle handle;
+                            handle.uuid = std::stoull(str);
+                            sc.luaInstance[def.name] = handle.Resolve(m_Scene);
+                        }
+                        catch (const std::exception&)
+                        {
+                            LOG_WARN("Failed to apply script property override '{}': invalid entity UUID '{}'", def.name, str);
+                            sc.luaInstance[def.name] = Entity{};
+                        }
+                    }
+                }
+                else if (val.is_number_unsigned())
+                {
+                    EntityHandle handle{ val.get<uint64_t>() };
                     sc.luaInstance[def.name] = handle.Resolve(m_Scene);
+                }
+                else if (val.is_number_integer() && val.get<int64_t>() > 0)
+                {
+                    EntityHandle handle{ static_cast<EntityUUID>(val.get<int64_t>()) };
+                    sc.luaInstance[def.name] = handle.Resolve(m_Scene);
+                }
+                else if (val.is_null())
+                {
+                    sc.luaInstance[def.name] = Entity{};
                 }
                 break;
             }

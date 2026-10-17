@@ -39,6 +39,8 @@ public:
         }
     }
 
+    void SetScene(Scene* scene) override { m_Scene = scene; }
+
     void Execute() override
     {
         ApplyParent(m_NewParentUUID);
@@ -167,6 +169,8 @@ public:
         if (targetParent != entt::null && reg.valid(targetParent) && targetParent != sourceParent && m_Scene->HasComponent<SceneTreeComponent>(targetParent))
             m_NewParentChildrenUUIDsBefore = m_Scene->GetComponent<SceneTreeComponent>(targetParent).childrenUUIDs;
     }
+
+    void SetScene(Scene* scene) override { m_Scene = scene; }
 
     void Execute() override
     {

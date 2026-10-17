@@ -284,7 +284,11 @@ static void ParsePropertyTableItem(ScriptPropertyDef& def, const sol::table& ite
             try
             {
                 if (defObj.is<std::string>())
-                    def.entityVal.uuid = std::stoull(defObj.as<std::string>());
+                {
+                    const std::string str = defObj.as<std::string>();
+                    if (!str.empty())
+                        def.entityVal.uuid = std::stoull(str);
+                }
                 else if (defObj.is<uint64_t>())
                     def.entityVal.uuid = defObj.as<uint64_t>();
                 else if (defObj.is<int64_t>() && defObj.as<int64_t>() > 0)

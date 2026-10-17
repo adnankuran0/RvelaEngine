@@ -1,5 +1,6 @@
 #pragma once
 #include "Command.h"
+#include "Core/Engine.h"
 #include <vector>
 #include <memory>
 #include <string>
@@ -13,6 +14,15 @@ public:
     {
         static CommandHistory s_Instance;
         return s_Instance;
+    }
+
+    void SetCurrentScene(Scene* scene)
+    {
+        for (auto& cmd : m_Commands)
+        {
+            if (cmd)
+                cmd->SetScene(scene);
+        }
     }
 
     void Execute(std::unique_ptr<Command> command)
@@ -53,6 +63,9 @@ public:
     {
         if (!CanUndo()) return;
 
+        if (Engine::Get())
+            SetCurrentScene(&Engine::Get()->GetActiveScene());
+
         m_CurrentIndex--;
         m_Commands[m_CurrentIndex]->Undo();
     }
@@ -60,6 +73,9 @@ public:
     void Redo()
     {
         if (!CanRedo()) return;
+
+        if (Engine::Get())
+            SetCurrentScene(&Engine::Get()->GetActiveScene());
 
         m_Commands[m_CurrentIndex]->Execute();
         m_CurrentIndex++;

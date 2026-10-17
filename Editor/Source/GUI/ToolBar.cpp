@@ -3,6 +3,7 @@
 #include "Core/Engine.h"
 #include "EditorUtils.h"
 #include "EditorSelection.h"
+#include "Commands/CommandHistory.h"
 #include "Render/IconLibrary.h"
 
 using namespace rv;
@@ -79,6 +80,7 @@ void ToolBar::Draw(Engine& engine)
         {
             engine.GetSceneManager().StopScene();
             EditorSelection::Get().Clear();
+            CommandHistory::Get().SetCurrentScene(&engine.GetActiveScene());
         }
         ImGui::PopStyleColor();
 

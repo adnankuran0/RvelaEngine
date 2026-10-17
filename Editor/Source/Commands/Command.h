@@ -3,6 +3,8 @@
 
 namespace rv {
 
+class Scene;
+
 class Command
 {
 public:
@@ -10,6 +12,7 @@ public:
     virtual void Execute() = 0;
     virtual void Undo() = 0;
     virtual std::string GetName() const = 0;
+    virtual void SetScene(Scene* scene) {}
 };
 
 }

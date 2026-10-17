@@ -14,6 +14,7 @@
 #include "Core/Engine.h"
 #include "Scene/Entity.h"
 #include "EditorSelection.h"
+#include "Commands/CommandHistory.h"
 #include "Renderer/EditorCamera.h"
 #include "AssetImporters/MaterialSerializer.h"
 #include "AssetImporters/AnimationLibrarySerializer.h"
@@ -1005,7 +1006,11 @@ static void OpenBrowserItem(const BrowserItem& item, Engine* engine)
     else if (item.extension == ".rscene")
     {
         if (engine)
+        {
+            CommandHistory::Get().Clear();
+            EditorSelection::Get().Clear();
             engine->GetSceneManager().LoadScene(item.path.string());
+        }
     }
     else if (item.extension == ".rprefab")
     {

@@ -34,6 +34,8 @@ void EditorUtils::OpenVSCodeWorkspace()
 
 void EditorUtils::CreateScene(Engine& engine)
 {
+    CommandHistory::Get().Clear();
+    EditorSelection::Get().Clear();
     auto& sm = engine.GetSceneManager();
     sm.SetActiveScene(sm.CreateScene("NewScene"));
     sm.GetActiveScene().SetDirty(false);
@@ -54,6 +56,8 @@ void EditorUtils::OpenScene(Engine& engine)
         { ".rscene" },
         startDir,
         [&engine](const std::filesystem::path& chosen) {
+            CommandHistory::Get().Clear();
+            EditorSelection::Get().Clear();
             engine.GetSceneManager().LoadScene(chosen.string());
         }
     );

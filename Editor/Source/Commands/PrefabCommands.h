@@ -35,6 +35,8 @@ public:
         }
     }
 
+    void SetScene(Scene* scene) override { m_Scene = scene; }
+
     void Execute() override
     {
         if (m_FirstExecute)
@@ -102,6 +104,8 @@ public:
         if (!m_Scene || oldRoot == entt::null) return;
         CollectSubtree(oldRoot, m_BeforeRecords);
     }
+
+    void SetScene(Scene* scene) override { m_Scene = scene; }
 
     void CaptureAfter(entt::entity newRoot)
     {
@@ -252,6 +256,8 @@ public:
             }
         }
     }
+
+    void SetScene(Scene* scene) override { m_Scene = scene; }
 
     void CaptureNewContent()
     {

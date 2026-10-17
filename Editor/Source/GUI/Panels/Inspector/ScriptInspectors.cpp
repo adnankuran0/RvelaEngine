@@ -281,10 +281,30 @@ void ScriptInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 				{
 					UI::PropertyLabel(prop.name.c_str());
 					EntityHandle value = prop.entityVal;
-					if (scriptComp.propertyValues.contains(prop.name) && scriptComp.propertyValues[prop.name].is_string())
+					if (scriptComp.propertyValues.contains(prop.name))
 					{
-						try { value.uuid = std::stoull(scriptComp.propertyValues[prop.name].get<std::string>()); }
-						catch (const std::exception&) { value = {}; }
+						const auto& propVal = scriptComp.propertyValues[prop.name];
+						if (propVal.is_string())
+						{
+							const std::string& strVal = propVal.get<std::string>();
+							if (!strVal.empty())
+							{
+								try { value.uuid = std::stoull(strVal); }
+								catch (const std::exception&) { value = {}; }
+							}
+							else
+							{
+								value = {};
+							}
+						}
+						else if (propVal.is_number_unsigned())
+						{
+							value.uuid = propVal.get<uint64_t>();
+						}
+						else if (propVal.is_null())
+						{
+							value = {};
+						}
 					}
 					const EntityUUID originalUUID = value.uuid;
 

@@ -105,6 +105,8 @@ public:
         }
     }
 
+    void SetScene(Scene* scene) override { m_Scene = scene; }
+
     void Execute() override
     {
         if (m_FirstExecute)
@@ -195,6 +197,8 @@ public:
         if (m_Scene && entity != entt::null && m_Scene->GetRegistry().valid(entity) && m_Scene->HasComponent<UUIDComponent>(entity))
             m_UUID = m_Scene->GetComponent<UUIDComponent>(entity).uuid;
     }
+
+    void SetScene(Scene* scene) override { m_Scene = scene; }
 
     void Execute() override
     {

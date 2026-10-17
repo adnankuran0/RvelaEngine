@@ -125,20 +125,24 @@ void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter,
 
         if (ImGui::BeginMenu("Edit"))
         {
+            const bool isEditMode = (engine && engine->GetActiveScene().GetState() == SceneState::EDIT);
+
             std::string undoLabel = "Undo";
             if (CommandHistory::Get().CanUndo())
                 undoLabel += " " + CommandHistory::Get().GetUndoName();
-            if (ImGui::MenuItem(undoLabel.c_str(), "Ctrl+Z", false, CommandHistory::Get().CanUndo()))
+            if (ImGui::MenuItem(undoLabel.c_str(), "Ctrl+Z", false, isEditMode && CommandHistory::Get().CanUndo()))
             {
-                CommandHistory::Get().Undo();
+                if (isEditMode)
+                    CommandHistory::Get().Undo();
             }
 
             std::string redoLabel = "Redo";
             if (CommandHistory::Get().CanRedo())
                 redoLabel += " " + CommandHistory::Get().GetRedoName();
-            if (ImGui::MenuItem(redoLabel.c_str(), "Ctrl+Y", false, CommandHistory::Get().CanRedo()))
+            if (ImGui::MenuItem(redoLabel.c_str(), "Ctrl+Y", false, isEditMode && CommandHistory::Get().CanRedo()))
             {
-                CommandHistory::Get().Redo();
+                if (isEditMode)
+                    CommandHistory::Get().Redo();
             }
 
             ImGui::Separator();
