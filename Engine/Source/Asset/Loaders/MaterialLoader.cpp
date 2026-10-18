@@ -105,6 +105,7 @@ Ref<Asset> MaterialLoader::Load(
     asset->ao = j.value("ao", asset->ao);
     asset->normalScale = j.value("normalScale", asset->normalScale);
     asset->heightScale = j.value("heightScale", asset->heightScale);
+    asset->invertHeight = j.value("invertHeight", asset->invertHeight);
 
     if (j.contains("UVScale"))
         asset->UVScale = { j["UVScale"][0], j["UVScale"][1] };

@@ -154,6 +154,7 @@ void TransparentPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             shader.setFloat("normalScale", material->GetNormalScale());
             shader.setFloat("specularIntensity", material->GetSpecular());
             shader.setFloat("heightScale", material->GetHeightScale());
+            shader.setBool("invertHeight", material->GetInvertHeight());
 
             std::array<MapInfo, 7> maps = { {
                 { material->IsUsingAlbedoMap(),    "albedoMap",    0, "useAlbedoMap",    material->GetAlbedoTexture() },

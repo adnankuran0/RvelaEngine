@@ -59,6 +59,10 @@ public:
     void SetHeightScale(float v) { m_Instance.SetHeightScale(v); }
     void ClearHeightScale() { m_Instance.ClearHeightScale(); }
 
+    bool GetInvertHeight() const { return m_Instance.GetInvertHeight(); }
+    void SetInvertHeight(bool v) { m_Instance.SetInvertHeight(v); }
+    void ClearInvertHeight() { m_Instance.ClearInvertHeight(); }
+
     glm::vec2 GetUVScale() const { return m_Instance.GetUVScale(); }
     void SetUVScale(const glm::vec2& v) { m_Instance.SetUVScale(v); }
     void ClearUVScale() { m_Instance.ClearUVScale(); }

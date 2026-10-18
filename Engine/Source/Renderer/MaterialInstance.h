@@ -22,6 +22,7 @@ enum class MatField : uint8_t {
     AO,
     NormalScale,
     HeightScale,
+    InvertHeight,
     UVScale,
     UVOffset,
     AlbedoTex,
@@ -80,6 +81,7 @@ public:
     void SetAO(float v) { m_AO = v; SetOverride(MatField::AO); }
     void SetNormalScale(float v) { m_NormalScale = v; SetOverride(MatField::NormalScale); }
     void SetHeightScale(float v) { m_HeightScale = v; SetOverride(MatField::HeightScale); }
+    void SetInvertHeight(bool v) { m_InvertHeight = v; SetOverride(MatField::InvertHeight); }
     void SetUVScale(const glm::vec2& v) { m_UVScale = v; SetOverride(MatField::UVScale); }
     void SetUVOffset(const glm::vec2& v) { m_UVOffset = v; SetOverride(MatField::UVOffset); }
 
@@ -105,6 +107,7 @@ public:
     float GetAO() const { return IsOverridden(MatField::AO) ? m_AO : (m_SourceAsset ? m_SourceAsset->ao : m_AO); }
     float GetNormalScale() const { return IsOverridden(MatField::NormalScale) ? m_NormalScale : (m_SourceAsset ? m_SourceAsset->normalScale : m_NormalScale); }
     float GetHeightScale() const { return IsOverridden(MatField::HeightScale) ? m_HeightScale : (m_SourceAsset ? m_SourceAsset->heightScale : m_HeightScale); }
+    bool GetInvertHeight() const { return IsOverridden(MatField::InvertHeight) ? m_InvertHeight : (m_SourceAsset ? m_SourceAsset->invertHeight : m_InvertHeight); }
     glm::vec2 GetUVScale() const { return IsOverridden(MatField::UVScale) ? m_UVScale : (m_SourceAsset ? m_SourceAsset->UVScale : m_UVScale); }
     glm::vec2 GetUVOffset() const { return IsOverridden(MatField::UVOffset) ? m_UVOffset : (m_SourceAsset ? m_SourceAsset->UVOffset : m_UVOffset); }
 
@@ -137,6 +140,7 @@ public:
     void ClearAO() { ClearOverride(MatField::AO); }
     void ClearNormalScale() { ClearOverride(MatField::NormalScale); }
     void ClearHeightScale() { ClearOverride(MatField::HeightScale); }
+    void ClearInvertHeight() { ClearOverride(MatField::InvertHeight); }
     void ClearUVScale() { ClearOverride(MatField::UVScale); }
     void ClearUVOffset() { ClearOverride(MatField::UVOffset); }
     void ClearAlbedoTexture() { m_AlbedoTex = nullptr; m_UseAlbedoMap = false; ClearOverride(MatField::AlbedoTex); }
@@ -225,7 +229,8 @@ private:
     float m_Roughness = 1.0f;
     float m_AO = 1.0f;
     float m_NormalScale = 1.0f;
-    float m_HeightScale = 0.1f;
+    float m_HeightScale = 0.05f;
+    bool m_InvertHeight = false;
     glm::vec2 m_UVScale = glm::vec2(1.0f);
     glm::vec2 m_UVOffset = glm::vec2(0.0f);
     bool m_UseTriplanar = false;

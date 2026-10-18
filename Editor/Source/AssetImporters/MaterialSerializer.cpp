@@ -59,6 +59,7 @@ bool MaterialSerializer::Save(const Ref<MaterialAsset>& asset, const std::filesy
     j["ao"] = asset->ao;
     j["normalScale"] = asset->normalScale;
     j["heightScale"] = asset->heightScale;
+    j["invertHeight"] = asset->invertHeight;
     j["UVScale"] = { asset->UVScale.x, asset->UVScale.y };
     j["UVOffset"] = { asset->UVOffset.x, asset->UVOffset.y };
 
@@ -170,7 +171,8 @@ bool MaterialSerializer::Load(const Ref<MaterialAsset>& asset, const std::filesy
     asset->specular = j.value("specular", 1.0f);
     asset->ao = j.value("ao", 1.0f);
     asset->normalScale = j.value("normalScale", 1.0f);
-    asset->heightScale = j.value("heightScale", 0.1f);
+    asset->heightScale = j.value("heightScale", 0.05f);
+    asset->invertHeight = j.value("invertHeight", false);
 
     if (j.contains("UVScale"))
     {

@@ -123,6 +123,7 @@ void MaterialInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 				if (inst.IsOverridden(MatField::AO)) asset->ao = material.GetAO();
 				if (inst.IsOverridden(MatField::NormalScale)) asset->normalScale = material.GetNormalScale();
 				if (inst.IsOverridden(MatField::HeightScale)) asset->heightScale = material.GetHeightScale();
+				if (inst.IsOverridden(MatField::InvertHeight)) asset->invertHeight = material.GetInvertHeight();
 				if (inst.IsOverridden(MatField::UVScale)) asset->UVScale = material.GetUVScale();
 				if (inst.IsOverridden(MatField::UVOffset)) asset->UVOffset = material.GetUVOffset();
 				if (inst.IsOverridden(MatField::UseTriplanar)) asset->useTriplanar = material.GetUseTriplanar();
@@ -575,7 +576,7 @@ void MaterialInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 			}
 		}
 
-		if (ImGui::CollapsingHeader("Height"))
+		if (ImGui::CollapsingHeader("Displacement"))
 		{
 			if (UI::BeginPropertyTable("HeightTable"))
 			{
@@ -585,8 +586,15 @@ void MaterialInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 				float heightScale = material.GetHeightScale();
 				float hgtW = inst.IsOverridden(MatField::HeightScale) ? ImGui::GetContentRegionAvail().x - 26.0f : -FLT_MIN;
 				ImGui::SetNextItemWidth(hgtW);
-				if (ImGui::SliderFloat("##hgtscl", &heightScale, 0.0f, 1.0f, "%.3f")) material.SetHeightScale(heightScale);
+				if (ImGui::SliderFloat("##hgtscl", &heightScale, 0.0f, 0.5f, "%.3f")) material.SetHeightScale(heightScale);
 				if (inst.IsOverridden(MatField::HeightScale)) RevertButton("R##hgtscl", [&]() { material.ClearHeightScale(); });
+
+				UI::PropertyLabel("Invert Height");
+				bool invert = material.GetInvertHeight();
+				float invW = inst.IsOverridden(MatField::InvertHeight) ? ImGui::GetContentRegionAvail().x - 26.0f : -FLT_MIN;
+				ImGui::SetNextItemWidth(invW);
+				if (ImGui::Checkbox("##invhgt", &invert)) material.SetInvertHeight(invert);
+				if (inst.IsOverridden(MatField::InvertHeight)) RevertButton("R##invhgt", [&]() { material.ClearInvertHeight(); });
 
 				UI::EndPropertyTable();
 			}

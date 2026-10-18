@@ -215,8 +215,12 @@ void LuaBindings::RegisterComponents(sol::state& lua)
             [](MaterialHandle& h, float v) { if (auto* c = h.Get()) c->SetNormalScale(v); }
         ),
         "heightScale", sol::property(
-            [](MaterialHandle& h) { return h.Get() ? h.Get()->GetHeightScale() : 1.0f; },
+            [](MaterialHandle& h) { return h.Get() ? h.Get()->GetHeightScale() : 0.05f; },
             [](MaterialHandle& h, float v) { if (auto* c = h.Get()) c->SetHeightScale(v); }
+        ),
+        "invertHeight", sol::property(
+            [](MaterialHandle& h) { return h.Get() ? h.Get()->GetInvertHeight() : false; },
+            [](MaterialHandle& h, bool v) { if (auto* c = h.Get()) c->SetInvertHeight(v); }
         ),
         "uvScale", sol::property(
             [](MaterialHandle& h) { return h.Get() ? h.Get()->GetUVScale() : glm::vec2(1.0f); },

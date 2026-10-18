@@ -37,6 +37,8 @@ json MaterialInstance::SerializeOverrides() const
         j["normalScale"] = m_NormalScale;
     if (IsOverridden(MatField::HeightScale))
         j["heightScale"] = m_HeightScale;
+    if (IsOverridden(MatField::InvertHeight))
+        j["invertHeight"] = m_InvertHeight;
     if (IsOverridden(MatField::UVScale))
         j["UVScale"] = { m_UVScale.x, m_UVScale.y };
     if (IsOverridden(MatField::UVOffset))
@@ -160,6 +162,11 @@ void MaterialInstance::DeserializeOverrides(const json& j)
     {
         m_HeightScale = j["heightScale"];
         SetOverride(MatField::HeightScale);
+    }
+    if (j.contains("invertHeight"))
+    {
+        m_InvertHeight = j["invertHeight"].get<bool>();
+        SetOverride(MatField::InvertHeight);
     }
     if (j.contains("UVScale"))
     {

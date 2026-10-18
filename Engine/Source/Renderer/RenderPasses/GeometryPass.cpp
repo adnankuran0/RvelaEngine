@@ -129,6 +129,22 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             glBindSampler(3, 0);
             glBindTextureUnit(3, 0);
         }
+
+        bool useHeight = material->IsUsingHeightMap() && material->GetHeightTexture();
+        shader.setBool("useHeightMap", useHeight);
+        shader.setFloat("heightScale", material->GetHeightScale());
+        shader.setBool("invertHeight", material->GetInvertHeight());
+        if (useHeight)
+        {
+            shader.setInt("heightMap", 5);
+            TextureCache::Get().GetOrCreate(material->GetHeightTexture()).Bind(5);
+            material->GetSampler().Bind(5);
+        }
+        else
+        {
+            glBindSampler(5, 0);
+            glBindTextureUnit(5, 0);
+        }
         };
 
     auto CleanupSamplers = []() {
@@ -136,10 +152,12 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         glBindSampler(1, 0);
         glBindSampler(2, 0);
         glBindSampler(3, 0);
+        glBindSampler(5, 0);
         glBindTextureUnit(0, 0);
         glBindTextureUnit(1, 0);
         glBindTextureUnit(2, 0);
         glBindTextureUnit(3, 0);
+        glBindTextureUnit(5, 0);
         };
 
     if (!staticCommands.empty())

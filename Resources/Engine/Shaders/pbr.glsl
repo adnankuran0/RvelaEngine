@@ -120,13 +120,13 @@ in vec3 LocalNormal;
 #include "Common/Constants.glsl"
 #include "Common/PBR.glsl"
 #include "Common/Shadows.glsl"
+#include "Common/Parallax.glsl"
 
 layout(binding = 0) uniform sampler2D albedoMap;
 layout(binding = 1) uniform sampler2D normalMap;
 layout(binding = 2) uniform sampler2D metallicMap;
 layout(binding = 3) uniform sampler2D roughnessMap;
 layout(binding = 4) uniform sampler2D aoMap;
-layout(binding = 5) uniform sampler2D heightMap;
 layout(binding = 12) uniform sampler2D armMap;
 
 uniform bool useAlbedoMap;
@@ -134,7 +134,6 @@ uniform bool useNormalMap;
 uniform bool useMetallicMap;
 uniform bool useRoughnessMap;
 uniform bool useAOMap;
-uniform bool useHeightMap;
 uniform bool useARMMap;
 
 uniform bool useTriplanar;
@@ -150,7 +149,6 @@ uniform float emmisiveIntensity;
 uniform float metallicValue;
 uniform float roughnessValue;
 uniform float aoValue;
-uniform float heightScale;
 uniform float normalScale;
 uniform float specularIntensity;
 
@@ -222,42 +220,11 @@ vec3 sampleTriplanarNormal(sampler2D tex, vec3 p, vec3 weights, vec3 geomNormal)
     return normalize(wX * weights.x + wY * weights.y + wZ * weights.z);
 }
 
-vec2 parallaxOcclusionMapping(vec2 texCoords, vec3 viewDirTS)
-{
-    if (!useHeightMap) return texCoords;
-
-    const float minLayers = 8.0;
-    const float maxLayers = 32.0;
-    float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDirTS)));
-
-    float layerDepth = 1.0 / numLayers;
-    float currentLayerDepth = 0.0;
-    vec2 P = normalize(viewDirTS).xy * -heightScale; 
-    vec2 deltaTexCoords = P / numLayers;
-    
-    vec2 currentTexCoords = texCoords;
-    float currentDepthMapValue = texture(heightMap, currentTexCoords).r;
-
-    while (currentLayerDepth < currentDepthMapValue)
-    {
-        currentTexCoords -= deltaTexCoords;
-        currentLayerDepth += layerDepth;
-        currentDepthMapValue = texture(heightMap, currentTexCoords).r;
-    }
-
-    vec2 prevTexCoords = currentTexCoords + deltaTexCoords;
-    float afterDepth = currentDepthMapValue - currentLayerDepth;
-    float beforeDepth = texture(heightMap, prevTexCoords).r - (currentLayerDepth - layerDepth);
-    float weight = afterDepth / (afterDepth - beforeDepth + 0.0001);
-    
-    return mix(currentTexCoords, prevTexCoords, weight);
-}
-
-vec3 getNormalFromMap(vec2 texCoords, vec3 N, vec3 T, vec3 B) 
+vec3 getNormalFromMap(vec2 texCoords, vec3 N, vec3 T, vec3 B, vec2 ddx, vec2 ddy) 
 {
     if (!useNormalMap) return N;
     
-    vec2 rg = texture(normalMap, texCoords).rg * 2.0 - 1.0;
+    vec2 rg = textureGrad(normalMap, texCoords, ddx, ddy).rg * 2.0 - 1.0;
     float b = sqrt(max(0.0, 1.0 - dot(rg, rg)));
     vec3 tangentNormal = vec3(rg, b);
     
@@ -268,6 +235,11 @@ vec3 getNormalFromMap(vec2 texCoords, vec3 N, vec3 T, vec3 B)
     tangentNormal /= tnLen;
     
     return normalize(mat3(T, B, N) * tangentNormal);
+}
+
+vec3 getNormalFromMap(vec2 texCoords, vec3 N, vec3 T, vec3 B) 
+{
+    return getNormalFromMap(texCoords, N, T, B, dFdx(texCoords), dFdy(texCoords));
 }
 
 float sampleSSAO()
@@ -289,23 +261,57 @@ void main()
 {
     vec3 viewDir = normalize(camPos - FragPos);
 
-    vec3 T = normalize(Tangent);
     vec3 N = normalize(Normal);
-
     if (!gl_FrontFacing)
     {
         N = -N;
-        T = -T;
     }
 
-    T = normalize(T - dot(T, N) * N);
-    vec3 B = normalize(cross(N, T));
+    vec3 T = Tangent;
+    vec3 B;
+    if (dot(T, T) < 0.001)
+    {
+        vec3 dp1 = dFdx(FragPos);
+        vec3 dp2 = dFdy(FragPos);
+        vec2 duv1 = dFdx(TexCoords);
+        vec2 duv2 = dFdy(TexCoords);
+
+        vec3 dp2perp = cross(dp2, N);
+        vec3 dp1perp = cross(N, dp1);
+        T = dp2perp * duv1.x + dp1perp * duv2.x;
+        B = dp2perp * duv1.y + dp1perp * duv2.y;
+
+        float invmax = inversesqrt(max(dot(T, T), dot(B, B)));
+        if (isinf(invmax) || isnan(invmax))
+        {
+            T = abs(N.z) < 0.999 ? normalize(cross(N, vec3(0.0, 0.0, 1.0))) : vec3(1.0, 0.0, 0.0);
+            B = normalize(cross(N, T));
+        }
+        else
+        {
+            T = normalize(T * invmax);
+            B = normalize(B * invmax);
+        }
+    }
+    else
+    {
+        T = normalize(T);
+        if (!gl_FrontFacing) T = -T;
+        T = normalize(T - dot(T, N) * N);
+        B = normalize(cross(N, T));
+    }
 
     vec4 albedoTex;
     vec3 Nmap;
     float metallic;
     float roughnessMapValue;
     float materialAO;
+
+    mat3 TBN = mat3(T, B, N);
+    float pomHitDepth = 0.0;
+    vec2 mappedTexCoords = TexCoords;
+    vec2 ddx = dFdx(TexCoords);
+    vec2 ddy = dFdy(TexCoords);
 
     if (useTriplanar)
     {
@@ -343,25 +349,51 @@ void main()
     }
     else
     {
-        mat3 TBN = mat3(T, B, N);
         vec3 viewDirTS = transpose(TBN) * viewDir;
-        vec2 mappedTexCoords = parallaxOcclusionMapping(TexCoords, viewDirTS);
+        mappedTexCoords = parallaxOcclusionMapping(TexCoords, viewDirTS, ddx, ddy, pomHitDepth);
 
-        albedoTex = useAlbedoMap ? texture(albedoMap, mappedTexCoords) : vec4(1.0);
+        if (useAlbedoMap)
+        {
+            albedoTex = textureGrad(albedoMap, mappedTexCoords, ddx, ddy);
+        }
+        else if (useHeightMap)
+        {
+            float hSample = textureGrad(heightMap, mappedTexCoords, ddx, ddy).r;
+            if (invertHeight) hSample = 1.0 - hSample;
+            albedoTex = vec4(vec3(hSample), 1.0);
+        }
+        else
+        {
+            albedoTex = vec4(1.0);
+        }
+
         if (useARMMap)
         {
-            vec3 arm = texture(armMap, mappedTexCoords).rgb;
-            materialAO = useAOMap ? texture(aoMap, mappedTexCoords).r : (arm.r * aoValue);
+            vec3 arm = textureGrad(armMap, mappedTexCoords, ddx, ddy).rgb;
+            materialAO = useAOMap ? textureGrad(aoMap, mappedTexCoords, ddx, ddy).r : (arm.r * aoValue);
             roughnessMapValue = arm.g;
             metallic = arm.b * metallicValue;
         }
         else
         {
-            metallic = useMetallicMap ? texture(metallicMap, mappedTexCoords).r : metallicValue;
-            roughnessMapValue = useRoughnessMap ? texture(roughnessMap, mappedTexCoords).r : 1.0;
-            materialAO = useAOMap ? texture(aoMap, mappedTexCoords).r : aoValue;
+            metallic = useMetallicMap ? textureGrad(metallicMap, mappedTexCoords, ddx, ddy).r : metallicValue;
+            roughnessMapValue = useRoughnessMap ? textureGrad(roughnessMap, mappedTexCoords, ddx, ddy).r : 1.0;
+            materialAO = useAOMap ? textureGrad(aoMap, mappedTexCoords, ddx, ddy).r : aoValue;
         }
-        Nmap = getNormalFromMap(mappedTexCoords, N, T, B);
+
+        if (useNormalMap)
+        {
+            Nmap = getNormalFromMap(mappedTexCoords, N, T, B, ddx, ddy);
+        }
+        else if (useHeightMap)
+        {
+            vec3 hNorm = getNormalFromHeightMap(mappedTexCoords, ddx, ddy, heightScale);
+            Nmap = normalize(TBN * hNorm);
+        }
+        else
+        {
+            Nmap = N;
+        }
     }
 
     vec4 fullAlbedo = albedoTex * albedoColor;
@@ -415,6 +447,13 @@ void main()
             vec2 screenUV = gl_FragCoord.xy / windowSize;
             float contactShadow = texture(contactShadowTexture, screenUV).r;
             shadow = max(shadow, contactShadow);
+        }
+
+        if (useHeightMap && !useTriplanar && receiveShadows && pomHitDepth > 0.02)
+        {
+            vec3 lightDirTS = transpose(TBN) * L;
+            float pomShadow = calculateParallaxShadow(mappedTexCoords, pomHitDepth, lightDirTS, ddx, ddy, heightScale);
+            shadow = max(shadow, 1.0 - pomShadow);
         }
 
         vec3 lightColor = directionalLight.colorIntensity.rgb;

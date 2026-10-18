@@ -120,6 +120,7 @@ void main()
 #version 460 core
 
 #include "Common/Camera.glsl"
+#include "Common/Parallax.glsl"
 
 in vec3 FragPos;
 in vec3 Normal;
@@ -199,11 +200,11 @@ vec3 sampleTriplanarNormal(sampler2D tex, vec3 p, vec3 weights, vec3 geomNormal)
     return normalize(wX * weights.x + wY * weights.y + wZ * weights.z);
 }
 
-vec3 getNormalFromMap(vec2 texCoords, vec3 N, vec3 T, vec3 B) 
+vec3 getNormalFromMap(vec2 texCoords, vec3 N, vec3 T, vec3 B, vec2 ddx, vec2 ddy) 
 {
     if (!useNormalMap) return N;
     
-    vec2 rg = texture(normalMap, texCoords).rg * 2.0 - 1.0;
+    vec2 rg = textureGrad(normalMap, texCoords, ddx, ddy).rg * 2.0 - 1.0;
     float b = sqrt(max(0.0, 1.0 - dot(rg, rg)));
     vec3 tangentNormal = vec3(rg, b);
     
@@ -216,22 +217,56 @@ vec3 getNormalFromMap(vec2 texCoords, vec3 N, vec3 T, vec3 B)
     return normalize(mat3(T, B, N) * tangentNormal);
 }
 
+vec3 getNormalFromMap(vec2 texCoords, vec3 N, vec3 T, vec3 B) 
+{
+    return getNormalFromMap(texCoords, N, T, B, dFdx(texCoords), dFdy(texCoords));
+}
+
 void main()
 {
     if (transparencyMode == 1)
         discard;
 
-    vec3 T = normalize(Tangent);
+    vec3 T = Tangent;
     vec3 N = normalize(WorldNormal);
 
     if (!gl_FrontFacing)
     {
         N = -N;
-        T = -T;
     }
 
-    T = normalize(T - dot(T, N) * N);
-    vec3 B = normalize(cross(N, T));
+    vec3 B;
+    if (dot(T, T) < 0.001)
+    {
+        vec3 dp1 = dFdx(WorldPos);
+        vec3 dp2 = dFdy(WorldPos);
+        vec2 duv1 = dFdx(TexCoords);
+        vec2 duv2 = dFdy(TexCoords);
+
+        vec3 dp2perp = cross(dp2, N);
+        vec3 dp1perp = cross(N, dp1);
+        T = dp2perp * duv1.x + dp1perp * duv2.x;
+        B = dp2perp * duv1.y + dp1perp * duv2.y;
+
+        float invmax = inversesqrt(max(dot(T, T), dot(B, B)));
+        if (isinf(invmax) || isnan(invmax))
+        {
+            T = abs(N.z) < 0.999 ? normalize(cross(N, vec3(0.0, 0.0, 1.0))) : vec3(1.0, 0.0, 0.0);
+            B = normalize(cross(N, T));
+        }
+        else
+        {
+            T = normalize(T * invmax);
+            B = normalize(B * invmax);
+        }
+    }
+    else
+    {
+        T = normalize(T);
+        if (!gl_FrontFacing) T = -T;
+        T = normalize(T - dot(T, N) * N);
+        B = normalize(cross(N, T));
+    }
 
     if (useTriplanar)
     {
@@ -266,18 +301,45 @@ void main()
     }
     else
     {
+        vec2 ddx = dFdx(TexCoords);
+        vec2 ddy = dFdy(TexCoords);
+        vec2 mappedTexCoords = TexCoords;
+        mat3 TBN = mat3(T, B, N);
+        float pomHitDepth = 0.0;
+
+        if (useHeightMap)
+        {
+            vec3 viewDir = normalize(camPos - WorldPos);
+            vec3 viewDirTS = transpose(TBN) * viewDir;
+            mappedTexCoords = parallaxOcclusionMapping(TexCoords, viewDirTS, ddx, ddy, pomHitDepth);
+        }
+
         if (transparencyMode == 2 || transparencyMode == 3)
         {
-            float alpha = (useAlbedoMap ? texture(albedoMap, TexCoords).a : 1.0) * albedoColor.a;
+            float alpha = (useAlbedoMap ? textureGrad(albedoMap, mappedTexCoords, ddx, ddy).a : 1.0) * albedoColor.a;
             if (alpha < alphaCutoff)
             {
                 discard;
             }
         }
 
-        vec3 worldNmap = getNormalFromMap(TexCoords, N, T, B);
+        vec3 worldNmap;
+        if (useNormalMap)
+        {
+            worldNmap = getNormalFromMap(mappedTexCoords, N, T, B, ddx, ddy);
+        }
+        else if (useHeightMap)
+        {
+            vec3 hNorm = getNormalFromHeightMap(mappedTexCoords, ddx, ddy, heightScale);
+            worldNmap = normalize(TBN * hNorm);
+        }
+        else
+        {
+            worldNmap = N;
+        }
+
         gNormal = normalize(mat3(view) * worldNmap);
-        gRoughness = useRoughnessMap ? texture(roughnessMap, TexCoords).r : roughness;
-        gMetallic = useMetallicMap ? texture(metallicMap, TexCoords).r : metallic;
+        gRoughness = useRoughnessMap ? textureGrad(roughnessMap, mappedTexCoords, ddx, ddy).r : roughness;
+        gMetallic = useMetallicMap ? textureGrad(metallicMap, mappedTexCoords, ddx, ddy).r : metallic;
     }
 }

@@ -43,7 +43,8 @@ public:
     float roughness = 1.0f;
     float ao = 1.0f;
     float normalScale = 1.0f;
-    float heightScale = 0.1f;
+    float heightScale = 0.05f;
+    bool invertHeight = false;
     glm::vec2 UVScale = glm::vec2(1.0f);
     glm::vec2 UVOffset = glm::vec2(0.0f);
     bool useTriplanar = false;

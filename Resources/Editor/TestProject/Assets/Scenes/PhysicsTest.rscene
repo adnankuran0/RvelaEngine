@@ -661,7 +661,7 @@
                     0.9999991655349731
                 ]
             },
-            "UUID": 375162718838792882
+            "UUID": 16433614378836913357
         },
         {
             "Material": {
@@ -1381,7 +1381,7 @@
                     1.0
                 ]
             },
-            "UUID": 4456181148354437380
+            "UUID": 5910669149460810173
         },
         {
             "ParentUUID": 0,
@@ -1670,7 +1670,74 @@
                     1.0
                 ]
             },
-            "UUID": 2953397926187976399
+            "UUID": 4585824914373290568
+        },
+        {
+            "BoxColliderComponent": {
+                "offset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    0.5,
+                    0.5,
+                    0.5
+                ]
+            },
+            "Material": {
+                "material": "b0784c11-b6f4-4d9a-bfbc-dbf570c9d21f"
+            },
+            "Mesh": {
+                "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
+            },
+            "ParentUUID": 0,
+            "RigidbodyComponent": {
+                "allowSleep": 1,
+                "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 1,
+                "bodyType": 0,
+                "collisionLayer": 1,
+                "collisionMask": 4294967295,
+                "friction": 0.5,
+                "gravityFactor": 1.0,
+                "isSensor": false,
+                "linearDamping": 0.05000000074505806,
+                "lockRotationX": false,
+                "lockRotationY": false,
+                "lockRotationZ": false,
+                "lockTranslationX": false,
+                "lockTranslationY": false,
+                "lockTranslationZ": false,
+                "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
+                "restitution": 0.0,
+                "useCCD": false
+            },
+            "Tag": {
+                "isActive": true,
+                "tag": "Cube"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    3.0,
+                    0.2548578381538391,
+                    7.480610370635986
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    5.0,
+                    0.5,
+                    5.0
+                ]
+            },
+            "UUID": 8991314975200728782
         }
     ],
     "Environment": {
@@ -1678,7 +1745,7 @@
         "Bloom_Intensity": 1.0,
         "Bloom_Knee": 0.0,
         "Bloom_Treshold": 1.0,
-        "ContactShadows": true,
+        "ContactShadows": false,
         "ContactShadows_Bias": 0.004999999888241291,
         "ContactShadows_Distance": 0.10999999940395355,
         "ContactShadows_Intensity": 1.409999966621399,
@@ -1689,8 +1756,8 @@
             0.75,
             0.8500000238418579
         ],
-        "Fog_Density": 0.014999999664723873,
-        "Fog_Enabled": false,
+        "Fog_Density": 0.0010999999940395355,
+        "Fog_Enabled": true,
         "Fog_End": 80.0,
         "Fog_Mode": 1,
         "Fog_Start": 5.0,
@@ -1716,13 +1783,13 @@
         "PostProcess_VignetteIntensity": 0.25,
         "PostProcess_VignetteSmoothness": 0.5,
         "SSAO": true,
-        "SSAO_Bias": 0.02500000037252903,
+        "SSAO_Bias": 0.024000000208616257,
         "SSAO_Intensity": 1.0,
         "SSAO_Radius": 1.0,
-        "SSGI": true,
+        "SSGI": false,
         "SSGI_Intensity": 1.0,
-        "SSGI_Radius": 3.0,
-        "SSGI_Steps": 16,
+        "SSGI_Radius": 1.0,
+        "SSGI_Steps": 32,
         "SSR": true,
         "SSR_EdgeFade": 0.15000000596046448,
         "SSR_MaxDistance": 25.0,
