@@ -23,6 +23,7 @@
 #include "Render/IconLibrary.h"
 #include "Utils/ProjectManager.h"
 #include "ImportSettingsPanel.h"
+#include "ThumbnailCache.h"
 
 using namespace rv;
 
@@ -82,6 +83,7 @@ static bool IsSubpathOf(const std::filesystem::path& child, const std::filesyste
     auto str = rel.generic_string();
     return str != ".." && str.rfind("../", 0) != 0;
 }
+
 static std::filesystem::path s_SelectedItemPath;
 static bool s_SelectedIsDir = false;
 static uintmax_t s_SelectedFileSize = 0;
@@ -190,6 +192,7 @@ static std::string s_RenameExtension;
 
 static void ResetInternal(const std::filesystem::path& rootDirectory)
 {
+    ThumbnailCache::Get().Reset();
     s_LastRootDirectory = rootDirectory;
     s_CurrentDirectory = rootDirectory;
     s_NavHistory.clear();
@@ -256,6 +259,7 @@ static void NavigateTo(const std::filesystem::path& path)
 {
     if (path.empty()) return;
     if (s_CurrentDirectory == path) return;
+    ThumbnailCache::Get().OnDirectoryChanged();
 
     if (s_NavHistoryIndex >= 0 && s_NavHistoryIndex + 1 < (int)s_NavHistory.size())
     {
@@ -275,6 +279,7 @@ static void NavigateBack()
 {
     if (s_NavHistoryIndex > 0)
     {
+        ThumbnailCache::Get().OnDirectoryChanged();
         s_NavHistoryIndex--;
         s_CurrentDirectory = s_NavHistory[s_NavHistoryIndex];
         s_SearchBuffer[0] = '\0';
@@ -288,6 +293,7 @@ static void NavigateForward()
 {
     if (s_NavHistoryIndex + 1 < (int)s_NavHistory.size())
     {
+        ThumbnailCache::Get().OnDirectoryChanged();
         s_NavHistoryIndex++;
         s_CurrentDirectory = s_NavHistory[s_NavHistoryIndex];
         s_SearchBuffer[0] = '\0';
@@ -1518,6 +1524,7 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
 
     ImGui::Separator();
 
+    ThumbnailCache::Get().BeginFrame();
     ImGui::BeginChild("FilesGridArea", ImVec2(0.0f, -24.0f), false);
 
     ImGuiIO& io = ImGui::GetIO();
@@ -1659,14 +1666,21 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
         if (s_IsBoxSelecting)
             isClicked = false;
 
+        ImTextureID thumb = 0;
+        if (!item.isDirectory && IsSupportedThumbnailImage(item.path))
+        {
+            thumb = ThumbnailCache::Get().GetThumbnail(item.path);
+        }
+
         if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
         {
             s_DeselectOthersOnMouseRelease = false;
             auto pathStr = item.path.string();
             ImGui::SetDragDropPayload("ASSET_PATH", pathStr.c_str(), pathStr.size() + 1);
-            if (item.icon)
+            ImTextureID dragIcon = (thumb != 0) ? thumb : item.icon;
+            if (dragIcon)
             {
-                ImGui::Image(item.icon, ImVec2(20.0f, 20.0f));
+                ImGui::Image(dragIcon, ImVec2(20.0f, 20.0f));
                 ImGui::SameLine();
             }
             if (s_SelectedPaths.size() > 1 && IsSelected(item.path))
@@ -1712,7 +1726,15 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
         // Draw Icon Centered
         const float iconPosX = cellPos.x + (cardWidth - thumbnailSize) * 0.5f;
         const float iconPosY = cellPos.y + padTop;
-        if (item.icon)
+        if (thumb != 0)
+        {
+            drawList->AddRectFilled(ImVec2(iconPosX, iconPosY), ImVec2(iconPosX + thumbnailSize, iconPosY + thumbnailSize),
+                IM_COL32(20, 20, 24, 200), 4.0f);
+            drawList->AddImage(thumb, ImVec2(iconPosX, iconPosY), ImVec2(iconPosX + thumbnailSize, iconPosY + thumbnailSize));
+            drawList->AddRect(ImVec2(iconPosX, iconPosY), ImVec2(iconPosX + thumbnailSize, iconPosY + thumbnailSize),
+                IM_COL32(255, 255, 255, 30), 4.0f);
+        }
+        else if (item.icon)
         {
             drawList->AddImage(item.icon, ImVec2(iconPosX, iconPosY), ImVec2(iconPosX + thumbnailSize, iconPosY + thumbnailSize));
         }
@@ -2086,6 +2108,7 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
     }
 
     ImGui::EndChild();
+    ThumbnailCache::Get().EndFrame();
 
     ImGui::Separator();
     {
@@ -2200,6 +2223,7 @@ void AssetBrowserPanel::RequestRename(const std::filesystem::path& path)
 
 void AssetBrowserPanel::RequestRefresh()
 {
+    ThumbnailCache::Get().OnDirectoryChanged();
     s_NeedsRefresh = true;
     s_DirectoryTreeDirty = true;
 }

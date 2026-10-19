@@ -661,7 +661,7 @@
                     0.9999991655349731
                 ]
             },
-            "UUID": 16433614378836913357
+            "UUID": 11077122878547883976
         },
         {
             "Material": {
@@ -1381,7 +1381,7 @@
                     1.0
                 ]
             },
-            "UUID": 5910669149460810173
+            "UUID": 2857669014769061666
         },
         {
             "ParentUUID": 0,
@@ -1670,7 +1670,7 @@
                     1.0
                 ]
             },
-            "UUID": 4585824914373290568
+            "UUID": 7115668275352960748
         },
         {
             "BoxColliderComponent": {
@@ -1761,8 +1761,8 @@
         "Fog_End": 80.0,
         "Fog_Mode": 1,
         "Fog_Start": 5.0,
-        "HDR": "27eefd09-33f2-4818-a0d7-9b0641e4eb5e",
-        "HDRPath": "Assets\\.cache\\27eefd09-33f2-4818-a0d7-9b0641e4eb5e.rtex",
+        "HDR": "9336556f-443f-4c5f-a210-2c30fa69828f",
+        "HDRPath": "Assets\\.cache\\9336556f-443f-4c5f-a210-2c30fa69828f.rtex",
         "Lighting_AmbientColor": [
             1.0,
             1.0,
@@ -1776,7 +1776,7 @@
         "MotionBlur_MaxVelocity": 0.08500000089406967,
         "MotionBlur_Samples": 16,
         "PostProcess_Brightness": 0.0,
-        "PostProcess_ChromaticStrength": 0.009999999776482582,
+        "PostProcess_ChromaticStrength": 0.0010000000474974513,
         "PostProcess_Contrast": 1.0,
         "PostProcess_Exposure": 1.0,
         "PostProcess_Saturation": 1.0,
