@@ -10,7 +10,7 @@
         "maxSize": 4096,
         "mipFilter": 0,
         "normalizeNormals": true,
-        "sRGB": false,
+        "sRGB": true,
         "textureType": 0
     },
     "importerVersion": 0,

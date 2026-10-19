@@ -1,7 +1,19 @@
 {
     "dependencies": [],
     "importerID": "TextureImporter",
-    "importerSettings": {},
+    "importerSettings": {
+        "compress": true,
+        "compressionFormat": 0,
+        "flipY": true,
+        "generateMips": true,
+        "invertGreenChannel": false,
+        "maxSize": 4096,
+        "mipFilter": 0,
+        "normalizeNormals": true,
+        "sRGB": true,
+        "textureType": 0
+    },
+    "importerVersion": 0,
     "lastWriteTime": 13414169305,
     "subAssets": [],
     "uuid": "00cee4d0-bfb5-409b-b56b-50761462f57e"

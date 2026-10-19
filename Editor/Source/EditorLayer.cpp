@@ -353,6 +353,8 @@ void EditorLayer::Render()
         if (projectSelected)
         {
             EditorSelection::Get().Clear();
+            ImportSettingsPanel::SetInspectedAsset({});
+            AssetBrowserPanel::Reset(ProjectManager::GetAssetDirectory());
         }
     }
 

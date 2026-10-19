@@ -11,7 +11,7 @@
         "mipFilter": 0,
         "normalizeNormals": true,
         "sRGB": false,
-        "textureType": 0
+        "textureType": 2
     },
     "importerVersion": 0,
     "lastWriteTime": 13436792728,

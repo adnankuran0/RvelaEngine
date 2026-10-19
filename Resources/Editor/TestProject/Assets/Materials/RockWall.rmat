@@ -25,7 +25,7 @@
         0.0
     ],
     "emissiveIntensity": 0.0,
-    "heightScale": 0.19200000166893005,
+    "heightScale": 0.1420000046491623,
     "heightTexture": "0bf72cce-2667-4f07-9bf6-572e247536bf",
     "invertHeight": false,
     "metallic": 0.0,
@@ -34,6 +34,11 @@
     "receiveShadows": true,
     "roughness": 1.0,
     "roughnessTexture": "40c18283-2585-45be-a0cd-ec0436ff7c79",
+    "sampler": {
+        "aniso": 0,
+        "filter": 0,
+        "repeat": 0
+    },
     "shadingMode": 0,
     "specular": 1.0,
     "transparencyMode": 0,

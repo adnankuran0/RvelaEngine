@@ -16,6 +16,7 @@ public:
 	void HandleFileDrop(FileDroppedEvent& event, AssetImportPipeline& importPipeline);
 	static void RequestRename(const std::filesystem::path& path);
 	static void RequestRefresh();
+	static void Reset(const std::filesystem::path& rootDirectory = {});
 	static const std::vector<std::filesystem::path>& GetSelectedPaths();
 	static std::filesystem::path GetSelectedPrimaryPath();
 	static void ClearSelection();

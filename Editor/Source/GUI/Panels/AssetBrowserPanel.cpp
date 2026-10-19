@@ -60,7 +60,28 @@ static bool IsModelFile(const std::filesystem::path& path)
     return ext == ".fbx" || ext == ".obj" || ext == ".gltf" || ext == ".glb";
 }
 
+static std::filesystem::path s_LastRootDirectory;
 static std::filesystem::path s_CurrentDirectory;
+
+static bool ArePathsEqual(const std::filesystem::path& p1, const std::filesystem::path& p2)
+{
+    if (p1.empty() && p2.empty()) return true;
+    if (p1.empty() || p2.empty()) return false;
+    std::error_code ec;
+    bool eq = std::filesystem::equivalent(p1, p2, ec);
+    if (!ec) return eq;
+    return p1.lexically_normal() == p2.lexically_normal();
+}
+
+static bool IsSubpathOf(const std::filesystem::path& child, const std::filesystem::path& parent)
+{
+    if (child.empty() || parent.empty()) return false;
+    std::error_code ec;
+    auto rel = std::filesystem::relative(child, parent, ec);
+    if (ec) return false;
+    auto str = rel.generic_string();
+    return str != ".." && str.rfind("../", 0) != 0;
+}
 static std::filesystem::path s_SelectedItemPath;
 static bool s_SelectedIsDir = false;
 static uintmax_t s_SelectedFileSize = 0;
@@ -167,6 +188,52 @@ static std::filesystem::path s_RenamingPath;
 static char s_RenameBuffer[256] = "";
 static std::string s_RenameExtension;
 
+static void ResetInternal(const std::filesystem::path& rootDirectory)
+{
+    s_LastRootDirectory = rootDirectory;
+    s_CurrentDirectory = rootDirectory;
+    s_NavHistory.clear();
+    if (!rootDirectory.empty() && std::filesystem::exists(rootDirectory))
+    {
+        s_NavHistory.push_back(rootDirectory);
+        s_NavHistoryIndex = 0;
+    }
+    else
+    {
+        s_NavHistoryIndex = -1;
+    }
+
+    ClearSelectionInternal();
+    s_SearchBuffer[0] = '\0';
+    s_SearchItemResults.clear();
+    s_CachedItems.clear();
+    s_DirectoryTree.clear();
+    s_CachedBreadcrumbs.clear();
+
+    s_RenamingActive = false;
+    s_RenameJustCommitted = false;
+    s_RenamingPath.clear();
+    s_RenameBuffer[0] = '\0';
+    s_RenameExtension.clear();
+
+    s_ReimportState.open = false;
+    s_ReimportState.path.clear();
+
+    s_IsBoxSelecting = false;
+    s_PreBoxSelectedPaths.clear();
+    s_DeselectOthersOnMouseRelease = false;
+    s_DeselectTargetIndex = -1;
+
+    s_NeedsRefresh = true;
+    s_DirectoryTreeDirty = true;
+    s_BreadcrumbsDirty = true;
+}
+
+void AssetBrowserPanel::Reset(const std::filesystem::path& rootDirectory)
+{
+    ResetInternal(rootDirectory);
+}
+
 static std::string FormatFileSize(uintmax_t bytes)
 {
     if (bytes < 1024)
@@ -234,7 +301,11 @@ static void NavigateUp(const std::filesystem::path& rootDirectory)
 {
     if (s_CurrentDirectory != rootDirectory && s_CurrentDirectory.has_parent_path())
     {
-        NavigateTo(s_CurrentDirectory.parent_path());
+        auto parent = s_CurrentDirectory.parent_path();
+        if (IsSubpathOf(parent, rootDirectory))
+            NavigateTo(parent);
+        else
+            NavigateTo(rootDirectory);
     }
 }
 
@@ -1214,20 +1285,23 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
 {
     s_RenameJustCommitted = false;
 
-    if (s_CurrentDirectory.empty() || !std::filesystem::exists(s_CurrentDirectory))
+    bool rootChanged = !ArePathsEqual(rootDirectory, s_LastRootDirectory);
+    bool currentInvalid = s_CurrentDirectory.empty() || 
+                          !std::filesystem::exists(s_CurrentDirectory) || 
+                          !IsSubpathOf(s_CurrentDirectory, rootDirectory);
+
+    if (rootChanged || currentInvalid)
     {
-        s_CurrentDirectory = rootDirectory;
-        s_NavHistory.clear();
-        s_NavHistory.push_back(rootDirectory);
-        s_NavHistoryIndex = 0;
-        s_NeedsRefresh = true;
-        s_DirectoryTreeDirty = true;
+        ResetInternal(rootDirectory);
     }
 
     if (s_DirectoryTreeDirty)
     {
         s_DirectoryTree.clear();
-        BuildDirectoryTreeRecursive(rootDirectory, s_DirectoryTree);
+        if (!rootDirectory.empty() && std::filesystem::exists(rootDirectory))
+        {
+            BuildDirectoryTreeRecursive(rootDirectory, s_DirectoryTree);
+        }
         s_DirectoryTreeDirty = false;
     }
 
