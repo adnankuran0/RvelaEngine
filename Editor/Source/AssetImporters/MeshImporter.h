@@ -35,7 +35,8 @@ public:
         const std::filesystem::path& sourcePath,
         AssetRegistry& registry,
         std::unordered_map<unsigned int, AssetUUID>& outMeshMap,
-        const std::vector<std::string>& meshNames = {});
+        const std::vector<std::string>& meshNames = {},
+        bool optimize = true);
 
     std::string GetDefaultSettings() const override { return ""; }
 

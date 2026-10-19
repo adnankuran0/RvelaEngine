@@ -12,6 +12,9 @@
     "settings": {
         "autoloads": [],
         "borderless": false,
+        "defaultAnisotropy": 4,
+        "defaultTextureFilter": 4,
+        "defaultTextureWrap": 1,
         "fxaaEnabled": true,
         "maxFPS": 0,
         "msaaSamples": 1,

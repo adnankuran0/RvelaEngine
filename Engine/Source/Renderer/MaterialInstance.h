@@ -44,6 +44,9 @@ enum class MatField : uint8_t {
     UseWorldTriplanar,
     TriplanarSharpness,
     CustomShader,
+    TextureFilterMode,
+    TextureWrapMode,
+    TextureAnisotropyMode,
     COUNT
 };
 
@@ -187,6 +190,18 @@ public:
     Sampler& GetSampler() { return m_Sampler; }
     const Sampler& GetSampler() const { return m_Sampler; }
 
+    TextureFilter GetTextureFilter() const { return IsOverridden(MatField::TextureFilterMode) ? m_TextureFilter : (m_SourceAsset ? m_SourceAsset->samplerDesc.filter : m_TextureFilter); }
+    void SetTextureFilter(TextureFilter f) { m_TextureFilter = f; SetOverride(MatField::TextureFilterMode); m_Sampler.GetDesc().filter = f; }
+    void ClearTextureFilter() { ClearOverride(MatField::TextureFilterMode); m_Sampler.GetDesc().filter = m_SourceAsset ? m_SourceAsset->samplerDesc.filter : TextureFilter::Default; }
+
+    TextureWrap GetTextureWrap() const { return IsOverridden(MatField::TextureWrapMode) ? m_TextureWrap : (m_SourceAsset ? m_SourceAsset->samplerDesc.repeat : m_TextureWrap); }
+    void SetTextureWrap(TextureWrap w) { m_TextureWrap = w; SetOverride(MatField::TextureWrapMode); m_Sampler.GetDesc().repeat = w; }
+    void ClearTextureWrap() { ClearOverride(MatField::TextureWrapMode); m_Sampler.GetDesc().repeat = m_SourceAsset ? m_SourceAsset->samplerDesc.repeat : TextureWrap::Default; }
+
+    TextureAnisotropy GetTextureAnisotropy() const { return IsOverridden(MatField::TextureAnisotropyMode) ? m_TextureAnisotropy : (m_SourceAsset ? m_SourceAsset->samplerDesc.aniso : m_TextureAnisotropy); }
+    void SetTextureAnisotropy(TextureAnisotropy a) { m_TextureAnisotropy = a; SetOverride(MatField::TextureAnisotropyMode); m_Sampler.GetDesc().aniso = a; }
+    void ClearTextureAnisotropy() { ClearOverride(MatField::TextureAnisotropyMode); m_Sampler.GetDesc().aniso = m_SourceAsset ? m_SourceAsset->samplerDesc.aniso : TextureAnisotropy::Default; }
+
     bool IsOverridden(MatField f) const { return m_OverrideMask.test((size_t)f); }
     bool HasAnyOverride() const { return m_OverrideMask.any(); }
     void ClearAllOverrides() { m_OverrideMask.reset(); m_CustomUniformOverrides.clear(); }
@@ -260,6 +275,10 @@ private:
     Ref<ShaderAsset> m_CachedCustomShader;
     std::unordered_map<std::string, CustomUniformValue> m_CustomUniformOverrides;
     std::unordered_map<std::string, CustomUniformValue> m_CachedCustomUniforms;
+
+    TextureFilter m_TextureFilter = TextureFilter::Default;
+    TextureWrap m_TextureWrap = TextureWrap::Default;
+    TextureAnisotropy m_TextureAnisotropy = TextureAnisotropy::Default;
 
     Sampler m_Sampler;
 };

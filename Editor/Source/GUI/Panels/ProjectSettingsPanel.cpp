@@ -230,6 +230,56 @@ void ProjectSettingsPanel::Draw(Engine* engine)
             if (currentShadow == 0) settings.shadowResolution = 1024;
             else if (currentShadow == 1) settings.shadowResolution = 2048;
             else if (currentShadow == 2) settings.shadowResolution = 4096;
+            ProjectManager::SaveActiveProject();
+        }
+
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::TextColored(ImVec4(0.62f, 0.56f, 0.80f, 1.0f), "Textures & Sampling");
+        ImGui::Spacing();
+
+        const char* defaultFilters[] = {
+            "Nearest",
+            "Linear",
+            "Nearest Mipmap",
+            "Linear Mipmap"
+        };
+        int currentDefFilter = static_cast<int>(settings.defaultTextureFilter) - 1;
+        if (currentDefFilter < 0 || currentDefFilter >= 4) currentDefFilter = 3;
+        if (ImGui::Combo("Default Texture Filter", &currentDefFilter, defaultFilters, IM_ARRAYSIZE(defaultFilters)))
+        {
+            settings.defaultTextureFilter = static_cast<TextureFilter>(currentDefFilter + 1);
+            ProjectManager::SaveActiveProject();
+        }
+
+        const char* defaultWraps[] = {
+            "Repeat",
+            "Mirror Repeat",
+            "Clamp to Edge",
+            "Clamp to Border",
+            "Mirror Clamp to Edge"
+        };
+        int currentDefWrap = static_cast<int>(settings.defaultTextureWrap) - 1;
+        if (currentDefWrap < 0 || currentDefWrap >= 5) currentDefWrap = 0;
+        if (ImGui::Combo("Default Texture Repeat", &currentDefWrap, defaultWraps, IM_ARRAYSIZE(defaultWraps)))
+        {
+            settings.defaultTextureWrap = static_cast<TextureWrap>(currentDefWrap + 1);
+            ProjectManager::SaveActiveProject();
+        }
+
+        const char* defaultAnisoLevels[] = {
+            "Disabled",
+            "2x",
+            "4x",
+            "8x",
+            "16x"
+        };
+        int currentDefAniso = static_cast<int>(settings.defaultAnisotropy) - 1;
+        if (currentDefAniso < 0 || currentDefAniso >= 5) currentDefAniso = 3;
+        if (ImGui::Combo("Default Anisotropy", &currentDefAniso, defaultAnisoLevels, IM_ARRAYSIZE(defaultAnisoLevels)))
+        {
+            settings.defaultAnisotropy = static_cast<TextureAnisotropy>(currentDefAniso + 1);
+            ProjectManager::SaveActiveProject();
         }
 
         ImGui::EndTabItem();

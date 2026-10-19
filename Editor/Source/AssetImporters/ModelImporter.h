@@ -33,14 +33,36 @@ struct ModelImportResult
     bool IsValid() const { return prefabUUID.IsValid(); }
 };
 
+enum class ModelNormalMode : int
+{
+    Import = 0, // import normals from file if available
+    GenerateSmooth = 1,
+    GenerateFlat = 2
+};
+
 struct ModelImportSettings
 {
     float scale = 1.0f;
+    bool preservePivots = false;
+
     bool importNormals = true;
+    ModelNormalMode normalMode = ModelNormalMode::Import;
     bool importTangents = true;
     bool importUVs = true;
-    bool importTextures = true;
+    bool flipUVs = false;
+    bool optimizeMesh = true;
+    bool joinIdenticalVertices = true;
+    bool removeDegenerateTriangles = true;
+    bool triangulate = true;
+    bool generateBoundingBoxes = true;
+
+    bool importSkeleton = true;
+    bool importAnimations = true;
+    bool importSkeletalMeshes = true;
+
     bool importMaterials = true;
+    bool importTextures = true;
+
     bool generatePrefab = true;
 };
 
@@ -94,7 +116,8 @@ private:
         const aiScene* scene,
         const std::filesystem::path& modelPath,
         AssetRegistry& registry,
-        ModelImportResult& result);
+        ModelImportResult& result,
+        const ModelImportSettings& settings);
 
     void ExtractSkeleton(
         const aiScene* scene,

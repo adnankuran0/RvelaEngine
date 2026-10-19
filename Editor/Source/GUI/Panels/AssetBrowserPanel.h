@@ -12,12 +12,14 @@ class Engine;
 class AssetBrowserPanel
 {
 public:
-	void Draw(Engine* engine ,const std::filesystem::path& rootDirectory, AssetImportPipeline& importPipeline);
+	void Draw(Engine* engine, const std::filesystem::path& rootDirectory, AssetImportPipeline& importPipeline);
 	void HandleFileDrop(FileDroppedEvent& event, AssetImportPipeline& importPipeline);
 	static void RequestRename(const std::filesystem::path& path);
 	static void RequestRefresh();
 	static const std::vector<std::filesystem::path>& GetSelectedPaths();
+	static std::filesystem::path GetSelectedPrimaryPath();
 	static void ClearSelection();
+	static void OpenImportSettings(const std::filesystem::path& path);
 };
 
 }

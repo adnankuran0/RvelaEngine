@@ -22,6 +22,7 @@ public:
     }
 
     void Unload(const AssetUUID& uuid);
+    void Reload(const AssetUUID& uuid);
     void UnloadAll();
 
 private:

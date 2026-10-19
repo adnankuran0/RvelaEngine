@@ -63,6 +63,12 @@ bool MaterialSerializer::Save(const Ref<MaterialAsset>& asset, const std::filesy
     j["UVScale"] = { asset->UVScale.x, asset->UVScale.y };
     j["UVOffset"] = { asset->UVOffset.x, asset->UVOffset.y };
 
+    j["sampler"] = {
+        { "filter", static_cast<int>(asset->samplerDesc.filter) },
+        { "repeat", static_cast<int>(asset->samplerDesc.repeat) },
+        { "aniso", static_cast<int>(asset->samplerDesc.aniso) }
+    };
+
     if (asset->customShaderUUID.IsValid())
     {
         j["customShader"] = asset->customShaderUUID.ToString();
@@ -183,6 +189,14 @@ bool MaterialSerializer::Load(const Ref<MaterialAsset>& asset, const std::filesy
     {
         auto uv = j["UVOffset"];
         asset->UVOffset = glm::vec2(uv[0], uv[1]);
+    }
+
+    if (j.contains("sampler") && j["sampler"].is_object())
+    {
+        const auto& smp = j["sampler"];
+        asset->samplerDesc.filter = static_cast<TextureFilter>(smp.value("filter", static_cast<int>(TextureFilter::Default)));
+        asset->samplerDesc.repeat = static_cast<TextureWrap>(smp.value("repeat", smp.value("wrap", static_cast<int>(TextureWrap::Default))));
+        asset->samplerDesc.aniso = static_cast<TextureAnisotropy>(smp.value("aniso", smp.value("anisotropy", static_cast<int>(TextureAnisotropy::Default))));
     }
 
     if (j.contains("customShader"))

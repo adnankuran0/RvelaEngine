@@ -17,6 +17,7 @@
 #include "GUI/Panels/ConsolePanel.h"
 #include "GUI/Panels/ProjectSelectorPanel.h"
 #include "GUI/Panels/ProjectSettingsPanel.h"
+#include "GUI/Panels/ImportSettingsPanel.h"
 #include <Renderer/RenderPipeline.h>
 
 namespace rv {
@@ -58,6 +59,7 @@ private:
     ConsolePanel m_ConsolePanel;
     ProjectSelectorPanel m_ProjectSelectorPanel;
     ProjectSettingsPanel m_ProjectSettingsPanel;
+    ImportSettingsPanel m_ImportSettingsPanel;
     Viewport m_Viewport;
 
     RenderPassHandle m_GizmoPass;

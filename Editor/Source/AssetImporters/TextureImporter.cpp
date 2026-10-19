@@ -11,10 +11,10 @@
 #include <algorithm>
 #include <cctype>
 #include <array>
+#include <cmath>
 
 using namespace rv;
 using json = nlohmann::json;
-
 
 TextureImportSettings TextureImporter::ParseSettings(const std::string& settingsJson)
 {
@@ -26,11 +26,34 @@ TextureImportSettings TextureImporter::ParseSettings(const std::string& settings
     if (j.is_discarded())
         return settings;
 
-    settings.sRGB = j.value("sRGB", false);
-    settings.generateMips = j.value("generateMips", false);
-    settings.maxSize = j.value("maxSize", 2048);
+    settings.textureType = static_cast<TextureImportType>(j.value("textureType", 0));
+    settings.sRGB = j.value("sRGB", true);
+    settings.generateMips = j.value("generateMips", true);
+    settings.mipFilter = static_cast<TextureMipFilter>(j.value("mipFilter", 0));
+    settings.maxSize = j.value("maxSize", 4096);
     settings.compress = j.value("compress", true);
+    settings.compressionFormat = static_cast<TextureCompressionFormat>(j.value("compressionFormat", 0));
+    settings.flipY = j.value("flipY", true);
+    settings.invertGreenChannel = j.value("invertGreenChannel", false);
+    settings.normalizeNormals = j.value("normalizeNormals", true);
     return settings;
+}
+
+std::string TextureImporter::GetDefaultSettings() const
+{
+    TextureImportSettings s;
+    json j;
+    j["textureType"] = static_cast<int>(s.textureType);
+    j["sRGB"] = s.sRGB;
+    j["generateMips"] = s.generateMips;
+    j["mipFilter"] = static_cast<int>(s.mipFilter);
+    j["maxSize"] = s.maxSize;
+    j["compress"] = s.compress;
+    j["compressionFormat"] = static_cast<int>(s.compressionFormat);
+    j["flipY"] = s.flipY;
+    j["invertGreenChannel"] = s.invertGreenChannel;
+    j["normalizeNormals"] = s.normalizeNormals;
+    return j.dump();
 }
 
 DXGI_FORMAT TextureImporter::ToDXGI(TextureFormat format, bool sRGB)
@@ -159,7 +182,8 @@ std::vector<TextureImporter::Mip> TextureImporter::GenerateMipChain(
 std::vector<DirectX::Image> TextureImporter::BuildImages(
     const std::vector<TextureImporter::Mip>& mips,
     int channels,
-    std::vector<std::vector<uint8_t>>& expandedBuffers)
+    std::vector<std::vector<uint8_t>>& expandedBuffers,
+    bool isSRGB)
 {
     std::vector<DirectX::Image> images;
     images.resize(mips.size());
@@ -177,9 +201,9 @@ std::vector<DirectX::Image> TextureImporter::BuildImages(
         srcFormat = DXGI_FORMAT_R8G8_UNORM;
         bytesPerPixel = 2;
         break;
-    case 3: // expand
+    case 3: // expand to RGBA
     case 4:
-        srcFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+        srcFormat = isSRGB ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM;
         bytesPerPixel = 4;
         break;
     default:
@@ -224,7 +248,7 @@ std::vector<uint8_t> TextureImporter::CompressMips(const std::vector<TextureImpo
     int channels, TextureFormat format, bool isSRGB)
 {
     std::vector<std::vector<uint8_t>> expandedBuffers;
-    auto images = BuildImages(mips, channels, expandedBuffers);
+    auto images = BuildImages(mips, channels, expandedBuffers, isSRGB);
 
     DirectX::TexMetadata meta{};
     meta.width = mips[0].w;
@@ -239,33 +263,28 @@ std::vector<uint8_t> TextureImporter::CompressMips(const std::vector<TextureImpo
 
     DirectX::TEX_COMPRESS_FLAGS flags = DirectX::TEX_COMPRESS_PARALLEL;
 
-    if (isSRGB)
-        flags |= DirectX::TEX_COMPRESS_SRGB;
-
     DirectX::ScratchImage compressed;
-
     HRESULT hr = DirectX::Compress(
         images.data(),
         images.size(),
         meta,
         dstFormat,
         flags,
-        1.0f,
+        DirectX::TEX_THRESHOLD_DEFAULT,
         compressed
     );
 
     if (FAILED(hr))
     {
-        LOG_ERROR("Texture compression failed");
+        LOG_ERROR("DirectXTex compression failed: 0x{:X}", (unsigned long)hr);
         return {};
     }
 
     std::vector<uint8_t> out;
-
     const DirectX::Image* imgs = compressed.GetImages();
-    size_t count = compressed.GetImageCount();
+    size_t nImages = compressed.GetImageCount();
 
-    for (size_t i = 0; i < count; i++)
+    for (size_t i = 0; i < nImages; i++)
     {
         const DirectX::Image& img = imgs[i];
         out.insert(out.end(), img.pixels, img.pixels + img.slicePitch);
@@ -287,7 +306,6 @@ uint32_t TextureImporter::GetImporterVersion(const std::filesystem::path& source
     std::string extension = sourcePath.extension().string();
     std::transform(extension.begin(), extension.end(), extension.begin(),
         [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
-    // Version 2 stores HDR cache pixels as unclamped floating-point data.
     return extension == ".hdr" ? 2u : 0u;
 }
 
@@ -302,23 +320,11 @@ bool TextureImporter::Import(
     std::string lowerFilename = filename;
     std::transform(lowerFilename.begin(), lowerFilename.end(), lowerFilename.begin(), ::tolower);
 
-    bool isAlbedo = false;
-    bool isNormal = false;
-    bool hasAlpha = false;
-    bool isSingleChannel = false;
-
-    // TODO: Use import settings instead of this approach
-    if (lowerFilename.find("nor") != std::string::npos ||
-        lowerFilename.find("normal") != std::string::npos)
-    {
-        isNormal = true;
-    }
-
     std::string ext = sourcePath.extension().string();
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
     if (ext == ".hdr")
     {
-        stbi_set_flip_vertically_on_load(true);
+        stbi_set_flip_vertically_on_load(settings.flipY ? 1 : 0);
         int w, h, channels;
         float* pixels = stbi_loadf(sourcePath.string().c_str(), &w, &h, &channels, 0);
         if (!pixels)
@@ -370,7 +376,7 @@ bool TextureImporter::Import(
         return true;
     }
 
-    stbi_set_flip_vertically_on_load(true);
+    stbi_set_flip_vertically_on_load(settings.flipY ? 1 : 0);
     int w, h, channels;
     uint8_t* pixels = stbi_load(sourcePath.string().c_str(), &w, &h, &channels, 0);
     if (!pixels)
@@ -379,69 +385,184 @@ bool TextureImporter::Import(
         return false;
     }
 
-    switch (channels)
+    bool isAlbedo = false;
+    bool isNormal = false;
+    bool hasAlpha = (channels == 4);
+    bool isSingleChannel = (channels == 1);
+
+    if (settings.textureType == TextureImportType::NormalMap)
     {
-    case 1:
+        isNormal = true;
+    }
+    else if (settings.textureType == TextureImportType::Color)
+    {
+        isAlbedo = true;
+    }
+    else if (settings.textureType == TextureImportType::GrayscaleMask)
+    {
         isSingleChannel = true;
-        break;
-    case 3:
-        if (!isNormal) isAlbedo = true;
-        break;
-    case 4:
-        if (!isNormal) isAlbedo = true;
-        hasAlpha = true;
-        break;
-    default:
-        LOG_ERROR("Unsupported channel count: {}", channels);
-        return false;
-        break;
+    }
+    else // Auto
+    {
+        if (lowerFilename.find("nor") != std::string::npos ||
+            lowerFilename.find("normal") != std::string::npos ||
+            lowerFilename.find("nrm") != std::string::npos)
+        {
+            isNormal = true;
+        }
+        else if (lowerFilename.find("rough") != std::string::npos ||
+                 lowerFilename.find("metal") != std::string::npos ||
+                 lowerFilename.find("mask") != std::string::npos ||
+                 lowerFilename.find("height") != std::string::npos ||
+                 lowerFilename.find("disp") != std::string::npos ||
+                 lowerFilename.find("ao") != std::string::npos ||
+                 channels == 1)
+        {
+            isSingleChannel = true;
+        }
+        else
+        {
+            isAlbedo = true;
+        }
     }
 
-    if (w > settings.maxSize || h > settings.maxSize)
-        LOG_WARN("Texture exceeds maxSize ({}): {}x{} - {}",
-            settings.maxSize, w, h, sourcePath.string());
+    bool isSRGB = false;
+    if (settings.textureType == TextureImportType::Color)
+    {
+        isSRGB = settings.sRGB;
+    }
+    else if (settings.textureType == TextureImportType::NormalMap || settings.textureType == TextureImportType::GrayscaleMask)
+    {
+        isSRGB = false;
+    }
+    else // Auto
+    {
+        if (isNormal || isSingleChannel)
+            isSRGB = false;
+        else
+            isSRGB = settings.sRGB;
+    }
 
-    assert(!(isNormal && channels != 3) && "Normal map must be RGB!");
+    // Invert green channel for normal maps if requested 
+    if (isNormal && settings.invertGreenChannel && channels >= 3)
+    {
+        for (int p = 0; p < w * h; ++p)
+        {
+            pixels[p * channels + 1] = 255 - pixels[p * channels + 1];
+        }
+    }
 
-    unsigned int mipCount = CalculateMipCount(w,h);
-    auto mips = GenerateMipChain(pixels, w, h, channels, mipCount, isAlbedo, isNormal);
+    // Downscale if image exceeds maxSize
+    if (settings.maxSize > 0 && (w > settings.maxSize || h > settings.maxSize))
+    {
+        int targetW = w;
+        int targetH = h;
+        if (w >= h)
+        {
+            targetW = settings.maxSize;
+            targetH = std::max(1, (int)std::round((float)h * (float)settings.maxSize / (float)w));
+        }
+        else
+        {
+            targetH = settings.maxSize;
+            targetW = std::max(1, (int)std::round((float)w * (float)settings.maxSize / (float)h));
+        }
+
+        stbir_pixel_layout layout = STBIR_RGBA;
+        switch (channels)
+        {
+        case 1: layout = STBIR_1CHANNEL; break;
+        case 2: layout = STBIR_2CHANNEL; break;
+        case 3: layout = STBIR_RGB; break;
+        case 4: layout = STBIR_RGBA; break;
+        default: break;
+        }
+
+        std::vector<uint8_t> resized(targetW * targetH * channels);
+        if (isSRGB)
+        {
+            stbir_resize_uint8_srgb(pixels, w, h, 0, resized.data(), targetW, targetH, 0, layout);
+        }
+        else
+        {
+            stbir_resize_uint8_linear(pixels, w, h, 0, resized.data(), targetW, targetH, 0, layout);
+        }
+
+        stbi_image_free(pixels);
+        pixels = (uint8_t*)malloc(resized.size());
+        if (pixels)
+        {
+            memcpy(pixels, resized.data(), resized.size());
+            w = targetW;
+            h = targetH;
+        }
+    }
+
+    unsigned int mipCount = settings.generateMips ? CalculateMipCount(w, h) : 1;
+    auto mips = GenerateMipChain(pixels, w, h, channels, mipCount, isSRGB, isNormal && settings.normalizeNormals);
 
     std::vector<uint8_t> finalData;
-
     TextureCacheHeader header{};
     TextureFormat format = TextureFormat::Unknown;
-    if (!settings.compress)
+
+    if (!settings.compress || settings.compressionFormat == TextureCompressionFormat::Uncompressed)
     {
         switch (channels)
         {
         case 1: format = TextureFormat::R8; break;
-        case 3: format = TextureFormat::RGBA8; break; // expand
+        case 3: format = TextureFormat::RGBA8; break; // expand 3 to 4 channels
         case 4: format = TextureFormat::RGBA8; break;
+        default: format = TextureFormat::RGBA8; break;
         }
+
         for (auto& mip : mips)
         {
-            finalData.insert(finalData.end(), mip.data.begin(), mip.data.end());
+            if (channels == 3)
+            {
+                size_t numPixels = (size_t)mip.w * mip.h;
+                size_t startOffset = finalData.size();
+                finalData.resize(startOffset + numPixels * 4);
+                uint8_t* dst = finalData.data() + startOffset;
+                const uint8_t* src = mip.data.data();
+                for (size_t p = 0; p < numPixels; ++p)
+                {
+                    dst[p * 4 + 0] = src[p * 3 + 0];
+                    dst[p * 4 + 1] = src[p * 3 + 1];
+                    dst[p * 4 + 2] = src[p * 3 + 2];
+                    dst[p * 4 + 3] = 255;
+                }
+            }
+            else
+            {
+                finalData.insert(finalData.end(), mip.data.begin(), mip.data.end());
+            }
         }
     }
     else
     {
-        if (isSingleChannel) format = TextureFormat::BC4;
-        else if (isNormal) format = TextureFormat::BC5;
-        else if (isAlbedo)
+        switch (settings.compressionFormat)
         {
-            if (hasAlpha) format = TextureFormat::BC3;
+        case TextureCompressionFormat::BC1: format = TextureFormat::BC1; break;
+        case TextureCompressionFormat::BC3: format = TextureFormat::BC3; break;
+        case TextureCompressionFormat::BC4: format = TextureFormat::BC4; break;
+        case TextureCompressionFormat::BC5: format = TextureFormat::BC5; break;
+        case TextureCompressionFormat::Auto:
+        default:
+            if (isSingleChannel) format = TextureFormat::BC4;
+            else if (isNormal) format = TextureFormat::BC5;
+            else if (hasAlpha) format = TextureFormat::BC3;
             else format = TextureFormat::BC1;
+            break;
         }
-        finalData = CompressMips(mips, channels, format, isAlbedo);
+        finalData = CompressMips(mips, channels, format, isSRGB);
     }
+
     header.width = static_cast<uint32_t>(w);
     header.height = static_cast<uint32_t>(h);
     header.format = format;
     header.mipCount = mipCount;
-    header.isSRGB = isAlbedo ? 1 : 0;
+    header.isSRGB = isSRGB ? 1 : 0;
     header.dataSize = (uint32_t)finalData.size();
-
-    size_t pixelSize = static_cast<size_t>(w) * h * channels;
    
     std::ofstream file(outCachePath, std::ios::binary);
     if (!file)
@@ -456,15 +577,4 @@ bool TextureImporter::Import(
 
     stbi_image_free(pixels);
     return true;
-}
-
-std::string TextureImporter::GetDefaultSettings() const
-{
-    TextureImportSettings s;
-    json j;
-    j["sRGB"] = s.sRGB;
-    j["generateMips"] = s.generateMips;
-    j["maxSize"] = s.maxSize;
-    j["compress"] = s.compress;
-    return j.dump();
 }

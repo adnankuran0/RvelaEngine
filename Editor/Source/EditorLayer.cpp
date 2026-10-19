@@ -358,7 +358,7 @@ void EditorLayer::Render()
 
     if (ProjectManager::IsProjectLoaded())
     {
-        m_MenuBar.Draw(m_Engine, m_AssetImportPipeline, &m_ProjectSettingsPanel, &m_ProjectSelectorPanel);
+        m_MenuBar.Draw(m_Engine, m_AssetImportPipeline, &m_ProjectSettingsPanel, &m_ProjectSelectorPanel, &m_ImportSettingsPanel);
          
         m_ToolBar.Draw(*m_Engine);
 
@@ -379,6 +379,8 @@ void EditorLayer::Render()
         m_ConsolePanel.Draw();
 
         m_ProjectSettingsPanel.Draw(m_Engine);
+
+        m_ImportSettingsPanel.Draw(m_AssetImportPipeline);
 
         m_Viewport.Draw(m_Engine, m_EditorCameraNavigation == EditorCamera::NavigationMode::Orbit);
     }

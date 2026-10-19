@@ -196,7 +196,8 @@ bool SkeletalMeshImporter::ImportFromScene(
     AssetRegistry& registry,
     const std::unordered_map<std::string, int32_t>& boneNameToIndex,
     std::unordered_map<unsigned int, AssetUUID>& outSkeletalMeshMap,
-    const std::vector<std::string>& meshNames)
+    const std::vector<std::string>& meshNames,
+    bool optimize)
 {
     if (scene->mNumMeshes == 0 || boneNameToIndex.empty()) return false;
 
@@ -232,7 +233,10 @@ bool SkeletalMeshImporter::ImportFromScene(
 
         auto vertices = ProcessVertices(mesh, boneNameToIndex);
         auto indices = ProcessIndices(mesh);
-        OptimizeMesh(vertices, indices);
+        if (optimize)
+        {
+            OptimizeMesh(vertices, indices);
+        }
 
         aiVector3D mn = mesh->mAABB.mMin, mx = mesh->mAABB.mMax;
         AABB aabb(glm::vec3(mn.x, mn.y, mn.z), glm::vec3(mx.x, mx.y, mx.z));

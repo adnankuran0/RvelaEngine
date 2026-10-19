@@ -3,9 +3,15 @@
     "importerID": "TextureImporter",
     "importerSettings": {
         "compress": true,
-        "generateMips": false,
+        "compressionFormat": 0,
+        "flipY": true,
+        "generateMips": true,
+        "invertGreenChannel": false,
         "maxSize": 4096,
-        "sRGB": false
+        "mipFilter": 0,
+        "normalizeNormals": true,
+        "sRGB": false,
+        "textureType": 0
     },
     "importerVersion": 0,
     "lastWriteTime": 13436792722,

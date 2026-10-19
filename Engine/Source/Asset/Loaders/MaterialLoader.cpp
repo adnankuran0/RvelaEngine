@@ -112,6 +112,14 @@ Ref<Asset> MaterialLoader::Load(
     if (j.contains("UVOffset"))
         asset->UVOffset = { j["UVOffset"][0], j["UVOffset"][1] };
 
+    if (j.contains("sampler") && j["sampler"].is_object())
+    {
+        const auto& smp = j["sampler"];
+        asset->samplerDesc.filter = static_cast<TextureFilter>(smp.value("filter", static_cast<int>(TextureFilter::Default)));
+        asset->samplerDesc.repeat = static_cast<TextureWrap>(smp.value("repeat", smp.value("wrap", static_cast<int>(TextureWrap::Default))));
+        asset->samplerDesc.aniso = static_cast<TextureAnisotropy>(smp.value("aniso", smp.value("anisotropy", static_cast<int>(TextureAnisotropy::Default))));
+    }
+
     asset->useTriplanar = j.value("useTriplanar", false);
     asset->useWorldTriplanar = j.value("useWorldTriplanar", false);
     asset->triplanarSharpness = j.value("triplanarSharpness", 4.0f);

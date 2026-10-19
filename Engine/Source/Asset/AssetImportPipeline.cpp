@@ -5,6 +5,7 @@
 #include "IAssetImporter.h"
 #include "Core/Log.h"
 #include "Asset/AssetManager.h"
+#include "Renderer/TextureCache.h"
 #include <fstream>
 #include <chrono>
 
@@ -73,7 +74,10 @@ bool AssetImportPipeline::ImportAsset(const std::filesystem::path& sourcePath, A
     updatedMeta.importerVersion = importer->GetImporterVersion(sourcePath);
     registry.SaveMeta(sourcePath, updatedMeta);
     registry.RegisterPath(updatedMeta.uuid, cachePath);
-    AssetManager::Get().Unload(updatedMeta.uuid);
+
+    TextureCache::Get().Remove(updatedMeta.uuid);
+
+    AssetManager::Get().Reload(updatedMeta.uuid);
 
     return true;
 }

@@ -22,6 +22,7 @@
 #include <AssetImporters/ModelImporter.h>
 #include "Render/IconLibrary.h"
 #include "Utils/ProjectManager.h"
+#include "ImportSettingsPanel.h"
 
 using namespace rv;
 
@@ -29,10 +30,6 @@ struct ReimportWindowState
 {
     bool open = false;
     std::filesystem::path path;
-    std::string importerID;
-
-    TextureImportSettings textureSettings;
-    ModelImportSettings modelSettings;
 };
 
 static ReimportWindowState s_ReimportState;
@@ -101,9 +98,25 @@ const std::vector<std::filesystem::path>& AssetBrowserPanel::GetSelectedPaths()
     return s_SelectedPaths;
 }
 
+std::filesystem::path AssetBrowserPanel::GetSelectedPrimaryPath()
+{
+    if (!s_SelectedItemPath.empty())
+        return s_SelectedItemPath;
+    if (!s_SelectedPaths.empty())
+        return s_SelectedPaths.front();
+    return {};
+}
+
 void AssetBrowserPanel::ClearSelection()
 {
     ClearSelectionInternal();
+}
+
+void AssetBrowserPanel::OpenImportSettings(const std::filesystem::path& path)
+{
+    s_ReimportState.open = true;
+    s_ReimportState.path = path;
+    ImportSettingsPanel::SetInspectedAsset(path);
 }
 
 static std::vector<std::filesystem::path> s_NavHistory;
@@ -230,81 +243,14 @@ static void DrawReimportWindow(AssetImportPipeline& importPipeline)
     if (!s_ReimportState.open)
         return;
 
-    ImGui::Begin("Reimport Settings", &s_ReimportState.open);
-
-    if (s_ReimportState.importerID == "TextureImporter")
+    ImGui::SetNextWindowSize(ImVec2(480, 600), ImGuiCond_FirstUseEver);
+    if (ImGui::Begin("Asset Import Settings", &s_ReimportState.open))
     {
-        auto& s = s_ReimportState.textureSettings;
-        ImGui::Checkbox("sRGB", &s.sRGB);
-        ImGui::Checkbox("Generate Mips", &s.generateMips);
-        ImGui::DragInt("Max Size", &s.maxSize, 1, 1, 8192);
-    }
-    if (s_ReimportState.importerID == "ModelImporter")
-    {
-        auto& s = s_ReimportState.modelSettings;
-        ImGui::DragFloat("Scale", &s.scale, 0.01f, 0.001f, 100.0f);
-        ImGui::Separator();
-        ImGui::Checkbox("Import Normals", &s.importNormals);
-        ImGui::Checkbox("Import Tangents", &s.importTangents);
-        ImGui::Checkbox("Import UVs", &s.importUVs);
-        ImGui::Separator();
-        ImGui::Checkbox("Import Textures", &s.importTextures);
-        ImGui::Checkbox("Import Materials", &s.importMaterials);
-        ImGui::Checkbox("Generate Prefab", &s.generatePrefab);
-    }
-
-    if (ImGui::Button("Reimport"))
-    {
-        auto& registry = AssetManager::Get().GetRegistry();
-        auto metaPath = std::filesystem::path(s_ReimportState.path.string() + ".rmeta");
-
-        AssetMeta meta;
-        meta.LoadFromFile(metaPath);
-        json j;
-
-        if (s_ReimportState.importerID == "TextureImporter")
+        if (ImportSettingsPanel::DrawAssetSettingsUI(s_ReimportState.path, importPipeline, true))
         {
-            auto& s = s_ReimportState.textureSettings;
-            j["sRGB"] = s.sRGB;
-            j["generateMips"] = s.generateMips;
-            j["maxSize"] = s.maxSize;
+            s_ReimportState.open = false;
         }
-
-        if (s_ReimportState.importerID == "ModelImporter")
-        {
-            auto& s = s_ReimportState.modelSettings;
-            j["scale"] = s.scale;
-            j["importNormals"] = s.importNormals;
-            j["importTangents"] = s.importTangents;
-            j["importUVs"] = s.importUVs;
-            j["importTextures"] = s.importTextures;
-            j["importMaterials"] = s.importMaterials;
-            j["generatePrefab"] = s.generatePrefab;
-        }
-
-        meta.importerSettingsJson = j.dump();
-        registry.SaveMeta(s_ReimportState.path, meta);
-        importPipeline.Reimport(s_ReimportState.path, registry);
-
-        s_ReimportState.open = false;
     }
-
-    ImGui::SameLine();
-    if (ImGui::Button("Reset"))
-    {
-        if (s_ReimportState.importerID == "TextureImporter")
-            s_ReimportState.textureSettings = TextureImportSettings();
-
-        if (s_ReimportState.importerID == "ModelImporter")
-            s_ReimportState.modelSettings = ModelImportSettings();
-    }
-
-    ImGui::SameLine();
-    if (ImGui::Button("Cancel"))
-    {
-        s_ReimportState.open = false;
-    }
-
     ImGui::End();
 }
 
@@ -503,28 +449,9 @@ static bool MoveAssetToDirectory(const std::filesystem::path& sourcePath, const 
 
 static void HandleReimport(const std::filesystem::path& path, AssetImportPipeline& importPipeline)
 {
-    auto metaPath = std::filesystem::path(path.string() + ".rmeta");
-    if (std::filesystem::exists(metaPath))
-    {
-        AssetMeta meta;
-        meta.LoadFromFile(metaPath);
-
-        if (meta.importerID.empty() || meta.importerSettingsJson.empty())
-        {
-            importPipeline.Reimport(path, AssetManager::Get().GetRegistry());
-            return;
-        }
-            
-        s_ReimportState.open = true;
-        s_ReimportState.path = path;
-        s_ReimportState.importerID = meta.importerID;
-
-        if (meta.importerID == "TextureImporter")
-            s_ReimportState.textureSettings = TextureImporter::ParseSettings(meta.importerSettingsJson);
-
-        if (meta.importerID == "ModelImporter")
-            s_ReimportState.modelSettings = ModelImporter::ParseSettings(meta.importerSettingsJson);
-    }
+    s_ReimportState.open = true;
+    s_ReimportState.path = path;
+    ImportSettingsPanel::SetInspectedAsset(path);
 }
 
 static void CreateEmptyTextFile(const std::filesystem::path& path, const std::string& content = "")
@@ -1237,8 +1164,11 @@ static void DrawItemContextMenu(const std::filesystem::path& itemPath, AssetImpo
                     }
                 }
 
-                if (ImGui::MenuItem("Reimport"))
+                if (ImGui::MenuItem("Import Settings..."))
                     HandleReimport(itemPath, importPipeline);
+
+                if (ImGui::MenuItem("Reimport"))
+                    importPipeline.Reimport(itemPath, AssetManager::Get().GetRegistry());
             }
         }
         else
@@ -1836,6 +1766,8 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
                 s_SelectedIsDir = item.isDirectory;
                 s_SelectedFileSize = item.fileSize;
                 s_DeselectOthersOnMouseRelease = false;
+                if (!item.isDirectory)
+                    ImportSettingsPanel::SetInspectedAsset(item.path);
             }
             else
             {
@@ -1848,6 +1780,8 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
                     s_SelectedFileSize = item.fileSize;
                     s_LastSelectedIndex = (int)i;
                     s_DeselectOthersOnMouseRelease = false;
+                    if (!item.isDirectory)
+                        ImportSettingsPanel::SetInspectedAsset(item.path);
                 }
                 else
                 {

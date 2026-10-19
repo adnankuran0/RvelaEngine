@@ -224,6 +224,18 @@ public:
     Sampler& GetSampler() { return m_Instance.GetSampler(); }
     const Sampler& GetSampler() const { return m_Instance.GetSampler(); }
 
+    TextureFilter GetTextureFilter() const { return m_Instance.GetTextureFilter(); }
+    void SetTextureFilter(TextureFilter f) { m_Instance.SetTextureFilter(f); }
+    void ClearTextureFilter() { m_Instance.ClearTextureFilter(); }
+
+    TextureWrap GetTextureWrap() const { return m_Instance.GetTextureWrap(); }
+    void SetTextureWrap(TextureWrap w) { m_Instance.SetTextureWrap(w); }
+    void ClearTextureWrap() { m_Instance.ClearTextureWrap(); }
+
+    TextureAnisotropy GetTextureAnisotropy() const { return m_Instance.GetTextureAnisotropy(); }
+    void SetTextureAnisotropy(TextureAnisotropy a) { m_Instance.SetTextureAnisotropy(a); }
+    void ClearTextureAnisotropy() { m_Instance.ClearTextureAnisotropy(); }
+
     nlohmann::json Serialize() const;
     void Deserialize(const nlohmann::json& j);
 

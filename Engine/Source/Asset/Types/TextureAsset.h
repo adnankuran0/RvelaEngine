@@ -41,6 +41,7 @@ public:
 
 private:
     friend class TextureLoader;
+    friend class AssetManager;
 
     uint32_t m_Width = 0;
     uint32_t m_Height = 0;

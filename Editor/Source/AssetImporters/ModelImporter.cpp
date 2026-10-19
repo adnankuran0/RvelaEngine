@@ -146,9 +146,23 @@ ModelImportSettings ModelImporter::ParseSettings(const std::string& settingsJson
     if (j.is_discarded()) return s;
 
     s.scale = j.value("scale", 1.0f);
+    s.preservePivots = j.value("preservePivots", false);
+
     s.importNormals = j.value("importNormals", true);
+    s.normalMode = static_cast<ModelNormalMode>(j.value("normalMode", 0));
     s.importTangents = j.value("importTangents", true);
     s.importUVs = j.value("importUVs", true);
+    s.flipUVs = j.value("flipUVs", false);
+    s.optimizeMesh = j.value("optimizeMesh", true);
+    s.joinIdenticalVertices = j.value("joinIdenticalVertices", true);
+    s.removeDegenerateTriangles = j.value("removeDegenerateTriangles", true);
+    s.triangulate = j.value("triangulate", true);
+    s.generateBoundingBoxes = j.value("generateBoundingBoxes", true);
+
+    s.importSkeleton = j.value("importSkeleton", true);
+    s.importAnimations = j.value("importAnimations", true);
+    s.importSkeletalMeshes = j.value("importSkeletalMeshes", true);
+
     s.importTextures = j.value("importTextures", true);
     s.importMaterials = j.value("importMaterials", true);
     s.generatePrefab = j.value("generatePrefab", true);
@@ -191,15 +205,16 @@ ModelImportResult ModelImporter::ImportModel(
     if (settings.importMaterials)
         ExtractMaterials(scene, sourcePath, registry, result);
 
-    ExtractSkeleton(scene, sourcePath, registry, result);
+    if (settings.importSkeleton)
+        ExtractSkeleton(scene, sourcePath, registry, result);
 
-    if (scene->mNumAnimations > 0 && result.skeletonUUID.IsValid())
+    if (settings.importAnimations && scene->mNumAnimations > 0 && result.skeletonUUID.IsValid())
     {
         result.animLibUUID = m_AnimationImporter.ImportFromScene(
             scene, sourcePath, registry, result.boneNameToIndex);
     }
 
-    ExtractMeshes(scene, sourcePath, registry, result);
+    ExtractMeshes(scene, sourcePath, registry, result, settings);
     MergeAndSaveSubAssets(scene, sourcePath, registry, result);
 
     if (settings.generatePrefab)
@@ -303,9 +318,23 @@ std::string ModelImporter::GetDefaultSettings() const
 
     json j;
     j["scale"] = s.scale;
+    j["preservePivots"] = s.preservePivots;
+
     j["importNormals"] = s.importNormals;
+    j["normalMode"] = static_cast<int>(s.normalMode);
     j["importTangents"] = s.importTangents;
     j["importUVs"] = s.importUVs;
+    j["flipUVs"] = s.flipUVs;
+    j["optimizeMesh"] = s.optimizeMesh;
+    j["joinIdenticalVertices"] = s.joinIdenticalVertices;
+    j["removeDegenerateTriangles"] = s.removeDegenerateTriangles;
+    j["triangulate"] = s.triangulate;
+    j["generateBoundingBoxes"] = s.generateBoundingBoxes;
+
+    j["importSkeleton"] = s.importSkeleton;
+    j["importAnimations"] = s.importAnimations;
+    j["importSkeletalMeshes"] = s.importSkeletalMeshes;
+
     j["importTextures"] = s.importTextures;
     j["importMaterials"] = s.importMaterials;
     j["generatePrefab"] = s.generatePrefab;
@@ -387,18 +416,24 @@ const aiScene* ModelImporter::LoadScene(
     const std::filesystem::path& path,
     const ModelImportSettings& settings)
 {
-    m_Importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
+    m_Importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, settings.preservePivots);
     m_Importer.SetPropertyFloat(AI_CONFIG_GLOBAL_SCALE_FACTOR_KEY, settings.scale);
     m_Importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_ALL_GEOMETRY_LAYERS, false);
 
-    unsigned int flags =
-        aiProcess_Triangulate |
-        aiProcess_GenUVCoords |
-        aiProcess_TransformUVCoords |
-        aiProcess_CalcTangentSpace |
-        aiProcess_JoinIdenticalVertices |
-        aiProcess_ImproveCacheLocality |
-        aiProcess_GenBoundingBoxes;
+    unsigned int flags = 0;
+    if (settings.triangulate) flags |= aiProcess_Triangulate;
+    if (settings.importUVs) flags |= (aiProcess_GenUVCoords | aiProcess_TransformUVCoords);
+    if (settings.flipUVs) flags |= aiProcess_FlipUVs;
+    if (settings.importTangents) flags |= aiProcess_CalcTangentSpace;
+    if (settings.joinIdenticalVertices) flags |= aiProcess_JoinIdenticalVertices;
+    if (settings.optimizeMesh) flags |= aiProcess_ImproveCacheLocality;
+    if (settings.generateBoundingBoxes) flags |= aiProcess_GenBoundingBoxes;
+    if (settings.removeDegenerateTriangles) flags |= aiProcess_FindDegenerates;
+
+    if (settings.normalMode == ModelNormalMode::GenerateSmooth)
+        flags |= aiProcess_GenSmoothNormals;
+    else if (settings.normalMode == ModelNormalMode::GenerateFlat)
+        flags |= aiProcess_GenNormals;
 
     if (settings.scale != 1.0f)
     {
@@ -1066,7 +1101,8 @@ void ModelImporter::ExtractMeshes(
     const aiScene* scene,
     const std::filesystem::path& modelPath,
     AssetRegistry& registry,
-    ModelImportResult& result)
+    ModelImportResult& result,
+    const ModelImportSettings& settings)
 {
     if (!scene || scene->mNumMeshes == 0)
         return;
@@ -1080,7 +1116,7 @@ void ModelImporter::ExtractMeshes(
     for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
     {
         aiMesh* mesh = scene->mMeshes[i];
-        std::string expectedType = (mesh->mNumBones > 0 && !result.boneNameToIndex.empty()) ? "SkeletalMesh" : "Mesh";
+        std::string expectedType = (settings.importSkeletalMeshes && mesh->mNumBones > 0 && !result.boneNameToIndex.empty()) ? "SkeletalMesh" : "Mesh";
         for (const auto& sub : parentMeta.subAssets)
         {
             if (sub.type == expectedType && sub.name == meshNames[i] && !claimedUUIDs.contains(sub.uuid))
@@ -1096,7 +1132,7 @@ void ModelImporter::ExtractMeshes(
     {
         if (assignedUUIDs[i].IsValid()) continue;
         aiMesh* mesh = scene->mMeshes[i];
-        std::string expectedType = (mesh->mNumBones > 0 && !result.boneNameToIndex.empty()) ? "SkeletalMesh" : "Mesh";
+        std::string expectedType = (settings.importSkeletalMeshes && mesh->mNumBones > 0 && !result.boneNameToIndex.empty()) ? "SkeletalMesh" : "Mesh";
         for (const auto& sub : parentMeta.subAssets)
         {
             if (sub.type == expectedType && sub.index == i && !claimedUUIDs.contains(sub.uuid))
@@ -1115,7 +1151,7 @@ void ModelImporter::ExtractMeshes(
             assignedUUIDs[i] = AssetUUID{};
         }
         aiMesh* mesh = scene->mMeshes[i];
-        if (mesh->mNumBones > 0 && !result.boneNameToIndex.empty())
+        if (settings.importSkeletalMeshes && mesh->mNumBones > 0 && !result.boneNameToIndex.empty())
             result.skeletalMeshUUIDs[i] = assignedUUIDs[i];
         else
             result.meshUUIDs[i] = assignedUUIDs[i];
@@ -1135,12 +1171,12 @@ void ModelImporter::ExtractMeshes(
         }
     }
 
-    m_MeshImporter.ImportFromScene(scene, modelPath, registry, result.meshUUIDs, meshNames);
+    m_MeshImporter.ImportFromScene(scene, modelPath, registry, result.meshUUIDs, meshNames, settings.optimizeMesh);
 
-    if (!result.boneNameToIndex.empty())
+    if (settings.importSkeletalMeshes && !result.boneNameToIndex.empty())
     {
         m_SkeletalMeshImporter.ImportFromScene(
-            scene, modelPath, registry, result.boneNameToIndex, result.skeletalMeshUUIDs, meshNames);
+            scene, modelPath, registry, result.boneNameToIndex, result.skeletalMeshUUIDs, meshNames, settings.optimizeMesh);
     }
 }
 

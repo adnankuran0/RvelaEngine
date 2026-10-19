@@ -38,6 +38,10 @@ std::string Project::Serialize() const
 	s["fxaaEnabled"] = m_Settings.fxaaEnabled;
 	s["shadowResolution"] = m_Settings.shadowResolution;
 
+	s["defaultTextureFilter"] = static_cast<int>(m_Settings.defaultTextureFilter);
+	s["defaultTextureWrap"] = static_cast<int>(m_Settings.defaultTextureWrap);
+	s["defaultAnisotropy"] = static_cast<int>(m_Settings.defaultAnisotropy);
+
 	json autoArr = json::array();
 	for (const auto& a : m_Settings.autoloads)
 	{
@@ -117,6 +121,10 @@ void Project::Deserialize(const std::string& jsonStr)
 		m_Settings.msaaSamples = s.value("msaaSamples", 1u);
 		m_Settings.fxaaEnabled = s.value("fxaaEnabled", true);
 		m_Settings.shadowResolution = s.value("shadowResolution", 2048u);
+
+		m_Settings.defaultTextureFilter = static_cast<TextureFilter>(s.value("defaultTextureFilter", static_cast<int>(TextureFilter::LinearMipmap)));
+		m_Settings.defaultTextureWrap = static_cast<TextureWrap>(s.value("defaultTextureWrap", static_cast<int>(TextureWrap::Repeat)));
+		m_Settings.defaultAnisotropy = static_cast<TextureAnisotropy>(s.value("defaultAnisotropy", static_cast<int>(TextureAnisotropy::Aniso8x)));
 
 		m_Settings.autoloads.clear();
 		if (s.contains("autoloads") && s["autoloads"].is_array())

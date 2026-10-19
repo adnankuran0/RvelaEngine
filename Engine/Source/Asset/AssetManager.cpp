@@ -101,6 +101,49 @@ void AssetManager::Unload(const AssetUUID& uuid)
     m_LoadedAssets.erase(it);
 }
 
+void AssetManager::Reload(const AssetUUID& uuid)
+{
+    if (!m_Registry || !m_Registry->Exists(uuid)) return;
+
+    auto it = m_LoadedAssets.find(uuid);
+    if (it == m_LoadedAssets.end()) return;
+
+    auto existingAsset = it->second.Lock();
+    if (!existingAsset)
+    {
+        m_LoadedAssets.erase(it);
+        return;
+    }
+
+    auto path = m_Registry->GetPath(uuid);
+    if (path.empty()) return;
+
+    auto ext = path.extension().string();
+    IAssetLoader* loader = FindLoader(ext);
+    if (!loader) return;
+
+    auto meta = m_Registry->GetMeta(uuid);
+    Ref<Asset> reloaded = loader->Load(path, meta);
+    if (!reloaded)
+    {
+        LOG_ERROR("Failed to reload asset: {}", path.string());
+        return;
+    }
+
+    if (auto texAsset = DynamicCast<TextureAsset>(existingAsset))
+    {
+        if (auto newTexAsset = DynamicCast<TextureAsset>(reloaded))
+        {
+            texAsset->m_Width = newTexAsset->m_Width;
+            texAsset->m_Height = newTexAsset->m_Height;
+            texAsset->m_MipCount = newTexAsset->m_MipCount;
+            texAsset->m_Format = newTexAsset->m_Format;
+            texAsset->m_SRGB = newTexAsset->m_SRGB;
+            texAsset->m_Pixels = std::move(newTexAsset->m_Pixels);
+        }
+    }
+}
+
 void AssetManager::UnloadAll()
 {
     m_LoadedAssets.clear();

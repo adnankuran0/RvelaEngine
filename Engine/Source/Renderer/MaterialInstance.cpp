@@ -10,6 +10,9 @@ MaterialInstance MaterialInstance::CreateFromAsset(const Ref<MaterialAsset>& ass
     MaterialInstance inst;
     if (!asset) return inst;
     inst.m_SourceAsset = asset;
+    inst.m_TextureFilter = asset->samplerDesc.filter;
+    inst.m_TextureWrap = asset->samplerDesc.repeat;
+    inst.m_TextureAnisotropy = asset->samplerDesc.aniso;
     inst.m_Sampler.Init(asset->samplerDesc);
     inst.RebuildCache();
     return inst;
@@ -86,6 +89,13 @@ json MaterialInstance::SerializeOverrides() const
 
     if (IsOverridden(MatField::CustomShader))
         j["customShader"] = m_CustomShaderUUID.ToString();
+
+    if (IsOverridden(MatField::TextureFilterMode))
+        j["textureFilter"] = static_cast<int>(m_TextureFilter);
+    if (IsOverridden(MatField::TextureWrapMode))
+        j["textureWrap"] = static_cast<int>(m_TextureWrap);
+    if (IsOverridden(MatField::TextureAnisotropyMode))
+        j["textureAnisotropy"] = static_cast<int>(m_TextureAnisotropy);
 
     if (!m_CustomUniformOverrides.empty())
     {
@@ -268,6 +278,13 @@ void MaterialInstance::DeserializeOverrides(const json& j)
         SetOverride(MatField::CustomShader);
     }
 
+    if (j.contains("textureFilter"))
+        SetTextureFilter(static_cast<TextureFilter>(j["textureFilter"].get<int>()));
+    if (j.contains("textureWrap"))
+        SetTextureWrap(static_cast<TextureWrap>(j["textureWrap"].get<int>()));
+    if (j.contains("textureAnisotropy"))
+        SetTextureAnisotropy(static_cast<TextureAnisotropy>(j["textureAnisotropy"].get<int>()));
+
     if (j.contains("customUniformOverrides") && j["customUniformOverrides"].is_object())
     {
         m_CustomUniformOverrides.clear();
@@ -320,6 +337,14 @@ void MaterialInstance::RebuildCache()
     m_CachedARMTex = m_SourceAsset->useARMMap ? mgr.GetAsset<TextureAsset>(m_SourceAsset->armTextureUUID) : nullptr;
     m_CachedCustomShader = m_SourceAsset->customShaderUUID.IsValid() ? mgr.GetAsset<ShaderAsset>(m_SourceAsset->customShaderUUID) : nullptr;
     m_CachedCustomUniforms = m_SourceAsset->customUniforms;
+
+    m_Sampler.GetDesc().filter = GetTextureFilter();
+    m_Sampler.GetDesc().repeat = GetTextureWrap();
+    m_Sampler.GetDesc().aniso = GetTextureAnisotropy();
+    m_Sampler.GetDesc().minFilter = m_SourceAsset->samplerDesc.minFilter;
+    m_Sampler.GetDesc().magFilter = m_SourceAsset->samplerDesc.magFilter;
+    m_Sampler.GetDesc().wrap = m_SourceAsset->samplerDesc.wrap;
+    m_Sampler.GetDesc().anisotropy = m_SourceAsset->samplerDesc.anisotropy;
 }
 
 CustomUniformValue MaterialInstance::GetCustomUniform(const std::string& name) const

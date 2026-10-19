@@ -67,7 +67,8 @@ bool MeshImporter::ImportFromScene(
     const std::filesystem::path& sourcePath,
     AssetRegistry& registry,
     std::unordered_map<unsigned int, AssetUUID>& outMeshMap,
-    const std::vector<std::string>& meshNames)
+    const std::vector<std::string>& meshNames,
+    bool optimize)
 {
     if (scene->mNumMeshes == 0) return false;
 
@@ -102,7 +103,10 @@ bool MeshImporter::ImportFromScene(
 
         auto vertices = ProcessVertices(mesh);
         auto indices = ProcessIndices(mesh);
-        OptimizeMesh(vertices, indices);
+        if (optimize)
+        {
+            OptimizeMesh(vertices, indices);
+        }
         aiVector3D mn = mesh->mAABB.mMin, mx = mesh->mAABB.mMax;
         AABB aabb(glm::vec3(mn.x, mn.y, mn.z), glm::vec3(mx.x, mx.y, mx.z));
 

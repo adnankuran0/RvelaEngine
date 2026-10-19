@@ -15,12 +15,14 @@
 #include "EditorSettings.h"
 #include "Commands/CommandHistory.h"
 #include "Renderer/RenderLayer.h"
+#include "Panels/ImportSettingsPanel.h"
 
 using namespace rv;
 
 void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter,
     ProjectSettingsPanel* projectSettingsPanel,
-    ProjectSelectorPanel* projectSelectorPanel)
+    ProjectSelectorPanel* projectSelectorPanel,
+    ImportSettingsPanel* importSettingsPanel)
 {
     auto& registry = AssetManager::Get().GetRegistry();
 
@@ -167,6 +169,20 @@ void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter,
             if (ImGui::MenuItem("Snap to Floor", "PageDown", false, hasTransformSelection))
             {
                 EditorUtils::SnapSelectedToFloor(*engine, false);
+            }
+
+            ImGui::Separator();
+
+            if (importSettingsPanel)
+            {
+                bool isOpen = importSettingsPanel->IsOpen();
+                if (ImGui::MenuItem("Import Settings", nullptr, &isOpen))
+                {
+                    if (isOpen)
+                        importSettingsPanel->Open();
+                    else
+                        importSettingsPanel->Close();
+                }
             }
 
             ImGui::EndMenu();

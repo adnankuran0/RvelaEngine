@@ -144,6 +144,9 @@ void MaterialInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 				if (inst.IsOverridden(MatField::UseARMMap)) { asset->useARMMap = material.GetUseARMMap(); }
 
 				if (inst.IsOverridden(MatField::CustomShader)) asset->customShaderUUID = material.GetCustomShaderUUID();
+				if (inst.IsOverridden(MatField::TextureFilterMode)) asset->samplerDesc.filter = material.GetTextureFilter();
+				if (inst.IsOverridden(MatField::TextureWrapMode)) asset->samplerDesc.repeat = material.GetTextureWrap();
+				if (inst.IsOverridden(MatField::TextureAnisotropyMode)) asset->samplerDesc.aniso = material.GetTextureAnisotropy();
 				for (const auto& [name, val] : inst.GetCustomUniformOverrides())
 				{
 					asset->customUniforms[name] = val;
@@ -661,35 +664,64 @@ void MaterialInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 		{
 			if (UI::BeginPropertyTable("SamplerTable"))
 			{
-				const char* minFilterTypes[] = { "Nearest", "Linear", "Nearest Mipmap", "Linear Mipmap" };
-				const char* magFilterTypes[] = { "Nearest", "Linear" };
-				const char* wrapTypes[] = { "Repeat", "Mirror Repeat", "Clamp to edge", "Clamp to border", "Mirror clamp to edge" };
-				const char* anisoLevels[] = { "1x", "2x", "4x", "8x", "16x" };
-				SamplerDesc desc = material.GetSampler().GetDesc();
-				int minF = static_cast<uint8_t>(desc.minFilter);
-				int magF = static_cast<uint8_t>(desc.magFilter);
-				int wrap = static_cast<uint8_t>(desc.wrap);
-				int aniso = desc.anisotropy > 8.0f ? 4 : desc.anisotropy > 4.0f ? 3 : desc.anisotropy > 2.0f ? 2 : desc.anisotropy > 1.0f ? 1 : 0;
-				bool dirty = false;
+				UI::PropertyLabel("Filter");
+				const char* filterOptions[] = {
+					"Default",
+					"Nearest",
+					"Linear",
+					"Nearest Mipmap",
+					"Linear Mipmap"
+				};
+				int currentFilter = static_cast<int>(material.GetTextureFilter());
+				float filterW = inst.IsOverridden(MatField::TextureFilterMode) ? ImGui::GetContentRegionAvail().x - 26.0f : -FLT_MIN;
+				ImGui::SetNextItemWidth(filterW);
+				if (ImGui::Combo("##TextureFilter", &currentFilter, filterOptions, IM_ARRAYSIZE(filterOptions)))
+				{
+					InspectorContext::ApplyEntityChange(selectedEntity, "Change Texture Filter", [&]() {
+						material.SetTextureFilter(static_cast<TextureFilter>(currentFilter));
+					});
+				}
+				if (inst.IsOverridden(MatField::TextureFilterMode)) RevertButton("R##texfilt", [&]() { material.ClearTextureFilter(); });
 
-				UI::PropertyLabel("Min Filter");
-				if (ImGui::Combo("##MinFilter", &minF, minFilterTypes, 4)) { desc.minFilter = static_cast<MinFilter>(minF); dirty = true; }
-
-				UI::PropertyLabel("Mag Filter");
-				if (ImGui::Combo("##MagFilter", &magF, magFilterTypes, 2)) { desc.magFilter = static_cast<MagFilter>(magF); dirty = true; }
-
-				UI::PropertyLabel("Wrap Mode");
-				if (ImGui::Combo("##WrapMode", &wrap, wrapTypes, 5)) { desc.wrap = static_cast<Wrap>(wrap); dirty = true; }
+				UI::PropertyLabel("Repeat / Wrap");
+				const char* wrapOptions[] = {
+					"Default",
+					"Repeat",
+					"Mirror Repeat",
+					"Clamp to Edge",
+					"Clamp to Border",
+					"Mirror Clamp to Edge"
+				};
+				int currentWrap = static_cast<int>(material.GetTextureWrap());
+				float wrapW = inst.IsOverridden(MatField::TextureWrapMode) ? ImGui::GetContentRegionAvail().x - 26.0f : -FLT_MIN;
+				ImGui::SetNextItemWidth(wrapW);
+				if (ImGui::Combo("##TextureWrap", &currentWrap, wrapOptions, IM_ARRAYSIZE(wrapOptions)))
+				{
+					InspectorContext::ApplyEntityChange(selectedEntity, "Change Texture Wrap", [&]() {
+						material.SetTextureWrap(static_cast<TextureWrap>(currentWrap));
+					});
+				}
+				if (inst.IsOverridden(MatField::TextureWrapMode)) RevertButton("R##texwrap", [&]() { material.ClearTextureWrap(); });
 
 				UI::PropertyLabel("Anisotropy");
-				if (ImGui::Combo("##AnisoMode", &aniso, anisoLevels, 5))
+				const char* anisoOptions[] = {
+					"Default",
+					"Disabled",
+					"2x",
+					"4x",
+					"8x",
+					"16x"
+				};
+				int currentAniso = static_cast<int>(material.GetTextureAnisotropy());
+				float anisoW = inst.IsOverridden(MatField::TextureAnisotropyMode) ? ImGui::GetContentRegionAvail().x - 26.0f : -FLT_MIN;
+				ImGui::SetNextItemWidth(anisoW);
+				if (ImGui::Combo("##TextureAniso", &currentAniso, anisoOptions, IM_ARRAYSIZE(anisoOptions)))
 				{
-					constexpr float values[] = { 1.0f, 2.0f, 4.0f, 8.0f, 16.0f };
-					desc.anisotropy = values[aniso];
-					dirty = true;
+					InspectorContext::ApplyEntityChange(selectedEntity, "Change Texture Anisotropy", [&]() {
+						material.SetTextureAnisotropy(static_cast<TextureAnisotropy>(currentAniso));
+					});
 				}
-
-				if (dirty) material.GetSampler().Init(desc);
+				if (inst.IsOverridden(MatField::TextureAnisotropyMode)) RevertButton("R##texaniso", [&]() { material.ClearTextureAnisotropy(); });
 
 				UI::EndPropertyTable();
 			}

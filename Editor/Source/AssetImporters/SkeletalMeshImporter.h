@@ -19,7 +19,8 @@ public:
         AssetRegistry& registry,
         const std::unordered_map<std::string, int32_t>& boneNameToIndex,
         std::unordered_map<unsigned int, AssetUUID>& outSkeletalMeshMap,
-        const std::vector<std::string>& meshNames = {});
+        const std::vector<std::string>& meshNames = {},
+        bool optimize = true);
 
 private:
     struct BoneWeight { int32_t boneIndex; float weight; };

@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <cstdint>
+#include "Renderer/Sampler.h"
 
 namespace rv {
 
@@ -72,6 +73,10 @@ struct ProjectSettings
 	uint32_t msaaSamples = 1;
 	bool fxaaEnabled = true;
 	uint32_t shadowResolution = 2048;
+
+	TextureFilter defaultTextureFilter = TextureFilter::LinearMipmap;
+	TextureWrap defaultTextureWrap = TextureWrap::Repeat;
+	TextureAnisotropy defaultAnisotropy = TextureAnisotropy::Aniso8x;
 
 	std::vector<AutoloadEntry> autoloads;
 };
