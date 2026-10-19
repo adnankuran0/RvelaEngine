@@ -1667,7 +1667,7 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
             isClicked = false;
 
         ImTextureID thumb = 0;
-        if (!item.isDirectory && IsSupportedThumbnailImage(item.path))
+        if (!item.isDirectory && IsSupportedThumbnailAsset(item.path))
         {
             thumb = ThumbnailCache::Get().GetThumbnail(item.path);
         }

@@ -5,7 +5,8 @@
 
 namespace rv {
 
-bool IsSupportedThumbnailImage(const std::filesystem::path& path);
+bool IsSupportedThumbnailAsset(const std::filesystem::path& path);
+inline bool IsSupportedThumbnailImage(const std::filesystem::path& path) { return IsSupportedThumbnailAsset(path); }
 
 class ThumbnailCache
 {
