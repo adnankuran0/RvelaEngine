@@ -1,6 +1,7 @@
 #include "rvelapch.h"
 #include "TransformSystem.h"
 #include "Scene/Scene.h"
+#include "Scene/Components/SkeletalMeshComponent.h"
 
 using namespace rv;
 
@@ -84,30 +85,21 @@ void TransformSystem::UpdateNodeRecursive(entt::entity e, const glm::mat4& paren
         meshRenderer.worldAABB = meshRenderer.localAABB.CalculateWorldAABB(worldMatrix);
     }
 
-    if (isDirty && m_Scene.HasComponent<SkeletalMeshRendererComponent>(e)) {
+    if (m_Scene.HasComponent<SkeletalMeshRendererComponent>(e)) {
         auto& meshRenderer = m_Scene.GetComponent<SkeletalMeshRendererComponent>(e);
 
         entt::entity skelEntity = FindSkeletonEntity(e);
 
         if (skelEntity != entt::null) {
             auto& skel = m_Scene.GetComponent<SkeletonComponent>(skelEntity);
+            Ref<SkeletalMeshAsset> meshAsset;
+            if (m_Scene.HasComponent<SkeletalMeshComponent>(e))
+            {
+                meshAsset = m_Scene.GetComponent<SkeletalMeshComponent>(e).GetMesh();
+            }
 
-            if (!skel.modelSpaceMatrices.empty()) {
-                glm::vec3 boneMin(FLT_MAX);
-                glm::vec3 boneMax(-FLT_MAX);
-
-                for (const auto& boneMatrix : skel.modelSpaceMatrices) {
-                    glm::vec3 bonePos = glm::vec3(boneMatrix[3]);
-                    boneMin = glm::min(boneMin, bonePos);
-                    boneMax = glm::max(boneMax, bonePos);
-                }
-
-                glm::vec3 padding = (meshRenderer.localAABB.max - meshRenderer.localAABB.min) * 0.2f;
-                boneMin -= padding;
-                boneMax += padding;
-
-                AABB animatedAABB{ boneMin, boneMax };
-
+            if (meshAsset && !skel.skinningPalette.empty()) {
+                AABB animatedAABB = meshAsset->CalculateAnimatedAABB(skel.skinningPalette);
                 auto& skelTransform = m_Scene.GetComponent<TransformComponent>(skelEntity);
                 meshRenderer.worldAABB = animatedAABB.CalculateWorldAABB(skelTransform.GetWorldMatrix());
             }

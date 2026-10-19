@@ -34,6 +34,16 @@ public:
 
     bool IsValid() const { return !m_Vertices.empty() && !m_Indices.empty(); }
 
+    struct BoneBound
+    {
+        AABB aabb;
+        bool hasVertices = false;
+    };
+
+    const std::vector<BoneBound>& GetBoneBounds() const;
+    AABB CalculateAnimatedAABB(const std::vector<glm::mat4>& skinningPalette) const;
+    void ComputeBoneBounds();
+
 private:
     friend class SkeletalMeshLoader;
 
@@ -41,6 +51,11 @@ private:
     std::vector<unsigned int>   m_Indices;
     AABB m_LocalAABB;
     std::string m_MeshName;
+
+    std::vector<BoneBound> m_BoneBounds;
+    AABB m_UnweightedBounds;
+    bool m_HasUnweighted = false;
+    bool m_BoneBoundsComputed = false;
 };
 
 }

@@ -148,6 +148,14 @@ bool AssetImportPipeline::CheckAndReimportModifiedAssets(AssetRegistry& registry
         IAssetImporter* importer = FindImporter(ext);
         if (!importer) continue;
 
+        static std::unordered_map<std::string, std::chrono::steady_clock::time_point> s_LastReimportAttempts;
+        auto attemptIt = s_LastReimportAttempts.find(path.string());
+        if (attemptIt != s_LastReimportAttempts.end())
+        {
+            if (std::chrono::duration_cast<std::chrono::seconds>(now - attemptIt->second).count() < 5)
+                continue;
+        }
+
         AssetMeta meta = registry.GetOrCreateMeta(path);
         if (NeedsReimport(path, meta))
         {
@@ -158,6 +166,7 @@ bool AssetImportPipeline::CheckAndReimportModifiedAssets(AssetRegistry& registry
                     continue;
             }
 
+            s_LastReimportAttempts[path.string()] = now;
             LOG_INFO("[AssetImportPipeline] Auto-reimporting modified asset: {}", path.filename().string());
             if (ImportAsset(path, registry, /*force=*/true))
             {

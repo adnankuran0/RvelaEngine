@@ -194,6 +194,19 @@ void RenderLayer::CollectRenderCommands(Scene* scene)
 		if (!skeletonComp)
 			continue;
 
+		if (auto meshAsset = meshComp.GetMesh())
+		{
+			if (skeletonComp && !skeletonComp->skinningPalette.empty())
+			{
+				AABB animatedAABB = meshAsset->CalculateAnimatedAABB(skeletonComp->skinningPalette);
+				skelRenderer.worldAABB = animatedAABB.CalculateWorldAABB(transform.GetWorldMatrix());
+			}
+			else
+			{
+				skelRenderer.worldAABB = skelRenderer.localAABB.CalculateWorldAABB(transform.GetWorldMatrix());
+			}
+		}
+
 		SkeletalRenderCommand cmd;
 		cmd.transform = &scene->GetComponent<TransformComponent>(entity);
 		cmd.mesh = &scene->GetComponent<SkeletalMeshRendererComponent>(entity);

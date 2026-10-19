@@ -194,7 +194,7 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
         for (auto& command : skeletalCommands) {
             if (!command.mesh || command.mesh->indexCount == 0) continue;
-            // if (!ctx.camera->Intersects(command.mesh->worldAABB)) continue;
+            if (command.mesh->worldAABB.IsValid() && !ctx.camera->Intersects(command.mesh->worldAABB)) continue;
 
             auto& material = command.material;
             ApplyCullMode(material->GetCullMode());

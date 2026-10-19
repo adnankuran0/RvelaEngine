@@ -208,7 +208,16 @@ bool SkeletalMeshImporter::ImportFromScene(
     for (unsigned int i = 0; i < scene->mNumMeshes; ++i)
     {
         aiMesh* mesh = scene->mMeshes[i];
-        if (mesh->mNumBones == 0) continue;
+        if (!outSkeletalMeshMap.empty())
+        {
+            if (outSkeletalMeshMap.find(i) == outSkeletalMeshMap.end())
+                continue;
+        }
+        else
+        {
+            if (mesh->mNumBones == 0)
+                continue;
+        }
 
         std::string meshName;
         if (i < meshNames.size() && !meshNames[i].empty())
