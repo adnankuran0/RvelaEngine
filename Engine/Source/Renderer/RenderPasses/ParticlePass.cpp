@@ -148,7 +148,12 @@ void ParticlePass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
         cmd.mesh->VAO.Bind();
         glDrawElementsInstanced(GL_TRIANGLES, cmd.mesh->indexCount, GL_UNSIGNED_INT, 0, cmd.instanceCount);
+
+        glBindSampler(0, 0);
     }
+
+    glBindSampler(0, 0);
+    glBindTextureUnit(0, 0);
 
     glDepthMask(GL_TRUE);
     glDisable(GL_BLEND);

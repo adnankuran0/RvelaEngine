@@ -41,6 +41,7 @@ void BloomPass::Downsample(const RenderContext& ctx, RenderFrame& frame)
 
     downsampleShader.use();
     downsampleShader.setInt("u_Texture", 0);
+    glBindSampler(0, 0);
 
     for (int i = 0; i < s_MipLevels; ++i)
     {
@@ -57,6 +58,8 @@ void BloomPass::Downsample(const RenderContext& ctx, RenderFrame& frame)
 
         Renderer::DrawFullScreenQuad();
     }
+
+    glBindTextureUnit(0, 0);
 }
 
 void BloomPass::Upsample(const RenderContext& ctx, RenderFrame& frame)
@@ -64,9 +67,11 @@ void BloomPass::Upsample(const RenderContext& ctx, RenderFrame& frame)
     Shader& upsampleShader = ShaderManager::Get("Upsample");
     upsampleShader.use();
     upsampleShader.setInt("u_LowMip", 0);
-    upsampleShader.setInt("u_BaseMip", 1);
 
-    glDisable(GL_BLEND);
+    glBindSampler(0, 0);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE);
     glDisable(GL_DEPTH_TEST);
 
     for (int i = s_MipLevels - 2; i >= 0; --i)
@@ -74,10 +79,12 @@ void BloomPass::Upsample(const RenderContext& ctx, RenderFrame& frame)
         m_DownsampleFBOs[i].BindViewport();
 
         glBindTextureUnit(0, m_DownsampleFBOs[i + 1].GetColorAttachment(0));
-        glBindTextureUnit(1, m_DownsampleFBOs[i].GetColorAttachment(0));
 
         Renderer::DrawFullScreenQuad();
     }
+
+    glDisable(GL_BLEND);
+    glBindTextureUnit(0, 0);
 }
 
 void BloomPass::OnResize(uint32_t width, uint32_t height, RenderFrame& frame)

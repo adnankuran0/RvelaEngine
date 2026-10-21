@@ -25,6 +25,7 @@ uniform vec2 u_TexelSize;
 
 void main()
 {
-    vec3 color = BoxSample4Tap(u_Texture, TexCoords, u_TexelSize);
+    vec2 texelSize = 1.0 / vec2(textureSize(u_Texture, 0));
+    vec3 color = BoxSample4Tap(u_Texture, TexCoords, texelSize);
     FragColor = vec4(color, 1.0);
 }

@@ -83,12 +83,18 @@ void CompositePass::Execute(const RenderContext& ctx, RenderFrame& frame)
     compositeShader.setInt("ssrTexture", 2);
     compositeShader.setInt("depthTexture", 3);
 
+    for (int s = 0; s < 4; ++s)
+        glBindSampler(s, 0);
+
     glBindTextureUnit(0, i_ScreenTexture);
     glBindTextureUnit(1, i_BloomBlurTexture);
     glBindTextureUnit(2, i_SsrTexture);
     glBindTextureUnit(3, i_DepthTexture);
 
     Renderer::DrawFullScreenQuad();
+
+    for (int s = 0; s < 4; ++s)
+        glBindTextureUnit(s, 0);
 
     bool useFXAA = false;
     if (ProjectManager::IsProjectLoaded())

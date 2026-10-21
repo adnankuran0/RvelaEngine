@@ -57,6 +57,7 @@ void BrightPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     brightShader.setFloat("threshold", env.Bloom_Treshold);
     brightShader.setFloat("knee", env.Bloom_Knee);
 
+    glBindSampler(0, 0);
     glBindTextureUnit(0, i_ScreenTexture);
 
     m_Framebuffer.BindViewport();
@@ -64,6 +65,7 @@ void BrightPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     Renderer::DrawFullScreenQuad();
 
+    glBindTextureUnit(0, 0);
     glEnable(GL_DEPTH_TEST);
     Framebuffer::BindDefault();
 }
