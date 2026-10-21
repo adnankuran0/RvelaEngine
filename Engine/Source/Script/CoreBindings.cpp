@@ -6,6 +6,7 @@
 #include "Scene/Scene.h"
 #include "Scene/Components/UIComponents.h"
 #include "Scene/Components/ParticleEmitterComponent.h"
+#include "Scene/Components/ColliderComponents.h"
 #include "ComponentHandle.h"
 #include "Asset/AssetManager.h"
 #include "Asset/AssetUUID.h"
@@ -148,6 +149,9 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             else if (type == "Material") return e.HasComponent<MaterialComponent>();
             else if (type == "Rigidbody") return e.HasComponent<RigidbodyComponent>();
             else if (type == "CharacterBody") return e.HasComponent<CharacterBodyComponent>();
+            else if (type == "CapsuleCollider") return e.HasComponent<CapsuleColliderComponent>();
+            else if (type == "BoxCollider") return e.HasComponent<BoxColliderComponent>();
+            else if (type == "SphereCollider") return e.HasComponent<SphereColliderComponent>();
             else if (type == "AudioEmitter") return e.HasComponent<AudioEmitterComponent>();
             else if (type == "Animator") return e.HasComponent<AnimatorComponent>();
             else if (type == "ParticleEmitter") return e.HasComponent<ParticleEmitterComponent>();
@@ -188,6 +192,15 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             }
             else if (type == "CharacterBody") {
                 return sol::make_object(lua, ComponentHandle<CharacterBodyComponent>{ e });
+            }
+            else if (type == "CapsuleCollider") {
+                return sol::make_object(lua, ComponentHandle<CapsuleColliderComponent>{ e });
+            }
+            else if (type == "BoxCollider") {
+                return sol::make_object(lua, ComponentHandle<BoxColliderComponent>{ e });
+            }
+            else if (type == "SphereCollider") {
+                return sol::make_object(lua, ComponentHandle<SphereColliderComponent>{ e });
             }
             else if (type == "AudioEmitter") {
                 return sol::make_object(lua, ComponentHandle<AudioEmitterComponent>{ e });

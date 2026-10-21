@@ -4,6 +4,7 @@
 #include "Physics/PhysicsWorld.h"
 #include "Scene/Components/RigidbodyComponent.h"
 #include "Scene/Components/CharacterBodyComponent.h"
+#include "Scene/Components/ColliderComponents.h"
 #include "Physics/CollisionInfo.h"
 #include "Scene/Entity.h"
 #include "Core/Engine.h"
@@ -12,6 +13,9 @@
 
 using RigidbodyHandle = rv::ComponentHandle<rv::RigidbodyComponent>;
 using CharacterBodyHandle = rv::ComponentHandle<rv::CharacterBodyComponent>;
+using CapsuleColliderHandle = rv::ComponentHandle<rv::CapsuleColliderComponent>;
+using BoxColliderHandle = rv::ComponentHandle<rv::BoxColliderComponent>;
+using SphereColliderHandle = rv::ComponentHandle<rv::SphereColliderComponent>;
 
 using namespace rv::Physics;
 
@@ -142,6 +146,46 @@ void rv::LuaBindings::RegisterPhysicsAPI(sol::state& lua)
         "groundNormal", sol::property([=](CharacterBodyHandle& h) { return h.Get() ? GetPW().GetCharacterGroundNormal(h.Get()) : glm::vec3(0.0f); }),
         "groundVelocity", sol::property([=](CharacterBodyHandle& h) { return h.Get() ? GetPW().GetCharacterGroundVelocity(h.Get()) : glm::vec3(0.0f); }),
         "groundPosition", sol::property([=](CharacterBodyHandle& h) { return h.Get() ? GetPW().GetCharacterGroundPosition(h.Get()) : glm::vec3(0.0f); })
+    );
+
+    lua.new_usertype<CapsuleColliderHandle>("CapsuleColliderComponent",
+        "IsValid", &CapsuleColliderHandle::IsValid,
+        "radius", sol::property(
+            [](CapsuleColliderHandle& h) { return h.Get() ? h.Get()->GetRadius() : 0.0f; },
+            [](CapsuleColliderHandle& h, float r) { if (auto* c = h.Get()) c->SetRadius(r); }
+        ),
+        "halfHeight", sol::property(
+            [](CapsuleColliderHandle& h) { return h.Get() ? h.Get()->GetHalfHeight() : 0.0f; },
+            [](CapsuleColliderHandle& h, float hh) { if (auto* c = h.Get()) c->SetHalfHeight(hh); }
+        ),
+        "offset", sol::property(
+            [](CapsuleColliderHandle& h) { return h.Get() ? h.Get()->GetOffset() : glm::vec3(0.0f); },
+            [](CapsuleColliderHandle& h, const glm::vec3& o) { if (auto* c = h.Get()) c->SetOffset(o); }
+        )
+    );
+
+    lua.new_usertype<BoxColliderHandle>("BoxColliderComponent",
+        "IsValid", &BoxColliderHandle::IsValid,
+        "size", sol::property(
+            [](BoxColliderHandle& h) { return h.Get() ? h.Get()->GetSize() : glm::vec3(0.0f); },
+            [](BoxColliderHandle& h, const glm::vec3& s) { if (auto* c = h.Get()) c->SetSize(s); }
+        ),
+        "offset", sol::property(
+            [](BoxColliderHandle& h) { return h.Get() ? h.Get()->GetOffset() : glm::vec3(0.0f); },
+            [](BoxColliderHandle& h, const glm::vec3& o) { if (auto* c = h.Get()) c->SetOffset(o); }
+        )
+    );
+
+    lua.new_usertype<SphereColliderHandle>("SphereColliderComponent",
+        "IsValid", &SphereColliderHandle::IsValid,
+        "radius", sol::property(
+            [](SphereColliderHandle& h) { return h.Get() ? h.Get()->GetRadius() : 0.0f; },
+            [](SphereColliderHandle& h, float r) { if (auto* c = h.Get()) c->SetRadius(r); }
+        ),
+        "offset", sol::property(
+            [](SphereColliderHandle& h) { return h.Get() ? h.Get()->GetOffset() : glm::vec3(0.0f); },
+            [](SphereColliderHandle& h, const glm::vec3& o) { if (auto* c = h.Get()) c->SetOffset(o); }
+        )
     );
 
 

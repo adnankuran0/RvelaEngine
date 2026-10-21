@@ -413,7 +413,8 @@ RaycastResult PhysicsWorld::Raycast(const glm::vec3& rayOrigin,
 		result.distance = distance;
 		result.point = math::FromJoltRVec3(hitPoint);
 		result.normal = math::FromJoltVec3(normal);
-		result.entity = reinterpret_cast<UserData*>(body.GetUserData())->entity;
+		auto* ud = reinterpret_cast<UserData*>(body.GetUserData());
+		result.entity = ud ? ud->entity : entt::null;
 	}
 
 	return result;

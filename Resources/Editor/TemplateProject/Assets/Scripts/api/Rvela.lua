@@ -754,6 +754,22 @@ function RigidbodyComponent:AddLinearVelocity(velocity) end
 ---@field groundVelocity Vec3 Velocity of platform under character (read-only)
 ---@field groundPosition Vec3 Position of ground contact (read-only)
 
+---@class CapsuleColliderComponent : ComponentHandle
+---@field IsValid fun(self: ComponentHandle): boolean
+---@field radius number Capsule radius
+---@field halfHeight number Capsule half height
+---@field offset Vec3 Local offset
+
+---@class BoxColliderComponent : ComponentHandle
+---@field IsValid fun(self: ComponentHandle): boolean
+---@field size Vec3 Box size
+---@field offset Vec3 Local offset
+
+---@class SphereColliderComponent : ComponentHandle
+---@field IsValid fun(self: ComponentHandle): boolean
+---@field radius number Sphere radius
+---@field offset Vec3 Local offset
+
 ---@class AudioEmitterComponent : ComponentHandle
 ---@field IsValid fun(self: ComponentHandle): boolean
 ---@field volume number Playback volume [0..1]
@@ -936,6 +952,9 @@ function UICheckboxComponent:OnValueChanged(callback) end
 ---| '"Material"'
 ---| '"Rigidbody"'
 ---| '"CharacterBody"'
+---| '"CapsuleCollider"'
+---| '"BoxCollider"'
+---| '"SphereCollider"'
 ---| '"AudioEmitter"'
 ---| '"Animator"'
 ---| '"ParticleEmitter"'
@@ -1038,6 +1057,9 @@ function Entity:HasComponent(typeName) end
 ---@overload fun(self: Entity, typeName: '"Material"'): MaterialComponent
 ---@overload fun(self: Entity, typeName: '"Rigidbody"'): RigidbodyComponent
 ---@overload fun(self: Entity, typeName: '"CharacterBody"'): CharacterBodyComponent
+---@overload fun(self: Entity, typeName: '"CapsuleCollider"'): CapsuleColliderComponent
+---@overload fun(self: Entity, typeName: '"BoxCollider"'): BoxColliderComponent
+---@overload fun(self: Entity, typeName: '"SphereCollider"'): SphereColliderComponent
 ---@overload fun(self: Entity, typeName: '"AudioEmitter"'): AudioEmitterComponent
 ---@overload fun(self: Entity, typeName: '"Animator"'): AnimatorComponent
 ---@overload fun(self: Entity, typeName: '"ParticleEmitter"'): ParticleEmitterComponent
