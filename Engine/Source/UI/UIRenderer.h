@@ -40,6 +40,8 @@ public:
 
     static void SetScissor(int x, int y, int width, int height);
     static void ResetScissor();
+    static void PushScissorRect(const glm::vec4& screenRect);
+    static void PopScissorRect();
 
 private:
     static void Flush();

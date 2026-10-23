@@ -168,6 +168,11 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             else if (type == "UISlider") return e.HasComponent<UISliderComponent>();
             else if (type == "UIProgressBar") return e.HasComponent<UIProgressBarComponent>();
             else if (type == "UICheckbox") return e.HasComponent<UICheckboxComponent>();
+            else if (type == "UIPanel") return e.HasComponent<UIPanelComponent>();
+            else if (type == "UILayoutGroup") return e.HasComponent<UILayoutGroupComponent>();
+            else if (type == "UITextInput") return e.HasComponent<UITextInputComponent>();
+            else if (type == "UIScrollRect") return e.HasComponent<UIScrollRectComponent>();
+            else if (type == "UITabContainer") return e.HasComponent<UITabContainerComponent>();
             return false;
         },
         "GetComponent", [&](Entity& e, const std::string& type) -> sol::object {
@@ -243,6 +248,21 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             else if (type == "UICheckbox") {
                 return sol::make_object(lua, ComponentHandle<UICheckboxComponent>{ e });
             }
+            else if (type == "UIPanel") {
+                return sol::make_object(lua, ComponentHandle<UIPanelComponent>{ e });
+            }
+            else if (type == "UILayoutGroup") {
+                return sol::make_object(lua, ComponentHandle<UILayoutGroupComponent>{ e });
+            }
+            else if (type == "UITextInput") {
+                return sol::make_object(lua, ComponentHandle<UITextInputComponent>{ e });
+            }
+            else if (type == "UIScrollRect") {
+                return sol::make_object(lua, ComponentHandle<UIScrollRectComponent>{ e });
+            }
+            else if (type == "UITabContainer") {
+                return sol::make_object(lua, ComponentHandle<UITabContainerComponent>{ e });
+            }
             return sol::make_object(lua, sol::nil);
         },
         "AddComponent", [&](Entity& e, const std::string& typeName) -> sol::object {
@@ -309,6 +329,26 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             else if (typeName == "UICheckbox") {
                 if (!e.HasComponent<UICheckboxComponent>()) e.AddComponent<UICheckboxComponent>();
                 return sol::make_object(lua, ComponentHandle<UICheckboxComponent>{ e });
+            }
+            else if (typeName == "UIPanel") {
+                if (!e.HasComponent<UIPanelComponent>()) e.AddComponent<UIPanelComponent>();
+                return sol::make_object(lua, ComponentHandle<UIPanelComponent>{ e });
+            }
+            else if (typeName == "UILayoutGroup") {
+                if (!e.HasComponent<UILayoutGroupComponent>()) e.AddComponent<UILayoutGroupComponent>();
+                return sol::make_object(lua, ComponentHandle<UILayoutGroupComponent>{ e });
+            }
+            else if (typeName == "UITextInput") {
+                if (!e.HasComponent<UITextInputComponent>()) e.AddComponent<UITextInputComponent>();
+                return sol::make_object(lua, ComponentHandle<UITextInputComponent>{ e });
+            }
+            else if (typeName == "UIScrollRect") {
+                if (!e.HasComponent<UIScrollRectComponent>()) e.AddComponent<UIScrollRectComponent>();
+                return sol::make_object(lua, ComponentHandle<UIScrollRectComponent>{ e });
+            }
+            else if (typeName == "UITabContainer") {
+                if (!e.HasComponent<UITabContainerComponent>()) e.AddComponent<UITabContainerComponent>();
+                return sol::make_object(lua, ComponentHandle<UITabContainerComponent>{ e });
             }
             return sol::nil;
         }

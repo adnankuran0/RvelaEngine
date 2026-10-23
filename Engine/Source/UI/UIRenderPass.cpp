@@ -277,7 +277,12 @@ void UIRenderPass::RenderEntityRecursively(Scene* scene, entt::entity entity)
             scene->HasComponent<UIImageComponent>(entity) ||
             scene->HasComponent<UIButtonComponent>(entity) ||
             scene->HasComponent<UISliderComponent>(entity) ||
-            scene->HasComponent<UIProgressBarComponent>(entity))
+            scene->HasComponent<UIProgressBarComponent>(entity) ||
+            scene->HasComponent<UICheckboxComponent>(entity) ||
+            scene->HasComponent<UIPanelComponent>(entity) ||
+            scene->HasComponent<UITextInputComponent>(entity) ||
+            scene->HasComponent<UIScrollRectComponent>(entity) ||
+            scene->HasComponent<UITabContainerComponent>(entity))
         {
             scene->AddComponent<RectTransformComponent>(entity);
         }
@@ -298,15 +303,34 @@ void UIRenderPass::RenderEntityRecursively(Scene* scene, entt::entity entity)
             else if (button.isHovered) currentColor = button.hoverColor;
 
             uint32_t texId = 0;
-            if (scene->HasComponent<UIImageComponent>(entity)) {
+            AssetUUID targetUUID = AssetUUID::Invalid();
+            if (button.normalTextureUUID.IsValid())
+            {
+                if (!button.interactable && button.disabledTextureUUID.IsValid()) targetUUID = button.disabledTextureUUID;
+                else if (button.isPressed && button.pressedTextureUUID.IsValid()) targetUUID = button.pressedTextureUUID;
+                else if (button.isHovered && button.hoverTextureUUID.IsValid()) targetUUID = button.hoverTextureUUID;
+                else targetUUID = button.normalTextureUUID;
+            }
+            else if (scene->HasComponent<UIImageComponent>(entity))
+            {
                 const auto& img = scene->GetComponent<UIImageComponent>(entity);
-                if (img.textureUUID.IsValid()) {
-                    auto texAsset = AssetManager::Get().GetAsset<TextureAsset>(img.textureUUID);
-                    if (texAsset) texId = TextureCache::Get().GetOrCreate(texAsset).GetID();
-                }
+                targetUUID = img.textureUUID;
             }
 
-            UIRenderer::DrawQuadRotated(screenRect, rect.computedRotation, currentColor, texId, button.cornerRadius);
+            if (targetUUID.IsValid())
+            {
+                auto texAsset = AssetManager::Get().GetAsset<TextureAsset>(targetUUID);
+                if (texAsset) texId = TextureCache::Get().GetOrCreate(texAsset).GetID();
+            }
+
+            if (button.imageType == ImageType::Sliced && texId != 0)
+            {
+                UIRenderer::DrawNineSlice(screenRect, currentColor, button.borderSize, texId);
+            }
+            else
+            {
+                UIRenderer::DrawQuadRotated(screenRect, rect.computedRotation, currentColor, texId, button.cornerRadius);
+            }
 
             // button text
             if (!button.text.empty()) {
@@ -334,20 +358,56 @@ void UIRenderPass::RenderEntityRecursively(Scene* scene, entt::entity entity)
             }
         }
 
+        if (scene->HasComponent<UIPanelComponent>(entity))
+        {
+            const auto& panel = scene->GetComponent<UIPanelComponent>(entity);
+            uint32_t texId = 0;
+            if (panel.backgroundTextureUUID.IsValid()) {
+                auto texAsset = AssetManager::Get().GetAsset<TextureAsset>(panel.backgroundTextureUUID);
+                if (texAsset) texId = TextureCache::Get().GetOrCreate(texAsset).GetID();
+            }
+
+            if (panel.imageType == ImageType::Sliced && texId != 0)
+            {
+                UIRenderer::DrawNineSlice(screenRect, panel.backgroundColor, 8.0f, texId);
+            }
+            else
+            {
+                UIRenderer::DrawQuadRotated(screenRect, rect.computedRotation, panel.backgroundColor, texId, panel.cornerRadius);
+            }
+
+            if (panel.borderThickness > 0.0f && panel.borderColor.a > 0.0f)
+            {
+                float bt = panel.borderThickness;
+                UIRenderer::DrawQuadRotated(glm::vec4(screenRect.x, screenRect.y, screenRect.x + bt, screenRect.w), rect.computedRotation, panel.borderColor, 0, 0.0f, rectCenter);
+                UIRenderer::DrawQuadRotated(glm::vec4(screenRect.z - bt, screenRect.y, screenRect.z, screenRect.w), rect.computedRotation, panel.borderColor, 0, 0.0f, rectCenter);
+                UIRenderer::DrawQuadRotated(glm::vec4(screenRect.x, screenRect.y, screenRect.z, screenRect.y + bt), rect.computedRotation, panel.borderColor, 0, 0.0f, rectCenter);
+                UIRenderer::DrawQuadRotated(glm::vec4(screenRect.x, screenRect.w - bt, screenRect.z, screenRect.w), rect.computedRotation, panel.borderColor, 0, 0.0f, rectCenter);
+            }
+
+            if (panel.isDraggable || !panel.title.empty())
+            {
+                glm::vec4 headerRect = glm::vec4(screenRect.x, screenRect.w - panel.headerHeight, screenRect.z, screenRect.w);
+                UIRenderer::DrawQuadRotated(headerRect, rect.computedRotation, panel.headerColor, 0, panel.cornerRadius, rectCenter);
+                if (!panel.title.empty())
+                {
+                    glm::vec2 titlePos = { screenRect.x + 12.0f, screenRect.w - panel.headerHeight * 0.5f };
+                    UIRenderer::DrawTextString(panel.title, titlePos, panel.titleFontSize, panel.titleColor, TextAlignment::Left, rect.computedRotation, rectCenter, nullptr, true);
+                }
+            }
+        }
+
         if (scene->HasComponent<UISliderComponent>(entity))
         {
             const auto& slider = scene->GetComponent<UISliderComponent>(entity);
-            // Background
             UIRenderer::DrawQuadRotated(screenRect, rect.computedRotation, slider.backgroundColor, 0, 4.0f, rectCenter);
 
             float width = screenRect.z - screenRect.x;
             float t = std::clamp((slider.value - slider.minValue) / (slider.maxValue - slider.minValue), 0.0f, 1.0f);
             
-            // Fill
             glm::vec4 fillRect = glm::vec4(screenRect.x, screenRect.y, screenRect.x + width * t, screenRect.w);
             UIRenderer::DrawQuadRotated(fillRect, rect.computedRotation, slider.fillColor, 0, 4.0f, rectCenter);
 
-            // Handle
             float handleW = 12.0f;
             float handleX = screenRect.x + width * t - handleW * 0.5f;
             glm::vec4 handleRect = glm::vec4(handleX, screenRect.y - 2.0f, handleX + handleW, screenRect.w + 2.0f);
@@ -357,15 +417,112 @@ void UIRenderPass::RenderEntityRecursively(Scene* scene, entt::entity entity)
         if (scene->HasComponent<UIProgressBarComponent>(entity))
         {
             const auto& pb = scene->GetComponent<UIProgressBarComponent>(entity);
-            // Background
-            UIRenderer::DrawQuadRotated(screenRect, rect.computedRotation, pb.backgroundColor, 0, 4.0f, rectCenter);
+            uint32_t bgTexId = 0;
+            if (pb.backgroundTextureUUID.IsValid()) {
+                auto texAsset = AssetManager::Get().GetAsset<TextureAsset>(pb.backgroundTextureUUID);
+                if (texAsset) bgTexId = TextureCache::Get().GetOrCreate(texAsset).GetID();
+            }
+            uint32_t fillTexId = 0;
+            if (pb.fillTextureUUID.IsValid()) {
+                auto texAsset = AssetManager::Get().GetAsset<TextureAsset>(pb.fillTextureUUID);
+                if (texAsset) fillTexId = TextureCache::Get().GetOrCreate(texAsset).GetID();
+            }
+
+            UIRenderer::DrawQuadRotated(screenRect, rect.computedRotation, pb.backgroundColor, bgTexId, pb.cornerRadius, rectCenter);
 
             float width = screenRect.z - screenRect.x;
+            float height = screenRect.w - screenRect.y;
             float t = std::clamp(pb.value, 0.0f, 1.0f);
 
-            // Fill
-            glm::vec4 fillRect = glm::vec4(screenRect.x, screenRect.y, screenRect.x + width * t, screenRect.w);
-            UIRenderer::DrawQuadRotated(fillRect, rect.computedRotation, pb.fillColor, 0, 4.0f, rectCenter);
+            glm::vec4 fillRect = screenRect;
+            if (pb.direction == UIProgressBarDirection::LeftToRight)
+                fillRect = glm::vec4(screenRect.x, screenRect.y, screenRect.x + width * t, screenRect.w);
+            else if (pb.direction == UIProgressBarDirection::RightToLeft)
+                fillRect = glm::vec4(screenRect.z - width * t, screenRect.y, screenRect.z, screenRect.w);
+            else if (pb.direction == UIProgressBarDirection::BottomToTop)
+                fillRect = glm::vec4(screenRect.x, screenRect.y, screenRect.z, screenRect.y + height * t);
+            else if (pb.direction == UIProgressBarDirection::TopToBottom)
+                fillRect = glm::vec4(screenRect.x, screenRect.w - height * t, screenRect.z, screenRect.w);
+
+            UIRenderer::DrawQuadRotated(fillRect, rect.computedRotation, pb.fillColor, fillTexId, pb.cornerRadius, rectCenter);
+
+            if (pb.borderThickness > 0.0f && pb.borderColor.a > 0.0f)
+            {
+                float bt = pb.borderThickness;
+                UIRenderer::DrawQuadRotated(glm::vec4(screenRect.x, screenRect.y, screenRect.x + bt, screenRect.w), rect.computedRotation, pb.borderColor, 0, 0.0f, rectCenter);
+                UIRenderer::DrawQuadRotated(glm::vec4(screenRect.z - bt, screenRect.y, screenRect.z, screenRect.w), rect.computedRotation, pb.borderColor, 0, 0.0f, rectCenter);
+                UIRenderer::DrawQuadRotated(glm::vec4(screenRect.x, screenRect.y, screenRect.z, screenRect.y + bt), rect.computedRotation, pb.borderColor, 0, 0.0f, rectCenter);
+                UIRenderer::DrawQuadRotated(glm::vec4(screenRect.x, screenRect.w - bt, screenRect.z, screenRect.w), rect.computedRotation, pb.borderColor, 0, 0.0f, rectCenter);
+            }
+
+            if (pb.showPercentageText)
+            {
+                std::string pctText = std::to_string(static_cast<int>(t * 100.0f + 0.5f)) + "%";
+                UIRenderer::DrawTextString(pctText, rectCenter, pb.percentageFontSize, pb.percentageTextColor, TextAlignment::Center, rect.computedRotation, rectCenter, nullptr, true);
+            }
+        }
+
+        if (scene->HasComponent<UITextInputComponent>(entity))
+        {
+            const auto& input = scene->GetComponent<UITextInputComponent>(entity);
+            UIRenderer::DrawQuadRotated(screenRect, rect.computedRotation, input.backgroundColor, 0, input.cornerRadius, rectCenter);
+
+            if (input.borderThickness > 0.0f)
+            {
+                glm::vec4 bColor = input.isFocused ? input.focusedBorderColor : (input.isHovered ? input.focusedBorderColor * 0.8f : input.borderColor);
+                float bt = input.borderThickness;
+                UIRenderer::DrawQuadRotated(glm::vec4(screenRect.x, screenRect.y, screenRect.x + bt, screenRect.w), rect.computedRotation, bColor, 0, 0.0f, rectCenter);
+                UIRenderer::DrawQuadRotated(glm::vec4(screenRect.z - bt, screenRect.y, screenRect.z, screenRect.w), rect.computedRotation, bColor, 0, 0.0f, rectCenter);
+                UIRenderer::DrawQuadRotated(glm::vec4(screenRect.x, screenRect.y, screenRect.z, screenRect.y + bt), rect.computedRotation, bColor, 0, 0.0f, rectCenter);
+                UIRenderer::DrawQuadRotated(glm::vec4(screenRect.x, screenRect.w - bt, screenRect.z, screenRect.w), rect.computedRotation, bColor, 0, 0.0f, rectCenter);
+            }
+
+            glm::vec2 textPos = { screenRect.x + input.textPadding.x, rectCenter.y };
+            float maxW = screenRect.z - textPos.x - 4.0f;
+            if (input.text.empty())
+            {
+                UIRenderer::DrawTextString(input.placeholder, textPos, input.fontSize, input.placeholderColor, TextAlignment::Left, rect.computedRotation, rectCenter, nullptr, false, false, 0.0f, glm::vec4(0), maxW);
+            }
+            else
+            {
+                std::string displayText = input.isPassword ? std::string(input.text.length(), '*') : input.text;
+                UIRenderer::DrawTextString(displayText, textPos, input.fontSize, input.textColor, TextAlignment::Left, rect.computedRotation, rectCenter, nullptr, false, false, 0.0f, glm::vec4(0), maxW);
+            }
+
+            if (input.isFocused && input.cursorVisible)
+            {
+                float cursorOffset = input.cursorPosition * (input.fontSize * 0.52f);
+                glm::vec4 cursorRect = glm::vec4(textPos.x + cursorOffset, rectCenter.y - input.fontSize * 0.45f, textPos.x + cursorOffset + 2.0f, rectCenter.y + input.fontSize * 0.45f);
+                UIRenderer::DrawQuadRotated(cursorRect, rect.computedRotation, input.cursorColor, 0, 0.0f, rectCenter);
+            }
+        }
+
+        if (scene->HasComponent<UITabContainerComponent>(entity))
+        {
+            const auto& tabs = scene->GetComponent<UITabContainerComponent>(entity);
+            float viewW = screenRect.z - screenRect.x;
+            int numTabs = static_cast<int>(tabs.tabTitles.size());
+
+            glm::vec4 contentRect = glm::vec4(screenRect.x, screenRect.y, screenRect.z, screenRect.w - tabs.tabHeight);
+            UIRenderer::DrawQuadRotated(contentRect, rect.computedRotation, tabs.contentBackgroundColor, 0, tabs.contentCornerRadius, rectCenter);
+
+            if (numTabs > 0)
+            {
+                float tabW = (viewW - (tabs.tabSpacing * (numTabs - 1))) / static_cast<float>(numTabs);
+                float tabTop = screenRect.w;
+                float tabBottom = tabTop - tabs.tabHeight;
+
+                for (int i = 0; i < numTabs; i++)
+                {
+                    float tabLeft = screenRect.x + i * (tabW + tabs.tabSpacing);
+                    glm::vec4 tabRect = glm::vec4(tabLeft, tabBottom, tabLeft + tabW, tabTop);
+                    glm::vec4 tabCol = (i == tabs.activeTabIndex) ? tabs.tabActiveColor : ((i == tabs.hoveredTabIndex) ? tabs.tabHoverColor : tabs.tabNormalColor);
+                    UIRenderer::DrawQuadRotated(tabRect, rect.computedRotation, tabCol, 0, tabs.tabCornerRadius, rectCenter);
+
+                    glm::vec2 tabTextCenter = { (tabRect.x + tabRect.z) * 0.5f, (tabRect.y + tabRect.w) * 0.5f };
+                    UIRenderer::DrawTextString(tabs.tabTitles[i], tabTextCenter, tabs.tabFontSize, tabs.tabTextColor, TextAlignment::Center, rect.computedRotation, rectCenter, nullptr, (i == tabs.activeTabIndex));
+                }
+            }
         }
 
         if (scene->HasComponent<UICheckboxComponent>(entity))
@@ -376,7 +533,6 @@ void UIRenderPass::RenderEntityRecursively(Scene* scene, entt::entity entity)
             float boxY = rectCenter.y - boxSize * 0.5f;
             glm::vec4 boxRect = glm::vec4(screenRect.x, boxY, screenRect.x + boxSize, boxY + boxSize);
 
-            // Draw Box
             glm::vec4 bColor = cb.boxColor;
             if (!cb.interactable) bColor *= 0.6f;
             else if (cb.isHovered) bColor += glm::vec4(0.1f, 0.1f, 0.1f, 0.0f);
@@ -420,12 +576,74 @@ void UIRenderPass::RenderEntityRecursively(Scene* scene, entt::entity entity)
         }
     }
 
+    bool clipScissor = false;
+    if (scene->HasComponent<UIScrollRectComponent>(entity))
+    {
+        clipScissor = true;
+    }
+    else if (scene->HasComponent<UIPanelComponent>(entity))
+    {
+        clipScissor = scene->GetComponent<UIPanelComponent>(entity).clipChildren;
+    }
+
+    if (scene->HasComponent<RectTransformComponent>(entity) && clipScissor)
+    {
+        const auto& rect = scene->GetComponent<RectTransformComponent>(entity);
+        UIRenderer::PushScissorRect(rect.computedScreenRect);
+    }
+
     if (scene->HasComponent<SceneTreeComponent>(entity))
     {
         const auto& children = scene->GetComponent<SceneTreeComponent>(entity).children;
-        for (auto child : children)
+
+        if (scene->HasComponent<UITabContainerComponent>(entity))
         {
-            RenderEntityRecursively(scene, child);
+            const auto& tabs = scene->GetComponent<UITabContainerComponent>(entity);
+            if (tabs.activeTabIndex >= 0 && tabs.activeTabIndex < (int)children.size())
+            {
+                RenderEntityRecursively(scene, children[tabs.activeTabIndex]);
+            }
+            else
+            {
+                for (auto child : children)
+                {
+                    RenderEntityRecursively(scene, child);
+                }
+            }
+        }
+        else
+        {
+            for (auto child : children)
+            {
+                RenderEntityRecursively(scene, child);
+            }
+        }
+    }
+
+    if (scene->HasComponent<RectTransformComponent>(entity) && clipScissor)
+    {
+        UIRenderer::PopScissorRect();
+    }
+
+    if (scene->HasComponent<RectTransformComponent>(entity) && scene->HasComponent<UIScrollRectComponent>(entity))
+    {
+        const auto& rect = scene->GetComponent<RectTransformComponent>(entity);
+        const auto& scroll = scene->GetComponent<UIScrollRectComponent>(entity);
+        const glm::vec4& screenRect = rect.computedScreenRect;
+        glm::vec2 rectCenter = { (screenRect.x + screenRect.z) * 0.5f, (screenRect.y + screenRect.w) * 0.5f };
+        float viewH = screenRect.w - screenRect.y;
+
+        if (scroll.showScrollbar && scroll.vertical && scroll.contentSize.y > viewH)
+        {
+            glm::vec4 trackRect = glm::vec4(screenRect.z - scroll.scrollbarWidth, screenRect.y, screenRect.z, screenRect.w);
+            UIRenderer::DrawQuadRotated(trackRect, rect.computedRotation, scroll.trackColor, 0, scroll.cornerRadius, rectCenter);
+
+            float thumbH = std::max(20.0f, viewH * (viewH / scroll.contentSize.y));
+            float maxTravel = viewH - thumbH;
+            float thumbY = screenRect.w - thumbH - (scroll.scrollPosition.y * maxTravel);
+            glm::vec4 thumbRect = glm::vec4(trackRect.x, thumbY, trackRect.z, thumbY + thumbH);
+            glm::vec4 thumbCol = (scroll.isDraggingVertical || scroll.isThumbHovered) ? scroll.thumbHoverColor : scroll.thumbColor;
+            UIRenderer::DrawQuadRotated(thumbRect, rect.computedRotation, thumbCol, 0, scroll.cornerRadius, rectCenter);
         }
     }
 }
@@ -442,7 +660,11 @@ void UIRenderPass::RenderEntityIDRecursively(Scene* scene, entt::entity entity, 
             scene->HasComponent<UIButtonComponent>(entity) ||
             scene->HasComponent<UISliderComponent>(entity) ||
             scene->HasComponent<UIProgressBarComponent>(entity) ||
-            scene->HasComponent<UICheckboxComponent>(entity))
+            scene->HasComponent<UICheckboxComponent>(entity) ||
+            scene->HasComponent<UIPanelComponent>(entity) ||
+            scene->HasComponent<UITextInputComponent>(entity) ||
+            scene->HasComponent<UIScrollRectComponent>(entity) ||
+            scene->HasComponent<UITabContainerComponent>(entity))
         {
             scene->AddComponent<RectTransformComponent>(entity);
         }
@@ -455,7 +677,11 @@ void UIRenderPass::RenderEntityIDRecursively(Scene* scene, entt::entity entity, 
                      scene->HasComponent<UITextComponent>(entity) ||
                      scene->HasComponent<UISliderComponent>(entity) ||
                      scene->HasComponent<UIProgressBarComponent>(entity) ||
-                     scene->HasComponent<UICheckboxComponent>(entity);
+                     scene->HasComponent<UICheckboxComponent>(entity) ||
+                     scene->HasComponent<UIPanelComponent>(entity) ||
+                     scene->HasComponent<UITextInputComponent>(entity) ||
+                     scene->HasComponent<UIScrollRectComponent>(entity) ||
+                     scene->HasComponent<UITabContainerComponent>(entity);
         if (hasUI)
         {
             const auto& rect = scene->GetComponent<RectTransformComponent>(entity);

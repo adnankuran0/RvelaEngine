@@ -3,6 +3,8 @@
 #include "glm/glm.hpp"
 #include "KeyCodes.h"
 #include "MouseCodes.h"
+#include <vector>
+#include <unordered_map>
 
 namespace rv { 
 
@@ -21,6 +23,8 @@ public:
 	static void Update() noexcept;
 
 	static void OnMouseScrolled(float xOffset, float yOffset) noexcept;
+	static void OnCharTyped(unsigned int codepoint) noexcept;
+	static const std::vector<uint32_t>& GetTypedCharacters() noexcept;
 
 	static bool IsKeyPressed(KeyCode key) noexcept;
 
@@ -68,6 +72,7 @@ private:
 	static glm::vec2 s_MouseDelta;
 	static glm::vec2 s_CurrentScrollDelta;
 	static glm::vec2 s_AccumulatedScrollDelta;
+	static std::vector<uint32_t> s_TypedCharacters;
 	static bool s_FirstMouse;
 	static bool s_GameplayInputEnabled;
 	static MouseMode s_RequestedMouseMode;

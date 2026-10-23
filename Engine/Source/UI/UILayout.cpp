@@ -138,9 +138,98 @@ void UILayout::UpdateLayoutRecursively(Scene* scene, entt::entity entity, const 
     if (scene->HasComponent<SceneTreeComponent>(entity))
     {
         const auto& children = scene->GetComponent<SceneTreeComponent>(entity).children;
+
+        if (scene->HasComponent<UILayoutGroupComponent>(entity))
+        {
+            const auto& lg = scene->GetComponent<UILayoutGroupComponent>(entity);
+            float usableW = std::max(0.0f, currentSize.x - lg.padding.x - lg.padding.z);
+            float usableH = std::max(0.0f, currentSize.y - lg.padding.y - lg.padding.w);
+
+            if (lg.type == UILayoutType::Vertical)
+            {
+                float currentTopY = currentSize.y - lg.padding.y;
+                for (auto child : children)
+                {
+                    if (!scene->IsEntityActive(child) || !scene->HasComponent<RectTransformComponent>(child))
+                        continue;
+
+                    auto& childRect = scene->GetComponent<RectTransformComponent>(child);
+                    if (lg.controlChildWidth)
+                        childRect.size.x = usableW;
+
+                    float childW = childRect.size.x * childRect.scale.x;
+                    float childH = childRect.size.y * childRect.scale.y;
+
+                    float childX = lg.padding.x;
+                    if (lg.alignment == UIChildAlignment::Center)
+                        childX += (usableW - childW) * 0.5f;
+                    else if (lg.alignment == UIChildAlignment::End)
+                        childX += usableW - childW;
+
+                    childRect.anchorMin = { 0.0f, 0.0f };
+                    childRect.anchorMax = { 0.0f, 0.0f };
+                    childRect.pivot = { 0.0f, 0.0f };
+                    childRect.position.x = childX;
+                    childRect.position.y = currentTopY - childH;
+
+                    currentTopY -= (childH + lg.spacing);
+                }
+            }
+            else // Horizontal
+            {
+                float currentLeftX = lg.padding.x;
+                for (auto child : children)
+                {
+                    if (!scene->IsEntityActive(child) || !scene->HasComponent<RectTransformComponent>(child))
+                        continue;
+
+                    auto& childRect = scene->GetComponent<RectTransformComponent>(child);
+                    if (lg.controlChildHeight)
+                        childRect.size.y = usableH;
+
+                    float childW = childRect.size.x * childRect.scale.x;
+                    float childH = childRect.size.y * childRect.scale.y;
+
+                    float childY = lg.padding.w;
+                    if (lg.alignment == UIChildAlignment::Center)
+                        childY += (usableH - childH) * 0.5f;
+                    else if (lg.alignment == UIChildAlignment::End)
+                        childY += usableH - childH;
+
+                    childRect.anchorMin = { 0.0f, 0.0f };
+                    childRect.anchorMax = { 0.0f, 0.0f };
+                    childRect.pivot = { 0.0f, 0.0f };
+                    childRect.position.x = currentLeftX;
+                    childRect.position.y = childY;
+
+                    currentLeftX += (childW + lg.spacing);
+                }
+            }
+        }
+
+        glm::vec2 childParentPos = currentPos;
+        glm::vec2 childParentSize = currentSize;
+
+        if (scene->HasComponent<UIScrollRectComponent>(entity))
+        {
+            const auto& scroll = scene->GetComponent<UIScrollRectComponent>(entity);
+            float maxScrollX = std::max(0.0f, scroll.contentSize.x - currentSize.x);
+            float maxScrollY = std::max(0.0f, scroll.contentSize.y - currentSize.y);
+            float offsetX = -std::clamp(scroll.scrollPosition.x, 0.0f, 1.0f) * maxScrollX;
+            float offsetY = std::clamp(scroll.scrollPosition.y, 0.0f, 1.0f) * maxScrollY;
+            childParentPos.x += offsetX;
+            childParentPos.y += offsetY;
+        }
+
+        if (scene->HasComponent<UITabContainerComponent>(entity))
+        {
+            const auto& tabs = scene->GetComponent<UITabContainerComponent>(entity);
+            childParentSize.y = std::max(10.0f, currentSize.y - tabs.tabHeight);
+        }
+
         for (auto child : children)
         {
-            UpdateLayoutRecursively(scene, child, currentPos, currentSize, currentCenter, currentRotation);
+            UpdateLayoutRecursively(scene, child, childParentPos, childParentSize, currentCenter, currentRotation);
         }
     }
 }

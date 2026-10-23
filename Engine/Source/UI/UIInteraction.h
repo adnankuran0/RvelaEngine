@@ -13,6 +13,7 @@ class UIInteraction
 public:
     static void UpdateInteractions(Scene* scene, float dt, const glm::vec2& viewportSize, const glm::vec2& mousePos, bool mousePressed, bool mouseHeld, bool mouseReleased);
     static void DispatchLuaCallback(Scene* scene, entt::entity entity, const std::string& callbackName, float param = 0.0f);
+    static void DispatchLuaCallbackString(Scene* scene, entt::entity entity, const std::string& callbackName, const std::string& param);
 };
 
 }

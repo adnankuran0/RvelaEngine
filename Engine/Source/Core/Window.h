@@ -84,6 +84,7 @@ private:
 	static void MouseScrolledCallback(GLFWwindow* window, double xoffset, double yoffset) noexcept;
 	static void FramebufferSizeCallback(GLFWwindow* window, int width, int height) noexcept;
 	static void FileDropCallback(GLFWwindow* window, int pathCount, const char* paths[]) noexcept;
+	static void CharCallback(GLFWwindow* window, unsigned int codepoint) noexcept;
 
 };
 

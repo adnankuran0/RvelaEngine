@@ -41,6 +41,7 @@ void Window::SetCallbacks() noexcept
     glfwSetScrollCallback(m_Window, MouseScrolledCallback);
     glfwSetFramebufferSizeCallback(m_Window, FramebufferSizeCallback);
     glfwSetDropCallback(m_Window, FileDropCallback);
+    glfwSetCharCallback(m_Window, CharCallback);
 }
 
 void Window::Init()
@@ -161,6 +162,11 @@ void Window::FramebufferSizeCallback(GLFWwindow* window, int width, int height) 
 void Window::FileDropCallback(GLFWwindow* window, int pathCount, const char* paths[]) noexcept
 {
     EventManager::PushEvent(new FileDroppedEvent(pathCount, paths));
+}
+
+void Window::CharCallback(GLFWwindow* window, unsigned int codepoint) noexcept
+{
+    Input::OnCharTyped(codepoint);
 }
 
 WindowSize Window::GetSize() noexcept

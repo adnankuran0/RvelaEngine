@@ -197,7 +197,13 @@ void DrawAddComponentEntry(const char* label, const char* searchFilter, entt::re
 					  std::is_same_v<T, UITextComponent> ||
 					  std::is_same_v<T, UIButtonComponent> ||
 					  std::is_same_v<T, UISliderComponent> ||
-					  std::is_same_v<T, UIProgressBarComponent>)
+					  std::is_same_v<T, UIProgressBarComponent> ||
+					  std::is_same_v<T, UICheckboxComponent> ||
+					  std::is_same_v<T, UIPanelComponent> ||
+					  std::is_same_v<T, UILayoutGroupComponent> ||
+					  std::is_same_v<T, UITextInputComponent> ||
+					  std::is_same_v<T, UIScrollRectComponent> ||
+					  std::is_same_v<T, UITabContainerComponent>)
 		{
 			if (!registry.any_of<RectTransformComponent>(entity))
 			{

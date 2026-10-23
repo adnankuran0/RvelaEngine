@@ -118,7 +118,7 @@ void PhysicsInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 						if (activeProj)
 							layerName = activeProj->GetSettings().GetPhysicsLayerNameByBit(i);
 						if (!layerName.empty())
-							ImGui::SetTooltip("Layer %d: %s", i + 1, layerName.c_str();
+							ImGui::SetTooltip("Layer %d: %s", i + 1, layerName.c_str());
 						else
 							ImGui::SetTooltip("Layer %d", i + 1);
 					}

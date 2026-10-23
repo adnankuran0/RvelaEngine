@@ -9,6 +9,7 @@ glm::vec2 Input::s_LastMousePosition = { 0.0f, 0.0f };
 glm::vec2 Input::s_MouseDelta = { 0.0f, 0.0f };
 glm::vec2 Input::s_CurrentScrollDelta = { 0.0f, 0.0f };
 glm::vec2 Input::s_AccumulatedScrollDelta = { 0.0f, 0.0f };
+std::vector<uint32_t> Input::s_TypedCharacters;
 bool Input::s_FirstMouse = true;
 bool Input::s_GameplayInputEnabled = true;
 Input::MouseMode Input::s_RequestedMouseMode = Input::MouseMode::VISIBLE;
@@ -21,6 +22,7 @@ void Input::BeginFrame() noexcept
 {
     s_CurrentScrollDelta = s_AccumulatedScrollDelta;
     s_AccumulatedScrollDelta = { 0.0f, 0.0f };
+    s_TypedCharacters.clear();
 
     GLFWwindow* window = Engine::Get()->GetWindow().GetGLFWWindow();
     if (window && s_GameplayInputEnabled)
@@ -50,6 +52,19 @@ void Input::BeginFrame() noexcept
 void Input::OnMouseScrolled(float xOffset, float yOffset) noexcept
 {
     s_AccumulatedScrollDelta += glm::vec2(xOffset, yOffset);
+}
+
+void Input::OnCharTyped(unsigned int codepoint) noexcept
+{
+    if (s_GameplayInputEnabled)
+    {
+        s_TypedCharacters.push_back(codepoint);
+    }
+}
+
+const std::vector<uint32_t>& Input::GetTypedCharacters() noexcept
+{
+    return s_TypedCharacters;
 }
 
 glm::vec2 Input::GetMouseDelta() noexcept

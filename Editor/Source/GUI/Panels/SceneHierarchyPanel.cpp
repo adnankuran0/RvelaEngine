@@ -1135,6 +1135,86 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                 }
                 registerCreatedEntity(cb);
             }
+            if (ImGui::MenuItem("UI Panel"))
+            {
+                entt::entity parent = EditorSelection::Get().GetPrimary();
+                entt::entity panel = scene.CreateEntity("UI Panel");
+                auto& rect = scene.AddComponent<RectTransformComponent>(panel);
+                rect.size = { 300.0f, 200.0f };
+                scene.AddComponent<UIPanelComponent>(panel);
+                if (registry.valid(parent) && parent != rootEntity)
+                {
+                    scene.SetParent(panel, parent);
+                }
+                registerCreatedEntity(panel);
+            }
+            if (ImGui::MenuItem("UI Vertical Container"))
+            {
+                entt::entity parent = EditorSelection::Get().GetPrimary();
+                entt::entity vbox = scene.CreateEntity("UI Vertical Container");
+                auto& rect = scene.AddComponent<RectTransformComponent>(vbox);
+                rect.size = { 200.0f, 300.0f };
+                auto& lg = scene.AddComponent<UILayoutGroupComponent>(vbox);
+                lg.type = UILayoutType::Vertical;
+                if (registry.valid(parent) && parent != rootEntity)
+                {
+                    scene.SetParent(vbox, parent);
+                }
+                registerCreatedEntity(vbox);
+            }
+            if (ImGui::MenuItem("UI Horizontal Container"))
+            {
+                entt::entity parent = EditorSelection::Get().GetPrimary();
+                entt::entity hbox = scene.CreateEntity("UI Horizontal Container");
+                auto& rect = scene.AddComponent<RectTransformComponent>(hbox);
+                rect.size = { 400.0f, 60.0f };
+                auto& lg = scene.AddComponent<UILayoutGroupComponent>(hbox);
+                lg.type = UILayoutType::Horizontal;
+                if (registry.valid(parent) && parent != rootEntity)
+                {
+                    scene.SetParent(hbox, parent);
+                }
+                registerCreatedEntity(hbox);
+            }
+            if (ImGui::MenuItem("UI Text Input"))
+            {
+                entt::entity parent = EditorSelection::Get().GetPrimary();
+                entt::entity input = scene.CreateEntity("UI Text Input");
+                auto& rect = scene.AddComponent<RectTransformComponent>(input);
+                rect.size = { 200.0f, 36.0f };
+                scene.AddComponent<UITextInputComponent>(input);
+                if (registry.valid(parent) && parent != rootEntity)
+                {
+                    scene.SetParent(input, parent);
+                }
+                registerCreatedEntity(input);
+            }
+            if (ImGui::MenuItem("UI Scroll View"))
+            {
+                entt::entity parent = EditorSelection::Get().GetPrimary();
+                entt::entity sv = scene.CreateEntity("UI Scroll View");
+                auto& rect = scene.AddComponent<RectTransformComponent>(sv);
+                rect.size = { 250.0f, 200.0f };
+                scene.AddComponent<UIScrollRectComponent>(sv);
+                if (registry.valid(parent) && parent != rootEntity)
+                {
+                    scene.SetParent(sv, parent);
+                }
+                registerCreatedEntity(sv);
+            }
+            if (ImGui::MenuItem("UI Tab Container"))
+            {
+                entt::entity parent = EditorSelection::Get().GetPrimary();
+                entt::entity tabs = scene.CreateEntity("UI Tab Container");
+                auto& rect = scene.AddComponent<RectTransformComponent>(tabs);
+                rect.size = { 350.0f, 250.0f };
+                scene.AddComponent<UITabContainerComponent>(tabs);
+                if (registry.valid(parent) && parent != rootEntity)
+                {
+                    scene.SetParent(tabs, parent);
+                }
+                registerCreatedEntity(tabs);
+            }
             ImGui::EndMenu();
         }
 

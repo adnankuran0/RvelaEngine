@@ -13,6 +13,11 @@ using UIButtonHandle = ComponentHandle<UIButtonComponent>;
 using UISliderHandle = ComponentHandle<UISliderComponent>;
 using UIProgressBarHandle = ComponentHandle<UIProgressBarComponent>;
 using UICheckboxHandle = ComponentHandle<UICheckboxComponent>;
+using UIPanelHandle = ComponentHandle<UIPanelComponent>;
+using UILayoutGroupHandle = ComponentHandle<UILayoutGroupComponent>;
+using UITextInputHandle = ComponentHandle<UITextInputComponent>;
+using UIScrollRectHandle = ComponentHandle<UIScrollRectComponent>;
+using UITabContainerHandle = ComponentHandle<UITabContainerComponent>;
 
 void LuaBindings::RegisterUIComponents(sol::state& lua)
 {
@@ -160,21 +165,13 @@ void LuaBindings::RegisterUIComponents(sol::state& lua)
             [](UIButtonHandle& h) { return h.Get() ? h.Get()->textColor : glm::vec4(1.0f); },
             [](UIButtonHandle& h, const glm::vec4& col) { if (auto* c = h.Get()) c->textColor = col; }
         ),
+        "fontSize", sol::property(
+            [](UIButtonHandle& h) { return h.Get() ? h.Get()->fontSize : 24.0f; },
+            [](UIButtonHandle& h, float sz) { if (auto* c = h.Get()) c->fontSize = sz; }
+        ),
         "isBold", sol::property(
             [](UIButtonHandle& h) { return h.Get() ? h.Get()->isBold : false; },
             [](UIButtonHandle& h, bool b) { if (auto* c = h.Get()) c->isBold = b; }
-        ),
-        "isOutline", sol::property(
-            [](UIButtonHandle& h) { return h.Get() ? h.Get()->isOutline : false; },
-            [](UIButtonHandle& h, bool b) { if (auto* c = h.Get()) c->isOutline = b; }
-        ),
-        "outlineSize", sol::property(
-            [](UIButtonHandle& h) { return h.Get() ? h.Get()->outlineSize : 1.0f; },
-            [](UIButtonHandle& h, float size) { if (auto* c = h.Get()) c->outlineSize = size; }
-        ),
-        "outlineColor", sol::property(
-            [](UIButtonHandle& h) { return h.Get() ? h.Get()->outlineColor : glm::vec4(0.0f, 0.0f, 0.0f, 1.0f); },
-            [](UIButtonHandle& h, const glm::vec4& col) { if (auto* c = h.Get()) c->outlineColor = col; }
         ),
         "normalColor", sol::property(
             [](UIButtonHandle& h) { return h.Get() ? h.Get()->normalColor : glm::vec4(1.0f); },
@@ -187,6 +184,30 @@ void LuaBindings::RegisterUIComponents(sol::state& lua)
         "pressedColor", sol::property(
             [](UIButtonHandle& h) { return h.Get() ? h.Get()->pressedColor : glm::vec4(1.0f); },
             [](UIButtonHandle& h, const glm::vec4& col) { if (auto* c = h.Get()) c->pressedColor = col; }
+        ),
+        "disabledColor", sol::property(
+            [](UIButtonHandle& h) { return h.Get() ? h.Get()->disabledColor : glm::vec4(1.0f); },
+            [](UIButtonHandle& h, const glm::vec4& col) { if (auto* c = h.Get()) c->disabledColor = col; }
+        ),
+        "normalTextureUUID", sol::property(
+            [](UIButtonHandle& h) { return h.Get() ? h.Get()->normalTextureUUID : AssetUUID::Invalid(); },
+            [](UIButtonHandle& h, const AssetUUID& u) { if (auto* c = h.Get()) c->normalTextureUUID = u; }
+        ),
+        "hoverTextureUUID", sol::property(
+            [](UIButtonHandle& h) { return h.Get() ? h.Get()->hoverTextureUUID : AssetUUID::Invalid(); },
+            [](UIButtonHandle& h, const AssetUUID& u) { if (auto* c = h.Get()) c->hoverTextureUUID = u; }
+        ),
+        "pressedTextureUUID", sol::property(
+            [](UIButtonHandle& h) { return h.Get() ? h.Get()->pressedTextureUUID : AssetUUID::Invalid(); },
+            [](UIButtonHandle& h, const AssetUUID& u) { if (auto* c = h.Get()) c->pressedTextureUUID = u; }
+        ),
+        "disabledTextureUUID", sol::property(
+            [](UIButtonHandle& h) { return h.Get() ? h.Get()->disabledTextureUUID : AssetUUID::Invalid(); },
+            [](UIButtonHandle& h, const AssetUUID& u) { if (auto* c = h.Get()) c->disabledTextureUUID = u; }
+        ),
+        "cornerRadius", sol::property(
+            [](UIButtonHandle& h) { return h.Get() ? h.Get()->cornerRadius : 0.0f; },
+            [](UIButtonHandle& h, float r) { if (auto* c = h.Get()) c->cornerRadius = r; }
         ),
         "luaCallback", sol::property(
             [](UIButtonHandle& h) { return h.Get() ? h.Get()->luaCallback : std::string(); },
@@ -246,9 +267,29 @@ void LuaBindings::RegisterUIComponents(sol::state& lua)
             [](UIProgressBarHandle& h) { return h.Get() ? h.Get()->value : 0.0f; },
             [](UIProgressBarHandle& h, float val) { if (auto* c = h.Get()) c->value = val; }
         ),
+        "backgroundColor", sol::property(
+            [](UIProgressBarHandle& h) { return h.Get() ? h.Get()->backgroundColor : glm::vec4(1.0f); },
+            [](UIProgressBarHandle& h, const glm::vec4& col) { if (auto* c = h.Get()) c->backgroundColor = col; }
+        ),
         "fillColor", sol::property(
             [](UIProgressBarHandle& h) { return h.Get() ? h.Get()->fillColor : glm::vec4(1.0f); },
             [](UIProgressBarHandle& h, const glm::vec4& col) { if (auto* c = h.Get()) c->fillColor = col; }
+        ),
+        "backgroundTextureUUID", sol::property(
+            [](UIProgressBarHandle& h) { return h.Get() ? h.Get()->backgroundTextureUUID : AssetUUID::Invalid(); },
+            [](UIProgressBarHandle& h, const AssetUUID& u) { if (auto* c = h.Get()) c->backgroundTextureUUID = u; }
+        ),
+        "fillTextureUUID", sol::property(
+            [](UIProgressBarHandle& h) { return h.Get() ? h.Get()->fillTextureUUID : AssetUUID::Invalid(); },
+            [](UIProgressBarHandle& h, const AssetUUID& u) { if (auto* c = h.Get()) c->fillTextureUUID = u; }
+        ),
+        "showPercentageText", sol::property(
+            [](UIProgressBarHandle& h) { return h.Get() ? h.Get()->showPercentageText : false; },
+            [](UIProgressBarHandle& h, bool b) { if (auto* c = h.Get()) c->showPercentageText = b; }
+        ),
+        "direction", sol::property(
+            [](UIProgressBarHandle& h) { return h.Get() ? static_cast<int>(h.Get()->direction) : 0; },
+            [](UIProgressBarHandle& h, int d) { if (auto* c = h.Get()) c->direction = static_cast<UIProgressBarDirection>(d); }
         )
     );
 
@@ -289,6 +330,192 @@ void LuaBindings::RegisterUIComponents(sol::state& lua)
         }
     );
 
+    lua.new_usertype<UIPanelHandle>("UIPanelComponent",
+        "IsValid", &UIPanelHandle::IsValid,
+        "backgroundColor", sol::property(
+            [](UIPanelHandle& h) { return h.Get() ? h.Get()->backgroundColor : glm::vec4(1.0f); },
+            [](UIPanelHandle& h, const glm::vec4& col) { if (auto* c = h.Get()) c->backgroundColor = col; }
+        ),
+        "borderColor", sol::property(
+            [](UIPanelHandle& h) { return h.Get() ? h.Get()->borderColor : glm::vec4(1.0f); },
+            [](UIPanelHandle& h, const glm::vec4& col) { if (auto* c = h.Get()) c->borderColor = col; }
+        ),
+        "borderThickness", sol::property(
+            [](UIPanelHandle& h) { return h.Get() ? h.Get()->borderThickness : 0.0f; },
+            [](UIPanelHandle& h, float f) { if (auto* c = h.Get()) c->borderThickness = f; }
+        ),
+        "cornerRadius", sol::property(
+            [](UIPanelHandle& h) { return h.Get() ? h.Get()->cornerRadius : 0.0f; },
+            [](UIPanelHandle& h, float r) { if (auto* c = h.Get()) c->cornerRadius = r; }
+        ),
+        "title", sol::property(
+            [](UIPanelHandle& h) { return h.Get() ? h.Get()->title : std::string(); },
+            [](UIPanelHandle& h, const std::string& t) { if (auto* c = h.Get()) c->title = t; }
+        ),
+        "isDraggable", sol::property(
+            [](UIPanelHandle& h) { return h.Get() ? h.Get()->isDraggable : false; },
+            [](UIPanelHandle& h, bool b) { if (auto* c = h.Get()) c->isDraggable = b; }
+        ),
+        "clipChildren", sol::property(
+            [](UIPanelHandle& h) { return h.Get() ? h.Get()->clipChildren : false; },
+            [](UIPanelHandle& h, bool b) { if (auto* c = h.Get()) c->clipChildren = b; }
+        )
+    );
+
+    lua.new_usertype<UILayoutGroupHandle>("UILayoutGroupComponent",
+        "IsValid", &UILayoutGroupHandle::IsValid,
+        "type", sol::property(
+            [](UILayoutGroupHandle& h) { return h.Get() ? static_cast<int>(h.Get()->type) : 0; },
+            [](UILayoutGroupHandle& h, int t) { if (auto* c = h.Get()) c->type = static_cast<UILayoutType>(t); }
+        ),
+        "spacing", sol::property(
+            [](UILayoutGroupHandle& h) { return h.Get() ? h.Get()->spacing : 0.0f; },
+            [](UILayoutGroupHandle& h, float s) { if (auto* c = h.Get()) c->spacing = s; }
+        ),
+        "fitChildren", sol::property(
+            [](UILayoutGroupHandle& h) { return h.Get() ? h.Get()->fitChildren : false; },
+            [](UILayoutGroupHandle& h, bool b) { if (auto* c = h.Get()) c->fitChildren = b; }
+        ),
+        "controlChildWidth", sol::property(
+            [](UILayoutGroupHandle& h) { return h.Get() ? h.Get()->controlChildWidth : false; },
+            [](UILayoutGroupHandle& h, bool b) { if (auto* c = h.Get()) c->controlChildWidth = b; }
+        ),
+        "controlChildHeight", sol::property(
+            [](UILayoutGroupHandle& h) { return h.Get() ? h.Get()->controlChildHeight : false; },
+            [](UILayoutGroupHandle& h, bool b) { if (auto* c = h.Get()) c->controlChildHeight = b; }
+        )
+    );
+
+    lua.new_usertype<UITextInputHandle>("UITextInputComponent",
+        "IsValid", &UITextInputHandle::IsValid,
+        "text", sol::property(
+            [](UITextInputHandle& h) { return h.Get() ? h.Get()->text : std::string(); },
+            [](UITextInputHandle& h, const std::string& t) { if (auto* c = h.Get()) c->text = t; }
+        ),
+        "placeholder", sol::property(
+            [](UITextInputHandle& h) { return h.Get() ? h.Get()->placeholder : std::string(); },
+            [](UITextInputHandle& h, const std::string& p) { if (auto* c = h.Get()) c->placeholder = p; }
+        ),
+        "isPassword", sol::property(
+            [](UITextInputHandle& h) { return h.Get() ? h.Get()->isPassword : false; },
+            [](UITextInputHandle& h, bool b) { if (auto* c = h.Get()) c->isPassword = b; }
+        ),
+        "interactable", sol::property(
+            [](UITextInputHandle& h) { return h.Get() ? h.Get()->interactable : true; },
+            [](UITextInputHandle& h, bool b) { if (auto* c = h.Get()) c->interactable = b; }
+        ),
+        "isFocused", sol::property(
+            [](UITextInputHandle& h) { return h.Get() ? h.Get()->isFocused : false; },
+            [](UITextInputHandle& h, bool b) { if (auto* c = h.Get()) c->isFocused = b; }
+        ),
+        "luaCallback", sol::property(
+            [](UITextInputHandle& h) { return h.Get() ? h.Get()->luaCallback : std::string(); },
+            [](UITextInputHandle& h, const std::string& cb) { if (auto* c = h.Get()) c->luaCallback = cb; }
+        ),
+        "luaSubmitCallback", sol::property(
+            [](UITextInputHandle& h) { return h.Get() ? h.Get()->luaSubmitCallback : std::string(); },
+            [](UITextInputHandle& h, const std::string& cb) { if (auto* c = h.Get()) c->luaSubmitCallback = cb; }
+        ),
+        "OnValueChanged", [](UITextInputHandle& h, sol::protected_function func) {
+            if (auto* c = h.Get()) {
+                c->onValueChanged = [func](const std::string& str) {
+                    if (func.valid()) {
+                        auto result = func(str);
+                        if (!result.valid()) {
+                            sol::error err = result;
+                            LOG_ERROR("Lua TextInput OnValueChanged error: {}", err.what());
+                        }
+                    }
+                };
+            }
+        },
+        "OnSubmit", [](UITextInputHandle& h, sol::protected_function func) {
+            if (auto* c = h.Get()) {
+                c->onSubmit = [func](const std::string& str) {
+                    if (func.valid()) {
+                        auto result = func(str);
+                        if (!result.valid()) {
+                            sol::error err = result;
+                            LOG_ERROR("Lua TextInput OnSubmit error: {}", err.what());
+                        }
+                    }
+                };
+            }
+        }
+    );
+
+    lua.new_usertype<UIScrollRectHandle>("UIScrollRectComponent",
+        "IsValid", &UIScrollRectHandle::IsValid,
+        "horizontal", sol::property(
+            [](UIScrollRectHandle& h) { return h.Get() ? h.Get()->horizontal : false; },
+            [](UIScrollRectHandle& h, bool b) { if (auto* c = h.Get()) c->horizontal = b; }
+        ),
+        "vertical", sol::property(
+            [](UIScrollRectHandle& h) { return h.Get() ? h.Get()->vertical : true; },
+            [](UIScrollRectHandle& h, bool b) { if (auto* c = h.Get()) c->vertical = b; }
+        ),
+        "scrollPosition", sol::property(
+            [](UIScrollRectHandle& h) { return h.Get() ? h.Get()->scrollPosition : glm::vec2(0.0f); },
+            [](UIScrollRectHandle& h, const glm::vec2& p) { if (auto* c = h.Get()) c->scrollPosition = p; }
+        ),
+        "contentSize", sol::property(
+            [](UIScrollRectHandle& h) { return h.Get() ? h.Get()->contentSize : glm::vec2(0.0f); },
+            [](UIScrollRectHandle& h, const glm::vec2& s) { if (auto* c = h.Get()) c->contentSize = s; }
+        ),
+        "scrollSpeed", sol::property(
+            [](UIScrollRectHandle& h) { return h.Get() ? h.Get()->scrollSpeed : 30.0f; },
+            [](UIScrollRectHandle& h, float s) { if (auto* c = h.Get()) c->scrollSpeed = s; }
+        ),
+        "showScrollbar", sol::property(
+            [](UIScrollRectHandle& h) { return h.Get() ? h.Get()->showScrollbar : true; },
+            [](UIScrollRectHandle& h, bool b) { if (auto* c = h.Get()) c->showScrollbar = b; }
+        ),
+        "OnScroll", [](UIScrollRectHandle& h, sol::protected_function func) {
+            if (auto* c = h.Get()) {
+                c->onScroll = [func](const glm::vec2& pos) {
+                    if (func.valid()) {
+                        auto result = func(pos);
+                        if (!result.valid()) {
+                            sol::error err = result;
+                            LOG_ERROR("Lua ScrollRect OnScroll error: {}", err.what());
+                        }
+                    }
+                };
+            }
+        }
+    );
+
+    lua.new_usertype<UITabContainerHandle>("UITabContainerComponent",
+        "IsValid", &UITabContainerHandle::IsValid,
+        "activeTabIndex", sol::property(
+            [](UITabContainerHandle& h) { return h.Get() ? h.Get()->activeTabIndex : 0; },
+            [](UITabContainerHandle& h, int idx) { if (auto* c = h.Get()) c->activeTabIndex = idx; }
+        ),
+        "tabHeight", sol::property(
+            [](UITabContainerHandle& h) { return h.Get() ? h.Get()->tabHeight : 34.0f; },
+            [](UITabContainerHandle& h, float th) { if (auto* c = h.Get()) c->tabHeight = th; }
+        ),
+        "AddTab", [](UITabContainerHandle& h, const std::string& title) {
+            if (auto* c = h.Get()) c->tabTitles.push_back(title);
+        },
+        "GetTabCount", [](UITabContainerHandle& h) -> int {
+            return h.Get() ? static_cast<int>(h.Get()->tabTitles.size()) : 0;
+        },
+        "OnTabChanged", [](UITabContainerHandle& h, sol::protected_function func) {
+            if (auto* c = h.Get()) {
+                c->onTabChanged = [func](int idx) {
+                    if (func.valid()) {
+                        auto result = func(idx);
+                        if (!result.valid()) {
+                            sol::error err = result;
+                            LOG_ERROR("Lua TabContainer OnTabChanged error: {}", err.what());
+                        }
+                    }
+                };
+            }
+        }
+    );
+
     lua.new_enum<TextAlignment>("TextAlignment", {
         { "Left", TextAlignment::Left },
         { "Center", TextAlignment::Center },
@@ -299,5 +526,23 @@ void LuaBindings::RegisterUIComponents(sol::state& lua)
         { "Top", TextVerticalAlignment::Top },
         { "Middle", TextVerticalAlignment::Middle },
         { "Bottom", TextVerticalAlignment::Bottom }
+    });
+
+    lua.new_enum<UILayoutType>("UILayoutType", {
+        { "Vertical", UILayoutType::Vertical },
+        { "Horizontal", UILayoutType::Horizontal }
+    });
+
+    lua.new_enum<UIChildAlignment>("UIChildAlignment", {
+        { "Start", UIChildAlignment::Start },
+        { "Center", UIChildAlignment::Center },
+        { "End", UIChildAlignment::End }
+    });
+
+    lua.new_enum<UIProgressBarDirection>("UIProgressBarDirection", {
+        { "LeftToRight", UIProgressBarDirection::LeftToRight },
+        { "RightToLeft", UIProgressBarDirection::RightToLeft },
+        { "BottomToTop", UIProgressBarDirection::BottomToTop },
+        { "TopToBottom", UIProgressBarDirection::TopToBottom }
     });
 }

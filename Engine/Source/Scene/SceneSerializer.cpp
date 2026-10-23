@@ -399,6 +399,21 @@ json SceneSerializer::SerializeEntity(Scene& scene, entt::entity e, bool seriali
     if (scene.HasComponent<UICheckboxComponent>(e))
         j["UICheckboxComponent"] = scene.GetComponent<UICheckboxComponent>(e).Serialize();
 
+    if (scene.HasComponent<UIPanelComponent>(e))
+        j["UIPanelComponent"] = scene.GetComponent<UIPanelComponent>(e).Serialize();
+
+    if (scene.HasComponent<UILayoutGroupComponent>(e))
+        j["UILayoutGroupComponent"] = scene.GetComponent<UILayoutGroupComponent>(e).Serialize();
+
+    if (scene.HasComponent<UITextInputComponent>(e))
+        j["UITextInputComponent"] = scene.GetComponent<UITextInputComponent>(e).Serialize();
+
+    if (scene.HasComponent<UIScrollRectComponent>(e))
+        j["UIScrollRectComponent"] = scene.GetComponent<UIScrollRectComponent>(e).Serialize();
+
+    if (scene.HasComponent<UITabContainerComponent>(e))
+        j["UITabContainerComponent"] = scene.GetComponent<UITabContainerComponent>(e).Serialize();
+
     return j;
 }
 
@@ -536,6 +551,21 @@ void SceneSerializer::DeserializeEntityComponents(Scene& scene, entt::entity han
 
     if (entityJson.contains("UICheckboxComponent"))
         scene.AddComponent<UICheckboxComponent>(handle).Deserialize(entityJson["UICheckboxComponent"]);
+
+    if (entityJson.contains("UIPanelComponent"))
+        scene.AddComponent<UIPanelComponent>(handle).Deserialize(entityJson["UIPanelComponent"]);
+
+    if (entityJson.contains("UILayoutGroupComponent"))
+        scene.AddComponent<UILayoutGroupComponent>(handle).Deserialize(entityJson["UILayoutGroupComponent"]);
+
+    if (entityJson.contains("UITextInputComponent"))
+        scene.AddComponent<UITextInputComponent>(handle).Deserialize(entityJson["UITextInputComponent"]);
+
+    if (entityJson.contains("UIScrollRectComponent"))
+        scene.AddComponent<UIScrollRectComponent>(handle).Deserialize(entityJson["UIScrollRectComponent"]);
+
+    if (entityJson.contains("UITabContainerComponent"))
+        scene.AddComponent<UITabContainerComponent>(handle).Deserialize(entityJson["UITabContainerComponent"]);
 
     if (entityJson.contains("Prefab"))
     {

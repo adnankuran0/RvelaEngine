@@ -56,6 +56,11 @@ void AddComponentPopup::Draw(Scene& scene, entt::entity selectedEntity)
 		UI::DrawAddComponentEntry<UISliderComponent>("UI Slider", filterBuf, registry, selectedEntity);
 		UI::DrawAddComponentEntry<UIProgressBarComponent>("UI Progress Bar", filterBuf, registry, selectedEntity);
 		UI::DrawAddComponentEntry<UICheckboxComponent>("UI Checkbox", filterBuf, registry, selectedEntity);
+		UI::DrawAddComponentEntry<UIPanelComponent>("UI Panel", filterBuf, registry, selectedEntity);
+		UI::DrawAddComponentEntry<UILayoutGroupComponent>("UI Layout Group", filterBuf, registry, selectedEntity);
+		UI::DrawAddComponentEntry<UITextInputComponent>("UI Text Input", filterBuf, registry, selectedEntity);
+		UI::DrawAddComponentEntry<UIScrollRectComponent>("UI Scroll Rect", filterBuf, registry, selectedEntity);
+		UI::DrawAddComponentEntry<UITabContainerComponent>("UI Tab Container", filterBuf, registry, selectedEntity);
 
 		if (!ImGui::IsPopupOpen("AddComponentPopup"))
 			filterBuf[0] = '\0';

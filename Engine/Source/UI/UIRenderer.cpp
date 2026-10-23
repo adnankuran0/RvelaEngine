@@ -22,6 +22,7 @@ uint32_t UIRenderer::s_ActiveTextureID = 0;
 float UIRenderer::s_ViewportWidth = 1920.0f;
 float UIRenderer::s_ViewportHeight = 1080.0f;
 glm::mat4 UIRenderer::s_ProjectionMatrix = glm::mat4(1.0f);
+static std::vector<glm::vec4> s_ScissorStack;
 
 static uint32_t CreateGLTexture(uint32_t width, uint32_t height, const void* data)
 {
@@ -145,6 +146,11 @@ void UIRenderer::Begin(float viewportWidth, float viewportHeight, const glm::mat
 void UIRenderer::End()
 {
     Flush();
+    if (!s_ScissorStack.empty())
+    {
+        s_ScissorStack.clear();
+        glDisable(GL_SCISSOR_TEST);
+    }
 }
 
 void UIRenderer::Flush()
@@ -588,13 +594,57 @@ void UIRenderer::SetScissor(int x, int y, int width, int height)
 {
     Flush();
     glEnable(GL_SCISSOR_TEST);
-    glScissor(x, y, width, height);
+    glScissor(x, y, std::max(0, width), std::max(0, height));
 }
 
 void UIRenderer::ResetScissor()
 {
     Flush();
     glDisable(GL_SCISSOR_TEST);
+}
+
+void UIRenderer::PushScissorRect(const glm::vec4& screenRect)
+{
+    glm::vec4 effective = screenRect;
+    if (!s_ScissorStack.empty())
+    {
+        const glm::vec4& parent = s_ScissorStack.back();
+        effective.x = std::max(screenRect.x, parent.x);
+        effective.y = std::max(screenRect.y, parent.y);
+        effective.z = std::min(screenRect.z, parent.z);
+        effective.w = std::min(screenRect.w, parent.w);
+        if (effective.z < effective.x) effective.z = effective.x;
+        if (effective.w < effective.y) effective.w = effective.y;
+    }
+    s_ScissorStack.push_back(effective);
+
+    int sx = static_cast<int>(std::floor(effective.x));
+    int sy = static_cast<int>(std::floor(effective.y));
+    int sw = static_cast<int>(std::ceil(effective.z - effective.x));
+    int sh = static_cast<int>(std::ceil(effective.w - effective.y));
+    SetScissor(sx, sy, sw, sh);
+}
+
+void UIRenderer::PopScissorRect()
+{
+    if (!s_ScissorStack.empty())
+    {
+        s_ScissorStack.pop_back();
+    }
+
+    if (!s_ScissorStack.empty())
+    {
+        const glm::vec4& top = s_ScissorStack.back();
+        int sx = static_cast<int>(std::floor(top.x));
+        int sy = static_cast<int>(std::floor(top.y));
+        int sw = static_cast<int>(std::ceil(top.z - top.x));
+        int sh = static_cast<int>(std::ceil(top.w - top.y));
+        SetScissor(sx, sy, sw, sh);
+    }
+    else
+    {
+        ResetScissor();
+    }
 }
 
 }
