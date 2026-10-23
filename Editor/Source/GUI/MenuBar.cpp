@@ -16,6 +16,7 @@
 #include "Commands/CommandHistory.h"
 #include "Renderer/RenderLayer.h"
 #include "Panels/ImportSettingsPanel.h"
+#include "Style.h"
 
 using namespace rv;
 
@@ -184,6 +185,28 @@ void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter,
                         importSettingsPanel->Close();
                 }
             }
+
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Theme"))
+        {
+            EditorTheme currentTheme = GetCurrentTheme();
+            auto ThemeItem = [&](const char* name, EditorTheme theme) {
+                bool selected = (currentTheme == theme);
+                if (ImGui::MenuItem(name, nullptr, selected))
+                {
+                    ApplyTheme(theme);
+                    EditorSettings::Get().Theme = static_cast<int>(theme);
+                    EditorSettings::Get().Save();
+                }
+            };
+
+            ThemeItem("Deep Slate (Midnight)", EditorTheme::DeepSlate);
+            ThemeItem("Tokyo Night (Violet)", EditorTheme::TokyoNight);
+            ThemeItem("Catppuccin (Mocha)", EditorTheme::Catppuccin);
+            ThemeItem("Obsidian (Carbon)", EditorTheme::ObsidianCarbon);
+            ThemeItem("Warm Charcoal (Amber)", EditorTheme::WarmCharcoal);
 
             ImGui::EndMenu();
         }

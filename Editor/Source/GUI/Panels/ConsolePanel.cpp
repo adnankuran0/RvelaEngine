@@ -1,6 +1,7 @@
 #include "ConsolePanel.h"
 #include "Core/EditorConsoleSink.h"
 #include "ImGui/imgui.h"
+#include "GUI/Style.h"
 
 using namespace rv;
 void ConsolePanel::Draw()
@@ -29,15 +30,21 @@ void ConsolePanel::Draw()
     ImGui::SameLine();
 
     snprintf(buf, sizeof(buf), "Warn (%u)", sink.GetWarnCount());
+    if (sink.GetWarnCount() > 0) ImGui::PushStyleColor(ImGuiCol_Text, GetWarningColor());
     ImGui::Checkbox(buf, &m_ShowWarn);
+    if (sink.GetWarnCount() > 0) ImGui::PopStyleColor();
     ImGui::SameLine();
 
     snprintf(buf, sizeof(buf), "Error (%u)", sink.GetErrorCount());
+    if (sink.GetErrorCount() > 0) ImGui::PushStyleColor(ImGuiCol_Text, GetErrorColor());
     ImGui::Checkbox(buf, &m_ShowError);
+    if (sink.GetErrorCount() > 0) ImGui::PopStyleColor();
     ImGui::SameLine();
 
     snprintf(buf, sizeof(buf), "Lua (%u)", sink.GetLuaCount());
+    if (sink.GetLuaCount() > 0) ImGui::PushStyleColor(ImGuiCol_Text, GetAccentHoverColor());
     ImGui::Checkbox(buf, &m_ShowLua);
+    if (sink.GetLuaCount() > 0) ImGui::PopStyleColor();
 
     ImGui::Separator();
 

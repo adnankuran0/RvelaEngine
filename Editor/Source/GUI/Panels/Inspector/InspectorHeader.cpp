@@ -7,6 +7,7 @@
 #include "Scene/Entity.h"
 #include "Commands/CommandHistory.h"
 #include "Commands/PrefabCommands.h"
+#include "GUI/Style.h"
 #include <cstring>
 #include <string>
 
@@ -64,12 +65,13 @@ bool InspectorHeader::Draw(Scene& scene, entt::entity selectedEntity)
 		std::string prefabName = EditorUtils::GetAssetFileName(pUUID);
 		if (prefabName.empty()) prefabName = "Prefab Asset";
 
-		ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.22f, 0.35f, 0.55f, 0.8f));
+		ImVec4 accHdr = GetAccentColor();
+		ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(accHdr.x, accHdr.y, accHdr.z, 0.40f));
 		if (ImGui::CollapsingHeader("Prefab Instance", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			ImGui::TextDisabled("Source:");
 			ImGui::SameLine();
-			ImGui::TextColored(ImVec4(0.4f, 0.8f, 1.0f, 1.0f), "%s", prefabName.c_str());
+			ImGui::TextColored(GetAccentHoverColor(), "%s", prefabName.c_str());
 
 			static entt::entity s_CachedPrefabEntity = entt::null;
 			static json s_CachedOverrides = json::array();

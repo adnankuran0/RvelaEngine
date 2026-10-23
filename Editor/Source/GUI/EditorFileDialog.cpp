@@ -4,6 +4,7 @@
 #include "Renderer/Texture.h"
 #include "Utils/ProjectManager.h"
 #include "Core/Log.h"
+#include "Style.h"
 #include <algorithm>
 #include <system_error>
 
@@ -387,7 +388,7 @@ void EditorFileDialog::InternalDraw()
         const float sidebarWidth = 150.0f;
 
         ImGui::BeginChild("##QuickAccessSidebar", ImVec2(sidebarWidth, -footerHeight), true);
-        ImGui::TextColored(ImVec4(0.62f, 0.56f, 0.80f, 1.0f), "Quick Access");
+        ImGui::TextColored(GetAccentColor(), "Quick Access");
         ImGui::Separator();
         ImGui::Spacing();
 
@@ -617,10 +618,10 @@ void EditorFileDialog::InternalDraw()
         }
 
         if (!canConfirm) ImGui::BeginDisabled();
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.62f, 0.56f, 0.80f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.70f, 0.64f, 0.88f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.55f, 0.50f, 0.72f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.08f, 0.08f, 0.12f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_Button, GetAccentColor());
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, GetAccentHoverColor());
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, GetAccentActiveColor());
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
 
         if (ImGui::Button(confirmBtnText, ImVec2(buttonWidth, 26.0f)))
         {

@@ -19,8 +19,120 @@
 #include "Commands/EntityLifecycleCommands.h"
 #include "Commands/ReparentCommand.h"
 #include "Commands/PrefabCommands.h"
+#include "GUI/Style.h"
+#include "Render/IconLibrary.h"
+#include "Renderer/Texture.h"
+#include "Scene/Components/CameraComponent.h"
+#include "Scene/Components/DirectionalLightComponent.h"
+#include "Scene/Components/PointLightComponent.h"
+#include "Scene/Components/SpotLightComponent.h"
+#include "Scene/Components/AudioEmitterComponent.h"
+#include "Scene/Components/ParticleEmitterComponent.h"
+#include "Scene/Components/ScriptComponent.h"
+#include "Scene/Components/AnimatorComponent.h"
+#include "Scene/Components/SkeletonComponent.h"
+#include "Scene/Components/UIComponents.h"
 
 using namespace rv;
+
+struct EntityVisualInfo
+{
+    ImTextureID icon = 0;
+    ImVec4 iconTint = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+};
+
+static EntityVisualInfo GetEntityVisualInfo(Scene& scene, entt::entity e, bool isPrefab)
+{
+    EntityVisualInfo info;
+    auto& iconLib = IconLibrary::Get();
+
+    if (isPrefab)
+    {
+        info.icon = (ImTextureID)(intptr_t)iconLib.GetIcon(EditorIcon::Prefab).GetID();
+        info.iconTint = GetAccentColor();
+        return info;
+    }
+
+    if (scene.HasComponent<CameraComponent>(e))
+    {
+        info.icon = (ImTextureID)(intptr_t)iconLib.GetIcon(EditorIcon::Camera).GetID();
+        info.iconTint = ImVec4(0.38f, 0.76f, 0.98f, 1.0f);
+        return info;
+    }
+
+    if (scene.HasComponent<DirectionalLightComponent>(e))
+    {
+        info.icon = (ImTextureID)(intptr_t)iconLib.GetIcon(EditorIcon::DirectionalLight).GetID();
+        info.iconTint = ImVec4(0.98f, 0.82f, 0.28f, 1.0f);
+        return info;
+    }
+
+    if (scene.HasComponent<PointLightComponent>(e))
+    {
+        info.icon = (ImTextureID)(intptr_t)iconLib.GetIcon(EditorIcon::PointLight).GetID();
+        info.iconTint = ImVec4(0.98f, 0.75f, 0.20f, 1.0f);
+        return info;
+    }
+
+    if (scene.HasComponent<SpotLightComponent>(e))
+    {
+        info.icon = (ImTextureID)(intptr_t)iconLib.GetIcon(EditorIcon::SpotLight).GetID();
+        info.iconTint = ImVec4(0.98f, 0.70f, 0.15f, 1.0f);
+        return info;
+    }
+
+    if (scene.HasComponent<AudioEmitterComponent>(e))
+    {
+        info.icon = (ImTextureID)(intptr_t)iconLib.GetIcon(EditorIcon::AudioEmitter).GetID();
+        info.iconTint = ImVec4(0.78f, 0.60f, 0.98f, 1.0f);
+        return info;
+    }
+
+    if (scene.HasComponent<ParticleEmitterComponent>(e))
+    {
+        info.icon = (ImTextureID)(intptr_t)iconLib.GetIcon(EditorIcon::ParticleEmitter).GetID();
+        info.iconTint = ImVec4(0.98f, 0.55f, 0.35f, 1.0f);
+        return info;
+    }
+
+    if (scene.HasComponent<MeshComponent>(e) || scene.HasComponent<MeshRendererComponent>(e))
+    {
+        info.icon = (ImTextureID)(intptr_t)iconLib.GetIcon(EditorIcon::Mesh).GetID();
+        info.iconTint = ImVec4(0.55f, 0.75f, 0.90f, 1.0f);
+        return info;
+    }
+
+    if (scene.HasComponent<AnimatorComponent>(e))
+    {
+        info.icon = (ImTextureID)(intptr_t)iconLib.GetIcon(EditorIcon::AnimLib).GetID();
+        info.iconTint = ImVec4(0.95f, 0.60f, 0.75f, 1.0f);
+        return info;
+    }
+
+    if (scene.HasComponent<SkeletonComponent>(e))
+    {
+        info.icon = (ImTextureID)(intptr_t)iconLib.GetIcon(EditorIcon::Skeleton).GetID();
+        info.iconTint = ImVec4(0.85f, 0.70f, 0.95f, 1.0f);
+        return info;
+    }
+
+    if (scene.HasComponent<UICanvasComponent>(e) || scene.HasComponent<RectTransformComponent>(e))
+    {
+        info.icon = (ImTextureID)(intptr_t)iconLib.GetIcon(EditorIcon::Texture).GetID();
+        info.iconTint = ImVec4(0.40f, 0.78f, 0.90f, 1.0f);
+        return info;
+    }
+
+    if (scene.HasComponent<ScriptComponent>(e))
+    {
+        info.icon = (ImTextureID)(intptr_t)iconLib.GetIcon(EditorIcon::Script).GetID();
+        info.iconTint = ImVec4(0.40f, 0.85f, 0.60f, 1.0f);
+        return info;
+    }
+
+    info.icon = 0;
+    return info;
+}
 
 static Ref<MeshAsset> ResolvePrimitiveMesh(const std::string& primitiveMeshName, AssetUUID& outMeshUUID)
 {
@@ -216,15 +328,100 @@ void SceneHierarchyPanel::Draw(Engine* engine)
     ImGui::Begin("Scene Hierarchy", nullptr, ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoCollapse);
 
     static char searchFilter[128] = "";
-    ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.17f, 0.17f, 0.23f, 1.0f));
-    ImGui::SetNextItemWidth(-ImGui::GetFrameHeightWithSpacing());
+
+    float quickAddBtnWidth = 26.0f;
+    float searchWidth = ImGui::GetContentRegionAvail().x - quickAddBtnWidth - 6.0f;
+
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 5.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(8.0f, 4.0f));
+
+    ImGui::SetNextItemWidth(searchWidth);
     ImGui::InputTextWithHint("##HierarchySearch", "Search Entities...", searchFilter, sizeof(searchFilter));
-    ImGui::SameLine();
-    if (ImGui::SmallButton("X##ClearHierarchySearch"))
-        searchFilter[0] = '\0';
-    if (ImGui::IsItemHovered())
-        ImGui::SetTooltip("Clear search");
-    ImGui::PopStyleColor();
+
+    if (searchFilter[0] != '\0')
+    {
+        ImGui::SameLine(searchWidth - 20.0f);
+        if (ImGui::SmallButton("x##ClearSearch"))
+            searchFilter[0] = '\0';
+    }
+
+    ImGui::SameLine(0, 6.0f);
+    if (ImGui::Button("+##QuickAddEntity", ImVec2(quickAddBtnWidth, 0.0f)))
+    {
+        ImGui::OpenPopup("HierarchyQuickAddPopup");
+    }
+
+    ImGui::PopStyleVar(2); 
+
+    auto registerCreatedEntity = [&](entt::entity handle) {
+        if (handle != entt::null && registry.valid(handle))
+        {
+            CommandHistory::Get().Execute(std::make_unique<CreateEntityCommand>(&scene, handle));
+            selectSingle(handle);
+        }
+    };
+
+    if (ImGui::BeginPopup("HierarchyQuickAddPopup"))
+    {
+        if (ImGui::MenuItem("Create Empty Entity"))
+        {
+            registerCreatedEntity(scene.CreateEntity("New Entity"));
+        }
+        if (ImGui::MenuItem("Camera"))
+        {
+            entt::entity cam = scene.CreateEntity("Camera");
+            scene.AddComponent<CameraComponent>(cam);
+            registerCreatedEntity(cam);
+        }
+        if (ImGui::BeginMenu("3D Objects"))
+        {
+            if (ImGui::MenuItem("Cube")) registerCreatedEntity(LoadPrimitive(scene, "Cube").GetHandle());
+            if (ImGui::MenuItem("Sphere")) registerCreatedEntity(LoadPrimitive(scene, "Sphere").GetHandle());
+            if (ImGui::MenuItem("Cylinder")) registerCreatedEntity(LoadPrimitive(scene, "Cylinder").GetHandle());
+            if (ImGui::MenuItem("Quad")) registerCreatedEntity(LoadPrimitive(scene, "Quad").GetHandle());
+            if (ImGui::MenuItem("Capsule")) registerCreatedEntity(LoadPrimitive(scene, "Capsule").GetHandle());
+            if (ImGui::MenuItem("Plane")) registerCreatedEntity(LoadPrimitive(scene, "Plane").GetHandle());
+            if (ImGui::MenuItem("Torus")) registerCreatedEntity(LoadPrimitive(scene, "Torus").GetHandle());
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Lights"))
+        {
+            if (ImGui::MenuItem("Directional Light"))
+            {
+                entt::entity l = scene.CreateEntity("Directional Light");
+                scene.AddComponent<DirectionalLightComponent>(l);
+                registerCreatedEntity(l);
+            }
+            if (ImGui::MenuItem("Point Light"))
+            {
+                entt::entity l = scene.CreateEntity("Point Light");
+                scene.AddComponent<PointLightComponent>(l);
+                registerCreatedEntity(l);
+            }
+            if (ImGui::MenuItem("Spot Light"))
+            {
+                entt::entity l = scene.CreateEntity("Spot Light");
+                scene.AddComponent<SpotLightComponent>(l);
+                registerCreatedEntity(l);
+            }
+            ImGui::EndMenu();
+        }
+        if (ImGui::MenuItem("Particle Emitter"))
+        {
+            Entity emitterEntity = LoadPrimitive(scene, "Quad");
+            if (emitterEntity)
+            {
+                if (emitterEntity.HasComponent<RigidbodyComponent>())
+                    emitterEntity.RemoveComponent<RigidbodyComponent>();
+                if (emitterEntity.HasComponent<ConvexHullColliderComponent>())
+                    emitterEntity.RemoveComponent<ConvexHullColliderComponent>();
+                emitterEntity.GetComponent<TagComponent>().tag = "Particle Emitter";
+                emitterEntity.AddComponent<ParticleEmitterComponent>();
+                registerCreatedEntity(emitterEntity.GetHandle());
+            }
+        }
+        ImGui::EndPopup();
+    }
 
     ImGui::Spacing();
     ImGui::Separator();
@@ -276,10 +473,10 @@ void SceneHierarchyPanel::Draw(Engine* engine)
         return entt::null;
     };
 
-    ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.20f, 0.20f, 0.27f, 0.8f));
-    ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.55f, 0.50f, 0.72f, 0.6f));
-    ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.62f, 0.56f, 0.80f, 0.9f));
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4.0f, 2.0f));
+    ImGui::PushStyleColor(ImGuiCol_Header, ImGui::GetStyleColorVec4(ImGuiCol_Header));
+    ImGui::PushStyleColor(ImGuiCol_HeaderHovered, GetAccentHoverColor());
+    ImGui::PushStyleColor(ImGuiCol_HeaderActive, GetAccentActiveColor());
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4.0f, 3.0f));
 
     if (m_RenamingEntity != entt::null && !registry.valid(m_RenamingEntity))
         m_RenamingEntity = entt::null;
@@ -301,6 +498,8 @@ void SceneHierarchyPanel::Draw(Engine* engine)
             m_FocusRenameInput = true;
         }
     }
+
+    int rowIndex = 0;
 
     std::function<void(entt::entity)> DrawEntityNode = [&](entt::entity entity)
         {
@@ -355,21 +554,112 @@ void SceneHierarchyPanel::Draw(Engine* engine)
             }
             else if (!isActiveInHierarchy)
             {
-                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.50f, 0.50f, 0.50f, 0.60f));
+                ImGui::PushStyleColor(ImGuiCol_Text, GetMutedTextColor());
                 colorPushes++;
             }
             else if (isPrefab)
             {
-                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.62f, 0.56f, 0.80f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_Text, GetAccentColor());
                 colorPushes++;
             }
 
             std::string nodeTitle = tagComponent.tag;
             const bool isRenaming = (m_RenamingEntity == entity);
 
+            EntityVisualInfo vInfo = GetEntityVisualInfo(scene, entity, isPrefab);
+
+            std::string labelText = "    " + nodeTitle;
+
             bool nodeOpen = isRenaming
                 ? ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "##EntityRenameNode")
-                : ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", nodeTitle.c_str());
+                : ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", labelText.c_str());
+
+            ImVec2 itemMin = ImGui::GetItemRectMin();
+            ImVec2 itemMax = ImGui::GetItemRectMax();
+            ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+            if (!isSelected && (rowIndex % 2 == 1))
+            {
+                drawList->AddRectFilled(itemMin, itemMax, IM_COL32(255, 255, 255, 4));
+            }
+            rowIndex++;
+
+            if (isSelected)
+            {
+                drawList->AddRectFilled(
+                    ImVec2(itemMin.x, itemMin.y + 1.0f),
+                    ImVec2(itemMin.x + 3.0f, itemMax.y - 1.0f),
+                    ImGui::GetColorU32(GetAccentColor()),
+                    1.5f
+                );
+            }
+
+            if (vInfo.icon != 0)
+            {
+                float arrowSpace = ImGui::GetTreeNodeToLabelSpacing();
+                float iconX = itemMin.x + arrowSpace + 1.0f;
+                float iconY = itemMin.y + (itemMax.y - itemMin.y - 14.0f) * 0.5f;
+
+                ImU32 iconColor = (!isActiveInHierarchy)
+                    ? IM_COL32(130, 130, 140, 130)
+                    : ImGui::ColorConvertFloat4ToU32(vInfo.iconTint);
+
+                drawList->AddImage(
+                    vInfo.icon,
+                    ImVec2(iconX, iconY),
+                    ImVec2(iconX + 14.0f, iconY + 14.0f),
+                    ImVec2(0, 0), ImVec2(1, 1),
+                    iconColor
+                );
+            }
+            else
+            {
+                float arrowSpace = ImGui::GetTreeNodeToLabelSpacing();
+                float boxX = itemMin.x + arrowSpace + 2.0f;
+                float boxY = itemMin.y + (itemMax.y - itemMin.y - 10.0f) * 0.5f;
+                ImU32 boxCol = (!isActiveInHierarchy)
+                    ? IM_COL32(100, 100, 110, 110)
+                    : IM_COL32(145, 150, 165, 170);
+                drawList->AddRect(ImVec2(boxX, boxY), ImVec2(boxX + 10.0f, boxY + 10.0f), boxCol, 2.0f, 0, 1.2f);
+            }
+
+            bool toggleHovered = false;
+            if (!isRoot && !isRenaming)
+            {
+                float toggleSize = 14.0f;
+                float toggleX = itemMax.x - 22.0f;
+                float toggleY = itemMin.y + (itemMax.y - itemMin.y - toggleSize) * 0.5f;
+
+                bool isSelfActive = scene.IsEntitySelfActive(entity);
+
+                toggleHovered = ImGui::IsMouseHoveringRect(
+                    ImVec2(toggleX - 3.0f, toggleY - 3.0f),
+                    ImVec2(toggleX + toggleSize + 3.0f, toggleY + toggleSize + 3.0f)
+                );
+
+                if (toggleHovered)
+                {
+                    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+                    {
+                        scene.SetEntityActive(entity, !isSelfActive);
+                    }
+                }
+
+                ImVec2 dotCenter(toggleX + toggleSize * 0.5f, toggleY + toggleSize * 0.5f);
+                if (isSelfActive && isActiveInHierarchy)
+                {
+                    drawList->AddCircleFilled(dotCenter, 3.5f, IM_COL32(16, 185, 129, 230));
+                }
+                else if (isSelfActive && !isActiveInHierarchy)
+                {
+                    drawList->AddCircle(dotCenter, 3.5f, IM_COL32(245, 158, 11, 220), 0, 1.5f);
+                }
+                else
+                {
+                    drawList->AddCircle(dotCenter, 3.5f, IM_COL32(140, 140, 150, 140), 0, 1.2f);
+                }
+
+            }
 
             if (isRenaming)
             {
@@ -400,7 +690,7 @@ void SceneHierarchyPanel::Draw(Engine* engine)
             if (colorPushes > 0)
                 ImGui::PopStyleColor(colorPushes);
 
-            if (!isRoot && !isRenaming)
+            if (!isRoot && !isRenaming && !toggleHovered)
             {
                 if (ImGui::IsItemClicked(ImGuiMouseButton_Left) && !ImGui::IsItemToggledOpen())
                 {
@@ -420,9 +710,7 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                     {
                         if (!EditorSelection::Get().IsSelected(entity))
                         {
-                            EditorSelection::Get().Select(entity);
-                            m_SelectionAnchor = entity;
-                            m_PendingSingleSelect = entt::null;
+                            m_PendingSingleSelect = entity;
                         }
                         else if (EditorSelection::Get().GetCount() > 1)
                         {
@@ -455,12 +743,204 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                     m_PendingSingleSelect = entt::null;
                 }
 
-                if (ImGui::MenuItem("Create Child Entity"))
+                if (ImGui::BeginMenu("Create Child Entity"))
                 {
-                    entt::entity child = scene.CreateEntity("New Entity");
-                    scene.SetParent(child, entity);
-                    CommandHistory::Get().Execute(std::make_unique<CreateEntityCommand>(&scene, child));
-                    selectSingle(child);
+                    auto registerChild = [&](entt::entity child) {
+                        if (child != entt::null && registry.valid(child))
+                        {
+                            scene.SetParent(child, entity);
+                            CommandHistory::Get().Execute(std::make_unique<CreateEntityCommand>(&scene, child));
+                            selectSingle(child);
+                        }
+                    };
+
+                    if (ImGui::MenuItem("Empty Entity"))
+                    {
+                        registerChild(scene.CreateEntity("New Entity"));
+                    }
+
+                    if (ImGui::MenuItem("Camera"))
+                    {
+                        entt::entity cam = scene.CreateEntity("Camera");
+                        scene.AddComponent<CameraComponent>(cam);
+                        registerChild(cam);
+                    }
+
+                    if (ImGui::MenuItem("Particle Emitter"))
+                    {
+                        Entity emitterEntity = LoadPrimitive(scene, "Quad");
+                        if (emitterEntity)
+                        {
+                            if (emitterEntity.HasComponent<RigidbodyComponent>())
+                                emitterEntity.RemoveComponent<RigidbodyComponent>();
+                            if (emitterEntity.HasComponent<ConvexHullColliderComponent>())
+                                emitterEntity.RemoveComponent<ConvexHullColliderComponent>();
+
+                            emitterEntity.GetComponent<TagComponent>().tag = "Particle Emitter";
+                            emitterEntity.AddComponent<ParticleEmitterComponent>();
+                            registerChild(emitterEntity.GetHandle());
+                        }
+                    }
+
+                    if (ImGui::MenuItem("Audio Emitter"))
+                    {
+                        entt::entity audio = scene.CreateEntity("AudioEmitter");
+                        scene.AddComponent<AudioEmitterComponent>(audio);
+                        registerChild(audio);
+                    }
+
+                    if (ImGui::MenuItem("Decal"))
+                    {
+                        entt::entity decalEnt = scene.CreateEntity("Decal");
+                        scene.GetComponent<TransformComponent>(decalEnt).SetEulerRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
+                        scene.AddComponent<DecalComponent>(decalEnt);
+                        registerChild(decalEnt);
+                    }
+
+                    if (ImGui::BeginMenu("3D Objects"))
+                    {
+                        if (ImGui::MenuItem("Cube")) registerChild(LoadPrimitive(scene, "Cube").GetHandle());
+                        if (ImGui::MenuItem("Sphere")) registerChild(LoadPrimitive(scene, "Sphere").GetHandle());
+                        if (ImGui::MenuItem("Cylinder")) registerChild(LoadPrimitive(scene, "Cylinder").GetHandle());
+                        if (ImGui::MenuItem("Quad")) registerChild(LoadPrimitive(scene, "Quad").GetHandle());
+                        if (ImGui::MenuItem("Cone")) registerChild(LoadPrimitive(scene, "Cone").GetHandle());
+                        if (ImGui::MenuItem("Capsule")) registerChild(LoadPrimitive(scene, "Capsule").GetHandle());
+                        if (ImGui::MenuItem("Torus")) registerChild(LoadPrimitive(scene, "Torus").GetHandle());
+                        if (ImGui::MenuItem("Plane")) registerChild(LoadPrimitive(scene, "Plane").GetHandle());
+                        if (ImGui::MenuItem("Monkey")) registerChild(LoadPrimitive(scene, "Monkey").GetHandle());
+                        ImGui::EndMenu();
+                    }
+
+                    if (ImGui::BeginMenu("Lights"))
+                    {
+                        if (ImGui::MenuItem("Directional Light"))
+                        {
+                            entt::entity light = scene.CreateEntity("DirectionalLight");
+                            scene.GetComponent<TransformComponent>(light).SetEulerRotation(glm::vec3(-60.0f, -90.0f, 0.0f));
+                            scene.AddComponent<DirectionalLightComponent>(light);
+                            registerChild(light);
+                        }
+                        if (ImGui::MenuItem("Point Light"))
+                        {
+                            entt::entity light = scene.CreateEntity("PointLight");
+                            scene.AddComponent<PointLightComponent>(light);
+                            registerChild(light);
+                        }
+                        if (ImGui::MenuItem("Spot Light"))
+                        {
+                            entt::entity light = scene.CreateEntity("SpotLight");
+                            scene.GetComponent<TransformComponent>(light).SetEulerRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
+                            scene.AddComponent<SpotLightComponent>(light);
+                            registerChild(light);
+                        }
+                        ImGui::EndMenu();
+                    }
+
+                    if (ImGui::BeginMenu("UI"))
+                    {
+                        if (ImGui::MenuItem("UI Canvas"))
+                        {
+                            entt::entity canvas = scene.CreateEntity("Canvas");
+                            scene.AddComponent<UICanvasComponent>(canvas);
+                            scene.AddComponent<RectTransformComponent>(canvas);
+                            registerChild(canvas);
+                        }
+                        if (ImGui::MenuItem("UI Text"))
+                        {
+                            entt::entity text = scene.CreateEntity("UI Text");
+                            scene.AddComponent<RectTransformComponent>(text);
+                            scene.AddComponent<UITextComponent>(text);
+                            registerChild(text);
+                        }
+                        if (ImGui::MenuItem("UI Button"))
+                        {
+                            entt::entity button = scene.CreateEntity("UI Button");
+                            scene.AddComponent<RectTransformComponent>(button);
+                            scene.AddComponent<UIButtonComponent>(button);
+                            registerChild(button);
+                        }
+                        if (ImGui::MenuItem("UI Image"))
+                        {
+                            entt::entity img = scene.CreateEntity("UI Image");
+                            scene.AddComponent<RectTransformComponent>(img);
+                            scene.AddComponent<UIImageComponent>(img);
+                            registerChild(img);
+                        }
+                        if (ImGui::MenuItem("UI Slider"))
+                        {
+                            entt::entity slider = scene.CreateEntity("UI Slider");
+                            scene.AddComponent<RectTransformComponent>(slider);
+                            scene.AddComponent<UISliderComponent>(slider);
+                            registerChild(slider);
+                        }
+                        if (ImGui::MenuItem("UI Progress Bar"))
+                        {
+                            entt::entity pbar = scene.CreateEntity("UI Progress Bar");
+                            scene.AddComponent<RectTransformComponent>(pbar);
+                            scene.AddComponent<UIProgressBarComponent>(pbar);
+                            registerChild(pbar);
+                        }
+                        if (ImGui::MenuItem("UI Checkbox"))
+                        {
+                            entt::entity cb = scene.CreateEntity("UI Checkbox");
+                            scene.AddComponent<RectTransformComponent>(cb);
+                            scene.AddComponent<UICheckboxComponent>(cb);
+                            registerChild(cb);
+                        }
+                        if (ImGui::MenuItem("UI Panel"))
+                        {
+                            entt::entity panel = scene.CreateEntity("UI Panel");
+                            auto& rect = scene.AddComponent<RectTransformComponent>(panel);
+                            rect.size = { 300.0f, 200.0f };
+                            scene.AddComponent<UIPanelComponent>(panel);
+                            registerChild(panel);
+                        }
+                        if (ImGui::MenuItem("UI Vertical Container"))
+                        {
+                            entt::entity vbox = scene.CreateEntity("UI Vertical Container");
+                            auto& rect = scene.AddComponent<RectTransformComponent>(vbox);
+                            rect.size = { 200.0f, 300.0f };
+                            auto& lg = scene.AddComponent<UILayoutGroupComponent>(vbox);
+                            lg.type = UILayoutType::Vertical;
+                            registerChild(vbox);
+                        }
+                        if (ImGui::MenuItem("UI Horizontal Container"))
+                        {
+                            entt::entity hbox = scene.CreateEntity("UI Horizontal Container");
+                            auto& rect = scene.AddComponent<RectTransformComponent>(hbox);
+                            rect.size = { 400.0f, 60.0f };
+                            auto& lg = scene.AddComponent<UILayoutGroupComponent>(hbox);
+                            lg.type = UILayoutType::Horizontal;
+                            registerChild(hbox);
+                        }
+                        if (ImGui::MenuItem("UI Text Input"))
+                        {
+                            entt::entity input = scene.CreateEntity("UI Text Input");
+                            auto& rect = scene.AddComponent<RectTransformComponent>(input);
+                            rect.size = { 200.0f, 36.0f };
+                            scene.AddComponent<UITextInputComponent>(input);
+                            registerChild(input);
+                        }
+                        if (ImGui::MenuItem("UI Scroll View"))
+                        {
+                            entt::entity sv = scene.CreateEntity("UI Scroll View");
+                            auto& rect = scene.AddComponent<RectTransformComponent>(sv);
+                            rect.size = { 250.0f, 200.0f };
+                            scene.AddComponent<UIScrollRectComponent>(sv);
+                            registerChild(sv);
+                        }
+                        if (ImGui::MenuItem("UI Tab Container"))
+                        {
+                            entt::entity tabs = scene.CreateEntity("UI Tab Container");
+                            auto& rect = scene.AddComponent<RectTransformComponent>(tabs);
+                            rect.size = { 350.0f, 250.0f };
+                            scene.AddComponent<UITabContainerComponent>(tabs);
+                            registerChild(tabs);
+                        }
+                        ImGui::EndMenu();
+                    }
+
+                    ImGui::EndMenu();
                 }
 
                 if (ImGui::MenuItem("Save as prefab"))
@@ -645,14 +1125,10 @@ void SceneHierarchyPanel::Draw(Engine* engine)
             if (!isRoot && ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
             {
                 m_PendingSingleSelect = entt::null;
-                if (!EditorSelection::Get().IsSelected(entity))
-                {
-                    EditorSelection::Get().Select(entity);
-                    m_SelectionAnchor = entity;
-                }
                 entt::entity e = entity;
                 ImGui::SetDragDropPayload("ENTITY_DRAG", &e, sizeof(entt::entity));
-                size_t count = EditorSelection::Get().GetCount();
+                bool isSelected = EditorSelection::Get().IsSelected(entity);
+                size_t count = isSelected ? EditorSelection::Get().GetCount() : 1;
                 if (count > 1)
                 {
                     ImGui::Text("%s (+ %d others)", tagComponent.tag.c_str(), (int)(count - 1));
@@ -852,17 +1328,14 @@ void SceneHierarchyPanel::Draw(Engine* engine)
 
     if (m_PendingSingleSelect != entt::null)
     {
-        if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+        if (ImGui::IsMouseDragging(ImGuiMouseButton_Left, 2.0f) || ImGui::IsDragDropActive())
         {
-            if (!ImGui::IsDragDropActive())
-            {
-                EditorSelection::Get().Select(m_PendingSingleSelect);
-                m_SelectionAnchor = m_PendingSingleSelect;
-            }
             m_PendingSingleSelect = entt::null;
         }
-        else if (ImGui::IsDragDropActive())
+        else if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
         {
+            EditorSelection::Get().Select(m_PendingSingleSelect);
+            m_SelectionAnchor = m_PendingSingleSelect;
             m_PendingSingleSelect = entt::null;
         }
     }
@@ -964,14 +1437,6 @@ void SceneHierarchyPanel::Draw(Engine* engine)
 
     if (ImGui::BeginPopupContextWindow(nullptr, ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems))
     {
-        auto registerCreatedEntity = [&](entt::entity handle) {
-            if (handle != entt::null && registry.valid(handle))
-            {
-                CommandHistory::Get().Execute(std::make_unique<CreateEntityCommand>(&scene, handle));
-                selectSingle(handle);
-            }
-        };
-
         if (ImGui::MenuItem("Create Entity"))
         {
             registerCreatedEntity(scene.CreateEntity("New Entity"));
@@ -1229,3 +1694,4 @@ void SceneHierarchyPanel::Draw(Engine* engine)
     ImGui::End();
     ImGui::PopStyleVar();
 }
+

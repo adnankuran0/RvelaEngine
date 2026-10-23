@@ -24,6 +24,7 @@
 #include "Utils/ProjectManager.h"
 #include "ImportSettingsPanel.h"
 #include "ThumbnailCache.h"
+#include "GUI/Style.h"
 
 using namespace rv;
 
@@ -1435,13 +1436,14 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
 
             if (isCurrent)
             {
-                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.24f, 0.35f, 0.52f, 0.6f));
-                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.92f, 0.95f, 1.0f, 1.0f));
+                ImVec4 acc = GetAccentColor();
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(acc.x, acc.y, acc.z, 0.35f));
+                ImGui::PushStyleColor(ImGuiCol_Text, GetAccentHoverColor());
             }
             else
             {
-                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.18f, 0.18f, 0.22f, 0.5f));
-                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.75f, 0.78f, 0.85f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+                ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
             }
 
             std::string btnId = label + "##crumb_" + std::to_string(i);
@@ -1712,10 +1714,13 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
 
         if (isSelected)
         {
+            ImVec4 acc = GetAccentColor();
+            ImU32 fillCol = ImGui::ColorConvertFloat4ToU32(ImVec4(acc.x, acc.y, acc.z, 0.28f));
+            ImU32 borderCol = ImGui::ColorConvertFloat4ToU32(ImVec4(acc.x, acc.y, acc.z, 0.90f));
             drawList->AddRectFilled(cellPos, ImVec2(cellPos.x + cardWidth, cellPos.y + cardHeight),
-                IM_COL32(66, 133, 244, 80), 4.0f);
+                fillCol, 4.0f);
             drawList->AddRect(cellPos, ImVec2(cellPos.x + cardWidth, cellPos.y + cardHeight),
-                IM_COL32(90, 155, 255, 230), 4.0f, 0, 1.5f);
+                borderCol, 4.0f, 0, 1.5f);
         }
         else if (isItemHovered)
         {
@@ -1789,7 +1794,9 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
             float badgeH = 16.0f;
             float badgeX = cellPos.x + cardWidth - badgeW - 3.0f;
             float badgeY = cellPos.y + 3.0f;
-            drawList->AddRectFilled(ImVec2(badgeX, badgeY), ImVec2(badgeX + badgeW, badgeY + badgeH), IM_COL32(30, 110, 220, 220), 4.0f);
+            ImVec4 acc = GetAccentColor();
+            ImU32 badgeCol = ImGui::ColorConvertFloat4ToU32(ImVec4(acc.x, acc.y, acc.z, 0.85f));
+            drawList->AddRectFilled(ImVec2(badgeX, badgeY), ImVec2(badgeX + badgeW, badgeY + badgeH), badgeCol, 4.0f);
             drawList->AddText(ImVec2(badgeX + 4.0f, badgeY + 1.0f), IM_COL32(255, 255, 255, 255), badgeText.c_str());
         }
 
@@ -1994,8 +2001,11 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
 
         if (clampedMax.x > clampedMin.x && clampedMax.y > clampedMin.y)
         {
-            dl->AddRectFilled(clampedMin, clampedMax, IM_COL32(66, 133, 244, 45));
-            dl->AddRect(clampedMin, clampedMax, IM_COL32(90, 155, 255, 200), 0.0f, 0, 1.5f);
+            ImVec4 acc = GetAccentColor();
+            ImU32 fillCol = ImGui::ColorConvertFloat4ToU32(ImVec4(acc.x, acc.y, acc.z, 0.20f));
+            ImU32 borderCol = ImGui::ColorConvertFloat4ToU32(ImVec4(acc.x, acc.y, acc.z, 0.85f));
+            dl->AddRectFilled(clampedMin, clampedMax, fillCol);
+            dl->AddRect(clampedMin, clampedMax, borderCol, 0.0f, 0, 1.5f);
         }
     }
 

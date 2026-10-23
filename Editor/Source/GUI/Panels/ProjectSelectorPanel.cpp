@@ -2,6 +2,7 @@
 #include "Core/Engine.h"
 #include "Utils/ProjectManager.h"
 #include "GUI/Dialogs.h"
+#include "GUI/Style.h"
 #include <imgui.h>
 #include <filesystem>
 #include <vector>
@@ -65,7 +66,7 @@ bool ProjectSelectorPanel::Draw(Engine* engine)
 
     if (visible)
     {
-        ImGui::TextColored(ImVec4(0.62f, 0.56f, 0.80f, 1.0f), "RvelaEngine - Project Hub");
+        ImGui::TextColored(GetAccentColor(), "RvelaEngine - Project Hub");
         ImGui::Separator();
         ImGui::Spacing();
 

@@ -66,7 +66,11 @@ void EditorLayer::OnAttach()
     ImGui_ImplGlfw_InitForOpenGL(m_Engine->GetWindow().GetGLFWWindow(), true);
     ImGui_ImplOpenGL3_Init("#version 460");
 
-    SetStyle();
+    EditorSettings::Get().Load();
+    EditorSettings::Get().ApplyToCamera(m_EditorCamera);
+    EditorSettings::Get().ApplyToViewport(m_Viewport);
+
+    SetStyle(static_cast<EditorTheme>(EditorSettings::Get().Theme));
 
     m_GizmoPass = m_Engine->GetRenderLayer().PushRenderPass(std::make_unique<GizmoPass>());
     m_SelectedEntityMaskPass = m_Engine->GetRenderLayer().PushRenderPass(std::make_unique<SelectedEntityMaskPass>());
@@ -76,10 +80,6 @@ void EditorLayer::OnAttach()
     m_AssetImportPipeline.RegisterImporter(std::make_unique<TextureImporter>());
 
     IconLibrary::Init();
-
-    EditorSettings::Get().Load();
-    EditorSettings::Get().ApplyToCamera(m_EditorCamera);
-    EditorSettings::Get().ApplyToViewport(m_Viewport);
 
 }
 

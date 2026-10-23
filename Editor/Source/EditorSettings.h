@@ -52,6 +52,7 @@ public:
 
     EditorCameraSettings Camera;
     ViewportGizmoSettings ViewportSettings;
+    int Theme = 0; // 0: Deep Slate, 1: Tokyo Night, 2: Catppuccin, 3: Obsidian Carbon, 4: Warm Charcoal
 
 private:
     EditorSettings() = default;

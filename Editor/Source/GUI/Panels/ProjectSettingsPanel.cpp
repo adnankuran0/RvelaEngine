@@ -3,6 +3,7 @@
 #include "Utils/ProjectManager.h"
 #include "GUI/Dialogs.h"
 #include "GUI/EditorFileDialog.h"
+#include "GUI/Style.h"
 #include "Core/Time.h"
 #include <imgui.h>
 #include <filesystem>
@@ -46,7 +47,7 @@ void ProjectSettingsPanel::Draw(Engine* engine)
             if (ImGui::BeginTabItem("General"))
             {
                 ImGui::Spacing();
-                ImGui::TextColored(ImVec4(0.62f, 0.56f, 0.80f, 1.0f), "General Settings");
+                ImGui::TextColored(GetAccentColor(), "General Settings");
                 ImGui::Separator();
                 ImGui::Spacing();
 
@@ -104,7 +105,7 @@ void ProjectSettingsPanel::Draw(Engine* engine)
 
         ImGui::Spacing();
         ImGui::Separator();
-        ImGui::TextColored(ImVec4(0.62f, 0.56f, 0.80f, 1.0f), "Viewport");
+        ImGui::TextColored(GetAccentColor(), "Viewport");
         ImGui::Spacing();
 
         int viewRes[2] = { static_cast<int>(settings.viewportWidth), static_cast<int>(settings.viewportHeight) };
@@ -150,7 +151,7 @@ void ProjectSettingsPanel::Draw(Engine* engine)
 
         ImGui::Spacing();
         ImGui::Separator();
-        ImGui::TextColored(ImVec4(0.62f, 0.56f, 0.80f, 1.0f), "Window");
+        ImGui::TextColored(GetAccentColor(), "Window");
         ImGui::Spacing();
 
         int winSize[2] = { static_cast<int>(settings.windowWidth), static_cast<int>(settings.windowHeight) };
@@ -205,7 +206,7 @@ void ProjectSettingsPanel::Draw(Engine* engine)
 
         ImGui::Spacing();
         ImGui::Separator();
-        ImGui::TextColored(ImVec4(0.62f, 0.56f, 0.80f, 1.0f), "Rendering & Quality");
+        ImGui::TextColored(GetAccentColor(), "Rendering & Quality");
         ImGui::Spacing();
 
         const char* msaaOptions[] = { "Off (1x)", "2x MSAA", "4x MSAA", "8x MSAA" };
@@ -239,7 +240,7 @@ void ProjectSettingsPanel::Draw(Engine* engine)
 
         ImGui::Spacing();
         ImGui::Separator();
-        ImGui::TextColored(ImVec4(0.62f, 0.56f, 0.80f, 1.0f), "Textures & Sampling");
+        ImGui::TextColored(GetAccentColor(), "Textures & Sampling");
         ImGui::Spacing();
 
         const char* defaultFilters[] = {
@@ -292,7 +293,7 @@ void ProjectSettingsPanel::Draw(Engine* engine)
         if (ImGui::BeginTabItem("Globals"))
         {
             ImGui::Spacing();
-            ImGui::TextColored(ImVec4(0.62f, 0.56f, 0.80f, 1.0f), "Autoload");
+            ImGui::TextColored(GetAccentColor(), "Autoload");
             ImGui::Separator();
             ImGui::Spacing();
 
@@ -455,7 +456,7 @@ void ProjectSettingsPanel::Draw(Engine* engine)
         if (ImGui::BeginTabItem("Physics Layers"))
         {
             ImGui::Spacing();
-            ImGui::TextColored(ImVec4(0.62f, 0.56f, 0.80f, 1.0f), "Physics 3D Layer Names");
+            ImGui::TextColored(GetAccentColor(), "Physics 3D Layer Names");
             ImGui::Separator();
             ImGui::Spacing();
 

@@ -65,6 +65,11 @@ void EditorSettings::Load()
             if (v.contains("drawSceneGizmos")) ViewportSettings.DrawSceneGizmos = v["drawSceneGizmos"].get<bool>();
             if (v.contains("showStatistics")) ViewportSettings.ShowStatistics = v["showStatistics"].get<bool>();
         }
+
+        if (j.contains("theme"))
+        {
+            Theme = j["theme"].get<int>();
+        }
     }
     catch (const std::exception& e)
     {
@@ -105,6 +110,8 @@ void EditorSettings::Save()
         { "drawSceneGizmos", ViewportSettings.DrawSceneGizmos },
         { "showStatistics", ViewportSettings.ShowStatistics }
     };
+
+    j["theme"] = Theme;
 
     std::ofstream file(filePath);
     if (file.is_open())

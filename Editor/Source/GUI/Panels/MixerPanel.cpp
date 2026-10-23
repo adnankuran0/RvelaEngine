@@ -1,9 +1,10 @@
-﻿#include "MixerPanel.h"
+#include "MixerPanel.h"
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_internal.h"
 #include "glm/glm.hpp"
 #include "Audio/AudioManager.h"
 #include "Audio/AudioBus.h"
+#include "GUI/Style.h"
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
@@ -17,9 +18,9 @@ void MixerPanel::Draw()
     ImGui::Begin("Audio Mixer");
 
     float availWidth = ImGui::GetContentRegionAvail().x;
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.17f, 0.17f, 0.23f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.55f, 0.50f, 0.72f, 0.8f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.68f, 0.62f, 0.88f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_Button, GetAccentColor());
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, GetAccentHoverColor());
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, GetAccentActiveColor());
 
     if (ImGui::Button("+ Add Bus", ImVec2(120.0f, 26.0f)))
     {
@@ -56,7 +57,7 @@ void MixerPanel::Draw()
         ImGui::PushID(busID);
 
         ImVec4 cardBg = isMaster ? ImVec4(0.17f, 0.17f, 0.25f, 0.95f) : ImVec4(0.13f, 0.13f, 0.18f, 0.90f);
-        ImVec4 cardBorder = isMaster ? ImVec4(0.62f, 0.56f, 0.80f, 0.60f) : ImVec4(0.25f, 0.25f, 0.35f, 0.35f);
+        ImVec4 cardBorder = isMaster ? GetAccentColor() : ImVec4(0.25f, 0.25f, 0.35f, 0.35f);
 
         ImGui::PushStyleColor(ImGuiCol_ChildBg, cardBg);
         ImGui::PushStyleColor(ImGuiCol_Border, cardBorder);
@@ -132,8 +133,8 @@ void MixerPanel::Draw()
         ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0.09f, 0.09f, 0.13f, 1.0f));
         ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, ImVec4(0.12f, 0.12f, 0.17f, 1.0f));
         ImGui::PushStyleColor(ImGuiCol_FrameBgActive, ImVec4(0.12f, 0.12f, 0.17f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_SliderGrab, ImVec4(0.62f, 0.56f, 0.80f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, ImVec4(0.68f, 0.62f, 0.88f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_SliderGrab, GetAccentColor());
+        ImGui::PushStyleColor(ImGuiCol_SliderGrabActive, GetAccentActiveColor());
         ImGui::PushStyleVar(ImGuiStyleVar_GrabRounding, 4.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.0f);
 
