@@ -19,6 +19,8 @@
 #include <Scene/Components/ColliderComponents.h>
 #include <Scene/Components/SceneTreeComponent.h>
 #include <Scene/Components/TagComponent.h>
+#include <Scene/Components/PhysicsConstraintComponent.h>
+#include <Scene/Components/UUIDComponent.h>
 
 #include "Math/RvelaMath.h"
 #include <glm/gtx/component_wise.hpp>
@@ -114,6 +116,7 @@ void PhysicsSystem::DebugDraw()
 
 	// draw rigidbodies
 	m_PhysicsSystem.DrawBodies(settings, &m_DebugRenderer);
+	m_PhysicsSystem.DrawConstraints(&m_DebugRenderer);
 
 	// draw character bodies
 	auto view = m_Scene.GetRegistry().view<CharacterBodyComponent>();
@@ -193,6 +196,15 @@ void PhysicsSystem::OnStop()
 	}
 
 	m_ColliderHierarchyCache.clear();
+	auto constraintView = m_Scene.GetRegistry().view<PhysicsConstraintComponent>();
+	for (auto e : constraintView)
+	{
+		auto& comp = constraintView.get<PhysicsConstraintComponent>(e);
+		m_PhysicsWorld.RemoveConstraintComponent(comp);
+		comp.SetDirty();
+	}
+	m_PhysicsWorld.DestroyAllDynamicConstraints();
+
 	m_StepTimeMs = 0.0f;
 }
 
@@ -202,6 +214,7 @@ void PhysicsSystem::BindCallbacks()
 
 	reg.on_destroy<RigidbodyComponent>().connect<&PhysicsSystem::OnRigidbodyDestroyed>(this);
 	reg.on_destroy<CharacterBodyComponent>().connect<&PhysicsSystem::OnCharacterBodyDestroyed>(this);
+	reg.on_destroy<PhysicsConstraintComponent>().connect<&PhysicsSystem::OnConstraintDestroyed>(this);
 
 	reg.on_destroy<BoxColliderComponent>().connect<&PhysicsSystem::OnShapeChanged>(this);
 	reg.on_construct<BoxColliderComponent>().connect<&PhysicsSystem::OnShapeChanged>(this);
@@ -223,6 +236,21 @@ void PhysicsSystem::BuildBodies()
 	RebuildDirtyShapes();
 	BuildRigidbodies();
 	BuildCharacterBodies();
+	BuildConstraints();
+}
+
+void PhysicsSystem::BuildConstraints()
+{
+	auto& reg = m_Scene.GetRegistry();
+	auto view = reg.view<PhysicsConstraintComponent>();
+	for (auto e : view)
+	{
+		auto& comp = view.get<PhysicsConstraintComponent>(e);
+		if (comp.IsDirty() || !comp.runtimeConstraint)
+		{
+			m_PhysicsWorld.BuildConstraintComponent(reg, e, comp);
+		}
+	}
 }
 
 void PhysicsSystem::RebuildDirtyShapes()
@@ -531,6 +559,26 @@ void PhysicsSystem::OnRigidbodyDestroyed(entt::registry& reg, entt::entity e)
 {
 	m_ColliderHierarchyCache.erase(e);
 
+	if (auto* c = reg.try_get<PhysicsConstraintComponent>(e))
+	{
+		m_PhysicsWorld.RemoveConstraintComponent(*c);
+		c->SetDirty();
+	}
+
+	if (auto* uuidComp = reg.try_get<UUIDComponent>(e))
+	{
+		auto view = reg.view<PhysicsConstraintComponent>();
+		for (auto other : view)
+		{
+			auto& otherComp = view.get<PhysicsConstraintComponent>(other);
+			if (otherComp.connectedEntityUUID == uuidComp->uuid)
+			{
+				m_PhysicsWorld.RemoveConstraintComponent(otherComp);
+				otherComp.SetDirty();
+			}
+		}
+	}
+
 	auto& rb = reg.get<RigidbodyComponent>(e);
 	if (rb.RuntimeBodyID.IsInvalid()) return;
 
@@ -545,6 +593,26 @@ void PhysicsSystem::OnCharacterBodyDestroyed(entt::registry& reg, entt::entity e
 {
 	m_ColliderHierarchyCache.erase(e);
 
+	if (auto* c = reg.try_get<PhysicsConstraintComponent>(e))
+	{
+		m_PhysicsWorld.RemoveConstraintComponent(*c);
+		c->SetDirty();
+	}
+
+	if (auto* uuidComp = reg.try_get<UUIDComponent>(e))
+	{
+		auto view = reg.view<PhysicsConstraintComponent>();
+		for (auto other : view)
+		{
+			auto& otherComp = view.get<PhysicsConstraintComponent>(other);
+			if (otherComp.connectedEntityUUID == uuidComp->uuid)
+			{
+				m_PhysicsWorld.RemoveConstraintComponent(otherComp);
+				otherComp.SetDirty();
+			}
+		}
+	}
+
 	auto& cb = reg.get<CharacterBodyComponent>(e);
 	if (!cb.character) return;
 
@@ -552,6 +620,17 @@ void PhysicsSystem::OnCharacterBodyDestroyed(entt::registry& reg, entt::entity e
 	delete data;
 
 	cb.character = nullptr;
+}
+
+void PhysicsSystem::OnConstraintDestroyed(entt::registry& reg, entt::entity e)
+{
+	if (reg.valid(e))
+	{
+		if (auto* comp = reg.try_get<PhysicsConstraintComponent>(e))
+		{
+			m_PhysicsWorld.RemoveConstraintComponent(*comp);
+		}
+	}
 }
 
 void PhysicsSystem::OnShapeChanged(entt::registry& reg, entt::entity e)

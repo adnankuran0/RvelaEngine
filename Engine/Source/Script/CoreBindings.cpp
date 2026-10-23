@@ -7,6 +7,7 @@
 #include "Scene/Components/UIComponents.h"
 #include "Scene/Components/ParticleEmitterComponent.h"
 #include "Scene/Components/ColliderComponents.h"
+#include "Scene/Components/PhysicsConstraintComponent.h"
 #include "ComponentHandle.h"
 #include "Asset/AssetManager.h"
 #include "Asset/AssetUUID.h"
@@ -151,6 +152,7 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             else if (type == "MeshRenderer") return e.HasComponent<MeshRendererComponent>();
             else if (type == "Material") return e.HasComponent<MaterialComponent>();
             else if (type == "Rigidbody") return e.HasComponent<RigidbodyComponent>();
+            else if (type == "PhysicsConstraint") return e.HasComponent<PhysicsConstraintComponent>();
             else if (type == "CharacterBody") return e.HasComponent<CharacterBodyComponent>();
             else if (type == "CapsuleCollider") return e.HasComponent<CapsuleColliderComponent>();
             else if (type == "BoxCollider") return e.HasComponent<BoxColliderComponent>();
@@ -192,6 +194,9 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             }
             else if (type == "Rigidbody") {
                 return sol::make_object(lua, ComponentHandle<RigidbodyComponent>{ e });
+            }
+            else if (type == "PhysicsConstraint") {
+                return sol::make_object(lua, ComponentHandle<PhysicsConstraintComponent>{ e });
             }
             else if (type == "CharacterBody") {
                 return sol::make_object(lua, ComponentHandle<CharacterBodyComponent>{ e });
@@ -260,6 +265,10 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             else if (typeName == "Rigidbody") {
                 if (!e.HasComponent<RigidbodyComponent>()) e.AddComponent<RigidbodyComponent>();
                 return sol::make_object(lua, ComponentHandle<RigidbodyComponent>{ e });
+            }
+            else if (typeName == "PhysicsConstraint") {
+                if (!e.HasComponent<PhysicsConstraintComponent>()) e.AddComponent<PhysicsConstraintComponent>();
+                return sol::make_object(lua, ComponentHandle<PhysicsConstraintComponent>{ e });
             }
             else if (typeName == "AudioEmitter") {
                 if (!e.HasComponent<AudioEmitterComponent>()) e.AddComponent<AudioEmitterComponent>();

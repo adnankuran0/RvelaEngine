@@ -53,6 +53,13 @@ std::string Project::Serialize() const
 	}
 	s["autoloads"] = autoArr;
 
+	json layerArr = json::array();
+	for (const auto& lName : m_Settings.physicsLayerNames)
+	{
+		layerArr.push_back(lName);
+	}
+	s["physicsLayers"] = layerArr;
+
 	j["settings"] = s;
 
 	j["busLayout"] = AudioManager::Get().SaveBusLayout();
@@ -137,6 +144,22 @@ void Project::Deserialize(const std::string& jsonStr)
 				entry.enabled = item.value("enabled", true);
 				if (!entry.name.empty() && !entry.path.empty())
 					m_Settings.autoloads.push_back(entry);
+			}
+		}
+
+		for (size_t i = 0; i < m_Settings.physicsLayerNames.size(); ++i)
+			m_Settings.physicsLayerNames[i] = (i == 0) ? "Default" : "";
+
+		if (s.contains("physicsLayers") && s["physicsLayers"].is_array())
+		{
+			size_t i = 0;
+			for (const auto& val : s["physicsLayers"])
+			{
+				if (i < m_Settings.physicsLayerNames.size())
+				{
+					m_Settings.physicsLayerNames[i] = val.get<std::string>();
+					i++;
+				}
 			}
 		}
 	}

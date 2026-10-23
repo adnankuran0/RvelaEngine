@@ -25,6 +25,7 @@
 #include "Scene/Components/SkeletonComponent.h"
 #include "Scene/Components/UIComponents.h"
 #include "Scene/Components/DecalComponent.h"
+#include "Scene/Components/PhysicsConstraintComponent.h"
 
 namespace rv {
 
@@ -65,6 +66,7 @@ enum class ComponentType
 	UISlider,
 	UIProgressBar,
 	Decal,
+	PhysicsConstraint,
 
 };
 

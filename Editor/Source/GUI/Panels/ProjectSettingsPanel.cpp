@@ -31,6 +31,10 @@ void ProjectSettingsPanel::Draw(Engine* engine)
     {
         strncpy_s(m_NameBuf, settings.name.c_str(), sizeof(m_NameBuf) - 1);
         strncpy_s(m_StartSceneBuf, settings.startScene.c_str(), sizeof(m_StartSceneBuf) - 1);
+        for (int i = 0; i < 32; i++)
+        {
+            strncpy_s(m_PhysicsLayerBuf[i], settings.physicsLayerNames[i].c_str(), sizeof(m_PhysicsLayerBuf[i]) - 1);
+        }
         m_Initialized = true;
     }
 
@@ -444,6 +448,36 @@ void ProjectSettingsPanel::Draw(Engine* engine)
                     ImGui::EndTable();
                 }
             }
+
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::BeginTabItem("Physics Layers"))
+        {
+            ImGui::Spacing();
+            ImGui::TextColored(ImVec4(0.62f, 0.56f, 0.80f, 1.0f), "Physics 3D Layer Names");
+            ImGui::Separator();
+            ImGui::Spacing();
+
+            ImGui::Columns(2, "LayerColumns", false);
+            for (int col = 0; col < 2; col++)
+            {
+                for (int row = 0; row < 16; row++)
+                {
+                    int i = col * 16 + row;
+                    std::string label = "Layer " + std::to_string(i + 1);
+                    ImGui::Text("%s:", label.c_str());
+                    ImGui::SameLine(70.0f);
+                    std::string inputId = "##PhysicsLayer" + std::to_string(i + 1);
+                    ImGui::SetNextItemWidth(-10.0f);
+                    if (ImGui::InputText(inputId.c_str(), m_PhysicsLayerBuf[i], sizeof(m_PhysicsLayerBuf[i])))
+                    {
+                        settings.physicsLayerNames[i] = m_PhysicsLayerBuf[i];
+                    }
+                }
+                ImGui::NextColumn();
+            }
+            ImGui::Columns(1);
 
             ImGui::EndTabItem();
         }

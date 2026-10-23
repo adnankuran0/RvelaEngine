@@ -238,6 +238,7 @@ private:
         if (reg.any_of<ScriptComponent>(target)) reg.remove<ScriptComponent>(target);
         if (reg.any_of<RigidbodyComponent>(target)) reg.remove<RigidbodyComponent>(target);
         if (reg.any_of<CharacterBodyComponent>(target)) reg.remove<CharacterBodyComponent>(target);
+        if (reg.any_of<PhysicsConstraintComponent>(target)) reg.remove<PhysicsConstraintComponent>(target);
         if (reg.any_of<BoxColliderComponent>(target)) reg.remove<BoxColliderComponent>(target);
         if (reg.any_of<SphereColliderComponent>(target)) reg.remove<SphereColliderComponent>(target);
         if (reg.any_of<CapsuleColliderComponent>(target)) reg.remove<CapsuleColliderComponent>(target);

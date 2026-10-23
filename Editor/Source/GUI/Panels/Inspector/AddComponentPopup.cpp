@@ -35,6 +35,7 @@ void AddComponentPopup::Draw(Scene& scene, entt::entity selectedEntity)
 		UI::DrawAddComponentEntry<SpotLightComponent>("Spot Light", filterBuf, registry, selectedEntity);
 		UI::DrawAddComponentEntry<RigidbodyComponent>("Rigidbody", filterBuf, registry, selectedEntity);
 		UI::DrawAddComponentEntry<CharacterBodyComponent>("CharacterBody", filterBuf, registry, selectedEntity);
+		UI::DrawAddComponentEntry<PhysicsConstraintComponent>("Physics Constraint", filterBuf, registry, selectedEntity);
 		UI::DrawAddComponentEntry<BoxColliderComponent>("Box Collider", filterBuf, registry, selectedEntity);
 		UI::DrawAddComponentEntry<SphereColliderComponent>("Sphere Collider", filterBuf, registry, selectedEntity);
 		UI::DrawAddComponentEntry<CapsuleColliderComponent>("Capsule Collider", filterBuf, registry, selectedEntity);

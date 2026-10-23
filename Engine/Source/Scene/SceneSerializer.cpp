@@ -326,6 +326,9 @@ json SceneSerializer::SerializeEntity(Scene& scene, entt::entity e, bool seriali
     if (scene.HasComponent<CharacterBodyComponent>(e))
         j["CharacterBodyComponent"] = scene.GetComponent<CharacterBodyComponent>(e).Serialize();
 
+    if (scene.HasComponent<PhysicsConstraintComponent>(e))
+        j["PhysicsConstraintComponent"] = scene.GetComponent<PhysicsConstraintComponent>(e).Serialize();
+
     if (scene.HasComponent<BoxColliderComponent>(e))
         j["BoxColliderComponent"] = scene.GetComponent<BoxColliderComponent>(e).Serialize();
 
@@ -453,6 +456,14 @@ void SceneSerializer::DeserializeEntityComponents(Scene& scene, entt::entity han
         cb.Deserialize(entityJson["CharacterBodyComponent"]);
         cb.character = nullptr;
         cb.SetShapeDirty();
+    }
+
+    if (entityJson.contains("PhysicsConstraintComponent"))
+    {
+        auto& constraint = scene.AddComponent<PhysicsConstraintComponent>(handle);
+        constraint.Deserialize(entityJson["PhysicsConstraintComponent"]);
+        constraint.runtimeConstraint = nullptr;
+        constraint.SetDirty();
     }
 
     if (entityJson.contains("BoxColliderComponent"))

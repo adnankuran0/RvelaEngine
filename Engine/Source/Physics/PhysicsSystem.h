@@ -22,6 +22,7 @@ namespace rv {
 class Scene;
 struct RigidbodyComponent;
 struct CharacterBodyComponent;
+struct PhysicsConstraintComponent;
 
 struct PhysicsStats
 {
@@ -60,6 +61,7 @@ private:
 	void RebuildDirtyShapes();
 	void BuildRigidbodies();
 	void BuildCharacterBodies();
+	void BuildConstraints();
 
 	void SyncBodiesFromTransforms();
 	void SyncTransforms();
@@ -82,6 +84,7 @@ private:
 
 	void OnRigidbodyDestroyed(entt::registry& reg, entt::entity e);
 	void OnCharacterBodyDestroyed(entt::registry& reg, entt::entity e);
+	void OnConstraintDestroyed(entt::registry& reg, entt::entity e);
 	void OnShapeChanged(entt::registry& reg, entt::entity e);
 
 	void DebugDraw();

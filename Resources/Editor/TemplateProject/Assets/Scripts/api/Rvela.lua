@@ -513,6 +513,24 @@ MotionType = {
 }
 _G.MotionType = MotionType
 
+---@enum ConstraintType
+ConstraintType = {
+    Fixed = 0,
+    Point = 1,
+    Distance = 2,
+    Hinge = 3,
+    Slider = 4,
+    Cone = 5,
+}
+_G.ConstraintType = ConstraintType
+
+---@enum ConstraintSpace
+ConstraintSpace = {
+    WorldSpace = 0,
+    LocalSpace = 1,
+}
+_G.ConstraintSpace = ConstraintSpace
+
 ---@class CollisionInfo
 ---@field point Vec3 Collision contact point
 ---@field normal Vec3 Surface contact normal
@@ -522,20 +540,297 @@ _G.MotionType = MotionType
 ---@class RaycastResult
 ---@field hit boolean Whether the ray hit something
 ---@field distance number Distance from ray origin to hit point
+---@field fraction number Fraction along the ray where the hit occurred [0..1]
 ---@field point Vec3 Contact point in world space
 ---@field normal Vec3 Surface normal at contact point
 ---@field entity Entity The entity that was hit
+---@field bodyId integer Jolt physics body ID
+
+---@class ShapeCastResult : RaycastResult
+---@field hit boolean Whether the shape sweep hit something
+---@field distance number Distance swept along direction to hit point
+---@field fraction number Fraction along sweep direction where the hit occurred [0..1]
+---@field point Vec3 Contact point in world space
+---@field normal Vec3 Surface normal at contact point
+---@field entity Entity The entity that was hit
+---@field bodyId integer Jolt physics body ID
+
+---@class RaycastOptions
+---@field origin? Vec3 Ray start point (or `start`)
+---@field start? Vec3 Ray start point (or `origin`)
+---@field direction? Vec3 Ray direction vector (or `dir`)
+---@field dir? Vec3 Ray direction vector (or `direction`)
+---@field maxDistance? number Maximum ray distance (or `maxDist`)
+---@field maxDist? number Maximum ray distance (or `maxDistance`)
+---@field hitInside? boolean Whether to detect hits if starting inside a collider
+---@field layerMask? integer 32-bit collision layer mask (or `mask`)
+---@field mask? integer 32-bit collision layer mask (or `layerMask`)
+---@field exclude? Entity|Entity[] Entity or array of entities to exclude/ignore (or `ignore`)
+---@field ignore? Entity|Entity[] Entity or array of entities to exclude/ignore (or `exclude`)
+
+---@class SphereCastOptions
+---@field origin? Vec3 Sphere start center (or `start`)
+---@field start? Vec3 Sphere start center (or `origin`)
+---@field radius? number Sphere radius (default 0.5)
+---@field direction? Vec3 Cast direction (or `dir`)
+---@field dir? Vec3 Cast direction (or `direction`)
+---@field maxDistance? number Maximum sweep distance (or `maxDist`)
+---@field maxDist? number Maximum sweep distance (or `maxDistance`)
+---@field hitInside? boolean Whether to detect hits if starting inside a collider
+---@field exclude? Entity|Entity[] Entity or array of entities to exclude/ignore (or `ignore`)
+---@field ignore? Entity|Entity[] Entity or array of entities to exclude/ignore (or `exclude`)
+
+---@class BoxCastOptions
+---@field origin? Vec3 Box start center (or `start`)
+---@field start? Vec3 Box start center (or `origin`)
+---@field halfExtents? Vec3 Half dimensions of the box (or `size`)
+---@field size? Vec3 Full box size (converted to halfExtents)
+---@field rotation? Quat Orientation of the box during cast
+---@field direction? Vec3 Cast direction (or `dir`)
+---@field dir? Vec3 Cast direction (or `direction`)
+---@field maxDistance? number Maximum sweep distance (or `maxDist`)
+---@field maxDist? number Maximum sweep distance (or `maxDistance`)
+---@field hitInside? boolean Whether to detect hits if starting inside a collider
+---@field exclude? Entity|Entity[] Entity or array of entities to exclude/ignore (or `ignore`)
+---@field ignore? Entity|Entity[] Entity or array of entities to exclude/ignore (or `exclude`)
+
+---@class CapsuleCastOptions
+---@field origin? Vec3 Capsule start center (or `start`)
+---@field start? Vec3 Capsule start center (or `origin`)
+---@field radius? number Radius of capsule hemisphere caps (default 0.5)
+---@field halfHeight? number Half height of the capsule cylinder section (default 1.0)
+---@field rotation? Quat Orientation of the capsule during cast
+---@field direction? Vec3 Cast direction (or `dir`)
+---@field dir? Vec3 Cast direction (or `direction`)
+---@field maxDistance? number Maximum sweep distance (or `maxDist`)
+---@field maxDist? number Maximum sweep distance (or `maxDistance`)
+---@field hitInside? boolean Whether to detect hits if starting inside a collider
+---@field exclude? Entity|Entity[] Entity or array of entities to exclude/ignore (or `ignore`)
+---@field ignore? Entity|Entity[] Entity or array of entities to exclude/ignore (or `exclude`)
+
+---@class ConstraintHandle
+---@field id integer Unique constraint runtime ID
+---@field enabled boolean Whether constraint is currently active
+local ConstraintHandle = {}
+
+---Checks whether constraint is currently valid and active in physics world.
+---@return boolean
+function ConstraintHandle:IsValid() end
+
+---Destroys this constraint and removes it from the physics world.
+function ConstraintHandle:Destroy() end
+
+---Enables or disables this constraint.
+---@param enabled boolean
+function ConstraintHandle:SetEnabled(enabled) end
+
+---Returns whether this constraint is enabled.
+---@return boolean
+function ConstraintHandle:IsEnabled() end
+
+---Sets angular limits for a hinge constraint in radians.
+---@param minAngle number Minimum angle in radians
+---@param maxAngle number Maximum angle in radians
+function ConstraintHandle:SetHingeLimits(minAngle, maxAngle) end
+
+---Configures the drive motor on a hinge constraint.
+---@param enabled boolean
+---@param targetVelocity number Target angular velocity (rad/s)
+---@param maxTorque number Maximum motor torque
+function ConstraintHandle:SetHingeMotor(enabled, targetVelocity, maxTorque) end
+
+---Gets the current rotation angle of a hinge constraint in radians.
+---@return number
+function ConstraintHandle:GetHingeAngle() end
+
+---Sets linear translation limits for a slider constraint.
+---@param minLimit number Minimum linear offset
+---@param maxLimit number Maximum linear offset
+function ConstraintHandle:SetSliderLimits(minLimit, maxLimit) end
+
+---Configures the drive motor on a slider constraint.
+---@param enabled boolean
+---@param targetVelocity number Target linear velocity
+---@param maxForce number Maximum motor force
+function ConstraintHandle:SetSliderMotor(enabled, targetVelocity, maxForce) end
+
+---Gets the current linear position of a slider constraint.
+---@return number
+function ConstraintHandle:GetSliderPosition() end
+
+---Sets min and max distance limits for a distance constraint.
+---@param minDistance number Minimum distance (-1 for free/unlimited)
+---@param maxDistance number Maximum distance (-1 for free/unlimited)
+function ConstraintHandle:SetDistanceRange(minDistance, maxDistance) end
 
 ---@class Physics
 Physics = {}
 
----Casts a ray into the physics world.
+---Casts a ray into the physics world and returns the closest hit.
+---@overload fun(options: RaycastOptions): RaycastResult
 ---@param origin Vec3 Ray starting position
 ---@param dir Vec3 Ray direction vector (should be normalized)
----@param maxDistance number Maximum ray distance
----@param hitInside boolean Whether to detect hits if starting inside a collider
+---@param maxDistance? number Maximum ray distance (default 1000)
+---@param hitInside? boolean Whether to detect hits if starting inside a collider (default false)
+---@param layerMask? integer 32-bit collision layer mask (default 0xFFFFFFFF)
+---@param exclude? Entity|Entity[] Entity or array of entities to exclude/ignore
 ---@return RaycastResult
-function Physics.Raycast(origin, dir, maxDistance, hitInside) end
+function Physics.Raycast(origin, dir, maxDistance, hitInside, layerMask, exclude) end
+
+---Casts a ray and returns all hits along the ray sorted from closest to farthest.
+---@overload fun(options: RaycastOptions): RaycastResult[]
+---@param origin Vec3 Ray starting position
+---@param dir Vec3 Ray direction vector (should be normalized)
+---@param maxDistance? number Maximum ray distance (default 1000)
+---@param hitInside? boolean Whether to detect hits if starting inside a collider (default false)
+---@param layerMask? integer 32-bit collision layer mask (default 0xFFFFFFFF)
+---@param exclude? Entity|Entity[] Entity or array of entities to exclude/ignore
+---@return RaycastResult[]
+function Physics.RaycastAll(origin, dir, maxDistance, hitInside, layerMask, exclude) end
+
+---Sweeps a sphere along a direction vector and returns the closest hit.
+---@overload fun(options: SphereCastOptions): ShapeCastResult
+---@param start Vec3 Center of the sphere at start
+---@param radius number Sphere radius
+---@param dir Vec3 Sweep direction vector
+---@param maxDistance? number Maximum sweep distance (default 1000)
+---@param hitInside? boolean Whether to detect hits if starting inside a collider (default false)
+---@param exclude? Entity|Entity[] Entity or array of entities to exclude/ignore
+---@return ShapeCastResult
+function Physics.SphereCast(start, radius, dir, maxDistance, hitInside, exclude) end
+
+---Sweeps a sphere and returns all hits along the sweep sorted closest to farthest.
+---@overload fun(options: SphereCastOptions): ShapeCastResult[]
+---@param start Vec3 Center of the sphere at start
+---@param radius number Sphere radius
+---@param dir Vec3 Sweep direction vector
+---@param maxDistance? number Maximum sweep distance (default 1000)
+---@param hitInside? boolean Whether to detect hits if starting inside a collider (default false)
+---@param exclude? Entity|Entity[] Entity or array of entities to exclude/ignore
+---@return ShapeCastResult[]
+function Physics.SphereCastAll(start, radius, dir, maxDistance, hitInside, exclude) end
+
+---Sweeps an oriented box along a direction vector and returns the closest hit.
+---@overload fun(options: BoxCastOptions): ShapeCastResult
+---@param start Vec3 Center of the box at start
+---@param halfExtents Vec3 Half-size of the box
+---@param rotation Quat Orientation of the box
+---@param dir Vec3 Sweep direction vector
+---@param maxDistance? number Maximum sweep distance (default 1000)
+---@param hitInside? boolean Whether to detect hits if starting inside a collider (default false)
+---@param exclude? Entity|Entity[] Entity or array of entities to exclude/ignore
+---@return ShapeCastResult
+function Physics.BoxCast(start, halfExtents, rotation, dir, maxDistance, hitInside, exclude) end
+
+---Sweeps an oriented box and returns all hits along the sweep sorted closest to farthest.
+---@overload fun(options: BoxCastOptions): ShapeCastResult[]
+---@param start Vec3 Center of the box at start
+---@param halfExtents Vec3 Half-size of the box
+---@param rotation Quat Orientation of the box
+---@param dir Vec3 Sweep direction vector
+---@param maxDistance? number Maximum sweep distance (default 1000)
+---@param hitInside? boolean Whether to detect hits if starting inside a collider (default false)
+---@param exclude? Entity|Entity[] Entity or array of entities to exclude/ignore
+---@return ShapeCastResult[]
+function Physics.BoxCastAll(start, halfExtents, rotation, dir, maxDistance, hitInside, exclude) end
+
+---Sweeps an oriented capsule along a direction vector and returns the closest hit.
+---@overload fun(options: CapsuleCastOptions): ShapeCastResult
+---@param start Vec3 Center of the capsule at start
+---@param radius number Capsule radius
+---@param halfHeight number Capsule cylinder half-height
+---@param rotation Quat Orientation of the capsule
+---@param dir Vec3 Sweep direction vector
+---@param maxDistance? number Maximum sweep distance (default 1000)
+---@param hitInside? boolean Whether to detect hits if starting inside a collider (default false)
+---@param exclude? Entity|Entity[] Entity or array of entities to exclude/ignore
+---@return ShapeCastResult
+function Physics.CapsuleCast(start, radius, halfHeight, rotation, dir, maxDistance, hitInside, exclude) end
+
+---Sweeps an oriented capsule and returns all hits along the sweep sorted closest to farthest.
+---@overload fun(options: CapsuleCastOptions): ShapeCastResult[]
+---@param start Vec3 Center of the capsule at start
+---@param radius number Capsule radius
+---@param halfHeight number Capsule cylinder half-height
+---@param rotation Quat Orientation of the capsule
+---@param dir Vec3 Sweep direction vector
+---@param maxDistance? number Maximum sweep distance (default 1000)
+---@param hitInside? boolean Whether to detect hits if starting inside a collider (default false)
+---@param exclude? Entity|Entity[] Entity or array of entities to exclude/ignore
+---@return ShapeCastResult[]
+function Physics.CapsuleCastAll(start, radius, halfHeight, rotation, dir, maxDistance, hitInside, exclude) end
+
+---Creates a dynamic fixed (weld) constraint between two bodies or body and world.
+---@param bodyA Entity|RigidbodyComponent
+---@param bodyB? Entity|RigidbodyComponent nil for world anchor
+---@param autoDetect? boolean Automatically lock current relative transform (default true)
+---@return ConstraintHandle
+function Physics.CreateFixedConstraint(bodyA, bodyB, autoDetect) end
+
+---Creates a dynamic point-to-point (ball-socket) constraint.
+---@param bodyA Entity|RigidbodyComponent
+---@param bodyB? Entity|RigidbodyComponent nil for world anchor
+---@param pivot? Vec3 Pivot location (default vec3(0,0,0))
+---@param worldSpace? boolean Whether pivot is in world space (default true)
+---@return ConstraintHandle
+function Physics.CreatePointConstraint(bodyA, bodyB, pivot, worldSpace) end
+
+---Creates a dynamic distance constraint between two bodies.
+---@param bodyA Entity|RigidbodyComponent
+---@param bodyB? Entity|RigidbodyComponent nil for world anchor
+---@param pointA? Vec3 Attachment point on body A
+---@param pointB? Vec3 Attachment point on body B
+---@param minDistance? number Minimum distance (-1 for free/unlimited)
+---@param maxDistance? number Maximum distance (-1 for free/unlimited)
+---@param worldSpace? boolean Whether points are in world space (default true)
+---@return ConstraintHandle
+function Physics.CreateDistanceConstraint(bodyA, bodyB, pointA, pointB, minDistance, maxDistance, worldSpace) end
+
+---Creates a dynamic hinge (revolute) constraint.
+---@param bodyA Entity|RigidbodyComponent
+---@param bodyB? Entity|RigidbodyComponent nil for world anchor
+---@param pivot? Vec3 Hinge pivot position
+---@param axis? Vec3 Hinge rotation axis (default vec3(0,1,0))
+---@param minAngle? number Minimum rotation limit in radians
+---@param maxAngle? number Maximum rotation limit in radians
+---@param worldSpace? boolean Whether pivot/axis are in world space (default true)
+---@return ConstraintHandle
+function Physics.CreateHingeConstraint(bodyA, bodyB, pivot, axis, minAngle, maxAngle, worldSpace) end
+
+---Creates a dynamic slider (prismatic) constraint.
+---@param bodyA Entity|RigidbodyComponent
+---@param bodyB? Entity|RigidbodyComponent nil for world anchor
+---@param sliderAxis? Vec3 Slider direction axis (default vec3(1,0,0))
+---@param minLimit? number Minimum slide limit
+---@param maxLimit? number Maximum slide limit
+---@param worldSpace? boolean Whether axis is in world space (default true)
+---@return ConstraintHandle
+function Physics.CreateSliderConstraint(bodyA, bodyB, sliderAxis, minLimit, maxLimit, worldSpace) end
+
+---Creates a dynamic cone constraint (spherical limit).
+---@param bodyA Entity|RigidbodyComponent
+---@param bodyB? Entity|RigidbodyComponent nil for world anchor
+---@param pivot? Vec3 Cone apex pivot position
+---@param axis? Vec3 Cone centerline axis (default vec3(0,1,0))
+---@param halfAngle? number Half angle cone aperture in radians
+---@param worldSpace? boolean Whether pivot/axis are in world space (default true)
+---@return ConstraintHandle
+function Physics.CreateConeConstraint(bodyA, bodyB, pivot, axis, halfAngle, worldSpace) end
+
+---Destroys a constraint in the physics world.
+---@param constraint ConstraintHandle|integer
+---@return boolean
+function Physics.DestroyConstraint(constraint) end
+
+---Gets the configured name of a physics layer from Project Settings (1-based index 1..32).
+---@param layer integer Layer number (1..32)
+---@return string
+function Physics.GetLayerName(layer) end
+
+---Calculates the combined 32-bit layer bitmask from one or more layer names or 1-based layer indices.
+---@param ... string|integer Layer names (e.g. "Player", "Enemies") or layer indices (1..32)
+---@return integer mask
+function Physics.GetLayerMask(...) end
 
 _G.Physics = Physics
 
@@ -713,6 +1008,8 @@ function TransformComponent:LookAt(target, up) end
 ---@field gravityFactor number Gravity multiplier
 ---@field restitution number Bounciness [0..1]
 ---@field isSensor boolean Whether this body acts as a trigger/sensor
+---@field collisionLayer integer 32-bit collision layer mask
+---@field collisionMask integer 32-bit collision mask
 ---@field centerOfMass Vec3 Center of mass position (read-only)
 ---@field position Vec3 Position
 ---@field rotation Quat Rotation quaternion
@@ -745,6 +1042,8 @@ function RigidbodyComponent:AddLinearVelocity(velocity) end
 ---@field velocity Vec3 Linear velocity
 ---@field up Vec3 Up direction
 ---@field maxSlopeAngle number Maximum walkable slope in degrees
+---@field collisionLayer integer 32-bit collision layer mask
+---@field collisionMask integer 32-bit collision mask
 ---@field isGrounded boolean Whether character is standing on ground
 ---@field isOnSteepGround boolean Whether character is on too steep ground
 ---@field isInAir boolean Whether character is airborne
@@ -769,6 +1068,38 @@ function RigidbodyComponent:AddLinearVelocity(velocity) end
 ---@field IsValid fun(self: ComponentHandle): boolean
 ---@field radius number Sphere radius
 ---@field offset Vec3 Local offset
+
+---@class PhysicsConstraintComponent : ComponentHandle
+---@field IsValid fun(self: ComponentHandle): boolean
+---@field type ConstraintType Constraint type (Fixed, Point, Distance, Hinge, Slider, Cone)
+---@field space ConstraintSpace WorldSpace or LocalSpace
+---@field enabled boolean Whether constraint is currently active
+---@field autoDetectPoints boolean Whether fixed/slider auto-calculates relative attachment
+---@field anchorA Vec3 Pivot / anchor point on this entity body
+---@field anchorB Vec3 Pivot / anchor point on connected entity body
+---@field axisA Vec3 Joint axis on this entity body
+---@field axisB Vec3 Joint axis on connected entity body
+---@field minLimit number Minimum distance, angle (rad), or translation limit
+---@field maxLimit number Maximum distance, angle (rad), or translation limit
+---@field springFrequency number Spring oscillation frequency in Hz (0 = rigid)
+---@field springDamping number Spring damping ratio (0 = no damping, 1 = critical)
+---@field maxFriction number Friction resistance for hinge or slider
+---@field motorEnabled boolean Whether hinge or slider motor is enabled
+---@field motorTargetVelocity number Target motor velocity (rad/s for hinge, m/s for slider)
+---@field motorMaxForce number Maximum force / torque motor can exert
+local PhysicsConstraintComponent = {}
+---Sets connected entity. Pass nil to connect to world (static anchor).
+---@param entity? Entity
+function PhysicsConstraintComponent:SetConnectedEntity(entity) end
+---Gets connected entity or nil if connected to world.
+---@return Entity?
+function PhysicsConstraintComponent:GetConnectedEntity() end
+---Gets current angle in radians if this is a Hinge constraint.
+---@return number
+function PhysicsConstraintComponent:GetHingeAngle() end
+---Gets current position offset if this is a Slider constraint.
+---@return number
+function PhysicsConstraintComponent:GetSliderPosition() end
 
 ---@class AudioEmitterComponent : ComponentHandle
 ---@field IsValid fun(self: ComponentHandle): boolean
@@ -955,6 +1286,7 @@ function UICheckboxComponent:OnValueChanged(callback) end
 ---| '"CapsuleCollider"'
 ---| '"BoxCollider"'
 ---| '"SphereCollider"'
+---| '"PhysicsConstraint"'
 ---| '"AudioEmitter"'
 ---| '"Animator"'
 ---| '"ParticleEmitter"'
@@ -1060,6 +1392,7 @@ function Entity:HasComponent(typeName) end
 ---@overload fun(self: Entity, typeName: '"CapsuleCollider"'): CapsuleColliderComponent
 ---@overload fun(self: Entity, typeName: '"BoxCollider"'): BoxColliderComponent
 ---@overload fun(self: Entity, typeName: '"SphereCollider"'): SphereColliderComponent
+---@overload fun(self: Entity, typeName: '"PhysicsConstraint"'): PhysicsConstraintComponent
 ---@overload fun(self: Entity, typeName: '"AudioEmitter"'): AudioEmitterComponent
 ---@overload fun(self: Entity, typeName: '"Animator"'): AnimatorComponent
 ---@overload fun(self: Entity, typeName: '"ParticleEmitter"'): ParticleEmitterComponent
@@ -1083,6 +1416,7 @@ function Entity:GetComponent(typeName) end
 ---@overload fun(self: Entity, typeName: '"DirectionalLight"'): DirectionalLightComponent
 ---@overload fun(self: Entity, typeName: '"Camera"'): CameraComponent
 ---@overload fun(self: Entity, typeName: '"Rigidbody"'): RigidbodyComponent
+---@overload fun(self: Entity, typeName: '"PhysicsConstraint"'): PhysicsConstraintComponent
 ---@overload fun(self: Entity, typeName: '"AudioEmitter"'): AudioEmitterComponent
 ---@overload fun(self: Entity, typeName: '"Animator"'): AnimatorComponent
 ---@overload fun(self: Entity, typeName: '"RectTransform"'): RectTransformComponent

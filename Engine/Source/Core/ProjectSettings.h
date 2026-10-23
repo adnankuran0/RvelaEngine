@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <array>
 #include <cstdint>
 #include "Renderer/Sampler.h"
 
@@ -79,6 +80,46 @@ struct ProjectSettings
 	TextureAnisotropy defaultAnisotropy = TextureAnisotropy::Aniso8x;
 
 	std::vector<AutoloadEntry> autoloads;
+
+	std::array<std::string, 32> physicsLayerNames = {
+		"Default", "", "", "", "", "", "", "",
+		"", "", "", "", "", "", "", "",
+		"", "", "", "", "", "", "", "",
+		"", "", "", "", "", "", "", ""
+	};
+
+	const std::string& GetPhysicsLayerName(uint32_t layer1Based) const
+	{
+		static const std::string s_Empty = "";
+		if (layer1Based >= 1 && layer1Based <= 32)
+			return physicsLayerNames[layer1Based - 1];
+		return s_Empty;
+	}
+
+	const std::string& GetPhysicsLayerNameByBit(uint32_t bitIndex) const
+	{
+		static const std::string s_Empty = "";
+		if (bitIndex < 32)
+			return physicsLayerNames[bitIndex];
+		return s_Empty;
+	}
+
+	void SetPhysicsLayerName(uint32_t layer1Based, const std::string& name)
+	{
+		if (layer1Based >= 1 && layer1Based <= 32)
+			physicsLayerNames[layer1Based - 1] = name;
+	}
+
+	uint32_t GetPhysicsLayerMask(const std::string& name) const
+	{
+		if (name.empty()) return 0;
+		for (size_t i = 0; i < physicsLayerNames.size(); ++i)
+		{
+			if (physicsLayerNames[i] == name)
+				return 1u << i;
+		}
+		return 0;
+	}
 };
 
 }
