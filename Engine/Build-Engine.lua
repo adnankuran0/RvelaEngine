@@ -31,7 +31,7 @@ project "RvelaEngine"
       "../Vendor/stb",
       "../Vendor/entt",
       "../Vendor/tiny_obj_loader",
-      "../Vendor/Assimp/include",
+
       "../Vendor/nlohmann",
       "../Vendor/uuid_v4",
       "../Vendor/robin_map/include",
@@ -44,7 +44,7 @@ project "RvelaEngine"
    libdirs
    {
       "../Vendor/GLFW/lib",
-      "../Vendor/Assimp/lib",
+
       "../Vendor/lua/lib",
       "../Vendor/Jolt/lib",
       "../Vendor/meshoptimizer/lib",
@@ -55,7 +55,7 @@ project "RvelaEngine"
    {
       "glfw3",
       "opengl32",
-      "assimp-vc143-mt",
+
       "lua54",
       "meshoptimizer",
       
@@ -84,6 +84,7 @@ project "RvelaEngine"
 
    filter "configurations:Dist"
        defines { "DIST" }
+       links { "Jolt" }
        runtime "Release"
        optimize "On"
        symbols "Off"

@@ -26,8 +26,8 @@ Engine::Engine(const WindowData& windowData)
 {
 	RvelaLog::Init("log.txt");
 
-	Path::SetEngineResourcesPath(std::filesystem::path(RVELA_ROOT_DIR) / "Resources" / "Engine");
-	Path::SetEditorResourcesPath(std::filesystem::path(RVELA_ROOT_DIR) / "Resources" / "Editor");
+	InitResourcePaths();
+
 
 	m_Window.Init();
 	AssetManager& assetManager = AssetManager::Get();
@@ -141,7 +141,8 @@ void Engine::Run()
 {
 	LOG_INFO("Engine has started!");
 
-	while (!glfwWindowShouldClose(GetWindow().GetGLFWWindow()))
+	m_IsRunning = true;
+	while (m_IsRunning && !glfwWindowShouldClose(GetWindow().GetGLFWWindow()))
 	{
 		glfwPollEvents();
 		HandleEvents();
@@ -219,4 +220,84 @@ void Engine::Shutdown()
 	m_Renderer.Shutdown();
 
 	glfwTerminate();
+}
+
+void Engine::Quit() noexcept
+{
+	m_IsRunning = false;
+	if (m_Window.GetGLFWWindow())
+	{
+		glfwSetWindowShouldClose(m_Window.GetGLFWWindow(), GLFW_TRUE);
+	}
+}
+
+void Engine::InitResourcePaths()
+{
+	auto exeDir = Path::GetExecutableDirectory();
+	auto curDir = std::filesystem::current_path();
+
+	std::vector<std::filesystem::path> engineCandidates = {
+		exeDir / "Resources" / "Engine",
+		curDir / "Resources" / "Engine",
+		exeDir.parent_path() / "Resources" / "Engine",
+		exeDir.parent_path().parent_path() / "Resources" / "Engine",
+		exeDir.parent_path().parent_path().parent_path() / "Resources" / "Engine"
+	};
+
+#if defined(RVELA_ROOT_DIR)
+	engineCandidates.push_back(std::filesystem::path(RVELA_ROOT_DIR) / "Resources" / "Engine");
+#endif
+
+	std::filesystem::path engineRes;
+	for (const auto& path : engineCandidates)
+	{
+		std::error_code ec;
+		if (std::filesystem::exists(path, ec) && std::filesystem::is_directory(path, ec))
+		{
+			engineRes = std::filesystem::canonical(path, ec);
+			if (ec) engineRes = path;
+			break;
+		}
+	}
+
+	if (engineRes.empty())
+	{
+		engineRes = exeDir / "Resources" / "Engine";
+		LOG_WARN("Could not locate existing Resources/Engine directory. Falling back to: {}", engineRes.string());
+	}
+	else
+	{
+		LOG_INFO("Engine Resources located at: {}", engineRes.string());
+	}
+	Path::SetEngineResourcesPath(engineRes);
+
+	std::vector<std::filesystem::path> editorCandidates = {
+		exeDir / "Resources" / "Editor",
+		curDir / "Resources" / "Editor",
+		exeDir.parent_path() / "Resources" / "Editor",
+		exeDir.parent_path().parent_path() / "Resources" / "Editor",
+		exeDir.parent_path().parent_path().parent_path() / "Resources" / "Editor"
+	};
+
+#if defined(RVELA_ROOT_DIR)
+	editorCandidates.push_back(std::filesystem::path(RVELA_ROOT_DIR) / "Resources" / "Editor");
+#endif
+
+	std::filesystem::path editorRes;
+	for (const auto& path : editorCandidates)
+	{
+		std::error_code ec;
+		if (std::filesystem::exists(path, ec) && std::filesystem::is_directory(path, ec))
+		{
+			editorRes = std::filesystem::canonical(path, ec);
+			if (ec) editorRes = path;
+			break;
+		}
+	}
+
+	if (editorRes.empty())
+	{
+		editorRes = exeDir / "Resources" / "Editor";
+	}
+	Path::SetEditorResourcesPath(editorRes);
 }

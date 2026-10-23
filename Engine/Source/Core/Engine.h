@@ -26,6 +26,8 @@ public:
 	void LateUpdate();
 	void Render();
 	void Shutdown();
+	void Quit() noexcept;
+	bool IsRunning() const noexcept { return m_IsRunning; }
 
 	void PushLayer(Layer* layer);
 	void PopLayer(Layer* layer);
@@ -54,6 +56,9 @@ private:
 	RenderLayer* m_RenderLayer;
 
 	void HandleEvents() noexcept;
+	void InitResourcePaths();
+
+	bool m_IsRunning = true;
 
 	static Engine* s_Instance;
 	EditorCamera* m_EditorCamera = nullptr;

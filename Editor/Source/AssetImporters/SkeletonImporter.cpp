@@ -6,6 +6,7 @@
 #include "SkeletonSerializer.h"
 #include "Core/Log.h"
 #include "Math/RvelaMath.h"
+#include "AssimpUtils.h"
 
 using namespace rv;
 

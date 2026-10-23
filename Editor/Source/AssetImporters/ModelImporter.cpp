@@ -17,6 +17,7 @@
 #include "Core/Engine.h"
 #include "Core/Log.h"
 #include "Math/RvelaMath.h"
+#include "AssimpUtils.h"
 #include <Assimp/scene.h>
 #include <Assimp/postprocess.h>
 #include <Assimp/GltfMaterial.h>

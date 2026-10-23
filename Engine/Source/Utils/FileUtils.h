@@ -46,6 +46,9 @@ public:
 
 	static void SetEngineResourcesPath(const std::filesystem::path& path);
 	static void SetEditorResourcesPath(const std::filesystem::path& path);
+	static const std::filesystem::path& GetEngineResourcesPath() { return s_EngineResourcesPath; }
+	static const std::filesystem::path& GetEditorResourcesPath() { return s_EditorResourcesPath; }
+	static std::filesystem::path GetExecutableDirectory();
 
 private:
 	std::filesystem::path m_VirtualPath;

@@ -1,6 +1,7 @@
 #include "Core/Engine.h"
 #include "RuntimeBlitLayer.h"
 #include "Core/Log.h"
+#include "Utils/FileUtils.h"
 #include <filesystem>
 #include <iostream>
 
@@ -28,6 +29,16 @@ static std::filesystem::path FindProjectToRun(int argc, char** argv)
 		}
 	}
 
+	std::filesystem::path exeDir = Path::GetExecutableDirectory();
+	if (std::filesystem::exists(exeDir))
+	{
+		for (const auto& entry : std::filesystem::directory_iterator(exeDir))
+		{
+			if (entry.path().extension() == ".rproj")
+				return entry.path();
+		}
+	}
+
 	std::filesystem::path currentDir = std::filesystem::current_path();
 	for (const auto& entry : std::filesystem::directory_iterator(currentDir))
 	{
@@ -42,9 +53,14 @@ static std::filesystem::path FindProjectToRun(int argc, char** argv)
 			return r;
 	}
 
+#if defined(RVELA_ROOT_DIR)
 	std::filesystem::path defaultTest = std::filesystem::path(RVELA_ROOT_DIR) / "Resources" / "Editor" / "TestProject" / "TestProject.rproj";
 	if (std::filesystem::exists(defaultTest))
 		return defaultTest;
+
+#endif
+
+
 
 	return "";
 }

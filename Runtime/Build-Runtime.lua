@@ -31,7 +31,7 @@ project "RvelaRuntime"
       "../Vendor/robin_map/include",
       "../Vendor/lua/include",
       "../Vendor/Jolt/include",
-      "../Vendor/Assimp/include",
+
    }
 
    libdirs
@@ -66,6 +66,8 @@ project "RvelaRuntime"
        --{ "{COPY} ../Vendor/Assimp/lib/assimp-vc143-mt.dll ../Binaries/" .. OutputDir .. "/Editor/" }
 
    filter "configurations:Release"
+       kind "WindowedApp"
+       entrypoint "mainCRTStartup"
        defines { "RELEASE","NDEBUG"  }
        runtime "Release"
        links { "Jolt" }
@@ -76,7 +78,10 @@ project "RvelaRuntime"
       --"{COPY} ../Vendor/Assimp/lib/assimp-vc143-mt.dll ../Binaries/" .. OutputDir .. "/%{prj.name}/"}
 
    filter "configurations:Dist"
+       kind "WindowedApp"
+       entrypoint "mainCRTStartup"
        defines { "DIST" }
+       links { "Jolt" }
        runtime "Release"
        optimize "On"
        symbols "Off"

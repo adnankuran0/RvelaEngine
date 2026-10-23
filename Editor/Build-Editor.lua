@@ -44,6 +44,7 @@ project "RvelaEditor"
       "../Vendor/GLFW/lib",
       "../Vendor/lua/lib",
       "../Vendor/Jolt/lib",
+      "../Vendor/Assimp/lib",
       "../Vendor/DirectXTex/lib",
       "../Vendor/meshoptimizer/lib",
 
@@ -54,6 +55,7 @@ project "RvelaEditor"
       "RvelaEngine",
         "glfw3",
         "lua54",
+        "assimp-vc143-mt",
         "DirectXTex",
         "meshoptimizer",
    }
@@ -65,6 +67,9 @@ project "RvelaEditor"
        systemversion "latest"
        defines { "WINDOWS","GLFW_INCLUDE_NONE" }
        buildoptions { "/utf-8","/MP"  }
+       postbuildcommands {
+          "{COPYFILE} ../Vendor/Assimp/lib/assimp-vc143-mt.dll %{cfg.targetdir}"
+       }
 
    filter "configurations:Debug"
        defines { "DEBUG"}
@@ -86,6 +91,7 @@ project "RvelaEditor"
 
    filter "configurations:Dist"
        defines { "DIST" }
+       links { "Jolt" }
        runtime "Release"
        optimize "On"
        symbols "Off"

@@ -2,6 +2,16 @@
 #include "FileUtils.h"
 #include "ProjectManager.h"
 #include "Core/Engine.h"
+
+#if defined(_WIN32)
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#endif
 using namespace rv;
 
 std::filesystem::path Path::s_EngineResourcesPath;
@@ -23,6 +33,19 @@ Path Path::FromEditorResource(const std::string& p) { return Path(p, true, PathO
 
 void Path::SetEngineResourcesPath(const std::filesystem::path& path) { s_EngineResourcesPath = path; }
 void Path::SetEditorResourcesPath(const std::filesystem::path& path) { s_EditorResourcesPath = path; }
+
+std::filesystem::path Path::GetExecutableDirectory()
+{
+#if defined(_WIN32)
+	wchar_t buffer[MAX_PATH];
+	DWORD len = GetModuleFileNameW(NULL, buffer, MAX_PATH);
+	if (len > 0)
+	{
+		return std::filesystem::path(buffer).parent_path();
+	}
+#endif
+	return std::filesystem::current_path();
+}
 
 std::filesystem::path Path::GetAbsolute() const
 {

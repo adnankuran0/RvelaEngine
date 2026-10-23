@@ -11,6 +11,7 @@
 #include "Asset/AssetManager.h"
 #include "Asset/AssetUUID.h"
 #include "Core/Time.h"
+#include "Core/Engine.h"
 #include <vector>
 
 using namespace rv;
@@ -320,4 +321,16 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
         return sol::nil;
     };
     timeTable[sol::metatable_key] = timeMeta;
+
+    auto engineTable = lua.create_named_table("Engine");
+    engineTable["Quit"] = []() {
+        if (Engine::Get()) {
+            Engine::Get()->Quit();
+        }
+    };
+    engineTable["Exit"] = engineTable["Quit"];
+
+    auto appTable = lua.create_named_table("Application");
+    appTable["Quit"] = engineTable["Quit"];
+    appTable["Exit"] = engineTable["Quit"];
 }
