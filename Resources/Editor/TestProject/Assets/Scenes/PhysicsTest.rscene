@@ -669,7 +669,7 @@
                     0.9999991655349731
                 ]
             },
-            "UUID": 13135215670958562651
+            "UUID": 341598754863110701
         },
         {
             "Material": {
@@ -1389,7 +1389,7 @@
                     1.0
                 ]
             },
-            "UUID": 98436486662725137
+            "UUID": 433600001592367455
         },
         {
             "ParentUUID": 0,
@@ -1481,6 +1481,7 @@
                 ]
             },
             "UIButtonComponent": {
+                "borderSize": 8.0,
                 "cornerRadius": 6.0,
                 "disabledColor": [
                     0.20000000298023224,
@@ -1488,6 +1489,7 @@
                     0.20000000298023224,
                     0.5
                 ],
+                "disabledTextureUUID": "00000000-0000-0000-0000-000000000000",
                 "fontPath": "",
                 "fontSize": 24.0,
                 "hoverColor": [
@@ -1496,6 +1498,8 @@
                     0.800000011920929,
                     0.501960813999176
                 ],
+                "hoverTextureUUID": "00000000-0000-0000-0000-000000000000",
+                "imageType": 0,
                 "interactable": true,
                 "isBold": true,
                 "isOutline": false,
@@ -1506,6 +1510,7 @@
                     0.6509804129600525,
                     0.501960813999176
                 ],
+                "normalTextureUUID": "00000000-0000-0000-0000-000000000000",
                 "outlineColor": [
                     0.0,
                     0.0,
@@ -1519,6 +1524,7 @@
                     0.501960813999176,
                     0.501960813999176
                 ],
+                "pressedTextureUUID": "00000000-0000-0000-0000-000000000000",
                 "text": "Change scene",
                 "textColor": [
                     1.0,
@@ -1678,7 +1684,7 @@
                     1.0
                 ]
             },
-            "UUID": 7263178051729816671
+            "UUID": 11953192651942637600
         },
         {
             "BoxColliderComponent": {
@@ -2272,7 +2278,7 @@
         "Lighting_AmbientIntensity": 0.10000000149011612,
         "Lighting_IBL": true,
         "Lighting_IBLIntensity": 0.10000000149011612,
-        "MotionBlur": true,
+        "MotionBlur": false,
         "MotionBlur_Intensity": 1.0,
         "MotionBlur_MaxVelocity": 0.08500000089406967,
         "MotionBlur_Samples": 16,

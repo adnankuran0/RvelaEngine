@@ -281,6 +281,7 @@ function AssetHandle.FromString(str) end
 function AssetHandle.Invalid() end
 
 _G.AssetHandle = AssetHandle
+_G.AssetUUID = AssetHandle
 
 
 ---@class AssetManager
@@ -408,6 +409,9 @@ MouseMode = {
 _G.MouseMode = MouseMode
 
 ---@class Input
+---@field mouseDelta Vec2 Delta movement of the mouse cursor this frame
+---@field mousePosition Vec2 Current mouse cursor position in screen coordinates
+---@field mouseScroll Vec2 Scroll wheel delta vector (x, y) this frame
 Input = {}
 
 ---Checks if a keyboard key is currently held down.
@@ -447,6 +451,30 @@ function Input.GetMousePosition() end
 ---Sets the cursor mode (MouseMode.VISIBLE, MouseMode.HIDDEN, MouseMode.CAPTURED).
 ---@param mode MouseMode|number
 function Input.SetMouseMode(mode) end
+
+---Returns the mouse cursor position delta between current and last frame.
+---@return Vec2
+function Input.GetMouseDelta() end
+
+---Returns the horizontal mouse cursor delta.
+---@return number
+function Input.GetMouseDeltaX() end
+
+---Returns the vertical mouse cursor delta.
+---@return number
+function Input.GetMouseDeltaY() end
+
+---Returns the mouse scroll wheel delta vector (x, y).
+---@return Vec2
+function Input.GetMouseScrollDelta() end
+
+---Returns the horizontal mouse scroll delta.
+---@return number
+function Input.GetMouseScrollX() end
+
+---Returns the vertical mouse scroll delta.
+---@return number
+function Input.GetMouseScrollY() end
 
 ---Checks if the mouse is currently hovering over an interactive UI element.
 ---@return boolean
@@ -499,6 +527,150 @@ function Time.GetMaxFPS() end
 function Time.SetMaxFPS(maxFPS) end
 
 _G.Time = Time
+
+
+-------------------------------------------------------------------------------
+-- DEBUG & LOGGING SYSTEM
+-------------------------------------------------------------------------------
+
+---@class Debug
+Debug = {}
+
+---Draws a debug line between two points in 3D world space.
+---@param from Vec3 Start position
+---@param to Vec3 End position
+---@param color? Vec4 Line color (default white)
+function Debug.DrawLine(from, to, color) end
+
+---Draws a debug triangle between three points in 3D world space.
+---@param a Vec3 First vertex
+---@param b Vec3 Second vertex
+---@param c Vec3 Third vertex
+---@param color? Vec4 Triangle wireframe color (default white)
+function Debug.DrawTriangle(a, b, c, color) end
+
+---Draws an axis-aligned debug bounding box in 3D world space.
+---@param min Vec3 Minimum world bounds
+---@param max Vec3 Maximum world bounds
+---@param color? Vec4 Box wireframe color (default white)
+function Debug.DrawBox(min, max, color) end
+
+---Logs a message at Trace level.
+---@param ... any Values to format and log
+function Debug.Trace(...) end
+
+---Logs a message at Debug level.
+---@param ... any Values to format and log
+function Debug.Debug(...) end
+
+---Logs an informational message.
+---@param ... any Values to format and log
+function Debug.Info(...) end
+
+---Logs a warning message.
+---@param ... any Values to format and log
+function Debug.Warn(...) end
+
+---Logs an error message.
+---@param ... any Values to format and log
+function Debug.Error(...) end
+
+---Logs a fatal/critical error message.
+---@param ... any Values to format and log
+function Debug.Fatal(...) end
+
+---Alias for Trace.
+---@param ... any
+function Debug.LogTrace(...) end
+
+---Alias for Debug.
+---@param ... any
+function Debug.LogDebug(...) end
+
+---Alias for Info.
+---@param ... any
+function Debug.Log(...) end
+
+---Alias for Info.
+---@param ... any
+function Debug.LogInfo(...) end
+
+---Alias for Warn.
+---@param ... any
+function Debug.LogWarning(...) end
+
+---Alias for Error.
+---@param ... any
+function Debug.LogError(...) end
+
+---Alias for Fatal.
+---@param ... any
+function Debug.LogFatal(...) end
+
+_G.Debug = Debug
+
+
+-------------------------------------------------------------------------------
+-- ENGINE & APPLICATION
+-------------------------------------------------------------------------------
+
+---@class Engine
+Engine = {}
+
+---Requests the engine to shut down and terminate the application cleanly.
+function Engine.Quit() end
+
+---Alias for Quit.
+function Engine.Exit() end
+
+_G.Engine = Engine
+
+---@class Application
+Application = {}
+
+---Requests the application to terminate cleanly.
+function Application.Quit() end
+
+---Alias for Quit.
+function Application.Exit() end
+
+_G.Application = Application
+
+
+-------------------------------------------------------------------------------
+-- STORAGE & SAVE SYSTEM
+-------------------------------------------------------------------------------
+
+---@class Storage
+Storage = {}
+
+---Returns the absolute filesystem directory path used for game saves.
+---@return string
+function Storage.GetSaveDirectory() end
+
+---Writes string content to a save file in the game saves directory.
+---@param filename string File name or relative path inside Saves directory
+---@param content string Text content to save
+---@return boolean success
+function Storage.SaveText(filename, content) end
+
+---Reads text content from a save file in the game saves directory.
+---@param filename string File name or relative path inside Saves directory
+---@return string? content File content or nil if the file does not exist
+function Storage.LoadText(filename) end
+
+---Checks if a file exists in the game saves directory.
+---@param filename string File name or relative path inside Saves directory
+---@return boolean exists
+function Storage.FileExists(filename) end
+
+---Deletes a save file from the game saves directory.
+---@param filename string File name or relative path inside Saves directory
+---@return boolean success
+function Storage.DeleteFile(filename) end
+
+_G.Storage = Storage
+_G.SaveSystem = Storage
 
 
 -------------------------------------------------------------------------------
@@ -934,6 +1106,10 @@ function ComponentHandle:IsValid() end
 ---@field up Vec3 Up direction vector (read-only)
 ---@field right Vec3 Right direction vector (read-only)
 local TransformComponent = {}
+---Rotates transform by an angle around an axis in local space.
+---@param angleDeg number Angle in degrees
+---@param axis Vec3 Axis of rotation (e.g. Vec3.UP)
+function TransformComponent:Rotate(angleDeg, axis) end
 ---Translates local position by vector.
 ---@param delta Vec3
 function TransformComponent:Translate(delta) end
@@ -993,8 +1169,69 @@ function TransformComponent:LookAt(target, up) end
 ---@field ao number Ambient occlusion factor [0..1]
 ---@field normalScale number Normal map intensity scale
 ---@field heightScale number Parallax displacement height scale
+---@field invertHeight boolean Invert parallax height displacement
 ---@field uvScale Vec2 UV tiling scale
 ---@field uvOffset Vec2 UV scroll offset
+local MaterialComponent = {}
+---Checks if the material uses a custom shader.
+---@return boolean
+function MaterialComponent:HasCustomShader() end
+---Sets a custom shader float uniform.
+---@param name string
+---@param val number
+function MaterialComponent:SetShaderFloat(name, val) end
+---Gets a custom shader float uniform.
+---@param name string
+---@return number
+function MaterialComponent:GetShaderFloat(name) end
+---Sets a custom shader integer uniform.
+---@param name string
+---@param val integer
+function MaterialComponent:SetShaderInt(name, val) end
+---Gets a custom shader integer uniform.
+---@param name string
+---@return integer
+function MaterialComponent:GetShaderInt(name) end
+---Sets a custom shader boolean uniform.
+---@param name string
+---@param val boolean
+function MaterialComponent:SetShaderBool(name, val) end
+---Gets a custom shader boolean uniform.
+---@param name string
+---@return boolean
+function MaterialComponent:GetShaderBool(name) end
+---Sets a custom shader Vec2 uniform.
+---@param name string
+---@param val Vec2
+function MaterialComponent:SetShaderVec2(name, val) end
+---Gets a custom shader Vec2 uniform.
+---@param name string
+---@return Vec2
+function MaterialComponent:GetShaderVec2(name) end
+---Sets a custom shader Vec3 uniform.
+---@param name string
+---@param val Vec3
+function MaterialComponent:SetShaderVec3(name, val) end
+---Gets a custom shader Vec3 uniform.
+---@param name string
+---@return Vec3
+function MaterialComponent:GetShaderVec3(name) end
+---Sets a custom shader Vec4 uniform.
+---@param name string
+---@param val Vec4
+function MaterialComponent:SetShaderVec4(name, val) end
+---Gets a custom shader Vec4 uniform.
+---@param name string
+---@return Vec4
+function MaterialComponent:GetShaderVec4(name) end
+---Sets a custom shader color uniform.
+---@param name string
+---@param val Vec4
+function MaterialComponent:SetShaderColor(name, val) end
+---Sets any custom shader parameter (float, int, bool, Vec2, Vec3, Vec4).
+---@param name string
+---@param val number|boolean|Vec2|Vec3|Vec4
+function MaterialComponent:SetShaderParameter(name, val) end
 
 ---@class RigidbodyComponent : ComponentHandle
 ---@field IsValid fun(self: ComponentHandle): boolean
@@ -1013,6 +1250,7 @@ function TransformComponent:LookAt(target, up) end
 ---@field centerOfMass Vec3 Center of mass position (read-only)
 ---@field position Vec3 Position
 ---@field rotation Quat Rotation quaternion
+---@field eulerRotation Vec3 Local Euler angles in degrees
 local RigidbodyComponent = {}
 ---Moves kinematic body towards position and rotation over delta time.
 ---@param pos Vec3
@@ -1186,6 +1424,46 @@ function AnimatorComponent:hasClip(clipName) end
 ---@field startColor Vec4
 ---@field endColor Vec4
 
+---@enum TextAlignment
+TextAlignment = {
+    Left = 0,
+    Center = 1,
+    Right = 2,
+}
+_G.TextAlignment = TextAlignment
+
+---@enum TextVerticalAlignment
+TextVerticalAlignment = {
+    Top = 0,
+    Middle = 1,
+    Bottom = 2,
+}
+_G.TextVerticalAlignment = TextVerticalAlignment
+
+---@enum UILayoutType
+UILayoutType = {
+    Vertical = 0,
+    Horizontal = 1,
+}
+_G.UILayoutType = UILayoutType
+
+---@enum UIChildAlignment
+UIChildAlignment = {
+    Start = 0,
+    Center = 1,
+    End = 2,
+}
+_G.UIChildAlignment = UIChildAlignment
+
+---@enum UIProgressBarDirection
+UIProgressBarDirection = {
+    LeftToRight = 0,
+    RightToLeft = 1,
+    BottomToTop = 2,
+    TopToBottom = 3,
+}
+_G.UIProgressBarDirection = UIProgressBarDirection
+
 ---@class RectTransformComponent : ComponentHandle
 ---@field IsValid fun(self: ComponentHandle): boolean
 ---@field position Vec2 Anchor-relative position
@@ -1208,12 +1486,21 @@ function AnimatorComponent:hasClip(clipName) end
 ---@class UIImageComponent : ComponentHandle
 ---@field IsValid fun(self: ComponentHandle): boolean
 ---@field color Vec4 Tint color (RGBA)
+---@field textureUUID AssetHandle Texture asset UUID handle
+local UIImageComponent = {}
+---Sets the image texture by asset handle or UUID string.
+---@param texture AssetHandle|string
+function UIImageComponent:SetTexture(texture) end
+---Clears the image texture.
+function UIImageComponent:ClearTexture() end
 
 ---@class UITextComponent : ComponentHandle
 ---@field IsValid fun(self: ComponentHandle): boolean
 ---@field text string Label text
 ---@field color Vec4 Text color (RGBA)
 ---@field fontSize number Font size in points
+---@field alignment TextAlignment|integer Horizontal alignment (0=Left, 1=Center, 2=Right)
+---@field verticalAlignment TextVerticalAlignment|integer Vertical alignment (0=Top, 1=Middle, 2=Bottom)
 ---@field isBold boolean
 ---@field isOutline boolean
 ---@field outlineSize number
@@ -1226,15 +1513,19 @@ function AnimatorComponent:hasClip(clipName) end
 ---@field IsValid fun(self: ComponentHandle): boolean
 ---@field interactable boolean Whether button accepts clicks
 ---@field text string Button label
----@field textColor Vec4
+---@field textColor Vec4 Text color (RGBA)
+---@field fontSize number Font size in points
 ---@field isBold boolean
----@field isOutline boolean
----@field outlineSize number
----@field outlineColor Vec4
----@field normalColor Vec4
----@field hoverColor Vec4
----@field pressedColor Vec4
----@field luaCallback string
+---@field normalColor Vec4 Normal background tint
+---@field hoverColor Vec4 Hover background tint
+---@field pressedColor Vec4 Pressed background tint
+---@field disabledColor Vec4 Disabled background tint
+---@field normalTextureUUID AssetHandle Default state background texture
+---@field hoverTextureUUID AssetHandle Hover state background texture
+---@field pressedTextureUUID AssetHandle Pressed state background texture
+---@field disabledTextureUUID AssetHandle Disabled state background texture
+---@field cornerRadius number Rounded corner radius
+---@field luaCallback string Name of callback method on script instance
 local UIButtonComponent = {}
 ---Registers a click listener callback function.
 ---@param callback fun()
@@ -1254,7 +1545,12 @@ function UISliderComponent:OnValueChanged(callback) end
 ---@class UIProgressBarComponent : ComponentHandle
 ---@field IsValid fun(self: ComponentHandle): boolean
 ---@field value number Progress percentage [0..1]
----@field fillColor Vec4 Fill bar color
+---@field backgroundColor Vec4 Background bar color (RGBA)
+---@field fillColor Vec4 Fill bar color (RGBA)
+---@field backgroundTextureUUID AssetHandle Background texture UUID handle
+---@field fillTextureUUID AssetHandle Fill texture UUID handle
+---@field showPercentageText boolean Whether percentage text is shown
+---@field direction UIProgressBarDirection|integer Fill progress direction
 
 ---@class UICheckboxComponent : ComponentHandle
 ---@field IsValid fun(self: ComponentHandle): boolean
@@ -1267,6 +1563,69 @@ local UICheckboxComponent = {}
 ---Registers a toggle change callback.
 ---@param callback fun(checked: boolean)
 function UICheckboxComponent:OnValueChanged(callback) end
+
+---@class UIPanelComponent : ComponentHandle
+---@field IsValid fun(self: ComponentHandle): boolean
+---@field backgroundColor Vec4 Background fill color
+---@field borderColor Vec4 Outline border color
+---@field borderThickness number Border thickness in pixels
+---@field cornerRadius number Rounded corner radius
+---@field title string Optional panel header title
+---@field isDraggable boolean Whether panel can be dragged with mouse
+---@field clipChildren boolean Whether child elements are clipped to panel bounds
+
+---@class UILayoutGroupComponent : ComponentHandle
+---@field IsValid fun(self: ComponentHandle): boolean
+---@field type UILayoutType|integer Layout type (0=Vertical, 1=Horizontal)
+---@field spacing number Spacing in pixels between children
+---@field fitChildren boolean Auto-size this container to fit all children
+---@field controlChildWidth boolean Automatically resize children's width
+---@field controlChildHeight boolean Automatically resize children's height
+
+---@class UITextInputComponent : ComponentHandle
+---@field IsValid fun(self: ComponentHandle): boolean
+---@field text string Current input text
+---@field placeholder string Placeholder text shown when empty
+---@field isPassword boolean Mask characters with bullet points
+---@field interactable boolean Whether input field accepts focus and typing
+---@field isFocused boolean Whether input field currently has keyboard focus
+---@field luaCallback string Name of callback method on script instance
+---@field luaSubmitCallback string Name of enter/submit callback method on script instance
+local UITextInputComponent = {}
+---Registers a text change callback function.
+---@param callback fun(text: string)
+function UITextInputComponent:OnValueChanged(callback) end
+---Registers an enter/submit key callback function.
+---@param callback fun(text: string)
+function UITextInputComponent:OnSubmit(callback) end
+
+---@class UIScrollRectComponent : ComponentHandle
+---@field IsValid fun(self: ComponentHandle): boolean
+---@field horizontal boolean Allow horizontal scrolling
+---@field vertical boolean Allow vertical scrolling
+---@field scrollPosition Vec2 Current scroll position offset
+---@field contentSize Vec2 Total virtual content bounds size
+---@field scrollSpeed number Scroll wheel sensitivity / speed
+---@field showScrollbar boolean Whether scrollbars are rendered
+local UIScrollRectComponent = {}
+---Registers a scroll change callback function.
+---@param callback fun(pos: Vec2)
+function UIScrollRectComponent:OnScroll(callback) end
+
+---@class UITabContainerComponent : ComponentHandle
+---@field IsValid fun(self: ComponentHandle): boolean
+---@field activeTabIndex integer Index of currently active tab (0-based)
+---@field tabHeight number Height in pixels of tab bar buttons
+local UITabContainerComponent = {}
+---Adds a new tab header with title.
+---@param title string Tab header title text
+function UITabContainerComponent:AddTab(title) end
+---Returns total number of tabs.
+---@return integer
+function UITabContainerComponent:GetTabCount() end
+---Registers a tab change callback function.
+---@param callback fun(activeTabIndex: integer)
+function UITabContainerComponent:OnTabChanged(callback) end
 
 
 -------------------------------------------------------------------------------
@@ -1298,6 +1657,11 @@ function UICheckboxComponent:OnValueChanged(callback) end
 ---| '"UISlider"'
 ---| '"UIProgressBar"'
 ---| '"UICheckbox"'
+---| '"UIPanel"'
+---| '"UILayoutGroup"'
+---| '"UITextInput"'
+---| '"UIScrollRect"'
+---| '"UITabContainer"'
 
 ---@class Entity
 ---@field name string Entity tag name
@@ -1404,6 +1768,11 @@ function Entity:HasComponent(typeName) end
 ---@overload fun(self: Entity, typeName: '"UISlider"'): UISliderComponent
 ---@overload fun(self: Entity, typeName: '"UIProgressBar"'): UIProgressBarComponent
 ---@overload fun(self: Entity, typeName: '"UICheckbox"'): UICheckboxComponent
+---@overload fun(self: Entity, typeName: '"UIPanel"'): UIPanelComponent
+---@overload fun(self: Entity, typeName: '"UILayoutGroup"'): UILayoutGroupComponent
+---@overload fun(self: Entity, typeName: '"UITextInput"'): UITextInputComponent
+---@overload fun(self: Entity, typeName: '"UIScrollRect"'): UIScrollRectComponent
+---@overload fun(self: Entity, typeName: '"UITabContainer"'): UITabContainerComponent
 ---@overload fun(self: Entity, typeName: string): any
 function Entity:GetComponent(typeName) end
 
@@ -1427,6 +1796,11 @@ function Entity:GetComponent(typeName) end
 ---@overload fun(self: Entity, typeName: '"UISlider"'): UISliderComponent
 ---@overload fun(self: Entity, typeName: '"UIProgressBar"'): UIProgressBarComponent
 ---@overload fun(self: Entity, typeName: '"UICheckbox"'): UICheckboxComponent
+---@overload fun(self: Entity, typeName: '"UIPanel"'): UIPanelComponent
+---@overload fun(self: Entity, typeName: '"UILayoutGroup"'): UILayoutGroupComponent
+---@overload fun(self: Entity, typeName: '"UITextInput"'): UITextInputComponent
+---@overload fun(self: Entity, typeName: '"UIScrollRect"'): UIScrollRectComponent
+---@overload fun(self: Entity, typeName: '"UITabContainer"'): UITabContainerComponent
 ---@overload fun(self: Entity, typeName: string): any
 function Entity:AddComponent(typeName) end
 
@@ -1458,15 +1832,80 @@ function Scene:FindEntityByName(name) end
 ---@return Entity
 function Scene:Instantiate(prefab, position, rotation, parent) end
 
+---Gets an autoload singleton entity or script instance by registered name.
+---@param name string
+---@return ScriptInstance|Entity?
+function Scene:GetAutoload(name) end
+
 _G.Scene = Scene
+
+---@enum AsyncLoadStatus
+AsyncLoadStatus = {
+    None = 0,
+    Loading = 1,
+    Loaded = 2,
+    Failed = 3,
+    Cancelled = 4,
+}
+_G.AsyncLoadStatus = AsyncLoadStatus
 
 ---@class SceneManager
 local SceneManager = {}
 
----Queues a scene change by .rscene path or scene AssetHandle. Relative paths can start at the project or Assets folder. Returns whether the request was accepted.
----@param target string|AssetHandle
+---Queues a scene change by .rscene path, scene AssetHandle, or taskId.
+---@param target string|AssetHandle|integer
 ---@return boolean accepted
 function SceneManager.ChangeScene(target) end
+
+---Starts loading a scene asynchronously in the background. Returns a task ID.
+---@param target string|AssetHandle
+---@param autoActivate? boolean If true, activates the scene once loading completes (default false)
+---@return integer taskId Task ID used with IsSceneLoaded, GetLoadProgress, etc.
+function SceneManager.LoadSceneAsync(target, autoActivate) end
+
+---Starts asynchronous scene load and automatically activates it upon completion.
+---@param target string|AssetHandle
+---@return integer taskId Task ID
+function SceneManager.ChangeSceneAsync(target) end
+
+---Checks if a scene is finished loading.
+---@param target string|AssetHandle|integer Scene path, AssetHandle, or async taskId
+---@return boolean isLoaded
+function SceneManager.IsSceneLoaded(target) end
+
+---Gets the asynchronous loading progress fraction [0.0..1.0].
+---@param target string|AssetHandle|integer Scene path, AssetHandle, or async taskId
+---@return number progress [0..1]
+function SceneManager.GetLoadProgress(target) end
+
+---Gets the current asynchronous load status ("None", "Loading", "Loaded", "Failed", "Cancelled").
+---@param target string|AssetHandle|integer Scene path, AssetHandle, or async taskId
+---@return string status
+function SceneManager.GetLoadStatus(target) end
+
+---Switches to an already loaded scene.
+---@param target string|AssetHandle|integer Scene path, AssetHandle, or async taskId
+---@return boolean success
+function SceneManager.ChangeToLoadedScene(target) end
+
+---Unloads a previously preloaded scene from memory.
+---@param target string|AssetHandle|integer Scene path, AssetHandle, or async taskId
+---@return boolean success
+function SceneManager.UnloadLoadedScene(target) end
+
+---Cancels an in-progress asynchronous scene loading task.
+---@param target string|AssetHandle|integer Scene path, AssetHandle, or async taskId
+---@return boolean success
+function SceneManager.CancelAsyncLoad(target) end
+
+---Returns a list of all currently loaded scene paths.
+---@return string[]
+function SceneManager.GetLoadedScenes() end
+
+---Gets an autoload singleton entity or script instance by registered name.
+---@param name string
+---@return ScriptInstance|Entity?
+function SceneManager.GetAutoload(name) end
 
 _G.SceneManager = SceneManager
 
