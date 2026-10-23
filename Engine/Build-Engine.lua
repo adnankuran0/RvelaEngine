@@ -83,7 +83,7 @@ project "RvelaEngine"
        symbols "On"
 
    filter "configurations:Dist"
-       defines { "DIST" }
+       defines { "DIST", "NDEBUG" }
        links { "Jolt" }
        runtime "Release"
        optimize "On"

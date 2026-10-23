@@ -12,6 +12,8 @@
 #include "Asset/AssetUUID.h"
 #include "Core/Time.h"
 #include "Core/Engine.h"
+#include "Utils/ProjectManager.h"
+#include "Utils/FileUtils.h"
 #include <vector>
 
 using namespace rv;
@@ -333,4 +335,65 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
     auto appTable = lua.create_named_table("Application");
     appTable["Quit"] = engineTable["Quit"];
     appTable["Exit"] = engineTable["Quit"];
+
+    auto storageTable = lua.create_named_table("Storage");
+    storageTable["GetSaveDirectory"] = []() -> std::string {
+        std::filesystem::path saveDir = ProjectManager::IsProjectLoaded()
+            ? (ProjectManager::GetProjectPath() / "Saves")
+            : (Path::GetExecutableDirectory() / "Saves");
+        std::error_code ec;
+        std::filesystem::create_directories(saveDir, ec);
+        return saveDir.string();
+    };
+
+    storageTable["SaveText"] = [](const std::string& filename, const std::string& content) -> bool {
+        std::filesystem::path saveDir = ProjectManager::IsProjectLoaded()
+            ? (ProjectManager::GetProjectPath() / "Saves")
+            : (Path::GetExecutableDirectory() / "Saves");
+        std::error_code ec;
+        std::filesystem::create_directories(saveDir, ec);
+        std::filesystem::path filePath = saveDir / filename;
+        std::ofstream file(filePath);
+        if (!file.is_open()) {
+            LOG_ERROR("Storage: Failed to open file for writing: {}", filePath.string());
+            return false;
+        }
+        file << content;
+        return true;
+    };
+
+    storageTable["LoadText"] = [](sol::this_state s, const std::string& filename) -> sol::object {
+        std::filesystem::path saveDir = ProjectManager::IsProjectLoaded()
+            ? (ProjectManager::GetProjectPath() / "Saves")
+            : (Path::GetExecutableDirectory() / "Saves");
+        std::filesystem::path filePath = saveDir / filename;
+        if (!std::filesystem::exists(filePath)) {
+            return sol::nil;
+        }
+        std::ifstream file(filePath);
+        if (!file.is_open()) {
+            LOG_ERROR("Storage: Failed to open file for reading: {}", filePath.string());
+            return sol::nil;
+        }
+        std::stringstream buffer;
+        buffer << file.rdbuf();
+        return sol::make_object(s, buffer.str());
+    };
+
+    storageTable["FileExists"] = [](const std::string& filename) -> bool {
+        std::filesystem::path saveDir = ProjectManager::IsProjectLoaded()
+            ? (ProjectManager::GetProjectPath() / "Saves")
+            : (Path::GetExecutableDirectory() / "Saves");
+        return std::filesystem::exists(saveDir / filename);
+    };
+
+    storageTable["DeleteFile"] = [](const std::string& filename) -> bool {
+        std::filesystem::path saveDir = ProjectManager::IsProjectLoaded()
+            ? (ProjectManager::GetProjectPath() / "Saves")
+            : (Path::GetExecutableDirectory() / "Saves");
+        std::error_code ec;
+        return std::filesystem::remove(saveDir / filename, ec);
+    };
+
+    lua["SaveSystem"] = storageTable;
 }

@@ -17,7 +17,10 @@ public:
 		CAPTURED
 	};
 
+	static void BeginFrame() noexcept;
 	static void Update() noexcept;
+
+	static void OnMouseScrolled(float xOffset, float yOffset) noexcept;
 
 	static bool IsKeyPressed(KeyCode key) noexcept;
 
@@ -52,8 +55,20 @@ public:
 		return s_LastMousePosition.y;
 	}
 
+	static glm::vec2 GetMouseDelta() noexcept;
+	static float GetMouseDeltaX() noexcept;
+	static float GetMouseDeltaY() noexcept;
+
+	static glm::vec2 GetMouseScrollDelta() noexcept;
+	static float GetMouseScrollX() noexcept;
+	static float GetMouseScrollY() noexcept;
+
 private:
 	static glm::vec2 s_LastMousePosition;
+	static glm::vec2 s_MouseDelta;
+	static glm::vec2 s_CurrentScrollDelta;
+	static glm::vec2 s_AccumulatedScrollDelta;
+	static bool s_FirstMouse;
 	static bool s_GameplayInputEnabled;
 	static MouseMode s_RequestedMouseMode;
 	static MouseMode s_ActiveMouseMode;

@@ -6,12 +6,81 @@ using namespace rv;
 
 // Cache for the last known mouse position to avoid redundant GLFW calls
 glm::vec2 Input::s_LastMousePosition = { 0.0f, 0.0f };
+glm::vec2 Input::s_MouseDelta = { 0.0f, 0.0f };
+glm::vec2 Input::s_CurrentScrollDelta = { 0.0f, 0.0f };
+glm::vec2 Input::s_AccumulatedScrollDelta = { 0.0f, 0.0f };
+bool Input::s_FirstMouse = true;
 bool Input::s_GameplayInputEnabled = true;
 Input::MouseMode Input::s_RequestedMouseMode = Input::MouseMode::VISIBLE;
 Input::MouseMode Input::s_ActiveMouseMode = Input::MouseMode::VISIBLE;
 // Cache previosly pressed keys and buttons
 std::unordered_map<KeyCode, bool> Input::s_PreviousKeyState;
 std::unordered_map<MouseCode, bool> Input::s_PreviousMouseButtonState;
+
+void Input::BeginFrame() noexcept
+{
+    s_CurrentScrollDelta = s_AccumulatedScrollDelta;
+    s_AccumulatedScrollDelta = { 0.0f, 0.0f };
+
+    GLFWwindow* window = Engine::Get()->GetWindow().GetGLFWWindow();
+    if (window && s_GameplayInputEnabled)
+    {
+        double xPos, yPos;
+        glfwGetCursorPos(window, &xPos, &yPos);
+        glm::vec2 currentPos = { static_cast<float>(xPos), static_cast<float>(yPos) };
+
+        if (s_FirstMouse)
+        {
+            s_LastMousePosition = currentPos;
+            s_MouseDelta = { 0.0f, 0.0f };
+            s_FirstMouse = false;
+        }
+        else
+        {
+            s_MouseDelta = currentPos - s_LastMousePosition;
+            s_LastMousePosition = currentPos;
+        }
+    }
+    else
+    {
+        s_MouseDelta = { 0.0f, 0.0f };
+    }
+}
+
+void Input::OnMouseScrolled(float xOffset, float yOffset) noexcept
+{
+    s_AccumulatedScrollDelta += glm::vec2(xOffset, yOffset);
+}
+
+glm::vec2 Input::GetMouseDelta() noexcept
+{
+    return s_GameplayInputEnabled ? s_MouseDelta : glm::vec2(0.0f);
+}
+
+float Input::GetMouseDeltaX() noexcept
+{
+    return GetMouseDelta().x;
+}
+
+float Input::GetMouseDeltaY() noexcept
+{
+    return GetMouseDelta().y;
+}
+
+glm::vec2 Input::GetMouseScrollDelta() noexcept
+{
+    return s_GameplayInputEnabled ? s_CurrentScrollDelta : glm::vec2(0.0f);
+}
+
+float Input::GetMouseScrollX() noexcept
+{
+    return GetMouseScrollDelta().x;
+}
+
+float Input::GetMouseScrollY() noexcept
+{
+    return GetMouseScrollDelta().y;
+}
 
 void Input::Update() noexcept
 {
@@ -75,6 +144,7 @@ bool Input::IsMouseButtonJustReleased(MouseCode button) noexcept
 void rv::Input::SetMouseMode(MouseMode mode) noexcept
 {
 	s_RequestedMouseMode = mode;
+	s_FirstMouse = true;
 	ApplyMouseMode(s_GameplayInputEnabled ? mode : MouseMode::VISIBLE);
 }
 
@@ -84,6 +154,7 @@ void Input::SetGameplayInputEnabled(bool enabled) noexcept
 		return;
 
 	s_GameplayInputEnabled = enabled;
+	s_FirstMouse = true;
 	ApplyMouseMode(enabled ? s_RequestedMouseMode : MouseMode::VISIBLE);
 }
 

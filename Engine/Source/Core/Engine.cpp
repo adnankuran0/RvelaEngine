@@ -145,6 +145,7 @@ void Engine::Run()
 	while (m_IsRunning && !glfwWindowShouldClose(GetWindow().GetGLFWWindow()))
 	{
 		glfwPollEvents();
+		Input::BeginFrame();
 		HandleEvents();
 
 		Time::Update();

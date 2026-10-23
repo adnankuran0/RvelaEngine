@@ -9,6 +9,7 @@
 #include "Event/MouseEvents.h"
 #include "Event/WindowEvents.h"
 #include "Utils/FileUtils.h"
+#include "Input/Input.h"
 #include "glm/vec2.hpp"
 #include "Core/ProjectSettings.h"
 
@@ -147,6 +148,7 @@ void Window::MouseMovedCallback(GLFWwindow* window, double xpos, double ypos) no
 
 void Window::MouseScrolledCallback(GLFWwindow* window, double xoffset, double yoffset) noexcept 
 {
+    Input::OnMouseScrolled(static_cast<float>(xoffset), static_cast<float>(yoffset));
     EventManager::PushEvent(new MouseScrolledEvent(static_cast<float>(xoffset), static_cast<float>(yoffset)));
 }
 

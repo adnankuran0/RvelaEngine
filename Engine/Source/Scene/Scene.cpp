@@ -195,9 +195,9 @@ void Scene::OnUpdate(float dt)
     bool released = inputEnabled && Input::IsMouseButtonJustReleased(MouseCode::ButtonLeft);
     m_UISystem.Update(this, dt, glm::vec2(vpW, vpH), mousePos, pressed, held, released);
 
-    JPH::BodyManager::DrawSettings settings;
-    settings.mDrawBoundingBox = true;
-    settings.mDrawShapeWireframe = true;
+
+
+
 }
 
 void rv::Scene::OnFixedUpdate(float dt)

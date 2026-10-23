@@ -90,7 +90,7 @@ project "RvelaEditor"
       --"{COPY} ../Vendor/Assimp/lib/assimp-vc143-mt.dll ../Binaries/" .. OutputDir .. "/%{prj.name}/"}
 
    filter "configurations:Dist"
-       defines { "DIST" }
+       defines { "DIST", "NDEBUG" }
        links { "Jolt" }
        runtime "Release"
        optimize "On"

@@ -211,6 +211,45 @@ void LuaBindings::RegisterInputAPI(sol::state& lua)
             Input::SetMouseMode(static_cast<Input::MouseMode>(mode));
         };
 
+    lua["Input"]["GetMouseDelta"] = []()
+        {
+            return Input::GetMouseDelta();
+        };
+
+    lua["Input"]["GetMouseDeltaX"] = []()
+        {
+            return Input::GetMouseDeltaX();
+        };
+
+    lua["Input"]["GetMouseDeltaY"] = []()
+        {
+            return Input::GetMouseDeltaY();
+        };
+
+    lua["Input"]["GetMouseScrollDelta"] = []()
+        {
+            return Input::GetMouseScrollDelta();
+        };
+
+    lua["Input"]["GetMouseScrollX"] = []()
+        {
+            return Input::GetMouseScrollX();
+        };
+
+    lua["Input"]["GetMouseScrollY"] = []()
+        {
+            return Input::GetMouseScrollY();
+        };
+
+    sol::table inputMeta = lua.create_table();
+    inputMeta[sol::meta_function::index] = [](sol::table t, const std::string& key) -> sol::object {
+        if (key == "mouseDelta") return sol::make_object(t.lua_state(), Input::GetMouseDelta());
+        if (key == "mousePosition") return sol::make_object(t.lua_state(), Input::GetMousePosition());
+        if (key == "mouseScroll") return sol::make_object(t.lua_state(), Input::GetMouseScrollDelta());
+        return sol::nil;
+    };
+    lua["Input"][sol::metatable_key] = inputMeta;
+
     lua["Input"]["IsMouseOverUI"] = []()
         {
             return Input::IsMouseOverUI();

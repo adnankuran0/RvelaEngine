@@ -80,7 +80,7 @@ project "RvelaRuntime"
    filter "configurations:Dist"
        kind "WindowedApp"
        entrypoint "mainCRTStartup"
-       defines { "DIST" }
+       defines { "DIST", "NDEBUG" }
        links { "Jolt" }
        runtime "Release"
        optimize "On"
