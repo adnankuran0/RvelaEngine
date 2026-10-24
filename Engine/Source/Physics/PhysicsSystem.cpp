@@ -195,6 +195,9 @@ void PhysicsSystem::OnStop()
 		m_CollisionEventQueue.clear();
 	}
 
+	m_ContactListener.Clear();
+	m_CharacterContactListener.Clear();
+
 	m_ColliderHierarchyCache.clear();
 	auto constraintView = m_Scene.GetRegistry().view<PhysicsConstraintComponent>();
 	for (auto e : constraintView)

@@ -50,7 +50,7 @@
                 "maxAngularVelocity": 50.0,
                 "maxLinearVelocity": 500.0,
                 "restitution": 0.5,
-                "useCCD": false
+                "useCCD": true
             },
             "ScriptComponent": {
                 "propertyValues": {
@@ -88,7 +88,7 @@
                     0.30000001192092896
                 ]
             },
-            "UUID": 7548015563591399556,
+            "UUID": 17264794457944502265,
             "_isRoot": true
         }
     ]

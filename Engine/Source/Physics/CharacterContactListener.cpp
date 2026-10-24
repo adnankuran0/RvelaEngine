@@ -56,7 +56,9 @@ void CharacterContactListener::OnContactAdded(
 
     CharacterContactKey key{ inCharacter, inBodyID2 };
     std::lock_guard contactsLock(m_ActiveContactsMutex);
-    m_ActiveContacts[key] = e;
+    auto [it, inserted] = m_ActiveContacts.try_emplace(key, e);
+    if (!inserted)
+        return;
 
     std::lock_guard eventLock(*m_EventMutex);
     m_EventQueue->push_back(e);
@@ -130,4 +132,3 @@ void CharacterContactListener::OnContactSolve(
     //if (inCharacterVelocity.IsNearZero() && !inCharacter->IsSlopeTooSteep(inContactNormal))
         //ioNewCharacterVelocity = JPH::Vec3::sZero();
 }
-

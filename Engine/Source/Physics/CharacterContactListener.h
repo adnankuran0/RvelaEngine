@@ -17,6 +17,12 @@ public:
         m_EventMutex = eventMutex;
     }
 
+    void Clear()
+    {
+        std::lock_guard contactsLock(m_ActiveContactsMutex);
+        m_ActiveContacts.clear();
+    }
+
     bool OnContactValidate(const JPH::CharacterVirtual* inCharacter, const JPH::BodyID& inBodyID2, 
         const JPH::SubShapeID& inSubShapeID2) override;
 

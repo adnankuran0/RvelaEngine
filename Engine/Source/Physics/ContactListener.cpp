@@ -35,11 +35,15 @@ JPH::ValidateResult ContactListener::OnContactValidate(const JPH::Body& inBody1,
 void ContactListener::OnContactAdded(const JPH::Body& inBody1, const JPH::Body& inBody2,
 	const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings)
 {
-	CollisionEvent e = BuildEvent(inBody1, inBody2, inManifold, CollisionEventType::ENTER);
-
 	ContactKey key(inBody1.GetID(), inBody2.GetID());
 	std::lock_guard contactsLock(m_ActiveContactsMutex);
-	m_ActiveContacts[key] = e;
+
+	auto [it, inserted] = m_ActiveContacts.try_emplace(key);
+	if (!inserted)
+		return;
+
+	CollisionEvent e = BuildEvent(inBody1, inBody2, inManifold, CollisionEventType::ENTER);
+	it->second = e;
 
 	std::lock_guard eventLock(*m_EventMutex);
 	m_EventQueue->push_back(e);
@@ -65,6 +69,9 @@ void ContactListener::OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair
 
 	auto it = m_ActiveContacts.find(key);
 	if (it == m_ActiveContacts.end())
+		return;
+
+	if (m_PhysicsSystem && m_PhysicsSystem->WereBodiesInContact(inSubShapePair.GetBody1ID(), inSubShapePair.GetBody2ID()))
 		return;
 
 	CollisionEvent e = it->second;

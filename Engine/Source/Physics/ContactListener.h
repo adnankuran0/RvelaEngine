@@ -20,6 +20,12 @@ public:
 		m_EventQueue = eventQueue;
 		m_EventMutex = eventMutex;
 	}
+
+	void Clear()
+	{
+		std::lock_guard contactsLock(m_ActiveContactsMutex);
+		m_ActiveContacts.clear();
+	}
 	
 private:
 	virtual JPH::ValidateResult	OnContactValidate(const JPH::Body& inBody1, const JPH::Body& inBody2, JPH::RVec3Arg inBaseOffset, const JPH::CollideShapeResult& inCollisionResult) override;
