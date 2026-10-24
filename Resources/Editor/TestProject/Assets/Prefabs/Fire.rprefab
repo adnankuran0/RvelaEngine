@@ -73,6 +73,7 @@
                 ]
             },
             "PointLight": {
+                "blurRadius": 0.029999999329447746,
                 "castShadows": true,
                 "color": [
                     1.0,
@@ -81,7 +82,9 @@
                 ],
                 "falloff": 0.4399999976158142,
                 "intensity": 20.0,
-                "radius": 5.0
+                "radius": 5.0,
+                "reverseCullFace": true,
+                "shadowBias": 0.10000000149011612
             },
             "Tag": {
                 "isActive": true,
@@ -105,7 +108,7 @@
                     1.0
                 ]
             },
-            "UUID": 13412136208800969531,
+            "UUID": 7784078465783032216,
             "_isRoot": true
         }
     ]

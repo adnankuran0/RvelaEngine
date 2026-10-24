@@ -30,9 +30,11 @@
                 "mesh": "62345031-f93b-40f4-aa76-18c59801997d"
             },
             "ScriptComponent": {
+                "propertyValues": {},
                 "scriptAssetUUID": "b3326755-edfb-4522-ada1-080110d5fba5"
             },
             "Tag": {
+                "isActive": true,
                 "tag": "Character"
             },
             "Transform": {
@@ -53,14 +55,17 @@
                     1.0
                 ]
             },
-            "UUID": 6
+            "UUID": 17049795220756749611,
+            "_isRoot": true
         },
         {
-            "ParentUUID": 6,
+            "ParentUUID": 17049795220756749611,
             "ScriptComponent": {
+                "propertyValues": {},
                 "scriptAssetUUID": "bc183720-0ea6-40c0-adb4-6438019b61d8"
             },
             "Tag": {
+                "isActive": true,
                 "tag": "CameraHolder"
             },
             "Transform": {
@@ -81,7 +86,7 @@
                     1.0
                 ]
             },
-            "UUID": 7
+            "UUID": 1622952202847157550
         },
         {
             "CameraComponent": {
@@ -91,8 +96,9 @@
                 "nearClip": 0.10000000149011612,
                 "projectionType": 0
             },
-            "ParentUUID": 7,
+            "ParentUUID": 1622952202847157550,
             "Tag": {
+                "isActive": true,
                 "tag": "Camera"
             },
             "Transform": {
@@ -113,7 +119,7 @@
                     1.0
                 ]
             },
-            "UUID": 8
+            "UUID": 10132902268703251532
         }
     ]
 }

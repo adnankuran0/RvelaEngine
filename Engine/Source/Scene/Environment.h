@@ -61,6 +61,72 @@ public:
 	float Fog_End = 80.0f;
 	int Fog_Mode = 1; // 0: Linear, 1: Exponential, 2: Exponential Squared
 
+	void CopySettingsFrom(const Environment& other)
+	{
+		Lighting_IBL = other.Lighting_IBL;
+		Lighting_IBLIntensity = other.Lighting_IBLIntensity;
+		Lighting_AmbientColor = other.Lighting_AmbientColor;
+		Lighting_AmbientIntensity = other.Lighting_AmbientIntensity;
+
+		SSAO = other.SSAO;
+		SSAO_Radius = other.SSAO_Radius;
+		SSAO_Bias = other.SSAO_Bias;
+		SSAO_Intensity = other.SSAO_Intensity;
+
+		ContactShadows = other.ContactShadows;
+		ContactShadows_Distance = other.ContactShadows_Distance;
+		ContactShadows_Thickness = other.ContactShadows_Thickness;
+		ContactShadows_Bias = other.ContactShadows_Bias;
+		ContactShadows_Intensity = other.ContactShadows_Intensity;
+		ContactShadows_Steps = other.ContactShadows_Steps;
+
+		SSR = other.SSR;
+		SSR_MaxSteps = other.SSR_MaxSteps;
+		SSR_MaxDistance = other.SSR_MaxDistance;
+		SSR_Thickness = other.SSR_Thickness;
+		SSR_EdgeFade = other.SSR_EdgeFade;
+		SSR_MaxRoughness = other.SSR_MaxRoughness;
+
+		SSGI = other.SSGI;
+		SSGI_Intensity = other.SSGI_Intensity;
+		SSGI_Radius = other.SSGI_Radius;
+		SSGI_Steps = other.SSGI_Steps;
+
+		Bloom = other.Bloom;
+		Bloom_Intensity = other.Bloom_Intensity;
+		Bloom_Treshold = other.Bloom_Treshold;
+		Bloom_Knee = other.Bloom_Knee;
+
+		MotionBlur = other.MotionBlur;
+		MotionBlur_Intensity = other.MotionBlur_Intensity;
+		MotionBlur_Samples = other.MotionBlur_Samples;
+		MotionBlur_MaxVelocity = other.MotionBlur_MaxVelocity;
+
+		PostProcess_Exposure = other.PostProcess_Exposure;
+		PostProcess_Brightness = other.PostProcess_Brightness;
+		PostProcess_Contrast = other.PostProcess_Contrast;
+		PostProcess_Saturation = other.PostProcess_Saturation;
+		PostProcess_VignetteIntensity = other.PostProcess_VignetteIntensity;
+		PostProcess_VignetteSmoothness = other.PostProcess_VignetteSmoothness;
+		PostProcess_ChromaticStrength = other.PostProcess_ChromaticStrength;
+
+		Fog_Enabled = other.Fog_Enabled;
+		Fog_Color = other.Fog_Color;
+		Fog_Density = other.Fog_Density;
+		Fog_Start = other.Fog_Start;
+		Fog_End = other.Fog_End;
+		Fog_Mode = other.Fog_Mode;
+	}
+
+	Environment& operator=(const Environment& other)
+	{
+		if (this != &other)
+		{
+			CopySettingsFrom(other);
+		}
+		return *this;
+	}
+
 	Skybox& GetSkybox() { return m_Skybox; }
 
 	nlohmann::json Serialize();

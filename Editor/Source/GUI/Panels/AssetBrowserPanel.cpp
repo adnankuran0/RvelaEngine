@@ -24,6 +24,10 @@
 #include "Utils/ProjectManager.h"
 #include "ImportSettingsPanel.h"
 #include "MaterialEditorPanel.h"
+#include "PrefabEditManager.h"
+#include "AssetImporters/PrefabImporter.h"
+#include "Scene/Components/PrefabComponent.h"
+#include "Scene/Components/TagComponent.h"
 #include "ThumbnailCache.h"
 #include "GUI/Style.h"
 
@@ -499,6 +503,83 @@ static bool MoveSingleAsset(const std::filesystem::path& sourcePath, const std::
     return true;
 }
 
+static bool SaveEntityAsPrefabInDirectory(Engine* engine, entt::entity entity, const std::filesystem::path& targetFolder)
+{
+    if (!engine || entity == entt::null)
+        return false;
+
+    Scene& scene = engine->GetActiveScene();
+    if (!scene.GetRegistry().valid(entity) || entity == scene.GetRootEntity())
+        return false;
+
+    std::vector<entt::entity> entitiesToSave;
+    if (EditorSelection::Get().IsSelected(entity) && EditorSelection::Get().GetCount() > 1)
+    {
+        entitiesToSave = EditorSelection::Get().GetSelectedEntities();
+    }
+    else
+    {
+        entitiesToSave.push_back(entity);
+    }
+
+    std::error_code ec;
+    if (!std::filesystem::exists(targetFolder, ec))
+        std::filesystem::create_directories(targetFolder, ec);
+
+    AssetRegistry& reg = AssetManager::Get().GetRegistry();
+    std::filesystem::path lastSavedPath;
+
+    for (entt::entity e : entitiesToSave)
+    {
+        if (!scene.GetRegistry().valid(e) || e == scene.GetRootEntity())
+            continue;
+
+        if (scene.HasComponent<TagComponent>(e) && scene.GetComponent<TagComponent>(e).tag == "__PrefabEditorLight__")
+            continue;
+
+        std::string entityName = scene.HasComponent<TagComponent>(e)
+            ? scene.GetComponent<TagComponent>(e).tag
+            : "prefab";
+        for (char& c : entityName)
+            if (std::string("\\/:*?\"<>|").find(c) != std::string::npos) c = '_';
+        if (entityName.empty()) entityName = "prefab";
+
+        std::filesystem::path prefabPath = targetFolder / (entityName + ".rprefab");
+        for (int i = 1; std::filesystem::exists(prefabPath); ++i)
+            prefabPath = targetFolder / (entityName + std::to_string(i) + ".rprefab");
+
+        AssetMeta meta = reg.GetOrCreateMeta(prefabPath);
+        Ref<PrefabAsset> prefab = PrefabImporter::CreatePrefabAsset(prefabPath, meta.uuid, scene, e);
+        if (prefab)
+        {
+            meta.importerID = "PrefabImporter";
+            reg.SaveMeta(prefabPath, meta);
+
+            if (!scene.HasComponent<PrefabComponent>(e))
+                scene.AddComponent<PrefabComponent>(e, meta.uuid);
+            else
+                scene.GetComponent<PrefabComponent>(e).SetPrefabID(meta.uuid);
+
+            lastSavedPath = prefabPath;
+        }
+    }
+
+    if (!lastSavedPath.empty())
+    {
+        auto assetDir = reg.GetAssetDir();
+        if (!assetDir.empty() && std::filesystem::exists(assetDir))
+            reg.Scan(assetDir);
+
+        scene.SetDirty(true);
+        s_NeedsRefresh = true;
+        s_DirectoryTreeDirty = true;
+        AssetBrowserPanel::RequestRename(lastSavedPath);
+        return true;
+    }
+
+    return false;
+}
+
 static bool MoveAssetToDirectory(const std::filesystem::path& sourcePath, const std::filesystem::path& targetDir)
 {
     bool anyMoved = false;
@@ -709,6 +790,11 @@ static void RenderDirectoryRecursiveCached(const std::vector<DirNode>& nodes, st
             {
                 std::filesystem::path srcPath((const char*)payload->Data);
                 MoveAssetToDirectory(srcPath, node.path);
+            }
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY_DRAG"))
+            {
+                entt::entity e = *(const entt::entity*)payload->Data;
+                SaveEntityAsPrefabInDirectory(Engine::Get(), e, node.path);
             }
             ImGui::EndDragDropTarget();
         }
@@ -1027,12 +1113,7 @@ static void OpenBrowserItem(const BrowserItem& item, Engine* engine)
         AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(item.path.string());
         if (uuid.IsValid() && engine)
         {
-            glm::vec3 spawnPos(0.0f);
-            if (auto* cam = engine->GetEditorCamera())
-                spawnPos = cam->Position + cam->Front * 5.0f;
-            Entity inst = engine->GetActiveScene().Instantiate(uuid, spawnPos);
-            if (inst.GetHandle() != entt::null)
-                EditorSelection::Get().Select(inst.GetHandle());
+            PrefabEditManager::Get().OpenPrefab(*engine, uuid);
         }
     }
     else if (item.extension == ".rmat")
@@ -1171,6 +1252,30 @@ static void DrawItemContextMenu(const std::filesystem::path& itemPath, AssetImpo
 
         if (s_SelectedPaths.size() <= 1)
         {
+            if (itemPath.extension() == ".rprefab")
+            {
+                if (ImGui::MenuItem("Open in Prefab Mode"))
+                {
+                    AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(itemPath.string());
+                    if (uuid.IsValid() && Engine::Get())
+                        PrefabEditManager::Get().OpenPrefab(*Engine::Get(), uuid);
+                }
+                if (ImGui::MenuItem("Instantiate in Scene"))
+                {
+                    AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(itemPath.string());
+                    if (uuid.IsValid() && Engine::Get())
+                    {
+                        glm::vec3 spawnPos(0.0f);
+                        if (auto* cam = Engine::Get()->GetEditorCamera())
+                            spawnPos = cam->Position + cam->Front * 5.0f;
+                        Entity inst = Engine::Get()->GetActiveScene().Instantiate(uuid, spawnPos);
+                        if (inst.GetHandle() != entt::null)
+                            EditorSelection::Get().Select(inst.GetHandle());
+                    }
+                }
+                ImGui::Separator();
+            }
+
             if (itemPath.extension() == ".rmat")
             {
                 if (ImGui::MenuItem("Edit in Material Editor"))
@@ -1367,6 +1472,11 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
             std::filesystem::path srcPath((const char*)payload->Data);
             MoveAssetToDirectory(srcPath, rootDirectory);
         }
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY_DRAG"))
+        {
+            entt::entity e = *(const entt::entity*)payload->Data;
+            SaveEntityAsPrefabInDirectory(Engine::Get(), e, rootDirectory);
+        }
         ImGui::EndDragDropTarget();
     }
     if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
@@ -1483,6 +1593,11 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
                 {
                     std::filesystem::path srcPath((const char*)payload->Data);
                     MoveAssetToDirectory(srcPath, path);
+                }
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY_DRAG"))
+                {
+                    entt::entity e = *(const entt::entity*)payload->Data;
+                    SaveEntityAsPrefabInDirectory(engine, e, path);
                 }
                 ImGui::EndDragDropTarget();
             }
@@ -1730,6 +1845,11 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
                     std::filesystem::path srcPath((const char*)payload->Data);
                     MoveAssetToDirectory(srcPath, item.path);
                 }
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY_DRAG"))
+                {
+                    entt::entity e = *(const entt::entity*)payload->Data;
+                    SaveEntityAsPrefabInDirectory(engine, e, item.path);
+                }
                 ImGui::EndDragDropTarget();
             }
         }
@@ -1969,6 +2089,31 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
                 ImGui::SameLine(0.0f, cardSpacing);
             }
         }
+        else
+        {
+            const float lastRight = ImGui::GetItemRectMax().x;
+            const float windowMaxX = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
+            float remainingRowWidth = windowMaxX - lastRight - cardSpacing;
+            if (remainingRowWidth > 15.0f)
+            {
+                ImGui::SameLine(0.0f, cardSpacing);
+                ImGui::Dummy(ImVec2(remainingRowWidth, cardHeight));
+                if (ImGui::BeginDragDropTarget())
+                {
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
+                    {
+                        std::filesystem::path srcPath((const char*)payload->Data);
+                        MoveAssetToDirectory(srcPath, s_CurrentDirectory);
+                    }
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY_DRAG"))
+                    {
+                        entt::entity e = *(const entt::entity*)payload->Data;
+                        SaveEntityAsPrefabInDirectory(engine, e, s_CurrentDirectory);
+                    }
+                    ImGui::EndDragDropTarget();
+                }
+            }
+        }
     }
 
     if (isDraggingBox)
@@ -2143,6 +2288,39 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
         {
             NavigateUp(rootDirectory);
         }
+    }
+
+    ImVec2 availSpace = ImGui::GetContentRegionAvail();
+    ImGui::Dummy(ImVec2(availSpace.x > 0.0f ? availSpace.x : 1.0f, std::max(availSpace.y, 40.0f)));
+    if (ImGui::BeginDragDropTarget())
+    {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
+        {
+            std::filesystem::path srcPath((const char*)payload->Data);
+            MoveAssetToDirectory(srcPath, s_CurrentDirectory);
+        }
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY_DRAG"))
+        {
+            entt::entity e = *(const entt::entity*)payload->Data;
+            SaveEntityAsPrefabInDirectory(engine, e, s_CurrentDirectory);
+        }
+        ImGui::EndDragDropTarget();
+    }
+
+    ImRect gridAreaRect(ImGui::GetWindowPos(), ImVec2(ImGui::GetWindowPos().x + ImGui::GetWindowWidth(), ImGui::GetWindowPos().y + ImGui::GetWindowHeight()));
+    if (ImGui::BeginDragDropTargetCustom(gridAreaRect, ImGui::GetID("##FilesGridAreaCustomTarget")))
+    {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
+        {
+            std::filesystem::path srcPath((const char*)payload->Data);
+            MoveAssetToDirectory(srcPath, s_CurrentDirectory);
+        }
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY_DRAG"))
+        {
+            entt::entity e = *(const entt::entity*)payload->Data;
+            SaveEntityAsPrefabInDirectory(engine, e, s_CurrentDirectory);
+        }
+        ImGui::EndDragDropTarget();
     }
 
     ImGui::EndChild();

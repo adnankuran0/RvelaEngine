@@ -7,6 +7,8 @@
 #include "Scene/Entity.h"
 #include "Commands/CommandHistory.h"
 #include "Commands/PrefabCommands.h"
+#include "PrefabEditManager.h"
+#include "Core/Engine.h"
 #include "GUI/Style.h"
 #include <cstring>
 #include <string>
@@ -38,6 +40,35 @@ bool InspectorHeader::Draw(Scene& scene, entt::entity selectedEntity)
 	ImGui::Spacing();
 	ImGui::Separator();
 	ImGui::Spacing();
+
+	if (PrefabEditManager::Get().IsInPrefabMode())
+	{
+		ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.20f, 0.40f, 0.70f, 0.5f));
+		if (ImGui::CollapsingHeader("Prefab Mode Active", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::TextDisabled("Editing Asset:");
+			ImGui::SameLine();
+			ImGui::TextColored(GetAccentHoverColor(), "%s.rprefab", PrefabEditManager::Get().GetPrefabName().c_str());
+
+			float btnW = (ImGui::GetContentRegionAvail().x - 8.0f) / 2.0f;
+			if (ImGui::Button("Save Prefab", ImVec2(btnW, 24.0f)))
+			{
+				if (Engine::Get())
+					PrefabEditManager::Get().SaveCurrentPrefab(*Engine::Get());
+			}
+
+			ImGui::SameLine();
+			if (ImGui::Button("Return to Scene", ImVec2(btnW, 24.0f)))
+			{
+				if (Engine::Get())
+					PrefabEditManager::Get().ExitPrefabMode(*Engine::Get(), true);
+			}
+		}
+		ImGui::PopStyleColor();
+		ImGui::Spacing();
+		ImGui::Separator();
+		ImGui::Spacing();
+	}
 
 	entt::entity prefabRoot = entt::null;
 	if (registry.any_of<PrefabComponent>(selectedEntity))
@@ -111,7 +142,14 @@ bool InspectorHeader::Draw(Scene& scene, entt::entity selectedEntity)
 				ImGui::TextColored(ImVec4(0.5f, 0.85f, 0.5f, 1.0f), "In Sync");
 			}
 
-			float btnWidth = (ImGui::GetContentRegionAvail().x - 16.0f) / 3.0f;
+			float btnWidth = (ImGui::GetContentRegionAvail().x - 24.0f) / 4.0f;
+			if (ImGui::Button("Open", ImVec2(btnWidth, 24.0f)))
+			{
+				if (Engine::Get())
+					PrefabEditManager::Get().OpenPrefab(*Engine::Get(), pUUID);
+			}
+
+			ImGui::SameLine();
 			if (ImGui::Button("Apply", ImVec2(btnWidth, 24.0f)))
 			{
 				auto cmd = std::make_unique<ApplyPrefabCommand>(&scene, selectedEntity);
@@ -119,8 +157,6 @@ bool InspectorHeader::Draw(Scene& scene, entt::entity selectedEntity)
 				CommandHistory::Get().Execute(std::move(cmd));
 				s_ForceOverridesRefresh = true;
 			}
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("Save current hierarchy and component changes back to the .rprefab file");
 
 			ImGui::SameLine();
 			if (ImGui::Button("Revert", ImVec2(btnWidth, 24.0f)))
@@ -134,8 +170,6 @@ bool InspectorHeader::Draw(Scene& scene, entt::entity selectedEntity)
 				ImGui::PopStyleColor();
 				return false;
 			}
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("Discard local changes and reload from the .rprefab file");
 
 			ImGui::SameLine();
 			if (ImGui::Button("Unpack", ImVec2(btnWidth, 24.0f)))
@@ -145,8 +179,6 @@ bool InspectorHeader::Draw(Scene& scene, entt::entity selectedEntity)
 				CommandHistory::Get().Execute(std::move(cmd));
 				s_CachedPrefabEntity = entt::null;
 			}
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("Convert this instance into standard scene entities (Break Prefab link)");
 		}
 		ImGui::PopStyleColor();
 		ImGui::Spacing();
@@ -167,13 +199,18 @@ bool InspectorHeader::Draw(Scene& scene, entt::entity selectedEntity)
 			ImGui::SameLine();
 			ImGui::TextColored(ImVec4(0.62f, 0.56f, 0.80f, 1.0f), "%s", prefabName.c_str());
 
-			float btnWidth = (ImGui::GetContentRegionAvail().x - 12.0f) / 2.0f;
+			float btnWidth = (ImGui::GetContentRegionAvail().x - 16.0f) / 3.0f;
 			if (ImGui::Button("Select Root", ImVec2(btnWidth, 24.0f)))
 			{
 				EditorSelection::Get().Select(prefabRoot);
 			}
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("Select the root entity of this prefab instance");
+
+			ImGui::SameLine();
+			if (ImGui::Button("Open Prefab", ImVec2(btnWidth, 24.0f)))
+			{
+				if (Engine::Get())
+					PrefabEditManager::Get().OpenPrefab(*Engine::Get(), pUUID);
+			}
 
 			ImGui::SameLine();
 			if (ImGui::Button("Apply Prefab", ImVec2(btnWidth, 24.0f)))
@@ -182,8 +219,6 @@ bool InspectorHeader::Draw(Scene& scene, entt::entity selectedEntity)
 				PrefabImporter::ApplyPrefab(scene, prefabRoot);
 				CommandHistory::Get().Execute(std::move(cmd));
 			}
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("Save changes back to the .rprefab file");
 		}
 		ImGui::PopStyleColor();
 		ImGui::Spacing();

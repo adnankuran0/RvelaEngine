@@ -3,6 +3,7 @@
 #include "Core/Engine.h"
 #include "EditorSelection.h"
 #include "Commands/CommandHistory.h"
+#include "PrefabEditManager.h"
 #include "Render/IconLibrary.h"
 #include <cmath>
 
@@ -91,15 +92,20 @@ void ToolBar::Draw(Engine& engine)
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.06f, 0.45f, 0.28f, 0.8f));
         }
 
+        bool inPrefabMode = PrefabEditManager::Get().IsInPrefabMode();
+        if (inPrefabMode)
+        {
+            ImGui::BeginDisabled();
+        }
         if (ImGui::ImageButton("##PlayBtn", playIcon, icon_size, ImVec2(0, 0), ImVec2(1, 1), ImVec4(0, 0, 0, 0), tintWhite))
         {
             engine.GetSceneManager().PlayScene();
         }
-        ImGui::PopStyleColor(3);
-        if (ImGui::IsItemHovered())
+        if (inPrefabMode)
         {
-            ImGui::SetTooltip(isPlaying ? "Playing... (Click to restart)" : "Play Scene (F5)");
+            ImGui::EndDisabled();
         }
+        ImGui::PopStyleColor(3);
 
         ImGui::SameLine();
 

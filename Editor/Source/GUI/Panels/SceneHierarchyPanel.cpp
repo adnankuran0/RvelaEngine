@@ -19,6 +19,7 @@
 #include "Commands/EntityLifecycleCommands.h"
 #include "Commands/ReparentCommand.h"
 #include "Commands/PrefabCommands.h"
+#include "PrefabEditManager.h"
 #include "GUI/Style.h"
 #include "Render/IconLibrary.h"
 #include "Renderer/Texture.h"
@@ -198,6 +199,14 @@ void SceneHierarchyPanel::Draw(Engine* engine)
     auto registerCreatedEntity = [&](entt::entity handle) {
         if (handle != entt::null && registry.valid(handle))
         {
+            if (PrefabEditManager::Get().IsInPrefabMode())
+            {
+                entt::entity pRoot = PrefabEditManager::Get().GetPrefabRootEntity();
+                if (pRoot != entt::null && registry.valid(pRoot) && handle != pRoot && scene.GetParent(handle) == rootEntity)
+                {
+                    scene.SetParent(handle, pRoot);
+                }
+            }
             CommandHistory::Get().Execute(std::make_unique<CreateEntityCommand>(&scene, handle));
             selectSingle(handle);
         }
@@ -347,6 +356,9 @@ void SceneHierarchyPanel::Draw(Engine* engine)
     std::function<void(entt::entity)> DrawEntityNode = [&](entt::entity entity)
         {
             if (!registry.valid(entity)) return;
+
+            if (registry.any_of<TagComponent>(entity) && registry.get<TagComponent>(entity).tag == "__PrefabEditorLight__")
+                return;
 
             if (searchFilter[0] != '\0' && !matchesFilter(entity, matchesFilter))
                 return;
@@ -858,8 +870,17 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                     }
                 }
 
-                if (prefabRoot != entt::null)
+                if (prefabRoot != entt::null && !PrefabEditManager::Get().IsInPrefabMode())
                 {
+                    if (ImGui::MenuItem("Open in Prefab Mode"))
+                    {
+                        AssetUUID pUUID = scene.GetComponent<PrefabComponent>(prefabRoot).GetPrefabID();
+                        if (pUUID.IsValid())
+                        {
+                            PrefabEditManager::Get().OpenPrefab(*engine, pUUID);
+                        }
+                    }
+
                     if (prefabRoot == entity)
                     {
                         if (ImGui::MenuItem("Apply to Prefab"))

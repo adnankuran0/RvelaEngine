@@ -60,6 +60,12 @@ public:
     {
         m_CurrentScene = std::move(newScene);
     }
+    std::unique_ptr<Scene> SwapActiveScene(std::unique_ptr<Scene> newScene)
+    {
+        std::unique_ptr<Scene> oldScene = std::move(m_CurrentScene);
+        m_CurrentScene = std::move(newScene);
+        return oldScene;
+    }
 
     void PlayScene();
     void PauseScene();

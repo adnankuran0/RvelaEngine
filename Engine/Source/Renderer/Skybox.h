@@ -15,6 +15,8 @@ namespace rv {
     public:
         Skybox();
         ~Skybox();
+        Skybox(const Skybox&) = delete;
+        Skybox& operator=(const Skybox&) = delete;
 
         void Init(const std::vector<Path>& faces);
         void InitHDR(const AssetUUID& uuid);

@@ -17,6 +17,7 @@
 #include "Renderer/RenderLayer.h"
 #include "Panels/ImportSettingsPanel.h"
 #include "Panels/MaterialEditorPanel.h"
+#include "PrefabEditManager.h"
 #include "Style.h"
 
 using namespace rv;
@@ -33,19 +34,32 @@ void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter,
     {
         if (ImGui::BeginMenu("File"))
         {
-            if (ImGui::MenuItem("New scene", "Ctrl+N"))
-                EditorUtils::CreateScene(*engine);
+            if (PrefabEditManager::Get().IsInPrefabMode())
+            {
+                if (ImGui::MenuItem("Save Prefab", "Ctrl+S"))
+                    PrefabEditManager::Get().SaveCurrentPrefab(*engine);
 
-            if (ImGui::MenuItem("Open scene", "Ctrl+O"))
-                EditorUtils::OpenScene(*engine);
+                if (ImGui::MenuItem("Return to Scene", "Esc"))
+                    PrefabEditManager::Get().ExitPrefabMode(*engine, true);
 
-            if (ImGui::MenuItem("Save scene", "Ctrl+S"))
-                EditorUtils::SaveScene(*engine);
+                ImGui::Separator();
+            }
+            else
+            {
+                if (ImGui::MenuItem("New scene", "Ctrl+N"))
+                    EditorUtils::CreateScene(*engine);
 
-            if (ImGui::MenuItem("Save scene as", "Ctrl+Shift+S"))
-                EditorUtils::SaveSceneAs(*engine);
+                if (ImGui::MenuItem("Open scene", "Ctrl+O"))
+                    EditorUtils::OpenScene(*engine);
 
-            ImGui::Separator();
+                if (ImGui::MenuItem("Save scene", "Ctrl+S"))
+                    EditorUtils::SaveScene(*engine);
+
+                if (ImGui::MenuItem("Save scene as", "Ctrl+Shift+S"))
+                    EditorUtils::SaveSceneAs(*engine);
+
+                ImGui::Separator();
+            }
 
             if (ImGui::MenuItem("Switch Project..."))
             {

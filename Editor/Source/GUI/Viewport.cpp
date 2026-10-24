@@ -16,6 +16,7 @@
 #include "EditorUtils.h"
 #include "Scene/Entity.h"
 #include "Scene/Components/PrefabComponent.h"
+#include "PrefabEditManager.h"
 #include "Commands/CommandHistory.h"
 #include "Commands/TransformCommand.h"
 #include "Commands/EntityLifecycleCommands.h"
@@ -329,6 +330,72 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
         m_WasGizmoUsing = false;
         m_InitialTransforms.clear();
     }
+}
+
+void Viewport::DrawPrefabBanner(Engine* engine, ImVec2& displayPos, ImVec2& displaySize)
+{
+    if (!PrefabEditManager::Get().IsInPrefabMode())
+        return;
+
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    const std::string& prefabName = PrefabEditManager::Get().GetPrefabName();
+    
+    char bannerText[256];
+    snprintf(bannerText, sizeof(bannerText), "Prefab: %s.rprefab", prefabName.c_str());
+
+    const float btnBackW = 75.0f;
+    const float btnSaveW = 55.0f;
+    const float btnDiscardW = 65.0f;
+    const float textW = ImGui::CalcTextSize(bannerText).x;
+    const float padding = 12.0f;
+    const float bannerW = btnBackW + 8.0f + textW + 16.0f + btnSaveW + 6.0f + btnDiscardW + padding * 2.0f;
+    const float bannerH = 32.0f;
+
+    const float bannerX = displayPos.x + std::max(10.0f, (displaySize.x - bannerW) * 0.5f);
+    const float bannerY = displayPos.y + 10.0f;
+
+    const ImVec2 rectMin(bannerX, bannerY);
+    const ImVec2 rectMax(bannerX + bannerW, bannerY + bannerH);
+
+    drawList->AddRectFilled(rectMin, rectMax, IM_COL32(20, 32, 52, 235), 6.0f);
+    drawList->AddRect(rectMin, rectMax, IM_COL32(45, 105, 180, 255), 6.0f, 0, 1.5f);
+
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(6.0f, 0.0f));
+
+    ImGui::SetCursorScreenPos(ImVec2(bannerX + padding, bannerY + 4.0f));
+
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.20f, 0.35f, 0.55f, 0.9f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.25f, 0.45f, 0.70f, 1.0f));
+    if (ImGui::Button("<- Scene", ImVec2(btnBackW, 24.0f)))
+    {
+        PrefabEditManager::Get().ExitPrefabMode(*engine, true);
+    }
+    ImGui::PopStyleColor(2);
+
+    ImGui::SameLine();
+    ImGui::AlignTextToFramePadding();
+    ImGui::TextColored(ImVec4(0.40f, 0.78f, 1.0f, 1.0f), "%s", bannerText);
+
+    ImGui::SameLine();
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.18f, 0.52f, 0.28f, 0.9f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.22f, 0.65f, 0.35f, 1.0f));
+    if (ImGui::Button("Save", ImVec2(btnSaveW, 24.0f)))
+    {
+        PrefabEditManager::Get().SaveCurrentPrefab(*engine);
+    }
+    ImGui::PopStyleColor(2);
+
+    ImGui::SameLine();
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.55f, 0.22f, 0.22f, 0.8f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.70f, 0.28f, 0.28f, 1.0f));
+    if (ImGui::Button("Discard", ImVec2(btnDiscardW, 24.0f)))
+    {
+        PrefabEditManager::Get().ExitPrefabMode(*engine, false);
+    }
+    ImGui::PopStyleColor(2);
+
+    ImGui::PopStyleVar(2);
 }
 
 void Viewport::DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySize)
@@ -1426,6 +1493,7 @@ void Viewport::Draw(Engine* engine, bool orbitDragActive)
         {
             DrawToolbar(engine, displayPos, displaySize);
             DrawOrientationGizmo(engine, displayPos, displaySize);
+            DrawPrefabBanner(engine, displayPos, displaySize);
         }
 
         if (!suppressViewportEditing)
