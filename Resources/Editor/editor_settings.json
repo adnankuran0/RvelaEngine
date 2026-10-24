@@ -1,11 +1,11 @@
 {
     "camera": {
-        "farClip": 40.0,
+        "farClip": 80.0,
         "fov": 75.0,
         "mouseSensitivity": 0.07500000298023224,
-        "movementSpeed": 5.0,
+        "movementSpeed": 2.0,
         "nearClip": 0.10000000149011612,
-        "orthoSize": 10.0,
+        "orthoSize": 3.5,
         "positionSmoothness": 25.0,
         "projection": 0,
         "sprintSpeed": 5.0

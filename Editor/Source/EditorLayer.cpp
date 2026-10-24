@@ -387,13 +387,14 @@ void EditorLayer::Render()
         {
             EditorSelection::Get().Clear();
             ImportSettingsPanel::SetInspectedAsset({});
+            MaterialEditorPanel::Reset();
             AssetBrowserPanel::Reset(ProjectManager::GetAssetDirectory());
         }
     }
 
     if (ProjectManager::IsProjectLoaded())
     {
-        m_MenuBar.Draw(m_Engine, m_AssetImportPipeline, &m_ProjectSettingsPanel, &m_ProjectSelectorPanel, &m_ImportSettingsPanel);
+        m_MenuBar.Draw(m_Engine, m_AssetImportPipeline, &m_ProjectSettingsPanel, &m_ProjectSelectorPanel, &m_ImportSettingsPanel, &m_MaterialEditorPanel);
          
         m_ToolBar.Draw(*m_Engine);
 
@@ -416,6 +417,8 @@ void EditorLayer::Render()
         m_ProjectSettingsPanel.Draw(m_Engine);
 
         m_ImportSettingsPanel.Draw(m_AssetImportPipeline);
+
+        m_MaterialEditorPanel.Draw(m_Engine);
 
         m_Viewport.Draw(m_Engine, m_EditorCameraNavigation == EditorCamera::NavigationMode::Orbit);
     }

@@ -23,6 +23,7 @@
 #include "Render/IconLibrary.h"
 #include "Utils/ProjectManager.h"
 #include "ImportSettingsPanel.h"
+#include "MaterialEditorPanel.h"
 #include "ThumbnailCache.h"
 #include "GUI/Style.h"
 
@@ -177,6 +178,10 @@ static void SetSingleSelection(const std::filesystem::path& path)
     }
     s_DeselectOthersOnMouseRelease = false;
     s_DeselectTargetIndex = -1;
+    if (!s_SelectedIsDir && path.extension() == ".rmat")
+    {
+        MaterialEditorPanel::SetMaterial(EditorUtils::ReadUUIDFromMeta(path.string()));
+    }
 }
 
 static bool s_NeedsRefresh = true;
@@ -1030,6 +1035,14 @@ static void OpenBrowserItem(const BrowserItem& item, Engine* engine)
                 EditorSelection::Get().Select(inst.GetHandle());
         }
     }
+    else if (item.extension == ".rmat")
+    {
+        AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(item.path.string());
+        if (uuid.IsValid())
+        {
+            MaterialEditorPanel::OpenMaterial(uuid);
+        }
+    }
     else if (item.extension == ".glsl" || item.extension == ".lua" || item.extension == ".rshader")
     {
         if (item.extension == ".lua")
@@ -1158,6 +1171,17 @@ static void DrawItemContextMenu(const std::filesystem::path& itemPath, AssetImpo
 
         if (s_SelectedPaths.size() <= 1)
         {
+            if (itemPath.extension() == ".rmat")
+            {
+                if (ImGui::MenuItem("Edit in Material Editor"))
+                {
+                    AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(itemPath.string());
+                    if (uuid.IsValid())
+                        MaterialEditorPanel::OpenMaterial(uuid);
+                }
+                ImGui::Separator();
+            }
+
             if (ImGui::MenuItem("Rename", "F2"))
             {
                 BeginRenameForNew(itemPath);
@@ -1870,7 +1894,11 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
                 s_SelectedFileSize = item.fileSize;
                 s_DeselectOthersOnMouseRelease = false;
                 if (!item.isDirectory)
+                {
                     ImportSettingsPanel::SetInspectedAsset(item.path);
+                    if (item.path.extension() == ".rmat")
+                        MaterialEditorPanel::SetMaterial(EditorUtils::ReadUUIDFromMeta(item.path.string()));
+                }
             }
             else
             {

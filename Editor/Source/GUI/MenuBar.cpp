@@ -16,6 +16,7 @@
 #include "Commands/CommandHistory.h"
 #include "Renderer/RenderLayer.h"
 #include "Panels/ImportSettingsPanel.h"
+#include "Panels/MaterialEditorPanel.h"
 #include "Style.h"
 
 using namespace rv;
@@ -23,7 +24,8 @@ using namespace rv;
 void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter,
     ProjectSettingsPanel* projectSettingsPanel,
     ProjectSelectorPanel* projectSelectorPanel,
-    ImportSettingsPanel* importSettingsPanel)
+    ImportSettingsPanel* importSettingsPanel,
+    MaterialEditorPanel* materialEditorPanel)
 {
     auto& registry = AssetManager::Get().GetRegistry();
 
@@ -183,6 +185,18 @@ void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter,
                         importSettingsPanel->Open();
                     else
                         importSettingsPanel->Close();
+                }
+            }
+
+            if (materialEditorPanel)
+            {
+                bool isOpen = materialEditorPanel->IsOpen();
+                if (ImGui::MenuItem("Material Editor", nullptr, &isOpen))
+                {
+                    if (isOpen)
+                        materialEditorPanel->Open();
+                    else
+                        materialEditorPanel->Close();
                 }
             }
 
