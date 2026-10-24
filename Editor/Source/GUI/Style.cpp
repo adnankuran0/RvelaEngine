@@ -12,6 +12,7 @@ static ImVec4 s_MutedTextColor = ImVec4(0.550f, 0.580f, 0.680f, 1.00f);
 static const ImVec4 s_SuccessColor = ImVec4(0.063f, 0.725f, 0.506f, 1.00f); // #10b981
 static const ImVec4 s_WarningColor = ImVec4(0.961f, 0.620f, 0.043f, 1.00f); // #f59e0b
 static const ImVec4 s_ErrorColor = ImVec4(0.937f, 0.267f, 0.267f, 1.00f);   // #ef4444
+static ImVec4 s_DarkTextColor = ImVec4(0.067f, 0.067f, 0.106f, 1.00f);
 
 void InitFonts()
 {
@@ -158,6 +159,7 @@ void ApplyTheme(EditorTheme theme)
     s_AccentHoverColor = accentHover;
     s_AccentActiveColor = accentActive;
     s_MutedTextColor = textMuted;
+    s_DarkTextColor = crust;
 
     colors[ImGuiCol_Text]                  = text;
     colors[ImGuiCol_TextDisabled]          = textDisabled;
@@ -321,6 +323,22 @@ ImVec4 GetWarningColor()
 ImVec4 GetErrorColor()
 {
     return s_ErrorColor;
+}
+
+ImVec4 GetDarkTextColor()
+{
+    return s_DarkTextColor;
+}
+
+bool IsAccentBright()
+{
+    float lum = 0.2126f * s_AccentColor.x + 0.7152f * s_AccentColor.y + 0.0722f * s_AccentColor.z;
+    return lum > 0.45f;
+}
+
+ImVec4 GetSelectionTextColor()
+{
+    return IsAccentBright() ? s_DarkTextColor : ImGui::GetStyleColorVec4(ImGuiCol_Text);
 }
 
 }

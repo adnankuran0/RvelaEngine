@@ -1,11 +1,13 @@
 #pragma once
 #include "Asset/AssetUUID.h"
+#include "Scene/Entity.h"
 #include <vector>
 #include <string>
 
 namespace rv {
 
 class Engine;
+class Scene;
 
 class EditorUtils
 {
@@ -21,6 +23,7 @@ public:
 	static void AlignSelectedWithView(Engine& engine);
 	static void SnapSelectedToFloor(Engine& engine, bool alignWithNormal = false);
 	static bool HasTransformSelection(Engine& engine);
+	static Entity LoadPrimitive(Scene& scene, const std::string& primitiveMeshName);
 
 	struct MeshAssetInfo
 	{

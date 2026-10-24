@@ -31,6 +31,8 @@
 #include "Scene/Components/ScriptComponent.h"
 #include "Scene/Components/AnimatorComponent.h"
 #include "Scene/Components/SkeletonComponent.h"
+#include "Scene/Components/SkeletalMeshComponent.h"
+#include "Scene/Components/SkeletalMeshRendererComponent.h"
 #include "Scene/Components/UIComponents.h"
 
 using namespace rv;
@@ -95,7 +97,7 @@ static EntityVisualInfo GetEntityVisualInfo(Scene& scene, entt::entity e, bool i
         return info;
     }
 
-    if (scene.HasComponent<MeshComponent>(e) || scene.HasComponent<MeshRendererComponent>(e))
+    if (scene.HasComponent<MeshComponent>(e) || scene.HasComponent<MeshRendererComponent>(e) || scene.HasComponent<SkeletalMeshComponent>(e) || scene.HasComponent<SkeletalMeshRendererComponent>(e))
     {
         info.icon = (ImTextureID)(intptr_t)iconLib.GetIcon(EditorIcon::Mesh).GetID();
         info.iconTint = ImVec4(0.55f, 0.75f, 0.90f, 1.0f);
@@ -134,169 +136,9 @@ static EntityVisualInfo GetEntityVisualInfo(Scene& scene, entt::entity e, bool i
     return info;
 }
 
-static Ref<MeshAsset> ResolvePrimitiveMesh(const std::string& primitiveMeshName, AssetUUID& outMeshUUID)
+static inline Entity LoadPrimitive(Scene& scene, const std::string& primitiveMeshName)
 {
-    auto& manager = AssetManager::Get();
-    auto& registry = manager.GetRegistry();
-    auto projectAssetsPath = ProjectManager::GetAssetDirectory();
-    auto primitivesDir = projectAssetsPath / "Models" / "Primitives";
-
-    static const std::vector<std::string> extensions = { ".glb", ".fbx", ".obj" };
-
-    std::filesystem::path foundModelPath;
-
-    // Check primitive paths
-    for (const auto& ext : extensions)
-    {
-        auto candidate = primitivesDir / (primitiveMeshName + ext);
-        if (std::filesystem::exists(candidate))
-        {
-            foundModelPath = candidate;
-            break;
-        }
-    }
-
-    if (foundModelPath.empty() && std::filesystem::exists(projectAssetsPath))
-    {
-        for (const auto& entry : std::filesystem::recursive_directory_iterator(projectAssetsPath))
-        {
-            if (!entry.is_regular_file()) continue;
-            const auto& p = entry.path();
-            if (p.extension() == ".rmeta") continue;
-            if (p.stem().string() == primitiveMeshName)
-            {
-                std::string ext = p.extension().string();
-                if (ext == ".glb" || ext == ".fbx" || ext == ".obj")
-                {
-                    foundModelPath = p;
-                    break;
-                }
-            }
-        }
-    }
-
-    if (!foundModelPath.empty())
-    {
-        AssetUUID modelUUID = registry.GetUUID(foundModelPath);
-        if (!modelUUID.IsValid())
-        {
-            AssetMeta meta = registry.GetOrCreateMeta(foundModelPath);
-            modelUUID = meta.uuid;
-        }
-
-        if (modelUUID.IsValid())
-        {
-            AssetMeta meta = registry.GetMeta(modelUUID);
-            for (const auto& sub : meta.subAssets)
-            {
-                if (sub.type == "Mesh" && sub.uuid.IsValid())
-                {
-                    Ref<MeshAsset> mesh = manager.GetAsset<MeshAsset>(sub.uuid);
-                    if (mesh)
-                    {
-                        outMeshUUID = sub.uuid;
-                        return mesh;
-                    }
-                }
-            }
-        }
-
-        // try import primitives
-        ModelImporter importer;
-        ModelImportSettings settings;
-        ModelImportResult result = importer.ImportModel(foundModelPath, registry, settings);
-        for (const auto& [idx, uuid] : result.meshUUIDs)
-        {
-            Ref<MeshAsset> mesh = manager.GetAsset<MeshAsset>(uuid);
-            if (mesh)
-            {
-                outMeshUUID = uuid;
-                return mesh;
-            }
-        }
-    }
-
-    // fallback
-    static const std::unordered_map<std::string, AssetUUID> legacyMap =
-    {
-        {"Cube", AssetUUID::FromString("55dee74b-34c1-4aac-80c9-627b95a8cf58")},
-        {"Sphere", AssetUUID::FromString("b6c7f2a2-cce2-4b68-be50-19a8f552e727")},
-        {"Cylinder", AssetUUID::FromString("2c4d9b01-fea1-4eec-b741-bb054229ba61")},
-        {"Quad", AssetUUID::FromString("1d2596bb-18d3-41a6-9848-a8a584870ce3")},
-        {"Cone", AssetUUID::FromString("92ffc5c9-9f6f-4332-ad83-e1d03b046a53")},
-        {"Capsule", AssetUUID::FromString("62345031-f93b-40f4-aa76-18c59801997d")},
-        {"Plane", AssetUUID::FromString("077f6760-e8d5-44b4-895c-5d88be2db952")},
-        {"Monkey", AssetUUID::FromString("d5b8e68a-8170-4b1a-b439-62ae98d391f8")},
-        {"Torus", AssetUUID::FromString("db65917a-cf92-4335-addb-f30e2608d318")}
-    };
-
-    auto it = legacyMap.find(primitiveMeshName);
-    if (it != legacyMap.end())
-    {
-        Ref<MeshAsset> mesh = manager.GetAsset<MeshAsset>(it->second);
-        if (mesh)
-        {
-            outMeshUUID = it->second;
-            return mesh;
-        }
-    }
-
-    auto templatePrimitive = EDITOR_PATH("TemplateProject/Assets/Models/Primitives/" + primitiveMeshName + ".glb").GetAbsolute();
-    if (std::filesystem::exists(templatePrimitive))
-    {
-        std::filesystem::create_directories(primitivesDir);
-        auto destModel = primitivesDir / (primitiveMeshName + ".glb");
-        std::error_code ec;
-        std::filesystem::copy_file(templatePrimitive, destModel, std::filesystem::copy_options::overwrite_existing, ec);
-        if (!ec)
-        {
-            ModelImporter importer;
-            ModelImportSettings settings;
-            ModelImportResult result = importer.ImportModel(destModel, registry, settings);
-            for (const auto& [idx, uuid] : result.meshUUIDs)
-            {
-                Ref<MeshAsset> mesh = manager.GetAsset<MeshAsset>(uuid);
-                if (mesh)
-                {
-                    outMeshUUID = uuid;
-                    return mesh;
-                }
-            }
-        }
-    }
-
-    return nullptr;
-}
-
-static Entity LoadPrimitive(Scene& scene, const std::string& primitiveMeshName)
-{
-    AssetUUID meshUUID = AssetUUID::Invalid();
-    Ref<MeshAsset> m = ResolvePrimitiveMesh(primitiveMeshName, meshUUID);
-    if (!m)
-    {
-        LOG_ERROR("Mesh not found for primitive: {}", primitiveMeshName);
-        return Entity{};
-    }
-
-    Entity root = scene.CreateEntity(primitiveMeshName);
-    root.AddComponent<MeshComponent>(m->GetUUID());
-    root.AddComponent<MeshRendererComponent>(m);
-    root.GetComponent<TagComponent>().tag = primitiveMeshName;
-    root.AddComponent<MaterialComponent>();
-    root.AddComponent<RigidbodyComponent>();
-    if (primitiveMeshName == "Cube")
-        root.AddComponent<BoxColliderComponent>();
-    else if (primitiveMeshName == "Sphere")
-        root.AddComponent<SphereColliderComponent>();
-    else if (primitiveMeshName == "Capsule")
-        root.AddComponent<CapsuleColliderComponent>();
-    else if (primitiveMeshName == "Cylinder")
-        root.AddComponent<CylinderColliderComponent>();
-    else
-        root.AddComponent<ConvexHullColliderComponent>();
-
-    scene.SetParent(root.GetHandle(), scene.GetRootEntity());
-    return root;
+    return EditorUtils::LoadPrimitive(scene, primitiveMeshName);
 }
 
 void SceneHierarchyPanel::Draw(Engine* engine)
@@ -473,9 +315,10 @@ void SceneHierarchyPanel::Draw(Engine* engine)
         return entt::null;
     };
 
+    ImVec4 unselectedHover = ImGui::GetStyleColorVec4(ImGuiCol_HeaderHovered);
     ImGui::PushStyleColor(ImGuiCol_Header, ImGui::GetStyleColorVec4(ImGuiCol_Header));
-    ImGui::PushStyleColor(ImGuiCol_HeaderHovered, GetAccentHoverColor());
-    ImGui::PushStyleColor(ImGuiCol_HeaderActive, GetAccentActiveColor());
+    ImGui::PushStyleColor(ImGuiCol_HeaderHovered, unselectedHover);
+    ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(GetAccentColor().x, GetAccentColor().y, GetAccentColor().z, 0.35f));
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4.0f, 3.0f));
 
     if (m_RenamingEntity != entt::null && !registry.valid(m_RenamingEntity))
@@ -542,29 +385,46 @@ void SceneHierarchyPanel::Draw(Engine* engine)
             entt::entity prefabRoot = getPrefabRoot(entity);
             bool isPrefab = (prefabRoot != entt::null);
             bool isActiveInHierarchy = scene.IsEntityActive(entity);
+            const bool isRenaming = (m_RenamingEntity == entity);
 
             int colorPushes = 0;
             bool isPrimary = (isSelected && EditorSelection::Get().IsPrimary(entity) && EditorSelection::Get().GetCount() > 1);
 
-            if (isPrimary)
+            if (isSelected)
             {
-                ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.28f, 0.48f, 0.82f, 0.95f));
-                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.88f, 0.45f, 1.0f));
-                colorPushes += 2;
+                ImGui::PushStyleColor(ImGuiCol_Header, GetAccentColor());
+                ImGui::PushStyleColor(ImGuiCol_HeaderHovered, GetAccentHoverColor());
+                ImGui::PushStyleColor(ImGuiCol_HeaderActive, GetAccentActiveColor());
+                colorPushes += 3;
+
+                if (isPrimary)
+                {
+                    ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.28f, 0.48f, 0.82f, 0.95f));
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.88f, 0.45f, 1.0f));
+                    colorPushes += 2;
+                }
+                else if (!isRenaming)
+                {
+                    ImVec4 selTextColor = GetSelectionTextColor();
+                    ImGui::PushStyleColor(ImGuiCol_Text, selTextColor);
+                    colorPushes++;
+                }
             }
-            else if (!isActiveInHierarchy)
+            else
             {
-                ImGui::PushStyleColor(ImGuiCol_Text, GetMutedTextColor());
-                colorPushes++;
-            }
-            else if (isPrefab)
-            {
-                ImGui::PushStyleColor(ImGuiCol_Text, GetAccentColor());
-                colorPushes++;
+                if (!isActiveInHierarchy)
+                {
+                    ImGui::PushStyleColor(ImGuiCol_Text, GetMutedTextColor());
+                    colorPushes++;
+                }
+                else if (isPrefab)
+                {
+                    ImGui::PushStyleColor(ImGuiCol_Text, GetAccentColor());
+                    colorPushes++;
+                }
             }
 
             std::string nodeTitle = tagComponent.tag;
-            const bool isRenaming = (m_RenamingEntity == entity);
 
             EntityVisualInfo vInfo = GetEntityVisualInfo(scene, entity, isPrefab);
 
@@ -589,7 +449,7 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                 drawList->AddRectFilled(
                     ImVec2(itemMin.x, itemMin.y + 1.0f),
                     ImVec2(itemMin.x + 3.0f, itemMax.y - 1.0f),
-                    ImGui::GetColorU32(GetAccentColor()),
+                    IsAccentBright() ? IM_COL32(20, 20, 32, 255) : ImGui::GetColorU32(GetAccentColor()),
                     1.5f
                 );
             }
@@ -600,9 +460,19 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                 float iconX = itemMin.x + arrowSpace + 1.0f;
                 float iconY = itemMin.y + (itemMax.y - itemMin.y - 14.0f) * 0.5f;
 
-                ImU32 iconColor = (!isActiveInHierarchy)
-                    ? IM_COL32(130, 130, 140, 130)
-                    : ImGui::ColorConvertFloat4ToU32(vInfo.iconTint);
+                ImU32 iconColor;
+                if (isSelected && IsAccentBright())
+                {
+                    iconColor = IM_COL32(20, 20, 32, 240);
+                }
+                else if (!isActiveInHierarchy)
+                {
+                    iconColor = IM_COL32(130, 130, 140, 130);
+                }
+                else
+                {
+                    iconColor = ImGui::ColorConvertFloat4ToU32(vInfo.iconTint);
+                }
 
                 drawList->AddImage(
                     vInfo.icon,
@@ -617,9 +487,13 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                 float arrowSpace = ImGui::GetTreeNodeToLabelSpacing();
                 float boxX = itemMin.x + arrowSpace + 2.0f;
                 float boxY = itemMin.y + (itemMax.y - itemMin.y - 10.0f) * 0.5f;
-                ImU32 boxCol = (!isActiveInHierarchy)
-                    ? IM_COL32(100, 100, 110, 110)
-                    : IM_COL32(145, 150, 165, 170);
+                ImU32 boxCol;
+                if (isSelected && IsAccentBright())
+                    boxCol = IM_COL32(20, 20, 32, 240);
+                else if (!isActiveInHierarchy)
+                    boxCol = IM_COL32(100, 100, 110, 110);
+                else
+                    boxCol = IM_COL32(145, 150, 165, 170);
                 drawList->AddRect(ImVec2(boxX, boxY), ImVec2(boxX + 10.0f, boxY + 10.0f), boxCol, 2.0f, 0, 1.2f);
             }
 

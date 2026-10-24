@@ -72,6 +72,8 @@ private:
     bool m_ShowUI = true;
     bool m_ShowGrid = true;
     EditorCamera::NavigationMode m_EditorCameraNavigation = EditorCamera::NavigationMode::None;
+    bool m_RightClickPending = false;
+    glm::vec2 m_RightClickStartPos{ 0.0f, 0.0f };
 
     bool m_LauncherMode = true;
     bool m_SavedMaximized = true;

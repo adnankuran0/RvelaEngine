@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <unordered_map>
+#include <optional>
 #include "glm/gtc/quaternion.hpp"
 #include "Scene/EntityUUID.h"
 
@@ -18,6 +19,7 @@ class Viewport
 public:
 	void Draw(Engine* engine, bool orbitDragActive = false);
 	bool ContainsPoint(const glm::vec2& point) const;
+	void OpenContextMenu(const ImVec2& mousePos) { m_PendingContextMenu = true; m_ContextMenuMousePos = mousePos; }
 
 	float GetSnapTranslate() const { return m_snapTranslate; }
 	void SetSnapTranslate(float v) { m_snapTranslate = v; }
@@ -43,6 +45,8 @@ private:
 	void DrawOrientationGizmo(Engine* engine, ImVec2& displayPos, ImVec2& displaySize);
 	void DrawDebugBufferBadge(Engine* engine, ImVec2& displayPos, ImVec2& displaySize);
 	void HandleSelection(Engine* engine, ImVec2& displayPos, ImVec2& displaySize);
+	void DrawContextMenu(Engine* engine, const ImVec2& displayPos, const ImVec2& displaySize);
+	glm::vec3 CalculateSpawnPosition(Engine* engine, const ImVec2& mousePos, const ImVec2& displayPos, const ImVec2& displaySize);
 
 private:
 	float m_snapTranslate = 1.0f;
@@ -76,6 +80,10 @@ private:
 	glm::vec3 m_InitialGizmoPos{ 0.0f };
 	glm::quat m_InitialGizmoRot{ 1.0f, 0.0f, 0.0f, 0.0f };
 	glm::vec3 m_InitialGizmoScale{ 1.0f };
+	bool m_PendingContextMenu = false;
+	ImVec2 m_ContextMenuMousePos{ 0.0f, 0.0f };
+	glm::vec3 m_ContextSpawnPos{ 0.0f };
+	std::optional<glm::vec3> m_ContextSpawnNormal;
 };
 
 }

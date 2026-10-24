@@ -1,18 +1,6 @@
 {
     "Entities": [
         {
-            "BoxColliderComponent": {
-                "offset": [
-                    0.0,
-                    0.0,
-                    0.0
-                ],
-                "size": [
-                    0.5,
-                    0.5,
-                    0.5
-                ]
-            },
             "Material": {
                 "material": "",
                 "overrides": {
@@ -28,6 +16,7 @@
                 "mesh": "b6c7f2a2-cce2-4b68-be50-19a8f552e727"
             },
             "PointLight": {
+                "blurRadius": 0.029999999329447746,
                 "castShadows": true,
                 "color": [
                     0.0,
@@ -36,7 +25,9 @@
                 ],
                 "falloff": 2.490000009536743,
                 "intensity": 4.260000228881836,
-                "radius": 2.549999952316284
+                "radius": 2.549999952316284,
+                "reverseCullFace": true,
+                "shadowBias": 0.10000000149011612
             },
             "RigidbodyComponent": {
                 "allowSleep": 1,
@@ -63,9 +54,17 @@
             },
             "ScriptComponent": {
                 "propertyValues": {
-                    "speed": 500.0
+                    "speed": 250.0
                 },
                 "scriptAssetUUID": "5ec5b495-85ae-451f-bb42-959430e47874"
+            },
+            "SphereColliderComponent": {
+                "offset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "radius": 0.5
             },
             "Tag": {
                 "isActive": true,
@@ -89,7 +88,7 @@
                     0.30000001192092896
                 ]
             },
-            "UUID": 2660239966567617444,
+            "UUID": 7548015563591399556,
             "_isRoot": true
         }
     ]

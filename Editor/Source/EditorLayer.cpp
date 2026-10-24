@@ -185,7 +185,14 @@ void EditorLayer::OnEvent(Event& event)
             {
                 EditorCamera::NavigationMode requestedMode = EditorCamera::NavigationMode::None;
                 if (mouseEvent->GetMouseCode() == MouseCode::ButtonRight)
-                    requestedMode = EditorCamera::NavigationMode::FreeLook;
+                {
+                    if (IsCursorOverViewport())
+                    {
+                        m_RightClickPending = true;
+                        ImVec2 mp = ImGui::GetIO().MousePos;
+                        m_RightClickStartPos = glm::vec2(mp.x, mp.y);
+                    }
+                }
                 else if (mouseEvent->GetMouseCode() == MouseCode::ButtonMiddle)
                     requestedMode = EditorCamera::NavigationMode::Pan;
                 else if (mouseEvent->GetMouseCode() == MouseCode::ButtonLeft &&
@@ -224,6 +231,12 @@ void EditorLayer::OnEvent(Event& event)
         {
             if (auto* mouseEvent = static_cast<MouseButtonReleasedEvent*>(&event))
             {
+                if (m_RightClickPending && mouseEvent->GetMouseCode() == MouseCode::ButtonRight)
+                {
+                    m_RightClickPending = false;
+                    m_Viewport.OpenContextMenu(ImVec2(m_RightClickStartPos.x, m_RightClickStartPos.y));
+                }
+
                 const bool releasedNavigationButton =
                     (m_EditorCameraNavigation == EditorCamera::NavigationMode::FreeLook && mouseEvent->GetMouseCode() == MouseCode::ButtonRight) ||
                     (m_EditorCameraNavigation == EditorCamera::NavigationMode::Orbit && mouseEvent->GetMouseCode() == MouseCode::ButtonLeft) ||
@@ -242,17 +255,31 @@ void EditorLayer::OnEvent(Event& event)
     {
         if (MouseMovedEvent* mouseEvent = static_cast<MouseMovedEvent*>(&event))
         {
-            if (m_Engine->GetActiveScene().GetState() == SceneState::EDIT && m_EditorCameraNavigation != EditorCamera::NavigationMode::None)
+            if (m_Engine->GetActiveScene().GetState() == SceneState::EDIT)
             {
-                m_EditorCamera.OnMouseMoved(
-                    mouseEvent->GetX(),
-                    mouseEvent->GetY(),
-                    m_Engine->GetWindow().GetGLFWWindow(),
-                    m_EditorCameraNavigation
-                );
-                event.Handled = true;
-            }
+                if (m_RightClickPending)
+                {
+                    ImVec2 curMp = ImGui::GetIO().MousePos;
+                    glm::vec2 curPos(curMp.x, curMp.y);
+                    if (glm::distance(curPos, m_RightClickStartPos) > 4.0f)
+                    {
+                        m_RightClickPending = false;
+                        m_EditorCameraNavigation = EditorCamera::NavigationMode::FreeLook;
+                        m_EditorCamera.BeginMouseCapture(m_Engine->GetWindow().GetGLFWWindow());
+                    }
+                }
 
+                if (m_EditorCameraNavigation != EditorCamera::NavigationMode::None)
+                {
+                    m_EditorCamera.OnMouseMoved(
+                        mouseEvent->GetX(),
+                        mouseEvent->GetY(),
+                        m_Engine->GetWindow().GetGLFWWindow(),
+                        m_EditorCameraNavigation
+                    );
+                    event.Handled = true;
+                }
+            }
         }
         break;
     }
@@ -270,6 +297,12 @@ void EditorLayer::OnEvent(Event& event)
     }
     case EventType::KeyPressed:
     {
+        if (m_Engine->GetActiveScene().GetState() == SceneState::EDIT && m_RightClickPending)
+        {
+            m_RightClickPending = false;
+            m_EditorCameraNavigation = EditorCamera::NavigationMode::FreeLook;
+            m_EditorCamera.BeginMouseCapture(m_Engine->GetWindow().GetGLFWWindow());
+        }
         if (Input::IsKeyJustPressed(KeyCode::End))
         {
             LOG_DEBUG("Shaders reloaded.");

@@ -26,5 +26,8 @@ ImVec4 GetMutedTextColor();
 ImVec4 GetSuccessColor();
 ImVec4 GetWarningColor();
 ImVec4 GetErrorColor();
+ImVec4 GetDarkTextColor();
+bool IsAccentBright();
+ImVec4 GetSelectionTextColor();
 
 }

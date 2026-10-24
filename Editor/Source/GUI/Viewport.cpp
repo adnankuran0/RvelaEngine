@@ -18,6 +18,19 @@
 #include "Scene/Components/PrefabComponent.h"
 #include "Commands/CommandHistory.h"
 #include "Commands/TransformCommand.h"
+#include "Commands/EntityLifecycleCommands.h"
+#include "Scene/Components/CameraComponent.h"
+#include "Scene/Components/DirectionalLightComponent.h"
+#include "Scene/Components/PointLightComponent.h"
+#include "Scene/Components/SpotLightComponent.h"
+#include "Scene/Components/AudioEmitterComponent.h"
+#include "Scene/Components/ParticleEmitterComponent.h"
+#include "Scene/Components/DecalComponent.h"
+#include "Scene/Components/UIComponents.h"
+#include "Scene/Components/ColliderComponents.h"
+#include "Scene/Components/RigidbodyComponent.h"
+#include "Physics/PhysicsSystem.h"
+#include "Physics/PhysicsWorld.h"
 
 using namespace rv;
 
@@ -293,7 +306,6 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
                 {
                     auto& curTc = currentReg.get<TransformComponent>(entityHandle);
 
-                    // Check if transform actually changed
                     bool changed = (curTc.GetPosition() != initTr.localPos) ||
                                    (curTc.GetRotation() != initTr.localRot) ||
                                    (curTc.GetScale() != initTr.localScale);
@@ -308,7 +320,6 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
 
             if (!beforeRecords.empty())
             {
-                // Create command with both before and after but dont reexecute
                 auto cmd = std::make_unique<TransformCommand>(&activeScene, beforeRecords, afterRecords);
                 CommandHistory::Get().Execute(std::move(cmd));
             }
@@ -1492,7 +1503,367 @@ void Viewport::Draw(Engine* engine, bool orbitDragActive)
             }
             ImGui::EndDragDropTarget();
         }
+
+        if (m_PendingContextMenu)
+        {
+            m_PendingContextMenu = false;
+
+            const float gizmoSize = 96.0f;
+            const float margin = 10.0f;
+            bool isOverOrientationGizmo = m_ContextMenuMousePos.x >= (displayPos.x + displaySize.x - gizmoSize - margin) &&
+                m_ContextMenuMousePos.x <= (displayPos.x + displaySize.x - margin) &&
+                m_ContextMenuMousePos.y >= (displayPos.y + margin) &&
+                m_ContextMenuMousePos.y <= (displayPos.y + margin + gizmoSize);
+
+            const float leftToolbarWidth = 308.0f;
+            const float leftToolbarHeight = 32.0f;
+            bool isOverLeftToolbar = m_ContextMenuMousePos.x >= (displayPos.x + 10.0f) &&
+                m_ContextMenuMousePos.x <= (displayPos.x + 10.0f + leftToolbarWidth) &&
+                m_ContextMenuMousePos.y >= (displayPos.y + 10.0f) &&
+                m_ContextMenuMousePos.y <= (displayPos.y + 10.0f + leftToolbarHeight);
+
+            const float rightToolbarWidth = 196.0f;
+            const float rightToolbarHeight = 32.0f;
+            float rightToolbarX = displayPos.x + displaySize.x - margin - gizmoSize - 8.0f - rightToolbarWidth;
+            bool isOverRightToolbar = m_ContextMenuMousePos.x >= rightToolbarX &&
+                m_ContextMenuMousePos.x <= (rightToolbarX + rightToolbarWidth) &&
+                m_ContextMenuMousePos.y >= (displayPos.y + margin) &&
+                m_ContextMenuMousePos.y <= (displayPos.y + margin + rightToolbarHeight);
+
+            bool isOverStats = false;
+            if (m_ShowStatistics)
+            {
+                const float statsW = 240.0f;
+                const float statsH = 260.0f;
+                float statsY = (engine->GetActiveScene().GetState() == SceneState::EDIT) ? 115.0f : 14.0f;
+                isOverStats = m_ContextMenuMousePos.x >= (displayPos.x + displaySize.x - statsW - 14.0f) &&
+                    m_ContextMenuMousePos.x <= (displayPos.x + displaySize.x - 14.0f) &&
+                    m_ContextMenuMousePos.y >= (displayPos.y + statsY) &&
+                    m_ContextMenuMousePos.y <= (displayPos.y + statsY + statsH);
+            }
+
+            if (!isOverOrientationGizmo && !isOverLeftToolbar && !isOverRightToolbar && !isOverStats && !ImGuizmo::IsOver() && !ImGuizmo::IsUsing())
+            {
+                m_ContextSpawnPos = CalculateSpawnPosition(engine, m_ContextMenuMousePos, displayPos, displaySize);
+                ImGui::OpenPopup("ViewportContextMenu");
+            }
+        }
+
+        DrawContextMenu(engine, displayPos, displaySize);
     }
     ImGui::End();
     ImGui::PopStyleVar();
+}
+
+glm::vec3 Viewport::CalculateSpawnPosition(Engine* engine, const ImVec2& mousePos, const ImVec2& displayPos, const ImVec2& displaySize)
+{
+    m_ContextSpawnNormal = std::nullopt;
+
+    auto* cam = engine->GetEditorCamera();
+    if (!cam)
+        return glm::vec3(0.0f);
+
+    glm::vec3 spawnPos = cam->Position + cam->Front * 5.0f;
+
+    if (displaySize.x <= 0.0f || displaySize.y <= 0.0f)
+        return spawnPos;
+
+    float mouseX = mousePos.x - displayPos.x;
+    float mouseY = mousePos.y - displayPos.y;
+    if (mouseX < 0.0f || mouseX > displaySize.x || mouseY < 0.0f || mouseY > displaySize.y)
+        return spawnPos;
+
+    float ndcX = (2.0f * mouseX) / displaySize.x - 1.0f;
+    float ndcY = 1.0f - (2.0f * mouseY) / displaySize.y;
+
+    glm::mat4 invVP = glm::inverse(cam->GetProjectionMatrix() * cam->GetViewMatrix());
+    glm::vec4 nearPoint = invVP * glm::vec4(ndcX, ndcY, -1.0f, 1.0f);
+    glm::vec4 farPoint = invVP * glm::vec4(ndcX, ndcY, 1.0f, 1.0f);
+
+    if (nearPoint.w == 0.0f || farPoint.w == 0.0f)
+        return spawnPos;
+
+    glm::vec3 rayOrigin = glm::vec3(nearPoint) / nearPoint.w;
+    glm::vec3 rayEnd = glm::vec3(farPoint) / farPoint.w;
+    glm::vec3 rayDir = glm::normalize(rayEnd - rayOrigin);
+
+    auto& scene = engine->GetActiveScene();
+
+    Physics::RaycastResult hit = scene.GetPhysicsSystem().GetPhysicsWorld().Raycast(rayOrigin, rayDir, 2000.0f);
+    if (hit.hit)
+    {
+        m_ContextSpawnNormal = hit.normal;
+        return hit.point;
+    }
+
+    auto& context = engine->GetRenderLayer().GetRenderContext();
+    float fboWidth = context.viewportWidth;
+    float fboHeight = context.viewportHeight;
+    float normX = std::clamp(mouseX / displaySize.x, 0.0f, 1.0f);
+    float normY = std::clamp(mouseY / displaySize.y, 0.0f, 1.0f);
+    uint32_t fboX = static_cast<uint32_t>(normX * (fboWidth - 1));
+    uint32_t fboY = static_cast<uint32_t>((1.0f - normY) * (fboHeight - 1));
+    uint32_t pickedID = engine->Selection.Pick(fboX, fboY);
+
+    if (pickedID != 0)
+    {
+        entt::entity pickedEntity = static_cast<entt::entity>(pickedID);
+        if (scene.GetRegistry().valid(pickedEntity) && scene.HasComponent<TransformComponent>(pickedEntity))
+        {
+            glm::vec3 entityPos = scene.GetComponent<TransformComponent>(pickedEntity).GetWorldPosition();
+            glm::vec3 planeNormal = -cam->Front;
+            float denom = glm::dot(rayDir, planeNormal);
+            if (std::abs(denom) > 1e-4f)
+            {
+                float t = glm::dot(entityPos - rayOrigin, planeNormal) / denom;
+                if (t > 0.0f)
+                {
+                    m_ContextSpawnNormal = glm::vec3(0.0f, 1.0f, 0.0f);
+                    return rayOrigin + rayDir * t;
+                }
+            }
+        }
+    }
+
+    if (std::abs(rayDir.y) > 0.001f)
+    {
+        float t = -rayOrigin.y / rayDir.y;
+        if (t > 0.0f && t < 1000.0f)
+        {
+            m_ContextSpawnNormal = glm::vec3(0.0f, 1.0f, 0.0f);
+            return rayOrigin + rayDir * t;
+        }
+    }
+
+    return rayOrigin + rayDir * 5.0f;
+}
+
+void Viewport::DrawContextMenu(Engine* engine, const ImVec2& displayPos, const ImVec2& displaySize)
+{
+    if (ImGui::BeginPopup("ViewportContextMenu"))
+    {
+        auto& scene = engine->GetActiveScene();
+        auto registerCreated = [&](entt::entity handle) {
+            if (handle != entt::null && scene.GetRegistry().valid(handle))
+            {
+                CommandHistory::Get().Execute(std::make_unique<CreateEntityCommand>(&scene, handle));
+                EditorSelection::Get().Select(handle);
+                scene.SetDirty(true);
+            }
+        };
+
+        if (ImGui::MenuItem("Create Empty Entity"))
+        {
+            entt::entity e = scene.CreateEntity("New Entity");
+            scene.GetComponent<TransformComponent>(e).SetPosition(m_ContextSpawnPos);
+            registerCreated(e);
+        }
+
+        if (ImGui::MenuItem("Camera"))
+        {
+            entt::entity camEnt = scene.CreateEntity("Camera");
+            scene.GetComponent<TransformComponent>(camEnt).SetPosition(m_ContextSpawnPos);
+            scene.AddComponent<CameraComponent>(camEnt);
+            registerCreated(camEnt);
+        }
+
+        if (ImGui::MenuItem("Particle Emitter"))
+        {
+            Entity emitterEntity = EditorUtils::LoadPrimitive(scene, "Quad");
+            if (emitterEntity)
+            {
+                if (emitterEntity.HasComponent<RigidbodyComponent>())
+                    emitterEntity.RemoveComponent<RigidbodyComponent>();
+                if (emitterEntity.HasComponent<ConvexHullColliderComponent>())
+                    emitterEntity.RemoveComponent<ConvexHullColliderComponent>();
+
+                emitterEntity.GetComponent<TagComponent>().tag = "Particle Emitter";
+                emitterEntity.GetComponent<TransformComponent>().SetPosition(m_ContextSpawnPos);
+                emitterEntity.AddComponent<ParticleEmitterComponent>();
+                registerCreated(emitterEntity.GetHandle());
+            }
+        }
+
+        if (ImGui::MenuItem("Audio Emitter"))
+        {
+            entt::entity audio = scene.CreateEntity("AudioEmitter");
+            scene.GetComponent<TransformComponent>(audio).SetPosition(m_ContextSpawnPos);
+            scene.AddComponent<AudioEmitterComponent>(audio);
+            registerCreated(audio);
+        }
+
+        if (ImGui::MenuItem("Decal"))
+        {
+            entt::entity decalEnt = scene.CreateEntity("Decal");
+            auto& tc = scene.GetComponent<TransformComponent>(decalEnt);
+            tc.SetPosition(m_ContextSpawnPos);
+            tc.SetEulerRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
+            scene.AddComponent<DecalComponent>(decalEnt);
+            registerCreated(decalEnt);
+        }
+
+        if (ImGui::BeginMenu("3D Objects"))
+        {
+            auto createPrimitive = [&](const std::string& name) {
+                Entity prim = EditorUtils::LoadPrimitive(scene, name);
+                if (prim.GetHandle() != entt::null)
+                {
+                    glm::vec3 pos = m_ContextSpawnPos;
+                    if (m_ContextSpawnNormal.has_value())
+                    {
+                        pos += m_ContextSpawnNormal.value() * 0.5f;
+                    }
+                    prim.GetComponent<TransformComponent>().SetPosition(pos);
+                    registerCreated(prim.GetHandle());
+                }
+            };
+
+            if (ImGui::MenuItem("Cube")) createPrimitive("Cube");
+            if (ImGui::MenuItem("Sphere")) createPrimitive("Sphere");
+            if (ImGui::MenuItem("Cylinder")) createPrimitive("Cylinder");
+            if (ImGui::MenuItem("Quad")) createPrimitive("Quad");
+            if (ImGui::MenuItem("Cone")) createPrimitive("Cone");
+            if (ImGui::MenuItem("Capsule")) createPrimitive("Capsule");
+            if (ImGui::MenuItem("Torus")) createPrimitive("Torus");
+            if (ImGui::MenuItem("Plane")) createPrimitive("Plane");
+            if (ImGui::MenuItem("Monkey")) createPrimitive("Monkey");
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Lights"))
+        {
+            if (ImGui::MenuItem("Directional Light"))
+            {
+                entt::entity light = scene.CreateEntity("DirectionalLight");
+                auto& tc = scene.GetComponent<TransformComponent>(light);
+                tc.SetPosition(m_ContextSpawnPos);
+                tc.SetEulerRotation(glm::vec3(-60.0f, -90.0f, 0.0f));
+                scene.AddComponent<DirectionalLightComponent>(light);
+                registerCreated(light);
+            }
+            if (ImGui::MenuItem("Point Light"))
+            {
+                entt::entity light = scene.CreateEntity("PointLight");
+                scene.GetComponent<TransformComponent>(light).SetPosition(m_ContextSpawnPos);
+                scene.AddComponent<PointLightComponent>(light);
+                registerCreated(light);
+            }
+            if (ImGui::MenuItem("Spot Light"))
+            {
+                entt::entity light = scene.CreateEntity("SpotLight");
+                auto& tc = scene.GetComponent<TransformComponent>(light);
+                tc.SetPosition(m_ContextSpawnPos);
+                tc.SetEulerRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
+                scene.AddComponent<SpotLightComponent>(light);
+                registerCreated(light);
+            }
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("UI"))
+        {
+            if (ImGui::MenuItem("UI Canvas"))
+            {
+                entt::entity canvas = scene.CreateEntity("Canvas");
+                scene.AddComponent<UICanvasComponent>(canvas);
+                scene.AddComponent<RectTransformComponent>(canvas);
+                registerCreated(canvas);
+            }
+            if (ImGui::MenuItem("UI Text"))
+            {
+                entt::entity text = scene.CreateEntity("UI Text");
+                scene.AddComponent<RectTransformComponent>(text);
+                scene.AddComponent<UITextComponent>(text);
+                registerCreated(text);
+            }
+            if (ImGui::MenuItem("UI Button"))
+            {
+                entt::entity button = scene.CreateEntity("UI Button");
+                scene.AddComponent<RectTransformComponent>(button);
+                scene.AddComponent<UIButtonComponent>(button);
+                registerCreated(button);
+            }
+            if (ImGui::MenuItem("UI Image"))
+            {
+                entt::entity img = scene.CreateEntity("UI Image");
+                scene.AddComponent<RectTransformComponent>(img);
+                scene.AddComponent<UIImageComponent>(img);
+                registerCreated(img);
+            }
+            if (ImGui::MenuItem("UI Slider"))
+            {
+                entt::entity slider = scene.CreateEntity("UI Slider");
+                scene.AddComponent<RectTransformComponent>(slider);
+                scene.AddComponent<UISliderComponent>(slider);
+                registerCreated(slider);
+            }
+            if (ImGui::MenuItem("UI Progress Bar"))
+            {
+                entt::entity pbar = scene.CreateEntity("UI Progress Bar");
+                scene.AddComponent<RectTransformComponent>(pbar);
+                scene.AddComponent<UIProgressBarComponent>(pbar);
+                registerCreated(pbar);
+            }
+            if (ImGui::MenuItem("UI Checkbox"))
+            {
+                entt::entity cb = scene.CreateEntity("UI Checkbox");
+                scene.AddComponent<RectTransformComponent>(cb);
+                scene.AddComponent<UICheckboxComponent>(cb);
+                registerCreated(cb);
+            }
+            if (ImGui::MenuItem("UI Panel"))
+            {
+                entt::entity panel = scene.CreateEntity("UI Panel");
+                auto& rect = scene.AddComponent<RectTransformComponent>(panel);
+                rect.size = { 300.0f, 200.0f };
+                scene.AddComponent<UIPanelComponent>(panel);
+                registerCreated(panel);
+            }
+            if (ImGui::MenuItem("UI Vertical Container"))
+            {
+                entt::entity vbox = scene.CreateEntity("UI Vertical Container");
+                auto& rect = scene.AddComponent<RectTransformComponent>(vbox);
+                rect.size = { 200.0f, 300.0f };
+                auto& lg = scene.AddComponent<UILayoutGroupComponent>(vbox);
+                lg.type = UILayoutType::Vertical;
+                registerCreated(vbox);
+            }
+            if (ImGui::MenuItem("UI Horizontal Container"))
+            {
+                entt::entity hbox = scene.CreateEntity("UI Horizontal Container");
+                auto& rect = scene.AddComponent<RectTransformComponent>(hbox);
+                rect.size = { 400.0f, 60.0f };
+                auto& lg = scene.AddComponent<UILayoutGroupComponent>(hbox);
+                lg.type = UILayoutType::Horizontal;
+                registerCreated(hbox);
+            }
+            if (ImGui::MenuItem("UI Text Input"))
+            {
+                entt::entity input = scene.CreateEntity("UI Text Input");
+                auto& rect = scene.AddComponent<RectTransformComponent>(input);
+                rect.size = { 200.0f, 36.0f };
+                scene.AddComponent<UITextInputComponent>(input);
+                registerCreated(input);
+            }
+            if (ImGui::MenuItem("UI Scroll View"))
+            {
+                entt::entity sv = scene.CreateEntity("UI Scroll View");
+                auto& rect = scene.AddComponent<RectTransformComponent>(sv);
+                rect.size = { 250.0f, 200.0f };
+                scene.AddComponent<UIScrollRectComponent>(sv);
+                registerCreated(sv);
+            }
+            if (ImGui::MenuItem("UI Tab Container"))
+            {
+                entt::entity tabs = scene.CreateEntity("UI Tab Container");
+                auto& rect = scene.AddComponent<RectTransformComponent>(tabs);
+                rect.size = { 350.0f, 250.0f };
+                scene.AddComponent<UITabContainerComponent>(tabs);
+                registerCreated(tabs);
+            }
+            ImGui::EndMenu();
+        }
+
+        ImGui::EndPopup();
+    }
 }

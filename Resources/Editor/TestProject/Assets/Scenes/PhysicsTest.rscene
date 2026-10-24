@@ -44,7 +44,7 @@
             "AudioEmitterComponent": {
                 "attenuationModel": 1,
                 "audioClip": "e7dc7a60-7295-4655-85f4-34ce2a2975d9",
-                "busID": 1,
+                "busID": 0,
                 "doppler": true,
                 "dopplerFactor": 1.0,
                 "loop": false,
@@ -669,7 +669,7 @@
                     0.9999991655349731
                 ]
             },
-            "UUID": 5765367760431879173
+            "UUID": 157568117371957855
         },
         {
             "Material": {
@@ -1363,6 +1363,25 @@
                     "op": "add",
                     "path": "/0/PointLight/shadowBias",
                     "value": 0.10000000149011612
+                },
+                {
+                    "op": "add",
+                    "path": "/0/AudioEmitterComponent",
+                    "value": {
+                        "attenuationModel": 1,
+                        "audioClip": "68930e1c-60c1-4225-b2ba-19889df946cb",
+                        "busID": 0,
+                        "doppler": true,
+                        "dopplerFactor": 1.0,
+                        "loop": true,
+                        "maxDistance": 100.0,
+                        "minDistance": 0.3100000023841858,
+                        "pitch": 1.0,
+                        "playOnCreate": true,
+                        "rolloff": 1.0,
+                        "spatial": true,
+                        "volume": 1.0
+                    }
                 }
             ],
             "ParentUUID": 0,
@@ -1374,7 +1393,7 @@
             "Transform": {
                 "lockScaleRatio": false,
                 "position": [
-                    9.682028121460462e-07,
+                    -0.017539262771606445,
                     1.4773578643798828,
                     0.027390480041503906
                 ],
@@ -1389,7 +1408,7 @@
                     1.0
                 ]
             },
-            "UUID": 7304787093064759669
+            "UUID": 16777483379229402430
         },
         {
             "ParentUUID": 0,
@@ -1684,7 +1703,7 @@
                     1.0
                 ]
             },
-            "UUID": 6359827544365471797
+            "UUID": 16893164271060076479
         },
         {
             "BoxColliderComponent": {
@@ -2252,12 +2271,12 @@
         "Bloom_Intensity": 1.0,
         "Bloom_Knee": 0.0,
         "Bloom_Treshold": 1.0,
-        "ContactShadows": false,
-        "ContactShadows_Bias": 0.004999999888241291,
+        "ContactShadows": true,
+        "ContactShadows_Bias": 0.014700000174343586,
         "ContactShadows_Distance": 0.10999999940395355,
         "ContactShadows_Intensity": 1.409999966621399,
         "ContactShadows_Steps": 16,
-        "ContactShadows_Thickness": 0.03099999949336052,
+        "ContactShadows_Thickness": 0.04500000178813934,
         "Fog_Color": [
             0.6499999761581421,
             0.75,
@@ -2278,7 +2297,7 @@
         "Lighting_AmbientIntensity": 0.10000000149011612,
         "Lighting_IBL": true,
         "Lighting_IBLIntensity": 0.10000000149011612,
-        "MotionBlur": false,
+        "MotionBlur": true,
         "MotionBlur_Intensity": 1.0,
         "MotionBlur_MaxVelocity": 0.08500000089406967,
         "MotionBlur_Samples": 16,
