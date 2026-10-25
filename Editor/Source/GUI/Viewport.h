@@ -9,15 +9,19 @@
 #include <optional>
 #include "glm/gtc/quaternion.hpp"
 #include "Scene/EntityUUID.h"
+#include "Panels/EditorPanel.h"
 
 namespace rv {
 
 class Engine;
 
-class Viewport
+class Viewport : public EditorPanel
 {
 public:
+	Viewport() : EditorPanel("Viewport", true) {}
+public:
 	void Draw(Engine* engine, bool orbitDragActive = false);
+
 	bool ContainsPoint(const glm::vec2& point) const;
 	void OpenContextMenu(const ImVec2& mousePos) { m_PendingContextMenu = true; m_ContextMenuMousePos = mousePos; }
 

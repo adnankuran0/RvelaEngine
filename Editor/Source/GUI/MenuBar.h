@@ -1,22 +1,27 @@
 #pragma once
+#include <functional>
+#include <vector>
 
 namespace rv {
 
 class Engine;
 class AssetImportPipeline;
+class EditorPanel;
 class ProjectSettingsPanel;
 class ProjectSelectorPanel;
-class ImportSettingsPanel;
-class MaterialEditorPanel;
+
+struct EditorPanels
+{
+    std::vector<EditorPanel*> viewPanels;
+    ProjectSettingsPanel* projectSettings = nullptr;
+    ProjectSelectorPanel* projectSelector = nullptr;
+    std::function<void()> onResetLayout = nullptr;
+};
 
 class MenuBar
 {
 public:
-	void Draw(Engine* engine, AssetImportPipeline& assetImporter, 
-		ProjectSettingsPanel* projectSettingsPanel = nullptr,
-		ProjectSelectorPanel* projectSelectorPanel = nullptr,
-		ImportSettingsPanel* importSettingsPanel = nullptr,
-		MaterialEditorPanel* materialEditorPanel = nullptr);
+	void Draw(Engine* engine, AssetImportPipeline& assetImporter, const EditorPanels& panels);
 };
 
 }

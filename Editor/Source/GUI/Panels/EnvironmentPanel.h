@@ -1,4 +1,5 @@
 #pragma once
+#include "EditorPanel.h"
 #include <unordered_map>
 #include <string>
 
@@ -6,14 +7,13 @@ namespace rv {
 
 class Engine;
 
-class EnvironmentPanel
+class EnvironmentPanel : public EditorPanel
 {
 public:
-    EnvironmentPanel() = default;
-    ~EnvironmentPanel() = default;
+    EnvironmentPanel() : EditorPanel("Environment", true) {}
+    ~EnvironmentPanel() override = default;
 
     void Draw(Engine* engine);
-
 };
 
 } // namespace rv

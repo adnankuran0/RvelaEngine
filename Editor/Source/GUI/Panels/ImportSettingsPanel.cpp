@@ -83,7 +83,7 @@ void ImportSettingsPanel::Draw(AssetImportPipeline& importPipeline)
     if (!m_IsOpen)
         return;
 
-    ImGui::Begin("Import", &m_IsOpen);
+    ImGui::Begin("Import", nullptr);
 
     if (s_CurrentAssetPath.empty() || !std::filesystem::exists(s_CurrentAssetPath))
     {

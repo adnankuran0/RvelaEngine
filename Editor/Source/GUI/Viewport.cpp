@@ -41,6 +41,8 @@ using namespace rv;
 
 bool Viewport::ContainsPoint(const glm::vec2& point) const
 {
+	if (!m_IsOpen)
+		return false;
 	return point.x >= m_PanelPosition.x && point.x <= m_PanelPosition.x + m_PanelSize.x &&
 		point.y >= m_PanelPosition.y && point.y <= m_PanelPosition.y + m_PanelSize.y;
 }
@@ -1322,6 +1324,8 @@ void Viewport::HandleSelection(Engine* engine, ImVec2& displayPos, ImVec2& displ
 
 void Viewport::Draw(Engine* engine, bool orbitDragActive)
 {
+    if (!m_IsOpen)
+        return;
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
     ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
     {

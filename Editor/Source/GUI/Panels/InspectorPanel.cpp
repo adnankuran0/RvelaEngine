@@ -22,6 +22,8 @@ namespace rv {
 
 void InspectorPanel::Draw(Engine* engine)
 {
+	if (!m_IsOpen)
+		return;
 	entt::entity selectedEntity = EditorSelection::Get().GetPrimary();
 
 	Scene& scene = engine->GetActiveScene();

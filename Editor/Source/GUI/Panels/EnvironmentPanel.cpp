@@ -12,7 +12,9 @@ using namespace rv;
 
 void EnvironmentPanel::Draw(Engine* engine)
 {
-    ImGui::Begin("Environment");
+    if (!m_IsOpen)
+        return;
+    ImGui::Begin("Environment", nullptr);
 
     auto& env = engine->GetActiveScene().GetEnvironment();
 

@@ -15,18 +15,23 @@
 #include "EditorSettings.h"
 #include "Commands/CommandHistory.h"
 #include "Renderer/RenderLayer.h"
+#include "Panels/EditorPanel.h"
 #include "Panels/ImportSettingsPanel.h"
 #include "Panels/MaterialEditorPanel.h"
+#include "Viewport.h"
+#include "Panels/SceneHierarchyPanel.h"
+#include "Panels/InspectorPanel.h"
+#include "Panels/EnvironmentPanel.h"
+#include "Panels/AssetBrowserPanel.h"
+#include "Panels/MixerPanel.h"
+#include "Panels/AnimatorPanel.h"
+#include "Panels/ConsolePanel.h"
 #include "PrefabEditManager.h"
 #include "Style.h"
 
 using namespace rv;
 
-void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter,
-    ProjectSettingsPanel* projectSettingsPanel,
-    ProjectSelectorPanel* projectSelectorPanel,
-    ImportSettingsPanel* importSettingsPanel,
-    MaterialEditorPanel* materialEditorPanel)
+void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter, const EditorPanels& panels)
 {
     auto& registry = AssetManager::Get().GetRegistry();
 
@@ -63,8 +68,8 @@ void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter,
 
             if (ImGui::MenuItem("Switch Project..."))
             {
-                if (projectSelectorPanel)
-                    projectSelectorPanel->Open();
+                if (panels.projectSelector)
+                    panels.projectSelector->Open();
             }
 
             if (ImGui::MenuItem("Open VS Code Workspace", nullptr, false, ProjectManager::IsProjectLoaded()))
@@ -169,8 +174,8 @@ void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter,
 
             if (ImGui::MenuItem("Project Settings..."))
             {
-                if (projectSettingsPanel)
-                    projectSettingsPanel->Open();
+                if (panels.projectSettings)
+                    panels.projectSettings->Open();
             }
 
             ImGui::EndMenu();
@@ -190,27 +195,21 @@ void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter,
 
             ImGui::Separator();
 
-            if (importSettingsPanel)
+            if (ImGui::MenuItem("Reset Layout"))
             {
-                bool isOpen = importSettingsPanel->IsOpen();
-                if (ImGui::MenuItem("Import Settings", nullptr, &isOpen))
-                {
-                    if (isOpen)
-                        importSettingsPanel->Open();
-                    else
-                        importSettingsPanel->Close();
-                }
+                if (panels.onResetLayout)
+                    panels.onResetLayout();
             }
 
-            if (materialEditorPanel)
+            ImGui::Separator();
+
+            for (EditorPanel* panel : panels.viewPanels)
             {
-                bool isOpen = materialEditorPanel->IsOpen();
-                if (ImGui::MenuItem("Material Editor", nullptr, &isOpen))
+                if (!panel) continue;
+                bool isOpen = panel->IsOpen();
+                if (ImGui::MenuItem(panel->GetName(), nullptr, &isOpen))
                 {
-                    if (isOpen)
-                        materialEditorPanel->Open();
-                    else
-                        materialEditorPanel->Close();
+                    panel->SetOpen(isOpen);
                 }
             }
 

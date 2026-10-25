@@ -41,6 +41,7 @@ public:
     void Render();
 
     EditorCamera& GetEditorCamera() { return m_EditorCamera; }
+    void ResetLayout();
 
 
 private:
@@ -63,6 +64,7 @@ private:
     ImportSettingsPanel m_ImportSettingsPanel;
     MaterialEditorPanel m_MaterialEditorPanel;
     Viewport m_Viewport;
+    std::vector<EditorPanel*> m_DockPanels;
 
     RenderPassHandle m_GizmoPass;
     RenderPassHandle m_SelectedEntityMaskPass;

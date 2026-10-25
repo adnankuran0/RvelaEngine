@@ -1,4 +1,5 @@
 #pragma once
+#include "EditorPanel.h"
 #include <filesystem>
 #include <string>
 #include "AssetImporters/TextureImporter.h"
@@ -8,18 +9,13 @@ namespace rv {
 
 class AssetImportPipeline;
 
-class ImportSettingsPanel
+class ImportSettingsPanel : public EditorPanel
 {
 public:
-    ImportSettingsPanel() = default;
-    ~ImportSettingsPanel() = default;
+    ImportSettingsPanel() : EditorPanel("Import Settings", true) {}
+    ~ImportSettingsPanel() override = default;
 
     void Draw(AssetImportPipeline& importPipeline);
-
-    void Open() { m_IsOpen = true; }
-    void Close() { m_IsOpen = false; }
-    bool IsOpen() const { return m_IsOpen; }
-    void Toggle() { m_IsOpen = !m_IsOpen; }
 
     static void SetInspectedAsset(const std::filesystem::path& assetPath);
     static const std::filesystem::path& GetInspectedAsset();
@@ -28,9 +24,6 @@ public:
         const std::filesystem::path& assetPath,
         AssetImportPipeline& importPipeline,
         bool isEmbedded = false);
-
-private:
-    bool m_IsOpen = true;
 };
 
 }

@@ -73,7 +73,6 @@ AssetUUID AnimationImporter::ImportFromScene(
             if (!boneNameToIndex.contains(boneName))
                 continue;
 
-            // 1. Position Track
             if (channel->mNumPositionKeys > 0)
             {
                 auto posTrack = std::make_shared<Animation::BonePropertyTrack<glm::vec3>>();
@@ -98,7 +97,6 @@ AssetUUID AnimationImporter::ImportFromScene(
                 clip->propertyTracks.push_back(posTrack);
             }
 
-            // 2. Rotation Track
             if (channel->mNumRotationKeys > 0)
             {
                 auto rotTrack = std::make_shared<Animation::BonePropertyTrack<glm::quat>>();
@@ -123,7 +121,6 @@ AssetUUID AnimationImporter::ImportFromScene(
                 clip->propertyTracks.push_back(rotTrack);
             }
 
-            // 3. Scale Track
             if (channel->mNumScalingKeys > 0)
             {
                 auto scaleTrack = std::make_shared<Animation::BonePropertyTrack<glm::vec3>>();

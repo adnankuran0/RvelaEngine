@@ -1,9 +1,8 @@
 #pragma once
+#include "EditorPanel.h"
 #include "entt/entt.h"
 #include "Asset/AssetUUID.h"
 #include <unordered_map>
-
-
 #include <vector>
 
 namespace rv { 
@@ -11,9 +10,11 @@ namespace rv {
 class Engine;
 class AssetRegistry;
 
-class SceneHierarchyPanel
+class SceneHierarchyPanel : public EditorPanel
 {
 public:
+	SceneHierarchyPanel() : EditorPanel("Scene Hierarchy", true) {}
+
 	void Draw(Engine* engine);
 
 private:

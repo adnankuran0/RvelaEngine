@@ -1,4 +1,5 @@
 #pragma once
+#include "EditorPanel.h"
 #include <unordered_map>
 #include <string>
 #include <cstdint>
@@ -7,11 +8,11 @@ namespace rv {
 
 class AudioBus;
 
-class MixerPanel
+class MixerPanel : public EditorPanel
 {
 public:
-    MixerPanel() = default;
-    ~MixerPanel() = default;
+    MixerPanel() : EditorPanel("Audio Mixer", true) {}
+    ~MixerPanel() override = default;
 
     void Draw();
 

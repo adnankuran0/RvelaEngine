@@ -51,9 +51,11 @@ static std::vector<std::shared_ptr<Animation::IPropertyTrack>> GetVisiblePropert
 
 void AnimatorPanel::Draw(Engine* engine)
 {
+    if (!m_IsOpen)
+        return;
     entt::entity selectedEntity = EditorSelection::Get().GetPrimary();
 
-    ImGui::Begin("Animator");
+    ImGui::Begin("Animator", nullptr);
 
     if (m_SeqContext.lastSelectedEntity != selectedEntity) {
         m_SeqContext.ResetSelectionState();

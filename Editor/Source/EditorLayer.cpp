@@ -34,6 +34,20 @@ EditorLayer::EditorLayer(rv::Engine* engine)
     : m_Engine(engine)
 {
     m_LauncherMode = !ProjectManager::IsProjectLoaded();
+
+    m_DockPanels = {
+        &m_Viewport,
+        &m_SceneHierarchyPanel,
+        &m_InspectorPanel,
+        &m_AssetBrowserPanel,
+        &m_ConsolePanel,
+        &m_MixerPanel,
+        &m_EnvironmentPanel,
+        &m_AnimatorPanel,
+        &m_ImportSettingsPanel,
+        &m_MaterialEditorPanel,
+        &m_ProjectSettingsPanel
+    };
 }
 
 EditorLayer::~EditorLayer()
@@ -48,6 +62,15 @@ void EditorLayer::OnAttach()
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+
+    if (io.IniFilename)
+    {
+        std::error_code ec;
+        if (!std::filesystem::exists(io.IniFilename, ec) || std::filesystem::file_size(io.IniFilename, ec) == 0)
+        {
+            Dockspace::ResetLayout();
+        }
+    }
 
     ImGui::StyleColorsDark();
 
@@ -357,6 +380,19 @@ void EditorLayer::UpdateWindowMode()
     }
 }
 
+void EditorLayer::ResetLayout()
+{
+    for (EditorPanel* panel : m_DockPanels)
+    {
+        if (panel == &m_ProjectSettingsPanel)
+            panel->Close();
+        else
+            panel->Open();
+    }
+
+    Dockspace::ResetLayout();
+}
+
 void EditorLayer::Render()
 {
     UpdateWindowMode();
@@ -394,7 +430,13 @@ void EditorLayer::Render()
 
     if (ProjectManager::IsProjectLoaded())
     {
-        m_MenuBar.Draw(m_Engine, m_AssetImportPipeline, &m_ProjectSettingsPanel, &m_ProjectSelectorPanel, &m_ImportSettingsPanel, &m_MaterialEditorPanel);
+        EditorPanels panels;
+        panels.viewPanels = m_DockPanels;
+        panels.projectSettings = &m_ProjectSettingsPanel;
+        panels.projectSelector = &m_ProjectSelectorPanel;
+        panels.onResetLayout = [this]() { ResetLayout(); };
+
+        m_MenuBar.Draw(m_Engine, m_AssetImportPipeline, panels);
          
         m_ToolBar.Draw(*m_Engine);
 

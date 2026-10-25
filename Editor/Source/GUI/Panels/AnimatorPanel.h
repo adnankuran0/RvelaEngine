@@ -1,5 +1,5 @@
 #pragma once
-
+#include "EditorPanel.h"
 #include "GUI/AnimationSequenceAdapter.h"
 #include <entt/entt.h>
 #include <memory>
@@ -8,9 +8,11 @@ namespace rv {
 
 class Engine;
 
-class AnimatorPanel
+class AnimatorPanel : public EditorPanel
 {
 public:
+    AnimatorPanel() : EditorPanel("Animator", true) {}
+
     void Draw(Engine* engine);
 
 private:

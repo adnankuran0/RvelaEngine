@@ -6,7 +6,9 @@
 using namespace rv;
 void ConsolePanel::Draw()
 {
-    ImGui::Begin("Console");
+    if (!m_IsOpen)
+        return;
+    ImGui::Begin("Console", nullptr);
 
     auto& sink = EditorConsoleSink::Get();
 

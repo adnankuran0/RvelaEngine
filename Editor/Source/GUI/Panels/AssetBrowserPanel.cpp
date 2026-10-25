@@ -1419,6 +1419,8 @@ static void DrawItemContextMenu(const std::filesystem::path& itemPath, AssetImpo
 
 void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDirectory, AssetImportPipeline& importPipeline)
 {
+    if (!m_IsOpen)
+        return;
     s_RenameJustCommitted = false;
 
     bool rootChanged = !ArePathsEqual(rootDirectory, s_LastRootDirectory);

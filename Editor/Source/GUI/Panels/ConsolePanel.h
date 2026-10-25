@@ -1,13 +1,14 @@
 #pragma once
+#include "EditorPanel.h"
 #include <string>
 
 namespace rv {
 
-class ConsolePanel
+class ConsolePanel : public EditorPanel
 {
 public:
-    ConsolePanel() = default;
-    ~ConsolePanel() = default;
+    ConsolePanel() : EditorPanel("Console", true) {}
+    ~ConsolePanel() override = default;
 
     void Draw();
 

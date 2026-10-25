@@ -10,7 +10,7 @@
         "projection": 0,
         "sprintSpeed": 5.0
     },
-    "theme": 2,
+    "theme": 1,
     "viewport": {
         "drawBoundingBoxes": false,
         "drawColliders": false,

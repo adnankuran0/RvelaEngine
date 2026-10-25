@@ -20,6 +20,7 @@ namespace rv {
 MaterialEditorPanel* MaterialEditorPanel::s_Instance = nullptr;
 
 MaterialEditorPanel::MaterialEditorPanel()
+    : EditorPanel("Material Editor", true)
 {
     s_Instance = this;
 }
@@ -158,7 +159,7 @@ void MaterialEditorPanel::Draw(Engine* engine)
 
     ImGui::SetNextWindowSize(ImVec2(420.0f, 600.0f), ImGuiCond_FirstUseEver);
 
-    if (!ImGui::Begin(title.c_str(), &m_IsOpen, ImGuiWindowFlags_MenuBar))
+    if (!ImGui::Begin(title.c_str(), nullptr, ImGuiWindowFlags_MenuBar))
     {
         ImGui::End();
         return;

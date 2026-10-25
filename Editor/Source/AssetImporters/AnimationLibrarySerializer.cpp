@@ -69,7 +69,6 @@ bool AnimationLibrarySerializer::Save(const Ref<AnimationLibraryAsset>& asset, c
         uint32_t trackCount = static_cast<uint32_t>(clip->propertyTracks.size());
         file.write(reinterpret_cast<const char*>(&trackCount), sizeof(trackCount));
 
-        // AnimationLibrarySerializer::Save içindeki propertyTracks döngüsü:
         for (const auto& track : clip->propertyTracks)
         {
             WriteStringBinary(file, track->targetPath);

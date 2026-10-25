@@ -1,24 +1,20 @@
 #pragma once
+#include "EditorPanel.h"
 #include <string>
 
 namespace rv {
 
 class Engine;
 
-class ProjectSettingsPanel
+class ProjectSettingsPanel : public EditorPanel
 {
 public:
-    ProjectSettingsPanel() = default;
-    ~ProjectSettingsPanel() = default;
+    ProjectSettingsPanel() : EditorPanel("Project Settings", false) {}
+    ~ProjectSettingsPanel() override = default;
 
     void Draw(Engine* engine);
 
-    void Open() { m_IsOpen = true; }
-    void Close() { m_IsOpen = false; }
-    bool IsOpen() const { return m_IsOpen; }
-
 private:
-    bool m_IsOpen = false;
     char m_NameBuf[128] = "";
     char m_StartSceneBuf[256] = "";
     char m_AutoloadNameBuf[128] = "";

@@ -105,7 +105,7 @@ AssetUUID SkeletonImporter::ImportFromScene(const aiScene* scene, const std::fil
     registry.SaveMeta(skeletonPath, meta);
 
     if (outBoneNameToIndex)
-        *outBoneNameToIndex = asset->m_BoneNameToIndex; // asset hala friend uzerinden erisilebilir
+        *outBoneNameToIndex = asset->m_BoneNameToIndex;
 
     return meta.uuid;
 }

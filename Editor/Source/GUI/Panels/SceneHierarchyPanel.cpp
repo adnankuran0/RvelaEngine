@@ -144,6 +144,8 @@ static inline Entity LoadPrimitive(Scene& scene, const std::string& primitiveMes
 
 void SceneHierarchyPanel::Draw(Engine* engine)
 {
+    if (!m_IsOpen)
+        return;
     Scene& scene = engine->GetActiveScene();
     entt::entity rootEntity = scene.GetRootEntity();
     entt::registry& registry = scene.GetRegistry();
@@ -534,7 +536,7 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                 ImVec2 dotCenter(toggleX + toggleSize * 0.5f, toggleY + toggleSize * 0.5f);
                 if (isSelfActive && isActiveInHierarchy)
                 {
-                    drawList->AddCircleFilled(dotCenter, 3.5f, IM_COL32(16, 185, 129, 230));
+                    drawList->AddCircleFilled(dotCenter, 3.5f, IM_COL32(185, 185, 185, 230));
                 }
                 else if (isSelfActive && !isActiveInHierarchy)
                 {

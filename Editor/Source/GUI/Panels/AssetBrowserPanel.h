@@ -1,4 +1,5 @@
 #pragma once
+#include "EditorPanel.h"
 #include <filesystem>
 #include <vector>
 #include "Renderer/Texture.h"
@@ -9,11 +10,14 @@ namespace rv {
 
 class Engine;
 
-class AssetBrowserPanel
+class AssetBrowserPanel : public EditorPanel
 {
 public:
+	AssetBrowserPanel() : EditorPanel("Asset Browser", true) {}
+
 	void Draw(Engine* engine, const std::filesystem::path& rootDirectory, AssetImportPipeline& importPipeline);
 	void HandleFileDrop(FileDroppedEvent& event, AssetImportPipeline& importPipeline);
+
 	static void RequestRename(const std::filesystem::path& path);
 	static void RequestRefresh();
 	static void Reset(const std::filesystem::path& rootDirectory = {});

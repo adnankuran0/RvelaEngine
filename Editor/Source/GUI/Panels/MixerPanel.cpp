@@ -15,8 +15,10 @@ namespace rv {
 
 void MixerPanel::Draw()
 {
+    if (!m_IsOpen)
+        return;
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10.0f, 10.0f));
-    ImGui::Begin("Audio Mixer");
+    ImGui::Begin("Audio Mixer", nullptr);
 
     float availWidth = ImGui::GetContentRegionAvail().x;
     ImGui::PushStyleColor(ImGuiCol_Button, GetAccentColor());
