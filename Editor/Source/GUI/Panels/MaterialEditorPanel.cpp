@@ -597,6 +597,8 @@ void MaterialEditorPanel::Draw(Engine* engine)
         }
     }
 
+    if (!asset->customShaderUUID.IsValid())
+    {
     if (ImGui::CollapsingHeader("Transparency##transphdr"))
     {
         if (UI::BeginPropertyTable("TransparencyTable"))
@@ -929,6 +931,7 @@ void MaterialEditorPanel::Draw(Engine* engine)
 
             UI::EndPropertyTable();
         }
+    }
     }
 
     ImGui::End();

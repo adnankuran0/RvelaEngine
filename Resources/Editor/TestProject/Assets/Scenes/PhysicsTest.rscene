@@ -47,6 +47,7 @@
                 "busID": 0,
                 "doppler": true,
                 "dopplerFactor": 1.0,
+                "effects": [],
                 "loop": false,
                 "maxDistance": 100.0,
                 "minDistance": 1.0,
@@ -669,7 +670,7 @@
                     0.9999991655349731
                 ]
             },
-            "UUID": 15646784930341876658
+            "UUID": 2879395439309115783
         },
         {
             "Material": {
@@ -1351,21 +1352,6 @@
             "Overrides": [
                 {
                     "op": "add",
-                    "path": "/0/PointLight/blurRadius",
-                    "value": 0.029999999329447746
-                },
-                {
-                    "op": "add",
-                    "path": "/0/PointLight/reverseCullFace",
-                    "value": true
-                },
-                {
-                    "op": "add",
-                    "path": "/0/PointLight/shadowBias",
-                    "value": 0.10000000149011612
-                },
-                {
-                    "op": "add",
                     "path": "/0/AudioEmitterComponent",
                     "value": {
                         "attenuationModel": 1,
@@ -1373,6 +1359,7 @@
                         "busID": 0,
                         "doppler": true,
                         "dopplerFactor": 1.0,
+                        "effects": [],
                         "loop": true,
                         "maxDistance": 100.0,
                         "minDistance": 0.3100000023841858,
@@ -1408,7 +1395,7 @@
                     1.0
                 ]
             },
-            "UUID": 13130332765153260149
+            "UUID": 2902639516454098840
         },
         {
             "ParentUUID": 0,
@@ -1703,7 +1690,7 @@
                     1.0
                 ]
             },
-            "UUID": 889326078923882143
+            "UUID": 1496629816479366368
         },
         {
             "BoxColliderComponent": {
@@ -2271,12 +2258,12 @@
         "Bloom_Intensity": 1.0,
         "Bloom_Knee": 0.0,
         "Bloom_Treshold": 1.0,
-        "ContactShadows": true,
-        "ContactShadows_Bias": 0.014700000174343586,
-        "ContactShadows_Distance": 0.10999999940395355,
-        "ContactShadows_Intensity": 1.409999966621399,
+        "ContactShadows": false,
+        "ContactShadows_Bias": 9.999999747378752e-05,
+        "ContactShadows_Distance": 0.4699999988079071,
+        "ContactShadows_Intensity": 1.3899999856948853,
         "ContactShadows_Steps": 16,
-        "ContactShadows_Thickness": 0.04500000178813934,
+        "ContactShadows_Thickness": 0.03700000047683716,
         "Fog_Color": [
             0.6499999761581421,
             0.75,
@@ -2313,8 +2300,8 @@
         "SSAO_Intensity": 1.0,
         "SSAO_Radius": 1.0,
         "SSGI": false,
-        "SSGI_Intensity": 1.0,
-        "SSGI_Radius": 1.0,
+        "SSGI_Intensity": 0.5,
+        "SSGI_Radius": 3.0,
         "SSGI_Steps": 32,
         "SSR": true,
         "SSR_EdgeFade": 0.15000000596046448,

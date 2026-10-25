@@ -192,7 +192,7 @@ static bool s_NeedsRefresh = true;
 static bool s_DirectoryTreeDirty = true;
 static bool s_BreadcrumbsDirty = true;
 static std::vector<std::pair<std::string, std::filesystem::path>> s_CachedBreadcrumbs;
-static float s_ThumbnailSize = 56.0f;
+static float s_ThumbnailSize = 64.0f;
 
 static bool s_RenamingActive = false;
 static bool s_RenameJustCommitted = false;

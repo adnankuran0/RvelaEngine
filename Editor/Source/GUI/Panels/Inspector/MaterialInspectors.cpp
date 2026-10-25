@@ -430,6 +430,8 @@ void MaterialInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 			ImGui::Spacing();
 		}
 
+		if (!material.GetCustomShaderUUID().IsValid())
+		{
 		if (ImGui::CollapsingHeader("Transparency##transphdr"))
 		{
 			if (UI::BeginPropertyTable("TransparencyTable"))
@@ -784,6 +786,7 @@ void MaterialInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 
 				UI::EndPropertyTable();
 			}
+		}
 		}
 	});
 }
