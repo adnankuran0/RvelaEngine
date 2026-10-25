@@ -5,6 +5,7 @@
 #include "Audio/AudioManager.h"
 #include "Audio/AudioBus.h"
 #include "GUI/Style.h"
+#include "GUI/AudioEffectUI.h"
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
@@ -29,15 +30,45 @@ void MixerPanel::Draw()
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
+    if (ImGui::Button(m_ShowEffectsRack ? "Hide FX Rack" : "Show FX Rack", ImVec2(120.0f, 26.0f)))
+    {
+        m_ShowEffectsRack = !m_ShowEffectsRack;
+    }
+
+    ImGui::SameLine();
     ImGui::AlignTextToFramePadding();
     auto& busses = AudioManager::Get().GetBusses();
+
+    AudioBus* selectedBus = AudioManager::Get().GetBus(m_SelectedBusID);
+    if (!selectedBus && !busses.empty())
+    {
+        m_SelectedBusID = busses[0]->GetID();
+        selectedBus = busses[0].get();
+    }
+
+    if (selectedBus)
+    {
+        ImGui::TextDisabled("| Selected Bus: %s", selectedBus->GetName().c_str());
+    }
 
     ImGui::Spacing();
     ImGui::Separator();
     ImGui::Spacing();
 
+    availWidth = ImGui::GetContentRegionAvail().x;
+    float availableHeight = ImGui::GetContentRegionAvail().y;
+
+    float rackWidth = 0.0f;
+    float stripsWidth = availWidth;
+
+    if (m_ShowEffectsRack && availWidth > 450.0f)
+    {
+        rackWidth = std::clamp(availWidth * 0.35f, 280.0f, 400.0f);
+        stripsWidth = availWidth - rackWidth - 10.0f;
+    }
+
     ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.08f, 0.08f, 0.12f, 0.6f));
-    ImGui::BeginChild("MixerStrips", ImVec2(0.0f, 0.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
+    ImGui::BeginChild("MixerStrips", ImVec2(stripsWidth, 0.0f), false, ImGuiWindowFlags_HorizontalScrollbar);
     ImGui::PopStyleColor();
 
     uint32_t busToDelete = 0;
@@ -45,28 +76,36 @@ void MixerPanel::Draw()
     const float stripWidth = 92.0f;
     const float faderWidth = 24.0f;
 
-    float availableHeight = ImGui::GetContentRegionAvail().y;
-    float faderHeight = std::clamp(availableHeight - 145.0f, 120.0f, 380.0f);
+    float faderHeight = std::clamp(availableHeight - 175.0f, 100.0f, 360.0f);
 
     for (size_t i = 0; i < busses.size(); ++i)
     {
         const auto& bus = busses[i];
         uint32_t busID = bus->GetID();
         bool isMaster = (busID == 0);
+        bool isSelected = (busID == m_SelectedBusID);
 
         ImGui::PushID(busID);
 
         ImVec4 cardBg = isMaster ? ImVec4(0.17f, 0.17f, 0.25f, 0.95f) : ImVec4(0.13f, 0.13f, 0.18f, 0.90f);
-        ImVec4 cardBorder = isMaster ? GetAccentColor() : ImVec4(0.25f, 0.25f, 0.35f, 0.35f);
+        if (isSelected)
+            cardBg = isMaster ? ImVec4(0.20f, 0.20f, 0.32f, 1.0f) : ImVec4(0.16f, 0.16f, 0.24f, 1.0f);
+
+        ImVec4 cardBorder = isSelected ? GetAccentColor() : (isMaster ? ImVec4(0.40f, 0.38f, 0.65f, 0.8f) : ImVec4(0.25f, 0.25f, 0.35f, 0.35f));
 
         ImGui::PushStyleColor(ImGuiCol_ChildBg, cardBg);
         ImGui::PushStyleColor(ImGuiCol_Border, cardBorder);
         ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 6.0f);
-        ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1.0f);
+        ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, isSelected ? 2.0f : 1.0f);
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(6.0f, 8.0f));
 
         std::string stripChildId = "Strip_" + std::to_string(busID);
         ImGui::BeginChild(stripChildId.c_str(), ImVec2(stripWidth, availableHeight - 10.0f), true, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+
+        if (ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows) && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+        {
+            m_SelectedBusID = busID;
+        }
 
         if (m_RenamingBusID == busID)
         {
@@ -167,6 +206,34 @@ void MixerPanel::Draw()
             ImGui::TextDisabled("%s", volText);
 
         ImGui::Spacing();
+
+        // FX Button
+        size_t fxCount = bus->GetEffects().size();
+        char fxBtnText[32];
+        if (fxCount > 0)
+            std::snprintf(fxBtnText, sizeof(fxBtnText), "FX (%zu)", fxCount);
+        else
+            std::snprintf(fxBtnText, sizeof(fxBtnText), "+ FX");
+
+        if (fxCount > 0 || isSelected)
+        {
+            ImGui::PushStyleColor(ImGuiCol_Button, isSelected ? GetAccentColor() : ImVec4(0.24f, 0.26f, 0.38f, 0.85f));
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, GetAccentHoverColor());
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, GetAccentActiveColor());
+        }
+
+        if (ImGui::Button(fxBtnText, ImVec2(-FLT_MIN, 22.0f)))
+        {
+            m_SelectedBusID = busID;
+            m_ShowEffectsRack = true;
+        }
+
+        if (fxCount > 0 || isSelected)
+        {
+            ImGui::PopStyleColor(3);
+        }
+
+        ImGui::Spacing();
         ImGui::Separator();
         ImGui::Spacing();
 
@@ -191,13 +258,13 @@ void MixerPanel::Draw()
                 {
                     if (pBus->GetID() == busID) continue;
 
-                    bool isSelected = (pBus->GetID() == parentID);
-                    if (ImGui::Selectable(pBus->GetName().c_str(), isSelected))
+                    bool isSelectedParent = (pBus->GetID() == parentID);
+                    if (ImGui::Selectable(pBus->GetName().c_str(), isSelectedParent))
                     {
                         AudioManager::Get().SetParentBus(busID, pBus->GetID());
                     }
 
-                    if (isSelected)
+                    if (isSelectedParent)
                         ImGui::SetItemDefaultFocus();
                 }
                 ImGui::EndCombo();
@@ -231,11 +298,64 @@ void MixerPanel::Draw()
         AudioManager::Get().DestroyBus(busToDelete);
         if (m_RenamingBusID == busToDelete)
             m_RenamingBusID = UINT32_MAX;
+        if (m_SelectedBusID == busToDelete)
+            m_SelectedBusID = 0;
     }
 
     ImGui::EndChild();
+
+    // Right Side: Effects Rack Panel
+    if (m_ShowEffectsRack && rackWidth > 0.0f)
+    {
+        ImGui::SameLine(0, 10.0f);
+        DrawEffectsRack(selectedBus);
+    }
+
     ImGui::End();
     ImGui::PopStyleVar();
+}
+
+void MixerPanel::DrawEffectsRack(AudioBus* bus)
+{
+    if (!bus) return;
+
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.10f, 0.10f, 0.15f, 0.95f));
+    ImGui::PushStyleColor(ImGuiCol_Border, GetAccentColor());
+    ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 6.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 1.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10.0f, 10.0f));
+
+    ImGui::BeginChild("EffectsRackPanel", ImVec2(0.0f, 0.0f), true);
+
+    ImGui::TextColored(GetAccentColor(), "%s - Effects Rack", bus->GetName().c_str());
+    ImGui::SameLine(ImGui::GetContentRegionAvail().x - 20.0f);
+    if (ImGui::Button("X", ImVec2(20.0f, 20.0f)))
+    {
+        m_ShowEffectsRack = false;
+    }
+
+    ImGui::Spacing();
+    ImGui::Separator();
+    ImGui::Spacing();
+
+    std::string rackId = "BusRack_" + std::to_string(bus->GetID());
+    UI::DrawAudioEffectsList(
+        rackId,
+        bus->GetEffects(),
+        [bus](std::shared_ptr<AudioEffect> fx) {
+            bus->AddEffect(fx);
+        },
+        [bus](size_t index) {
+            bus->RemoveEffect(index);
+        },
+        [bus](size_t fromIndex, size_t toIndex) {
+            bus->MoveEffect(fromIndex, toIndex);
+        }
+    );
+
+    ImGui::EndChild();
+    ImGui::PopStyleVar(3);
+    ImGui::PopStyleColor(2);
 }
 
 } // namespace rv

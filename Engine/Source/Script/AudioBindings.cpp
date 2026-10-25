@@ -3,6 +3,7 @@
 #include "AudioBindings.h"
 #include "Audio/AudioManager.h"
 #include "Audio/AudioBus.h"
+#include "Audio/AudioEffects.h"
 #include "Scene/Components/AudioEmitterComponent.h"
 #include "Asset/AssetManager.h"
 #include "Asset/Types/AudioClipAsset.h"
@@ -19,7 +20,31 @@ void rv::LuaBindings::RegisterAudioAPI(sol::state& lua)
         { "Inverse",     AttenuationModel::Inverse     },
         { "Linear",      AttenuationModel::Linear      },
         { "Exponential", AttenuationModel::Exponential }
-        });
+    });
+
+    lua.new_enum<AudioEffectType>("AudioEffectType", {
+        { "Reverb",     AudioEffectType::Reverb     },
+        { "Limiter",    AudioEffectType::Limiter    },
+        { "Distortion", AudioEffectType::Distortion },
+        { "Delay",      AudioEffectType::Delay      },
+        { "Filter",     AudioEffectType::Filter     },
+        { "Equalizer",  AudioEffectType::Equalizer  }
+    });
+
+    lua.new_enum<DistortionType>("DistortionType", {
+        { "SoftClip", DistortionType::SoftClip },
+        { "HardClip", DistortionType::HardClip },
+        { "Tanh",     DistortionType::Tanh     },
+        { "Foldback", DistortionType::Foldback },
+        { "Bitcrush", DistortionType::Bitcrush }
+    });
+
+    lua.new_enum<FilterType>("FilterType", {
+        { "LowPass",  FilterType::LowPass  },
+        { "HighPass", FilterType::HighPass },
+        { "BandPass", FilterType::BandPass },
+        { "Notch",    FilterType::Notch    }
+    });
 
     lua.new_usertype<AudioEmitterHandle>("AudioEmitterComponent",
         "IsValid", &AudioEmitterHandle::IsValid,
@@ -83,6 +108,25 @@ void rv::LuaBindings::RegisterAudioAPI(sol::state& lua)
             if (auto* c = h.Get()) {
                 AudioManager::Get().SetClip(c, AssetManager::Get().GetAsset<AudioClipAsset>(uuid));
             }
+        },
+
+        "AddEffect", [](AudioEmitterHandle& h, AudioEffectType type) {
+            if (auto* c = h.Get()) {
+                auto fx = CreateAudioEffect(type);
+                if (fx) AudioManager::Get().AddEmitterEffect(c, fx);
+            }
+        },
+
+        "RemoveEffect", [](AudioEmitterHandle& h, size_t index) {
+            if (auto* c = h.Get()) {
+                AudioManager::Get().RemoveEmitterEffect(c, index);
+            }
+        },
+
+        "ClearEffects", [](AudioEmitterHandle& h) {
+            if (auto* c = h.Get()) {
+                c->effects.clear();
+            }
         }
     );
 
@@ -91,4 +135,11 @@ void rv::LuaBindings::RegisterAudioAPI(sol::state& lua)
     audio.set_function("GetBusVolume", [](uint32_t busID) { return AudioManager::Get().GetBusVolume(busID); });
     audio.set_function("GetBusID", [](const std::string& name) { return AudioManager::Get().GetBusID(name); });
     audio.set_function("SetParentBus", [](uint32_t busID, uint32_t parentID) { return AudioManager::Get().SetParentBus(busID, parentID); });
+    audio.set_function("AddBusEffect", [](uint32_t busID, AudioEffectType type) {
+        auto fx = CreateAudioEffect(type);
+        if (fx) AudioManager::Get().AddBusEffect(busID, fx);
+    });
+    audio.set_function("RemoveBusEffect", [](uint32_t busID, size_t index) {
+        AudioManager::Get().RemoveBusEffect(busID, index);
+    });
 }

@@ -55,11 +55,11 @@
                     1.0
                 ]
             },
-            "UUID": 17049795220756749611,
+            "UUID": 9356375940743574153,
             "_isRoot": true
         },
         {
-            "ParentUUID": 17049795220756749611,
+            "ParentUUID": 9356375940743574153,
             "ScriptComponent": {
                 "propertyValues": {},
                 "scriptAssetUUID": "bc183720-0ea6-40c0-adb4-6438019b61d8"
@@ -86,7 +86,7 @@
                     1.0
                 ]
             },
-            "UUID": 1622952202847157550
+            "UUID": 3073296665199471147
         },
         {
             "CameraComponent": {
@@ -96,7 +96,7 @@
                 "nearClip": 0.10000000149011612,
                 "projectionType": 0
             },
-            "ParentUUID": 1622952202847157550,
+            "ParentUUID": 3073296665199471147,
             "Tag": {
                 "isActive": true,
                 "tag": "Camera"
@@ -119,7 +119,7 @@
                     1.0
                 ]
             },
-            "UUID": 10132902268703251532
+            "UUID": 6602810750313048899
         }
     ]
 }

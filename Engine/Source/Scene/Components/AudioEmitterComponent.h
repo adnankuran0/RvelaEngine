@@ -2,6 +2,9 @@
 #include "json.hpp"
 #include "Asset/Types/AudioClipAsset.h"
 #include "Core/Ref.h"
+#include "Audio/AudioEffects.h"
+#include <vector>
+#include <memory>
 
 namespace rv {
 
@@ -36,6 +39,19 @@ struct AudioEmitterComponent
 
     uint32_t busID = 0;
 
+    std::vector<std::shared_ptr<AudioEffect>> effects;
+
+    void AddEffect(std::shared_ptr<AudioEffect> effect)
+    {
+        if (effect) effects.push_back(effect);
+    }
+
+    void RemoveEffect(size_t index)
+    {
+        if (index < effects.size())
+            effects.erase(effects.begin() + index);
+    }
+
     // local variables
     uint32_t instanceID = UINT32_MAX;
 
@@ -46,4 +62,4 @@ struct AudioEmitterComponent
     void Deserialize(const json& j);
 };
 
-}
+} // namespace rv

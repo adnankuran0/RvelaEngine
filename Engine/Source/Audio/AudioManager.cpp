@@ -7,6 +7,100 @@
 
 using namespace rv;
 
+void AudioInstance::ProcessEffects(const float* in, float* out, uint32_t frameCount, uint32_t channels, uint32_t sampleRate)
+{
+    std::unique_lock<std::mutex> lock(effectMutex, std::try_to_lock);
+    if (!lock.owns_lock() || !emitterComp || emitterComp->effects.empty())
+    {
+        std::memcpy(out, in, frameCount * channels * sizeof(float));
+        return;
+    }
+
+    bool anyEnabled = false;
+    for (const auto& fx : emitterComp->effects)
+    {
+        if (fx && fx->enabled)
+        {
+            anyEnabled = true;
+            break;
+        }
+    }
+
+    if (!anyEnabled)
+    {
+        std::memcpy(out, in, frameCount * channels * sizeof(float));
+        return;
+    }
+
+    size_t sampleCount = static_cast<size_t>(frameCount) * channels;
+    if (intermediateBuffer.size() < sampleCount)
+        intermediateBuffer.resize(sampleCount);
+
+    float* bufA = intermediateBuffer.data();
+    float* bufB = out;
+
+    bool first = true;
+    for (size_t i = 0; i < emitterComp->effects.size(); ++i)
+    {
+        auto& fx = emitterComp->effects[i];
+        if (!fx || !fx->enabled) continue;
+
+        const float* src = first ? in : bufA;
+        float* dst = bufB;
+
+        fx->Process(src, dst, frameCount, channels, sampleRate);
+
+        first = false;
+        std::swap(bufA, bufB);
+    }
+
+    if (bufA != out)
+    {
+        std::memcpy(out, intermediateBuffer.data(), sampleCount * sizeof(float));
+    }
+}
+
+static void EmitterEffectNodeProcess(
+    ma_node* pNode,
+    const float** ppFramesIn,
+    ma_uint32* pFrameCountIn,
+    float** ppFramesOut,
+    ma_uint32* pFrameCountOut)
+{
+    auto* node = reinterpret_cast<EmitterEffectNode*>(pNode);
+    if (!node || !node->instance || !ppFramesIn || !ppFramesOut || !ppFramesIn[0] || !ppFramesOut[0])
+    {
+        *pFrameCountIn = 0;
+        *pFrameCountOut = 0;
+        return;
+    }
+
+    ma_uint32 frameCount = std::min(*pFrameCountIn, *pFrameCountOut);
+    if (frameCount == 0)
+    {
+        *pFrameCountIn = 0;
+        *pFrameCountOut = 0;
+        return;
+    }
+
+    ma_uint32 channels = ma_node_get_output_channels(pNode, 0);
+    ma_uint32 sampleRate = ma_engine_get_sample_rate(AudioManager::Get().GetEngine());
+
+    node->instance->ProcessEffects(ppFramesIn[0], ppFramesOut[0], frameCount, channels, sampleRate);
+
+    *pFrameCountIn = frameCount;
+    *pFrameCountOut = frameCount;
+}
+
+static ma_node_vtable s_EmitterEffectNodeVTable =
+{
+    EmitterEffectNodeProcess,
+    nullptr,
+    1,
+    1,
+    0
+};
+
 AudioManager::AudioManager()
 {
     ma_engine_config cfg = ma_engine_config_init();
@@ -15,13 +109,12 @@ AudioManager::AudioManager()
     assert(result == MA_SUCCESS);
 
     CreateMasterBus();
-
 }
 
 AudioManager::~AudioManager()
 {
-    for (auto& [id, inst] : m_Instances)
-        ma_sound_uninit(&inst.sound);
+    StopAllInstances();
+    m_Busses.clear();
     ma_engine_uninit(&m_Engine);
 }
 
@@ -86,19 +179,50 @@ void AudioManager::CreateInstance(AudioEmitterComponent* comp)
         return;
     }
 
-    ma_result result = ma_sound_init_from_data_source(
-        &m_Engine,
-        (ma_data_source*)&instance.bufferRef,
-        0,
-        bus->GetGroup(),
-        &instance.sound
-    );
+    ma_node_graph* nodeGraph = ma_engine_get_node_graph(&m_Engine);
+    ma_uint32 channels = ma_engine_get_channels(&m_Engine);
 
+    ma_node_config nodeConfig = ma_node_config_init();
+    nodeConfig.vtable = &s_EmitterEffectNodeVTable;
+    nodeConfig.pInputChannels = &channels;
+    nodeConfig.pOutputChannels = &channels;
+
+    ma_result result = ma_node_init(nodeGraph, &nodeConfig, nullptr, &instance.effectNode.base);
     if (result != MA_SUCCESS)
     {
         m_Instances.erase(id);
         return;
     }
+    instance.effectNode.instance = &instance;
+    instance.effectNodeInitialized = true;
+    instance.emitterComp = comp;
+
+    result = ma_node_attach_output_bus(&instance.effectNode.base, 0, bus->GetGroup(), 0);
+    if (result != MA_SUCCESS)
+    {
+        ma_node_uninit(&instance.effectNode.base, nullptr);
+        instance.effectNodeInitialized = false;
+        m_Instances.erase(id);
+        return;
+    }
+
+    result = ma_sound_init_from_data_source(
+        &m_Engine,
+        (ma_data_source*)&instance.bufferRef,
+        0,
+        nullptr,
+        &instance.sound
+    );
+
+    if (result != MA_SUCCESS)
+    {
+        ma_node_uninit(&instance.effectNode.base, nullptr);
+        instance.effectNodeInitialized = false;
+        m_Instances.erase(id);
+        return;
+    }
+
+    ma_node_attach_output_bus(&instance.sound, 0, &instance.effectNode.base, 0);
 
     comp->instanceID = id;
 
@@ -111,7 +235,6 @@ void AudioManager::CreateInstance(AudioEmitterComponent* comp)
     SetMaxDistance(comp, comp->maxDistance);
     SetRolloff(comp, comp->rolloff);
     SetDopplerFactor(comp, comp->dopplerFactor);
-    
 }
 
 void AudioManager::DestroyInstance(AudioEmitterComponent* comp)
@@ -121,6 +244,11 @@ void AudioManager::DestroyInstance(AudioEmitterComponent* comp)
     auto it = m_Instances.find(comp->instanceID);
     if (it != m_Instances.end())
     {
+        if (it->second.effectNodeInitialized)
+        {
+            ma_node_uninit(&it->second.effectNode.base, nullptr);
+            it->second.effectNodeInitialized = false;
+        }
         ma_sound_uninit(&it->second.sound);
         m_Instances.erase(it);
     }
@@ -132,6 +260,11 @@ void AudioManager::StopAllInstances()
 {
     for (auto& [id, inst] : m_Instances)
     {
+        if (inst.effectNodeInitialized)
+        {
+            ma_node_uninit(&inst.effectNode.base, nullptr);
+            inst.effectNodeInitialized = false;
+        }
         ma_sound_uninit(&inst.sound);
     }
     m_Instances.clear();
@@ -140,7 +273,7 @@ void AudioManager::StopAllInstances()
 
 void AudioManager::SetClip(AudioEmitterComponent* comp, Ref<AudioClipAsset> clip)
 {
-    if (!comp || !clip->IsValid()) return;
+    if (!comp || !clip || !clip->IsValid()) return;
     DestroyInstance(comp);
     comp->audioClipUUID = clip ? clip->GetUUID() : AssetUUID::Invalid();
     CreateInstance(comp);
@@ -269,7 +402,6 @@ void AudioManager::SetSpatial(AudioEmitterComponent* comp, bool spatial)
 
     if (auto* inst = GetInstance(comp))
         ma_sound_set_spatialization_enabled(&inst->sound, spatial ? MA_TRUE : MA_FALSE);
-
 }
 
 void AudioManager::SetPosition(AudioEmitterComponent* comp, const glm::vec3& pos)
@@ -300,8 +432,6 @@ void AudioManager::SetListenerVelocity(const glm::vec3& vel)
 {
     ma_engine_listener_set_velocity(&m_Engine, 0, vel.x, vel.y, vel.z);
 }
-
-
 
 void AudioManager::SetAttenuationModel(AudioEmitterComponent* comp, AttenuationModel model)
 {
@@ -372,12 +502,12 @@ bool AudioManager::SetParentBus(uint32_t busID, uint32_t parentBusID)
         return false;
 
     ma_node_detach_output_bus(
-        bus->GetGroup(),
+        bus->GetOutputNode(),
         0
     );
 
     ma_node_attach_output_bus(
-        bus->GetGroup(),
+        bus->GetOutputNode(),
         0,
         parent->GetGroup(),
         0
@@ -399,15 +529,59 @@ void AudioManager::SetBus(AudioEmitterComponent* comp, uint32_t busID)
     if (!instance || !bus)
         return;
 
-    ma_node_attach_output_bus(
-        &instance->sound,
-        0,
-        bus->GetGroup(),
-        0
-    );
+    if (instance->effectNodeInitialized)
+    {
+        ma_node_detach_output_bus(
+            &instance->effectNode.base,
+            0
+        );
+        ma_node_attach_output_bus(
+            &instance->effectNode.base,
+            0,
+            bus->GetGroup(),
+            0
+        );
+    }
+    else
+    {
+        ma_node_detach_output_bus(
+            &instance->sound,
+            0
+        );
+        ma_node_attach_output_bus(
+            &instance->sound,
+            0,
+            bus->GetGroup(),
+            0
+        );
+    }
 
     comp->busID = busID;
     instance->busID = busID;
+}
+
+void AudioManager::AddBusEffect(uint32_t busID, std::shared_ptr<AudioEffect> effect)
+{
+    if (auto* bus = GetBus(busID))
+        bus->AddEffect(effect);
+}
+
+void AudioManager::RemoveBusEffect(uint32_t busID, size_t index)
+{
+    if (auto* bus = GetBus(busID))
+        bus->RemoveEffect(index);
+}
+
+void AudioManager::AddEmitterEffect(AudioEmitterComponent* comp, std::shared_ptr<AudioEffect> effect)
+{
+    if (!comp || !effect) return;
+    comp->AddEffect(effect);
+}
+
+void AudioManager::RemoveEmitterEffect(AudioEmitterComponent* comp, size_t index)
+{
+    if (!comp) return;
+    comp->RemoveEffect(index);
 }
 
 json AudioManager::SaveBusLayout()
@@ -420,6 +594,7 @@ json AudioManager::SaveBusLayout()
         b["parentId"] = bus->GetParentBusID();
         b["name"] = bus->GetName();
         b["volume"] = AudioManager::Get().GetBusVolume(bus->GetID());
+        b["effects"] = bus->SerializeEffects();
         busesJson.push_back(b);
     }
     return busesJson;
@@ -454,6 +629,8 @@ void AudioManager::LoadBusLayout(const std::string& jsonStr)
         {
             m_Busses[0]->SetName(name);
             SetBusVolume(0, volume);
+            if (bJson.contains("effects"))
+                m_Busses[0]->DeserializeEffects(bJson["effects"]);
             continue;
         }
 
@@ -461,6 +638,8 @@ void AudioManager::LoadBusLayout(const std::string& jsonStr)
         newBus->SetID(id);
         newBus->SetName(name);
         SetBusVolume(id, volume);
+        if (bJson.contains("effects"))
+            newBus->DeserializeEffects(bJson["effects"]);
 
         if (id > highestID) highestID = id;
     }
@@ -546,7 +725,7 @@ void AudioManager::SetBusVolume(uint32_t busID, float volume)
     ma_sound_group_set_volume(bus->GetGroup(), volume);
 }
 
-float rv::AudioManager::GetBusVolume(uint32_t busID)
+float AudioManager::GetBusVolume(uint32_t busID)
 {
     AudioBus* bus = GetBus(busID);
     if (!bus) return 0.0f;
@@ -573,7 +752,7 @@ void AudioManager::SyncState(AudioEmitterComponent* comp)
     }
 }
 
-void rv::AudioManager::Update(Camera* camera)
+void AudioManager::Update(Camera* camera)
 {
     if (camera)
     {

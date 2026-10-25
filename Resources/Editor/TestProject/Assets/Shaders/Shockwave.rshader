@@ -1,7 +1,6 @@
 shader_type spatial;
 render_mode unshaded, cull_disabled, depth_draw_disabled;
 
-// Parametreler (Inspector üzerinden ayarlanabilir)
 uniform float speed : hint_range(0.1, 5.0) = 1.2;
 uniform float frequency : hint_range(5.0, 50.0) = 20.0;
 uniform float wave_width : hint_range(0.02, 0.4) = 0.12;
@@ -11,32 +10,24 @@ uniform vec3 highlight_color : source_color = vec3(1.2, 1.4, 1.8);
 uniform float highlight_strength : hint_range(0.0, 1.0) = 0.25;
 
 void fragment() {
-    // Quad merkezinden (0.5, 0.5) uzaklık ve yön vektörü
     vec2 center = vec2(0.5);
     vec2 dir = UV - center;
     float dist = length(dir);
     
-    // Zamanla merkezden dışa doğru genişleyen dalga halkası
     float current_radius = mod(TIME * speed * 0.4, 0.7);
     
-    // Halka genişledikçe dışa doğru zayıflayan sönümleme (fade out)
     float fade = 1.0 - smoothstep(0.3, 0.7, current_radius);
     
-    // Dalga mesafesi ve halkanın kalınlık maskesi
     float diff = dist - current_radius;
     float ring_mask = smoothstep(wave_width, 0.0, abs(diff));
     
-    // Sinüs kırılma dalgası
     float wave = sin(diff * frequency) * ring_mask * fade;
     
-    // Dalga yönünde ekran UV'sini kır (refraction)
     vec2 normal_dir = (dist > 0.0001) ? (dir / dist) : vec2(0.0);
     vec2 distortion = normal_dir * wave * force;
     
-    // Kırılmış ekran koordinatları
     vec2 distorted_uv = SCREEN_UV - distortion;
     
-    // Kromatik aberasyon (RGB kanallarını hafifçe kaydırarak patlama hissi katma)
     vec2 r_offset = distortion * (1.0 + aberration * 50.0);
     vec2 b_offset = distortion * (1.0 - aberration * 50.0);
     
@@ -45,13 +36,10 @@ void fragment() {
     float b = texture(SCREEN_TEXTURE, SCREEN_UV - b_offset).b;
     vec3 scene_color = vec3(r, g, b);
     
-    // Halka kenarına hafif enerji parlaması (highlight)
     vec3 highlight = highlight_color * ring_mask * fade * highlight_strength;
     
-    // Quad'ın kare köşelerinin görünmemesi için dairesel yumuşak kenar maskesi
     float circle_mask = smoothstep(0.5, 0.48, dist);
     
-    // Quad kenarlarında arka plan sahnesine pürüzsüz geçiş
     vec3 final_color = mix(texture(SCREEN_TEXTURE, SCREEN_UV).rgb, scene_color + highlight, circle_mask);
     
     ALBEDO = final_color;

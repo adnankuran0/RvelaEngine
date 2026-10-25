@@ -4,6 +4,7 @@
 #include "ImGui/imgui.h"
 #include "EditorUtils.h"
 #include "Audio/AudioManager.h"
+#include "GUI/AudioEffectUI.h"
 #include "Scene/Entity.h"
 #include <algorithm>
 #include <array>
@@ -154,6 +155,18 @@ void MediaInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 					UI::EndPropertyTable();
 				}
 			}
+		}
+
+		if (ImGui::CollapsingHeader("Audio Effects"))
+		{
+			UI::DrawAudioEffectsList("EmitterFX", emitter.effects,
+				[&](std::shared_ptr<AudioEffect> fx) {
+					audio.AddEmitterEffect(&emitter, fx);
+				},
+				[&](size_t index) {
+					audio.RemoveEmitterEffect(&emitter, index);
+				}
+			);
 		}
 	});
 

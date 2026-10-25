@@ -1,6 +1,7 @@
 {
     "busLayout": [
         {
+            "effects": [],
             "id": 0,
             "name": "Master",
             "parentId": 0,

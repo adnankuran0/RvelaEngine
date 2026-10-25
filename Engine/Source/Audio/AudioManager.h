@@ -3,8 +3,8 @@
 #include "Scene/Components/AudioEmitterComponent.h"
 #include "Audio/AudioInstance.h"
 #include "Audio/AudioBus.h"
+#include "Audio/AudioEffects.h"
 #include <entt/entt.h>
-
 
 namespace rv {
 
@@ -22,6 +22,8 @@ public:
         static AudioManager instance; 
         return instance; 
     }
+
+    ma_engine* GetEngine() { return &m_Engine; }
 
     void CreateInstance(AudioEmitterComponent* comp);
     void DestroyInstance(AudioEmitterComponent* comp);
@@ -69,6 +71,12 @@ public:
     void SetBus(AudioEmitterComponent* comp, uint32_t busID);
     std::vector<std::unique_ptr<AudioBus>>& GetBusses() { return m_Busses; }
 
+    void AddBusEffect(uint32_t busID, std::shared_ptr<AudioEffect> effect);
+    void RemoveBusEffect(uint32_t busID, size_t index);
+
+    void AddEmitterEffect(AudioEmitterComponent* comp, std::shared_ptr<AudioEffect> effect);
+    void RemoveEmitterEffect(AudioEmitterComponent* comp, size_t index);
+
     json SaveBusLayout();
     void LoadBusLayout(const std::string& jsonStr);
 
@@ -93,4 +101,4 @@ private:
     uint32_t m_NextBusID = 1; // 0 is assigned to master bus
 };
 
-}
+} // namespace rv

@@ -24,27 +24,50 @@ json AudioEmitterComponent::Serialize() const
 
     j["busID"] = busID;
 
+    json fxArr = json::array();
+    for (const auto& fx : effects)
+    {
+        if (fx)
+            fxArr.push_back(fx->Serialize());
+    }
+    j["effects"] = fxArr;
 
     return j;
 }
 
 void AudioEmitterComponent::Deserialize(const json& j)
 {
-    audioClipUUID = AssetUUID::FromString(j.at("audioClip").get<std::string>());
-    volume = j["volume"];
-    pitch = j["pitch"];
-    loop = j["loop"];
-    playOnCreate = j["playOnCreate"];
+    if (j.contains("audioClip"))
+        audioClipUUID = AssetUUID::FromString(j.at("audioClip").get<std::string>());
+    if (j.contains("volume")) volume = j["volume"];
+    if (j.contains("pitch")) pitch = j["pitch"];
+    if (j.contains("loop")) loop = j["loop"];
+    if (j.contains("playOnCreate")) playOnCreate = j["playOnCreate"];
 
-    spatial = j["spatial"];
-    attenuationModel = static_cast<AttenuationModel>(j["attenuationModel"]);
-    minDistance = j["minDistance"];
-    maxDistance = j["maxDistance"];
-    rolloff = j["rolloff"];
+    if (j.contains("spatial")) spatial = j["spatial"];
+    if (j.contains("attenuationModel")) attenuationModel = static_cast<AttenuationModel>(j["attenuationModel"]);
+    if (j.contains("minDistance")) minDistance = j["minDistance"];
+    if (j.contains("maxDistance")) maxDistance = j["maxDistance"];
+    if (j.contains("rolloff")) rolloff = j["rolloff"];
 
-    doppler = j["doppler"];
-    dopplerFactor = j["dopplerFactor"];
+    if (j.contains("doppler")) doppler = j["doppler"];
+    if (j.contains("dopplerFactor")) dopplerFactor = j["dopplerFactor"];
 
-    busID = j["busID"];
+    if (j.contains("busID")) busID = j["busID"];
 
+    effects.clear();
+    if (j.contains("effects") && j["effects"].is_array())
+    {
+        for (const auto& fxJson : j["effects"])
+        {
+            if (!fxJson.contains("type")) continue;
+            auto type = static_cast<AudioEffectType>(fxJson["type"].get<int>());
+            auto fx = CreateAudioEffect(type);
+            if (fx)
+            {
+                fx->Deserialize(fxJson);
+                effects.push_back(fx);
+            }
+        }
+    }
 }

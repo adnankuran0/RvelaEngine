@@ -7,6 +7,7 @@
                 "busID": 0,
                 "doppler": true,
                 "dopplerFactor": 1.0,
+                "effects": [],
                 "loop": false,
                 "maxDistance": 40.0,
                 "minDistance": 1.0,
@@ -109,7 +110,7 @@
                     1.0
                 ]
             },
-            "UUID": 1390739400704233299,
+            "UUID": 18103167427730120604,
             "_isRoot": true
         }
     ]
