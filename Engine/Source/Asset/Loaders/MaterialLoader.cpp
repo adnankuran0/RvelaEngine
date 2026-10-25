@@ -120,6 +120,16 @@ Ref<Asset> MaterialLoader::Load(
         asset->samplerDesc.aniso = static_cast<TextureAnisotropy>(smp.value("aniso", smp.value("anisotropy", static_cast<int>(TextureAnisotropy::Default))));
     }
 
+    asset->hasOutline = j.value("hasOutline", false);
+    if (j.contains("outlineColor"))
+    {
+        auto& col = j["outlineColor"];
+        asset->outlineColor = { col[0], col[1], col[2], col.size() > 3 ? col[3].get<float>() : 1.0f };
+    }
+    asset->outlineWidth = j.value("outlineWidth", 2.0f);
+    asset->outlineFixedSize = j.value("outlineFixedSize", true);
+    asset->outlineXRay = j.value("outlineXRay", false);
+
     asset->useTriplanar = j.value("useTriplanar", false);
     asset->useWorldTriplanar = j.value("useWorldTriplanar", false);
     asset->triplanarSharpness = j.value("triplanarSharpness", 4.0f);

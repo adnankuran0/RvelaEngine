@@ -63,6 +63,12 @@ bool MaterialSerializer::Save(const Ref<MaterialAsset>& asset, const std::filesy
     j["UVScale"] = { asset->UVScale.x, asset->UVScale.y };
     j["UVOffset"] = { asset->UVOffset.x, asset->UVOffset.y };
 
+    j["hasOutline"] = asset->hasOutline;
+    j["outlineColor"] = { asset->outlineColor.r, asset->outlineColor.g, asset->outlineColor.b, asset->outlineColor.a };
+    j["outlineWidth"] = asset->outlineWidth;
+    j["outlineFixedSize"] = asset->outlineFixedSize;
+    j["outlineXRay"] = asset->outlineXRay;
+
     j["sampler"] = {
         { "filter", static_cast<int>(asset->samplerDesc.filter) },
         { "repeat", static_cast<int>(asset->samplerDesc.repeat) },
@@ -191,6 +197,16 @@ bool MaterialSerializer::Load(const Ref<MaterialAsset>& asset, const std::filesy
         asset->UVOffset = glm::vec2(uv[0], uv[1]);
     }
 
+    asset->hasOutline = j.value("hasOutline", false);
+    if (j.contains("outlineColor"))
+    {
+        auto col = j["outlineColor"];
+        asset->outlineColor = glm::vec4(col[0], col[1], col[2], col.size() > 3 ? col[3].get<float>() : 1.0f);
+    }
+    asset->outlineWidth = j.value("outlineWidth", 2.0f);
+    asset->outlineFixedSize = j.value("outlineFixedSize", true);
+    asset->outlineXRay = j.value("outlineXRay", false);
+
     if (j.contains("sampler") && j["sampler"].is_object())
     {
         const auto& smp = j["sampler"];
@@ -229,4 +245,3 @@ bool MaterialSerializer::Load(const Ref<MaterialAsset>& asset, const std::filesy
 
     return true;
 }
-

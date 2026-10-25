@@ -55,6 +55,9 @@ void Renderer::Init(GLFWwindow* window)
     ShaderManager::Add(Shader("Composite", ENGINE_PATH("Shaders\\composite.glsl")));
     ShaderManager::Add(Shader("FXAA", ENGINE_PATH("Shaders\\fxaa.glsl")));
     ShaderManager::Add(Shader("Outline", ENGINE_PATH("Shaders\\outline.glsl")));
+    ShaderManager::Add(Shader("MaterialMask", ENGINE_PATH("Shaders\\materialMask.glsl")));
+    ShaderManager::Add(Shader("MaterialMask_Skeletal", ENGINE_PATH("Shaders\\materialMask.glsl"), { "SKELETAL" }));
+    ShaderManager::Add(Shader("MaterialOutline", ENGINE_PATH("Shaders\\materialOutline.glsl")));
     ShaderManager::Add(Shader("ToCubemap", ENGINE_PATH("Shaders\\equirectangularToCubemap.glsl")));
     ShaderManager::Add(Shader("Irradiance", ENGINE_PATH("Shaders\\irradiance.glsl")));
     ShaderManager::Add(Shader("Prefilter", ENGINE_PATH("Shaders\\prefilter.glsl")));

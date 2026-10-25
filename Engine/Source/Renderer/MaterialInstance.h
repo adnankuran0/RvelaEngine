@@ -47,6 +47,11 @@ enum class MatField : uint8_t {
     TextureFilterMode,
     TextureWrapMode,
     TextureAnisotropyMode,
+    HasOutline,
+    OutlineColor,
+    OutlineWidth,
+    OutlineFixedSize,
+    OutlineXRay,
     COUNT
 };
 
@@ -101,6 +106,12 @@ public:
     void SetUseWorldTriplanar(bool v) { m_UseWorldTriplanar = v; SetOverride(MatField::UseWorldTriplanar); }
     void SetTriplanarSharpness(float v) { m_TriplanarSharpness = v; SetOverride(MatField::TriplanarSharpness); }
 
+    void SetHasOutline(bool v) { m_HasOutline = v; SetOverride(MatField::HasOutline); }
+    void SetOutlineColor(const glm::vec4& v) { m_OutlineColor = v; SetOverride(MatField::OutlineColor); }
+    void SetOutlineWidth(float v) { m_OutlineWidth = v; SetOverride(MatField::OutlineWidth); }
+    void SetOutlineFixedSize(bool v) { m_OutlineFixedSize = v; SetOverride(MatField::OutlineFixedSize); }
+    void SetOutlineXRay(bool v) { m_OutlineXRay = v; SetOverride(MatField::OutlineXRay); }
+
     glm::vec4 GetAlbedoColor() const { return IsOverridden(MatField::AlbedoColor) ? m_AlbedoColor : (m_SourceAsset ? m_SourceAsset->albedoColor : m_AlbedoColor); }
     glm::vec3 GetEmissiveColor() const { return IsOverridden(MatField::EmissiveColor) ? m_EmissiveColor : (m_SourceAsset ? m_SourceAsset->emissiveColor : m_EmissiveColor); }
     float GetEmissiveIntensity() const { return IsOverridden(MatField::EmissiveIntensity) ? m_EmissiveIntensity : (m_SourceAsset ? m_SourceAsset->emissiveIntensity : m_EmissiveIntensity); }
@@ -126,6 +137,12 @@ public:
     bool GetUseTriplanar() const { return IsOverridden(MatField::UseTriplanar) ? m_UseTriplanar : (m_SourceAsset ? m_SourceAsset->useTriplanar : false); }
     bool GetUseWorldTriplanar() const { return IsOverridden(MatField::UseWorldTriplanar) ? m_UseWorldTriplanar : (m_SourceAsset ? m_SourceAsset->useWorldTriplanar : false); }
     float GetTriplanarSharpness() const { return IsOverridden(MatField::TriplanarSharpness) ? m_TriplanarSharpness : (m_SourceAsset ? m_SourceAsset->triplanarSharpness : 4.0f); }
+
+    bool GetHasOutline() const { return IsOverridden(MatField::HasOutline) ? m_HasOutline : (m_SourceAsset ? m_SourceAsset->hasOutline : m_HasOutline); }
+    glm::vec4 GetOutlineColor() const { return IsOverridden(MatField::OutlineColor) ? m_OutlineColor : (m_SourceAsset ? m_SourceAsset->outlineColor : m_OutlineColor); }
+    float GetOutlineWidth() const { return IsOverridden(MatField::OutlineWidth) ? m_OutlineWidth : (m_SourceAsset ? m_SourceAsset->outlineWidth : m_OutlineWidth); }
+    bool GetOutlineFixedSize() const { return IsOverridden(MatField::OutlineFixedSize) ? m_OutlineFixedSize : (m_SourceAsset ? m_SourceAsset->outlineFixedSize : m_OutlineFixedSize); }
+    bool GetOutlineXRay() const { return IsOverridden(MatField::OutlineXRay) ? m_OutlineXRay : (m_SourceAsset ? m_SourceAsset->outlineXRay : m_OutlineXRay); }
 
     bool UsesAlbedoMap() const { return IsOverridden(MatField::AlbedoTex) ? m_UseAlbedoMap : (m_SourceAsset ? m_SourceAsset->useAlbedoMap : false); }
     bool UsesNormalMap() const { return IsOverridden(MatField::NormalTex) ? m_UseNormalMap : (m_SourceAsset ? m_SourceAsset->useNormalMap : false); }
@@ -171,6 +188,12 @@ public:
     void ClearUseTriplanar() { ClearOverride(MatField::UseTriplanar); }
     void ClearUseWorldTriplanar() { ClearOverride(MatField::UseWorldTriplanar); }
     void ClearTriplanarSharpness() { ClearOverride(MatField::TriplanarSharpness); }
+
+    void ClearHasOutline() { ClearOverride(MatField::HasOutline); }
+    void ClearOutlineColor() { ClearOverride(MatField::OutlineColor); }
+    void ClearOutlineWidth() { ClearOverride(MatField::OutlineWidth); }
+    void ClearOutlineFixedSize() { ClearOverride(MatField::OutlineFixedSize); }
+    void ClearOutlineXRay() { ClearOverride(MatField::OutlineXRay); }
 
     AssetUUID GetCustomShaderUUID() const { return IsOverridden(MatField::CustomShader) ? m_CustomShaderUUID : (m_SourceAsset ? m_SourceAsset->customShaderUUID : m_CustomShaderUUID); }
     void SetCustomShader(const AssetUUID& uuid);
@@ -251,6 +274,12 @@ private:
     bool m_UseTriplanar = false;
     bool m_UseWorldTriplanar = false;
     float m_TriplanarSharpness = 4.0f;
+
+    bool m_HasOutline = false;
+    glm::vec4 m_OutlineColor = glm::vec4(1.0f, 0.7f, 0.1f, 1.0f);
+    float m_OutlineWidth = 2.0f;
+    bool m_OutlineFixedSize = true;
+    bool m_OutlineXRay = false;
 
     TransparencyMode m_TransparencyMode = TransparencyMode::Opaque;
     BlendMode m_BlendMode = BlendMode::Mix;

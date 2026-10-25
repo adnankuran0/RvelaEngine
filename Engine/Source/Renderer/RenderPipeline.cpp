@@ -9,6 +9,7 @@
 #include "Renderer/RenderPasses/SkyboxPass.h"
 #include "Renderer/RenderPasses/ShadowPass.h"
 #include "Renderer/RenderPasses/CompositePass.h"
+#include "Renderer/RenderPasses/MaterialOutlinePass.h"
 #include "Renderer/RenderPasses/BrightPass.h"
 #include "Renderer/RenderPasses/BloomPass.h"
 #include "Renderer/RenderPasses/MotionBlurPass.h"
@@ -47,6 +48,7 @@ RenderPipeline::RenderPipeline()
 	PushRenderPass(std::make_unique<BloomPass>());
 	PushRenderPass(std::make_unique<MotionBlurPass>());
 	PushRenderPass(std::make_unique<CompositePass>());
+	PushRenderPass(std::make_unique<MaterialOutlinePass>());
 	PushRenderPass(std::make_unique<DebugPass>());
 	PushRenderPass(std::make_unique<DebugBufferPass>(this));
 }

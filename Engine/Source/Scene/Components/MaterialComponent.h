@@ -111,6 +111,26 @@ public:
     void SetBillboardMode(BillboardMode mode) { m_Instance.SetBillboardMode(mode); }
     void ClearBillboardMode() { m_Instance.ClearBillboardMode(); }
 
+    bool GetHasOutline() const { return m_Instance.GetHasOutline(); }
+    void SetHasOutline(bool v) { m_Instance.SetHasOutline(v); }
+    void ClearHasOutline() { m_Instance.ClearHasOutline(); }
+
+    glm::vec4 GetOutlineColor() const { return m_Instance.GetOutlineColor(); }
+    void SetOutlineColor(const glm::vec4& v) { m_Instance.SetOutlineColor(v); }
+    void ClearOutlineColor() { m_Instance.ClearOutlineColor(); }
+
+    float GetOutlineWidth() const { return m_Instance.GetOutlineWidth(); }
+    void SetOutlineWidth(float v) { m_Instance.SetOutlineWidth(v); }
+    void ClearOutlineWidth() { m_Instance.ClearOutlineWidth(); }
+
+    bool GetOutlineFixedSize() const { return m_Instance.GetOutlineFixedSize(); }
+    void SetOutlineFixedSize(bool v) { m_Instance.SetOutlineFixedSize(v); }
+    void ClearOutlineFixedSize() { m_Instance.ClearOutlineFixedSize(); }
+
+    bool GetOutlineXRay() const { return m_Instance.GetOutlineXRay(); }
+    void SetOutlineXRay(bool v) { m_Instance.SetOutlineXRay(v); }
+    void ClearOutlineXRay() { m_Instance.ClearOutlineXRay(); }
+
     bool IsUsingAlbedoMap() const { return m_Instance.UsesAlbedoMap(); }
     bool IsUsingNormalMap() const { return m_Instance.UsesNormalMap(); }
     bool IsUsingMetallicMap() const { return m_Instance.UsesMetallicMap(); }

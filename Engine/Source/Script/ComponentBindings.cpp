@@ -230,6 +230,26 @@ void LuaBindings::RegisterComponents(sol::state& lua)
             [](MaterialHandle& h) { return h.Get() ? h.Get()->GetUVOffset() : glm::vec2(0.0f); },
             [](MaterialHandle& h, const glm::vec2& v) { if (auto* c = h.Get()) c->SetUVOffset(v); }
         ),
+        "hasOutline", sol::property(
+            [](MaterialHandle& h) { return h.Get() ? h.Get()->GetHasOutline() : false; },
+            [](MaterialHandle& h, bool v) { if (auto* c = h.Get()) c->SetHasOutline(v); }
+        ),
+        "outlineColor", sol::property(
+            [](MaterialHandle& h) { return h.Get() ? h.Get()->GetOutlineColor() : glm::vec4(1.0f); },
+            [](MaterialHandle& h, const glm::vec4& v) { if (auto* c = h.Get()) c->SetOutlineColor(v); }
+        ),
+        "outlineWidth", sol::property(
+            [](MaterialHandle& h) { return h.Get() ? h.Get()->GetOutlineWidth() : 2.0f; },
+            [](MaterialHandle& h, float v) { if (auto* c = h.Get()) c->SetOutlineWidth(v); }
+        ),
+        "outlineFixedSize", sol::property(
+            [](MaterialHandle& h) { return h.Get() ? h.Get()->GetOutlineFixedSize() : true; },
+            [](MaterialHandle& h, bool v) { if (auto* c = h.Get()) c->SetOutlineFixedSize(v); }
+        ),
+        "outlineXRay", sol::property(
+            [](MaterialHandle& h) { return h.Get() ? h.Get()->GetOutlineXRay() : false; },
+            [](MaterialHandle& h, bool v) { if (auto* c = h.Get()) c->SetOutlineXRay(v); }
+        ),
         "HasCustomShader", [](MaterialHandle& h) {
             return h.Get() ? h.Get()->HasCustomShader() : false;
         },

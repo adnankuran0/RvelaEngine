@@ -61,6 +61,12 @@ public:
 
     SamplerDesc samplerDesc;
 
+    bool hasOutline = false;
+    glm::vec4 outlineColor = glm::vec4(1.0f, 0.7f, 0.1f, 1.0f);
+    float outlineWidth = 2.0f;
+    bool outlineFixedSize = true;
+    bool outlineXRay = false;
+
     bool IsValid() const { return true; }
 
 private:

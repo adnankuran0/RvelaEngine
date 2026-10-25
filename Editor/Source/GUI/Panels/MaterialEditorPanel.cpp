@@ -236,7 +236,7 @@ void MaterialEditorPanel::Draw(Engine* engine)
         ImGui::EndDisabled();
 
         ImGui::SameLine(0, spacing);
-        ImGui::Checkbox("Auto-Save", &m_AutoSave);
+        ImGui::Checkbox("Autosave", &m_AutoSave);
 
         if (ImGui::BeginPopup("SelectMatEditorPopup"))
         {
@@ -892,6 +892,41 @@ void MaterialEditorPanel::Draw(Engine* engine)
         }
     }
 
+    if (ImGui::CollapsingHeader("Outline##outlinehdr"))
+    {
+        if (UI::BeginPropertyTable("OutlineTable"))
+        {
+            UI::PropertyLabel("Enabled");
+            if (ImGui::Checkbox("##hasoutline", &asset->hasOutline))
+                MarkDirty(engine);
+
+            if (asset->hasOutline)
+            {
+                UI::PropertyLabel("Color");
+                float col[4] = { asset->outlineColor.r, asset->outlineColor.g, asset->outlineColor.b, asset->outlineColor.a };
+                if (ImGui::ColorEdit4("##outlinecol", col))
+                {
+                    asset->outlineColor = glm::vec4(col[0], col[1], col[2], col[3]);
+                    MarkDirty(engine);
+                }
+
+                UI::PropertyLabel("Width");
+                if (ImGui::DragFloat("##outlinewidth", &asset->outlineWidth, 0.1f, 0.5f, 10.0f, "%.1f px"))
+                    MarkDirty(engine);
+
+                UI::PropertyLabel("Fixed Size");
+                if (ImGui::Checkbox("##outlinefixedsize", &asset->outlineFixedSize))
+                    MarkDirty(engine);
+
+                UI::PropertyLabel("X-Ray (Always Visible)");
+                if (ImGui::Checkbox("##outlinexray", &asset->outlineXRay))
+                    MarkDirty(engine);
+            }
+
+            UI::EndPropertyTable();
+        }
+    }
+
     if (ImGui::CollapsingHeader("UV##uvhdr"))
     {
         if (UI::BeginPropertyTable("UVTable"))
@@ -931,7 +966,9 @@ void MaterialEditorPanel::Draw(Engine* engine)
 
             UI::EndPropertyTable();
         }
+
     }
+
     }
 
     ImGui::End();

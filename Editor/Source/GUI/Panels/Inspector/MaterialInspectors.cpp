@@ -147,6 +147,11 @@ void MaterialInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 				if (inst.IsOverridden(MatField::TextureFilterMode)) asset->samplerDesc.filter = material.GetTextureFilter();
 				if (inst.IsOverridden(MatField::TextureWrapMode)) asset->samplerDesc.repeat = material.GetTextureWrap();
 				if (inst.IsOverridden(MatField::TextureAnisotropyMode)) asset->samplerDesc.aniso = material.GetTextureAnisotropy();
+				if (inst.IsOverridden(MatField::HasOutline)) asset->hasOutline = material.GetHasOutline();
+				if (inst.IsOverridden(MatField::OutlineColor)) asset->outlineColor = material.GetOutlineColor();
+				if (inst.IsOverridden(MatField::OutlineWidth)) asset->outlineWidth = material.GetOutlineWidth();
+				if (inst.IsOverridden(MatField::OutlineFixedSize)) asset->outlineFixedSize = material.GetOutlineFixedSize();
+				if (inst.IsOverridden(MatField::OutlineXRay)) asset->outlineXRay = material.GetOutlineXRay();
 				for (const auto& [name, val] : inst.GetCustomUniformOverrides())
 				{
 					asset->customUniforms[name] = val;
@@ -218,7 +223,7 @@ void MaterialInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 		if (UI::BeginPropertyTable("CustomShaderTable"))
 		{
 			UI::PropertyLabel("Shader");
-			std::string shaderBtnLabel = "Default (Built-in PBR)";
+			std::string shaderBtnLabel = "Default (PBR)";
 			AssetUUID curShaderUUID = material.GetCustomShaderUUID();
 			Ref<ShaderAsset> shaderAsset = material.GetCustomShaderAsset();
 			if (curShaderUUID.IsValid())
@@ -746,6 +751,47 @@ void MaterialInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 			}
 		}
 
+		if (ImGui::CollapsingHeader("Outline##outlinehdr"))
+		{
+			if (UI::BeginPropertyTable("OutlineTable"))
+			{
+				UI::PropertyLabel("Enabled");
+				bool hasOutline = material.GetHasOutline();
+				if (ImGui::Checkbox("##hasoutline", &hasOutline)) material.SetHasOutline(hasOutline);
+				if (inst.IsOverridden(MatField::HasOutline)) RevertButton("R##hasoutline", [&]() { material.ClearHasOutline(); });
+
+				if (hasOutline)
+				{
+					UI::PropertyLabel("Color");
+					glm::vec4 c = material.GetOutlineColor();
+					float col[4] = { c.r, c.g, c.b, c.a };
+					float colW = inst.IsOverridden(MatField::OutlineColor) ? ImGui::GetContentRegionAvail().x - 26.0f : -FLT_MIN;
+					ImGui::SetNextItemWidth(colW);
+					if (ImGui::ColorEdit4("##outlinecol", col)) material.SetOutlineColor({ col[0], col[1], col[2], col[3] });
+					if (inst.IsOverridden(MatField::OutlineColor)) RevertButton("R##outlinecol", [&]() { material.ClearOutlineColor(); });
+
+					UI::PropertyLabel("Width");
+					float w = material.GetOutlineWidth();
+					float wW = inst.IsOverridden(MatField::OutlineWidth) ? ImGui::GetContentRegionAvail().x - 26.0f : -FLT_MIN;
+					ImGui::SetNextItemWidth(wW);
+					if (ImGui::DragFloat("##outlinewidth", &w, 0.1f, 0.5f, 10.0f, "%.1f px")) material.SetOutlineWidth(w);
+					if (inst.IsOverridden(MatField::OutlineWidth)) RevertButton("R##outlinewidth", [&]() { material.ClearOutlineWidth(); });
+
+					UI::PropertyLabel("Fixed Size");
+					bool fixedSize = material.GetOutlineFixedSize();
+					if (ImGui::Checkbox("##outlinefixedsize", &fixedSize)) material.SetOutlineFixedSize(fixedSize);
+					if (inst.IsOverridden(MatField::OutlineFixedSize)) RevertButton("R##outlinefixedsize", [&]() { material.ClearOutlineFixedSize(); });
+
+					UI::PropertyLabel("X-Ray (Always Visible)");
+					bool xray = material.GetOutlineXRay();
+					if (ImGui::Checkbox("##outlinexray", &xray)) material.SetOutlineXRay(xray);
+					if (inst.IsOverridden(MatField::OutlineXRay)) RevertButton("R##outlinexray", [&]() { material.ClearOutlineXRay(); });
+				}
+
+				UI::EndPropertyTable();
+			}
+		}
+
 		if (ImGui::CollapsingHeader("UV##uvhdr"))
 		{
 			if (UI::BeginPropertyTable("UVTable"))
@@ -787,6 +833,7 @@ void MaterialInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 				UI::EndPropertyTable();
 			}
 		}
+
 		}
 	});
 }

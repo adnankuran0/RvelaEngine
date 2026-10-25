@@ -440,6 +440,16 @@
                         1.0
                     ],
                     "cullMode": 0,
+                    "hasOutline": true,
+                    "outlineColor": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "outlineFixedSize": false,
+                    "outlineWidth": 5.800000190734863,
+                    "outlineXRay": false,
                     "transparencyMode": 0
                 }
             },
@@ -670,7 +680,7 @@
                     0.9999991655349731
                 ]
             },
-            "UUID": 2879395439309115783
+            "UUID": 9883779724910574739
         },
         {
             "Material": {
@@ -1395,7 +1405,7 @@
                     1.0
                 ]
             },
-            "UUID": 2902639516454098840
+            "UUID": 16012968477186291185
         },
         {
             "ParentUUID": 0,
@@ -1690,7 +1700,7 @@
                     1.0
                 ]
             },
-            "UUID": 1496629816479366368
+            "UUID": 17824274269346406086
         },
         {
             "BoxColliderComponent": {

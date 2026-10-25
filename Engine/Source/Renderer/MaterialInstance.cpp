@@ -14,6 +14,11 @@ MaterialInstance MaterialInstance::CreateFromAsset(const Ref<MaterialAsset>& ass
     inst.m_TextureWrap = asset->samplerDesc.repeat;
     inst.m_TextureAnisotropy = asset->samplerDesc.aniso;
     inst.m_Sampler.Init(asset->samplerDesc);
+    inst.m_HasOutline = asset->hasOutline;
+    inst.m_OutlineColor = asset->outlineColor;
+    inst.m_OutlineWidth = asset->outlineWidth;
+    inst.m_OutlineFixedSize = asset->outlineFixedSize;
+    inst.m_OutlineXRay = asset->outlineXRay;
     inst.RebuildCache();
     return inst;
 }
@@ -46,17 +51,6 @@ json MaterialInstance::SerializeOverrides() const
         j["UVScale"] = { m_UVScale.x, m_UVScale.y };
     if (IsOverridden(MatField::UVOffset))
         j["UVOffset"] = { m_UVOffset.x, m_UVOffset.y };
-    if (IsOverridden(MatField::UseTriplanar))
-        j["useTriplanar"] = m_UseTriplanar;
-    if (IsOverridden(MatField::UseWorldTriplanar))
-        j["useWorldTriplanar"] = m_UseWorldTriplanar;
-    if (IsOverridden(MatField::TriplanarSharpness))
-        j["triplanarSharpness"] = m_TriplanarSharpness;
-
-    if (IsOverridden(MatField::ShadingMode))
-        j["shadingMode"] = static_cast<int>(m_ShadingMode);
-    if (IsOverridden(MatField::ReceiveShadows))
-        j["receiveShadows"] = m_ReceiveShadows;
 
     if (IsOverridden(MatField::TransparencyMode))
         j["transparencyMode"] = static_cast<int>(m_TransparencyMode);
@@ -68,7 +62,29 @@ json MaterialInstance::SerializeOverrides() const
         j["alphaCutoff"] = m_AlphaCutoff;
 
     if (IsOverridden(MatField::BillboardMode))
-        j["billboardMode"] = m_BillboardMode;
+        j["billboardMode"] = static_cast<int>(m_BillboardMode);
+
+    if (IsOverridden(MatField::ShadingMode))
+        j["shadingMode"] = static_cast<int>(m_ShadingMode);
+    if (IsOverridden(MatField::ReceiveShadows))
+        j["receiveShadows"] = m_ReceiveShadows;
+    if (IsOverridden(MatField::UseTriplanar))
+        j["useTriplanar"] = m_UseTriplanar;
+    if (IsOverridden(MatField::UseWorldTriplanar))
+        j["useWorldTriplanar"] = m_UseWorldTriplanar;
+    if (IsOverridden(MatField::TriplanarSharpness))
+        j["triplanarSharpness"] = m_TriplanarSharpness;
+
+    if (IsOverridden(MatField::HasOutline))
+        j["hasOutline"] = m_HasOutline;
+    if (IsOverridden(MatField::OutlineColor))
+        j["outlineColor"] = { m_OutlineColor.r, m_OutlineColor.g, m_OutlineColor.b, m_OutlineColor.a };
+    if (IsOverridden(MatField::OutlineWidth))
+        j["outlineWidth"] = m_OutlineWidth;
+    if (IsOverridden(MatField::OutlineFixedSize))
+        j["outlineFixedSize"] = m_OutlineFixedSize;
+    if (IsOverridden(MatField::OutlineXRay))
+        j["outlineXRay"] = m_OutlineXRay;
 
     if (IsOverridden(MatField::AlbedoTex))
         j["albedoTex"] = m_AlbedoTex ? m_AlbedoTex->GetUUID().ToString() : "";
@@ -180,14 +196,17 @@ void MaterialInstance::DeserializeOverrides(const json& j)
     }
     if (j.contains("UVScale"))
     {
-        m_UVScale = { j["UVScale"][0], j["UVScale"][1] };
+        auto& uv = j["UVScale"];
+        m_UVScale = { uv[0], uv[1] };
         SetOverride(MatField::UVScale);
     }
     if (j.contains("UVOffset"))
     {
-        m_UVOffset = { j["UVOffset"][0], j["UVOffset"][1] };
+        auto& uv = j["UVOffset"];
+        m_UVOffset = { uv[0], uv[1] };
         SetOverride(MatField::UVOffset);
     }
+
     if (j.contains("useTriplanar"))
     {
         m_UseTriplanar = j["useTriplanar"].get<bool>();
@@ -238,6 +257,33 @@ void MaterialInstance::DeserializeOverrides(const json& j)
     if (j.contains("receiveShadows")) {
         m_ReceiveShadows = j["receiveShadows"].get<bool>();
         SetOverride(MatField::ReceiveShadows);
+    }
+
+    if (j.contains("hasOutline"))
+    {
+        m_HasOutline = j["hasOutline"].get<bool>();
+        SetOverride(MatField::HasOutline);
+    }
+    if (j.contains("outlineColor"))
+    {
+        auto& c = j["outlineColor"];
+        m_OutlineColor = { c[0], c[1], c[2], c.size() > 3 ? c[3].get<float>() : 1.0f };
+        SetOverride(MatField::OutlineColor);
+    }
+    if (j.contains("outlineWidth"))
+    {
+        m_OutlineWidth = j["outlineWidth"].get<float>();
+        SetOverride(MatField::OutlineWidth);
+    }
+    if (j.contains("outlineFixedSize"))
+    {
+        m_OutlineFixedSize = j["outlineFixedSize"].get<bool>();
+        SetOverride(MatField::OutlineFixedSize);
+    }
+    if (j.contains("outlineXRay"))
+    {
+        m_OutlineXRay = j["outlineXRay"].get<bool>();
+        SetOverride(MatField::OutlineXRay);
     }
 
     auto loadTex = [&](const char* key, Ref<TextureAsset>& target, bool& useFlag, MatField field)

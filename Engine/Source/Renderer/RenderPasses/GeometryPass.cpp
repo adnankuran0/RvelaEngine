@@ -27,6 +27,7 @@ void GeometryPass::Init(const RenderContext& ctx, RenderFrame& frame)
     frame.registry.Register("NormalTexture", { RenderResourceType::Texture, m_GBuffer.GetColorAttachment(0) });
     frame.registry.Register("RoughnessTexture", { RenderResourceType::Texture, m_GBuffer.GetColorAttachment(1) });
     frame.registry.Register("MetallicTexture", { RenderResourceType::Texture, m_GBuffer.GetColorAttachment(2) });
+    frame.registry.Register("GBuffer", { RenderResourceType::Framebuffer, m_GBuffer.GetID() });
 }
 
 void GeometryPass::OnResize(uint32_t width, uint32_t height, RenderFrame& frame)
@@ -39,6 +40,7 @@ void GeometryPass::OnResize(uint32_t width, uint32_t height, RenderFrame& frame)
     frame.registry.Register("NormalTexture", { RenderResourceType::Texture, m_GBuffer.GetColorAttachment(0) });
     frame.registry.Register("RoughnessTexture", { RenderResourceType::Texture, m_GBuffer.GetColorAttachment(1) });
     frame.registry.Register("MetallicTexture", { RenderResourceType::Texture, m_GBuffer.GetColorAttachment(2) });
+    frame.registry.Register("GBuffer", { RenderResourceType::Framebuffer, m_GBuffer.GetID() });
 }
 
 void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
