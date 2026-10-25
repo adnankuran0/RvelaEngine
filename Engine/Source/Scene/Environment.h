@@ -47,6 +47,12 @@ public:
 	float MotionBlur_MaxVelocity = 0.08f;
 
 	float PostProcess_Exposure = 1.0f;
+	bool PostProcess_AutoExposure = false;
+	float PostProcess_AutoExposureMin = 0.2f;
+	float PostProcess_AutoExposureMax = 5.0f;
+	float PostProcess_AutoExposureSpeedUp = 3.0f;
+	float PostProcess_AutoExposureSpeedDown = 1.0f;
+	float PostProcess_AutoExposureTarget = 0.18f;
 	float PostProcess_Brightness = 0.0f;
 	float PostProcess_Contrast = 1.0f;
 	float PostProcess_Saturation = 1.0f;
@@ -103,6 +109,12 @@ public:
 		MotionBlur_MaxVelocity = other.MotionBlur_MaxVelocity;
 
 		PostProcess_Exposure = other.PostProcess_Exposure;
+		PostProcess_AutoExposure = other.PostProcess_AutoExposure;
+		PostProcess_AutoExposureMin = other.PostProcess_AutoExposureMin;
+		PostProcess_AutoExposureMax = other.PostProcess_AutoExposureMax;
+		PostProcess_AutoExposureSpeedUp = other.PostProcess_AutoExposureSpeedUp;
+		PostProcess_AutoExposureSpeedDown = other.PostProcess_AutoExposureSpeedDown;
+		PostProcess_AutoExposureTarget = other.PostProcess_AutoExposureTarget;
 		PostProcess_Brightness = other.PostProcess_Brightness;
 		PostProcess_Contrast = other.PostProcess_Contrast;
 		PostProcess_Saturation = other.PostProcess_Saturation;

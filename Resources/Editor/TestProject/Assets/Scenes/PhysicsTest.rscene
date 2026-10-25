@@ -448,7 +448,7 @@
                         1.0
                     ],
                     "outlineFixedSize": false,
-                    "outlineWidth": 5.800000190734863,
+                    "outlineWidth": 4.0,
                     "outlineXRay": false,
                     "transparencyMode": 0
                 }
@@ -680,7 +680,7 @@
                     0.9999991655349731
                 ]
             },
-            "UUID": 9883779724910574739
+            "UUID": 16477841588501000594
         },
         {
             "Material": {
@@ -1405,7 +1405,7 @@
                     1.0
                 ]
             },
-            "UUID": 16012968477186291185
+            "UUID": 11216578342759689909
         },
         {
             "ParentUUID": 0,
@@ -1700,7 +1700,7 @@
                     1.0
                 ]
             },
-            "UUID": 17824274269346406086
+            "UUID": 2919413346886242313
         },
         {
             "BoxColliderComponent": {
@@ -2298,6 +2298,12 @@
         "MotionBlur_Intensity": 1.0,
         "MotionBlur_MaxVelocity": 0.08500000089406967,
         "MotionBlur_Samples": 16,
+        "PostProcess_AutoExposure": true,
+        "PostProcess_AutoExposureMax": 3.0,
+        "PostProcess_AutoExposureMin": 0.20000000298023224,
+        "PostProcess_AutoExposureSpeedDown": 1.0,
+        "PostProcess_AutoExposureSpeedUp": 3.0,
+        "PostProcess_AutoExposureTarget": 0.18000000715255737,
         "PostProcess_Brightness": 0.0,
         "PostProcess_ChromaticStrength": 0.0010000000474974513,
         "PostProcess_Contrast": 1.0,

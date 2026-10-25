@@ -204,7 +204,23 @@ void EnvironmentPanel::Draw(Engine* engine)
 
     if (ImGui::CollapsingHeader("Post Process"))
     {
-        ImGui::SliderFloat("Exposure", &env.PostProcess_Exposure, 0.0f, 10.0f);
+        ImGui::Checkbox("Auto Exposure", &env.PostProcess_AutoExposure);
+        if (env.PostProcess_AutoExposure)
+        {
+            ImGui::SliderFloat("Exposure Compensation", &env.PostProcess_Exposure, 0.0f, 10.0f);
+            ImGui::SliderFloat("Min Exposure", &env.PostProcess_AutoExposureMin, 0.01f, 5.0f);
+            ImGui::SliderFloat("Max Exposure", &env.PostProcess_AutoExposureMax, 0.5f, 20.0f);
+            ImGui::SliderFloat("Speed Up", &env.PostProcess_AutoExposureSpeedUp, 0.1f, 10.0f);
+            ImGui::SliderFloat("Speed Down", &env.PostProcess_AutoExposureSpeedDown, 0.1f, 10.0f);
+            ImGui::SliderFloat("Target Luminance", &env.PostProcess_AutoExposureTarget, 0.01f, 1.0f);
+
+            if (env.PostProcess_AutoExposureMin > env.PostProcess_AutoExposureMax)
+                env.PostProcess_AutoExposureMax = env.PostProcess_AutoExposureMin;
+        }
+        else
+        {
+            ImGui::SliderFloat("Exposure", &env.PostProcess_Exposure, 0.0f, 10.0f);
+        }
         ImGui::SliderFloat("Brightness", &env.PostProcess_Brightness, -1.0f, 1.0f, "%.2f");
         ImGui::SliderFloat("Contrast", &env.PostProcess_Contrast, 0.0f, 3.0f, "%.2f");
         ImGui::SliderFloat("Saturation", &env.PostProcess_Saturation, 0.0f, 3.0f, "%.2f");

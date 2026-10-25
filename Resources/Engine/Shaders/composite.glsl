@@ -26,6 +26,14 @@ layout(binding = 1) uniform sampler2D bloomTexture;
 layout(binding = 2) uniform sampler2D ssrTexture;
 layout(binding = 3) uniform sampler2D depthTexture;
 
+layout(std430, binding = 0) readonly buffer AutoExposureBuffer {
+    float b_Exposure;
+    float b_AvgLuminance;
+    float b_TargetExposure;
+    float b_Padding;
+};
+
+uniform bool u_AutoExposure;
 uniform float bloomIntensity;
 uniform float exposure;
 uniform float brightness;
@@ -79,7 +87,13 @@ void main()
 
     vec3 combined = hdrColor + bloomColor * bloomIntensity;
 
-    vec3 mapped = ACESFilm(combined * exposure);
+    float finalExposure = exposure;
+    if (u_AutoExposure)
+    {
+        finalExposure *= b_Exposure;
+    }
+
+    vec3 mapped = ACESFilm(combined * finalExposure);
 
     mapped = LinearToSRGB(mapped);
 

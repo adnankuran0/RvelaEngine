@@ -918,7 +918,7 @@ void MaterialEditorPanel::Draw(Engine* engine)
                 if (ImGui::Checkbox("##outlinefixedsize", &asset->outlineFixedSize))
                     MarkDirty(engine);
 
-                UI::PropertyLabel("X-Ray (Always Visible)");
+                UI::PropertyLabel("X-Ray");
                 if (ImGui::Checkbox("##outlinexray", &asset->outlineXRay))
                     MarkDirty(engine);
             }

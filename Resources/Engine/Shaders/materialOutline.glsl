@@ -20,6 +20,8 @@ layout(binding = 0) uniform sampler2D u_MaskColorTex;
 layout(binding = 1) uniform sampler2D u_MaskInfoTex;
 layout(binding = 2) uniform sampler2D u_SceneDepthTex;
 
+uniform int u_Radius = 2;
+
 void main() {
     ivec2 coord = ivec2(gl_FragCoord.xy);
     vec4 centerCol = texelFetch(u_MaskColorTex, coord, 0);
@@ -28,45 +30,55 @@ void main() {
         discard;
     }
 
-    float sceneZ = texelFetch(u_SceneDepthTex, coord, 0).r;
+    int r = clamp(u_Radius, 1, 8);
 
-    const int MAX_R = 8;
+    ivec2 offsets[12];
+    int count = 0;
+
+    offsets[count++] = ivec2( r,  0);
+    offsets[count++] = ivec2(-r,  0);
+    offsets[count++] = ivec2( 0,  r);
+    offsets[count++] = ivec2( 0, -r);
+    offsets[count++] = ivec2( r,  r);
+    offsets[count++] = ivec2(-r,  r);
+    offsets[count++] = ivec2( r, -r);
+    offsets[count++] = ivec2(-r, -r);
+
+    if (r > 1) {
+        offsets[count++] = ivec2( 1,  0);
+        offsets[count++] = ivec2(-1,  0);
+        offsets[count++] = ivec2( 0,  1);
+        offsets[count++] = ivec2( 0, -1);
+    }
+
+    float sceneZ = -1.0;
     vec4 bestColor = vec4(0.0);
-    float bestAlpha = 0.0;
+    bool found = false;
 
-    for (int y = -MAX_R; y <= MAX_R; ++y) {
-        for (int x = -MAX_R; x <= MAX_R; ++x) {
-            if (x == 0 && y == 0) continue;
-            float dist = length(vec2(x, y));
-            if (dist > float(MAX_R)) continue;
+    for (int i = 0; i < count; ++i) {
+        ivec2 sampleCoord = coord + offsets[i];
+        vec4 sCol = texelFetch(u_MaskColorTex, sampleCoord, 0);
+        if (sCol.a > 0.001) {
+            vec4 sInfo = texelFetch(u_MaskInfoTex, sampleCoord, 0);
+            float isXRay = sInfo.g;
+            float maskZ = sInfo.b;
 
-            ivec2 sampleCoord = coord + ivec2(x, y);
-            vec4 sCol = texelFetch(u_MaskColorTex, sampleCoord, 0);
-            if (sCol.a > 0.001) {
-                vec4 sInfo = texelFetch(u_MaskInfoTex, sampleCoord, 0);
-                float sWidth = sInfo.r;
-                float isXRay = sInfo.g;
-                float maskZ = sInfo.b;
-
-                if (isXRay < 0.5) {
-                    if (sceneZ < maskZ - 0.0002) {
-                        continue;
-                    }
+            if (isXRay < 0.5) {
+                if (sceneZ < 0.0) {
+                    sceneZ = texelFetch(u_SceneDepthTex, coord, 0).r;
                 }
-
-                if (dist <= sWidth) {
-                    float edge = clamp(sWidth - dist + 0.5, 0.0, 1.0);
-                    float a = sCol.a * edge;
-                    if (a > bestAlpha) {
-                        bestAlpha = a;
-                        bestColor = vec4(sCol.rgb, a);
-                    }
+                if (sceneZ < maskZ - 0.0005) {
+                    continue;
                 }
             }
+
+            bestColor = sCol;
+            found = true;
+            break;
         }
     }
 
-    if (bestAlpha <= 0.001) {
+    if (!found) {
         discard;
     }
 

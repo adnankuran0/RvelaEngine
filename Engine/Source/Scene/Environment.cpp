@@ -52,6 +52,12 @@ json Environment::Serialize()
     j["MotionBlur_MaxVelocity"] = MotionBlur_MaxVelocity;
 
     j["PostProcess_Exposure"] = PostProcess_Exposure;
+    j["PostProcess_AutoExposure"] = PostProcess_AutoExposure;
+    j["PostProcess_AutoExposureMin"] = PostProcess_AutoExposureMin;
+    j["PostProcess_AutoExposureMax"] = PostProcess_AutoExposureMax;
+    j["PostProcess_AutoExposureSpeedUp"] = PostProcess_AutoExposureSpeedUp;
+    j["PostProcess_AutoExposureSpeedDown"] = PostProcess_AutoExposureSpeedDown;
+    j["PostProcess_AutoExposureTarget"] = PostProcess_AutoExposureTarget;
     j["PostProcess_Brightness"] = PostProcess_Brightness;
     j["PostProcess_Contrast"] = PostProcess_Contrast;
     j["PostProcess_Saturation"] = PostProcess_Saturation;
@@ -162,6 +168,24 @@ void Environment::Deserialize(const json& j)
 
     if (j.contains("PostProcess_Exposure"))
         PostProcess_Exposure = j["PostProcess_Exposure"];
+
+    if (j.contains("PostProcess_AutoExposure"))
+        PostProcess_AutoExposure = j["PostProcess_AutoExposure"];
+
+    if (j.contains("PostProcess_AutoExposureMin"))
+        PostProcess_AutoExposureMin = j["PostProcess_AutoExposureMin"];
+
+    if (j.contains("PostProcess_AutoExposureMax"))
+        PostProcess_AutoExposureMax = j["PostProcess_AutoExposureMax"];
+
+    if (j.contains("PostProcess_AutoExposureSpeedUp"))
+        PostProcess_AutoExposureSpeedUp = j["PostProcess_AutoExposureSpeedUp"];
+
+    if (j.contains("PostProcess_AutoExposureSpeedDown"))
+        PostProcess_AutoExposureSpeedDown = j["PostProcess_AutoExposureSpeedDown"];
+
+    if (j.contains("PostProcess_AutoExposureTarget"))
+        PostProcess_AutoExposureTarget = j["PostProcess_AutoExposureTarget"];
 
     if (j.contains("PostProcess_Brightness"))
         PostProcess_Brightness = j["PostProcess_Brightness"];

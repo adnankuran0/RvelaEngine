@@ -42,13 +42,13 @@ RenderPipeline::RenderPipeline()
 	PushRenderPass(std::make_unique<DecalPass>());
 	PushRenderPass(std::make_unique<SSGIPass>());
 	PushRenderPass(std::make_unique<SSRPass>());
+	PushRenderPass(std::make_unique<MaterialOutlinePass>());
 	PushRenderPass(std::make_unique<ParticlePass>());
 	PushRenderPass(std::make_unique<TransparentPass>());
 	PushRenderPass(std::make_unique<BrightPass>());
 	PushRenderPass(std::make_unique<BloomPass>());
 	PushRenderPass(std::make_unique<MotionBlurPass>());
 	PushRenderPass(std::make_unique<CompositePass>());
-	PushRenderPass(std::make_unique<MaterialOutlinePass>());
 	PushRenderPass(std::make_unique<DebugPass>());
 	PushRenderPass(std::make_unique<DebugBufferPass>(this));
 }

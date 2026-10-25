@@ -1,12 +1,23 @@
 #include "rvelapch.h"
 #include "CompositePass.h"
+#include "Core/Time.h"
 #include "Renderer/RenderContext.h"
 #include "Renderer/ShaderManager.h"
 #include "Scene/Environment.h"
 #include "Renderer/Renderer.h"
 #include "Utils/ProjectManager.h"
+#include <algorithm>
 
 using namespace rv;
+
+CompositePass::~CompositePass()
+{
+    if (m_AutoExposureSSBO != 0)
+    {
+        glDeleteBuffers(1, &m_AutoExposureSSBO);
+        m_AutoExposureSSBO = 0;
+    }
+}
 
 void CompositePass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
@@ -20,6 +31,18 @@ void CompositePass::Init(const RenderContext& ctx, RenderFrame& frame)
 
     m_Framebuffer = Framebuffer(desc);
     m_FXAAFramebuffer = Framebuffer(desc);
+
+    if (m_AutoExposureSSBO == 0)
+    {
+        glCreateBuffers(1, &m_AutoExposureSSBO);
+        struct {
+            float exposure = 1.0f;
+            float avgLuminance = 0.18f;
+            float targetExposure = 1.0f;
+            float padding = 0.0f;
+        } initialData;
+        glNamedBufferData(m_AutoExposureSSBO, sizeof(initialData), &initialData, GL_DYNAMIC_DRAW);
+    }
 
     frame.registry.Register("CompositeTexture", { RenderResourceType::Texture, m_Framebuffer.GetColorAttachment(0) });
     frame.registry.Register("FinalTexture", { RenderResourceType::Texture, m_Framebuffer.GetColorAttachment(0) });
@@ -46,6 +69,18 @@ void CompositePass::Execute(const RenderContext& ctx, RenderFrame& frame)
         OnResize(ctx.viewportWidth, ctx.viewportHeight, frame);
     }
 
+    if (m_AutoExposureSSBO == 0)
+    {
+        glCreateBuffers(1, &m_AutoExposureSSBO);
+        struct {
+            float exposure = 1.0f;
+            float avgLuminance = 0.18f;
+            float targetExposure = 1.0f;
+            float padding = 0.0f;
+        } initialData;
+        glNamedBufferData(m_AutoExposureSSBO, sizeof(initialData), &initialData, GL_DYNAMIC_DRAW);
+    }
+
     auto& env = *ctx.environment;
 
     auto* mbRes = frame.registry.Get("MotionBlurTexture");
@@ -55,6 +90,32 @@ void CompositePass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     auto i_DepthTexture = frame.registry.Get("DepthTexture")->id;
 
+    if (env.PostProcess_AutoExposure)
+    {
+        Shader& autoExposureShader = ShaderManager::Get("AutoExposure");
+        autoExposureShader.use();
+        autoExposureShader.setFloat("u_DeltaTime", std::clamp(Time::GetDeltaTime(), 0.0001f, 0.1f));
+        autoExposureShader.setFloat("u_MinExposure", env.PostProcess_AutoExposureMin);
+        autoExposureShader.setFloat("u_MaxExposure", env.PostProcess_AutoExposureMax);
+        autoExposureShader.setFloat("u_SpeedUp", env.PostProcess_AutoExposureSpeedUp);
+        autoExposureShader.setFloat("u_SpeedDown", env.PostProcess_AutoExposureSpeedDown);
+        autoExposureShader.setFloat("u_TargetLuminance", env.PostProcess_AutoExposureTarget);
+        autoExposureShader.setBool("u_Reset", m_FirstFrame);
+        m_FirstFrame = false;
+
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_AutoExposureSSBO);
+        glBindTextureUnit(0, i_ScreenTexture);
+
+        autoExposureShader.dispatch(1, 1, 1);
+        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+        glBindTextureUnit(0, 0);
+    }
+    else
+    {
+        m_FirstFrame = true;
+    }
+
     glDisable(GL_DEPTH_TEST);
 
     m_Framebuffer.BindViewport();
@@ -62,6 +123,7 @@ void CompositePass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     Shader& compositeShader = ShaderManager::Get("Composite");
     compositeShader.use();
+    compositeShader.setBool("u_AutoExposure", env.PostProcess_AutoExposure);
     compositeShader.setFloat("exposure", env.PostProcess_Exposure);
     compositeShader.setFloat("brightness", env.PostProcess_Brightness);
     compositeShader.setFloat("contrast", env.PostProcess_Contrast);
@@ -86,6 +148,8 @@ void CompositePass::Execute(const RenderContext& ctx, RenderFrame& frame)
     for (int s = 0; s < 4; ++s)
         glBindSampler(s, 0);
 
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_AutoExposureSSBO);
+
     glBindTextureUnit(0, i_ScreenTexture);
     glBindTextureUnit(1, i_BloomBlurTexture);
     glBindTextureUnit(2, i_SsrTexture);
@@ -95,6 +159,8 @@ void CompositePass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     for (int s = 0; s < 4; ++s)
         glBindTextureUnit(s, 0);
+
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);
 
     bool useFXAA = false;
     if (ProjectManager::IsProjectLoaded())

@@ -782,7 +782,7 @@ void MaterialInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 					if (ImGui::Checkbox("##outlinefixedsize", &fixedSize)) material.SetOutlineFixedSize(fixedSize);
 					if (inst.IsOverridden(MatField::OutlineFixedSize)) RevertButton("R##outlinefixedsize", [&]() { material.ClearOutlineFixedSize(); });
 
-					UI::PropertyLabel("X-Ray (Always Visible)");
+					UI::PropertyLabel("X-Ray");
 					bool xray = material.GetOutlineXRay();
 					if (ImGui::Checkbox("##outlinexray", &xray)) material.SetOutlineXRay(xray);
 					if (inst.IsOverridden(MatField::OutlineXRay)) RevertButton("R##outlinexray", [&]() { material.ClearOutlineXRay(); });

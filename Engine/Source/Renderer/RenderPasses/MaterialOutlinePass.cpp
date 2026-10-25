@@ -43,6 +43,8 @@ void MaterialOutlinePass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
     bool hasAnyOutline = false;
     bool hasNonXRay = false;
+    float maxOutlineWidth = 1.0f;
+    bool hasDynamicScale = false;
 
     auto CheckCommands = [&](const auto& commands) {
         for (const auto& cmd : commands) {
@@ -50,6 +52,9 @@ void MaterialOutlinePass::Execute(const RenderContext& ctx, RenderFrame& frame)
                 hasAnyOutline = true;
                 if (!cmd.material->GetOutlineXRay())
                     hasNonXRay = true;
+                maxOutlineWidth = std::max(maxOutlineWidth, cmd.material->GetOutlineWidth());
+                if (!cmd.material->GetOutlineFixedSize())
+                    hasDynamicScale = true;
             }
         }
     };
@@ -61,6 +66,11 @@ void MaterialOutlinePass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     if (!hasAnyOutline)
         return;
+
+    int outlineRadius = static_cast<int>(std::ceil(maxOutlineWidth));
+    if (hasDynamicScale)
+        outlineRadius = std::max(outlineRadius, 4);
+    outlineRadius = std::clamp(outlineRadius, 1, 8);
 
     if (m_MaskFramebuffer.GetWidth() != ctx.viewportWidth || m_MaskFramebuffer.GetHeight() != ctx.viewportHeight)
     {
@@ -224,7 +234,7 @@ void MaterialOutlinePass::Execute(const RenderContext& ctx, RenderFrame& frame)
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
 
-    auto* finalFboRes = frame.registry.Get("FinalFramebuffer");
+    auto* finalFboRes = frame.registry.Get("ScreenBuffer");
     if (!finalFboRes)
         return;
 
@@ -238,6 +248,7 @@ void MaterialOutlinePass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     Shader& outlineShader = ShaderManager::Get("MaterialOutline");
     outlineShader.use();
+    outlineShader.setInt("u_Radius", outlineRadius);
     glBindTextureUnit(0, m_MaskFramebuffer.GetColorAttachment(0));
     glBindTextureUnit(1, m_MaskFramebuffer.GetColorAttachment(1));
 

@@ -52,6 +52,7 @@ void Renderer::Init(GLFWwindow* window)
     ShaderManager::Add(Shader("SSR", ENGINE_PATH("Shaders\\ssr.glsl")));
     ShaderManager::Add(Shader("SSRBlend", ENGINE_PATH("Shaders\\ssrBlend.glsl")));
     ShaderManager::Add(Shader("MotionBlur", ENGINE_PATH("Shaders\\motionBlur.glsl")));
+    ShaderManager::Add(Shader("AutoExposure", ENGINE_PATH("Shaders\\autoExposure.glsl")));
     ShaderManager::Add(Shader("Composite", ENGINE_PATH("Shaders\\composite.glsl")));
     ShaderManager::Add(Shader("FXAA", ENGINE_PATH("Shaders\\fxaa.glsl")));
     ShaderManager::Add(Shader("Outline", ENGINE_PATH("Shaders\\outline.glsl")));
