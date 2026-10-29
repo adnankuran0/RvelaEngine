@@ -36,7 +36,9 @@ project "RvelaEditor"
       "../Vendor/Jolt/include",
       "../Vendor/DirectXTex/include",
       "../Vendor/meshoptimizer/include",
-
+      "../Vendor/recastnavigation/Recast/Include",
+      "../Vendor/recastnavigation/Detour/Include",
+      "../Vendor/recastnavigation/DetourCrowd/Include",
    }
 
    libdirs
@@ -76,8 +78,6 @@ project "RvelaEditor"
        links { "JoltDebug" }
        runtime "Debug"
        symbols "On"
-       --postbuildcommands 
-       --{ "{COPY} ../Vendor/Assimp/lib/assimp-vc143-mt.dll ../Binaries/" .. OutputDir .. "/Editor/" }
 
    filter "configurations:Release"
        defines { "RELEASE","NDEBUG"  }
@@ -86,8 +86,6 @@ project "RvelaEditor"
        optimize "On"
        symbols "On"
        linkoptions { "/LTCG:incremental", "/NODEFAULTLIB:LIBCMT" }
-       --postbuildcommands {
-      --"{COPY} ../Vendor/Assimp/lib/assimp-vc143-mt.dll ../Binaries/" .. OutputDir .. "/%{prj.name}/"}
 
    filter "configurations:Dist"
        defines { "DIST", "NDEBUG" }

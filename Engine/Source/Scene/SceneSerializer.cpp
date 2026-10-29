@@ -329,6 +329,15 @@ json SceneSerializer::SerializeEntity(Scene& scene, entt::entity e, bool seriali
     if (scene.HasComponent<PhysicsConstraintComponent>(e))
         j["PhysicsConstraintComponent"] = scene.GetComponent<PhysicsConstraintComponent>(e).Serialize();
 
+    if (scene.HasComponent<NavMeshSurfaceComponent>(e))
+        j["NavMeshSurfaceComponent"] = scene.GetComponent<NavMeshSurfaceComponent>(e).Serialize();
+
+    if (scene.HasComponent<NavMeshAgentComponent>(e))
+        j["NavMeshAgentComponent"] = scene.GetComponent<NavMeshAgentComponent>(e).Serialize();
+
+    if (scene.HasComponent<NavMeshObstacleComponent>(e))
+        j["NavMeshObstacleComponent"] = scene.GetComponent<NavMeshObstacleComponent>(e).Serialize();
+
     if (scene.HasComponent<BoxColliderComponent>(e))
         j["BoxColliderComponent"] = scene.GetComponent<BoxColliderComponent>(e).Serialize();
 
@@ -480,6 +489,15 @@ void SceneSerializer::DeserializeEntityComponents(Scene& scene, entt::entity han
         constraint.runtimeConstraint = nullptr;
         constraint.SetDirty();
     }
+
+    if (entityJson.contains("NavMeshSurfaceComponent"))
+        scene.AddComponent<NavMeshSurfaceComponent>(handle).Deserialize(entityJson["NavMeshSurfaceComponent"]);
+
+    if (entityJson.contains("NavMeshAgentComponent"))
+        scene.AddComponent<NavMeshAgentComponent>(handle).Deserialize(entityJson["NavMeshAgentComponent"]);
+
+    if (entityJson.contains("NavMeshObstacleComponent"))
+        scene.AddComponent<NavMeshObstacleComponent>(handle).Deserialize(entityJson["NavMeshObstacleComponent"]);
 
     if (entityJson.contains("BoxColliderComponent"))
         scene.AddComponent<BoxColliderComponent>(handle).Deserialize(entityJson["BoxColliderComponent"]);

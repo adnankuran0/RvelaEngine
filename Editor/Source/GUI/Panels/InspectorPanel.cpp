@@ -9,6 +9,7 @@
 #include "Inspector/ScriptInspectors.h"
 #include "Inspector/MediaInspectors.h"
 #include "Inspector/UIInspectors.h"
+#include "Inspector/NavigationInspectors.h"
 #include "Inspector/AddComponentPopup.h"
 
 #include "Core/Engine.h"
@@ -60,6 +61,7 @@ void InspectorPanel::Draw(Engine* engine)
 	ScriptInspectors::Draw(scene, selectedEntity);
 	MediaInspectors::Draw(scene, selectedEntity);
 	UIInspectors::Draw(scene, selectedEntity);
+	NavigationInspectors::Draw(scene, selectedEntity);
 
 	ImGui::Spacing();
 	ImGui::Separator();

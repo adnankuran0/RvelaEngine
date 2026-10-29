@@ -10,3 +10,4 @@
 #include "AnimationBindings.h"
 #include "UIBindings.h"
 #include "TweenBindings.h"
+#include "NavMeshBindings.h"

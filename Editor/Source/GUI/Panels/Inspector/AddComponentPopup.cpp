@@ -5,6 +5,9 @@
 #include "Scene/Components/SkeletonComponent.h"
 #include "Scene/Components/CameraComponent.h"
 #include "GUI/Style.h"
+#include "Scene/Components/NavMeshSurfaceComponent.h"
+#include "Scene/Components/NavMeshAgentComponent.h"
+#include "Scene/Components/NavMeshObstacleComponent.h"
 #include <algorithm>
 #include <string>
 
@@ -203,6 +206,14 @@ void AddComponentPopup::Draw(Scene& scene, entt::entity selectedEntity)
 				DrawComponentMenuItem<ScriptComponent>("Script", "Scripts", "", registry, selectedEntity);
 				ImGui::EndMenu();
 			}
+
+			if (ImGui::BeginMenu("Navigation"))
+			{
+				DrawComponentMenuItem<NavMeshSurfaceComponent>("NavMesh Surface", "Navigation", "", registry, selectedEntity);
+				DrawComponentMenuItem<NavMeshAgentComponent>("NavMesh Agent", "Navigation", "", registry, selectedEntity);
+				DrawComponentMenuItem<NavMeshObstacleComponent>("NavMesh Obstacle", "Navigation", "", registry, selectedEntity);
+				ImGui::EndMenu();
+			}
 		}
 		else
 		{
@@ -263,6 +274,11 @@ void AddComponentPopup::Draw(Scene& scene, entt::entity selectedEntity)
 
 			// Scripts
 			RV_FILTER_ITEM(ScriptComponent, "Script", "Scripts");
+
+			// Navigation
+			RV_FILTER_ITEM(NavMeshSurfaceComponent, "NavMesh Surface", "Navigation");
+			RV_FILTER_ITEM(NavMeshAgentComponent, "NavMesh Agent", "Navigation");
+			RV_FILTER_ITEM(NavMeshObstacleComponent, "NavMesh Obstacle", "Navigation");
 
 			#undef RV_FILTER_ITEM
 

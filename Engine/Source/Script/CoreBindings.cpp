@@ -8,6 +8,9 @@
 #include "Scene/Components/ParticleEmitterComponent.h"
 #include "Scene/Components/ColliderComponents.h"
 #include "Scene/Components/PhysicsConstraintComponent.h"
+#include "Scene/Components/NavMeshSurfaceComponent.h"
+#include "Scene/Components/NavMeshAgentComponent.h"
+#include "Scene/Components/NavMeshObstacleComponent.h"
 #include "ComponentHandle.h"
 #include "Asset/AssetManager.h"
 #include "Asset/AssetUUID.h"
@@ -153,6 +156,9 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             else if (type == "Material") return e.HasComponent<MaterialComponent>();
             else if (type == "Rigidbody") return e.HasComponent<RigidbodyComponent>();
             else if (type == "PhysicsConstraint") return e.HasComponent<PhysicsConstraintComponent>();
+            else if (type == "NavMeshSurface") return e.HasComponent<NavMeshSurfaceComponent>();
+            else if (type == "NavMeshAgent") return e.HasComponent<NavMeshAgentComponent>();
+            else if (type == "NavMeshObstacle") return e.HasComponent<NavMeshObstacleComponent>();
             else if (type == "CharacterBody") return e.HasComponent<CharacterBodyComponent>();
             else if (type == "CapsuleCollider") return e.HasComponent<CapsuleColliderComponent>();
             else if (type == "BoxCollider") return e.HasComponent<BoxColliderComponent>();
@@ -202,6 +208,15 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             }
             else if (type == "PhysicsConstraint") {
                 return sol::make_object(lua, ComponentHandle<PhysicsConstraintComponent>{ e });
+            }
+            else if (type == "NavMeshSurface") {
+                return sol::make_object(lua, ComponentHandle<NavMeshSurfaceComponent>{ e });
+            }
+            else if (type == "NavMeshAgent") {
+                return sol::make_object(lua, ComponentHandle<NavMeshAgentComponent>{ e });
+            }
+            else if (type == "NavMeshObstacle") {
+                return sol::make_object(lua, ComponentHandle<NavMeshObstacleComponent>{ e });
             }
             else if (type == "CharacterBody") {
                 return sol::make_object(lua, ComponentHandle<CharacterBodyComponent>{ e });
@@ -289,6 +304,18 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             else if (typeName == "PhysicsConstraint") {
                 if (!e.HasComponent<PhysicsConstraintComponent>()) e.AddComponent<PhysicsConstraintComponent>();
                 return sol::make_object(lua, ComponentHandle<PhysicsConstraintComponent>{ e });
+            }
+            else if (typeName == "NavMeshSurface") {
+                if (!e.HasComponent<NavMeshSurfaceComponent>()) e.AddComponent<NavMeshSurfaceComponent>();
+                return sol::make_object(lua, ComponentHandle<NavMeshSurfaceComponent>{ e });
+            }
+            else if (typeName == "NavMeshAgent") {
+                if (!e.HasComponent<NavMeshAgentComponent>()) e.AddComponent<NavMeshAgentComponent>();
+                return sol::make_object(lua, ComponentHandle<NavMeshAgentComponent>{ e });
+            }
+            else if (typeName == "NavMeshObstacle") {
+                if (!e.HasComponent<NavMeshObstacleComponent>()) e.AddComponent<NavMeshObstacleComponent>();
+                return sol::make_object(lua, ComponentHandle<NavMeshObstacleComponent>{ e });
             }
             else if (typeName == "AudioEmitter") {
                 if (!e.HasComponent<AudioEmitterComponent>()) e.AddComponent<AudioEmitterComponent>();

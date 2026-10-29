@@ -26,7 +26,8 @@ m_TransformSystem(*this),
 m_PhysicsSystem(*this),
 m_AudioSystem(*this),
 m_ParticleSystem(*this),
-m_AnimationSystem(*this)
+m_AnimationSystem(*this),
+m_NavigationSystem(*this)
 {
     m_ScenePath = "";
     m_SceneName = sceneName;
@@ -171,6 +172,7 @@ void Scene::OnStart()
     m_AudioSystem.OnStart();
     m_AnimationSystem.OnStart();
     m_UISystem.Init();
+    m_NavigationSystem.OnStart();
 }
 
 void Scene::OnUpdate(float dt)
@@ -216,6 +218,7 @@ void Scene::OnStop()
     m_UISystem.Shutdown();
     m_ScriptSystem.OnStop();
     m_AudioSystem.OnStop();
+    m_NavigationSystem.OnStop();
     m_PhysicsSystem.OnStop();
     m_IsChangingScene = false;
 }
@@ -304,6 +307,7 @@ void Scene::Update()
     m_AudioSystem.Update();
     m_ParticleSystem.Update(Time::GetDeltaTime());
     m_AnimationSystem.Update();
+    m_NavigationSystem.Update(Time::GetDeltaTime());
 
     m_isUpdating = false;
     FlushDestroyQueue();

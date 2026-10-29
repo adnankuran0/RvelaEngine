@@ -41,6 +41,7 @@ void ScriptEngine::Init()
     LuaBindings::RegisterAnimationAPI(m_State);
     LuaBindings::RegisterUIComponents(m_State);
     LuaBindings::RegisterTweenAPI(m_State);
+    LuaBindings::RegisterNavigationAPI(m_State);
 
 }
 

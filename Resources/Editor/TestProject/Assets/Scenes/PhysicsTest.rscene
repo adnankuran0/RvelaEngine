@@ -680,7 +680,7 @@
                     0.9999991655349731
                 ]
             },
-            "UUID": 16477841588501000594
+            "UUID": 8364603106223596927
         },
         {
             "Material": {
@@ -1405,7 +1405,7 @@
                     1.0
                 ]
             },
-            "UUID": 11216578342759689909
+            "UUID": 14886793298674816970
         },
         {
             "ParentUUID": 0,
@@ -1607,6 +1607,10 @@
             "Mesh": {
                 "mesh": "b6c7f2a2-cce2-4b68-be50-19a8f552e727"
             },
+            "NavMeshObstacleComponent": {
+                "affectNavMesh": true,
+                "isWalkable": false
+            },
             "ParentUUID": 0,
             "RigidbodyComponent": {
                 "allowSleep": 1,
@@ -1647,7 +1651,7 @@
                 "lockScaleRatio": false,
                 "position": [
                     5.849568843841553,
-                    0.3585145175457001,
+                    0.5042288899421692,
                     0.9306256175041199
                 ],
                 "rotation": [
@@ -1700,7 +1704,7 @@
                     1.0
                 ]
             },
-            "UUID": 2919413346886242313
+            "UUID": 14165067422157167173
         },
         {
             "BoxColliderComponent": {
@@ -1753,7 +1757,7 @@
                 "lockScaleRatio": false,
                 "position": [
                     3.0,
-                    0.325478196144104,
+                    0.4202721118927002,
                     7.480610370635986
                 ],
                 "rotation": [
@@ -2261,6 +2265,188 @@
                 ]
             },
             "UUID": 16773436819392039289
+        },
+        {
+            "NavMeshSurfaceComponent": {
+                "agentHeight": 2.0,
+                "agentMaxClimb": 0.25,
+                "agentMaxSlope": 45.0,
+                "agentRadius": 0.5,
+                "autoBakeOnPlay": true,
+                "cellHeight": 0.20000000298023224,
+                "cellSize": 0.30000001192092896,
+                "debugColor": [
+                    0.10000000149011612,
+                    0.8500000238418579,
+                    0.20000000298023224,
+                    0.699999988079071
+                ],
+                "detailSampleDist": 6.0,
+                "detailSampleMaxError": 1.0,
+                "drawDebugMesh": false,
+                "edgeMaxError": 1.2999999523162842,
+                "edgeMaxLen": 12.0,
+                "filterLowHangingObstacles": false,
+                "regionMergeSize": 20.0,
+                "regionMinSize": 8.0,
+                "vertsPerPoly": 6.0
+            },
+            "ParentUUID": 0,
+            "Tag": {
+                "isActive": true,
+                "tag": "NavMeshSurface"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 10287078512223076991
+        },
+        {
+            "BoxColliderComponent": {
+                "offset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    0.5,
+                    0.5,
+                    0.5
+                ]
+            },
+            "Material": {
+                "material": ""
+            },
+            "Mesh": {
+                "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
+            },
+            "NavMeshAgentComponent": {
+                "acceleration": 8.0,
+                "angularSpeed": 360.0,
+                "autoRepath": true,
+                "drawDebugPath": true,
+                "height": 1.0,
+                "radius": 0.5,
+                "repathInterval": 0.25,
+                "speed": 3.0,
+                "stoppingDistance": 1.2000000476837158,
+                "updatePosition": true,
+                "updateRotation": true
+            },
+            "ParentUUID": 0,
+            "ScriptComponent": {
+                "propertyValues": {
+                    "followSpeed": 3.0,
+                    "stoppingDist": 1.2,
+                    "targetName": "Character"
+                },
+                "scriptAssetUUID": "8757ba77-ff9b-4a5d-92c7-70692b8aef00"
+            },
+            "Tag": {
+                "isActive": true,
+                "tag": "FollowerCube"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    4.0,
+                    1.0,
+                    4.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 666024611405253007
+        },
+        {
+            "Material": {
+                "material": ""
+            },
+            "Mesh": {
+                "mesh": "b6c7f2a2-cce2-4b68-be50-19a8f552e727"
+            },
+            "NavMeshObstacleComponent": {
+                "affectNavMesh": true,
+                "isWalkable": false
+            },
+            "ParentUUID": 0,
+            "RigidbodyComponent": {
+                "allowSleep": 1,
+                "angularDamping": 0.05000000074505806,
+                "autoCalculateMass": 0,
+                "bodyType": 0,
+                "collisionLayer": 1,
+                "collisionMask": 4294967295,
+                "friction": 0.5,
+                "gravityFactor": 1.0,
+                "isSensor": false,
+                "linearDamping": 0.05000000074505806,
+                "lockRotationX": false,
+                "lockRotationY": false,
+                "lockRotationZ": false,
+                "lockTranslationX": false,
+                "lockTranslationY": false,
+                "lockTranslationZ": false,
+                "mass": 1.0,
+                "maxAngularVelocity": 50.0,
+                "maxLinearVelocity": 500.0,
+                "restitution": 0.0,
+                "useCCD": false
+            },
+            "SphereColliderComponent": {
+                "offset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "radius": 0.5
+            },
+            "Tag": {
+                "isActive": true,
+                "tag": "Sphere"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    6.533329486846924,
+                    0.2741330862045288,
+                    -1.4539644718170166
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 3434157366133950140
         }
     ],
     "Environment": {
@@ -2299,8 +2485,8 @@
         "MotionBlur_MaxVelocity": 0.08500000089406967,
         "MotionBlur_Samples": 16,
         "PostProcess_AutoExposure": true,
-        "PostProcess_AutoExposureMax": 3.0,
-        "PostProcess_AutoExposureMin": 0.20000000298023224,
+        "PostProcess_AutoExposureMax": 2.619999885559082,
+        "PostProcess_AutoExposureMin": 0.22699999809265137,
         "PostProcess_AutoExposureSpeedDown": 1.0,
         "PostProcess_AutoExposureSpeedUp": 3.0,
         "PostProcess_AutoExposureTarget": 0.18000000715255737,

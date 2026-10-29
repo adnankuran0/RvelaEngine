@@ -31,7 +31,9 @@ project "RvelaRuntime"
       "../Vendor/robin_map/include",
       "../Vendor/lua/include",
       "../Vendor/Jolt/include",
-
+      "../Vendor/recastnavigation/Recast/Include",
+      "../Vendor/recastnavigation/Detour/Include",
+      "../Vendor/recastnavigation/DetourCrowd/Include",
    }
 
    libdirs
@@ -62,8 +64,6 @@ project "RvelaRuntime"
        links { "JoltDebug" }
        runtime "Debug"
        symbols "On"
-       --postbuildcommands 
-       --{ "{COPY} ../Vendor/Assimp/lib/assimp-vc143-mt.dll ../Binaries/" .. OutputDir .. "/Editor/" }
 
    filter "configurations:Release"
        kind "WindowedApp"
@@ -74,8 +74,6 @@ project "RvelaRuntime"
        optimize "On"
        symbols "On"
        linkoptions { "/LTCG:incremental", "/NODEFAULTLIB:LIBCMT" }
-       --postbuildcommands {
-      --"{COPY} ../Vendor/Assimp/lib/assimp-vc143-mt.dll ../Binaries/" .. OutputDir .. "/%{prj.name}/"}
 
    filter "configurations:Dist"
        kind "WindowedApp"

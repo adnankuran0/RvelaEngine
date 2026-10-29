@@ -524,6 +524,123 @@
                 ]
             },
             "UUID": 10503131110572297842
+        },
+        {
+            "NavMeshSurfaceComponent": {
+                "agentHeight": 2.0,
+                "agentMaxClimb": 0.8,
+                "agentMaxSlope": 45.0,
+                "agentRadius": 0.5,
+                "autoBakeOnPlay": true,
+                "cellHeight": 0.2,
+                "cellSize": 0.3,
+                "debugColor": [
+                    0.1,
+                    0.85,
+                    0.2,
+                    0.7
+                ],
+                "detailSampleDist": 6.0,
+                "detailSampleMaxError": 1.0,
+                "drawDebugMesh": true,
+                "edgeMaxError": 1.3,
+                "edgeMaxLen": 12.0,
+                "regionMergeSize": 20.0,
+                "regionMinSize": 8.0,
+                "vertsPerPoly": 6.0
+            },
+            "ParentUUID": 0,
+            "Tag": {
+                "isActive": true,
+                "tag": "NavMeshSurface"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 10287078512223076991
+        },
+        {
+            "BoxColliderComponent": {
+                "offset": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "size": [
+                    0.5,
+                    0.5,
+                    0.5
+                ]
+            },
+            "Material": {
+                "material": "b894fec8-4bd1-4ecf-9ff3-b82c5145074c",
+                "overrides": {
+                    "shadingMode": 0
+                }
+            },
+            "Mesh": {
+                "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
+            },
+            "NavMeshAgentComponent": {
+                "acceleration": 8.0,
+                "angularSpeed": 360.0,
+                "autoRepath": true,
+                "drawDebugPath": true,
+                "height": 1.0,
+                "radius": 0.5,
+                "repathInterval": 0.25,
+                "speed": 3.0,
+                "stoppingDistance": 1.2,
+                "updatePosition": true,
+                "updateRotation": true
+            },
+            "ParentUUID": 0,
+            "ScriptComponent": {
+                "propertyValues": {
+                    "followSpeed": 3.0,
+                    "stoppingDist": 1.2,
+                    "targetName": "TPSCharacter"
+                },
+                "scriptAssetUUID": "8757ba77-ff9b-4a5d-92c7-70692b8aef00"
+            },
+            "Tag": {
+                "isActive": true,
+                "tag": "FollowerCube"
+            },
+            "Transform": {
+                "lockScaleRatio": false,
+                "position": [
+                    4.0,
+                    1.0,
+                    4.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "UUID": 666024611405253007
         }
     ],
     "Environment": {

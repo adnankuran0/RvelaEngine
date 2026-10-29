@@ -21,11 +21,13 @@
 #include "Scene/Components/AnimatorComponent.h"
 #include "Scene/Components/SkeletalMeshComponent.h"
 #include "Scene/Components/SkeletalMeshRendererComponent.h"
-#include "Scene/Components/SkeletalMeshRendererComponent.h"
 #include "Scene/Components/SkeletonComponent.h"
 #include "Scene/Components/UIComponents.h"
 #include "Scene/Components/DecalComponent.h"
 #include "Scene/Components/PhysicsConstraintComponent.h"
+#include "Scene/Components/NavMeshSurfaceComponent.h"
+#include "Scene/Components/NavMeshAgentComponent.h"
+#include "Scene/Components/NavMeshObstacleComponent.h"
 
 namespace rv {
 
@@ -67,7 +69,9 @@ enum class ComponentType
 	UIProgressBar,
 	Decal,
 	PhysicsConstraint,
-
+	NavMeshSurface,
+	NavMeshAgent,
+	NavMeshObstacle,
 };
 
 }

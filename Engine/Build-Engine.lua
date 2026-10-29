@@ -15,10 +15,17 @@ project "RvelaEngine"
        "JPH_USE_SSE4_2"
    }
 
-   files { "Source/**.h", "Source/**.cpp", "../Vendor/GLAD/src/**.c" }
+   files {
+      "Source/**.h",
+      "Source/**.cpp",
+      "../Vendor/GLAD/src/**.c",
+      "../Vendor/recastnavigation/Recast/Source/**.cpp",
+      "../Vendor/recastnavigation/Detour/Source/**.cpp",
+      "../Vendor/recastnavigation/DetourCrowd/Source/**.cpp"
+   }
 
    pchheader "rvelapch.h"
-    pchsource "Source/rvelapch.cpp"
+   pchsource "Source/rvelapch.cpp"
 
    includedirs
    {
@@ -39,6 +46,9 @@ project "RvelaEngine"
       "../Vendor/lua/include",
       "../Vendor/Jolt/include",
       "../Vendor/meshoptimizer/include",
+      "../Vendor/recastnavigation/Recast/Include",
+      "../Vendor/recastnavigation/Detour/Include",
+      "../Vendor/recastnavigation/DetourCrowd/Include",
    }
 
    libdirs
@@ -89,5 +99,8 @@ project "RvelaEngine"
        optimize "On"
        symbols "Off"
 
-    filter "files:../Vendor/GLAD/src/gl.c"
-        enablepch "Off"
+   filter "files:../Vendor/GLAD/src/gl.c"
+       enablepch "Off"
+
+   filter "files:../Vendor/recastnavigation/**.cpp"
+       enablepch "Off"

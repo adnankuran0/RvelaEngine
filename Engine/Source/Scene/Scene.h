@@ -14,6 +14,7 @@
 #include "ParticleSystem.h"
 #include "Animation/AnimationSystem.h"
 #include "UI/UISystem.h"
+#include "Navigation/NavigationSystem.h"
 
 namespace rv {
 
@@ -165,6 +166,7 @@ public:
     inline ParticleSystem& GetParticleSystem() noexcept { return m_ParticleSystem; }
     inline AnimationSystem& GetAnimationSystem() noexcept { return m_AnimationSystem; }
     inline UISystem& GetUISystem() noexcept { return m_UISystem; }
+    inline NavigationSystem& GetNavigationSystem() noexcept { return m_NavigationSystem; }
     inline Environment& GetEnvironment() noexcept { return m_Environment; }
 
 
@@ -199,6 +201,7 @@ private:
     ParticleSystem m_ParticleSystem;
     AnimationSystem m_AnimationSystem;
     UISystem m_UISystem;
+    NavigationSystem m_NavigationSystem;
 
     Environment m_Environment;
 };
