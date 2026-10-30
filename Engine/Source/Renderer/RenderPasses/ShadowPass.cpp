@@ -213,7 +213,7 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
             shadowShader.setInt("billboardMode", 0);
 
             for (auto& command : commands) {
-                if (!command.mesh || command.mesh->indexCount == 0) continue;
+                if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
                 if (!command.mesh->IsCastShadow()) continue;
                 if (command.mesh->worldAABB.IsValid() && !ctx.camera->Intersects(cascadeMatrix, command.mesh->worldAABB)) continue;
 
@@ -227,7 +227,7 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
                 bool useAlb = BindMaterial(shadowShader, material);
 
                 shadowShader.setMat4("model", command.transform->GetWorldMatrix());
-                command.mesh->VAO.Bind();
+                command.mesh->Bind();
                 glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
 
                 if (useAlb) glBindSampler(0, 0);
@@ -242,7 +242,7 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
             GLint boneLoc = glGetUniformLocation(skeletalShadowShader.ID, "u_BoneMatrices");
 
             for (auto& command : skeletalCommands) {
-                if (!command.mesh || command.mesh->indexCount == 0) continue;
+                if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
                 if (!command.mesh->IsCastShadow()) continue;
 
                 auto& material = command.material;
@@ -263,7 +263,7 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
                     );
                 }
 
-                command.mesh->VAO.Bind();
+                command.mesh->Bind();
                 glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
 
                 if (useAlb) glBindSampler(0, 0);
@@ -352,7 +352,7 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
 
                 for (auto& command : commands)
                 {
-                    if (!command.mesh || command.mesh->indexCount == 0) continue;
+                    if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
                     if (!command.mesh->IsCastShadow()) continue;
                     if (command.mesh->worldAABB.IsValid() && !ctx.camera->Intersects(shadowTransforms[face], command.mesh->worldAABB)) continue;
 
@@ -365,7 +365,7 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
                     bool useAlb = BindMaterial(pointShadowShader, material);
 
                     pointShadowShader.setMat4("model", command.transform->GetWorldMatrix());
-                    command.mesh->VAO.Bind();
+                    command.mesh->Bind();
                     glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
 
                     if (useAlb) glBindSampler(0, 0);
@@ -385,7 +385,7 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
 
                 for (auto& command : skeletalCommands)
                 {
-                    if (!command.mesh || command.mesh->indexCount == 0) continue;
+                    if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
                     if (!command.mesh->IsCastShadow()) continue;
 
                     auto& material = command.material;
@@ -408,7 +408,7 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
                         );
                     }
 
-                    command.mesh->VAO.Bind();
+                    command.mesh->Bind();
                     glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
 
                     if (useAlb) glBindSampler(0, 0);
@@ -505,7 +505,7 @@ void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& fram
             shadowShader.setInt("billboardMode", 0);
 
             for (auto& command : commands) {
-                if (!command.mesh || command.mesh->indexCount == 0) continue;
+                if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
                 if (!command.mesh->IsCastShadow()) continue;
 
                 auto& material = command.material;
@@ -515,7 +515,7 @@ void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& fram
                 bool useAlb = BindMaterial(shadowShader, material);
 
                 shadowShader.setMat4("model", command.transform->GetWorldMatrix());
-                command.mesh->VAO.Bind();
+                command.mesh->Bind();
                 glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
 
                 if (useAlb) glBindSampler(0, 0);
@@ -529,7 +529,7 @@ void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& fram
             GLint boneLoc = glGetUniformLocation(skeletalShadowShader.ID, "u_BoneMatrices");
 
             for (auto& command : skeletalCommands) {
-                if (!command.mesh || command.mesh->indexCount == 0) continue;
+                if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
                 if (!command.mesh->IsCastShadow()) continue;
 
                 auto& material = command.material;
@@ -550,7 +550,7 @@ void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& fram
                     );
                 }
 
-                command.mesh->VAO.Bind();
+                command.mesh->Bind();
                 glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
 
                 if (useAlb) glBindSampler(0, 0);

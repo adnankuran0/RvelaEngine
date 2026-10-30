@@ -106,7 +106,7 @@ void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
                     bool useAlb = BindMaterial(shader, material);
 
-                    command.mesh->VAO.Bind();
+                    command.mesh->Bind();
                     glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
 
                     if (useAlb) glBindSampler(0, 0);
@@ -128,7 +128,7 @@ void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             {
                 for (const auto& command : commands)
                 {
-                    if (!command.mesh || command.mesh->indexCount == 0) continue;
+                    if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
 
                     auto& material = command.material;
                     ApplyCullMode(material->GetCullMode());
@@ -150,7 +150,7 @@ void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
                     bool useAlb = BindMaterial(skeletalShader, material);
 
-                    command.mesh->VAO.Bind();
+                    command.mesh->Bind();
                     glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
 
                     if (useAlb) glBindSampler(0, 0);

@@ -401,7 +401,7 @@ void TransparentPass::Execute(const RenderContext& ctx, RenderFrame& frame)
                 currentShader->setVec2("UVScale", material->GetUVScale());
                 currentShader->setVec2("UVOffset", material->GetUVOffset());
 
-                command.mesh->VAO.Bind();
+                command.mesh->Bind();
                 glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
 
                 if (hasCustomShader)
@@ -431,7 +431,7 @@ void TransparentPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             GLint defaultBoneLoc = glGetUniformLocation(skeletalShader.ID, "u_BoneMatrices");
 
             for (auto& command : skeletalCommands) {
-                if (!command.mesh || command.mesh->indexCount == 0) continue;
+                if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
 
                 auto* material = command.material;
                 ApplyCullMode(material->GetCullMode());
@@ -512,7 +512,7 @@ void TransparentPass::Execute(const RenderContext& ctx, RenderFrame& frame)
                     );
                 }
 
-                command.mesh->VAO.Bind();
+                command.mesh->Bind();
                 glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
 
                 if (hasCustomShader)

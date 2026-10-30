@@ -168,6 +168,7 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         geometryShader.use();
 
         for (auto& command : staticCommands) {
+            if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
             if (!ctx.camera->Intersects(command.mesh->worldAABB)) continue;
 
             auto& material = command.material;
@@ -180,7 +181,7 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
             BindMaterialGBuffer(geometryShader, material);
 
-            command.mesh->VAO.Bind();
+            command.mesh->Bind();
             glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
 
             CleanupSamplers();
@@ -195,7 +196,7 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         GLint boneLoc = glGetUniformLocation(skeletalGeometryShader.ID, "u_BoneMatrices");
 
         for (auto& command : skeletalCommands) {
-            if (!command.mesh || command.mesh->indexCount == 0) continue;
+            if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
             if (command.mesh->worldAABB.IsValid() && !ctx.camera->Intersects(command.mesh->worldAABB)) continue;
 
             auto& material = command.material;
@@ -219,7 +220,7 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
             BindMaterialGBuffer(skeletalGeometryShader, material);
 
-            command.mesh->VAO.Bind();
+            command.mesh->Bind();
             glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
 
             CleanupSamplers();

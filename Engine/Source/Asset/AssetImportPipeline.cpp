@@ -6,6 +6,7 @@
 #include "Core/Log.h"
 #include "Asset/AssetManager.h"
 #include "Renderer/TextureCache.h"
+#include "Renderer/MeshCache.h"
 #include <fstream>
 #include <chrono>
 
@@ -76,6 +77,7 @@ bool AssetImportPipeline::ImportAsset(const std::filesystem::path& sourcePath, A
     registry.RegisterPath(updatedMeta.uuid, cachePath);
 
     TextureCache::Get().Remove(updatedMeta.uuid);
+    MeshCache::Get().Remove(updatedMeta.uuid);
 
     AssetManager::Get().Reload(updatedMeta.uuid);
 

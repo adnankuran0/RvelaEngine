@@ -1,41 +1,28 @@
 #include "rvelapch.h"
 #include "MeshRendererComponent.h"
+#include "Renderer/MeshCache.h"
 
 using namespace rv;
 
 void MeshRendererComponent::RecreateFromMesh(Ref<MeshAsset> mesh)
 {
-    Destroy();
-
     if (!mesh || !mesh->IsValid())
     {
+        gpuMesh = nullptr;
         indexCount = 0;
+        localAABB.Reset();
         return;
     }
 
-    std::vector<float> packedVertices;
-    PackVertices(mesh->GetVertices(), packedVertices);
-
-    indexCount = (unsigned int)mesh->GetIndices().size();
-
-    VAO.Init();
-    VAO.Bind();
-
-    VBO.Init(packedVertices.data(), packedVertices.size() * sizeof(float));
-    VBO.Bind();
-
-    layout = BufferLayout(); // Reset layout before pushing again
-    layout.BindVertexBuffer(VBO.getID());
-    layout.Push<float>(3); // Position
-    layout.Push<float>(3); // Normal
-    layout.Push<float>(3); // Tangent
-    layout.Push<float>(2); // UV
-
-    VAO.SetBufferLayout(layout);
-
-    EBO.Init(mesh->GetIndices().data(), mesh->GetIndices().size() * sizeof(unsigned int));
-    EBO.Bind();
-    localAABB = mesh->GetAABB();
-
-    //worldAABB = localAABB;
+    gpuMesh = MeshCache::Get().GetOrCreate(mesh);
+    if (gpuMesh)
+    {
+        indexCount = gpuMesh->indexCount;
+        localAABB = gpuMesh->localAABB;
+    }
+    else
+    {
+        indexCount = 0;
+        localAABB.Reset();
+    }
 }

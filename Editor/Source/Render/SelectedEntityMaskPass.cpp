@@ -124,7 +124,7 @@ void SelectedEntityMaskPass::Execute(const RenderContext& ctx, RenderFrame& fram
 
                 bool useAlb = BindMaterial(shader, material);
 
-                command.mesh->VAO.Bind();
+                command.mesh->Bind();
                 glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
 
                 if (useAlb) glBindSampler(0, 0);
@@ -167,7 +167,7 @@ void SelectedEntityMaskPass::Execute(const RenderContext& ctx, RenderFrame& fram
 
                 bool useAlb = BindMaterial(skeletalShader, material);
 
-                command.mesh->VAO.Bind();
+                command.mesh->Bind();
                 glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
 
                 if (useAlb) glBindSampler(0, 0);

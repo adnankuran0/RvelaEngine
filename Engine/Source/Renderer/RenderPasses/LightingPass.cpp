@@ -437,7 +437,7 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             currentShader->setVec2("UVScale", command.material->GetUVScale());
             currentShader->setVec2("UVOffset", command.material->GetUVOffset());
 
-            command.mesh->VAO.Bind();
+            command.mesh->Bind();
             glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
 
             if (hasCustomShader)
@@ -468,7 +468,7 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
         for (auto& command : skeletalCommands)
         {
-            if (!command.mesh || command.mesh->indexCount == 0) continue;
+            if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
 
             glDisable(GL_STENCIL_TEST);
             ApplyCullMode(command.material->GetCullMode());
@@ -536,7 +536,7 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
                 );
             }
 
-            command.mesh->VAO.Bind();
+            command.mesh->Bind();
             glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
 
             if (hasCustomShader)

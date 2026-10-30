@@ -23,8 +23,10 @@ void VertexArray::Unbind() const
 
 void VertexArray::Destroy()
 {
-	glDeleteVertexArrays(1, &ID);
-    ID = 0;
+	if (ID != 0) {
+        glDeleteVertexArrays(1, &ID);
+        ID = 0;
+    }
 }
 
 void VertexArray::SetBufferLayout(const BufferLayout& layout)

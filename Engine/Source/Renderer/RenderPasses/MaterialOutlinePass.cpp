@@ -134,7 +134,7 @@ void MaterialOutlinePass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
         auto RenderList = [&](const auto& commands) {
             for (const auto& cmd : commands) {
-                if (!cmd.mesh || cmd.mesh->indexCount == 0) continue;
+                if (!cmd.mesh || cmd.mesh->indexCount == 0 || !cmd.mesh->gpuMesh) continue;
                 auto* mat = cmd.material;
                 if (!mat || !mat->GetHasOutline()) continue;
 
@@ -162,7 +162,7 @@ void MaterialOutlinePass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
                 bool useAlb = BindMaterial(shader, mat);
 
-                cmd.mesh->VAO.Bind();
+                cmd.mesh->Bind();
                 glDrawElements(GL_TRIANGLES, cmd.mesh->indexCount, GL_UNSIGNED_INT, 0);
 
                 if (useAlb) glBindSampler(0, 0);
@@ -181,7 +181,7 @@ void MaterialOutlinePass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
         auto RenderSkeletalList = [&](const auto& commands) {
             for (const auto& cmd : commands) {
-                if (!cmd.mesh || cmd.mesh->indexCount == 0) continue;
+                if (!cmd.mesh || cmd.mesh->indexCount == 0 || !cmd.mesh->gpuMesh) continue;
                 auto* mat = cmd.material;
                 if (!mat || !mat->GetHasOutline()) continue;
 
@@ -218,7 +218,7 @@ void MaterialOutlinePass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
                 bool useAlb = BindMaterial(skeletalShader, mat);
 
-                cmd.mesh->VAO.Bind();
+                cmd.mesh->Bind();
                 glDrawElements(GL_TRIANGLES, cmd.mesh->indexCount, GL_UNSIGNED_INT, 0);
 
                 if (useAlb) glBindSampler(0, 0);

@@ -146,7 +146,7 @@ void ParticlePass::Execute(const RenderContext& ctx, RenderFrame& frame)
             glBindSampler(0, 0);
         }
 
-        cmd.mesh->VAO.Bind();
+        cmd.mesh->Bind();
         glDrawElementsInstanced(GL_TRIANGLES, cmd.mesh->indexCount, GL_UNSIGNED_INT, 0, cmd.instanceCount);
 
         glBindSampler(0, 0);
