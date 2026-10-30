@@ -7,6 +7,7 @@ namespace rv {
 class DebugPass : public RenderPass
 {
 public:
+	const char* GetName() const override { return "DebugPass"; }
     void Init(const RenderContext& ctx, RenderFrame& frame) override;
     void Execute(const RenderContext& ctx, RenderFrame& frame) override;
 private:

@@ -8,6 +8,7 @@ namespace rv {
 class ContactShadowPass : public RenderPass
 {
 public:
+	const char* GetName() const override { return "ContactShadowPass"; }
     ContactShadowPass() = default;
     ~ContactShadowPass() = default;
 

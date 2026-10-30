@@ -7,6 +7,7 @@ namespace rv {
 class TransparentPass : public RenderPass
 {
 public:
+	const char* GetName() const override { return "TransparentPass"; }
     ~TransparentPass();
     void Init(const RenderContext& ctx, RenderFrame& frame) override;
     void Execute(const RenderContext& ctx, RenderFrame& frame) override;

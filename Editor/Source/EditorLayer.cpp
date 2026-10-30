@@ -46,7 +46,8 @@ EditorLayer::EditorLayer(rv::Engine* engine)
         &m_AnimatorPanel,
         &m_ImportSettingsPanel,
         &m_MaterialEditorPanel,
-        &m_ProjectSettingsPanel
+        &m_ProjectSettingsPanel,
+        &m_ProfilerPanel
     };
 }
 
@@ -93,6 +94,15 @@ void EditorLayer::OnAttach()
     EditorSettings::Get().ApplyToCamera(m_EditorCamera);
     EditorSettings::Get().ApplyToViewport(m_Viewport);
 
+    for (EditorPanel* panel : m_DockPanels)
+    {
+        auto it = EditorSettings::Get().Panels.find(panel->GetName());
+        if (it != EditorSettings::Get().Panels.end())
+        {
+            panel->SetOpen(it->second);
+        }
+    }
+
     SetStyle(static_cast<EditorTheme>(EditorSettings::Get().Theme));
 
     m_GizmoPass = m_Engine->GetRenderLayer().PushRenderPass(std::make_unique<GizmoPass>());
@@ -108,6 +118,10 @@ void EditorLayer::OnAttach()
 
 void EditorLayer::OnDetach()
 {
+    for (EditorPanel* panel : m_DockPanels)
+    {
+        EditorSettings::Get().Panels[panel->GetName()] = panel->IsOpen();
+    }
     EditorSettings::Get().UpdateFromCamera(m_EditorCamera);
     EditorSettings::Get().UpdateFromViewport(m_Viewport);
     EditorSettings::Get().Save();
@@ -455,6 +469,8 @@ void EditorLayer::Render()
         m_AnimatorPanel.Draw(m_Engine);
 
         m_ConsolePanel.Draw();
+
+        m_ProfilerPanel.Draw();
 
         m_ProjectSettingsPanel.Draw(m_Engine);
 

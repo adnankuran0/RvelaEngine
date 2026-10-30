@@ -8,6 +8,7 @@ namespace rv {
 class SSGIPass : public RenderPass
 {
 public:
+	const char* GetName() const override { return "SSGIPass"; }
     ~SSGIPass();
     void Init(const RenderContext& ctx, RenderFrame& frame) override;
     void Execute(const RenderContext& ctx, RenderFrame& frame) override;

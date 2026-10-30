@@ -210,6 +210,8 @@ void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter, const Edi
                 if (ImGui::MenuItem(panel->GetName(), nullptr, &isOpen))
                 {
                     panel->SetOpen(isOpen);
+                    EditorSettings::Get().Panels[panel->GetName()] = isOpen;
+                    EditorSettings::Get().Save();
                 }
             }
 

@@ -5,6 +5,7 @@
 #include "Input/Input.h"
 #include "Event/EventManager.h"
 #include "Time.h"
+#include "Profiler.h"
 #include <Renderer/EditorCamera.h>
 #include <Event/MouseEvents.h>
 #include "Renderer/DebugRenderer.h"
@@ -144,29 +145,49 @@ void Engine::Run()
 	m_IsRunning = true;
 	while (m_IsRunning && !glfwWindowShouldClose(GetWindow().GetGLFWWindow()))
 	{
-		glfwPollEvents();
-		Input::BeginFrame();
-		HandleEvents();
+		Profiler::Get().BeginFrame();
+
+		{
+			RV_PROFILE_CPU("Poll Events");
+			glfwPollEvents();
+			Input::BeginFrame();
+			HandleEvents();
+		}
 
 		Time::Update();
 
-		DebugRenderer::Get().BeginFrame();
-		
-		Update();
-		while (Time::ShouldRunFixedUpdate())
 		{
-			FixedUpdate();
-			Time::ConsumeFixedDeltaTime();
+			RV_PROFILE_CPU("Update");
+			DebugRenderer::Get().BeginFrame();
+			Update();
 		}
-		
-		LateUpdate();
 
+		{
+			RV_PROFILE_CPU("Fixed Update");
+			while (Time::ShouldRunFixedUpdate())
+			{
+				FixedUpdate();
+				Time::ConsumeFixedDeltaTime();
+			}
+		}
 
-		Render();
+		{
+			RV_PROFILE_CPU("Late Update");
+			LateUpdate();
+		}
 
-		EventManager::ClearEvents();
-		Input::Update();
-		
+		{
+			RV_PROFILE_CPU("Render");
+			Render();
+		}
+
+		{
+			RV_PROFILE_CPU("Input & Event Clear");
+			EventManager::ClearEvents();
+			Input::Update();
+		}
+
+		Profiler::Get().EndFrame();
 	}
 	LOG_INFO("Engine has stopped!");
 }
@@ -206,7 +227,10 @@ void Engine::Render()
 
 	m_Renderer.EndFrame();
 	
-	glfwSwapBuffers(GetWindow().GetGLFWWindow());
+	{
+		RV_PROFILE_CPU("Swap Buffers");
+		glfwSwapBuffers(GetWindow().GetGLFWWindow());
+	}
 	
 	GLenum err;
 	while ((err = glGetError()) != GL_NO_ERROR) {

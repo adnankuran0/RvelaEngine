@@ -8,6 +8,7 @@ namespace rv {
 class MotionBlurPass : public RenderPass
 {
 public:
+	const char* GetName() const override { return "MotionBlurPass"; }
     ~MotionBlurPass() override = default;
     void Init(const RenderContext& ctx, RenderFrame& frame) override;
     void Execute(const RenderContext& ctx, RenderFrame& frame) override;

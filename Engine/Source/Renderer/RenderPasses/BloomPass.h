@@ -9,6 +9,7 @@ namespace rv {
 class BloomPass : public RenderPass
 {
 public:
+	const char* GetName() const override { return "BloomPass"; }
     ~BloomPass() override = default;
     void Init(const RenderContext& ctx, RenderFrame& frame) override;
     void Execute(const RenderContext& ctx, RenderFrame& frame) override;

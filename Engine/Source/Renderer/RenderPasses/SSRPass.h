@@ -7,6 +7,7 @@ namespace rv {
 class SSRPass : public RenderPass
 {
 public:
+	const char* GetName() const override { return "SSRPass"; }
     ~SSRPass();
     void Init(const RenderContext& ctx, RenderFrame& frame) override;
     void Execute(const RenderContext& ctx, RenderFrame& frame) override;

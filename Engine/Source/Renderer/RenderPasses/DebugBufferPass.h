@@ -9,6 +9,7 @@ class RenderPipeline;
 class DebugBufferPass : public RenderPass
 {
 public:
+	const char* GetName() const override { return "DebugBufferPass"; }
     explicit DebugBufferPass(RenderPipeline* pipeline);
     ~DebugBufferPass() override;
 

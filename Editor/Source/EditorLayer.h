@@ -19,6 +19,7 @@
 #include "GUI/Panels/ProjectSettingsPanel.h"
 #include "GUI/Panels/ImportSettingsPanel.h"
 #include "GUI/Panels/MaterialEditorPanel.h"
+#include "GUI/Panels/ProfilerPanel.h"
 #include <Renderer/RenderPipeline.h>
 
 namespace rv {
@@ -63,6 +64,7 @@ private:
     ProjectSettingsPanel m_ProjectSettingsPanel;
     ImportSettingsPanel m_ImportSettingsPanel;
     MaterialEditorPanel m_MaterialEditorPanel;
+    ProfilerPanel m_ProfilerPanel;
     Viewport m_Viewport;
     std::vector<EditorPanel*> m_DockPanels;
 

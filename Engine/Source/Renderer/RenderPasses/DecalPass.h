@@ -7,6 +7,7 @@ namespace rv {
 class DecalPass : public RenderPass
 {
 public:
+	const char* GetName() const override { return "DecalPass"; }
     DecalPass() = default;
     ~DecalPass() override;
 

@@ -7,6 +7,7 @@ namespace rv {
 class GeometryPass : public RenderPass
 {
 public:
+	const char* GetName() const override { return "GeometryPass"; }
 	~GeometryPass() = default;
 	void Execute(const RenderContext& ctx, RenderFrame& frame) override;
 	void Init(const RenderContext& ctx, RenderFrame& frame) override;

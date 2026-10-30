@@ -1,6 +1,8 @@
 #pragma once
 
 #include <filesystem>
+#include <string>
+#include <unordered_map>
 #include "Renderer/Camera.h"
 #include "Renderer/EditorCamera.h"
 #include "GUI/Viewport.h"
@@ -52,7 +54,8 @@ public:
 
     EditorCameraSettings Camera;
     ViewportGizmoSettings ViewportSettings;
-    int Theme = 0; // 0: Deep Slate, 1: Tokyo Night, 2: Catppuccin, 3: Obsidian Carbon, 4: Warm Charcoal
+    int Theme = 0;
+    std::unordered_map<std::string, bool> Panels;
 
 private:
     EditorSettings() = default;

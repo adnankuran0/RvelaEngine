@@ -1,6 +1,7 @@
 #include "rvelapch.h"
 #include "RenderPipeline.h"
 #include "Utils/GPUTimer.h"
+#include "Core/Profiler.h"
 #include "Core/Engine.h"
 #include "Renderer/Camera.h"
 #include "RenderContext.h"
@@ -198,7 +199,11 @@ void RenderPipeline::Execute(const RenderContext& ctx)
 	UpdateUBOs(ctx);
 
 	for (auto& [id, pass] : m_RenderPasses)
+	{
+		RV_PROFILE_GPU(pass->GetName());
+		RV_PROFILE_CPU(pass->GetName());
 		pass->Execute(ctx, m_RenderFrame);
+	}
 	GLenum afterErr = glGetError();
 
 	m_Stats = {};
@@ -268,6 +273,8 @@ void RenderPipeline::Execute(const RenderContext& ctx)
 		m_Stats.triangles += 12;
 		m_Stats.vertices += 36;
 	}
+
+	Profiler::Get().SetRenderStats(m_Stats);
 
 	m_RenderFrame.Reset();
 }

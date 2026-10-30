@@ -8,6 +8,7 @@ namespace rv {
 class CompositePass : public RenderPass
 {
 public:
+	const char* GetName() const override { return "CompositePass"; }
     ~CompositePass() override;
     void Init(const RenderContext& ctx, RenderFrame& frame) override;
     void Execute(const RenderContext& ctx, RenderFrame& frame) override;

@@ -70,6 +70,15 @@ void EditorSettings::Load()
         {
             Theme = j["theme"].get<int>();
         }
+
+        if (j.contains("panels") && j["panels"].is_object())
+        {
+            for (auto& [key, val] : j["panels"].items())
+            {
+                if (val.is_boolean())
+                    Panels[key] = val.get<bool>();
+            }
+        }
     }
     catch (const std::exception& e)
     {
@@ -112,6 +121,7 @@ void EditorSettings::Save()
     };
 
     j["theme"] = Theme;
+    j["panels"] = Panels;
 
     std::ofstream file(filePath);
     if (file.is_open())
