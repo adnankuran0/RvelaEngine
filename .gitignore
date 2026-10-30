@@ -13,3 +13,4 @@ Makefile
 # Exclude
 !Vendor/Binaries
 *.txt
+Vendor/recastnavigation/
