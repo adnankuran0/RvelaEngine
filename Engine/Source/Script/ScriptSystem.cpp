@@ -768,7 +768,8 @@ void ScriptSystem::OnUpdate(float dt)
                 if (!result.valid())
                 {
                     sol::error err = result;
-                    LOG_ERROR("Lua OnUpdate error: {}", err.what());
+                    LOG_ERROR("Lua OnUpdate error on entity {}: {}", static_cast<uint32_t>(entity), err.what());
+                    sc.OnUpdate = sol::nil;
                 }
             }
         }
@@ -801,7 +802,8 @@ void ScriptSystem::OnFixedUpdate(float dt)
                 if (!result.valid())
                 {
                     sol::error err = result;
-                    LOG_ERROR("Lua OnFixedUpdate error: {}", err.what());
+                    LOG_ERROR("Lua OnFixedUpdate error on entity {}: {}", static_cast<uint32_t>(entity), err.what());
+                    sc.OnFixedUpdate = sol::nil;
                 }
             }
         }
@@ -827,7 +829,8 @@ void ScriptSystem::OnLateUpdate(float dt)
                 if (!result.valid())
                 {
                     sol::error err = result;
-                    LOG_ERROR("Lua OnLateUpdate error: {}", err.what());
+                    LOG_ERROR("Lua OnLateUpdate error on entity {}: {}", static_cast<uint32_t>(entity), err.what());
+                    sc.OnLateUpdate = sol::nil;
                 }
             }
         }
@@ -849,13 +852,7 @@ void ScriptSystem::OnStop()
 
         OnEntityDestroyed(entity);
     }
-    auto mcView = m_Scene.GetRegistry().view<MaterialComponent>();
-    for (auto entity : mcView)
-    {
-        auto& mc = mcView.get<MaterialComponent>(entity);
-        mc.Reload();
-        //TODO: WTF IS THIS?
-    }
+
 	ClearSignals();
 	m_Coroutines.clear();
 	m_Timers.clear();

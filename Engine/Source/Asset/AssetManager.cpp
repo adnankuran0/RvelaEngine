@@ -12,6 +12,14 @@
 #include "Asset/Loaders/SkeletalMeshLoader.h"
 #include "Asset/Loaders/SkeletonLoader.h"
 #include "Asset/Loaders/ShaderLoader.h"
+#include "Asset/Types/TextureAsset.h"
+#include "Asset/Types/MeshAsset.h"
+#include "Asset/Types/SkeletalMeshAsset.h"
+#include "Asset/Types/MaterialAsset.h"
+#include "Asset/Types/ShaderAsset.h"
+#include "Asset/Types/AudioClipAsset.h"
+#include "Renderer/TextureCache.h"
+#include "Renderer/MeshCache.h"
 #include "Utils/ProjectManager.h"
 
 using namespace rv;
@@ -38,6 +46,7 @@ void AssetManager::Init(AssetRegistry& registry)
 
 void AssetManager::RegisterLoader(std::unique_ptr<IAssetLoader> loader)
 {
+    std::unique_lock<std::shared_mutex> lock(m_AssetMutex);
     m_Loaders.push_back(std::move(loader));
 }
 
@@ -45,10 +54,15 @@ Ref<Asset> AssetManager::GetAssetInternal(const AssetUUID& uuid)
 {
     if (!m_Registry) return nullptr;
 
-    auto it = m_LoadedAssets.find(uuid);
-    if (it != m_LoadedAssets.end())
-        if (auto asset = it->second.Lock()) return asset;
-        else m_LoadedAssets.erase(it);
+    {
+        std::shared_lock<std::shared_mutex> readLock(m_AssetMutex);
+        auto it = m_LoadedAssets.find(uuid);
+        if (it != m_LoadedAssets.end())
+        {
+            if (auto asset = it->second.Lock())
+                return asset;
+        }
+    }
 
     if (!m_Registry->Exists(uuid))
     {
@@ -85,33 +99,57 @@ Ref<Asset> AssetManager::GetAssetInternal(const AssetUUID& uuid)
 
     auto meta = m_Registry->GetMeta(uuid);
     Ref<Asset> asset = loader->Load(path, meta);
-    if (asset)
-        m_LoadedAssets[uuid] = WeakRef<Asset>(asset);
+
+    {
+        std::unique_lock<std::shared_mutex> writeLock(m_AssetMutex);
+        auto it = m_LoadedAssets.find(uuid);
+        if (it != m_LoadedAssets.end())
+        {
+            if (auto existing = it->second.Lock())
+                return existing;
+        }
+
+        if (asset)
+            m_LoadedAssets[uuid] = WeakRef<Asset>(asset);
+        else if (it != m_LoadedAssets.end())
+            m_LoadedAssets.erase(it);
+    }
 
     return asset;
 }
 
 void AssetManager::Unload(const AssetUUID& uuid)
 {
-    auto it = m_LoadedAssets.find(uuid);
-    if (it == m_LoadedAssets.end())
     {
-        return;
+        std::unique_lock<std::shared_mutex> lock(m_AssetMutex);
+        auto it = m_LoadedAssets.find(uuid);
+        if (it == m_LoadedAssets.end())
+        {
+            return;
+        }
+        m_LoadedAssets.erase(it);
     }
-    m_LoadedAssets.erase(it);
+    TextureCache::Get().Remove(uuid);
+    MeshCache::Get().Remove(uuid);
 }
 
 void AssetManager::Reload(const AssetUUID& uuid)
 {
-    if (!m_Registry || !m_Registry->Exists(uuid)) return;
+    Ref<Asset> existingAsset = nullptr;
+    {
+        std::shared_lock<std::shared_mutex> lock(m_AssetMutex);
+        if (!m_Registry || !m_Registry->Exists(uuid)) return;
 
-    auto it = m_LoadedAssets.find(uuid);
-    if (it == m_LoadedAssets.end()) return;
+        auto it = m_LoadedAssets.find(uuid);
+        if (it == m_LoadedAssets.end()) return;
 
-    auto existingAsset = it->second.Lock();
+        existingAsset = it->second.Lock();
+    }
+
     if (!existingAsset)
     {
-        m_LoadedAssets.erase(it);
+        std::unique_lock<std::shared_mutex> lock(m_AssetMutex);
+        m_LoadedAssets.erase(uuid);
         return;
     }
 
@@ -140,17 +178,67 @@ void AssetManager::Reload(const AssetUUID& uuid)
             texAsset->m_Format = newTexAsset->m_Format;
             texAsset->m_SRGB = newTexAsset->m_SRGB;
             texAsset->m_Pixels = std::move(newTexAsset->m_Pixels);
+            TextureCache::Get().Remove(uuid);
+        }
+    }
+    else if (auto meshAsset = DynamicCast<MeshAsset>(existingAsset))
+    {
+        if (auto newMeshAsset = DynamicCast<MeshAsset>(reloaded))
+        {
+            meshAsset->CopyFrom(*newMeshAsset);
+            MeshCache::Get().Remove(uuid);
+        }
+    }
+    else if (auto skelMeshAsset = DynamicCast<SkeletalMeshAsset>(existingAsset))
+    {
+        if (auto newSkelMeshAsset = DynamicCast<SkeletalMeshAsset>(reloaded))
+        {
+            skelMeshAsset->CopyFrom(*newSkelMeshAsset);
+            MeshCache::Get().Remove(uuid);
+        }
+    }
+    else if (auto matAsset = DynamicCast<MaterialAsset>(existingAsset))
+    {
+        if (auto newMatAsset = DynamicCast<MaterialAsset>(reloaded))
+        {
+            *matAsset = *newMatAsset;
+        }
+    }
+    else if (auto shaderAsset = DynamicCast<ShaderAsset>(existingAsset))
+    {
+        if (auto newShader = DynamicCast<ShaderAsset>(reloaded))
+        {
+            shaderAsset->filePath = std::move(newShader->filePath);
+            shaderAsset->lastWriteTime = newShader->lastWriteTime;
+            shaderAsset->source = std::move(newShader->source);
+            shaderAsset->isLit = newShader->isLit;
+            shaderAsset->renderModes = newShader->renderModes;
+            shaderAsset->uniforms = std::move(newShader->uniforms);
+            shaderAsset->samplers = std::move(newShader->samplers);
+            shaderAsset->compileError = std::move(newShader->compileError);
+            shaderAsset->compileSuccess = newShader->compileSuccess;
+            shaderAsset->staticShader = std::move(newShader->staticShader);
+            shaderAsset->skeletalShader = std::move(newShader->skeletalShader);
+        }
+    }
+    else if (auto audioAsset = DynamicCast<AudioClipAsset>(existingAsset))
+    {
+        if (auto newAudio = DynamicCast<AudioClipAsset>(reloaded))
+        {
+            audioAsset->CopyFrom(*newAudio);
         }
     }
 }
 
 void AssetManager::UnloadAll()
 {
+    std::unique_lock<std::shared_mutex> lock(m_AssetMutex);
     m_LoadedAssets.clear();
 }
 
 IAssetLoader* AssetManager::FindLoader(const std::string& ext) const
 {
+    std::shared_lock<std::shared_mutex> lock(m_AssetMutex);
     for (auto& loader : m_Loaders)
         for (auto& supported : loader->GetSupportedExtensions())
             if (supported == ext)

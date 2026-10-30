@@ -14,6 +14,56 @@ class MaterialAsset : public Asset
 public:
     explicit MaterialAsset(AssetUUID uuid) : Asset(uuid) {}
 
+    MaterialAsset& operator=(const MaterialAsset& other)
+    {
+        if (this == &other) return *this;
+        customShaderUUID = other.customShaderUUID;
+        customUniforms = other.customUniforms;
+        albedoTextureUUID = other.albedoTextureUUID;
+        normalTextureUUID = other.normalTextureUUID;
+        metallicTextureUUID = other.metallicTextureUUID;
+        roughnessTextureUUID = other.roughnessTextureUUID;
+        aoTextureUUID = other.aoTextureUUID;
+        heightTextureUUID = other.heightTextureUUID;
+        armTextureUUID = other.armTextureUUID;
+        shadingMode = other.shadingMode;
+        receiveShadows = other.receiveShadows;
+        transparencyMode = other.transparencyMode;
+        blendMode = other.blendMode;
+        cullMode = other.cullMode;
+        alphaCutoff = other.alphaCutoff;
+        billboardMode = other.billboardMode;
+        albedoColor = other.albedoColor;
+        emissiveColor = other.emissiveColor;
+        emissiveIntensity = other.emissiveIntensity;
+        metallic = other.metallic;
+        specular = other.specular;
+        roughness = other.roughness;
+        ao = other.ao;
+        normalScale = other.normalScale;
+        heightScale = other.heightScale;
+        invertHeight = other.invertHeight;
+        UVScale = other.UVScale;
+        UVOffset = other.UVOffset;
+        useTriplanar = other.useTriplanar;
+        useWorldTriplanar = other.useWorldTriplanar;
+        triplanarSharpness = other.triplanarSharpness;
+        useAlbedoMap = other.useAlbedoMap;
+        useNormalMap = other.useNormalMap;
+        useMetallicMap = other.useMetallicMap;
+        useRoughnessMap = other.useRoughnessMap;
+        useAOMap = other.useAOMap;
+        useHeightMap = other.useHeightMap;
+        useARMMap = other.useARMMap;
+        samplerDesc = other.samplerDesc;
+        hasOutline = other.hasOutline;
+        outlineColor = other.outlineColor;
+        outlineWidth = other.outlineWidth;
+        outlineFixedSize = other.outlineFixedSize;
+        outlineXRay = other.outlineXRay;
+        return *this;
+    }
+
     AssetUUID customShaderUUID = AssetUUID::Invalid();
     std::unordered_map<std::string, CustomUniformValue> customUniforms;
 

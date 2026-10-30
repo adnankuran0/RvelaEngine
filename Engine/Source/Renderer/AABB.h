@@ -47,50 +47,27 @@ public:
     }
 
     AABB Transformed(const glm::mat4& transform) const {
-        glm::vec3 corners[8] = {
-            {min.x, min.y, min.z},
-            {max.x, min.y, min.z},
-            {min.x, max.y, min.z},
-            {max.x, max.y, min.z},
-            {min.x, min.y, max.z},
-            {max.x, min.y, max.z},
-            {min.x, max.y, max.z},
-            {max.x, max.y, max.z},
-        };
-
-        AABB result;
-        for (int i = 0; i < 8; ++i) {
-            glm::vec4 transformedCorner = transform * glm::vec4(corners[i], 1.0f);
-            result.Expand(glm::vec3(transformedCorner));
-        }
-
-        return result;
+        return CalculateWorldAABB(transform);
     }
 
-    inline AABB CalculateWorldAABB(const glm::mat4& worldMatrix) noexcept
+    inline AABB CalculateWorldAABB(const glm::mat4& worldMatrix) const noexcept
     {
-        static constexpr glm::vec3 corners[8] = 
-        {
-            {0, 0, 0}, {1, 0, 0}, {0, 1, 0}, {1, 1, 0},
-            {0, 0, 1}, {1, 0, 1}, {0, 1, 1}, {1, 1, 1}
-        };
+        if (!IsValid())
+            return *this;
 
-        glm::vec3 worldMin(std::numeric_limits<float>::max());
-        glm::vec3 worldMax(std::numeric_limits<float>::lowest());
+        glm::vec3 center = (min + max) * 0.5f;
+        glm::vec3 extent = (max - min) * 0.5f;
 
-        for (int i = 0; i < 8; ++i) 
-        {
-            glm::vec3 corner = glm::mix(min, max, corners[i]); 
-            glm::vec4 worldPos = worldMatrix * glm::vec4(corner, 1.0f);
-            glm::vec3 p(worldPos);
+        glm::vec3 newCenter = glm::vec3(worldMatrix * glm::vec4(center, 1.0f));
 
-            worldMin = glm::min(worldMin, p);
-            worldMax = glm::max(worldMax, p);
-        }
+        glm::vec3 newExtent(
+            glm::abs(worldMatrix[0][0]) * extent.x + glm::abs(worldMatrix[1][0]) * extent.y + glm::abs(worldMatrix[2][0]) * extent.z,
+            glm::abs(worldMatrix[0][1]) * extent.x + glm::abs(worldMatrix[1][1]) * extent.y + glm::abs(worldMatrix[2][1]) * extent.z,
+            glm::abs(worldMatrix[0][2]) * extent.x + glm::abs(worldMatrix[1][2]) * extent.y + glm::abs(worldMatrix[2][2]) * extent.z
+        );
 
-        return AABB(worldMin, worldMax);
+        return AABB(newCenter - newExtent, newCenter + newExtent);
     }
 };
-
 
 }

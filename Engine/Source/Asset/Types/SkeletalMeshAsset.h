@@ -44,8 +44,21 @@ public:
     AABB CalculateAnimatedAABB(const std::vector<glm::mat4>& skinningPalette) const;
     void ComputeBoneBounds();
 
+    void CopyFrom(const SkeletalMeshAsset& other)
+    {
+        m_Vertices = other.m_Vertices;
+        m_Indices = other.m_Indices;
+        m_LocalAABB = other.m_LocalAABB;
+        m_MeshName = other.m_MeshName;
+        m_BoneBounds = other.m_BoneBounds;
+        m_UnweightedBounds = other.m_UnweightedBounds;
+        m_HasUnweighted = other.m_HasUnweighted;
+        m_BoneBoundsComputed = other.m_BoneBoundsComputed;
+    }
+
 private:
     friend class SkeletalMeshLoader;
+    friend class AssetManager;
 
     std::vector<SkeletalVertex> m_Vertices;
     std::vector<unsigned int>   m_Indices;

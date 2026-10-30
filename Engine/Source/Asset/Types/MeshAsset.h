@@ -34,8 +34,17 @@ public:
 
     void GetTriangle(int triangleIndex,glm::vec3& v0, glm::vec3& v1, glm::vec3& v2) const;
 
+    void CopyFrom(const MeshAsset& other)
+    {
+        m_Vertices = other.m_Vertices;
+        m_Indices = other.m_Indices;
+        m_LocalAABB = other.m_LocalAABB;
+        m_MeshName = other.m_MeshName;
+    }
+
 private:
     friend class MeshLoader;
+    friend class AssetManager;
 
     std::vector<Vertex> m_Vertices;
     std::vector<unsigned int> m_Indices;

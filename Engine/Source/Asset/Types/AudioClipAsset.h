@@ -23,8 +23,18 @@ namespace rv {
             return ma_audio_buffer_ref_init(m_Format, m_Channels, m_PCMData.data(), m_FrameCount, pOut);
         }
 
+        void CopyFrom(const AudioClipAsset& other)
+        {
+            m_PCMData = other.m_PCMData;
+            m_Format = other.m_Format;
+            m_Channels = other.m_Channels;
+            m_SampleRate = other.m_SampleRate;
+            m_FrameCount = other.m_FrameCount;
+        }
+
     private:
         friend class AudioClipLoader;
+        friend class AssetManager;
 
         std::vector<uint8_t> m_PCMData;
         ma_format m_Format = ma_format_unknown;

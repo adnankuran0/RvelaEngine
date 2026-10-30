@@ -1,6 +1,7 @@
 #pragma once
 #include "AssetRegistry.h"
 #include "IAssetLoader.h"
+#include <shared_mutex>
 
 namespace rv {
 
@@ -34,6 +35,7 @@ private:
     Ref<Asset> GetAssetInternal(const AssetUUID& uuid);
     IAssetLoader* FindLoader(const std::string& ext) const;
 
+    mutable std::shared_mutex m_AssetMutex;
     AssetRegistry* m_Registry = nullptr;
     tsl::robin_map<AssetUUID, WeakRef<Asset>> m_LoadedAssets;
     std::vector<std::unique_ptr<IAssetLoader>> m_Loaders;

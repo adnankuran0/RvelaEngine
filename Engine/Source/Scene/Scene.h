@@ -133,18 +133,17 @@ public:
 
     [[nodiscard]] inline const entt::entity& GetRootEntity() const noexcept { return m_RootEntity; }
 
-    entt::entity GetEntityByUUID(EntityUUID& uuid) { return m_EntityMap.at(uuid); }
+    [[nodiscard]] entt::entity GetEntityByUUID(const EntityUUID& uuid) const
+    {
+        auto it = m_EntityMap.find(uuid);
+        return it != m_EntityMap.end() ? it->second : entt::null;
+    }
     Entity GetEntityByName(const std::string& name);
 
     void MoveChildOrder(entt::entity source, entt::entity target, bool insertBefore);
     [[nodiscard]] inline std::vector<entt::entity> GetRootEntities() noexcept
     {
         std::vector<entt::entity> roots;
-
-        if (!m_Registry.valid(entt::null)) 
-        { 
-            return roots;
-        }
 
         auto view = m_Registry.view<SceneTreeComponent>();
         for (auto e : view) {
