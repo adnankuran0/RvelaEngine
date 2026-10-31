@@ -117,6 +117,18 @@ PakBuildResult PakWriter::BuildPak(const PakBuildOptions& options)
         LOG_WARN("[PakWriter] No .rproj file found in project root: {}", SafePathToString(options.projectPath));
     }
 
+    const std::vector<std::string> rootIconCandidates = {
+        "icon.png", "icon.ico", "icon.jpg", "icon.jpeg", "Game.png", "Game.ico"
+    };
+    for (const auto& candidate : rootIconCandidates)
+    {
+        std::filesystem::path p = options.projectPath / candidate;
+        if (std::filesystem::exists(p, ec))
+        {
+            filesToPack.push_back({ candidate, p, MZ_NO_COMPRESSION });
+        }
+    }
+
     static const std::unordered_set<std::string> s_RawModelExtensions = {
         ".fbx", ".obj", ".gltf", ".glb", ".blend", ".dae", ".3ds", ".stl", ".ply"
     };

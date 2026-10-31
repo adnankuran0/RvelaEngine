@@ -56,6 +56,176 @@ struct StandaloneExportState
 
 static StandaloneExportState s_ExportState;
 
+#if defined(_WIN32)
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
+#pragma pack(push, 2)
+struct IcoHeader {
+    uint16_t reserved;
+    uint16_t type;
+    uint16_t count;
+};
+struct IcoEntry {
+    uint8_t  width;
+    uint8_t  height;
+    uint8_t  colorCount;
+    uint8_t  reserved;
+    uint16_t planes;
+    uint8_t  bitCountLo;
+    uint8_t  bitCountHi;
+    uint32_t bytesInRes;
+    uint32_t imageOffset;
+};
+struct GrpIconEntry {
+    uint8_t  width;
+    uint8_t  height;
+    uint8_t  colorCount;
+    uint8_t  reserved;
+    uint16_t planes;
+    uint16_t bitCount;
+    uint32_t bytesInRes;
+    uint16_t id;
+};
+struct GrpIconHeader {
+    uint16_t reserved;
+    uint16_t type;
+    uint16_t count;
+};
+#pragma pack(pop)
+
+static bool UpdateExecutableIcon(const std::filesystem::path& exePath, const std::filesystem::path& iconPath)
+{
+    if (!std::filesystem::exists(exePath) || !std::filesystem::exists(iconPath))
+        return false;
+
+    std::ifstream file(iconPath, std::ios::binary | std::ios::ate);
+    if (!file.is_open()) return false;
+    std::streamsize fileSize = file.tellg();
+    file.seekg(0, std::ios::beg);
+    if (fileSize <= 6) return false;
+
+    std::vector<uint8_t> data(static_cast<size_t>(fileSize));
+    if (!file.read(reinterpret_cast<char*>(data.data()), fileSize))
+        return false;
+
+    HANDLE hUpdate = BeginUpdateResourceW(exePath.wstring().c_str(), FALSE);
+    if (!hUpdate) return false;
+
+    bool isIco = (data.size() > 4 && data[0] == 0 && data[1] == 0 && data[2] == 1 && data[3] == 0);
+    if (isIco)
+    {
+        const IcoHeader* hdr = reinterpret_cast<const IcoHeader*>(data.data());
+        uint16_t count = hdr->count;
+        if (data.size() < sizeof(IcoHeader) + count * sizeof(IcoEntry))
+        {
+            EndUpdateResourceW(hUpdate, TRUE);
+            return false;
+        }
+
+        const IcoEntry* entries = reinterpret_cast<const IcoEntry*>(data.data() + sizeof(IcoHeader));
+        std::vector<uint8_t> grpData(sizeof(GrpIconHeader) + count * sizeof(GrpIconEntry));
+        GrpIconHeader* grpHdr = reinterpret_cast<GrpIconHeader*>(grpData.data());
+        grpHdr->reserved = 0;
+        grpHdr->type = 1;
+        grpHdr->count = count;
+
+        GrpIconEntry* grpEntries = reinterpret_cast<GrpIconEntry*>(grpData.data() + sizeof(GrpIconHeader));
+
+        for (uint16_t i = 0; i < count; ++i)
+        {
+            if (entries[i].imageOffset + entries[i].bytesInRes > data.size())
+                continue;
+
+            UpdateResourceW(hUpdate, RT_ICON, MAKEINTRESOURCEW(i + 1), MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),
+                data.data() + entries[i].imageOffset, entries[i].bytesInRes);
+
+            grpEntries[i].width = entries[i].width;
+            grpEntries[i].height = entries[i].height;
+            grpEntries[i].colorCount = entries[i].colorCount;
+            grpEntries[i].reserved = entries[i].reserved;
+            grpEntries[i].planes = entries[i].planes;
+            grpEntries[i].bitCount = static_cast<uint16_t>(entries[i].bitCountLo | (entries[i].bitCountHi << 8));
+            grpEntries[i].bytesInRes = entries[i].bytesInRes;
+            grpEntries[i].id = i + 1;
+        }
+
+        UpdateResourceW(hUpdate, RT_GROUP_ICON, MAKEINTRESOURCEW(1), MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),
+            grpData.data(), static_cast<DWORD>(grpData.size()));
+        EndUpdateResourceW(hUpdate, FALSE);
+        return true;
+    }
+    else
+    {
+        // Treat as PNG icon entry
+        std::vector<uint8_t> grpData(sizeof(GrpIconHeader) + sizeof(GrpIconEntry));
+        GrpIconHeader* grpHdr = reinterpret_cast<GrpIconHeader*>(grpData.data());
+        grpHdr->reserved = 0;
+        grpHdr->type = 1;
+        grpHdr->count = 1;
+
+        GrpIconEntry* grpEntries = reinterpret_cast<GrpIconEntry*>(grpData.data() + sizeof(GrpIconHeader));
+        grpEntries[0].width = 0;
+        grpEntries[0].height = 0;
+        grpEntries[0].colorCount = 0;
+        grpEntries[0].reserved = 0;
+        grpEntries[0].planes = 1;
+        grpEntries[0].bitCount = 32;
+        grpEntries[0].bytesInRes = static_cast<uint32_t>(data.size());
+        grpEntries[0].id = 1;
+
+        UpdateResourceW(hUpdate, RT_ICON, MAKEINTRESOURCEW(1), MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),
+            data.data(), static_cast<DWORD>(data.size()));
+        UpdateResourceW(hUpdate, RT_GROUP_ICON, MAKEINTRESOURCEW(1), MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),
+            grpData.data(), static_cast<DWORD>(grpData.size()));
+        EndUpdateResourceW(hUpdate, FALSE);
+        return true;
+    }
+}
+#endif
+
+static std::filesystem::path FindRuntimeExecutable()
+{
+    std::filesystem::path exeDir = rv::Path::GetExecutableDirectory();
+    std::error_code ec;
+
+    std::vector<std::filesystem::path> candidates = {
+        // 1. Sibling folder in same build architecture/configuration (e.g. Binaries/windows-x86_64/Release/RvelaRuntime/RvelaRuntime.exe)
+        exeDir.parent_path() / "RvelaRuntime" / "RvelaRuntime.exe",
+
+        // 2. Same directory as editor
+        exeDir / "RvelaRuntime.exe",
+
+        // 3. Parent directory
+        exeDir.parent_path() / "RvelaRuntime.exe",
+
+        // 4. Check Release / Dist / Debug siblings
+        exeDir.parent_path().parent_path() / "Release" / "RvelaRuntime" / "RvelaRuntime.exe",
+        exeDir.parent_path().parent_path() / "Dist" / "RvelaRuntime" / "RvelaRuntime.exe",
+        exeDir.parent_path().parent_path() / "Debug" / "RvelaRuntime" / "RvelaRuntime.exe",
+    };
+
+#if defined(RVELA_ROOT_DIR)
+    std::filesystem::path rootDir(RVELA_ROOT_DIR);
+    candidates.push_back(rootDir / "Binaries" / "windows-x86_64" / "Release" / "RvelaRuntime" / "RvelaRuntime.exe");
+    candidates.push_back(rootDir / "Binaries" / "windows-x86_64" / "Dist" / "RvelaRuntime" / "RvelaRuntime.exe");
+    candidates.push_back(rootDir / "Binaries" / "windows-x86_64" / "Debug" / "RvelaRuntime" / "RvelaRuntime.exe");
+    candidates.push_back(rootDir / "Binaries" / "Release" / "RvelaRuntime" / "RvelaRuntime.exe");
+    candidates.push_back(rootDir / "Binaries" / "Dist" / "RvelaRuntime" / "RvelaRuntime.exe");
+    candidates.push_back(rootDir / "Binaries" / "Debug" / "RvelaRuntime" / "RvelaRuntime.exe");
+#endif
+
+    for (const auto& path : candidates)
+    {
+        if (std::filesystem::exists(path, ec) && std::filesystem::is_regular_file(path, ec))
+        {
+            return path;
+        }
+    }
+
+    return "";
+}
+
 }
 
 using namespace rv;
@@ -134,8 +304,9 @@ void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter, const Edi
                         std::filesystem::path outFolder = chosen;
                         std::filesystem::path projPath = activeProj->projectFolderPath;
                         std::string projName = activeProj->name;
+                        std::string projIcon = activeProj->GetSettings().iconPath;
 
-                        s_ExportState.worker = std::thread([outFolder, projPath, projName]() {
+                        s_ExportState.worker = std::thread([outFolder, projPath, projName, projIcon]() {
                             std::filesystem::path pakDest = outFolder / (projName + ".pak");
 
                             PakBuildOptions options;
@@ -158,18 +329,56 @@ void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter, const Edi
                                     std::lock_guard<std::mutex> lock(s_ExportState.mutex);
                                     s_ExportState.currentFile = "Copying runtime executable...";
                                 }
-                                std::filesystem::path exeDir = Path::GetExecutableDirectory();
-                                std::filesystem::path runtimeSrc = exeDir / "RvelaRuntime.exe";
+                                std::filesystem::path runtimeSrc = FindRuntimeExecutable();
                                 std::filesystem::path runtimeDst = outFolder / (projName + ".exe");
 
-                                std::error_code copyEc;
-                                if (std::filesystem::exists(runtimeSrc, copyEc))
+                                if (runtimeSrc.empty())
                                 {
-                                    std::filesystem::copy_file(runtimeSrc, runtimeDst, std::filesystem::copy_options::overwrite_existing, copyEc);
+                                    s_ExportState.success = false;
+                                    s_ExportState.errorMessage = "RvelaRuntime.exe not found! Please build the RvelaRuntime project before exporting.";
                                 }
-
-                                s_ExportState.progress.store(1.0f);
-                                s_ExportState.success = true;
+                                else
+                                {
+                                    std::error_code copyEc;
+                                    std::filesystem::copy_file(runtimeSrc, runtimeDst, std::filesystem::copy_options::overwrite_existing, copyEc);
+                                    if (copyEc)
+                                    {
+                                        s_ExportState.success = false;
+                                        s_ExportState.errorMessage = "Failed to copy runtime executable: " + copyEc.message();
+                                    }
+                                    else
+                                    {
+#if defined(_WIN32)
+                                        // Update exported executable icon
+                                        std::filesystem::path iconToApply;
+                                        if (!projIcon.empty())
+                                        {
+                                            if (std::filesystem::exists(projPath / projIcon))
+                                                iconToApply = projPath / projIcon;
+                                            else if (std::filesystem::exists(projIcon))
+                                                iconToApply = projIcon;
+                                        }
+                                        if (iconToApply.empty())
+                                        {
+                                            const std::vector<std::string> candidates = { "icon.ico", "icon.png", "Assets/icon.ico", "Assets/icon.png" };
+                                            for (const auto& c : candidates)
+                                            {
+                                                if (std::filesystem::exists(projPath / c))
+                                                {
+                                                    iconToApply = projPath / c;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (!iconToApply.empty() && std::filesystem::exists(runtimeDst))
+                                        {
+                                            UpdateExecutableIcon(runtimeDst, iconToApply);
+                                        }
+#endif
+                                        s_ExportState.progress.store(1.0f);
+                                        s_ExportState.success = true;
+                                    }
+                                }
                             }
                             else
                             {

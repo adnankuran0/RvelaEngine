@@ -67,6 +67,11 @@ struct ProjectSettings
 	bool vsync = true;
 	int maxFPS = 0;
 
+	std::string iconPath = "";
+	std::string cursorIconPath = "";
+	int cursorHotspotX = 0;
+	int cursorHotspotY = 0;
+
 	StretchMode stretchMode = StretchMode::Viewport;
 	StretchAspect stretchAspect = StretchAspect::Keep;
 	ScalingFilter scalingFilter = ScalingFilter::Nearest;

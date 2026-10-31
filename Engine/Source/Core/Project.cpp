@@ -29,6 +29,10 @@ std::string Project::Serialize() const
 	s["borderless"] = m_Settings.borderless;
 	s["vsync"] = m_Settings.vsync;
 	s["maxFPS"] = m_Settings.maxFPS;
+	s["iconPath"] = m_Settings.iconPath;
+	s["cursorIconPath"] = m_Settings.cursorIconPath;
+	s["cursorHotspotX"] = m_Settings.cursorHotspotX;
+	s["cursorHotspotY"] = m_Settings.cursorHotspotY;
 
 	s["stretchMode"] = static_cast<int>(m_Settings.stretchMode);
 	s["stretchAspect"] = static_cast<int>(m_Settings.stretchAspect);
@@ -120,6 +124,10 @@ void Project::Deserialize(const std::string& jsonStr)
 		m_Settings.borderless = s.value("borderless", false);
 		m_Settings.vsync = s.value("vsync", true);
 		m_Settings.maxFPS = s.value("maxFPS", 0);
+		m_Settings.iconPath = s.value("iconPath", "");
+		m_Settings.cursorIconPath = s.value("cursorIconPath", "");
+		m_Settings.cursorHotspotX = s.value("cursorHotspotX", 0);
+		m_Settings.cursorHotspotY = s.value("cursorHotspotY", 0);
 
 		m_Settings.stretchMode = static_cast<StretchMode>(s.value("stretchMode", static_cast<int>(StretchMode::Viewport)));
 		m_Settings.stretchAspect = static_cast<StretchAspect>(s.value("stretchAspect", static_cast<int>(StretchAspect::Keep)));

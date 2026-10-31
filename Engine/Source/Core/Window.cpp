@@ -10,9 +10,19 @@
 #include "Event/MouseEvents.h"
 #include "Event/WindowEvents.h"
 #include "Utils/FileUtils.h"
+#include "Utils/ProjectManager.h"
 #include "Input/Input.h"
 #include "glm/vec2.hpp"
 #include "Core/ProjectSettings.h"
+#include <algorithm>
+#include <cctype>
+
+#if defined(_WIN32)
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
+#endif
 
 using namespace rv;
 
@@ -32,6 +42,50 @@ Window::Window(const std::string& title, int width, int height, bool maximized) 
 
 Window::~Window()
 {
+    ResetCursor();
+    ResetIcon();
+}
+
+Window::Window(Window&& other) noexcept
+    : m_Window(other.m_Window)
+    , m_CustomCursor(other.m_CustomCursor)
+#if defined(_WIN32)
+    , m_CustomHIcon(other.m_CustomHIcon)
+#endif
+    , m_WindowData(std::move(other.m_WindowData))
+    , m_VSync(other.m_VSync)
+    , m_Borderless(other.m_Borderless)
+    , m_Resizable(other.m_Resizable)
+{
+    other.m_Window = nullptr;
+    other.m_CustomCursor = nullptr;
+#if defined(_WIN32)
+    other.m_CustomHIcon = nullptr;
+#endif
+}
+
+Window& Window::operator=(Window&& other) noexcept
+{
+    if (this != &other)
+    {
+        Shutdown();
+        m_Window = other.m_Window;
+        m_CustomCursor = other.m_CustomCursor;
+#if defined(_WIN32)
+        m_CustomHIcon = other.m_CustomHIcon;
+#endif
+        m_WindowData = std::move(other.m_WindowData);
+        m_VSync = other.m_VSync;
+        m_Borderless = other.m_Borderless;
+        m_Resizable = other.m_Resizable;
+
+        other.m_Window = nullptr;
+        other.m_CustomCursor = nullptr;
+#if defined(_WIN32)
+        other.m_CustomHIcon = nullptr;
+#endif
+    }
+    return *this;
 }
 
 void Window::SetCallbacks() noexcept
@@ -72,18 +126,11 @@ void Window::Init()
         CenterOnMonitor();
     }
 
-    GLFWimage images[1];
-    images[0].pixels = stbi_load(EDITOR_PATH("icon.png").GetAbsoluteStr().c_str(), &images[0].width, &images[0].height, 0, 4);
-    if (images[0].pixels)
+    if (!SetIcon(EDITOR_PATH("icon.png").GetAbsoluteStr()))
     {
-        glfwSetWindowIcon(m_Window, 1, images);
-        stbi_image_free(images[0].pixels);
-    }
-    else
-    {
-        if (!VFS::Get().IsMounted())
+        if (!SetIcon("icon.png"))
         {
-            LOG_WARN("Failed to load editor icon.");
+            SetIcon("Assets/icon.png");
         }
     }
         
@@ -249,9 +296,15 @@ void Window::Restore()
     if (m_Window) glfwRestoreWindow(m_Window);
 }
 
-void Window::Shutdown() const
+void Window::Shutdown()
 {
-    glfwDestroyWindow(m_Window);
+    ResetCursor();
+    ResetIcon();
+    if (m_Window)
+    {
+        glfwDestroyWindow(m_Window);
+        m_Window = nullptr;
+    }
 }
 
 void Window::SetVSync(bool vsync)
@@ -346,5 +399,322 @@ void Window::ApplySettings(const ProjectSettings& settings)
     SetBorderless(settings.borderless);
     SetWindowMode(settings.windowMode);
     SetVSync(settings.vsync);
+
+    if (!settings.iconPath.empty())
+    {
+        SetIcon(settings.iconPath);
+    }
+    if (!settings.cursorIconPath.empty())
+    {
+        SetCursorIcon(settings.cursorIconPath, settings.cursorHotspotX, settings.cursorHotspotY);
+    }
+}
+
+bool Window::SetIcon(const std::string& iconPath)
+{
+    if (!m_Window || iconPath.empty())
+        return false;
+
+    if (VFS::Get().IsMounted())
+    {
+        std::string norm = VFS::NormalizePath(iconPath);
+        if (VFS::Get().FileExists(norm))
+        {
+            std::vector<uint8_t> buffer;
+            if (VFS::Get().ReadFile(norm, buffer) && !buffer.empty())
+            {
+                return SetIconFromMemory(buffer.data(), buffer.size());
+            }
+        }
+    }
+
+    std::filesystem::path resolved;
+    if (std::filesystem::exists(iconPath))
+    {
+        resolved = iconPath;
+    }
+    else if (ProjectManager::IsProjectLoaded() && std::filesystem::exists(ProjectManager::GetProjectPath() / iconPath))
+    {
+        resolved = ProjectManager::GetProjectPath() / iconPath;
+    }
+    else if (std::filesystem::exists(Path::GetExecutableDirectory() / iconPath))
+    {
+        resolved = Path::GetExecutableDirectory() / iconPath;
+    }
+    else if (EDITOR_PATH(iconPath).Exists())
+    {
+        resolved = EDITOR_PATH(iconPath).GetAbsolute();
+    }
+    else if (ENGINE_PATH(iconPath).Exists())
+    {
+        resolved = ENGINE_PATH(iconPath).GetAbsolute();
+    }
+
+    if (resolved.empty())
+    {
+        return false;
+    }
+
+#if defined(_WIN32)
+    std::string ext = resolved.extension().string();
+    std::transform(ext.begin(), ext.end(), ext.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+    if (ext == ".ico")
+    {
+        HWND hwnd = glfwGetWin32Window(m_Window);
+        if (hwnd)
+        {
+            HICON hIcon = (HICON)LoadImageA(nullptr, resolved.string().c_str(), IMAGE_ICON, 0, 0, LR_LOADFROMFILE | LR_DEFAULTSIZE);
+            if (hIcon)
+            {
+                if (m_CustomHIcon)
+                {
+                    DestroyIcon((HICON)m_CustomHIcon);
+                }
+                m_CustomHIcon = hIcon;
+                SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+                SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+                return true;
+            }
+        }
+    }
+#endif
+
+    int width = 0, height = 0, channels = 0;
+    stbi_uc* pixels = stbi_load(resolved.string().c_str(), &width, &height, &channels, 4);
+    if (!pixels)
+    {
+        return false;
+    }
+
+    GLFWimage images[1];
+    images[0].width = width;
+    images[0].height = height;
+    images[0].pixels = pixels;
+    glfwSetWindowIcon(m_Window, 1, images);
+    stbi_image_free(pixels);
+    return true;
+}
+
+bool Window::SetIconFromMemory(const uint8_t* data, size_t size)
+{
+    if (!m_Window || !data || size == 0)
+        return false;
+
+#if defined(_WIN32)
+    if (size > 4 && data[0] == 0 && data[1] == 0 && data[2] == 1 && data[3] == 0)
+    {
+        HWND hwnd = glfwGetWin32Window(m_Window);
+        if (hwnd)
+        {
+            HICON hIcon = CreateIconFromResourceEx((PBYTE)data, (DWORD)size, TRUE, 0x00030000, 0, 0, LR_DEFAULTSIZE);
+            if (hIcon)
+            {
+                if (m_CustomHIcon)
+                {
+                    DestroyIcon((HICON)m_CustomHIcon);
+                }
+                m_CustomHIcon = hIcon;
+                SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+                SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+                return true;
+            }
+        }
+    }
+#endif
+
+    int width = 0, height = 0, channels = 0;
+    stbi_uc* pixels = stbi_load_from_memory(data, static_cast<int>(size), &width, &height, &channels, 4);
+    if (!pixels)
+    {
+        LOG_WARN("Window::SetIconFromMemory: Failed to decode icon image from memory");
+        return false;
+    }
+
+    GLFWimage images[1];
+    images[0].width = width;
+    images[0].height = height;
+    images[0].pixels = pixels;
+    glfwSetWindowIcon(m_Window, 1, images);
+    stbi_image_free(pixels);
+    return true;
+}
+
+void Window::ResetIcon()
+{
+    if (m_Window)
+    {
+        glfwSetWindowIcon(m_Window, 0, nullptr);
+    }
+#if defined(_WIN32)
+    if (m_CustomHIcon)
+    {
+        DestroyIcon((HICON)m_CustomHIcon);
+        m_CustomHIcon = nullptr;
+    }
+#endif
+}
+
+bool Window::SetCursorIcon(const std::string& cursorPath, int hotX, int hotY)
+{
+    if (cursorPath.empty())
+    {
+        ResetCursor();
+        return true;
+    }
+
+    if (VFS::Get().IsMounted())
+    {
+        std::string norm = VFS::NormalizePath(cursorPath);
+        if (VFS::Get().FileExists(norm))
+        {
+            std::vector<uint8_t> buffer;
+            if (VFS::Get().ReadFile(norm, buffer) && !buffer.empty())
+            {
+                return SetCursorIconFromMemory(buffer.data(), buffer.size(), hotX, hotY);
+            }
+        }
+    }
+
+    std::filesystem::path resolved;
+    if (std::filesystem::exists(cursorPath))
+    {
+        resolved = cursorPath;
+    }
+    else if (ProjectManager::IsProjectLoaded() && std::filesystem::exists(ProjectManager::GetProjectPath() / cursorPath))
+    {
+        resolved = ProjectManager::GetProjectPath() / cursorPath;
+    }
+    else if (std::filesystem::exists(Path::GetExecutableDirectory() / cursorPath))
+    {
+        resolved = Path::GetExecutableDirectory() / cursorPath;
+    }
+    else if (EDITOR_PATH(cursorPath).Exists())
+    {
+        resolved = EDITOR_PATH(cursorPath).GetAbsolute();
+    }
+    else if (ENGINE_PATH(cursorPath).Exists())
+    {
+        resolved = ENGINE_PATH(cursorPath).GetAbsolute();
+    }
+
+    if (resolved.empty())
+    {
+        LOG_WARN("Window::SetCursorIcon: File not found: {}", cursorPath);
+        return false;
+    }
+
+    int width = 0, height = 0, channels = 0;
+    stbi_uc* pixels = stbi_load(resolved.string().c_str(), &width, &height, &channels, 4);
+    if (!pixels)
+    {
+        LOG_WARN("Window::SetCursorIcon: Failed to load cursor image: {}", resolved.string());
+        return false;
+    }
+
+    GLFWimage image;
+    image.width = width;
+    image.height = height;
+    image.pixels = pixels;
+
+    GLFWcursor* newCursor = glfwCreateCursor(&image, hotX, hotY);
+    stbi_image_free(pixels);
+
+    if (!newCursor)
+    {
+        LOG_WARN("Window::SetCursorIcon: glfwCreateCursor failed for {}", resolved.string());
+        return false;
+    }
+
+    if (m_CustomCursor)
+    {
+        glfwDestroyCursor(m_CustomCursor);
+    }
+    m_CustomCursor = newCursor;
+    if (m_Window)
+    {
+        glfwSetCursor(m_Window, m_CustomCursor);
+    }
+    return true;
+}
+
+bool Window::SetCursorIconFromMemory(const uint8_t* data, size_t size, int hotX, int hotY)
+{
+    if (!m_Window || !data || size == 0)
+        return false;
+
+    int width = 0, height = 0, channels = 0;
+    stbi_uc* pixels = stbi_load_from_memory(data, static_cast<int>(size), &width, &height, &channels, 4);
+    if (!pixels)
+    {
+        LOG_WARN("Window::SetCursorIconFromMemory: Failed to decode cursor image from memory");
+        return false;
+    }
+
+    GLFWimage image;
+    image.width = width;
+    image.height = height;
+    image.pixels = pixels;
+
+    GLFWcursor* newCursor = glfwCreateCursor(&image, hotX, hotY);
+    stbi_image_free(pixels);
+
+    if (!newCursor)
+    {
+        LOG_WARN("Window::SetCursorIconFromMemory: glfwCreateCursor failed");
+        return false;
+    }
+
+    if (m_CustomCursor)
+    {
+        glfwDestroyCursor(m_CustomCursor);
+    }
+    m_CustomCursor = newCursor;
+    if (m_Window)
+    {
+        glfwSetCursor(m_Window, m_CustomCursor);
+    }
+    return true;
+}
+
+void Window::SetStandardCursor(CursorShape shape)
+{
+    if (!m_Window)
+        return;
+
+    int glfwShape = GLFW_ARROW_CURSOR;
+    switch (shape)
+    {
+    case CursorShape::Arrow:     glfwShape = GLFW_ARROW_CURSOR; break;
+    case CursorShape::IBeam:     glfwShape = GLFW_IBEAM_CURSOR; break;
+    case CursorShape::Crosshair: glfwShape = GLFW_CROSSHAIR_CURSOR; break;
+    case CursorShape::Hand:      glfwShape = GLFW_HAND_CURSOR; break;
+    case CursorShape::HResize:   glfwShape = GLFW_HRESIZE_CURSOR; break;
+    case CursorShape::VResize:   glfwShape = GLFW_VRESIZE_CURSOR; break;
+    default:                     glfwShape = GLFW_ARROW_CURSOR; break;
+    }
+
+    GLFWcursor* newCursor = glfwCreateStandardCursor(glfwShape);
+    if (!newCursor)
+        return;
+
+    if (m_CustomCursor)
+    {
+        glfwDestroyCursor(m_CustomCursor);
+    }
+    m_CustomCursor = newCursor;
+    glfwSetCursor(m_Window, m_CustomCursor);
+}
+
+void Window::ResetCursor()
+{
+    if (m_Window)
+    {
+        glfwSetCursor(m_Window, nullptr);
+    }
+    if (m_CustomCursor)
+    {
+        glfwDestroyCursor(m_CustomCursor);
+        m_CustomCursor = nullptr;
+    }
 }
 

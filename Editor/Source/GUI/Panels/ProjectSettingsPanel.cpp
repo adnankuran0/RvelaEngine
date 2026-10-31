@@ -32,6 +32,8 @@ void ProjectSettingsPanel::Draw(Engine* engine)
     {
         strncpy_s(m_NameBuf, settings.name.c_str(), sizeof(m_NameBuf) - 1);
         strncpy_s(m_StartSceneBuf, settings.startScene.c_str(), sizeof(m_StartSceneBuf) - 1);
+        strncpy_s(m_IconPathBuf, settings.iconPath.c_str(), sizeof(m_IconPathBuf) - 1);
+        strncpy_s(m_CursorIconPathBuf, settings.cursorIconPath.c_str(), sizeof(m_CursorIconPathBuf) - 1);
         for (int i = 0; i < 32; i++)
         {
             strncpy_s(m_PhysicsLayerBuf[i], settings.physicsLayerNames[i].c_str(), sizeof(m_PhysicsLayerBuf[i]) - 1);
@@ -201,6 +203,129 @@ void ProjectSettingsPanel::Draw(Engine* engine)
             {
                 settings.windowOverrideWidth = static_cast<uint32_t>(std::max(1, overWin[0]));
                 settings.windowOverrideHeight = static_cast<uint32_t>(std::max(1, overWin[1]));
+            }
+        }
+
+        ImGui::Spacing();
+        ImGui::Separator();
+        ImGui::TextColored(GetAccentColor(), "Icons");
+        ImGui::Spacing();
+
+        ImGui::Text("Window Icon:");
+        if (ImGui::InputText("##WindowIcon", m_IconPathBuf, sizeof(m_IconPathBuf)))
+        {
+            settings.iconPath = m_IconPathBuf;
+            if (engine) engine->GetWindow().SetIcon(settings.iconPath);
+        }
+
+        if (ImGui::BeginDragDropTarget())
+        {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
+            {
+                std::filesystem::path droppedPath = (const char*)payload->Data;
+                std::string ext = droppedPath.extension().string();
+                std::transform(ext.begin(), ext.end(), ext.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+                if (ext == ".png" || ext == ".ico" || ext == ".jpg" || ext == ".jpeg")
+                {
+                    std::error_code ec;
+                    std::filesystem::path rel = std::filesystem::relative(droppedPath, ProjectManager::GetProjectPath(), ec);
+                    std::string relStr = (!ec && !rel.empty()) ? rel.generic_string() : droppedPath.generic_string();
+                    settings.iconPath = relStr;
+                    strncpy_s(m_IconPathBuf, relStr.c_str(), sizeof(m_IconPathBuf) - 1);
+                    if (engine) engine->GetWindow().SetIcon(settings.iconPath);
+                }
+            }
+            ImGui::EndDragDropTarget();
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("Browse##WindowIcon"))
+        {
+            EditorFileDialog::Open(
+                "Select Window Icon",
+                FileDialogMode::OpenFile,
+                { ".png", ".ico", ".jpg", ".jpeg" },
+                ProjectManager::GetAssetDirectory(),
+                [this, activeProj, engine](const std::filesystem::path& chosen) {
+                    std::error_code ec;
+                    std::filesystem::path rel = std::filesystem::relative(chosen, ProjectManager::GetProjectPath(), ec);
+                    std::string relStr = (!ec && !rel.empty()) ? rel.generic_string() : chosen.generic_string();
+                    activeProj->GetSettings().iconPath = relStr;
+                    strncpy_s(m_IconPathBuf, relStr.c_str(), sizeof(m_IconPathBuf) - 1);
+                    if (engine) engine->GetWindow().SetIcon(relStr);
+                }
+            );
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Clear##WindowIcon"))
+        {
+            settings.iconPath = "";
+            m_IconPathBuf[0] = '\0';
+            if (engine) engine->GetWindow().ResetIcon();
+        }
+
+        ImGui::Spacing();
+        ImGui::Text("Custom Cursor Icon:");
+        if (ImGui::InputText("##CursorIcon", m_CursorIconPathBuf, sizeof(m_CursorIconPathBuf)))
+        {
+            settings.cursorIconPath = m_CursorIconPathBuf;
+            if (engine) engine->GetWindow().SetCursorIcon(settings.cursorIconPath, settings.cursorHotspotX, settings.cursorHotspotY);
+        }
+
+        if (ImGui::BeginDragDropTarget())
+        {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
+            {
+                std::filesystem::path droppedPath = (const char*)payload->Data;
+                std::string ext = droppedPath.extension().string();
+                std::transform(ext.begin(), ext.end(), ext.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+                if (ext == ".png" || ext == ".ico" || ext == ".jpg" || ext == ".jpeg")
+                {
+                    std::error_code ec;
+                    std::filesystem::path rel = std::filesystem::relative(droppedPath, ProjectManager::GetProjectPath(), ec);
+                    std::string relStr = (!ec && !rel.empty()) ? rel.generic_string() : droppedPath.generic_string();
+                    settings.cursorIconPath = relStr;
+                    strncpy_s(m_CursorIconPathBuf, relStr.c_str(), sizeof(m_CursorIconPathBuf) - 1);
+                    if (engine) engine->GetWindow().SetCursorIcon(settings.cursorIconPath, settings.cursorHotspotX, settings.cursorHotspotY);
+                }
+            }
+            ImGui::EndDragDropTarget();
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("Browse##CursorIcon"))
+        {
+            EditorFileDialog::Open(
+                "Select Cursor Icon",
+                FileDialogMode::OpenFile,
+                { ".png", ".ico", ".jpg", ".jpeg" },
+                ProjectManager::GetAssetDirectory(),
+                [this, activeProj, engine](const std::filesystem::path& chosen) {
+                    std::error_code ec;
+                    std::filesystem::path rel = std::filesystem::relative(chosen, ProjectManager::GetProjectPath(), ec);
+                    std::string relStr = (!ec && !rel.empty()) ? rel.generic_string() : chosen.generic_string();
+                    activeProj->GetSettings().cursorIconPath = relStr;
+                    strncpy_s(m_CursorIconPathBuf, relStr.c_str(), sizeof(m_CursorIconPathBuf) - 1);
+                    if (engine) engine->GetWindow().SetCursorIcon(relStr, activeProj->GetSettings().cursorHotspotX, activeProj->GetSettings().cursorHotspotY);
+                }
+            );
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Clear##CursorIcon"))
+        {
+            settings.cursorIconPath = "";
+            m_CursorIconPathBuf[0] = '\0';
+            if (engine) engine->GetWindow().ResetCursor();
+        }
+
+        int hotspot[2] = { settings.cursorHotspotX, settings.cursorHotspotY };
+        if (ImGui::DragInt2("Cursor Hotspot (X, Y)", hotspot, 1.0f, 0, 256))
+        {
+            settings.cursorHotspotX = std::max(0, hotspot[0]);
+            settings.cursorHotspotY = std::max(0, hotspot[1]);
+            if (engine && !settings.cursorIconPath.empty())
+            {
+                engine->GetWindow().SetCursorIcon(settings.cursorIconPath, settings.cursorHotspotX, settings.cursorHotspotY);
             }
         }
 

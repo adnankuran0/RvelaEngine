@@ -469,6 +469,30 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
     windowTable["SetResizable"] = [](bool resizable) {
         if (Engine::Get()) Engine::Get()->GetWindow().SetResizable(resizable);
     };
+    windowTable["SetIcon"] = [](const std::string& path) -> bool {
+        return Engine::Get() ? Engine::Get()->GetWindow().SetIcon(path) : false;
+    };
+    windowTable["ResetIcon"] = []() {
+        if (Engine::Get()) Engine::Get()->GetWindow().ResetIcon();
+    };
+    windowTable["SetCursorIcon"] = [](const std::string& path, sol::optional<int> hotX, sol::optional<int> hotY) -> bool {
+        return Engine::Get() ? Engine::Get()->GetWindow().SetCursorIcon(path, hotX.value_or(0), hotY.value_or(0)) : false;
+    };
+    windowTable["SetCustomCursor"] = windowTable["SetCursorIcon"];
+    windowTable["ResetCursor"] = []() {
+        if (Engine::Get()) Engine::Get()->GetWindow().ResetCursor();
+    };
+    windowTable["SetStandardCursor"] = [](int shape) {
+        if (Engine::Get()) Engine::Get()->GetWindow().SetStandardCursor(static_cast<CursorShape>(shape));
+    };
+
+    auto cursorShapeEnum = lua.create_named_table("CursorShape");
+    cursorShapeEnum["Arrow"] = static_cast<int>(CursorShape::Arrow);
+    cursorShapeEnum["IBeam"] = static_cast<int>(CursorShape::IBeam);
+    cursorShapeEnum["Crosshair"] = static_cast<int>(CursorShape::Crosshair);
+    cursorShapeEnum["Hand"] = static_cast<int>(CursorShape::Hand);
+    cursorShapeEnum["HResize"] = static_cast<int>(CursorShape::HResize);
+    cursorShapeEnum["VResize"] = static_cast<int>(CursorShape::VResize);
 
     auto windowModeEnum = lua.create_named_table("WindowMode");
     windowModeEnum["Windowed"] = static_cast<int>(WindowMode::Windowed);

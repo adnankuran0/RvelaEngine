@@ -6,7 +6,7 @@ project "RvelaRuntime"
    staticruntime "off"
    warnings "Off"
 
-   files { "Source/**.h", "Source/**.cpp", "../Vendor/GLAD/src/**.c", }
+   files { "Source/**.h", "Source/**.cpp", "Source/**.rc", "../Vendor/GLAD/src/**.c", }
 
    defines
    {

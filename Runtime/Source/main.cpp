@@ -185,11 +185,53 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
+	std::string customIconArg;
+	std::string customCursorArg;
+	for (int i = 1; i < argc; ++i)
+	{
+		std::string arg = argv[i];
+		if (arg == "--icon" && i + 1 < argc)
+		{
+			customIconArg = argv[++i];
+		}
+		else if (arg == "--cursor" && i + 1 < argc)
+		{
+			customCursorArg = argv[++i];
+		}
+	}
+
 	auto activeProj = engine.GetProjectManager().GetActiveProject();
 	if (activeProj)
 	{
 		engine.GetWindow().SetTitle(activeProj->name);
 		engine.GetWindow().ApplySettings(activeProj->GetSettings());
+
+		if (activeProj->GetSettings().iconPath.empty())
+		{
+			const std::vector<std::string> fallbackIcons = {
+				"icon.png",
+				"Assets/icon.png",
+				"Assets/Icon.png",
+				"icon.ico",
+				"Assets/icon.ico",
+				"Game.png",
+				"Game.ico"
+			};
+			for (const auto& candidate : fallbackIcons)
+			{
+				if (engine.GetWindow().SetIcon(candidate))
+					break;
+			}
+		}
+	}
+
+	if (!customIconArg.empty())
+	{
+		engine.GetWindow().SetIcon(customIconArg);
+	}
+	if (!customCursorArg.empty())
+	{
+		engine.GetWindow().SetCursorIcon(customCursorArg);
 	}
 
 	engine.GetActiveScene().SetState(rv::SceneState::PLAY);

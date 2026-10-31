@@ -1,12 +1,24 @@
 #pragma once
 #include <string>
+#include <cstdint>
 #include "glm/fwd.hpp"
 struct GLFWwindow;
+struct GLFWcursor;
 
 namespace rv { 
 
 enum class WindowMode;
 struct ProjectSettings;
+
+enum class CursorShape
+{
+	Arrow = 0,
+	IBeam,
+	Crosshair,
+	Hand,
+	HResize,
+	VResize
+};
 
 struct WindowSize
 {
@@ -37,6 +49,11 @@ public:
 	Window(const std::string& title, int width, int height, bool maximized = true) noexcept;
 	~Window();
 
+	Window(Window&& other) noexcept;
+	Window& operator=(Window&& other) noexcept;
+	Window(const Window&) = delete;
+	Window& operator=(const Window&) = delete;
+
 	static Window Create() noexcept;
 	static Window Create(const std::string& title, int width, int height, bool maximized = true) noexcept;
 	void Init();
@@ -60,7 +77,7 @@ public:
 	bool IsMaximized() const;
 	void Maximize();
 	void Restore();
-	void Shutdown() const;
+	void Shutdown();
 
 	void SetVSync(bool vsync);
 	bool IsVSync() const noexcept { return m_VSync; }
@@ -68,9 +85,22 @@ public:
 	void SetBorderless(bool borderless);
 	void SetWindowMode(WindowMode mode);
 	void ApplySettings(const ProjectSettings& settings);
+
+	bool SetIcon(const std::string& iconPath);
+	bool SetIconFromMemory(const uint8_t* data, size_t size);
+	void ResetIcon();
+
+	bool SetCursorIcon(const std::string& cursorPath, int hotX = 0, int hotY = 0);
+	bool SetCursorIconFromMemory(const uint8_t* data, size_t size, int hotX = 0, int hotY = 0);
+	void SetStandardCursor(CursorShape shape);
+	void ResetCursor();
 	
 private:
 	GLFWwindow* m_Window{};
+	GLFWcursor* m_CustomCursor = nullptr;
+#if defined(_WIN32)
+	void* m_CustomHIcon = nullptr;
+#endif
 	WindowData m_WindowData;
 	bool m_VSync = true;
 	bool m_Borderless = false;
