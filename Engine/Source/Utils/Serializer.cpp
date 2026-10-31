@@ -1,5 +1,6 @@
 #include "rvelapch.h"
 #include "Serializer.h"
+#include "Core/VFS.h"
 
 namespace rv {
 
@@ -27,10 +28,21 @@ void Serializer::SaveToFile(const ISerializable& obj, const std::string& path)
 }
 void Serializer::LoadFromFile(ISerializable& obj, const std::string& path)
 {
+	if (VFS::Get().IsMounted())
+	{
+		std::string str;
+		if (VFS::Get().ReadTextFile(path, str))
+		{
+			obj.Deserialize(str.c_str());
+			return;
+		}
+	}
+
 	std::ifstream file(path);
 	if (!file.is_open())
 	{
 		LOG_ERROR("File can not be opened: {}", path);
+		return;
 	}
 	std::string str((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 	obj.Deserialize(str.c_str());

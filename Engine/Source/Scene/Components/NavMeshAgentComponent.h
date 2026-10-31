@@ -21,7 +21,7 @@ public:
     float repathInterval = 0.5f;
     bool updateRotation = true;
     bool updatePosition = true;
-    bool drawDebugPath = true;
+    bool drawDebugPath = false;
 
     // runtime
     glm::vec3 destination{ 0.0f };

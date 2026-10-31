@@ -1,5 +1,6 @@
 #include "rvelapch.h"
 #include "Engine.h"
+#include "Core/VFS.h"
 #include "Core/Log.h"
 #include "Renderer/RenderLayer.h"
 #include "Input/Input.h"
@@ -59,7 +60,14 @@ bool Engine::OpenProject(const std::string& projectFilePath)
 	AudioManager::Get().StopAllInstances();
 
 	AssetManager::Get().UnloadAll();
-	m_AssetRegistry.Scan(ProjectManager::GetAssetDirectory());
+	if (VFS::Get().IsMounted())
+	{
+		m_AssetRegistry.ScanFromVFS();
+	}
+	else
+	{
+		m_AssetRegistry.Scan(ProjectManager::GetAssetDirectory());
+	}
 
 	auto activeProj = m_ProjectManager.GetActiveProject();
 	if (activeProj)
@@ -69,8 +77,28 @@ bool Engine::OpenProject(const std::string& projectFilePath)
 
 		if (!settings.startScene.empty())
 		{
-			std::filesystem::path scenePath = ProjectManager::GetProjectPath() / settings.startScene;
-			if (std::filesystem::exists(scenePath))
+			bool sceneFound = false;
+			std::filesystem::path scenePath;
+			if (VFS::Get().IsMounted())
+			{
+				if (VFS::Get().FileExists(settings.startScene))
+				{
+					scenePath = settings.startScene;
+					sceneFound = true;
+				}
+				else if (VFS::Get().FileExists("Assets/" + settings.startScene))
+				{
+					scenePath = "Assets/" + settings.startScene;
+					sceneFound = true;
+				}
+			}
+			if (!sceneFound)
+			{
+				scenePath = ProjectManager::GetProjectPath() / settings.startScene;
+				sceneFound = std::filesystem::exists(scenePath);
+			}
+
+			if (sceneFound)
 			{
 				m_SceneManager.LoadScene(scenePath.string());
 				m_SceneManager.Update(); // Immediately apply pending scene load
@@ -290,7 +318,10 @@ void Engine::InitResourcePaths()
 	if (engineRes.empty())
 	{
 		engineRes = exeDir / "Resources" / "Engine";
-		LOG_WARN("Could not locate existing Resources/Engine directory. Falling back to: {}", engineRes.string());
+		if (!VFS::Get().IsMounted())
+		{
+			LOG_WARN("Could not locate existing Resources/Engine directory. Falling back to: {}", engineRes.string());
+		}
 	}
 	else
 	{

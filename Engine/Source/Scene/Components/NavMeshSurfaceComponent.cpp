@@ -133,6 +133,7 @@ void NavMeshSurfaceComponent::Clear()
 bool NavMeshSurfaceComponent::Bake(Scene& scene)
 {
     Cleanup();
+    scene.GetTransformSystem().Update();
 
     std::vector<float> worldVertices;
     std::vector<int> worldIndices;

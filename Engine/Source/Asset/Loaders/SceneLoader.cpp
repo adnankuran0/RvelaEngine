@@ -32,3 +32,16 @@ Ref<Asset> SceneLoader::Load(const std::filesystem::path& assetPath, const Asset
 
     return asset;
 }
+
+Ref<Asset> SceneLoader::LoadFromMemory(const uint8_t* data, size_t size, const AssetMeta& meta)
+{
+    if (!data || size == 0)
+    {
+        LOG_ERROR("Empty scene buffer for asset: {}", meta.uuid.ToString());
+        return nullptr;
+    }
+
+    auto asset = CreateRef<SceneAsset>(meta.uuid);
+    asset->m_JSON.assign(reinterpret_cast<const char*>(data), size);
+    return asset;
+}

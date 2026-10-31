@@ -1,5 +1,6 @@
 #include "rvelapch.h"
 #include "ProjectManager.h"
+#include "Core/VFS.h"
 #include "Utils/Serializer.h"
 #include "Utils/FileUtils.h"
 #include "json.hpp"
@@ -63,6 +64,33 @@ bool ProjectManager::CreateProject(const std::string& name, const std::string& p
 
 bool ProjectManager::LoadProject(const std::string& projectFilePath)
 {
+	if (VFS::Get().IsMounted())
+	{
+		std::string targetPath = projectFilePath;
+		if (!VFS::Get().FileExists(targetPath))
+		{
+			auto files = VFS::Get().ListFiles();
+			for (const auto& f : files)
+			{
+				if (f.ends_with(".rproj"))
+				{
+					targetPath = f;
+					break;
+				}
+			}
+		}
+
+		if (VFS::Get().FileExists(targetPath))
+		{
+			auto project = std::make_shared<Project>();
+			Serializer::LoadFromFile(*project, targetPath);
+			project->projectFolderPath = "";
+			m_ActiveProject = project;
+			m_ProjectFolderPath = "";
+			return true;
+		}
+	}
+
 	if (!std::filesystem::exists(projectFilePath))
 		return false;
 

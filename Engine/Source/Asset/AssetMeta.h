@@ -1,8 +1,9 @@
-﻿#pragma once
+#pragma once
 #include <string>
 #include <vector>
 #include <filesystem>
 #include "AssetUUID.h"
+#include <nlohmann/json.hpp>
 
 namespace rv {
 
@@ -29,6 +30,7 @@ struct AssetMeta
 
     bool SaveToFile(const std::filesystem::path& metaPath) const;
     bool LoadFromFile(const std::filesystem::path& metaPath);
+    bool LoadFromJson(const nlohmann::json& j);
 
     static std::filesystem::path GetMetaPath(const std::filesystem::path& assetPath)
     {
@@ -36,7 +38,6 @@ struct AssetMeta
     }
 
     bool IsModified(const std::filesystem::path& path) const;
-    
 };
 
 }

@@ -1,6 +1,7 @@
 #include "rvelapch.h"
 #include "ShaderLoader.h"
 #include "Asset/Types/ShaderAsset.h"
+#include "Asset/AssetManager.h"
 #include "Core/Log.h"
 #include <fstream>
 #include <sstream>
@@ -25,6 +26,22 @@ Ref<Asset> ShaderLoader::Load(const std::filesystem::path& assetPath, const Asse
     asset->filePath = assetPath;
     std::error_code ec;
     asset->lastWriteTime = std::filesystem::last_write_time(assetPath, ec);
+    asset->source = std::move(source);
+    asset->Compile();
+    return asset;
+}
+
+Ref<Asset> ShaderLoader::LoadFromMemory(const uint8_t* data, size_t size, const AssetMeta& meta)
+{
+    if (!data || size == 0)
+    {
+        LOG_ERROR("ShaderLoader::LoadFromMemory: empty buffer for shader {}", meta.uuid.ToString());
+        return nullptr;
+    }
+
+    std::string source(reinterpret_cast<const char*>(data), size);
+    auto asset = CreateRef<ShaderAsset>(meta.uuid);
+    asset->filePath = AssetManager::Get().GetRegistry().GetPath(meta.uuid);
     asset->source = std::move(source);
     asset->Compile();
     return asset;

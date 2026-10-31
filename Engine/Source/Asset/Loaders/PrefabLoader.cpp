@@ -31,3 +31,16 @@ Ref<Asset> PrefabLoader::Load(const std::filesystem::path& assetPath, const Asse
     asset->m_JSON = std::move(json);
     return asset;
 }
+
+Ref<Asset> PrefabLoader::LoadFromMemory(const uint8_t* data, size_t size, const AssetMeta& meta)
+{
+    if (!data || size == 0)
+    {
+        LOG_ERROR("Empty prefab buffer for asset: {}", meta.uuid.ToString());
+        return nullptr;
+    }
+
+    auto asset = CreateRef<PrefabAsset>(meta.uuid);
+    asset->m_JSON.assign(reinterpret_cast<const char*>(data), size);
+    return asset;
+}

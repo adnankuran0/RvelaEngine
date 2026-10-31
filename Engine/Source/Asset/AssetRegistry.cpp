@@ -1,5 +1,8 @@
 #include "rvelapch.h"
 #include "AssetRegistry.h"
+#include "Core/VFS.h"
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 #include "Asset/CacheTypes/TextureCacheHeader.h"
 #include "Core/Log.h"
 #include "Utils/ProjectManager.h"
@@ -445,4 +448,112 @@ void AssetRegistry::RegisterPath(const AssetUUID& uuid, const std::filesystem::p
     m_UUIDToPath[uuid] = normalPath;
     m_PathToUUID[normalPath.string()] = uuid;
     m_PathToUUID[normalPath.generic_string()] = uuid;
+}
+
+
+bool AssetRegistry::ScanFromVFS()
+{
+    if (!VFS::Get().IsMounted())
+        return false;
+
+    std::string manifestJsonStr;
+    if (!VFS::Get().ReadTextFile("manifest.json", manifestJsonStr))
+    {
+        LOG_WARN("[AssetRegistry::ScanFromVFS] manifest.json not found in VFS");
+        return false;
+    }
+
+    Clear();
+    m_AssetDir = "Assets";
+
+    try
+    {
+        json manifest = json::parse(manifestJsonStr);
+        if (!manifest.is_array())
+        {
+            LOG_ERROR("[AssetRegistry::ScanFromVFS] manifest.json root is not an array");
+            return false;
+        }
+
+        for (const auto& item : manifest)
+        {
+            if (!item.contains("uuid") || !item.contains("path") || !item.contains("meta"))
+                continue;
+
+            AssetUUID uuid = AssetUUID::FromString(item["uuid"].get<std::string>());
+            if (!uuid.IsValid()) continue;
+
+            std::filesystem::path path = item["path"].get<std::string>();
+            AssetMeta meta;
+            meta.LoadFromJson(item["meta"]);
+
+            m_UUIDToPath[uuid] = path;
+            m_PathToUUID[path.string()] = uuid;
+            m_PathToUUID[path.generic_string()] = uuid;
+            m_Metas[uuid] = meta;
+
+            auto rtexCache = GetCacheDir() / (uuid.ToString() + ".rtex");
+            if (meta.importerID == "TextureImporter" || VFS::Get().FileExists(rtexCache.generic_string()))
+            {
+                m_UUIDToPath[uuid] = rtexCache;
+                m_PathToUUID[rtexCache.string()] = uuid;
+                m_PathToUUID[rtexCache.generic_string()] = uuid;
+            }
+
+            auto rmeshCache = GetCacheDir() / (uuid.ToString() + ".rmesh");
+            if (VFS::Get().FileExists(rmeshCache.generic_string()))
+            {
+                m_UUIDToPath[uuid] = rmeshCache;
+                m_PathToUUID[rmeshCache.string()] = uuid;
+                m_PathToUUID[rmeshCache.generic_string()] = uuid;
+            }
+
+            auto rskmeshCache = GetCacheDir() / (uuid.ToString() + ".rskmesh");
+            if (VFS::Get().FileExists(rskmeshCache.generic_string()))
+            {
+                m_UUIDToPath[uuid] = rskmeshCache;
+                m_PathToUUID[rskmeshCache.string()] = uuid;
+                m_PathToUUID[rskmeshCache.generic_string()] = uuid;
+            }
+
+            for (auto& sub : meta.subAssets)
+            {
+                if (!sub.uuid.IsValid()) continue;
+
+                if (sub.hasCache)
+                {
+                    std::string subExt = sub.type == "Mesh" ? ".rmesh"
+                        : sub.type == "SkeletalMesh" ? ".rskmesh"
+                        : sub.type == "Texture" ? ".rtex"
+                        : "";
+                    auto cachePath = GetCacheDir() / (sub.uuid.ToString() + subExt);
+                    m_UUIDToPath[sub.uuid] = cachePath;
+                    m_PathToUUID[cachePath.string()] = sub.uuid;
+                    m_PathToUUID[cachePath.generic_string()] = sub.uuid;
+                }
+                else if (!m_UUIDToPath.contains(sub.uuid))
+                {
+                    m_UUIDToPath[sub.uuid] = path;
+                }
+
+                if (!m_Metas.contains(sub.uuid))
+                {
+                    AssetMeta subMeta;
+                    subMeta.uuid = sub.uuid;
+                    subMeta.importerID = sub.type == "Mesh" ? "MeshImporter"
+                        : sub.type == "SkeletalMesh" ? "SkeletalMeshImporter"
+                        : sub.type == "Material" ? "MaterialLoader"
+                        : "";
+                    m_Metas[sub.uuid] = subMeta;
+                }
+            }
+        }
+
+        return true;
+    }
+    catch (const std::exception& e)
+    {
+        LOG_ERROR("[AssetRegistry::ScanFromVFS] Error parsing manifest.json: {}", e.what());
+        return false;
+    }
 }

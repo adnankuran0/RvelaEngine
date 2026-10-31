@@ -24,7 +24,7 @@
         "Scene Hierarchy": true,
         "Viewport": true
     },
-    "theme": 0,
+    "theme": 2,
     "viewport": {
         "drawBoundingBoxes": false,
         "drawColliders": false,

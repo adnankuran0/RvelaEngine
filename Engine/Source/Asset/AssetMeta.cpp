@@ -1,9 +1,10 @@
 #include "rvelapch.h"
 #include "AssetMeta.h"
 #include <nlohmann/json.hpp>
+#include "Core/Log.h"
+#include <fstream>
 
 using namespace rv;
-
 using json = nlohmann::json;
 
 bool AssetMeta::SaveToFile(const std::filesystem::path& metaPath) const
@@ -43,6 +44,45 @@ bool AssetMeta::SaveToFile(const std::filesystem::path& metaPath) const
     return true;
 }
 
+bool AssetMeta::LoadFromJson(const nlohmann::json& j)
+{
+    uuid = AssetUUID::FromString(j.value("uuid", ""));
+    importerID = j.value("importerID", "");
+
+    if (j.contains("lastWriteTime"))
+        lastWriteTime = j.value<uint64_t>("lastWriteTime", 0);
+    else if (j.contains("sourceHash"))
+        lastWriteTime = j.value<uint64_t>("sourceHash", 0);
+
+    importerVersion = j.value<uint32_t>("importerVersion", 0);
+
+    importerSettingsJson = j.contains("importerSettings") ? j["importerSettings"].dump() : "{}";
+
+    dependencies.clear();
+    if (j.contains("dependencies"))
+    {
+        for (auto& dependency : j["dependencies"])
+            dependencies.push_back(AssetUUID::FromString(dependency.get<std::string>()));
+    }
+
+    subAssets.clear();
+    if (j.contains("subAssets"))
+    {
+        for (auto& jSub : j["subAssets"])
+        {
+            SubAssetEntry entry;
+            entry.uuid = AssetUUID::FromString(jSub.value("uuid", ""));
+            entry.name = jSub.value("name", "");
+            entry.type = jSub.value("type", "");
+            entry.index = jSub.value("index", 0u);
+            entry.hasCache = jSub.value("hasCache", false);
+            subAssets.push_back(entry);
+        }
+    }
+
+    return true;
+}
+
 bool AssetMeta::LoadFromFile(const std::filesystem::path& metaPath)
 {
     std::ifstream file(metaPath);
@@ -63,49 +103,17 @@ bool AssetMeta::LoadFromFile(const std::filesystem::path& metaPath)
         return false;
     }
 
-    uuid = AssetUUID::FromString(j.value("uuid", ""));
-    importerID = j.value("importerID", "");
-
-    if (j.contains("lastWriteTime"))
-        lastWriteTime = j.value<uint64_t>("lastWriteTime", 0);
-    else if (j.contains("sourceHash"))
-        lastWriteTime = j.value<uint64_t>("sourceHash", 0);
-
-    importerVersion = j.value<uint32_t>("importerVersion", 0);
-
-    importerSettingsJson = j.contains("importerSettings") ? j["importerSettings"].dump() : "{}";
-
-    dependencies.clear();
-    if (j.contains("dependencies"))
-        for (auto& dependency : j["dependencies"])
-            dependencies.push_back(AssetUUID::FromString(dependency.get<std::string>()));
-
-    subAssets.clear();
-    if (j.contains("subAssets"))
-    {
-        for (auto& jSub : j["subAssets"])
-        {
-            SubAssetEntry entry;
-            entry.uuid = AssetUUID::FromString(jSub.value("uuid", ""));
-            entry.name = jSub.value("name", "");
-            entry.type = jSub.value("type", "");
-            entry.index = jSub.value("index", 0u);
-            entry.hasCache = jSub.value("hasCache", false);
-            subAssets.push_back(entry);
-        }
-    }
-
-    return true;
+    return LoadFromJson(j);
 }
 
 bool AssetMeta::IsModified(const std::filesystem::path& path) const
 {
     std::error_code ec;
-    auto currentTime = std::filesystem::last_write_time(path, ec);
-    if (ec) return true;
+    auto currentLwt = std::filesystem::last_write_time(path, ec);
+    if (ec) return false;
 
-    auto currentTimeStamp = std::chrono::duration_cast<std::chrono::seconds>(
-        currentTime.time_since_epoch()).count();
+    uint64_t currentSec = std::chrono::duration_cast<std::chrono::seconds>(
+        currentLwt.time_since_epoch()).count();
 
-    return currentTimeStamp != lastWriteTime;
+    return currentSec != lastWriteTime;
 }

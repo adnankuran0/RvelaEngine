@@ -1,5 +1,6 @@
 #include "rvelapch.h"
 #include "SceneManager.h"
+#include "Core/VFS.h"
 #include "Entity.h"
 #include "json.hpp"
 #include "EntityUUID.h"  
@@ -27,8 +28,16 @@ namespace
 			return false;
 		}
 
-		const std::filesystem::path requested(input);
-		if (requested.extension() != ".rscene")
+		std::string normalizedInput = input;
+		std::replace(normalizedInput.begin(), normalizedInput.end(), '\\', '/');
+
+		std::filesystem::path requested(normalizedInput);
+		if (requested.extension().empty())
+		{
+			requested += ".rscene";
+			normalizedInput += ".rscene";
+		}
+		else if (requested.extension() != ".rscene")
 		{
 			LOG_ERROR("Cannot change scene: expected a .rscene file, got '{}'", input);
 			return false;
@@ -48,6 +57,28 @@ namespace
 				candidates.push_back(assetDir.parent_path() / requested);
 			}
 			candidates.push_back(requested);
+		}
+
+		if (VFS::Get().IsMounted())
+		{
+			std::vector<std::string> vfsCandidates = {
+				normalizedInput,
+				"Assets/" + normalizedInput,
+				"Assets/Scenes/" + requested.filename().generic_string()
+			};
+			for (const auto& candidate : candidates)
+			{
+				vfsCandidates.push_back(candidate.generic_string());
+			}
+
+			for (const auto& vfsPath : vfsCandidates)
+			{
+				if (VFS::Get().FileExists(vfsPath))
+				{
+					resolved = vfsPath;
+					return true;
+				}
+			}
 		}
 
 		for (const auto& candidate : candidates)
@@ -263,8 +294,31 @@ uint32_t SceneManager::LoadSceneAsync(const std::string& path, bool autoActivate
     task->workerThread = std::thread([task]() {
         task->progress.store(0.1f);
 
-        std::ifstream stream(task->path);
-        if (!stream.is_open())
+        std::string sceneText;
+        if (VFS::Get().IsMounted())
+        {
+            if (!VFS::Get().ReadTextFile(task->path, sceneText))
+            {
+                std::string vfsPath = task->path;
+                if (vfsPath.rfind("Assets/", 0) != 0)
+                {
+                    VFS::Get().ReadTextFile("Assets/" + vfsPath, sceneText);
+                }
+            }
+        }
+
+        if (sceneText.empty())
+        {
+            std::ifstream stream(task->path);
+            if (stream.is_open())
+            {
+                std::stringstream buffer;
+                buffer << stream.rdbuf();
+                sceneText = buffer.str();
+            }
+        }
+
+        if (sceneText.empty())
         {
             task->errorMessage = "Scene file could not be opened: " + task->path;
             task->progress.store(0.0f);
@@ -282,7 +336,7 @@ uint32_t SceneManager::LoadSceneAsync(const std::string& path, bool autoActivate
         task->progress.store(0.3f);
         try
         {
-            stream >> task->parsedJson;
+            task->parsedJson = json::parse(sceneText);
         }
         catch (const std::exception& e)
         {

@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cctype>
 #include "Utils/FileUtils.h"
+#include "Core/VFS.h"
 
 namespace rv {
 
@@ -375,6 +376,7 @@ bool CustomShaderGenerator::GenerateGLSL(
 
     // Extract vertex() and fragment()
     std::string remainingSource = rshaderSource;
+    remainingSource.erase(std::remove(remainingSource.begin(), remainingSource.end(), '\r'), remainingSource.end());
 
     size_t vertStart = 0, vertEnd = 0;
     std::string vertBody = ExtractFunctionBody(remainingSource, "vertex", vertStart, vertEnd);
@@ -394,24 +396,57 @@ bool CustomShaderGenerator::GenerateGLSL(
     ParseUniforms(remainingSource, outUniforms, cleanGlobals);
 
     std::string templatePath = ENGINE_PATH("Shaders\\CustomShaderBase.glsl").GetAbsoluteStr();
-    std::ifstream templateFile(templatePath);
-    if (!templateFile.is_open())
+    std::string glsl;
+
+    if (VFS::Get().IsMounted())
+    {
+        if (!VFS::Get().ReadTextFile("Resources/Engine/Shaders/CustomShaderBase.glsl", glsl))
+        {
+            VFS::Get().ReadTextFile("Shaders/CustomShaderBase.glsl", glsl);
+        }
+    }
+
+    if (glsl.empty())
+    {
+        std::ifstream templateFile(templatePath);
+        if (templateFile.is_open())
+        {
+            std::stringstream templateStream;
+            templateStream << templateFile.rdbuf();
+            glsl = templateStream.str();
+        }
+    }
+
+    if (glsl.empty())
     {
         outError = "Failed to load base custom shader template at: " + templatePath;
         return false;
     }
 
-    std::stringstream templateStream;
-    templateStream << templateFile.rdbuf();
-    std::string glsl = templateStream.str();
+    glsl.erase(std::remove(glsl.begin(), glsl.end(), '\r'), glsl.end());
 
     if (!outIsLit)
     {
-        std::string fragHeader = "#shader fragment\n#version 460 core";
-        size_t fragPos = glsl.find(fragHeader);
+        size_t fragPos = glsl.find("#shader fragment");
         if (fragPos != std::string::npos)
         {
-            glsl.insert(fragPos + fragHeader.length(), "\n#define RVELA_UNLIT\n");
+            size_t verPos = glsl.find("#version", fragPos);
+            if (verPos != std::string::npos)
+            {
+                size_t lineEnd = glsl.find('\n', verPos);
+                if (lineEnd != std::string::npos)
+                {
+                    glsl.insert(lineEnd + 1, "#define RVELA_UNLIT\n");
+                }
+            }
+            else
+            {
+                size_t lineEnd = glsl.find('\n', fragPos);
+                if (lineEnd != std::string::npos)
+                {
+                    glsl.insert(lineEnd + 1, "#define RVELA_UNLIT\n");
+                }
+            }
         }
     }
 

@@ -5,6 +5,7 @@
 #include <fstream>
 #include "Utils/FileUtils.h"
 #include "Core/Log.h"
+#include "Core/VFS.h"
 
 namespace rv {
 
@@ -45,6 +46,17 @@ std::shared_ptr<Font> Font::LoadFromFile(const std::string& filepath, float font
 
 bool Font::Load(const std::string& filepath, float fontSize)
 {
+    if (VFS::Get().IsMounted())
+    {
+        std::vector<uint8_t> vfsBuffer;
+        if (VFS::Get().ReadFile(filepath, vfsBuffer) ||
+            VFS::Get().ReadFile("Resources/Engine/Fonts/roboto.ttf", vfsBuffer) ||
+            VFS::Get().ReadFile("Fonts/roboto.ttf", vfsBuffer))
+        {
+            return LoadFromMemory(vfsBuffer.data(), vfsBuffer.size(), fontSize);
+        }
+    }
+
     std::ifstream file(filepath, std::ios::binary | std::ios::ate);
     if (!file.is_open())
     {
@@ -55,17 +67,34 @@ bool Font::Load(const std::string& filepath, float fontSize)
     std::streamsize size = file.tellg();
     file.seekg(0, std::ios::beg);
 
-    std::vector<unsigned char> fontBuffer(size);
+    if (size <= 0)
+    {
+        LOG_WARN("Empty font file: {}", filepath);
+        return false;
+    }
+
+    std::vector<uint8_t> fontBuffer(static_cast<size_t>(size));
     if (!file.read((char*)fontBuffer.data(), size))
     {
         LOG_WARN("Failed to read font file data: {}", filepath);
         return false;
     }
 
-    stbtt_fontinfo fontInfo;
-    if (!stbtt_InitFont(&fontInfo, fontBuffer.data(), 0))
+    return LoadFromMemory(fontBuffer.data(), fontBuffer.size(), fontSize);
+}
+
+bool Font::LoadFromMemory(const uint8_t* data, size_t size, float fontSize)
+{
+    if (!data || size == 0)
     {
-        LOG_WARN("Failed to init stb_truetype font: {}", filepath);
+        LOG_WARN("Font::LoadFromMemory: empty data buffer");
+        return false;
+    }
+
+    stbtt_fontinfo fontInfo;
+    if (!stbtt_InitFont(&fontInfo, data, 0))
+    {
+        LOG_WARN("Failed to init stb_truetype font from memory buffer");
         return false;
     }
 
@@ -200,5 +229,3 @@ const SDFGlyph& Font::GetSDFGlyph(uint32_t codepoint) const
 }
 
 }
-
-

@@ -1,6 +1,7 @@
 #include "rvelapch.h"
 #include "Window.h"
 #include "Core/Log.h"
+#include "Core/VFS.h"
 #include "Event/EventManager.h"
 #include <stb_image.h>
 #include "GLFW/glfw3.h"
@@ -80,7 +81,10 @@ void Window::Init()
     }
     else
     {
-        LOG_ERROR("Failed to load editor icon.");
+        if (!VFS::Get().IsMounted())
+        {
+            LOG_WARN("Failed to load editor icon.");
+        }
     }
         
     

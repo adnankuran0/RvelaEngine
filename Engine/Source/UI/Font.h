@@ -34,6 +34,7 @@ public:
     static std::shared_ptr<Font> LoadFromFile(const std::string& filepath, float fontSize = 48.0f);
 
     bool Load(const std::string& filepath, float fontSize = 48.0f);
+    bool LoadFromMemory(const uint8_t* data, size_t size, float fontSize = 48.0f);
 
     uint32_t GetTextureID() const { return m_TextureID; }
     float GetFontSize() const { return m_FontSize; }
@@ -55,4 +56,3 @@ private:
 };
 
 }
-

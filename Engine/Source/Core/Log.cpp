@@ -8,6 +8,9 @@ std::shared_ptr<spdlog::logger> RvelaLog::s_Logger;
 
 void RvelaLog::Init(const std::string& filePath)
 {
+    if (s_Logger)
+        return;
+
     auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
     consoleSink->set_pattern("[%^%l%$] %v");
 
@@ -38,5 +41,9 @@ void RvelaLog::Init(const std::string& filePath)
 
 std::shared_ptr<spdlog::logger>& RvelaLog::GetLogger()
 {
+    if (!s_Logger)
+    {
+        Init("log.txt");
+    }
     return s_Logger;
 }

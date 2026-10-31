@@ -79,7 +79,7 @@ void NavMeshAgentComponent::Deserialize(const nlohmann::json& j)
     repathInterval = j.value("repathInterval", 0.5f);
     updateRotation = j.value("updateRotation", true);
     updatePosition = j.value("updatePosition", true);
-    drawDebugPath = j.value("drawDebugPath", true);
+    drawDebugPath = j.value("drawDebugPath", false);
 }
 
 } // namespace rv

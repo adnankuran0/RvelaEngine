@@ -2,6 +2,7 @@
 #include "Skybox.h"
 #include <stb_image.h>
 #include "Core/Log.h"
+#include "Core/VFS.h"
 #include "ShaderManager.h"
 #include "Asset/AssetManager.h"
 #include "Asset/AssetRegistry.h"
@@ -74,12 +75,8 @@ void Skybox::InitHDR(const AssetUUID& uuid)
 
     ClearHDR();
 
-    Ref<TextureAsset> textureAsset = nullptr;
+    Ref<TextureAsset> textureAsset = AssetManager::Get().GetAsset<TextureAsset>(uuid);
     auto fsPath = AssetManager::Get().GetRegistry().GetPath(uuid);
-    if (!fsPath.empty() && fsPath.extension() == ".rtex")
-    {
-        textureAsset = AssetManager::Get().GetAsset<TextureAsset>(uuid);
-    }
 
     GLuint hdrTexture = 0;
     bool shouldDeleteHDRTexture = false;
@@ -289,8 +286,29 @@ GLuint Skybox::ConvertEquirectangularToCubemap(GLuint hdrTexture)
 GLuint Skybox::LoadHDRTexture(const Path& hdrPath)
 {
     stbi_set_flip_vertically_on_load(true);
-    int width, height, nrComponents;
-    float* data = stbi_loadf(hdrPath.GetAbsoluteStr().c_str(), &width, &height, &nrComponents, 0);
+    int width = 0, height = 0, nrComponents = 0;
+    float* data = nullptr;
+
+    if (VFS::Get().IsMounted())
+    {
+        std::vector<uint8_t> buffer;
+        std::string relPath = hdrPath.GetVirtualStr();
+        if (!VFS::Get().ReadFile(relPath, buffer))
+        {
+            if (relPath.rfind("Assets/", 0) != 0)
+                VFS::Get().ReadFile("Assets/" + relPath, buffer);
+        }
+
+        if (!buffer.empty())
+        {
+            data = stbi_loadf_from_memory(buffer.data(), static_cast<int>(buffer.size()), &width, &height, &nrComponents, 0);
+        }
+    }
+
+    if (!data)
+    {
+        data = stbi_loadf(hdrPath.GetAbsoluteStr().c_str(), &width, &height, &nrComponents, 0);
+    }
     if (!data)
     {
         LOG_ERROR("Failed to load HDR texture at path: {}", hdrPath.GetAbsoluteStr());

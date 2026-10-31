@@ -162,11 +162,13 @@ bool Scene::IsAutoloadEntity(entt::entity entity)
 
 void Scene::OnStart()
 {
+    m_TransformSystem.Update();
     InstantiateAutoloads();
     if (Engine::Get())
     {
         Engine::Get()->GetSceneManager().RestoreAutoloadStates(*this);
     }
+    m_TransformSystem.Update();
     m_PhysicsSystem.OnStart();
     m_ScriptSystem.OnStart();
     m_AudioSystem.OnStart();

@@ -1,5 +1,6 @@
 #include "rvelapch.h"
 #include "SceneSerializer.h"
+#include "Core/VFS.h"
 #include "Entity.h"
 #include "Audio/AudioManager.h"
 #include "Asset/Types/PrefabAsset.h"
@@ -222,18 +223,44 @@ void SceneSerializer::DeserializeScene(Scene& scene, const json& j)
 bool SceneSerializer::LoadScene(Scene& scene, const std::string& path)
 {
     json j;
-    std::ifstream stream(path);
-    if (!stream.is_open()) {
-        LOG_ERROR("Scene file could not be opened: {}", path);
-        return false;
+    if (VFS::Get().IsMounted())
+    {
+        std::string content;
+        if (!VFS::Get().ReadTextFile(path, content))
+        {
+            if (path.rfind("Assets/", 0) != 0)
+            {
+                VFS::Get().ReadTextFile("Assets/" + path, content);
+            }
+        }
+
+        if (!content.empty())
+        {
+            try {
+                j = json::parse(content);
+            }
+            catch (const std::exception& e) {
+                LOG_ERROR("JSON parse error in {}: {}", path, e.what());
+                return false;
+            }
+        }
     }
 
-    try {
-        stream >> j;
-    }
-    catch (const std::exception& e) {
-        LOG_ERROR("JSON parse error in {}: {}", path, e.what());
-        return false;
+    if (j.is_null())
+    {
+        std::ifstream stream(path);
+        if (!stream.is_open()) {
+            LOG_ERROR("Scene file could not be opened: {}", path);
+            return false;
+        }
+
+        try {
+            stream >> j;
+        }
+        catch (const std::exception& e) {
+            LOG_ERROR("JSON parse error in {}: {}", path, e.what());
+            return false;
+        }
     }
 
     if (!j.is_object() || !j.contains("Entities") || !j["Entities"].is_array())

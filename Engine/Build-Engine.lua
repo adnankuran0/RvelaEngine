@@ -19,6 +19,7 @@ project "RvelaEngine"
       "Source/**.h",
       "Source/**.cpp",
       "../Vendor/GLAD/src/**.c",
+      "../Vendor/miniz/miniz.c",
       "../Vendor/recastnavigation/Recast/Source/**.cpp",
       "../Vendor/recastnavigation/Detour/Source/**.cpp",
       "../Vendor/recastnavigation/DetourCrowd/Source/**.cpp"
@@ -49,6 +50,7 @@ project "RvelaEngine"
       "../Vendor/recastnavigation/Recast/Include",
       "../Vendor/recastnavigation/Detour/Include",
       "../Vendor/recastnavigation/DetourCrowd/Include",
+      "../Vendor/miniz",
    }
 
    libdirs
@@ -100,6 +102,9 @@ project "RvelaEngine"
        symbols "Off"
 
    filter "files:../Vendor/GLAD/src/gl.c"
+       enablepch "Off"
+
+   filter "files:../Vendor/miniz/miniz.c"
        enablepch "Off"
 
    filter "files:../Vendor/recastnavigation/**.cpp"

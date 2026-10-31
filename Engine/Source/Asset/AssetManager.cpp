@@ -1,6 +1,7 @@
 #include "rvelapch.h"
 #include "AssetManager.h"
 #include "Core/Log.h"
+#include "Core/VFS.h"
 #include "Asset/Loaders/PrefabLoader.h"
 #include "Asset/Loaders/MaterialLoader.h"
 #include "Asset/Loaders/MeshLoader.h"
@@ -38,7 +39,11 @@ void AssetManager::Init(AssetRegistry& registry)
     RegisterLoader(std::make_unique<AnimationLibraryLoader>());
     RegisterLoader(std::make_unique<SkeletalMeshLoader>());
     RegisterLoader(std::make_unique<SkeletonLoader>());
-    if (ProjectManager::IsProjectLoaded())
+    if (VFS::Get().IsMounted())
+    {
+        m_Registry->ScanFromVFS();
+    }
+    else if (ProjectManager::IsProjectLoaded())
     {
         m_Registry->Scan(ProjectManager::GetAssetDirectory());
     }
@@ -93,12 +98,49 @@ Ref<Asset> AssetManager::GetAssetInternal(const AssetUUID& uuid)
     IAssetLoader* loader = FindLoader(ext);
     if (!loader)
     {
+        std::string candidateExtensions[] = { ".rtex", ".rmesh", ".rskmesh" };
+        for (const auto& candidateExt : candidateExtensions)
+        {
+            auto cachePath = m_Registry->GetCacheDir() / (uuid.ToString() + candidateExt);
+            if ((VFS::Get().IsMounted() && VFS::Get().FileExists(cachePath.generic_string())) ||
+                std::filesystem::exists(cachePath))
+            {
+                loader = FindLoader(candidateExt);
+                if (loader)
+                {
+                    path = cachePath;
+                    ext = candidateExt;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (!loader)
+    {
         LOG_ERROR("No loader for extension '{}' (uuid: {})", ext, uuid.ToString());
         return nullptr;
     }
 
     auto meta = m_Registry->GetMeta(uuid);
-    Ref<Asset> asset = loader->Load(path, meta);
+    Ref<Asset> asset = nullptr;
+    if (VFS::Get().IsMounted())
+    {
+        std::vector<uint8_t> buffer;
+        std::string vfsPath = path.generic_string();
+        if (VFS::Get().ReadFile(vfsPath, buffer))
+        {
+            asset = loader->LoadFromMemory(buffer.data(), buffer.size(), meta);
+        }
+        else if (vfsPath.rfind("Assets/", 0) != 0 && VFS::Get().ReadFile("Assets/" + vfsPath, buffer))
+        {
+            asset = loader->LoadFromMemory(buffer.data(), buffer.size(), meta);
+        }
+    }
+    if (!asset)
+    {
+        asset = loader->Load(path, meta);
+    }
 
     {
         std::unique_lock<std::shared_mutex> writeLock(m_AssetMutex);
@@ -161,7 +203,21 @@ void AssetManager::Reload(const AssetUUID& uuid)
     if (!loader) return;
 
     auto meta = m_Registry->GetMeta(uuid);
-    Ref<Asset> reloaded = loader->Load(path, meta);
+    Ref<Asset> reloaded = nullptr;
+    if (VFS::Get().IsMounted())
+    {
+        std::vector<uint8_t> buffer;
+        std::string vfsPath = path.generic_string();
+        if (VFS::Get().ReadFile(vfsPath, buffer) ||
+            (vfsPath.rfind("Assets/", 0) != 0 && VFS::Get().ReadFile("Assets/" + vfsPath, buffer)))
+        {
+            reloaded = loader->LoadFromMemory(buffer.data(), buffer.size(), meta);
+        }
+    }
+    if (!reloaded)
+    {
+        reloaded = loader->Load(path, meta);
+    }
     if (!reloaded)
     {
         LOG_ERROR("Failed to reload asset: {}", path.string());

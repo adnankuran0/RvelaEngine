@@ -206,6 +206,14 @@ bool NavMeshBuilder::BuildSoloNavMesh(
     rcFreeCompactHeightfield(chf);
     rcFreeContourSet(cset);
 
+    if (pmesh->npolys <= 0 || pmesh->nverts <= 0)
+    {
+        LOG_WARN("[NavMesh] No walkable polygons found in geometry. NavMesh is empty.");
+        rcFreePolyMesh(pmesh);
+        rcFreePolyMeshDetail(dmesh);
+        return false;
+    }
+
     for (int i = 0; i < pmesh->npolys; ++i)
     {
         if (pmesh->areas[i] == RC_WALKABLE_AREA)

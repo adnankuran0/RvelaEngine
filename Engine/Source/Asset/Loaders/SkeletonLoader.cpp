@@ -40,29 +40,11 @@ glm::mat4 Mat4FromJson(const std::string& s)
 
 }
 
-Ref<Asset> SkeletonLoader::Load(const std::filesystem::path& assetPath, const AssetMeta& meta)
+Ref<Asset> SkeletonLoader::ParseSkeleton(const json& j, const AssetMeta& meta, const std::string& debugPath)
 {
-    std::ifstream file(assetPath);
-    if (!file)
-    {
-        LOG_ERROR("Cannot open: {}", assetPath.string());
-        return nullptr;
-    }
-
-    json j;
-    try
-    {
-        j = json::parse(file);
-    }
-    catch (const json::exception& e)
-    {
-        LOG_ERROR("JSON error in {}: {}", assetPath.string(), e.what());
-        return nullptr;
-    }
-
     if (!j.contains("bones") || !j["bones"].is_array() || j["bones"].empty())
     {
-        LOG_ERROR("Corrupted .rskeleton (empty bones): {}", assetPath.string());
+        LOG_ERROR("Corrupted .rskeleton (empty bones): {}", debugPath);
         return nullptr;
     }
 
@@ -85,7 +67,7 @@ Ref<Asset> SkeletonLoader::Load(const std::filesystem::path& assetPath, const As
         if (parent >= index)
         {
             LOG_ERROR("Corrupted skeleton asset, parent index sorting is invalid: {} (bone {})",
-                assetPath.string(), name);
+                debugPath, name);
             return nullptr;
         }
 
@@ -93,7 +75,7 @@ Ref<Asset> SkeletonLoader::Load(const std::filesystem::path& assetPath, const As
             !b.contains("bindScale") || !b.contains("inverseBindMatrix"))
         {
             LOG_ERROR("Corrupted skeleton asset, missing bone field(s): {} (bone {})",
-                assetPath.string(), name);
+                debugPath, name);
             return nullptr;
         }
 
@@ -111,4 +93,49 @@ Ref<Asset> SkeletonLoader::Load(const std::filesystem::path& assetPath, const As
         return nullptr;
 
     return asset;
+}
+
+Ref<Asset> SkeletonLoader::Load(const std::filesystem::path& assetPath, const AssetMeta& meta)
+{
+    std::ifstream file(assetPath);
+    if (!file)
+    {
+        LOG_ERROR("Cannot open: {}", assetPath.string());
+        return nullptr;
+    }
+
+    json j;
+    try
+    {
+        j = json::parse(file);
+    }
+    catch (const json::exception& e)
+    {
+        LOG_ERROR("JSON error in {}: {}", assetPath.string(), e.what());
+        return nullptr;
+    }
+
+    return ParseSkeleton(j, meta, assetPath.string());
+}
+
+Ref<Asset> SkeletonLoader::LoadFromMemory(const uint8_t* data, size_t size, const AssetMeta& meta)
+{
+    if (!data || size == 0)
+    {
+        LOG_ERROR("SkeletonLoader::LoadFromMemory: empty data for UUID: {}", meta.uuid.ToString());
+        return nullptr;
+    }
+
+    json j;
+    try
+    {
+        j = json::parse(reinterpret_cast<const char*>(data), reinterpret_cast<const char*>(data + size));
+    }
+    catch (const json::exception& e)
+    {
+        LOG_ERROR("JSON error in skeleton memory buffer {}: {}", meta.uuid.ToString(), e.what());
+        return nullptr;
+    }
+
+    return ParseSkeleton(j, meta, meta.uuid.ToString());
 }

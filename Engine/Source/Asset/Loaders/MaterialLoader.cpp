@@ -2,9 +2,9 @@
 #include "MaterialLoader.h"
 #include "Asset/Types/MaterialAsset.h"
 #include "Core/Log.h"
+#include "Asset/AssetMeta.h"
 #include <fstream>
 #include <nlohmann/json.hpp>
-#include "Asset/AssetMeta.h"
 
 using namespace rv;
 using json = nlohmann::json;
@@ -14,28 +14,8 @@ MaterialLoader::MaterialLoader()
     s_DefaultMaterial = CreateRef<MaterialAsset>(AssetUUID::Invalid());
 }
 
-Ref<Asset> MaterialLoader::Load(
-    const std::filesystem::path& assetPath,
-    const AssetMeta& meta)
+Ref<Asset> MaterialLoader::ParseMaterial(const json& j, const AssetMeta& meta)
 {
-    std::ifstream file(assetPath);
-    if (!file)
-    {
-        LOG_ERROR("Cannot open: {}", assetPath.string());
-        return nullptr;
-    }
-
-    json j;
-    try
-    {
-        j = json::parse(file);
-    }
-    catch (const json::exception& e)
-    {
-        LOG_ERROR("JSON error in {}: {}", assetPath.string(), e.what());
-        return nullptr;
-    }
-
     auto asset = CreateRef<MaterialAsset>(meta.uuid);
 
     if (j.contains("shadingMode"))
@@ -163,4 +143,44 @@ Ref<Asset> MaterialLoader::Load(
     }
 
     return asset;
+}
+
+Ref<Asset> MaterialLoader::LoadFromMemory(const uint8_t* data, size_t size, const AssetMeta& meta)
+{
+    if (!data || size == 0)
+        return nullptr;
+
+    try
+    {
+        json j = json::parse(data, data + size);
+        return ParseMaterial(j, meta);
+    }
+    catch (const json::exception& e)
+    {
+        LOG_ERROR("MaterialLoader::LoadFromMemory JSON error: {}", e.what());
+        return nullptr;
+    }
+}
+
+Ref<Asset> MaterialLoader::Load(const std::filesystem::path& assetPath, const AssetMeta& meta)
+{
+    std::ifstream file(assetPath);
+    if (!file)
+    {
+        LOG_ERROR("Cannot open: {}", assetPath.string());
+        return nullptr;
+    }
+
+    json j;
+    try
+    {
+        j = json::parse(file);
+    }
+    catch (const json::exception& e)
+    {
+        LOG_ERROR("JSON error in {}: {}", assetPath.string(), e.what());
+        return nullptr;
+    }
+
+    return ParseMaterial(j, meta);
 }

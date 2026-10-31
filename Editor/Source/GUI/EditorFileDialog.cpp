@@ -43,6 +43,26 @@ static std::string ToLower(std::string s)
     return s;
 }
 
+static std::string SafePathToString(const std::filesystem::path& p)
+{
+    try
+    {
+        auto u8 = p.u8string();
+        return std::string(reinterpret_cast<const char*>(u8.data()), u8.size());
+    }
+    catch (...)
+    {
+        try
+        {
+            return p.generic_string();
+        }
+        catch (...)
+        {
+            return "";
+        }
+    }
+}
+
 void EditorFileDialog::Open(
     const std::string& title,
     FileDialogMode mode,
@@ -100,7 +120,8 @@ void EditorFileDialog::InternalOpen(
     }
 
     std::filesystem::path startDir = initialDir;
-    if (startDir.empty() || !std::filesystem::exists(startDir))
+    std::error_code existsEc;
+    if (startDir.empty() || !std::filesystem::exists(startDir, existsEc))
     {
         if (ProjectManager::IsProjectLoaded())
         {
@@ -112,7 +133,10 @@ void EditorFileDialog::InternalOpen(
         }
     }
 
-    m_CurrentDirectory = std::filesystem::weakly_canonical(startDir);
+    std::error_code startEc;
+    m_CurrentDirectory = std::filesystem::weakly_canonical(startDir, startEc);
+    if (startEc || m_CurrentDirectory.empty())
+        m_CurrentDirectory = startDir;
 
     m_History.clear();
     m_History.push_back(m_CurrentDirectory);
@@ -132,43 +156,59 @@ void EditorFileDialog::RefreshFileList()
         return;
     }
 
-    for (const auto& entry : std::filesystem::directory_iterator(m_CurrentDirectory, std::filesystem::directory_options::skip_permission_denied, ec))
+    try
     {
-        FileItem item;
-        item.filename = entry.path().filename().string();
-        item.path = entry.path();
-        item.isDirectory = entry.is_directory(ec);
-        item.extension = entry.path().extension().string();
-
-        if (!item.isDirectory)
+        for (auto it = std::filesystem::directory_iterator(m_CurrentDirectory, std::filesystem::directory_options::skip_permission_denied, ec);
+             !ec && it != std::filesystem::directory_iterator();
+             it.increment(ec))
         {
-            item.fileSize = entry.file_size(ec);
-        }
-
-        if (m_Mode == FileDialogMode::SelectFolder && !item.isDirectory)
-        {
-            continue;
-        }
-
-        if (!item.isDirectory && !m_Filters.empty())
-        {
-            std::string extLower = ToLower(item.extension);
-            bool matched = false;
-            for (const auto& f : m_Filters)
+            try
             {
-                if (f == "*.*" || f == "*" || ToLower(f) == extLower)
+                const auto& entry = *it;
+                FileItem item;
+                item.filename = SafePathToString(entry.path().filename());
+                item.path = entry.path();
+                item.isDirectory = entry.is_directory(ec);
+                item.extension = SafePathToString(entry.path().extension());
+
+                if (!item.isDirectory)
                 {
-                    matched = true;
-                    break;
+                    item.fileSize = entry.file_size(ec);
                 }
+
+                if (m_Mode == FileDialogMode::SelectFolder && !item.isDirectory)
+                {
+                    continue;
+                }
+
+                if (!item.isDirectory && !m_Filters.empty())
+                {
+                    std::string extLower = ToLower(item.extension);
+                    bool matched = false;
+                    for (const auto& f : m_Filters)
+                    {
+                        if (f == "*.*" || f == "*" || ToLower(f) == extLower)
+                        {
+                            matched = true;
+                            break;
+                        }
+                    }
+                    if (!matched)
+                    {
+                        continue;
+                    }
+                }
+
+                m_CachedItems.push_back(std::move(item));
             }
-            if (!matched)
+            catch (...)
             {
                 continue;
             }
         }
-
-        m_CachedItems.push_back(std::move(item));
+    }
+    catch (...)
+    {
     }
 
     std::sort(m_CachedItems.begin(), m_CachedItems.end(), [](const FileItem& a, const FileItem& b) {
@@ -184,7 +224,9 @@ void EditorFileDialog::NavigateTo(const std::filesystem::path& newPath)
     if (!std::filesystem::exists(newPath, ec) || !std::filesystem::is_directory(newPath, ec))
         return;
 
-    auto canon = std::filesystem::weakly_canonical(newPath);
+    auto canon = std::filesystem::weakly_canonical(newPath, ec);
+    if (ec || canon.empty())
+        canon = newPath;
     if (canon == m_CurrentDirectory)
         return;
 
@@ -326,12 +368,12 @@ void EditorFileDialog::InternalDraw()
             auto rel = std::filesystem::relative(m_CurrentDirectory, projectRoot, ec);
             if (!ec && !rel.empty() && rel != ".")
             {
-                breadcrumbs.push_back({ projectRoot.filename().string(), projectRoot });
+                breadcrumbs.push_back({ SafePathToString(projectRoot.filename()), projectRoot });
                 std::filesystem::path accum = projectRoot;
                 for (const auto& part : rel)
                 {
                     accum /= part;
-                    breadcrumbs.push_back({ part.string(), accum });
+                    breadcrumbs.push_back({ SafePathToString(part), accum });
                 }
             }
         }
@@ -342,7 +384,7 @@ void EditorFileDialog::InternalDraw()
             for (const auto& part : m_CurrentDirectory)
             {
                 accum /= part;
-                std::string s = part.string();
+                std::string s = SafePathToString(part);
                 if (s.empty() || s == "\\" || s == "/") continue;
                 breadcrumbs.push_back({ s, accum });
             }

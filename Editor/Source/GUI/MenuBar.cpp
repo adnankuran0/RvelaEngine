@@ -1,4 +1,5 @@
 #include "MenuBar.h"
+#include "Core/PakWriter.h"
 #include "Core/Engine.h"
 #include "Asset/AssetImportPipeline.h"
 #include "Asset/AssetRegistry.h"
@@ -28,6 +29,34 @@
 #include "Panels/ConsolePanel.h"
 #include "PrefabEditManager.h"
 #include "Style.h"
+#include <thread>
+#include <atomic>
+#include <mutex>
+
+namespace {
+
+struct StandaloneExportState
+{
+    bool isExporting = false;
+    bool shouldOpenPopup = false;
+    std::atomic<float> progress{0.0f};
+    std::mutex mutex;
+    std::string currentFile;
+    bool finished = false;
+    bool success = false;
+    std::string errorMessage;
+    std::thread worker;
+
+    ~StandaloneExportState()
+    {
+        if (worker.joinable())
+            worker.join();
+    }
+};
+
+static StandaloneExportState s_ExportState;
+
+}
 
 using namespace rv;
 
@@ -66,7 +95,7 @@ void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter, const Edi
                 ImGui::Separator();
             }
 
-            if (ImGui::MenuItem("Switch Project..."))
+            if (ImGui::MenuItem("Switch Project"))
             {
                 if (panels.projectSelector)
                     panels.projectSelector->Open();
@@ -78,6 +107,80 @@ void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter, const Edi
             if (ImGui::MenuItem("Save Project"))
             {
                 ProjectManager::SaveActiveProject();
+            }
+
+            if (ImGui::MenuItem("Export project", nullptr, false, ProjectManager::IsProjectLoaded() && !s_ExportState.isExporting))
+            {
+                auto activeProj = ProjectManager::GetActiveProject();
+                if (activeProj)
+                {
+                    std::string chosen = Dialogs::SelectFolderDialog("Select Export Directory");
+                    if (!chosen.empty())
+                    {
+                        if (s_ExportState.worker.joinable())
+                            s_ExportState.worker.join();
+
+                        s_ExportState.isExporting = true;
+                        s_ExportState.shouldOpenPopup = true;
+                        s_ExportState.progress.store(0.0f);
+                        s_ExportState.finished = false;
+                        s_ExportState.success = false;
+                        s_ExportState.errorMessage.clear();
+                        {
+                            std::lock_guard<std::mutex> lock(s_ExportState.mutex);
+                            s_ExportState.currentFile = "Preparing export...";
+                        }
+
+                        std::filesystem::path outFolder = chosen;
+                        std::filesystem::path projPath = activeProj->projectFolderPath;
+                        std::string projName = activeProj->name;
+
+                        s_ExportState.worker = std::thread([outFolder, projPath, projName]() {
+                            std::filesystem::path pakDest = outFolder / (projName + ".pak");
+
+                            PakBuildOptions options;
+                            options.projectPath = projPath;
+                            options.outputPakPath = pakDest;
+                            options.includeEngineResources = true;
+                            options.progressCallback = [](const std::string& currentFile, float progress) {
+                                s_ExportState.progress.store(progress);
+                                std::lock_guard<std::mutex> lock(s_ExportState.mutex);
+                                s_ExportState.currentFile = currentFile;
+                            };
+
+                            auto u8 = pakDest.u8string();
+                            std::string pakDestStr(reinterpret_cast<const char*>(u8.data()), u8.size());
+                            PakBuildResult pakResult = PakWriter::BuildPak(options);
+
+                            if (pakResult.success)
+                            {
+                                {
+                                    std::lock_guard<std::mutex> lock(s_ExportState.mutex);
+                                    s_ExportState.currentFile = "Copying runtime executable...";
+                                }
+                                std::filesystem::path exeDir = Path::GetExecutableDirectory();
+                                std::filesystem::path runtimeSrc = exeDir / "RvelaRuntime.exe";
+                                std::filesystem::path runtimeDst = outFolder / (projName + ".exe");
+
+                                std::error_code copyEc;
+                                if (std::filesystem::exists(runtimeSrc, copyEc))
+                                {
+                                    std::filesystem::copy_file(runtimeSrc, runtimeDst, std::filesystem::copy_options::overwrite_existing, copyEc);
+                                }
+
+                                s_ExportState.progress.store(1.0f);
+                                s_ExportState.success = true;
+                            }
+                            else
+                            {
+                                s_ExportState.success = false;
+                                s_ExportState.errorMessage = pakResult.errorMessage;
+                            }
+
+                            s_ExportState.finished = true;
+                        });
+                    }
+                }
             }
 
             ImGui::Separator();
@@ -241,5 +344,58 @@ void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter, const Edi
         }
 
         ImGui::EndMainMenuBar();
+    }
+
+    if (s_ExportState.isExporting && s_ExportState.shouldOpenPopup)
+    {
+        ImGui::OpenPopup("Exporting Standalone Game##Modal");
+        s_ExportState.shouldOpenPopup = false;
+    }
+
+    if (ImGui::BeginPopupModal("Exporting Standalone Game##Modal", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        if (!s_ExportState.finished)
+        {
+            ImGui::Text("Exporting game package, please wait...");
+            ImGui::Spacing();
+
+            float prog = s_ExportState.progress.load();
+            ImGui::ProgressBar(prog, ImVec2(400.0f, 24.0f));
+
+            std::string curFile;
+            {
+                std::lock_guard<std::mutex> lock(s_ExportState.mutex);
+                curFile = s_ExportState.currentFile;
+            }
+            ImGui::TextDisabled("%s", curFile.c_str());
+        }
+        else
+        {
+            if (s_ExportState.worker.joinable())
+                s_ExportState.worker.join();
+
+            if (s_ExportState.success)
+            {
+                ImGui::TextColored(ImVec4(0.2f, 0.9f, 0.2f, 1.0f), "Game exported successfully!");
+                ImGui::Spacing();
+                if (ImGui::Button("OK", ImVec2(120.0f, 28.0f)))
+                {
+                    s_ExportState.isExporting = false;
+                    ImGui::CloseCurrentPopup();
+                }
+            }
+            else
+            {
+                ImGui::TextColored(ImVec4(0.9f, 0.2f, 0.2f, 1.0f), "Export failed: %s", s_ExportState.errorMessage.c_str());
+                ImGui::Spacing();
+                if (ImGui::Button("Close", ImVec2(120.0f, 28.0f)))
+                {
+                    s_ExportState.isExporting = false;
+                    ImGui::CloseCurrentPopup();
+                }
+            }
+        }
+
+        ImGui::EndPopup();
     }
 }

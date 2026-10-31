@@ -10,6 +10,7 @@ class AssetRegistry
 {
 public:
     void Scan(const std::filesystem::path& assetDir);
+    bool ScanFromVFS();
     void Clear();
 
     AssetMeta GetMeta(const AssetUUID& uuid) const;

@@ -1,6 +1,7 @@
 #include "rvelapch.h"
 #include "Shader.h"
 #include "Core/Log.h"
+#include "Core/VFS.h"
 
 using namespace rv;
 
@@ -198,9 +199,60 @@ std::string Shader::ProcessIncludes(const std::string& source, const Path& shade
             if (start != std::string::npos && end != std::string::npos && end > start)
             {
                 std::string includeFilename = line.substr(start + 1, end - start - 1);
+                std::string normInc = includeFilename;
+                std::replace(normInc.begin(), normInc.end(), '\\', '/');
+
+                std::filesystem::path currentShaderFs(shaderPath.String());
+                std::string currentParentDir = currentShaderFs.parent_path().generic_string();
+                std::string incFilenameOnly = std::filesystem::path(normInc).filename().generic_string();
+
+                if (VFS::Get().IsMounted())
+                {
+                    std::vector<std::string> incCandidatePaths;
+                    if (!currentParentDir.empty())
+                    {
+                        incCandidatePaths.push_back(currentParentDir + "/" + normInc);
+                        incCandidatePaths.push_back(currentParentDir + "/" + incFilenameOnly);
+                    }
+                    incCandidatePaths.push_back("Resources/Engine/Shaders/Common/" + normInc);
+                    incCandidatePaths.push_back("Resources/Engine/Shaders/Common/" + incFilenameOnly);
+                    incCandidatePaths.push_back("Resources/Engine/Shaders/" + normInc);
+                    incCandidatePaths.push_back("Resources/Engine/Shaders/" + incFilenameOnly);
+                    incCandidatePaths.push_back("Assets/Shaders/" + normInc);
+                    incCandidatePaths.push_back("Assets/Shaders/Common/" + normInc);
+                    incCandidatePaths.push_back("Shaders/" + normInc);
+                    incCandidatePaths.push_back(normInc);
+
+                    bool loadedFromVFS = false;
+                    for (const auto& cPath : incCandidatePaths)
+                    {
+                        std::string incContent;
+                        if (VFS::Get().ReadTextFile(cPath, incContent))
+                        {
+                            if (includedPaths.find(cPath) == includedPaths.end())
+                            {
+                                includedPaths.insert(cPath);
+                                result << ProcessIncludes(incContent, Path::FromVirtual(cPath), includedPaths) << "\n";
+                            }
+                            loadedFromVFS = true;
+                            break;
+                        }
+                    }
+                    if (loadedFromVFS)
+                    {
+                        continue;
+                    }
+                }
 
                 Path includePath = shaderPath.GetParentPath() / includeFilename;
-
+                if (!includePath.Exists())
+                {
+                    includePath = ENGINE_PATH("Shaders\\Common\\" + incFilenameOnly);
+                }
+                if (!includePath.Exists())
+                {
+                    includePath = ENGINE_PATH("Shaders\\" + normInc);
+                }
                 if (!includePath.Exists())
                 {
                     includePath = Path::FromVirtual(std::string("Assets/Shaders/") + includeFilename);
@@ -330,6 +382,25 @@ bool Shader::IsDefineEnabled(const std::string& define) const
 
 bool Shader::CompileInternal(const Path& path, GLuint& outProgram)
 {
+    if (VFS::Get().IsMounted())
+    {
+        std::string vfsPath;
+        if (path.GetOrigin() == PathOrigin::EngineResource)
+            vfsPath = "Resources/Engine/" + path.GetVirtual().generic_string();
+        else if (path.GetOrigin() == PathOrigin::EditorResource)
+            vfsPath = "Resources/Editor/" + path.GetVirtual().generic_string();
+        else
+            vfsPath = path.GetVirtual().generic_string();
+
+        std::string source;
+        if (VFS::Get().ReadTextFile(vfsPath, source) ||
+            VFS::Get().ReadTextFile(path.GetVirtual().generic_string(), source) ||
+            VFS::Get().ReadTextFile("Resources/Engine/Shaders/" + path.GetFilename(), source))
+        {
+            return CompileSourceInternal(source, path, outProgram);
+        }
+    }
+
     std::ifstream shaderFile(path.GetAbsolute());
     if (!shaderFile.is_open())
     {

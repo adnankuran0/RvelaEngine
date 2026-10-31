@@ -1,5 +1,6 @@
 #include "rvelapch.h"
 #include "NavigationSystem.h"
+#include "Core/Engine.h"
 #include "Scene/Scene.h"
 #include "Scene/Entity.h"
 #include "Scene/Components/NavMeshSurfaceComponent.h"
@@ -83,7 +84,10 @@ void NavigationSystem::Update(float dt)
 {
     auto surface = GetActiveSurface();
 
-    if (surface && surface->drawDebugMesh && surface->IsBaked())
+    const bool isRuntime = (!Engine::Get() || Engine::Get()->GetEditorCamera() == nullptr);
+    const bool debugEnabled = !isRuntime && surface && surface->drawDebugMesh;
+
+    if (debugEnabled && surface->IsBaked())
     {
         const auto debugLines = surface->GetDebugLines();
         for (const auto& line : debugLines)
@@ -125,7 +129,7 @@ void NavigationSystem::Update(float dt)
             }
         }
 
-        if (agent.drawDebugPath && agent.hasPath && !agent.waypoints.empty())
+        if (debugEnabled && agent.drawDebugPath && agent.hasPath && !agent.waypoints.empty())
         {
             glm::vec3 p0 = currentPos + glm::vec3(0.0f, 0.2f, 0.0f);
             glm::vec3 p1 = agent.waypoints[agent.currentWaypointIndex] + glm::vec3(0.0f, 0.2f, 0.0f);
