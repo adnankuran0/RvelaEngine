@@ -236,6 +236,32 @@ void AssetManager::UnloadAll()
     m_LoadedAssets.clear();
 }
 
+void AssetManager::UnloadUnusedAssets()
+{
+    std::vector<AssetUUID> unused;
+    {
+        std::unique_lock<std::shared_mutex> lock(m_AssetMutex);
+        for (auto it = m_LoadedAssets.begin(); it != m_LoadedAssets.end(); )
+        {
+            if (it->second.Expired() || it->second.UseCount() == 0)
+            {
+                unused.push_back(it->first);
+                it = m_LoadedAssets.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+    }
+
+    for (const auto& uuid : unused)
+    {
+        TextureCache::Get().Remove(uuid);
+        MeshCache::Get().Remove(uuid);
+    }
+}
+
 IAssetLoader* AssetManager::FindLoader(const std::string& ext) const
 {
     std::shared_lock<std::shared_mutex> lock(m_AssetMutex);

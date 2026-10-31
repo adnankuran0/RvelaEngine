@@ -228,6 +228,10 @@ void LuaBindings::RegisterSceneAPI(sol::state& lua, SceneManager* sceneManager)
         return 0;
     };
 
+    lua["SceneManager"]["UnloadUnusedAssets"] = []() {
+        AssetManager::Get().UnloadUnusedAssets();
+    };
+
     lua["SceneManager"]["IsSceneLoaded"] = [sceneManager](sol::variadic_args va) -> bool {
         if (!sceneManager) return false;
         auto args = GetCleanArgs(va);

@@ -42,6 +42,7 @@ public:
 	static void SetGameplayInputEnabled(bool enabled) noexcept;
 	static bool IsGameplayInputEnabled() noexcept;
 	static bool IsMouseCaptured() noexcept;
+	static void OnFocusChanged(bool focused) noexcept;
 
 	static glm::vec2 GetMousePosition() noexcept;
 

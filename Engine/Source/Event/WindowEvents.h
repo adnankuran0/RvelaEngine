@@ -1,5 +1,7 @@
 #pragma once
 #include "Event.h"
+#include <vector>
+#include <filesystem>
 
 namespace rv { 
 
@@ -45,6 +47,23 @@ public:
 private:
     std::vector<std::filesystem::path> m_Paths;
     static constexpr const char* EVENT_NAME = "FileDropped";
+};
+
+class WindowFocusEvent : public Event
+{
+public:
+    explicit WindowFocusEvent(bool focused) noexcept
+        : m_Focused(focused) {}
+
+    inline EventType GetEventType() const noexcept override { return EventType::WindowFocus; }
+    inline const char* GetName() const noexcept override { return EVENT_NAME; }
+    inline static EventType GetStaticType() noexcept { return EventType::WindowFocus; }
+
+    inline bool IsFocused() const noexcept { return m_Focused; }
+
+private:
+    bool m_Focused;
+    static constexpr const char* EVENT_NAME = "WindowFocus";
 };
 
 }

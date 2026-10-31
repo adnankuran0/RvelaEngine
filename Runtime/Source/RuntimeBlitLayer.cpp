@@ -6,8 +6,21 @@
 #include <algorithm>
 #include <cmath>
 
-void rv::RuntimeBlitLayer::OnRender()
+void rv::RuntimeBlitLayer::OnAttach()
 {
+	UpdateViewportAndMouse();
+}
+
+void rv::RuntimeBlitLayer::OnUpdate()
+{
+	UpdateViewportAndMouse();
+}
+
+void rv::RuntimeBlitLayer::UpdateViewportAndMouse()
+{
+	if (!m_Engine)
+		return;
+
 	int winWidth = 0, winHeight = 0;
 	glfwGetFramebufferSize(m_Engine->GetWindow().GetGLFWWindow(), &winWidth, &winHeight);
 	if (winWidth <= 0 || winHeight <= 0)
@@ -73,7 +86,6 @@ void rv::RuntimeBlitLayer::OnRender()
 
 	m_Engine->GetRenderLayer().SetTargetResolution(targetRenderW, targetRenderH);
 
-	GLuint finalFBO = m_Engine->GetRenderLayer().GetFinalFramebuffer();
 	auto& renderCtx = m_Engine->GetRenderLayer().GetRenderContext();
 	uint32_t srcW = renderCtx.viewportWidth > 0 ? renderCtx.viewportWidth : targetRenderW;
 	uint32_t srcH = renderCtx.viewportHeight > 0 ? renderCtx.viewportHeight : targetRenderH;
@@ -132,8 +144,36 @@ void rv::RuntimeBlitLayer::OnRender()
 		Input::SetViewportMousePos(glm::vec2(normX * static_cast<float>(srcW), normY * static_cast<float>(srcH)));
 	}
 
+	m_Metrics.winWidth = winWidth;
+	m_Metrics.winHeight = winHeight;
+	m_Metrics.targetRenderW = targetRenderW;
+	m_Metrics.targetRenderH = targetRenderH;
+	m_Metrics.srcW = srcW;
+	m_Metrics.srcH = srcH;
+	m_Metrics.dstX0 = dstX0;
+	m_Metrics.dstY0 = dstY0;
+	m_Metrics.dstX1 = dstX1;
+	m_Metrics.dstY1 = dstY1;
+}
+
+void rv::RuntimeBlitLayer::OnRender()
+{
+	if (!m_Engine)
+		return;
+
+	if (m_Metrics.winWidth <= 0 || m_Metrics.winHeight <= 0)
+	{
+		int winWidth = 0, winHeight = 0;
+		glfwGetFramebufferSize(m_Engine->GetWindow().GetGLFWWindow(), &winWidth, &winHeight);
+		if (winWidth <= 0 || winHeight <= 0)
+			return;
+		UpdateViewportAndMouse();
+	}
+
+	GLuint finalFBO = m_Engine->GetRenderLayer().GetFinalFramebuffer();
+
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-	glViewport(0, 0, winWidth, winHeight);
+	glViewport(0, 0, m_Metrics.winWidth, m_Metrics.winHeight);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -150,8 +190,8 @@ void rv::RuntimeBlitLayer::OnRender()
 	}
 
 	glBlitFramebuffer(
-		0, 0, srcW, srcH,
-		dstX0, dstY0, dstX1, dstY1,
+		0, 0, m_Metrics.srcW, m_Metrics.srcH,
+		m_Metrics.dstX0, m_Metrics.dstY0, m_Metrics.dstX1, m_Metrics.dstY1,
 		GL_COLOR_BUFFER_BIT,
 		blitFilter
 	);

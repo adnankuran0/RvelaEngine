@@ -4,6 +4,21 @@
 #include "Utils/FileUtils.h"
 #include <filesystem>
 #include <iostream>
+#include <string>
+
+#if defined(_WIN32)
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+static void ShowFatalError(const std::string& title, const std::string& message)
+{
+	MessageBoxA(nullptr, message.c_str(), title.c_str(), MB_OK | MB_ICONERROR);
+}
+#else
+static void ShowFatalError(const std::string& title, const std::string& message)
+{
+	std::cerr << "[" << title << "] " << message << std::endl;
+}
+#endif
 
 using namespace rv;
 
@@ -57,10 +72,7 @@ static std::filesystem::path FindProjectToRun(int argc, char** argv)
 	std::filesystem::path defaultTest = std::filesystem::path(RVELA_ROOT_DIR) / "Resources" / "Editor" / "TestProject" / "TestProject.rproj";
 	if (std::filesystem::exists(defaultTest))
 		return defaultTest;
-
 #endif
-
-
 
 	return "";
 }
@@ -72,14 +84,18 @@ int main(int argc, char** argv)
 	std::filesystem::path projectPath = FindProjectToRun(argc, argv);
 	if (projectPath.empty())
 	{
-		LOG_ERROR("Runtime: No valid .rproj file found to launch!");
+		const std::string err = "No valid .rproj project file found to launch!\n\nPlease place your .rproj project in the executable directory or specify it as a command line argument.";
+		LOG_ERROR("Runtime: {}", err);
+		ShowFatalError("Rvela Runtime - Project Not Found", err);
 		return -1;
 	}
 
 	LOG_INFO("Runtime: Launching project: {}", projectPath.string());
 	if (!engine.OpenProject(projectPath.string()))
 	{
-		LOG_ERROR("Runtime: Failed to open project: {}", projectPath.string());
+		const std::string err = "Failed to open project: " + projectPath.string() + "\n\n";
+		LOG_ERROR("Runtime: {}", err);
+		ShowFatalError("Rvela Runtime - Load Error", err);
 		return -1;
 	}
 
@@ -94,7 +110,22 @@ int main(int argc, char** argv)
 
 	engine.PushLayer(new rv::RuntimeBlitLayer(&engine));
 
-	engine.Run();
+	try
+	{
+		engine.Run();
+	}
+	catch (const std::exception& ex)
+	{
+		LOG_CRITICAL("Runtime unhandled exception: {}", ex.what());
+		ShowFatalError("Rvela Runtime Crash", std::string("An unhandled exception occurred:\n") + ex.what());
+		return -1;
+	}
+	catch (...)
+	{
+		LOG_CRITICAL("Runtime unhandled unknown exception");
+		ShowFatalError("Rvela Runtime Crash", "An unexpected fatal error occurred.");
+		return -1;
+	}
 
 	return 0;
 }

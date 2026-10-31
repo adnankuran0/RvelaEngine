@@ -24,7 +24,7 @@ void Input::BeginFrame() noexcept
     s_AccumulatedScrollDelta = { 0.0f, 0.0f };
     s_TypedCharacters.clear();
 
-    GLFWwindow* window = Engine::Get()->GetWindow().GetGLFWWindow();
+    GLFWwindow* window = Engine::Get() ? Engine::Get()->GetWindow().GetGLFWWindow() : nullptr;
     if (window && s_GameplayInputEnabled)
     {
         double xPos, yPos;
@@ -111,7 +111,7 @@ void Input::Update() noexcept
 }
 
 bool Input::IsKeyPressed(KeyCode key) noexcept {
-    GLFWwindow* window = Engine::Get()->GetWindow().GetGLFWWindow();
+    GLFWwindow* window = Engine::Get() ? Engine::Get()->GetWindow().GetGLFWWindow() : nullptr;
     if (!window) {
         return false;
     }
@@ -134,7 +134,7 @@ bool Input::IsKeyJustReleased(KeyCode key) noexcept
 }
 
 bool Input::IsMouseButtonPressed(MouseCode button) noexcept {
-    auto* window = Engine::Get()->GetWindow().GetGLFWWindow();
+    auto* window = Engine::Get() ? Engine::Get()->GetWindow().GetGLFWWindow() : nullptr;
     if (!window) {
         return false;
     }
@@ -202,10 +202,30 @@ void Input::ApplyMouseMode(MouseMode mode) noexcept
         break;
     }
 
-    GLFWwindow* window = Engine::Get()->GetWindow().GetGLFWWindow();
+    GLFWwindow* window = Engine::Get() ? Engine::Get()->GetWindow().GetGLFWWindow() : nullptr;
     if (window)
 		glfwSetInputMode(window, GLFW_CURSOR, glfwMode);
 	s_ActiveMouseMode = mode;
+}
+
+void Input::OnFocusChanged(bool focused) noexcept
+{
+    s_PreviousKeyState.clear();
+    s_PreviousMouseButtonState.clear();
+    s_MouseDelta = { 0.0f, 0.0f };
+    s_CurrentScrollDelta = { 0.0f, 0.0f };
+    s_AccumulatedScrollDelta = { 0.0f, 0.0f };
+    s_TypedCharacters.clear();
+    s_FirstMouse = true;
+
+    if (!focused)
+    {
+        ApplyMouseMode(MouseMode::VISIBLE);
+    }
+    else
+    {
+        ApplyMouseMode(s_GameplayInputEnabled ? s_RequestedMouseMode : MouseMode::VISIBLE);
+    }
 }
 
 // Viewport relative mouse position storage
@@ -225,7 +245,7 @@ glm::vec2 Input::GetViewportMousePosition(float viewportWidth, float viewportHei
         return s_ViewportMousePos;
     }
 
-    auto* window = Engine::Get()->GetWindow().GetGLFWWindow();
+    auto* window = Engine::Get() ? Engine::Get()->GetWindow().GetGLFWWindow() : nullptr;
     if (!window) {
         return { 0.0f, 0.0f };
     }
@@ -255,7 +275,7 @@ glm::vec2 Input::GetMousePosition() noexcept {
 	if (!s_GameplayInputEnabled)
 		return s_LastMousePosition;
 
-    auto* window = Engine::Get()->GetWindow().GetGLFWWindow();
+    auto* window = Engine::Get() ? Engine::Get()->GetWindow().GetGLFWWindow() : nullptr;
     if (!window) {
         return { 0.0f, 0.0f };
     }

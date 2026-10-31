@@ -73,6 +73,14 @@ public:
         return !weakPtr.expired();
     }
 
+    bool Expired() const {
+        return weakPtr.expired();
+    }
+
+    long UseCount() const {
+        return weakPtr.use_count();
+    }
+
     
 private:
     std::weak_ptr<T> weakPtr;

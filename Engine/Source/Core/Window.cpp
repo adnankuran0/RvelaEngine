@@ -40,6 +40,7 @@ void Window::SetCallbacks() noexcept
     glfwSetCursorPosCallback(m_Window, MouseMovedCallback);
     glfwSetScrollCallback(m_Window, MouseScrolledCallback);
     glfwSetFramebufferSizeCallback(m_Window, FramebufferSizeCallback);
+    glfwSetWindowFocusCallback(m_Window, WindowFocusCallback);
     glfwSetDropCallback(m_Window, FileDropCallback);
     glfwSetCharCallback(m_Window, CharCallback);
 }
@@ -157,6 +158,13 @@ void Window::FramebufferSizeCallback(GLFWwindow* window, int width, int height) 
 {
     glViewport(0, 0, width, height);
     EventManager::PushEvent(new WindowResizedEvent(width, height));
+}
+
+void Window::WindowFocusCallback(GLFWwindow* window, int focused) noexcept
+{
+    const bool isFocused = (focused == GLFW_TRUE);
+    Input::OnFocusChanged(isFocused);
+    EventManager::PushEvent(new WindowFocusEvent(isFocused));
 }
 
 void Window::FileDropCallback(GLFWwindow* window, int pathCount, const char* paths[]) noexcept

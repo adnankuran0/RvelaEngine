@@ -584,6 +584,7 @@ void SceneManager::ActivateSceneInternal(std::unique_ptr<Scene> scenePtr)
     }
 
     SetActiveScene(std::move(scenePtr));
+    AssetManager::Get().UnloadUnusedAssets();
     if (previousState == SceneState::PLAY)
     {
         m_CurrentScene->SetState(SceneState::PLAY);

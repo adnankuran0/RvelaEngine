@@ -19,7 +19,9 @@ enum class EventType {
 
     WindowResized,
 
-    FileDropped
+    FileDropped,
+
+    WindowFocus
 };
 
 }

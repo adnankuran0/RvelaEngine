@@ -31,20 +31,8 @@ static const SkeletonComponent* FindSkeletonInHierarchy(Scene* scene, entt::enti
 
 void RenderLayer::OnRender()
 {
-
 	Scene& scene = m_Engine->GetActiveScene();
 	Camera* camera = m_Engine->GetCamera();
-	if (!camera)
-		return;
-
-	LightSystem& lightSystem = scene.GetLightSystem();
-	
-	m_Context.Clear();
-
-	m_Context.camera = camera;
-	m_Context.pointLights = lightSystem.CollectPointLights();
-	m_Context.spotLights = lightSystem.CollectSpotLights();
-	m_Context.directionalLight = lightSystem.CollectDirectionalLight(camera);
 
 	uint32_t renderW = 1920;
 	uint32_t renderH = 1080;
@@ -78,17 +66,41 @@ void RenderLayer::OnRender()
 	m_Context.environment = &scene.GetEnvironment();
 	m_Context.wireframe = m_Wireframe;
 
+	m_RenderPipeline->EnsureInitialized(m_Context);
+
 	if (camera)
 	{
 		camera->width = static_cast<int>(renderW);
 		camera->height = static_cast<int>(renderH);
+
+		LightSystem& lightSystem = scene.GetLightSystem();
+		m_Context.Clear();
+		m_Context.camera = camera;
+		m_Context.pointLights = lightSystem.CollectPointLights();
+		m_Context.spotLights = lightSystem.CollectSpotLights();
+		m_Context.directionalLight = lightSystem.CollectDirectionalLight(camera);
+		m_Context.viewportWidth = renderW;
+		m_Context.viewportHeight = renderH;
+		m_Context.scene = &scene;
+		m_Context.environment = &scene.GetEnvironment();
+		m_Context.wireframe = m_Wireframe;
+
+		CollectRenderCommands(&scene);
+		m_RenderPipeline->Execute(m_Context);
 	}
-	
-	m_RenderPipeline->EnsureInitialized(m_Context);
-	
-	CollectRenderCommands(&scene);
-	
-	m_RenderPipeline->Execute(m_Context);
+	else
+	{
+		m_Context.Clear();
+		GLuint finalFB = m_RenderPipeline->GetFinalFramebuffer();
+		if (finalFB != 0)
+		{
+			glBindFramebuffer(GL_FRAMEBUFFER, finalFB);
+			glViewport(0, 0, m_Context.viewportWidth, m_Context.viewportHeight);
+			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		}
+	}
 
 	GLuint finalFB = m_RenderPipeline->GetFinalFramebuffer();
 	GLuint depthTexture = m_RenderPipeline->GetDepthTexture();

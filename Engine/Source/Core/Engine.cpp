@@ -25,10 +25,14 @@ Engine::Engine()
 Engine::Engine(const WindowData& windowData)
 	: m_Window(windowData)
 {
+	if (s_Instance == nullptr)
+		s_Instance = this;
+	else
+		LOG_WARN("Another instance of Engine already exists!");
+
 	RvelaLog::Init("log.txt");
 
 	InitResourcePaths();
-
 
 	m_Window.Init();
 	AssetManager& assetManager = AssetManager::Get();
@@ -37,10 +41,6 @@ Engine::Engine(const WindowData& windowData)
 	AudioManager::Init();
 
 	m_Renderer.Init(m_Window.GetGLFWWindow());
-	if (s_Instance == nullptr)
-		s_Instance = this;
-	else
-		LOG_WARN("Another instance of Engine already exists!");
 
 	m_SceneManager.Init();
 	m_RenderLayer = new RenderLayer(this);
@@ -99,6 +99,8 @@ bool Engine::OpenProject(const std::string& projectFilePath)
 Engine::~Engine()
 {
 	Shutdown();
+	if (s_Instance == this)
+		s_Instance = nullptr;
 }
 
 void Engine::PushLayer(Layer* layer)
@@ -113,13 +115,13 @@ void Engine::PopLayer(Layer* layer)
 
 void Engine::Update()
 {
-	m_SceneManager.Update();
-	AudioManager::Get().Update(GetCamera());
-
 	for (Layer* layer : m_LayerStack)
 	{
 		layer->OnUpdate();
 	}
+
+	m_SceneManager.Update();
+	AudioManager::Get().Update(GetCamera());
 }
 
 void Engine::FixedUpdate()

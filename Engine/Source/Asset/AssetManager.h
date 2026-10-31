@@ -25,6 +25,7 @@ public:
     void Unload(const AssetUUID& uuid);
     void Reload(const AssetUUID& uuid);
     void UnloadAll();
+    void UnloadUnusedAssets();
 
 private:
     AssetManager() = default;                        

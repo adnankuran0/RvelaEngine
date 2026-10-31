@@ -16,6 +16,7 @@
 #include "Asset/AssetUUID.h"
 #include "Core/Time.h"
 #include "Core/Engine.h"
+#include "Core/ProjectSettings.h"
 #include "Utils/ProjectManager.h"
 #include "Utils/FileUtils.h"
 #include <vector>
@@ -411,6 +412,69 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
     auto appTable = lua.create_named_table("Application");
     appTable["Quit"] = engineTable["Quit"];
     appTable["Exit"] = engineTable["Quit"];
+    appTable["SetMaxFPS"] = [](int fps) { Time::SetMaxFPS(fps); };
+    appTable["GetMaxFPS"] = []() -> int { return Time::GetMaxFPS(); };
+
+    engineTable["SetMaxFPS"] = appTable["SetMaxFPS"];
+    engineTable["GetMaxFPS"] = appTable["GetMaxFPS"];
+
+    auto windowTable = lua.create_named_table("Window");
+    windowTable["SetTitle"] = [](const std::string& title) {
+        if (Engine::Get()) Engine::Get()->GetWindow().SetTitle(title);
+    };
+    windowTable["GetTitle"] = []() -> std::string {
+        return Engine::Get() ? Engine::Get()->GetWindow().GetTitle() : "";
+    };
+    windowTable["SetSize"] = [](int width, int height) {
+        if (Engine::Get()) Engine::Get()->GetWindow().SetSize(width, height);
+    };
+    windowTable["GetWidth"] = []() -> int {
+        return Engine::Get() ? Engine::Get()->GetWindow().GetSize().width : 0;
+    };
+    windowTable["GetHeight"] = []() -> int {
+        return Engine::Get() ? Engine::Get()->GetWindow().GetSize().height : 0;
+    };
+    windowTable["GetSize"] = [](sol::this_state s) -> sol::object {
+        if (!Engine::Get()) return sol::nil;
+        auto sz = Engine::Get()->GetWindow().GetSize();
+        return sol::make_object(s, glm::vec2(static_cast<float>(sz.width), static_cast<float>(sz.height)));
+    };
+    windowTable["Center"] = []() {
+        if (Engine::Get()) Engine::Get()->GetWindow().CenterOnMonitor();
+    };
+    windowTable["SetVSync"] = [](bool vsync) {
+        if (Engine::Get()) Engine::Get()->GetWindow().SetVSync(vsync);
+    };
+    windowTable["IsVSync"] = []() -> bool {
+        return Engine::Get() ? Engine::Get()->GetWindow().IsVSync() : false;
+    };
+    windowTable["SetWindowMode"] = [](int mode) {
+        if (Engine::Get()) Engine::Get()->GetWindow().SetWindowMode(static_cast<WindowMode>(mode));
+    };
+    windowTable["SetFullscreen"] = [](bool fullscreen) {
+        if (Engine::Get()) Engine::Get()->GetWindow().SetWindowMode(fullscreen ? WindowMode::Fullscreen : WindowMode::Windowed);
+    };
+    windowTable["SetMaximized"] = [](bool max) {
+        if (Engine::Get()) {
+            if (max) Engine::Get()->GetWindow().Maximize();
+            else Engine::Get()->GetWindow().Restore();
+        }
+    };
+    windowTable["IsMaximized"] = []() -> bool {
+        return Engine::Get() ? Engine::Get()->GetWindow().IsMaximized() : false;
+    };
+    windowTable["SetBorderless"] = [](bool borderless) {
+        if (Engine::Get()) Engine::Get()->GetWindow().SetBorderless(borderless);
+    };
+    windowTable["SetResizable"] = [](bool resizable) {
+        if (Engine::Get()) Engine::Get()->GetWindow().SetResizable(resizable);
+    };
+
+    auto windowModeEnum = lua.create_named_table("WindowMode");
+    windowModeEnum["Windowed"] = static_cast<int>(WindowMode::Windowed);
+    windowModeEnum["Minimized"] = static_cast<int>(WindowMode::Minimized);
+    windowModeEnum["Maximized"] = static_cast<int>(WindowMode::Maximized);
+    windowModeEnum["Fullscreen"] = static_cast<int>(WindowMode::Fullscreen);
 
     auto storageTable = lua.create_named_table("Storage");
     storageTable["GetSaveDirectory"] = []() -> std::string {
