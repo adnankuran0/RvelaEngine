@@ -27,7 +27,7 @@ public:
     float blurRadius = 1.0f;
     bool reverseCullFace = false;
 
-    std::string Serialize() const;
+    json Serialize() const;
     void Deserialize(const json& j);
 
     void UpdateCutoffs()

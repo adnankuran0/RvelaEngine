@@ -230,10 +230,11 @@ void PhysicsInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 		{
 			glm::vec3 size = bc.GetSize();
 			glm::vec3 offset = bc.GetOffset();
+			glm::vec3 oldOffset = offset;
 			UI::DrawVec3Control("Size", size, 1.0f, 0.05f, 0.001f, 1000.0f);
 			UI::DrawVec3Control("Offset", offset, 0.0f, 0.05f);
 			bc.SetSize(size);
-			bc.SetOffset(offset);
+			if (offset != oldOffset) bc.SetOffset(offset);
 			UI::EndPropertyTable();
 		}
 	});
@@ -244,10 +245,11 @@ void PhysicsInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 		{
 			float radius = sc.GetRadius();
 			glm::vec3 offset = sc.GetOffset();
+			glm::vec3 oldOffset = offset;
 			UI::PropertyLabel("Radius");
 			if (ImGui::DragFloat("##SphereRadius", &radius, 0.05f, 0.001f, 1000.0f, "%.2f")) sc.SetRadius(radius);
 			UI::DrawVec3Control("Offset", offset, 0.0f, 0.05f);
-			sc.SetOffset(offset);
+			if (offset != oldOffset) sc.SetOffset(offset);
 			UI::EndPropertyTable();
 		}
 	});
@@ -259,12 +261,13 @@ void PhysicsInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 			float halfHeight = cc.GetHalfHeight();
 			float radius = cc.GetRadius();
 			glm::vec3 offset = cc.GetOffset();
+			glm::vec3 oldOffset = offset;
 			UI::PropertyLabel("Half Height");
 			if (ImGui::DragFloat("##CapsuleHalfHeight", &halfHeight, 0.05f, 0.001f, 100.0f, "%.2f")) cc.SetHalfHeight(halfHeight);
 			UI::PropertyLabel("Radius");
 			if (ImGui::DragFloat("##CapsuleRadius", &radius, 0.05f, 0.001f, 100.0f, "%.2f")) cc.SetRadius(radius);
 			UI::DrawVec3Control("Offset", offset, 0.0f, 0.05f);
-			cc.SetOffset(offset);
+			if (offset != oldOffset) cc.SetOffset(offset);
 			UI::EndPropertyTable();
 		}
 	});
@@ -276,12 +279,13 @@ void PhysicsInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 			float halfHeight = cc.GetHalfHeight();
 			float radius = cc.GetRadius();
 			glm::vec3 offset = cc.GetOffset();
+			glm::vec3 oldOffset = offset;
 			UI::PropertyLabel("Half Height");
 			if (ImGui::DragFloat("##CylinderHalfHeight", &halfHeight, 0.05f, 0.001f, 100.0f, "%.2f")) cc.SetHalfHeight(halfHeight);
 			UI::PropertyLabel("Radius");
 			if (ImGui::DragFloat("##CylinderRadius", &radius, 0.05f, 0.001f, 100.0f, "%.2f")) cc.SetRadius(radius);
 			UI::DrawVec3Control("Offset", offset, 0.0f, 0.05f);
-			cc.SetOffset(offset);
+			if (offset != oldOffset) cc.SetOffset(offset);
 			UI::EndPropertyTable();
 		}
 	});
@@ -293,12 +297,13 @@ void PhysicsInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 			int maxTris = mc.GetMaxTrianglesPerLeaf();
 			float edgeAngle = mc.GetActiveEdgeTresholdAngle();
 			glm::vec3 offset = mc.GetOffset();
+			glm::vec3 oldOffset = offset;
 			UI::PropertyLabel("Max Tris / Leaf");
 			if (ImGui::SliderInt("##MaxTris", &maxTris, 1, 16)) mc.SetMaxTrianglesPerLeaf(maxTris);
 			UI::PropertyLabel("Edge Threshold");
 			if (ImGui::SliderFloat("##EdgeAngle", &edgeAngle, 0.001f, 2.0f, "%.3f")) mc.SetActiveEdgeTresholdAngle(edgeAngle);
 			UI::DrawVec3Control("Offset", offset, 0.0f, 0.05f);
-			mc.SetOffset(offset);
+			if (offset != oldOffset) mc.SetOffset(offset);
 			UI::EndPropertyTable();
 		}
 	});
@@ -309,10 +314,11 @@ void PhysicsInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 		{
 			float maxConvexRadius = chc.GetMaxConvexRadius();
 			glm::vec3 offset = chc.GetOffset();
+			glm::vec3 oldOffset = offset;
 			UI::PropertyLabel("Max Convex Radius");
 			if (ImGui::SliderFloat("##MaxRadius", &maxConvexRadius, 0.0f, 0.1f, "%.4f")) chc.SetMaxConvexRadius(maxConvexRadius);
 			UI::DrawVec3Control("Offset", offset, 0.0f, 0.05f);
-			chc.SetOffset(offset);
+			if (offset != oldOffset) chc.SetOffset(offset);
 			UI::EndPropertyTable();
 		}
 	});

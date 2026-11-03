@@ -3,7 +3,7 @@
 
 using namespace rv;
 
-std::string SpotLightComponent::Serialize() const
+json SpotLightComponent::Serialize() const
 {
     json j;
     j["color"] = { color.r, color.g, color.b };
@@ -17,24 +17,40 @@ std::string SpotLightComponent::Serialize() const
     j["shadowBias"] = shadowBias;
     j["blurRadius"] = blurRadius;
     j["reverseCullFace"] = reverseCullFace;
-    return j.dump(4);
+    return j;
 }
 
 void SpotLightComponent::Deserialize(const json& j)
 {
-    if (j.contains("color"))
+    const json* source = &j;
+    json parsed;
+    if (j.is_string())
     {
-        auto colorData = j.at("color");
+        try {
+            parsed = json::parse(j.get<std::string>());
+            source = &parsed;
+        } catch (...) {
+            return;
+        }
+    }
+
+    const json& src = *source;
+    if (!src.is_object())
+        return;
+
+    if (src.contains("color"))
+    {
+        auto colorData = src.at("color");
         color = glm::vec3(colorData[0], colorData[1], colorData[2]);
     }
-    intensity = j.value("intensity", 1.0f);
-    radius = j.value("radius", 15.0f);
-    innerAngle = j.value("innerAngle", 15.0f);
-    outerAngle = j.value("outerAngle", 30.0f);
-    innerCutoff = j.value("innerCutoff", glm::cos(glm::radians(innerAngle)));
-    outerCutoff = j.value("outerCutoff", glm::cos(glm::radians(outerAngle)));
-    castShadows = j.value("castShadows", true);
-    shadowBias = j.value("shadowBias", 0.005f);
-    blurRadius = j.value("blurRadius", 1.0f);
-    reverseCullFace = j.value("reverseCullFace", false);
+    intensity = src.value("intensity", 10.0f);
+    radius = src.value("radius", 5.0f);
+    innerAngle = src.value("innerAngle", 5.0f);
+    outerAngle = src.value("outerAngle", 25.0f);
+    innerCutoff = src.value("innerCutoff", glm::cos(glm::radians(innerAngle)));
+    outerCutoff = src.value("outerCutoff", glm::cos(glm::radians(outerAngle)));
+    castShadows = src.value("castShadows", true);
+    shadowBias = src.value("shadowBias", 0.005f);
+    blurRadius = src.value("blurRadius", 1.0f);
+    reverseCullFace = src.value("reverseCullFace", false);
 }

@@ -127,15 +127,11 @@ void PhysicsSystem::DebugDraw()
 		auto& cb = view.get<CharacterBodyComponent>(e);
 		if (!cb.character) continue;
 
-		JPH::RVec3 pos = cb.character->GetPosition();
-		JPH::Quat rot = cb.character->GetRotation();
 		JPH::ShapeRefC shape = cb.character->GetShape();
-
-		JPH::Mat44 transform = JPH::Mat44::sRotationTranslation(rot, pos);
 
 		shape->Draw(
 			&m_DebugRenderer,
-			transform,
+			cb.character->GetCenterOfMassTransform(),
 			JPH::Vec3::sReplicate(1.0f),
 			JPH::Color::sGreen,
 			false,
@@ -292,7 +288,7 @@ void PhysicsSystem::RebuildDirtyShapes()
 		JPH::ShapeRefC newShape = m_ShapeBuilder.BuildShape(m_Scene.GetRegistry(), e);
 		cb.character->SetShape(
 			newShape,
-			1.5f * m_PhysicsSystem.GetPhysicsSettings().mPenetrationSlop,
+			FLT_MAX,
 			m_PhysicsSystem.GetDefaultBroadPhaseLayerFilter(Physics::Layers::MOVING),
 			m_PhysicsSystem.GetDefaultLayerFilter(Physics::Layers::MOVING),
 			{}, {},
@@ -519,7 +515,7 @@ JPH::BodyCreationSettings PhysicsSystem::BuildBodyCreationSettings(RigidbodyComp
 JPH::Ref<JPH::CharacterVirtualSettings> rv::PhysicsSystem::BuildCharacterBodyCreationSettings(CharacterBodyComponent& cbComp, TransformComponent& tComp)
 {
 	JPH::Ref<JPH::CharacterVirtualSettings> settings = new JPH::CharacterVirtualSettings();
-	settings->mSupportingVolume = JPH::Plane(JPH::Vec3::sAxisY(), -0.5f);
+	settings->mSupportingVolume = JPH::Plane(JPH::Vec3::sAxisY(), -1.0e10f);
 	settings->mMass = cbComp.mass;
 	settings->mMaxStrength = cbComp.maxStrength;
 	settings->mShapeOffset = math::ToJoltVec3(cbComp.shapeOffset);
