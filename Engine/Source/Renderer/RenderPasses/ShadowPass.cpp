@@ -6,6 +6,8 @@
 #include "Renderer/ShaderManager.h"
 #include "Renderer/TextureCache.h"
 #include "Utils/ProjectManager.h"
+#include "Core/Time.h"
+#include "Asset/Types/ShaderAsset.h"
 
 using namespace rv;
 
@@ -196,6 +198,66 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
         return useAlb;
     };
 
+    auto BindCustomUniforms = [](Shader& shader, const MaterialInstance& inst, const ShaderAsset& shaderAsset) {
+        const auto& overrides = inst.GetCustomUniformOverrides();
+        const auto& cached = inst.GetCachedCustomUniforms();
+
+        for (const auto& uDef : shaderAsset.uniforms)
+        {
+            if (uDef.engineTexture != EngineTextureType::None || uDef.type == ShaderUniformType::Texture2D)
+                continue;
+
+            CustomUniformValue val;
+            auto itOver = overrides.find(uDef.name);
+            if (itOver != overrides.end())
+            {
+                val = itOver->second;
+            }
+            else
+            {
+                auto itCached = cached.find(uDef.name);
+                if (itCached != cached.end())
+                    val = itCached->second;
+                else
+                {
+                    val.type = uDef.type;
+                    val.floatVal = uDef.floatVal;
+                    val.intVal = uDef.intVal;
+                    val.boolVal = uDef.boolVal;
+                    val.vec2Val = uDef.vec2Val;
+                    val.vec3Val = uDef.vec3Val;
+                    val.vec4Val = uDef.vec4Val;
+                }
+            }
+
+            switch (uDef.type)
+            {
+            case ShaderUniformType::Float:
+                shader.setFloat(uDef.name, val.floatVal);
+                break;
+            case ShaderUniformType::Int:
+                shader.setInt(uDef.name, val.intVal);
+                break;
+            case ShaderUniformType::Bool:
+                shader.setBool(uDef.name, val.boolVal);
+                break;
+            case ShaderUniformType::Vec2:
+                shader.setVec2(uDef.name, val.vec2Val);
+                break;
+            case ShaderUniformType::Vec3:
+            case ShaderUniformType::Color3:
+                shader.setVec3(uDef.name, val.vec3Val);
+                break;
+            case ShaderUniformType::Vec4:
+            case ShaderUniformType::Color4:
+                shader.setVec4(uDef.name, val.vec4Val);
+                break;
+            default:
+                break;
+            }
+        }
+    };
+
     Shader& shadowShader = ShaderManager::Get("DirectionalShadow");
     Shader& skeletalShadowShader = ShaderManager::Get("DirectionalShadow_Skeletal");
 
@@ -208,9 +270,7 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
 
         if (!commands.empty())
         {
-            shadowShader.use();
-            shadowShader.setMat4("lightSpaceMatrix", cascadeMatrix);
-            shadowShader.setInt("billboardMode", 0);
+            Shader* lastBound = nullptr;
 
             for (auto& command : commands) {
                 if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
@@ -218,15 +278,43 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
                 if (command.mesh->worldAABB.IsValid() && !ctx.camera->Intersects(cascadeMatrix, command.mesh->worldAABB)) continue;
 
                 auto& material = command.material;
-
                 if (material->GetTransparencyMode() == TransparencyMode::Alpha) continue;
 
-                ApplyCull(material->GetCullMode());
-                shadowShader.setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
+                bool hasCustom = material->HasCustomShader();
+                Ref<ShaderAsset> customAsset = hasCustom ? material->GetCustomShaderAsset() : nullptr;
+                if (hasCustom && (!customAsset || !customAsset->compileSuccess || !customAsset->directionalShadowShader))
+                    hasCustom = false;
 
-                bool useAlb = BindMaterial(shadowShader, material);
+                Shader* currentShader = hasCustom ? customAsset->directionalShadowShader.get() : &shadowShader;
+                if (currentShader != lastBound)
+                {
+                    currentShader->use();
+                    currentShader->setMat4("lightSpaceMatrix", cascadeMatrix);
+                    if (!hasCustom)
+                        currentShader->setInt("billboardMode", 0);
+                    lastBound = currentShader;
+                }
 
-                shadowShader.setMat4("model", command.transform->GetWorldMatrix());
+                if (hasCustom)
+                {
+                    BindCustomUniforms(*currentShader, material->GetInstance(), *customAsset);
+                }
+
+                CullMode effectiveCull = (hasCustom && customAsset->renderModes.hasCullMode)
+                    ? customAsset->renderModes.cullMode
+                    : material->GetCullMode();
+                ApplyCull(effectiveCull);
+
+                currentShader->setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
+                bool useAlb = BindMaterial(*currentShader, material);
+
+                currentShader->setMat4("model", command.transform->GetWorldMatrix());
+                glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(command.transform->GetWorldMatrix())));
+                currentShader->setMat3("normalMatrix", normalMatrix);
+                currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
+                currentShader->setVec2("UVScale", material->GetUVScale());
+                currentShader->setVec2("UVOffset", material->GetUVOffset());
+
                 command.mesh->Bind();
                 glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
 
@@ -236,22 +324,48 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
 
         if (!skeletalCommands.empty())
         {
-            skeletalShadowShader.use();
-            skeletalShadowShader.setMat4("lightSpaceMatrix", cascadeMatrix);
-
-            GLint boneLoc = glGetUniformLocation(skeletalShadowShader.ID, "u_BoneMatrices");
+            Shader* lastBound = nullptr;
 
             for (auto& command : skeletalCommands) {
                 if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
                 if (!command.mesh->IsCastShadow()) continue;
 
                 auto& material = command.material;
-                ApplyCull(material->GetCullMode());
+                if (material->GetTransparencyMode() == TransparencyMode::Alpha) continue;
 
-                bool useAlb = BindMaterial(skeletalShadowShader, material);
+                bool hasCustom = material->HasCustomShader();
+                Ref<ShaderAsset> customAsset = hasCustom ? material->GetCustomShaderAsset() : nullptr;
+                if (hasCustom && (!customAsset || !customAsset->compileSuccess || !customAsset->skeletalDirectionalShadowShader))
+                    hasCustom = false;
 
-                skeletalShadowShader.setMat4("model", command.transform->GetWorldMatrix());
+                Shader* currentShader = hasCustom ? customAsset->skeletalDirectionalShadowShader.get() : &skeletalShadowShader;
+                if (currentShader != lastBound)
+                {
+                    currentShader->use();
+                    currentShader->setMat4("lightSpaceMatrix", cascadeMatrix);
+                    lastBound = currentShader;
+                }
 
+                if (hasCustom)
+                {
+                    BindCustomUniforms(*currentShader, material->GetInstance(), *customAsset);
+                }
+
+                CullMode effectiveCull = (hasCustom && customAsset->renderModes.hasCullMode)
+                    ? customAsset->renderModes.cullMode
+                    : material->GetCullMode();
+                ApplyCull(effectiveCull);
+
+                bool useAlb = BindMaterial(*currentShader, material);
+
+                currentShader->setMat4("model", command.transform->GetWorldMatrix());
+                glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(command.transform->GetWorldMatrix())));
+                currentShader->setMat3("normalMatrix", normalMatrix);
+                currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
+                currentShader->setVec2("UVScale", material->GetUVScale());
+                currentShader->setVec2("UVOffset", material->GetUVOffset());
+
+                GLint boneLoc = glGetUniformLocation(currentShader->ID, "u_BoneMatrices");
                 if (boneLoc != -1 && command.skeleton && !command.skeleton->skinningPalette.empty())
                 {
                     GLsizei uploadCount = static_cast<GLsizei>(std::min(command.skeleton->skinningPalette.size(), MAX_BONES));
@@ -292,6 +406,66 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
 
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(1.5f, 4.0f);
+
+    auto BindCustomUniforms = [](Shader& shader, const MaterialInstance& inst, const ShaderAsset& shaderAsset) {
+        const auto& overrides = inst.GetCustomUniformOverrides();
+        const auto& cached = inst.GetCachedCustomUniforms();
+
+        for (const auto& uDef : shaderAsset.uniforms)
+        {
+            if (uDef.engineTexture != EngineTextureType::None || uDef.type == ShaderUniformType::Texture2D)
+                continue;
+
+            CustomUniformValue val;
+            auto itOver = overrides.find(uDef.name);
+            if (itOver != overrides.end())
+            {
+                val = itOver->second;
+            }
+            else
+            {
+                auto itCached = cached.find(uDef.name);
+                if (itCached != cached.end())
+                    val = itCached->second;
+                else
+                {
+                    val.type = uDef.type;
+                    val.floatVal = uDef.floatVal;
+                    val.intVal = uDef.intVal;
+                    val.boolVal = uDef.boolVal;
+                    val.vec2Val = uDef.vec2Val;
+                    val.vec3Val = uDef.vec3Val;
+                    val.vec4Val = uDef.vec4Val;
+                }
+            }
+
+            switch (uDef.type)
+            {
+            case ShaderUniformType::Float:
+                shader.setFloat(uDef.name, val.floatVal);
+                break;
+            case ShaderUniformType::Int:
+                shader.setInt(uDef.name, val.intVal);
+                break;
+            case ShaderUniformType::Bool:
+                shader.setBool(uDef.name, val.boolVal);
+                break;
+            case ShaderUniformType::Vec2:
+                shader.setVec2(uDef.name, val.vec2Val);
+                break;
+            case ShaderUniformType::Vec3:
+            case ShaderUniformType::Color3:
+                shader.setVec3(uDef.name, val.vec3Val);
+                break;
+            case ShaderUniformType::Vec4:
+            case ShaderUniformType::Color4:
+                shader.setVec4(uDef.name, val.vec4Val);
+                break;
+            default:
+                break;
+            }
+        }
+    };
 
     Shader& pointShadowShader = ShaderManager::Get("PointShadow");
     Shader& skeletalPointShadowShader = ShaderManager::Get("PointShadow_Skeletal");
@@ -343,12 +517,7 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
 
             if (!commands.empty())
             {
-                pointShadowShader.use();
-                pointShadowShader.setFloat("far_plane", far_plane);
-                pointShadowShader.setVec3("lightPos", lightPos);
-                pointShadowShader.setInt("baseLayer", baseLayer);
-                pointShadowShader.setInt("currentFace", face);
-                pointShadowShader.setMat4("shadowMatrix", shadowTransforms[face]);
+                Shader* lastBound = nullptr;
 
                 for (auto& command : commands)
                 {
@@ -357,14 +526,48 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
                     if (command.mesh->worldAABB.IsValid() && !ctx.camera->Intersects(shadowTransforms[face], command.mesh->worldAABB)) continue;
 
                     auto& material = command.material;
-                    CullMode mode = material->GetCullMode();
+                    if (material->GetTransparencyMode() == TransparencyMode::Alpha) continue;
+
+                    bool hasCustom = material->HasCustomShader();
+                    Ref<ShaderAsset> customAsset = hasCustom ? material->GetCustomShaderAsset() : nullptr;
+                    if (hasCustom && (!customAsset || !customAsset->compileSuccess || !customAsset->pointShadowShader))
+                        hasCustom = false;
+
+                    Shader* currentShader = hasCustom ? customAsset->pointShadowShader.get() : &pointShadowShader;
+                    if (currentShader != lastBound)
+                    {
+                        currentShader->use();
+                        currentShader->setFloat("far_plane", far_plane);
+                        currentShader->setVec3("lightPos", lightPos);
+                        currentShader->setInt("baseLayer", baseLayer);
+                        currentShader->setInt("currentFace", face);
+                        currentShader->setMat4("shadowMatrix", shadowTransforms[face]);
+                        if (!hasCustom)
+                            currentShader->setInt("billboardMode", 0);
+                        lastBound = currentShader;
+                    }
+
+                    if (hasCustom)
+                    {
+                        BindCustomUniforms(*currentShader, material->GetInstance(), *customAsset);
+                    }
+
+                    CullMode mode = (hasCustom && customAsset->renderModes.hasCullMode)
+                        ? customAsset->renderModes.cullMode
+                        : material->GetCullMode();
                     if (mode == CullMode::Disabled) glDisable(GL_CULL_FACE);
                     else { glEnable(GL_CULL_FACE); glCullFace(mode == CullMode::Back ? GL_BACK : GL_FRONT); }
 
-                    pointShadowShader.setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
-                    bool useAlb = BindMaterial(pointShadowShader, material);
+                    currentShader->setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
+                    bool useAlb = BindMaterial(*currentShader, material);
 
-                    pointShadowShader.setMat4("model", command.transform->GetWorldMatrix());
+                    currentShader->setMat4("model", command.transform->GetWorldMatrix());
+                    glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(command.transform->GetWorldMatrix())));
+                    currentShader->setMat3("normalMatrix", normalMatrix);
+                    currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
+                    currentShader->setVec2("UVScale", material->GetUVScale());
+                    currentShader->setVec2("UVOffset", material->GetUVOffset());
+
                     command.mesh->Bind();
                     glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
 
@@ -374,14 +577,7 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
 
             if (!skeletalCommands.empty())
             {
-                skeletalPointShadowShader.use();
-                skeletalPointShadowShader.setFloat("far_plane", far_plane);
-                skeletalPointShadowShader.setVec3("lightPos", lightPos);
-                skeletalPointShadowShader.setInt("baseLayer", baseLayer);
-                skeletalPointShadowShader.setInt("currentFace", face);
-                skeletalPointShadowShader.setMat4("shadowMatrix", shadowTransforms[face]);
-
-                GLint boneLoc = glGetUniformLocation(skeletalPointShadowShader.ID, "u_BoneMatrices");
+                Shader* lastBound = nullptr;
 
                 for (auto& command : skeletalCommands)
                 {
@@ -389,14 +585,46 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
                     if (!command.mesh->IsCastShadow()) continue;
 
                     auto& material = command.material;
-                    CullMode mode = material->GetCullMode();
+                    if (material->GetTransparencyMode() == TransparencyMode::Alpha) continue;
+
+                    bool hasCustom = material->HasCustomShader();
+                    Ref<ShaderAsset> customAsset = hasCustom ? material->GetCustomShaderAsset() : nullptr;
+                    if (hasCustom && (!customAsset || !customAsset->compileSuccess || !customAsset->skeletalPointShadowShader))
+                        hasCustom = false;
+
+                    Shader* currentShader = hasCustom ? customAsset->skeletalPointShadowShader.get() : &skeletalPointShadowShader;
+                    if (currentShader != lastBound)
+                    {
+                        currentShader->use();
+                        currentShader->setFloat("far_plane", far_plane);
+                        currentShader->setVec3("lightPos", lightPos);
+                        currentShader->setInt("baseLayer", baseLayer);
+                        currentShader->setInt("currentFace", face);
+                        currentShader->setMat4("shadowMatrix", shadowTransforms[face]);
+                        lastBound = currentShader;
+                    }
+
+                    if (hasCustom)
+                    {
+                        BindCustomUniforms(*currentShader, material->GetInstance(), *customAsset);
+                    }
+
+                    CullMode mode = (hasCustom && customAsset->renderModes.hasCullMode)
+                        ? customAsset->renderModes.cullMode
+                        : material->GetCullMode();
                     if (mode == CullMode::Disabled) glDisable(GL_CULL_FACE);
                     else { glEnable(GL_CULL_FACE); glCullFace(mode == CullMode::Back ? GL_BACK : GL_FRONT); }
 
-                    bool useAlb = BindMaterial(skeletalPointShadowShader, material);
+                    bool useAlb = BindMaterial(*currentShader, material);
 
-                    skeletalPointShadowShader.setMat4("model", command.transform->GetWorldMatrix());
+                    currentShader->setMat4("model", command.transform->GetWorldMatrix());
+                    glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(command.transform->GetWorldMatrix())));
+                    currentShader->setMat3("normalMatrix", normalMatrix);
+                    currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
+                    currentShader->setVec2("UVScale", material->GetUVScale());
+                    currentShader->setVec2("UVOffset", material->GetUVOffset());
 
+                    GLint boneLoc = glGetUniformLocation(currentShader->ID, "u_BoneMatrices");
                     if (boneLoc != -1 && command.skeleton && !command.skeleton->skinningPalette.empty())
                     {
                         GLsizei uploadCount = static_cast<GLsizei>(std::min(command.skeleton->skinningPalette.size(), MAX_BONES));
@@ -471,6 +699,66 @@ void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& fram
         return useAlb;
     };
 
+    auto BindCustomUniforms = [](Shader& shader, const MaterialInstance& inst, const ShaderAsset& shaderAsset) {
+        const auto& overrides = inst.GetCustomUniformOverrides();
+        const auto& cached = inst.GetCachedCustomUniforms();
+
+        for (const auto& uDef : shaderAsset.uniforms)
+        {
+            if (uDef.engineTexture != EngineTextureType::None || uDef.type == ShaderUniformType::Texture2D)
+                continue;
+
+            CustomUniformValue val;
+            auto itOver = overrides.find(uDef.name);
+            if (itOver != overrides.end())
+            {
+                val = itOver->second;
+            }
+            else
+            {
+                auto itCached = cached.find(uDef.name);
+                if (itCached != cached.end())
+                    val = itCached->second;
+                else
+                {
+                    val.type = uDef.type;
+                    val.floatVal = uDef.floatVal;
+                    val.intVal = uDef.intVal;
+                    val.boolVal = uDef.boolVal;
+                    val.vec2Val = uDef.vec2Val;
+                    val.vec3Val = uDef.vec3Val;
+                    val.vec4Val = uDef.vec4Val;
+                }
+            }
+
+            switch (uDef.type)
+            {
+            case ShaderUniformType::Float:
+                shader.setFloat(uDef.name, val.floatVal);
+                break;
+            case ShaderUniformType::Int:
+                shader.setInt(uDef.name, val.intVal);
+                break;
+            case ShaderUniformType::Bool:
+                shader.setBool(uDef.name, val.boolVal);
+                break;
+            case ShaderUniformType::Vec2:
+                shader.setVec2(uDef.name, val.vec2Val);
+                break;
+            case ShaderUniformType::Vec3:
+            case ShaderUniformType::Color3:
+                shader.setVec3(uDef.name, val.vec3Val);
+                break;
+            case ShaderUniformType::Vec4:
+            case ShaderUniformType::Color4:
+                shader.setVec4(uDef.name, val.vec4Val);
+                break;
+            default:
+                break;
+            }
+        }
+    };
+
     Shader& shadowShader = ShaderManager::Get("DirectionalShadow");
     Shader& skeletalShadowShader = ShaderManager::Get("DirectionalShadow_Skeletal");
 
@@ -500,21 +788,50 @@ void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& fram
 
         if (!commands.empty())
         {
-            shadowShader.use();
-            shadowShader.setMat4("lightSpaceMatrix", lightSpace);
-            shadowShader.setInt("billboardMode", 0);
+            Shader* lastBound = nullptr;
 
             for (auto& command : commands) {
                 if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
                 if (!command.mesh->IsCastShadow()) continue;
 
                 auto& material = command.material;
-                ApplyCull(material->GetCullMode());
-                shadowShader.setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
+                if (material->GetTransparencyMode() == TransparencyMode::Alpha) continue;
 
-                bool useAlb = BindMaterial(shadowShader, material);
+                bool hasCustom = material->HasCustomShader();
+                Ref<ShaderAsset> customAsset = hasCustom ? material->GetCustomShaderAsset() : nullptr;
+                if (hasCustom && (!customAsset || !customAsset->compileSuccess || !customAsset->directionalShadowShader))
+                    hasCustom = false;
 
-                shadowShader.setMat4("model", command.transform->GetWorldMatrix());
+                Shader* currentShader = hasCustom ? customAsset->directionalShadowShader.get() : &shadowShader;
+                if (currentShader != lastBound)
+                {
+                    currentShader->use();
+                    currentShader->setMat4("lightSpaceMatrix", lightSpace);
+                    if (!hasCustom)
+                        currentShader->setInt("billboardMode", 0);
+                    lastBound = currentShader;
+                }
+
+                if (hasCustom)
+                {
+                    BindCustomUniforms(*currentShader, material->GetInstance(), *customAsset);
+                }
+
+                CullMode effectiveCull = (hasCustom && customAsset->renderModes.hasCullMode)
+                    ? customAsset->renderModes.cullMode
+                    : material->GetCullMode();
+                ApplyCull(effectiveCull);
+
+                currentShader->setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
+                bool useAlb = BindMaterial(*currentShader, material);
+
+                currentShader->setMat4("model", command.transform->GetWorldMatrix());
+                glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(command.transform->GetWorldMatrix())));
+                currentShader->setMat3("normalMatrix", normalMatrix);
+                currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
+                currentShader->setVec2("UVScale", material->GetUVScale());
+                currentShader->setVec2("UVOffset", material->GetUVOffset());
+
                 command.mesh->Bind();
                 glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
 
@@ -524,21 +841,48 @@ void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& fram
 
         if (!skeletalCommands.empty())
         {
-            skeletalShadowShader.use();
-            skeletalShadowShader.setMat4("lightSpaceMatrix", lightSpace);
-            GLint boneLoc = glGetUniformLocation(skeletalShadowShader.ID, "u_BoneMatrices");
+            Shader* lastBound = nullptr;
 
             for (auto& command : skeletalCommands) {
                 if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
                 if (!command.mesh->IsCastShadow()) continue;
 
                 auto& material = command.material;
-                ApplyCull(material->GetCullMode());
+                if (material->GetTransparencyMode() == TransparencyMode::Alpha) continue;
 
-                bool useAlb = BindMaterial(skeletalShadowShader, material);
+                bool hasCustom = material->HasCustomShader();
+                Ref<ShaderAsset> customAsset = hasCustom ? material->GetCustomShaderAsset() : nullptr;
+                if (hasCustom && (!customAsset || !customAsset->compileSuccess || !customAsset->skeletalDirectionalShadowShader))
+                    hasCustom = false;
 
-                skeletalShadowShader.setMat4("model", command.transform->GetWorldMatrix());
+                Shader* currentShader = hasCustom ? customAsset->skeletalDirectionalShadowShader.get() : &skeletalShadowShader;
+                if (currentShader != lastBound)
+                {
+                    currentShader->use();
+                    currentShader->setMat4("lightSpaceMatrix", lightSpace);
+                    lastBound = currentShader;
+                }
 
+                if (hasCustom)
+                {
+                    BindCustomUniforms(*currentShader, material->GetInstance(), *customAsset);
+                }
+
+                CullMode effectiveCull = (hasCustom && customAsset->renderModes.hasCullMode)
+                    ? customAsset->renderModes.cullMode
+                    : material->GetCullMode();
+                ApplyCull(effectiveCull);
+
+                bool useAlb = BindMaterial(*currentShader, material);
+
+                currentShader->setMat4("model", command.transform->GetWorldMatrix());
+                glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(command.transform->GetWorldMatrix())));
+                currentShader->setMat3("normalMatrix", normalMatrix);
+                currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
+                currentShader->setVec2("UVScale", material->GetUVScale());
+                currentShader->setVec2("UVOffset", material->GetUVOffset());
+
+                GLint boneLoc = glGetUniformLocation(currentShader->ID, "u_BoneMatrices");
                 if (boneLoc != -1 && command.skeleton && !command.skeleton->skinningPalette.empty())
                 {
                     GLsizei uploadCount = static_cast<GLsizei>(std::min(command.skeleton->skinningPalette.size(), MAX_BONES));

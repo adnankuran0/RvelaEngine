@@ -420,6 +420,9 @@ const aiScene* ModelImporter::LoadScene(
     m_Importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, settings.preservePivots);
     m_Importer.SetPropertyFloat(AI_CONFIG_GLOBAL_SCALE_FACTOR_KEY, settings.scale);
     m_Importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_READ_ALL_GEOMETRY_LAYERS, false);
+    m_Importer.SetPropertyBool(AI_CONFIG_PP_FD_REMOVE, true);
+    m_Importer.SetPropertyBool(AI_CONFIG_PP_FD_CHECKAREA, true);
+    m_Importer.SetPropertyInteger(AI_CONFIG_PP_SBP_REMOVE, aiPrimitiveType_POINT | aiPrimitiveType_LINE);
 
     unsigned int flags = 0;
     if (settings.triangulate) flags |= aiProcess_Triangulate;
@@ -430,6 +433,7 @@ const aiScene* ModelImporter::LoadScene(
     if (settings.optimizeMesh) flags |= aiProcess_ImproveCacheLocality;
     if (settings.generateBoundingBoxes) flags |= aiProcess_GenBoundingBoxes;
     if (settings.removeDegenerateTriangles) flags |= aiProcess_FindDegenerates;
+    flags |= aiProcess_SortByPType;
 
     if (settings.normalMode == ModelNormalMode::GenerateSmooth)
         flags |= aiProcess_GenSmoothNormals;
@@ -737,6 +741,30 @@ void ModelImporter::ExtractMaterials(
                lower.find("roughnessmetallic") != std::string::npos;
     };
 
+    std::unordered_set<uint32_t> usedMaterialIndices;
+    if (scene->mNumMeshes > 0)
+    {
+        for (unsigned int m = 0; m < scene->mNumMeshes; ++m)
+        {
+            if (scene->mMeshes[m] && scene->mMeshes[m]->mMaterialIndex < scene->mNumMaterials)
+            {
+                usedMaterialIndices.insert(scene->mMeshes[m]->mMaterialIndex);
+            }
+        }
+    }
+    else
+    {
+        for (uint32_t i = 0; i < scene->mNumMaterials; ++i)
+        {
+            usedMaterialIndices.insert(i);
+        }
+    }
+
+    if (usedMaterialIndices.empty() && scene->mNumMaterials > 0)
+    {
+        usedMaterialIndices.insert(0);
+    }
+
     std::vector<std::string> matNames = GenerateCanonicalMaterialNames(scene, modelPath);
     std::unordered_set<AssetUUID> claimedMatUUIDs;
     std::vector<AssetUUID> assignedMatUUIDs(scene->mNumMaterials);
@@ -744,6 +772,7 @@ void ModelImporter::ExtractMaterials(
     // match by subtype and canonical subname
     for (uint32_t i = 0; i < scene->mNumMaterials; ++i)
     {
+        if (!usedMaterialIndices.contains(i)) continue;
         for (const auto& sub : parentMeta.subAssets)
         {
             if (sub.type == "Material" && sub.name == matNames[i] && !claimedMatUUIDs.contains(sub.uuid))
@@ -758,6 +787,7 @@ void ModelImporter::ExtractMaterials(
     // fallback
     for (uint32_t i = 0; i < scene->mNumMaterials; ++i)
     {
+        if (!usedMaterialIndices.contains(i)) continue;
         if (assignedMatUUIDs[i].IsValid()) continue;
         for (const auto& sub : parentMeta.subAssets)
         {
@@ -773,6 +803,7 @@ void ModelImporter::ExtractMaterials(
     // new UUIDs
     for (uint32_t i = 0; i < scene->mNumMaterials; ++i)
     {
+        if (!usedMaterialIndices.contains(i)) continue;
         if (!assignedMatUUIDs[i].IsValid())
         {
             assignedMatUUIDs[i] = AssetUUID{};
@@ -781,6 +812,8 @@ void ModelImporter::ExtractMaterials(
 
     for (uint32_t i = 0; i < scene->mNumMaterials; ++i)
     {
+        if (!usedMaterialIndices.contains(i)) continue;
+
         aiMaterial* aiMat = scene->mMaterials[i];
 
         std::string matFileName = modelPath.stem().string() + "_" + matNames[i] + ".rmat";
@@ -1088,11 +1121,34 @@ void ModelImporter::ExtractMaterials(
         result.materialUUIDs[i] = meta.uuid;
     }
 
-    // Unload any deleted materials
+    // Unload and clean up any unused materials
     for (const auto& sub : parentMeta.subAssets)
     {
         if (sub.type == "Material" && !claimedMatUUIDs.contains(sub.uuid))
         {
+            std::filesystem::path matPath;
+            if (registry.Exists(sub.uuid))
+                matPath = registry.GetPath(sub.uuid);
+            if (matPath.empty() || !std::filesystem::exists(matPath))
+            {
+                auto candidate = modelPath.parent_path() / (modelPath.stem().string() + "_" + sub.name + ".rmat");
+                if (std::filesystem::exists(candidate))
+                    matPath = candidate;
+                else
+                {
+                    candidate = modelPath.parent_path() / (sub.name + ".rmat");
+                    if (std::filesystem::exists(candidate))
+                        matPath = candidate;
+                }
+            }
+            if (!matPath.empty() && std::filesystem::exists(matPath))
+            {
+                std::error_code ec;
+                std::filesystem::remove(matPath, ec);
+                auto metaPath = std::filesystem::path(matPath.string() + ".rmeta");
+                if (std::filesystem::exists(metaPath))
+                    std::filesystem::remove(metaPath, ec);
+            }
             AssetManager::Get().Unload(sub.uuid);
         }
     }

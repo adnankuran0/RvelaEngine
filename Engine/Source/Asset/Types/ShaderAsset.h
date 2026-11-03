@@ -48,6 +48,14 @@ public:
 
     Ref<Shader> staticShader;
     Ref<Shader> skeletalShader;
+    Ref<Shader> directionalShadowShader;
+    Ref<Shader> skeletalDirectionalShadowShader;
+    Ref<Shader> pointShadowShader;
+    Ref<Shader> skeletalPointShadowShader;
+    Ref<Shader> gBufferShader;
+    Ref<Shader> skeletalGBufferShader;
+    Ref<Shader> entityBufferShader;
+    Ref<Shader> skeletalEntityBufferShader;
 
     bool Compile()
     {
@@ -77,6 +85,80 @@ public:
             compileError = skeletalShader->GetLastCompileLog();
             LOG_ERROR("Skeletal shader compile failed for {}: {}", GetUUID().ToString(), compileError);
             return false;
+        }
+
+        directionalShadowShader.Reset();
+        skeletalDirectionalShadowShader.Reset();
+        pointShadowShader.Reset();
+        skeletalPointShadowShader.Reset();
+
+        std::string dirShadowGLSL, pointShadowGLSL, shadowError;
+        if (CustomShaderGenerator::GenerateShadowGLSL(source, dirShadowGLSL, pointShadowGLSL, shadowError))
+        {
+            directionalShadowShader = CreateRef<Shader>();
+            if (!directionalShadowShader->InitFromSource("CustomShader_Shadow_" + GetUUID().ToString(), dirShadowGLSL, {}, ENGINE_PATH("Shaders\\directionalShadow.glsl")))
+            {
+                LOG_WARN("Custom shadow shader compile failed for {}: {}", GetUUID().ToString(), directionalShadowShader->GetLastCompileLog());
+                directionalShadowShader.Reset();
+            }
+
+            skeletalDirectionalShadowShader = CreateRef<Shader>();
+            if (!skeletalDirectionalShadowShader->InitFromSource("CustomShader_Skeletal_Shadow_" + GetUUID().ToString(), dirShadowGLSL, { "SKELETAL" }, ENGINE_PATH("Shaders\\directionalShadow.glsl")))
+            {
+                LOG_WARN("Custom skeletal shadow shader compile failed for {}: {}", GetUUID().ToString(), skeletalDirectionalShadowShader->GetLastCompileLog());
+                skeletalDirectionalShadowShader.Reset();
+            }
+
+            pointShadowShader = CreateRef<Shader>();
+            if (!pointShadowShader->InitFromSource("CustomShader_PointShadow_" + GetUUID().ToString(), pointShadowGLSL, {}, ENGINE_PATH("Shaders\\pointShadow.glsl")))
+            {
+                LOG_WARN("Custom point shadow shader compile failed for {}: {}", GetUUID().ToString(), pointShadowShader->GetLastCompileLog());
+                pointShadowShader.Reset();
+            }
+
+            skeletalPointShadowShader = CreateRef<Shader>();
+            if (!skeletalPointShadowShader->InitFromSource("CustomShader_Skeletal_PointShadow_" + GetUUID().ToString(), pointShadowGLSL, { "SKELETAL" }, ENGINE_PATH("Shaders\\pointShadow.glsl")))
+            {
+                LOG_WARN("Custom skeletal point shadow shader compile failed for {}: {}", GetUUID().ToString(), skeletalPointShadowShader->GetLastCompileLog());
+                skeletalPointShadowShader.Reset();
+            }
+        }
+
+        gBufferShader.Reset();
+        skeletalGBufferShader.Reset();
+        entityBufferShader.Reset();
+        skeletalEntityBufferShader.Reset();
+
+        std::string gbufferGLSL, entityGLSL, gbError;
+        if (CustomShaderGenerator::GenerateGBufferGLSL(source, gbufferGLSL, entityGLSL, gbError))
+        {
+            gBufferShader = CreateRef<Shader>();
+            if (!gBufferShader->InitFromSource("CustomShader_GBuffer_" + GetUUID().ToString(), gbufferGLSL, {}, ENGINE_PATH("Shaders\\geometry.glsl")))
+            {
+                LOG_WARN("Custom GBuffer shader compile failed for {}: {}", GetUUID().ToString(), gBufferShader->GetLastCompileLog());
+                gBufferShader.Reset();
+            }
+
+            skeletalGBufferShader = CreateRef<Shader>();
+            if (!skeletalGBufferShader->InitFromSource("CustomShader_Skeletal_GBuffer_" + GetUUID().ToString(), gbufferGLSL, { "SKELETAL" }, ENGINE_PATH("Shaders\\geometry.glsl")))
+            {
+                LOG_WARN("Custom skeletal GBuffer shader compile failed for {}: {}", GetUUID().ToString(), skeletalGBufferShader->GetLastCompileLog());
+                skeletalGBufferShader.Reset();
+            }
+
+            entityBufferShader = CreateRef<Shader>();
+            if (!entityBufferShader->InitFromSource("CustomShader_EntityBuffer_" + GetUUID().ToString(), entityGLSL, {}, ENGINE_PATH("Shaders\\entityBuffer.glsl")))
+            {
+                LOG_WARN("Custom entity buffer shader compile failed for {}: {}", GetUUID().ToString(), entityBufferShader->GetLastCompileLog());
+                entityBufferShader.Reset();
+            }
+
+            skeletalEntityBufferShader = CreateRef<Shader>();
+            if (!skeletalEntityBufferShader->InitFromSource("CustomShader_Skeletal_EntityBuffer_" + GetUUID().ToString(), entityGLSL, { "SKELETAL" }, ENGINE_PATH("Shaders\\entityBuffer.glsl")))
+            {
+                LOG_WARN("Custom skeletal entity buffer shader compile failed for {}: {}", GetUUID().ToString(), skeletalEntityBufferShader->GetLastCompileLog());
+                skeletalEntityBufferShader.Reset();
+            }
         }
 
         samplers.clear();

@@ -14,10 +14,11 @@ layout (location = 5) in vec4 aWeights;
 const int MAX_BONES = 200;
 uniform mat4 u_BoneMatrices[MAX_BONES];
 #else
-#include "Common/Camera.glsl"
 #include "Common/Billboard.glsl"
 uniform int billboardMode;
 #endif
+
+#include "Common/Camera.glsl"
 
 uniform mat4 model;
 uniform mat4 shadowMatrix;  

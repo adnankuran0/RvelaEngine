@@ -45,6 +45,8 @@ uniform vec2 UVOffset;
 #define CAMERA_POSITION camPos
 #define CAMERA_POS camPos
 #define VIEWPORT_SIZE windowSize
+#define NEAR_PLANE nearPlane
+#define FAR_PLANE farPlane
 
 // === USER_GLOBALS_VERTEX ===
 
@@ -143,7 +145,6 @@ uniform float u_Time;
 #define MODEL_MATRIX model
 #define MODEL model
 #define VIEW_MATRIX view
-#define VIEW view
 #define PROJECTION_MATRIX projection
 #define PROJECTION projection
 #define INV_VIEW_MATRIX invView
@@ -158,6 +159,7 @@ uniform float u_Time;
 #define NEAR_PLANE nearPlane
 #define FAR_PLANE farPlane
 #define SCREEN_UV (gl_FragCoord.xy / windowSize)
+#define VIEW normalize(camPos - FragPos)
 
 // Global lighting uniforms
 uniform vec3 ambientColor;
@@ -175,7 +177,6 @@ uniform bool useSSAO;
 uniform bool useIBL;
 uniform float iblIntensity;
 
-// Engine-supplied textures
 layout(binding = 14) uniform sampler2D u_EngineScreenTexture;
 layout(binding = 15) uniform sampler2D u_EngineDepthTexture;
 layout(binding = 16) uniform sampler2D u_EngineNormalTexture;
@@ -230,10 +231,8 @@ void main()
     if (ALPHA_SCISSOR > 0.0 && ALPHA < ALPHA_SCISSOR) discard;
 
 #ifdef RVELA_UNLIT
-    // --- Unlit Shading Output ---
     FragColor = vec4(ALBEDO + EMISSION, ALPHA);
 #else
-    // --- Lit PBR Lighting Pipeline ---
     vec3 N = NORMAL;
     vec3 T = normalize(TANGENT - dot(TANGENT, N) * N);
     vec3 B = normalize(cross(N, T));

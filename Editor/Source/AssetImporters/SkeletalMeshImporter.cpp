@@ -19,7 +19,15 @@ std::vector<unsigned int> SkeletalMeshImporter::ProcessIndices(aiMesh* mesh) con
     for (unsigned int i = 0; i < mesh->mNumFaces; i++)
     {
         const aiFace& face = mesh->mFaces[i];
-        indices.insert(indices.end(), face.mIndices, face.mIndices + face.mNumIndices);
+        if (face.mNumIndices != 3)
+            continue;
+
+        if (face.mIndices[0] >= mesh->mNumVertices ||
+            face.mIndices[1] >= mesh->mNumVertices ||
+            face.mIndices[2] >= mesh->mNumVertices)
+            continue;
+
+        indices.insert(indices.end(), face.mIndices, face.mIndices + 3);
     }
     return indices;
 }
@@ -126,12 +134,14 @@ void SkeletalMeshImporter::OptimizeMesh(
 {
     size_t vertexCount = outVertices.size();
     size_t indexCount = outIndices.size();
-    if (vertexCount == 0 || indexCount == 0) return;
+    if (vertexCount == 0 || indexCount < 3 || (indexCount % 3) != 0) return;
 
     std::vector<unsigned int> remap(vertexCount);
     size_t newVertexCount = meshopt_generateVertexRemap(
         remap.data(), outIndices.data(), indexCount,
         outVertices.data(), vertexCount, sizeof(SkeletalVertex));
+
+    if (newVertexCount == 0) return;
 
     std::vector<unsigned int> remappedIndices(indexCount);
     std::vector<SkeletalVertex> remappedVertices(newVertexCount);
@@ -148,11 +158,14 @@ void SkeletalMeshImporter::OptimizeMesh(
 
     meshopt_optimizeOverdraw(
         outIndices.data(), outIndices.data(), indexCount,
-        &outVertices[0].position.x, vertexCount, sizeof(SkeletalVertex), 1.05f);
+        reinterpret_cast<const float*>(outVertices.data()),
+        vertexCount, sizeof(SkeletalVertex), 1.05f);
 
-    meshopt_optimizeVertexFetch(
+    size_t finalVertexCount = meshopt_optimizeVertexFetch(
         outVertices.data(), outIndices.data(), indexCount,
         outVertices.data(), vertexCount, sizeof(SkeletalVertex));
+
+    outVertices.resize(finalVertexCount);
 }
 
 bool SkeletalMeshImporter::WriteMeshCache(
@@ -242,9 +255,21 @@ bool SkeletalMeshImporter::ImportFromScene(
 
         auto vertices = ProcessVertices(mesh, boneNameToIndex);
         auto indices = ProcessIndices(mesh);
+        if (vertices.empty() || indices.empty())
+        {
+            LOG_WARN("Skeletal Mesh '{}' (index {}) has no valid vertices or triangles, skipping.", meshName, i);
+            outSkeletalMeshMap.erase(i);
+            continue;
+        }
         if (optimize)
         {
             OptimizeMesh(vertices, indices);
+        }
+        if (vertices.empty() || indices.empty())
+        {
+            LOG_WARN("Skeletal Mesh '{}' (index {}) has no valid vertices or triangles after optimization, skipping.", meshName, i);
+            outSkeletalMeshMap.erase(i);
+            continue;
         }
 
         aiVector3D mn = mesh->mAABB.mMin, mx = mesh->mAABB.mMax;
@@ -253,6 +278,7 @@ bool SkeletalMeshImporter::ImportFromScene(
         if (!WriteMeshCache(cachePath, meshName, vertices, indices, aabb))
         {
             LOG_ERROR("Failed to write skeletal mesh cache for mesh {}", i);
+            outSkeletalMeshMap.erase(i);
             continue;
         }
 

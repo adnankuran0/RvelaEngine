@@ -86,6 +86,20 @@ public:
         std::string& outError
     );
 
+    static bool GenerateShadowGLSL(
+        const std::string& rshaderSource,
+        std::string& outDirShadowSource,
+        std::string& outPointShadowSource,
+        std::string& outError
+    );
+
+    static bool GenerateGBufferGLSL(
+        const std::string& rshaderSource,
+        std::string& outGBufferSource,
+        std::string& outEntityBufferSource,
+        std::string& outError
+    );
+
 private:
     static void ParseUniforms(
         const std::string& source,

@@ -89,6 +89,7 @@ render_mode unshaded, cull_disabled, blend_add;
 | :--- | :--- | :--- |
 | `VERTEX` | `vec3` | World-space fragment position |
 | `NORMAL` | `vec3` | World normal |
+| `VIEW` | `vec3` | Direction from fragment to camera (`normalize(CAMERA_POS - VERTEX)`) |
 | `TANGENT`, `BITANGENT` | `vec3` | World tangent / bitangent |
 | `UV` | `vec2` | Interpolated UV |
 | `FRONT_FACING` | `bool` | `gl_FrontFacing` |

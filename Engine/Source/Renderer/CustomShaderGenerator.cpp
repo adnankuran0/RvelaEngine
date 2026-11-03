@@ -468,4 +468,182 @@ bool CustomShaderGenerator::GenerateGLSL(
     return true;
 }
 
+bool CustomShaderGenerator::GenerateShadowGLSL(
+    const std::string& rshaderSource,
+    std::string& outDirShadowSource,
+    std::string& outPointShadowSource,
+    std::string& outError
+)
+{
+    outDirShadowSource.clear();
+    outPointShadowSource.clear();
+    outError.clear();
+
+    std::string remainingSource = rshaderSource;
+    remainingSource.erase(std::remove(remainingSource.begin(), remainingSource.end(), '\r'), remainingSource.end());
+
+    size_t vertStart = 0, vertEnd = 0;
+    std::string vertBody = ExtractFunctionBody(remainingSource, "vertex", vertStart, vertEnd);
+    if (vertStart != std::string::npos)
+    {
+        remainingSource.erase(vertStart, vertEnd - vertStart);
+    }
+
+    size_t fragStart = 0, fragEnd = 0;
+    std::string fragBody = ExtractFunctionBody(remainingSource, "fragment", fragStart, fragEnd);
+    if (fragStart != std::string::npos)
+    {
+        remainingSource.erase(fragStart, fragEnd - fragStart);
+    }
+
+    std::vector<ShaderUniformDef> dummyUniforms;
+    std::string cleanGlobals;
+    ParseUniforms(remainingSource, dummyUniforms, cleanGlobals);
+
+    auto LoadTemplate = [](const std::string& filename) -> std::string {
+        std::string glsl;
+        if (VFS::Get().IsMounted())
+        {
+            if (!VFS::Get().ReadTextFile("Resources/Engine/Shaders/" + filename, glsl))
+            {
+                VFS::Get().ReadTextFile("Shaders/" + filename, glsl);
+            }
+        }
+        if (glsl.empty())
+        {
+            std::string templatePath = ENGINE_PATH("Shaders\\" + filename).GetAbsoluteStr();
+            std::ifstream file(templatePath);
+            if (file.is_open())
+            {
+                std::stringstream ss;
+                ss << file.rdbuf();
+                glsl = ss.str();
+            }
+        }
+        glsl.erase(std::remove(glsl.begin(), glsl.end(), '\r'), glsl.end());
+        return glsl;
+    };
+
+    auto ReplaceAll = [](std::string& str, const std::string& from, const std::string& to) {
+        size_t pos = 0;
+        while ((pos = str.find(from, pos)) != std::string::npos)
+        {
+            str.replace(pos, from.length(), to);
+            pos += to.length();
+        }
+    };
+
+    std::string dirGlsl = LoadTemplate("CustomShadowBase.glsl");
+    if (dirGlsl.empty())
+    {
+        outError = "Failed to load CustomShadowBase.glsl";
+        return false;
+    }
+    ReplaceAll(dirGlsl, "// === USER_GLOBALS_VERTEX ===", cleanGlobals);
+    ReplaceAll(dirGlsl, "// === USER_VERTEX_CODE ===", vertBody);
+    outDirShadowSource = std::move(dirGlsl);
+
+    std::string pointGlsl = LoadTemplate("CustomPointShadowBase.glsl");
+    if (pointGlsl.empty())
+    {
+        outError = "Failed to load CustomPointShadowBase.glsl";
+        return false;
+    }
+    ReplaceAll(pointGlsl, "// === USER_GLOBALS_VERTEX ===", cleanGlobals);
+    ReplaceAll(pointGlsl, "// === USER_VERTEX_CODE ===", vertBody);
+    outPointShadowSource = std::move(pointGlsl);
+
+    return true;
+}
+
+bool CustomShaderGenerator::GenerateGBufferGLSL(
+    const std::string& rshaderSource,
+    std::string& outGBufferSource,
+    std::string& outEntityBufferSource,
+    std::string& outError
+)
+{
+    outError.clear();
+
+    std::string remainingSource = rshaderSource;
+    remainingSource.erase(std::remove(remainingSource.begin(), remainingSource.end(), '\r'), remainingSource.end());
+
+    size_t vertStart = 0, vertEnd = 0;
+    std::string vertBody = ExtractFunctionBody(remainingSource, "vertex", vertStart, vertEnd);
+    if (vertStart != std::string::npos)
+    {
+        remainingSource.erase(vertStart, vertEnd - vertStart);
+    }
+
+    size_t fragStart = 0, fragEnd = 0;
+    std::string fragBody = ExtractFunctionBody(remainingSource, "fragment", fragStart, fragEnd);
+    if (fragStart != std::string::npos)
+    {
+        remainingSource.erase(fragStart, fragEnd - fragStart);
+    }
+
+    std::vector<ShaderUniformDef> dummyUniforms;
+    std::string cleanGlobals;
+    ParseUniforms(remainingSource, dummyUniforms, cleanGlobals);
+
+    auto LoadTemplate = [](const std::string& filename) -> std::string {
+        std::string glsl;
+        if (VFS::Get().IsMounted())
+        {
+            if (!VFS::Get().ReadTextFile("Resources/Engine/Shaders/" + filename, glsl))
+            {
+                VFS::Get().ReadTextFile("Shaders/" + filename, glsl);
+            }
+        }
+        if (glsl.empty())
+        {
+            std::string templatePath = ENGINE_PATH("Shaders\\" + filename).GetAbsoluteStr();
+            std::ifstream file(templatePath);
+            if (file.is_open())
+            {
+                std::stringstream ss;
+                ss << file.rdbuf();
+                glsl = ss.str();
+            }
+        }
+        glsl.erase(std::remove(glsl.begin(), glsl.end(), '\r'), glsl.end());
+        return glsl;
+    };
+
+    auto ReplaceAll = [](std::string& str, const std::string& from, const std::string& to) {
+        size_t pos = 0;
+        while ((pos = str.find(from, pos)) != std::string::npos)
+        {
+            str.replace(pos, from.length(), to);
+            pos += to.length();
+        }
+    };
+
+    std::string gbufferGlsl = LoadTemplate("CustomGBufferBase.glsl");
+    if (gbufferGlsl.empty())
+    {
+        outError = "Failed to load CustomGBufferBase.glsl";
+        return false;
+    }
+    ReplaceAll(gbufferGlsl, "// === USER_GLOBALS_VERTEX ===", cleanGlobals);
+    ReplaceAll(gbufferGlsl, "// === USER_VERTEX_CODE ===", vertBody);
+    ReplaceAll(gbufferGlsl, "// === USER_GLOBALS_FRAGMENT ===", cleanGlobals);
+    ReplaceAll(gbufferGlsl, "// === USER_FRAGMENT_CODE ===", fragBody);
+    outGBufferSource = std::move(gbufferGlsl);
+
+    std::string entityGlsl = LoadTemplate("CustomEntityBufferBase.glsl");
+    if (entityGlsl.empty())
+    {
+        outError = "Failed to load CustomEntityBufferBase.glsl";
+        return false;
+    }
+    ReplaceAll(entityGlsl, "// === USER_GLOBALS_VERTEX ===", cleanGlobals);
+    ReplaceAll(entityGlsl, "// === USER_VERTEX_CODE ===", vertBody);
+    ReplaceAll(entityGlsl, "// === USER_GLOBALS_FRAGMENT ===", cleanGlobals);
+    ReplaceAll(entityGlsl, "// === USER_FRAGMENT_CODE ===", fragBody);
+    outEntityBufferSource = std::move(entityGlsl);
+
+    return true;
+}
+
 }

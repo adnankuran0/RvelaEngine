@@ -6,6 +6,8 @@
 #include "Renderer/ShaderManager.h"
 #include "Renderer/TextureCache.h"
 #include "Scene/Scene.h"
+#include "Asset/AssetManager.h"
+#include "Core/Time.h"
 
 using namespace rv;
 
@@ -86,9 +88,98 @@ void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         return useAlb;
         };
 
+    auto BindCustomUniforms = [](Shader& shader, const MaterialInstance& inst, const ShaderAsset& shaderAsset) {
+        int nextTextureSlot = 18;
+        const auto& overrides = inst.GetCustomUniformOverrides();
+        const auto& cached = inst.GetCachedCustomUniforms();
+
+        for (const auto& uDef : shaderAsset.uniforms)
+        {
+            if (uDef.engineTexture != EngineTextureType::None)
+                continue;
+
+            CustomUniformValue val;
+            auto itOver = overrides.find(uDef.name);
+            if (itOver != overrides.end())
+            {
+                val = itOver->second;
+            }
+            else
+            {
+                auto itCached = cached.find(uDef.name);
+                if (itCached != cached.end())
+                    val = itCached->second;
+                else
+                {
+                    val.type = uDef.type;
+                    val.floatVal = uDef.floatVal;
+                    val.intVal = uDef.intVal;
+                    val.boolVal = uDef.boolVal;
+                    val.vec2Val = uDef.vec2Val;
+                    val.vec3Val = uDef.vec3Val;
+                    val.vec4Val = uDef.vec4Val;
+                    val.textureUUID = uDef.textureUUID;
+                }
+            }
+
+            switch (uDef.type)
+            {
+            case ShaderUniformType::Float:
+                shader.setFloat(uDef.name, val.floatVal);
+                break;
+            case ShaderUniformType::Int:
+                shader.setInt(uDef.name, val.intVal);
+                break;
+            case ShaderUniformType::Bool:
+                shader.setBool(uDef.name, val.boolVal);
+                break;
+            case ShaderUniformType::Vec2:
+                shader.setVec2(uDef.name, val.vec2Val);
+                break;
+            case ShaderUniformType::Vec3:
+            case ShaderUniformType::Color3:
+                shader.setVec3(uDef.name, val.vec3Val);
+                break;
+            case ShaderUniformType::Vec4:
+            case ShaderUniformType::Color4:
+                shader.setVec4(uDef.name, val.vec4Val);
+                break;
+            case ShaderUniformType::Texture2D:
+                shader.setInt(uDef.name, nextTextureSlot);
+                if (val.textureUUID.IsValid())
+                {
+                    auto texAsset = AssetManager::Get().GetAsset<TextureAsset>(val.textureUUID);
+                    if (texAsset)
+                    {
+                        TextureCache::Get().GetOrCreate(texAsset).Bind(nextTextureSlot);
+                    }
+                    else
+                    {
+                        TextureCache::Get().GetWhiteTexture().Bind(nextTextureSlot);
+                    }
+                }
+                else
+                {
+                    TextureCache::Get().GetWhiteTexture().Bind(nextTextureSlot);
+                }
+
+                if (uDef.hasCustomSampler)
+                {
+                    auto itSampler = shaderAsset.samplers.find(uDef.name);
+                    if (itSampler != shaderAsset.samplers.end() && itSampler->second)
+                    {
+                        itSampler->second->Bind(nextTextureSlot);
+                    }
+                }
+                nextTextureSlot++;
+                break;
+            }
+        }
+    };
+
     {
-        Shader& shader = ShaderManager::Get("EntityBuffer");
-        shader.use();
+        Shader& defaultShader = ShaderManager::Get("EntityBuffer");
+        Shader* activeShader = nullptr;
 
         auto RenderCommandList = [&](const auto& commands)
             {
@@ -97,14 +188,38 @@ void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
                     if (!ctx.camera->Intersects(command.mesh->worldAABB)) continue;
 
                     auto& material = command.material;
-                    ApplyCullMode(material->GetCullMode());
+                    auto customShaderAsset = material->GetInstance().GetCustomShaderAsset();
+                    bool hasCustom = (customShaderAsset && customShaderAsset->IsValid() && customShaderAsset->entityBufferShader);
+
+                    Shader* targetShader = hasCustom ? customShaderAsset->entityBufferShader.get() : &defaultShader;
+                    if (activeShader != targetShader)
+                    {
+                        targetShader->use();
+                        activeShader = targetShader;
+                    }
+
+                    if (hasCustom && customShaderAsset->renderModes.hasCullMode)
+                        ApplyCullMode(customShaderAsset->renderModes.cullMode);
+                    else
+                        ApplyCullMode(material->GetCullMode());
 
                     glm::mat4 model = command.transform->GetWorldMatrix();
-                    shader.setMat4("model", model);
-                    shader.setUInt("u_EntityID", static_cast<uint32_t>(command.entityID));
-                    shader.setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
+                    targetShader->setMat4("model", model);
+                    targetShader->setUInt("u_EntityID", static_cast<uint32_t>(command.entityID));
 
-                    bool useAlb = BindMaterial(shader, material);
+                    bool useAlb = false;
+                    if (hasCustom)
+                    {
+                        targetShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
+                        targetShader->setVec2("UVScale", material->GetUVScale());
+                        targetShader->setVec2("UVOffset", material->GetUVOffset());
+                        BindCustomUniforms(*targetShader, material->GetInstance(), *customShaderAsset);
+                    }
+                    else
+                    {
+                        targetShader->setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
+                        useAlb = BindMaterial(*targetShader, material);
+                    }
 
                     command.mesh->Bind();
                     glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
@@ -119,10 +234,8 @@ void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     if (!skeletalOpaqueCommands.empty() || !skeletalTransparentCommands.empty())
     {
-        Shader& skeletalShader = ShaderManager::Get("EntityBuffer_Skeletal");
-        skeletalShader.use();
-
-        GLint boneLoc = glGetUniformLocation(skeletalShader.ID, "u_BoneMatrices");
+        Shader& defaultSkeletalShader = ShaderManager::Get("EntityBuffer_Skeletal");
+        Shader* activeShader = nullptr;
 
         auto RenderSkeletalCommandList = [&](const auto& commands)
             {
@@ -131,12 +244,26 @@ void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
                     if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
 
                     auto& material = command.material;
-                    ApplyCullMode(material->GetCullMode());
+                    auto customShaderAsset = material->GetInstance().GetCustomShaderAsset();
+                    bool hasCustom = (customShaderAsset && customShaderAsset->IsValid() && customShaderAsset->skeletalEntityBufferShader);
+
+                    Shader* targetShader = hasCustom ? customShaderAsset->skeletalEntityBufferShader.get() : &defaultSkeletalShader;
+                    if (activeShader != targetShader)
+                    {
+                        targetShader->use();
+                        activeShader = targetShader;
+                    }
+
+                    if (hasCustom && customShaderAsset->renderModes.hasCullMode)
+                        ApplyCullMode(customShaderAsset->renderModes.cullMode);
+                    else
+                        ApplyCullMode(material->GetCullMode());
 
                     glm::mat4 model = command.transform->GetWorldMatrix();
-                    skeletalShader.setMat4("model", model);
-                    skeletalShader.setUInt("u_EntityID", static_cast<uint32_t>(command.entityID));
+                    targetShader->setMat4("model", model);
+                    targetShader->setUInt("u_EntityID", static_cast<uint32_t>(command.entityID));
 
+                    GLint boneLoc = glGetUniformLocation(targetShader->ID, "u_BoneMatrices");
                     if (boneLoc != -1 && command.skeleton && !command.skeleton->skinningPalette.empty())
                     {
                         GLsizei uploadCount = static_cast<GLsizei>(std::min(command.skeleton->skinningPalette.size(), MAX_BONES));
@@ -148,7 +275,18 @@ void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
                         );
                     }
 
-                    bool useAlb = BindMaterial(skeletalShader, material);
+                    bool useAlb = false;
+                    if (hasCustom)
+                    {
+                        targetShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
+                        targetShader->setVec2("UVScale", material->GetUVScale());
+                        targetShader->setVec2("UVOffset", material->GetUVOffset());
+                        BindCustomUniforms(*targetShader, material->GetInstance(), *customShaderAsset);
+                    }
+                    else
+                    {
+                        useAlb = BindMaterial(*targetShader, material);
+                    }
 
                     command.mesh->Bind();
                     glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);

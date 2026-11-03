@@ -63,6 +63,10 @@ bool MaterialSerializer::Save(const Ref<MaterialAsset>& asset, const std::filesy
     j["UVScale"] = { asset->UVScale.x, asset->UVScale.y };
     j["UVOffset"] = { asset->UVOffset.x, asset->UVOffset.y };
 
+    j["useTriplanar"] = asset->useTriplanar;
+    j["useWorldTriplanar"] = asset->useWorldTriplanar;
+    j["triplanarSharpness"] = asset->triplanarSharpness;
+
     j["hasOutline"] = asset->hasOutline;
     j["outlineColor"] = { asset->outlineColor.r, asset->outlineColor.g, asset->outlineColor.b, asset->outlineColor.a };
     j["outlineWidth"] = asset->outlineWidth;
@@ -196,6 +200,10 @@ bool MaterialSerializer::Load(const Ref<MaterialAsset>& asset, const std::filesy
         auto uv = j["UVOffset"];
         asset->UVOffset = glm::vec2(uv[0], uv[1]);
     }
+
+    asset->useTriplanar = j.value("useTriplanar", false);
+    asset->useWorldTriplanar = j.value("useWorldTriplanar", false);
+    asset->triplanarSharpness = j.value("triplanarSharpness", 4.0f);
 
     asset->hasOutline = j.value("hasOutline", false);
     if (j.contains("outlineColor"))

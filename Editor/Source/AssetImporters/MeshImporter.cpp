@@ -112,9 +112,21 @@ bool MeshImporter::ImportFromScene(
 
         auto vertices = ProcessVertices(mesh);
         auto indices = ProcessIndices(mesh);
+        if (vertices.empty() || indices.empty())
+        {
+            LOG_WARN("Mesh '{}' (index {}) has no valid vertices or triangles, skipping.", meshName, i);
+            outMeshMap.erase(i);
+            continue;
+        }
         if (optimize)
         {
             OptimizeMesh(vertices, indices);
+        }
+        if (vertices.empty() || indices.empty())
+        {
+            LOG_WARN("Mesh '{}' (index {}) has no valid vertices or triangles after optimization, skipping.", meshName, i);
+            outMeshMap.erase(i);
+            continue;
         }
         aiVector3D mn = mesh->mAABB.mMin, mx = mesh->mAABB.mMax;
         AABB aabb(glm::vec3(mn.x, mn.y, mn.z), glm::vec3(mx.x, mx.y, mx.z));
@@ -122,6 +134,7 @@ bool MeshImporter::ImportFromScene(
         if (!WriteMeshCache(cachePath, meshName, vertices, indices, aabb))
         {
             LOG_ERROR("Failed to write cache for mesh {}", i);
+            outMeshMap.erase(i);
             continue;
         }
 
@@ -172,7 +185,7 @@ void MeshImporter::OptimizeMesh(std::vector<Vertex>& outVertices, std::vector<un
     size_t vertexCount = outVertices.size();
     size_t indexCount = outIndices.size();
 
-    if (vertexCount == 0 || indexCount == 0) return;
+    if (vertexCount == 0 || indexCount < 3 || (indexCount % 3) != 0) return;
 
     std::vector<unsigned int> remap(vertexCount);
     size_t newVertexCount = meshopt_generateVertexRemap(
@@ -182,6 +195,8 @@ void MeshImporter::OptimizeMesh(std::vector<Vertex>& outVertices, std::vector<un
         outVertices.data(),
         vertexCount,
         sizeof(Vertex));
+
+    if (newVertexCount == 0) return;
 
     std::vector<unsigned int> remappedIndices(indexCount);
     std::vector<Vertex> remappedVertices(newVertexCount);
@@ -213,18 +228,20 @@ void MeshImporter::OptimizeMesh(std::vector<Vertex>& outVertices, std::vector<un
         outIndices.data(),
         outIndices.data(),
         indexCount,
-        &outVertices[0].position.x,
+        reinterpret_cast<const float*>(outVertices.data()),
         vertexCount,
         sizeof(Vertex),
         1.05f);
 
-    meshopt_optimizeVertexFetch(
+    size_t finalVertexCount = meshopt_optimizeVertexFetch(
         outVertices.data(),
         outIndices.data(),
         indexCount,
         outVertices.data(),
         vertexCount,
         sizeof(Vertex));
+
+    outVertices.resize(finalVertexCount);
 }
 
 std::vector<Vertex> MeshImporter::ProcessVertices(aiMesh* mesh)
@@ -263,7 +280,15 @@ std::vector<unsigned int> MeshImporter::ProcessIndices(aiMesh* mesh)
     for (unsigned int i = 0; i < mesh->mNumFaces; i++)
     {
         const aiFace& face = mesh->mFaces[i];
-        indices.insert(indices.end(), face.mIndices, face.mIndices + face.mNumIndices);
+        if (face.mNumIndices != 3)
+            continue;
+
+        if (face.mIndices[0] >= mesh->mNumVertices ||
+            face.mIndices[1] >= mesh->mNumVertices ||
+            face.mIndices[2] >= mesh->mNumVertices)
+            continue;
+
+        indices.insert(indices.end(), face.mIndices, face.mIndices + 3);
     }
     return indices;
 }

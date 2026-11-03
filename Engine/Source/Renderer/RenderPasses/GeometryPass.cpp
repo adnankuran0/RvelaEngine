@@ -5,6 +5,9 @@
 #include "Renderer/RenderFrame.h"
 #include "Renderer/ShaderManager.h"
 #include "Renderer/TextureCache.h"
+#include "Asset/AssetManager.h"
+#include "Core/Time.h"
+#include <glm/gtc/type_ptr.hpp>
 
 using namespace rv;
 
@@ -162,24 +165,136 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         glBindTextureUnit(5, 0);
         };
 
+    auto BindCustomShaderUniforms = [](Shader& shader, const MaterialInstance& inst, const ShaderAsset& shaderAsset) {
+        int nextTextureSlot = 18;
+        const auto& overrides = inst.GetCustomUniformOverrides();
+        const auto& cached = inst.GetCachedCustomUniforms();
+
+        for (const auto& uDef : shaderAsset.uniforms)
+        {
+            if (uDef.engineTexture != EngineTextureType::None)
+                continue;
+
+            CustomUniformValue val;
+            auto itOver = overrides.find(uDef.name);
+            if (itOver != overrides.end())
+            {
+                val = itOver->second;
+            }
+            else
+            {
+                auto itCached = cached.find(uDef.name);
+                if (itCached != cached.end())
+                    val = itCached->second;
+                else
+                {
+                    val.type = uDef.type;
+                    val.floatVal = uDef.floatVal;
+                    val.intVal = uDef.intVal;
+                    val.boolVal = uDef.boolVal;
+                    val.vec2Val = uDef.vec2Val;
+                    val.vec3Val = uDef.vec3Val;
+                    val.vec4Val = uDef.vec4Val;
+                    val.textureUUID = uDef.textureUUID;
+                }
+            }
+
+            switch (uDef.type)
+            {
+            case ShaderUniformType::Float:
+                shader.setFloat(uDef.name, val.floatVal);
+                break;
+            case ShaderUniformType::Int:
+                shader.setInt(uDef.name, val.intVal);
+                break;
+            case ShaderUniformType::Bool:
+                shader.setBool(uDef.name, val.boolVal);
+                break;
+            case ShaderUniformType::Vec2:
+                shader.setVec2(uDef.name, val.vec2Val);
+                break;
+            case ShaderUniformType::Vec3:
+            case ShaderUniformType::Color3:
+                shader.setVec3(uDef.name, val.vec3Val);
+                break;
+            case ShaderUniformType::Vec4:
+            case ShaderUniformType::Color4:
+                shader.setVec4(uDef.name, val.vec4Val);
+                break;
+            case ShaderUniformType::Texture2D:
+                shader.setInt(uDef.name, nextTextureSlot);
+                if (val.textureUUID.IsValid())
+                {
+                    auto texAsset = AssetManager::Get().GetAsset<TextureAsset>(val.textureUUID);
+                    if (texAsset)
+                    {
+                        TextureCache::Get().GetOrCreate(texAsset).Bind(nextTextureSlot);
+                    }
+                    else
+                    {
+                        TextureCache::Get().GetWhiteTexture().Bind(nextTextureSlot);
+                    }
+                }
+                else
+                {
+                    TextureCache::Get().GetWhiteTexture().Bind(nextTextureSlot);
+                }
+
+                if (uDef.hasCustomSampler)
+                {
+                    auto itSampler = shaderAsset.samplers.find(uDef.name);
+                    if (itSampler != shaderAsset.samplers.end() && itSampler->second)
+                    {
+                        itSampler->second->Bind(nextTextureSlot);
+                    }
+                }
+                nextTextureSlot++;
+                break;
+            }
+        }
+    };
+
     if (!staticCommands.empty())
     {
-        Shader& geometryShader = ShaderManager::Get("Geometry");
-        geometryShader.use();
+        Shader& defaultGeometryShader = ShaderManager::Get("Geometry");
+        Shader* activeShader = nullptr;
 
         for (auto& command : staticCommands) {
             if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
             if (!ctx.camera->Intersects(command.mesh->worldAABB)) continue;
 
             auto& material = command.material;
-            ApplyCullMode(material->GetCullMode());
+            auto customShaderAsset = material->GetInstance().GetCustomShaderAsset();
+            bool hasCustomGBuffer = (customShaderAsset && customShaderAsset->IsValid() && customShaderAsset->gBufferShader);
+
+            Shader* targetShader = hasCustomGBuffer ? customShaderAsset->gBufferShader.get() : &defaultGeometryShader;
+            if (activeShader != targetShader)
+            {
+                targetShader->use();
+                activeShader = targetShader;
+            }
+
+            if (hasCustomGBuffer && customShaderAsset->renderModes.hasCullMode)
+                ApplyCullMode(customShaderAsset->renderModes.cullMode);
+            else
+                ApplyCullMode(material->GetCullMode());
 
             glm::mat4 model = command.transform->GetWorldMatrix();
-            geometryShader.setMat4("model", model);
+            targetShader->setMat4("model", model);
             glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(model)));
-            geometryShader.setMat3("normalMatrix", normalMatrix);
+            targetShader->setMat3("normalMatrix", normalMatrix);
 
-            BindMaterialGBuffer(geometryShader, material);
+            if (hasCustomGBuffer)
+            {
+                targetShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
+                targetShader->setVec2("UVScale", material->GetUVScale());
+                targetShader->setVec2("UVOffset", material->GetUVOffset());
+                BindCustomShaderUniforms(*targetShader, material->GetInstance(), *customShaderAsset);
+            }
+            else
+            {
+                BindMaterialGBuffer(*targetShader, material);
+            }
 
             command.mesh->Bind();
             glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
@@ -190,23 +305,35 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     if (!skeletalCommands.empty())
     {
-        Shader& skeletalGeometryShader = ShaderManager::Get("Geometry_Skeletal");
-        skeletalGeometryShader.use();
-
-        GLint boneLoc = glGetUniformLocation(skeletalGeometryShader.ID, "u_BoneMatrices");
+        Shader& defaultSkeletalGeometryShader = ShaderManager::Get("Geometry_Skeletal");
+        Shader* activeShader = nullptr;
 
         for (auto& command : skeletalCommands) {
             if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
             if (command.mesh->worldAABB.IsValid() && !ctx.camera->Intersects(command.mesh->worldAABB)) continue;
 
             auto& material = command.material;
-            ApplyCullMode(material->GetCullMode());
+            auto customShaderAsset = material->GetInstance().GetCustomShaderAsset();
+            bool hasCustomGBuffer = (customShaderAsset && customShaderAsset->IsValid() && customShaderAsset->skeletalGBufferShader);
+
+            Shader* targetShader = hasCustomGBuffer ? customShaderAsset->skeletalGBufferShader.get() : &defaultSkeletalGeometryShader;
+            if (activeShader != targetShader)
+            {
+                targetShader->use();
+                activeShader = targetShader;
+            }
+
+            if (hasCustomGBuffer && customShaderAsset->renderModes.hasCullMode)
+                ApplyCullMode(customShaderAsset->renderModes.cullMode);
+            else
+                ApplyCullMode(material->GetCullMode());
 
             glm::mat4 model = command.transform->GetWorldMatrix();
-            skeletalGeometryShader.setMat4("model", model);
+            targetShader->setMat4("model", model);
             glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(model)));
-            skeletalGeometryShader.setMat3("normalMatrix", normalMatrix);
+            targetShader->setMat3("normalMatrix", normalMatrix);
 
+            GLint boneLoc = glGetUniformLocation(targetShader->ID, "u_BoneMatrices");
             if (boneLoc != -1 && command.skeleton && !command.skeleton->skinningPalette.empty())
             {
                 GLsizei uploadCount = static_cast<GLsizei>(std::min(command.skeleton->skinningPalette.size(), MAX_BONES));
@@ -218,7 +345,17 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
                 );
             }
 
-            BindMaterialGBuffer(skeletalGeometryShader, material);
+            if (hasCustomGBuffer)
+            {
+                targetShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
+                targetShader->setVec2("UVScale", material->GetUVScale());
+                targetShader->setVec2("UVOffset", material->GetUVOffset());
+                BindCustomShaderUniforms(*targetShader, material->GetInstance(), *customShaderAsset);
+            }
+            else
+            {
+                BindMaterialGBuffer(*targetShader, material);
+            }
 
             command.mesh->Bind();
             glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);

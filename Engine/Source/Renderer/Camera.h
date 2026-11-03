@@ -36,7 +36,7 @@ public:
     glm::vec3 Up{ 0.0f, 1.0f, 0.0f };
     glm::vec3 Right{1.0f,0.0f,0.0f};
     glm::vec3 WorldUp{ 0.0f, 1.0f, 0.0f};
-    float FOV{ 90.0f };
+    float FOV{ 60.0f };
     float OrthoSize{ 10.0f };
     float NearClip{ 0.1f };
     float FarClip{ 1000.0f };
