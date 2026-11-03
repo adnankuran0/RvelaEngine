@@ -28,7 +28,11 @@ void LightingPass::Init(const RenderContext& ctx, RenderFrame& frame)
     FramebufferDesc screenDesc;
     screenDesc.width = ctx.viewportWidth;
     screenDesc.height = ctx.viewportHeight;
-    screenDesc.samples = 2;
+    screenDesc.samples = 1;
+    if (ProjectManager::IsProjectLoaded())
+    {
+        screenDesc.samples = ProjectManager::GetActiveProject()->GetSettings().msaaSamples;
+    }
     screenDesc.colorAttachments = {
         { FramebufferTextureFormat::RGBA16F }
     };
@@ -79,7 +83,7 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     auto i_SSAO = resourceRegistry.Get("SSAOTexture")->id;
     auto* contactShadowRes = resourceRegistry.Get("ContactShadowTexture");
     GLuint i_ContactShadow = contactShadowRes ? contactShadowRes->id : 0;
-    uint32_t targetSamples = 2;
+    uint32_t targetSamples = 1;
     if (ProjectManager::IsProjectLoaded())
     {
         targetSamples = ProjectManager::GetActiveProject()->GetSettings().msaaSamples;
@@ -431,7 +435,7 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             }
 
             currentShader->setMat4("model", command.transform->GetWorldMatrix());
-            glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(command.transform->GetWorldMatrix())));
+            glm::mat3 normalMatrix = command.transform->GetNormalMatrix();
             currentShader->setMat3("normalMatrix", normalMatrix);
             currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
             currentShader->setVec2("UVScale", command.material->GetUVScale());
@@ -518,7 +522,7 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             }
 
             currentShader->setMat4("model", command.transform->GetWorldMatrix());
-            glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(command.transform->GetWorldMatrix())));
+            glm::mat3 normalMatrix = command.transform->GetNormalMatrix();
             currentShader->setMat3("normalMatrix", normalMatrix);
             currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
             currentShader->setVec2("UVScale", command.material->GetUVScale());

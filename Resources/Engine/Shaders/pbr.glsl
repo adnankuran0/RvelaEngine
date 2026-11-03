@@ -186,13 +186,14 @@ vec3 getTriplanarWeights(vec3 normal, float sharpness)
 
 vec4 sampleTriplanar(sampler2D tex, vec3 p, vec3 weights)
 {
-    vec4 sampX = texture(tex, p.zy * vec2(-1.0, 1.0));
-    vec4 sampY = texture(tex, p.xz);
-    vec4 sampZ = texture(tex, p.xy);
-    return vec4(
-        sampX.rgb * weights.x + sampY.rgb * weights.y + sampZ.rgb * weights.z,
-        sampX.a * weights.x + sampY.a * weights.y + sampZ.a * weights.z
-    );
+    if (weights.y > 0.95) return texture(tex, p.xz);
+    if (weights.x > 0.95) return texture(tex, p.zy * vec2(-1.0, 1.0));
+    if (weights.z > 0.95) return texture(tex, p.xy);
+
+    vec4 sampX = (weights.x > 0.001) ? texture(tex, p.zy * vec2(-1.0, 1.0)) * weights.x : vec4(0.0);
+    vec4 sampY = (weights.y > 0.001) ? texture(tex, p.xz) * weights.y : vec4(0.0);
+    vec4 sampZ = (weights.z > 0.001) ? texture(tex, p.xy) * weights.z : vec4(0.0);
+    return sampX + sampY + sampZ;
 }
 
 vec3 unpackNormalRG(sampler2D tex, vec2 uv)
@@ -205,19 +206,37 @@ vec3 unpackNormalRG(sampler2D tex, vec2 uv)
 
 vec3 sampleTriplanarNormal(sampler2D tex, vec3 p, vec3 weights, vec3 geomNormal)
 {
-    vec3 nX = unpackNormalRG(tex, p.zy * vec2(-1.0, 1.0));
-    vec3 nY = unpackNormalRG(tex, p.xz);
-    vec3 nZ = unpackNormalRG(tex, p.xy);
-
     vec3 s = vec3(geomNormal.x >= 0.0 ? 1.0 : -1.0,
                   geomNormal.y >= 0.0 ? 1.0 : -1.0,
                   geomNormal.z >= 0.0 ? 1.0 : -1.0);
 
-    vec3 wX = vec3(nX.z * s.x, nX.y, -nX.x * s.x);
-    vec3 wY = vec3(nY.x, nY.z * s.y, nY.y);
-    vec3 wZ = vec3(nZ.x, nZ.y, nZ.z * s.z);
+    if (weights.y > 0.95) {
+        vec3 nY = unpackNormalRG(tex, p.xz);
+        return normalize(vec3(nY.x, nY.z * s.y, nY.y));
+    }
+    if (weights.x > 0.95) {
+        vec3 nX = unpackNormalRG(tex, p.zy * vec2(-1.0, 1.0));
+        return normalize(vec3(nX.z * s.x, nX.y, -nX.x * s.x));
+    }
+    if (weights.z > 0.95) {
+        vec3 nZ = unpackNormalRG(tex, p.xy);
+        return normalize(vec3(nZ.x, nZ.y, nZ.z * s.z));
+    }
 
-    return normalize(wX * weights.x + wY * weights.y + wZ * weights.z);
+    vec3 res = vec3(0.0);
+    if (weights.x > 0.001) {
+        vec3 nX = unpackNormalRG(tex, p.zy * vec2(-1.0, 1.0));
+        res += vec3(nX.z * s.x, nX.y, -nX.x * s.x) * weights.x;
+    }
+    if (weights.y > 0.001) {
+        vec3 nY = unpackNormalRG(tex, p.xz);
+        res += vec3(nY.x, nY.z * s.y, nY.y) * weights.y;
+    }
+    if (weights.z > 0.001) {
+        vec3 nZ = unpackNormalRG(tex, p.xy);
+        res += vec3(nZ.x, nZ.y, nZ.z * s.z) * weights.z;
+    }
+    return normalize(res);
 }
 
 vec3 getNormalFromMap(vec2 texCoords, vec3 N, vec3 T, vec3 B, vec2 ddx, vec2 ddy) 
@@ -245,16 +264,8 @@ vec3 getNormalFromMap(vec2 texCoords, vec3 N, vec3 T, vec3 B)
 float sampleSSAO()
 {
     if (!useSSAO) return 1.0;
-
     vec2 screenUV = gl_FragCoord.xy / windowSize;
-    vec2 texelSize = 1.0 / vec2(textureSize(ssaoTexture, 0));
-
-    float result = 0.0;
-    for (int x = -1; x <= 1; ++x)
-        for (int y = -1; y <= 1; ++y)
-            result += texture(ssaoTexture, screenUV + vec2(x, y) * texelSize).r;
-
-    return result / 9.0;
+    return texture(ssaoTexture, screenUV).r;
 }
 
 void main()
@@ -423,43 +434,45 @@ void main()
 
     if (hasDirectionalLight == 1) {
         vec3 L = normalize(-directionalLight.direction.xyz);
-        vec3 H = normalize(V + L);
-        
-        float NDF = DistributionGGX(Nmap, H, roughness);
-        float G = GeometrySmith(Nmap, V, L, roughness);
-        vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
-        
-        vec3 kS = F;
-        vec3 kD = (vec3(1.0) - kS) * (1.0 - metallic);
+        float NdotL = dot(Nmap, L);
+        if (NdotL > 0.0) {
+            vec3 H = normalize(V + L);
+            
+            float NDF = DistributionGGX(Nmap, H, roughness);
+            float G = GeometrySmith(Nmap, V, L, roughness);
+            vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+            
+            vec3 kS = F;
+            vec3 kD = (vec3(1.0) - kS) * (1.0 - metallic);
 
-        vec3 numerator = NDF * G * F;
-        float denominator = 4.0 * max(dot(Nmap, V), 0.0) * max(dot(Nmap, L), 0.0) + 0.0001;
-        vec3 specular = (numerator / denominator) * specularIntensity;
-        float NdotL = max(dot(Nmap, L), 0.0);
-        
-        bool castShadows = directionalLight.direction.w > 0.5;
-        float viewDepth = abs((view * vec4(FragPos, 1.0)).z);
-        float shadow = (castShadows && receiveShadows) ?   
-            calculateDirectionalShadow(shadowMap, FragPos, Nmap, L, viewDepth, directionalLight.shadowBias, directionalLight.normalBias, directionalLight.blurRadius) : 0.0;
+            vec3 numerator = NDF * G * F;
+            float denominator = 4.0 * max(dot(Nmap, V), 0.0) * NdotL + 0.0001;
+            vec3 specular = (numerator / denominator) * specularIntensity;
+            
+            bool castShadows = directionalLight.direction.w > 0.5;
+            float viewDepth = abs((view * vec4(FragPos, 1.0)).z);
+            float shadow = (castShadows && receiveShadows) ?   
+                calculateDirectionalShadow(shadowMap, FragPos, Nmap, L, viewDepth, directionalLight.shadowBias, directionalLight.normalBias, directionalLight.blurRadius) : 0.0;
 
-        if (useContactShadows && receiveShadows)
-        {
-            vec2 screenUV = gl_FragCoord.xy / windowSize;
-            float contactShadow = texture(contactShadowTexture, screenUV).r;
-            shadow = max(shadow, contactShadow);
+            if (useContactShadows && receiveShadows)
+            {
+                vec2 screenUV = gl_FragCoord.xy / windowSize;
+                float contactShadow = texture(contactShadowTexture, screenUV).r;
+                shadow = max(shadow, contactShadow);
+            }
+
+            if (useHeightMap && !useTriplanar && receiveShadows && pomHitDepth > 0.02)
+            {
+                vec3 lightDirTS = transpose(TBN) * L;
+                float pomShadow = calculateParallaxShadow(mappedTexCoords, pomHitDepth, lightDirTS, ddx, ddy, heightScale);
+                shadow = max(shadow, 1.0 - pomShadow);
+            }
+
+            vec3 lightColor = directionalLight.colorIntensity.rgb;
+            float lightIntensity = directionalLight.colorIntensity.a;
+
+            Lo += (1.0 - shadow) * (kD * albedo / PI + specular) * lightColor * lightIntensity * NdotL;
         }
-
-        if (useHeightMap && !useTriplanar && receiveShadows && pomHitDepth > 0.02)
-        {
-            vec3 lightDirTS = transpose(TBN) * L;
-            float pomShadow = calculateParallaxShadow(mappedTexCoords, pomHitDepth, lightDirTS, ddx, ddy, heightScale);
-            shadow = max(shadow, 1.0 - pomShadow);
-        }
-
-        vec3 lightColor = directionalLight.colorIntensity.rgb;
-        float lightIntensity = directionalLight.colorIntensity.a;
-
-        Lo += (1.0 - shadow) * (kD * albedo / PI + specular) * lightColor * lightIntensity * NdotL;
     }
 
     for (int i = 0; i < pointLightCount; ++i) 
@@ -473,6 +486,9 @@ void main()
         
         float distance = sqrt(dist2);
         vec3 L = L_vec / distance;
+        float NdotL = dot(Nmap, L);
+        if (NdotL <= 0.0) continue;
+
         vec3 H = normalize(V + L);
         
         float num = clamp(1.0 - (dist2 / radius2) * (dist2 / radius2), 0.0, 1.0);
@@ -486,9 +502,8 @@ void main()
         vec3 kD = (vec3(1.0) - kS) * (1.0 - metallic);
 
         vec3 numerator = NDF * G * F;
-        float denominator = 4.0 * max(dot(Nmap, V), 0.0) * max(dot(Nmap, L), 0.0) + 0.0001;
+        float denominator = 4.0 * max(dot(Nmap, V), 0.0) * NdotL + 0.0001;
         vec3 specular = (numerator / denominator) * specularIntensity;
-        float NdotL = max(dot(Nmap, L), 0.0);
         
         bool castShadows = light.shadowIndex >= 0;
         float shadow = (castShadows && receiveShadows) ? 
@@ -516,6 +531,9 @@ void main()
 
         if (theta < outerCutoff) continue;
 
+        float NdotL = dot(Nmap, L);
+        if (NdotL <= 0.0) continue;
+
         float epsilon = innerCutoff - outerCutoff;
         float spotFactor = clamp((theta - outerCutoff) / max(0.0001, epsilon), 0.0, 1.0);
 
@@ -531,9 +549,8 @@ void main()
         vec3 kD = (vec3(1.0) - kS) * (1.0 - metallic);
 
         vec3 numerator = NDF * G * F;
-        float denominator = 4.0 * max(dot(Nmap, V), 0.0) * max(dot(Nmap, L), 0.0) + 0.0001;
+        float denominator = 4.0 * max(dot(Nmap, V), 0.0) * NdotL + 0.0001;
         vec3 specular = (numerator / denominator) * specularIntensity;
-        float NdotL = max(dot(Nmap, L), 0.0);
 
         int sIndex = int(light.direction.w);
         float shadow = (sIndex >= 0 && receiveShadows) ?

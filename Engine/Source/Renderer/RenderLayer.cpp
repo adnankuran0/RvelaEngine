@@ -167,10 +167,11 @@ void RenderLayer::CollectRenderCommands(Scene* scene)
 			}
 		}
 
+		glm::vec3 objPos = glm::vec3(transform.GetWorldMatrix()[3]);
+		cmd.distanceToCamera = glm::length2(camPos - objPos);
+
 		if (isTransparent)
 		{
-			glm::vec3 objPos = glm::vec3(transform.GetWorldMatrix()[3]);
-			cmd.distanceToCamera = glm::length2(camPos - objPos);
 			m_RenderPipeline->m_RenderFrame.transparentCommands.push_back(cmd);
 		}
 		else
@@ -183,6 +184,13 @@ void RenderLayer::CollectRenderCommands(Scene* scene)
 		m_RenderPipeline->m_RenderFrame.transparentCommands.end(),
 		[](const RenderCommand& a, const RenderCommand& b) {
 			return a.distanceToCamera > b.distanceToCamera;
+		}
+	);
+	std::sort(
+		m_RenderPipeline->m_RenderFrame.opaqueCommands.begin(),
+		m_RenderPipeline->m_RenderFrame.opaqueCommands.end(),
+		[](const RenderCommand& a, const RenderCommand& b) {
+			return a.distanceToCamera < b.distanceToCamera;
 		}
 	);
 
@@ -236,10 +244,11 @@ void RenderLayer::CollectRenderCommands(Scene* scene)
 			}
 		}
 
+		glm::vec3 objPos = glm::vec3(transform.GetWorldMatrix()[3]);
+		cmd.distanceToCamera = glm::length2(camPos - objPos);
+
 		if (isSkeletalTransparent)
 		{
-			glm::vec3 objPos = glm::vec3(transform.GetWorldMatrix()[3]);
-			cmd.distanceToCamera = glm::length2(camPos - objPos);
 			m_RenderPipeline->m_RenderFrame.skeletalTransparentCommands.push_back(cmd);
 		}
 		else
@@ -252,6 +261,13 @@ void RenderLayer::CollectRenderCommands(Scene* scene)
 		m_RenderPipeline->m_RenderFrame.skeletalTransparentCommands.end(),
 		[](const SkeletalRenderCommand& a, const SkeletalRenderCommand& b) {
 			return a.distanceToCamera > b.distanceToCamera;
+		}
+	);
+	std::sort(
+		m_RenderPipeline->m_RenderFrame.skeletalOpaqueCommands.begin(),
+		m_RenderPipeline->m_RenderFrame.skeletalOpaqueCommands.end(),
+		[](const SkeletalRenderCommand& a, const SkeletalRenderCommand& b) {
+			return a.distanceToCamera < b.distanceToCamera;
 		}
 	);
 

@@ -37,14 +37,15 @@ float sampleCascadeShadow(sampler2DArray shadowMap, int cascadeIndex, vec3 world
 
     vec2 texelSize = (blurRadius * (1.0 + float(cascadeIndex) * 0.25)) / vec2(textureSize(shadowMap, 0).xy);
     float shadow = 0.0;
+    int sampleCount = (cascadeIndex == 0) ? 8 : 4;
 
-    for (int i = 0; i < 16; ++i) {
+    for (int i = 0; i < sampleCount; ++i) {
         vec2 offset = POISSON_DISK[i] * texelSize;
         float pcfDepth = texture(shadowMap, vec3(projCoords.xy + offset, float(cascadeIndex))).r;
         shadow += (currentDepth > pcfDepth) ? 1.0 : 0.0;
     }
 
-    return shadow / 16.0;
+    return shadow / float(sampleCount);
 }
 
 float calculateDirectionalShadow(sampler2DArray shadowMap, vec3 worldPos, vec3 normal, vec3 lightDir, float viewDepth, float shadowBias, float normalBias, float blurRadius)
@@ -104,14 +105,15 @@ float calculatePointLightShadow(samplerCubeArray pointShadowMap, int index, vec3
 
     float diskRadius = blurRadius * (1.0 + (currentDepth / farPlane));
     float shadow = 0.0;
+    int sampleCount = (currentDepth < farPlane * 0.4) ? 8 : 4;
 
-    for (int i = 0; i < 16; ++i) {
+    for (int i = 0; i < sampleCount; ++i) {
         vec3 sampleDir = fragToLight + vec3(POISSON_DISK[i] * diskRadius, POISSON_DISK[15 - i].x * diskRadius);
         float closestDepth = texture(pointShadowMap, vec4(sampleDir, float(index))).r;
         shadow += (shadowDepth > closestDepth) ? 1.0 : 0.0;
     }
 
-    return shadow / 16.0;
+    return shadow / float(sampleCount);
 }
 
 float calculateSpotLightShadow(sampler2DArray spotShadowMap, int shadowIndex, vec3 worldPos, mat4 lightSpaceMatrix, vec3 normal, float shadowBias, float blurRadius)
@@ -133,14 +135,15 @@ float calculateSpotLightShadow(sampler2DArray spotShadowMap, int shadowIndex, ve
 
     vec2 texelSize = blurRadius / vec2(textureSize(spotShadowMap, 0).xy);
     float shadow = 0.0;
+    int sampleCount = (projCoords.z < 0.4) ? 8 : 4;
 
-    for (int i = 0; i < 16; ++i) {
+    for (int i = 0; i < sampleCount; ++i) {
         vec2 offset = POISSON_DISK[i] * texelSize;
         float pcfDepth = texture(spotShadowMap, vec3(projCoords.xy + offset, float(shadowIndex))).r;
         shadow += (currentDepth > pcfDepth) ? 1.0 : 0.0;
     }
 
-    return shadow / 16.0;
+    return shadow / float(sampleCount);
 }
 
 #endif

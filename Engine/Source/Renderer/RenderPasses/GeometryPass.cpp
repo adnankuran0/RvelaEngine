@@ -7,6 +7,7 @@
 #include "Renderer/TextureCache.h"
 #include "Asset/AssetManager.h"
 #include "Core/Time.h"
+#include "Scene/Environment.h"
 #include <glm/gtc/type_ptr.hpp>
 
 using namespace rv;
@@ -54,6 +55,19 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     m_GBuffer.BindViewport();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    bool needsGBuffer = false;
+    if (ctx.environment)
+    {
+        needsGBuffer = ctx.environment->SSAO || 
+                       ctx.environment->SSR || 
+                       ctx.environment->SSGI || 
+                       ctx.environment->ContactShadows;
+    }
+    if (!needsGBuffer)
+    {
+        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+    }
 
     auto ApplyCullMode = [](CullMode mode) {
         if (mode == CullMode::Disabled) {
@@ -281,8 +295,15 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
             glm::mat4 model = command.transform->GetWorldMatrix();
             targetShader->setMat4("model", model);
-            glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(model)));
-            targetShader->setMat3("normalMatrix", normalMatrix);
+
+            if (!needsGBuffer)
+            {
+                command.mesh->Bind();
+                glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+                continue;
+            }
+
+            targetShader->setMat3("normalMatrix", command.transform->GetNormalMatrix());
 
             if (hasCustomGBuffer)
             {
@@ -330,8 +351,6 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
             glm::mat4 model = command.transform->GetWorldMatrix();
             targetShader->setMat4("model", model);
-            glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(model)));
-            targetShader->setMat3("normalMatrix", normalMatrix);
 
             GLint boneLoc = glGetUniformLocation(targetShader->ID, "u_BoneMatrices");
             if (boneLoc != -1 && command.skeleton && !command.skeleton->skinningPalette.empty())
@@ -344,6 +363,15 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
                     glm::value_ptr(command.skeleton->skinningPalette[0])
                 );
             }
+
+            if (!needsGBuffer)
+            {
+                command.mesh->Bind();
+                glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+                continue;
+            }
+
+            targetShader->setMat3("normalMatrix", command.transform->GetNormalMatrix());
 
             if (hasCustomGBuffer)
             {
@@ -362,6 +390,11 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
             CleanupSamplers();
         }
+    }
+
+    if (!needsGBuffer)
+    {
+        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     }
 
     glEnable(GL_CULL_FACE);

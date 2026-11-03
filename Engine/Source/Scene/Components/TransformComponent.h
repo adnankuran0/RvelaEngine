@@ -84,9 +84,16 @@ public:
 
     void SetWorldMatrix(const glm::mat4& matrix) {
         m_WorldMatrix = matrix;
+        glm::mat3 m3(matrix);
+        float det = glm::determinant(m3);
+        if (std::abs(det) > 1e-6f)
+            m_NormalMatrix = glm::transpose(glm::inverse(m3));
+        else
+            m_NormalMatrix = glm::mat3(1.0f);
         m_Dirty = false;
     }
     const glm::mat4& GetWorldMatrix() const { return m_WorldMatrix; }
+    const glm::mat3& GetNormalMatrix() const { return m_NormalMatrix; }
 
     inline glm::mat4 GetLocalMatrix() const noexcept
     {
@@ -128,6 +135,7 @@ private:
     glm::vec3 m_LocalEuler = glm::vec3(0.0f);
 
     glm::mat4 m_WorldMatrix = glm::mat4(1.0f);
+    glm::mat3 m_NormalMatrix = glm::mat3(1.0f);
 
     glm::vec3 m_WorldPositionCache{ 0.0f };
     glm::quat m_WorldRotationCache{ 1.0f, 0.0f, 0.0f, 0.0f };

@@ -169,10 +169,14 @@ vec3 getTriplanarWeights(vec3 normal, float sharpness)
 
 vec4 sampleTriplanar(sampler2D tex, vec3 p, vec3 weights)
 {
-    vec4 sampX = texture(tex, p.zy * vec2(-1.0, 1.0));
-    vec4 sampY = texture(tex, p.xz);
-    vec4 sampZ = texture(tex, p.xy);
-    return sampX * weights.x + sampY * weights.y + sampZ * weights.z;
+    if (weights.y > 0.95) return texture(tex, p.xz);
+    if (weights.x > 0.95) return texture(tex, p.zy * vec2(-1.0, 1.0));
+    if (weights.z > 0.95) return texture(tex, p.xy);
+
+    vec4 sampX = (weights.x > 0.001) ? texture(tex, p.zy * vec2(-1.0, 1.0)) * weights.x : vec4(0.0);
+    vec4 sampY = (weights.y > 0.001) ? texture(tex, p.xz) * weights.y : vec4(0.0);
+    vec4 sampZ = (weights.z > 0.001) ? texture(tex, p.xy) * weights.z : vec4(0.0);
+    return sampX + sampY + sampZ;
 }
 
 vec3 unpackNormalRG(sampler2D tex, vec2 uv)
@@ -185,19 +189,37 @@ vec3 unpackNormalRG(sampler2D tex, vec2 uv)
 
 vec3 sampleTriplanarNormal(sampler2D tex, vec3 p, vec3 weights, vec3 geomNormal)
 {
-    vec3 nX = unpackNormalRG(tex, p.zy * vec2(-1.0, 1.0));
-    vec3 nY = unpackNormalRG(tex, p.xz);
-    vec3 nZ = unpackNormalRG(tex, p.xy);
-
     vec3 s = vec3(geomNormal.x >= 0.0 ? 1.0 : -1.0,
                   geomNormal.y >= 0.0 ? 1.0 : -1.0,
                   geomNormal.z >= 0.0 ? 1.0 : -1.0);
 
-    vec3 wX = vec3(nX.z * s.x, nX.y, -nX.x * s.x);
-    vec3 wY = vec3(nY.x, nY.z * s.y, nY.y);
-    vec3 wZ = vec3(nZ.x, nZ.y, nZ.z * s.z);
+    if (weights.y > 0.95) {
+        vec3 nY = unpackNormalRG(tex, p.xz);
+        return normalize(vec3(nY.x, nY.z * s.y, nY.y));
+    }
+    if (weights.x > 0.95) {
+        vec3 nX = unpackNormalRG(tex, p.zy * vec2(-1.0, 1.0));
+        return normalize(vec3(nX.z * s.x, nX.y, -nX.x * s.x));
+    }
+    if (weights.z > 0.95) {
+        vec3 nZ = unpackNormalRG(tex, p.xy);
+        return normalize(vec3(nZ.x, nZ.y, nZ.z * s.z));
+    }
 
-    return normalize(wX * weights.x + wY * weights.y + wZ * weights.z);
+    vec3 res = vec3(0.0);
+    if (weights.x > 0.001) {
+        vec3 nX = unpackNormalRG(tex, p.zy * vec2(-1.0, 1.0));
+        res += vec3(nX.z * s.x, nX.y, -nX.x * s.x) * weights.x;
+    }
+    if (weights.y > 0.001) {
+        vec3 nY = unpackNormalRG(tex, p.xz);
+        res += vec3(nY.x, nY.z * s.y, nY.y) * weights.y;
+    }
+    if (weights.z > 0.001) {
+        vec3 nZ = unpackNormalRG(tex, p.xy);
+        res += vec3(nZ.x, nZ.y, nZ.z * s.z) * weights.z;
+    }
+    return normalize(res);
 }
 
 vec3 getNormalFromMap(vec2 texCoords, vec3 N, vec3 T, vec3 B, vec2 ddx, vec2 ddy) 

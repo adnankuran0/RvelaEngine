@@ -395,7 +395,7 @@ void TransparentPass::Execute(const RenderContext& ctx, RenderFrame& frame)
                 }
 
                 currentShader->setMat4("model", command.transform->GetWorldMatrix());
-                glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(command.transform->GetWorldMatrix())));
+                glm::mat3 normalMatrix = command.transform->GetNormalMatrix();
                 currentShader->setMat3("normalMatrix", normalMatrix);
                 currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
                 currentShader->setVec2("UVScale", material->GetUVScale());
@@ -494,7 +494,7 @@ void TransparentPass::Execute(const RenderContext& ctx, RenderFrame& frame)
                 }
 
                 currentShader->setMat4("model", command.transform->GetWorldMatrix());
-                glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(command.transform->GetWorldMatrix())));
+                glm::mat3 normalMatrix = command.transform->GetNormalMatrix();
                 currentShader->setMat3("normalMatrix", normalMatrix);
                 currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
                 currentShader->setVec2("UVScale", material->GetUVScale());

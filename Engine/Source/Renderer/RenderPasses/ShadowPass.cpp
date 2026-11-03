@@ -31,7 +31,7 @@ void ShadowPass::InitDirectionalShadowMap()
     glTexImage3D(
         GL_TEXTURE_2D_ARRAY,
         0,
-        GL_DEPTH_COMPONENT32F,
+        GL_DEPTH_COMPONENT24,
         m_CurrentShadowResolution,
         m_CurrentShadowResolution,
         NUM_SHADOW_CASCADES,
@@ -73,7 +73,7 @@ void ShadowPass::InitPointShadowMap()
     glTexImage3D(
         GL_TEXTURE_CUBE_MAP_ARRAY,
         0,
-        GL_DEPTH_COMPONENT32F,
+        GL_DEPTH_COMPONENT24,
         POINT_SHADOW_WIDTH,
         POINT_SHADOW_HEIGHT,
         6 * MaxPointLights,
@@ -112,7 +112,7 @@ void ShadowPass::InitSpotShadowMap()
     glTexImage3D(
         GL_TEXTURE_2D_ARRAY,
         0,
-        GL_DEPTH_COMPONENT32F,
+        GL_DEPTH_COMPONENT24,
         SPOT_SHADOW_WIDTH,
         SPOT_SHADOW_HEIGHT,
         MaxSpotLights,
@@ -309,7 +309,7 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
                 bool useAlb = BindMaterial(*currentShader, material);
 
                 currentShader->setMat4("model", command.transform->GetWorldMatrix());
-                glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(command.transform->GetWorldMatrix())));
+                glm::mat3 normalMatrix = command.transform->GetNormalMatrix();
                 currentShader->setMat3("normalMatrix", normalMatrix);
                 currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
                 currentShader->setVec2("UVScale", material->GetUVScale());
@@ -359,7 +359,7 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
                 bool useAlb = BindMaterial(*currentShader, material);
 
                 currentShader->setMat4("model", command.transform->GetWorldMatrix());
-                glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(command.transform->GetWorldMatrix())));
+                glm::mat3 normalMatrix = command.transform->GetNormalMatrix();
                 currentShader->setMat3("normalMatrix", normalMatrix);
                 currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
                 currentShader->setVec2("UVScale", material->GetUVScale());
@@ -562,7 +562,7 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
                     bool useAlb = BindMaterial(*currentShader, material);
 
                     currentShader->setMat4("model", command.transform->GetWorldMatrix());
-                    glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(command.transform->GetWorldMatrix())));
+                    glm::mat3 normalMatrix = command.transform->GetNormalMatrix();
                     currentShader->setMat3("normalMatrix", normalMatrix);
                     currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
                     currentShader->setVec2("UVScale", material->GetUVScale());
@@ -618,7 +618,7 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
                     bool useAlb = BindMaterial(*currentShader, material);
 
                     currentShader->setMat4("model", command.transform->GetWorldMatrix());
-                    glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(command.transform->GetWorldMatrix())));
+                    glm::mat3 normalMatrix = command.transform->GetNormalMatrix();
                     currentShader->setMat3("normalMatrix", normalMatrix);
                     currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
                     currentShader->setVec2("UVScale", material->GetUVScale());
@@ -826,7 +826,7 @@ void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& fram
                 bool useAlb = BindMaterial(*currentShader, material);
 
                 currentShader->setMat4("model", command.transform->GetWorldMatrix());
-                glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(command.transform->GetWorldMatrix())));
+                glm::mat3 normalMatrix = command.transform->GetNormalMatrix();
                 currentShader->setMat3("normalMatrix", normalMatrix);
                 currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
                 currentShader->setVec2("UVScale", material->GetUVScale());
@@ -876,7 +876,7 @@ void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& fram
                 bool useAlb = BindMaterial(*currentShader, material);
 
                 currentShader->setMat4("model", command.transform->GetWorldMatrix());
-                glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(command.transform->GetWorldMatrix())));
+                glm::mat3 normalMatrix = command.transform->GetNormalMatrix();
                 currentShader->setMat3("normalMatrix", normalMatrix);
                 currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
                 currentShader->setVec2("UVScale", material->GetUVScale());

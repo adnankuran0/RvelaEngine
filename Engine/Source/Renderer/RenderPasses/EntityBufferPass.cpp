@@ -41,6 +41,8 @@ void EntityBufferPass::OnResize(uint32_t width, uint32_t height, RenderFrame& fr
 
 void EntityBufferPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
+    if (ctx.scene && ctx.scene->GetState() == SceneState::PLAY)
+        return;
     auto& opaqueCommands = frame.opaqueCommands;
     auto& transparentCommands = frame.transparentCommands;
     auto& skeletalOpaqueCommands = frame.skeletalOpaqueCommands;
