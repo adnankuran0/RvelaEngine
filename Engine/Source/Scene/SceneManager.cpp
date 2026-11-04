@@ -156,7 +156,11 @@ bool SceneManager::ResolveScenePath(const AssetUUID& sceneAsset, std::filesystem
 
 void SceneManager::Init()
 {
-    SetActiveScene(CreateScene("EmptyScene"));
+    auto emptyScene = CreateScene("EmptyScene");
+    Path defaultHdr = ENGINE_PATH("Textures/skybox/environment.hdr");
+    if (defaultHdr.Exists())
+        emptyScene->GetEnvironment().GetSkybox().InitHDR(defaultHdr);
+    SetActiveScene(std::move(emptyScene));
 }
 
 void SceneManager::PlayScene()

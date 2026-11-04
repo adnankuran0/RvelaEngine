@@ -1,4 +1,5 @@
 #include "IconLibrary.h"
+#include "stb/stb_image.h"
 #include "Renderer/Texture.h"
 #include "Utils/FileUtils.h"
 #include <cassert>
@@ -18,6 +19,7 @@ void IconLibrary::LoadIcon(EditorIcon icon, const std::string& relativePath)
 
 void IconLibrary::Init()
 {
+    stbi_set_flip_vertically_on_load(0);
     auto& lib = Get();
     lib.m_Icons.clear();
 

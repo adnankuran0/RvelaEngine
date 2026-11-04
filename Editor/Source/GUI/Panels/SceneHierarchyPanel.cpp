@@ -529,7 +529,21 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                 {
                     if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
                     {
-                        scene.SetEntityActive(entity, !isSelfActive);
+                        bool newActive = !isSelfActive;
+                        if (EditorSelection::Get().IsSelected(entity) && EditorSelection::Get().GetCount() > 1)
+                        {
+                            for (auto selEntity : EditorSelection::Get().GetSelectedEntities())
+                            {
+                                if (selEntity != entt::null && scene.GetRegistry().valid(selEntity))
+                                {
+                                    scene.SetEntityActive(selEntity, newActive);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            scene.SetEntityActive(entity, newActive);
+                        }
                     }
                 }
 
@@ -951,6 +965,42 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                     {
                         CommandHistory::Get().Execute(std::move(compoundCmd));
                     }
+                }
+
+                if (EditorSelection::Get().GetCount() > 1)
+                {
+                    if (ImGui::MenuItem("Toggle Active for Selected"))
+                    {
+                        bool newActive = !scene.IsEntitySelfActive(entity);
+                        for (auto selEntity : EditorSelection::Get().GetSelectedEntities())
+                        {
+                            if (selEntity != entt::null && registry.valid(selEntity))
+                            {
+                                scene.SetEntityActive(selEntity, newActive);
+                            }
+                        }
+                    }
+                    if (ImGui::MenuItem("Enable Selected Entities"))
+                    {
+                        for (auto selEntity : EditorSelection::Get().GetSelectedEntities())
+                        {
+                            if (selEntity != entt::null && registry.valid(selEntity))
+                            {
+                                scene.SetEntityActive(selEntity, true);
+                            }
+                        }
+                    }
+                    if (ImGui::MenuItem("Disable Selected Entities"))
+                    {
+                        for (auto selEntity : EditorSelection::Get().GetSelectedEntities())
+                        {
+                            if (selEntity != entt::null && registry.valid(selEntity))
+                            {
+                                scene.SetEntityActive(selEntity, false);
+                            }
+                        }
+                    }
+                    ImGui::Separator();
                 }
 
                 if (EditorSelection::Get().GetCount() > 1)

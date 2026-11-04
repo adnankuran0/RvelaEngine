@@ -41,6 +41,12 @@ struct ReimportWindowState
 
 static ReimportWindowState s_ReimportState;
 
+struct FolderDropTarget {
+    ImRect rect;
+    std::filesystem::path path;
+};
+static std::vector<FolderDropTarget> s_FolderDropTargets;
+
 struct DirNode
 {
     std::string name;
@@ -783,6 +789,7 @@ static void RenderDirectoryRecursiveCached(const std::vector<DirNode>& nodes, st
             flags |= ImGuiTreeNodeFlags_Leaf;
 
         bool opened = ImGui::TreeNodeEx(node.path.string().c_str(), flags, "%s", node.name.c_str());
+        s_FolderDropTargets.push_back({ ImRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax()), node.path });
 
         if (ImGui::BeginDragDropTarget())
         {
@@ -1113,7 +1120,12 @@ static void OpenBrowserItem(const BrowserItem& item, Engine* engine)
         AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(item.path.string());
         if (uuid.IsValid() && engine)
         {
-            PrefabEditManager::Get().OpenPrefab(*engine, uuid);
+            glm::vec3 spawnPos(0.0f);
+            if (auto* cam = engine->GetEditorCamera())
+                spawnPos = cam->Position + cam->Front * 5.0f;
+            Entity inst = engine->GetActiveScene().Instantiate(uuid, spawnPos);
+            if (inst.GetHandle() != entt::null)
+                EditorSelection::Get().Select(inst.GetHandle());
         }
     }
     else if (item.extension == ".rmat")
@@ -1181,6 +1193,11 @@ static void DrawBackgroundContextMenu(Engine* engine, const std::filesystem::pat
             {
                 auto newPath = MakeUniquePath(currentDir, "NewScene", ".rscene");
                 auto scene = engine->GetSceneManager().CreateScene("NewScene");
+                Path defaultHdr = ENGINE_PATH("Textures/skybox/environment.hdr");
+                if (defaultHdr.Exists())
+                {
+                    scene->GetEnvironment().GetSkybox().InitHDR(defaultHdr);
+                }
                 engine->GetSceneManager().SaveScene(*scene, newPath.string());
                 assetReg.GetOrCreateMeta(newPath);
                 assetReg.Scan(assetReg.GetAssetDir());
@@ -1254,6 +1271,12 @@ static void DrawItemContextMenu(const std::filesystem::path& itemPath, AssetImpo
         {
             if (itemPath.extension() == ".rprefab")
             {
+                if (ImGui::MenuItem("Edit Prefab"))
+                {
+                    AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(itemPath.string());
+                    if (uuid.IsValid() && Engine::Get())
+                        PrefabEditManager::Get().OpenPrefab(*Engine::Get(), uuid);
+                }
                 if (ImGui::MenuItem("Open in Prefab Mode"))
                 {
                     AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(itemPath.string());
@@ -1421,6 +1444,7 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
 {
     if (!m_IsOpen)
         return;
+    s_FolderDropTargets.clear();
     s_RenameJustCommitted = false;
 
     bool rootChanged = !ArePathsEqual(rootDirectory, s_LastRootDirectory);
@@ -1467,6 +1491,7 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
         rootFlags |= ImGuiTreeNodeFlags_Selected;
 
     bool rootOpened = ImGui::TreeNodeEx("##rootFolderNode", rootFlags, "%s", rootName.c_str());
+    s_FolderDropTargets.push_back({ ImRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax()), rootDirectory });
     if (ImGui::BeginDragDropTarget())
     {
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
@@ -1588,6 +1613,7 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
                 if (!isCurrent)
                     NavigateTo(path);
             }
+            s_FolderDropTargets.push_back({ ImRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax()), path });
 
             if (ImGui::BeginDragDropTarget())
             {
@@ -1840,6 +1866,7 @@ void AssetBrowserPanel::Draw(Engine* engine, const std::filesystem::path& rootDi
 
         if (item.isDirectory)
         {
+            s_FolderDropTargets.push_back({ ImRect(cellPos, ImVec2(cellPos.x + cardWidth, cellPos.y + cardHeight)), item.path });
             if (ImGui::BeginDragDropTarget())
             {
                 if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
@@ -2380,11 +2407,28 @@ void AssetBrowserPanel::HandleFileDrop(FileDroppedEvent& event, AssetImportPipel
     if (s_CurrentDirectory.empty())
         return;
 
+    ImVec2 mousePos = ImGui::GetIO().MousePos;
+    if (event.GetScreenX() >= 0.0f && (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable))
+    {
+        mousePos = ImVec2(event.GetScreenX(), event.GetScreenY());
+    }
+
+    std::filesystem::path targetDir = s_CurrentDirectory;
+
+    for (auto it = s_FolderDropTargets.rbegin(); it != s_FolderDropTargets.rend(); ++it)
+    {
+        if (it->rect.Contains(mousePos))
+        {
+            targetDir = it->path;
+            break;
+        }
+    }
+
     std::vector<std::filesystem::path> toImport;
 
     for (const auto& sourcePath : event.GetPaths())
     {
-        auto destPath = s_CurrentDirectory / sourcePath.filename();
+        auto destPath = targetDir / sourcePath.filename();
 
         if (sourcePath == destPath)
             continue;
@@ -2422,7 +2466,7 @@ void AssetBrowserPanel::HandleFileDrop(FileDroppedEvent& event, AssetImportPipel
     for (const auto& path : toImport)
         importPipeline.ImportAsset(path, AssetManager::Get().GetRegistry());
 
-    if (!toImport.empty())
+    if (!toImport.empty() && targetDir == s_CurrentDirectory)
         SetSingleSelection(toImport.back());
 
     s_NeedsRefresh = true;

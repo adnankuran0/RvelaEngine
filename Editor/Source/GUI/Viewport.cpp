@@ -1,4 +1,5 @@
 #include "Viewport.h"
+#include <unordered_set>
 #include <iostream>
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_internal.h"
@@ -32,6 +33,7 @@
 #include "Scene/Components/RigidbodyComponent.h"
 #include "Physics/PhysicsSystem.h"
 #include "Physics/PhysicsWorld.h"
+#include "Style.h"
 
 using namespace rv;
 
@@ -1204,14 +1206,18 @@ void Viewport::DrawOrientationGizmo(Engine* engine, ImVec2& displayPos, ImVec2& 
 
 void Viewport::HandleSelection(Engine* engine, ImVec2& displayPos, ImVec2& displaySize)
 {
-    if (engine->GetActiveScene().GetState() != SceneState::EDIT) return;
+    if (engine->GetActiveScene().GetState() != SceneState::EDIT)
+    {
+        m_SelectionBoxPotential = false;
+        m_SelectionBoxActive = false;
+        return;
+    }
 
-    if (ImGui::IsPopupOpen((const char*)nullptr, ImGuiPopupFlags_AnyPopupId))
-        return;
-    if (GImGui && GImGui->HoveredWindow && GImGui->HoveredWindow != ImGui::GetCurrentWindow())
-        return;
-    if (ImGui::IsAnyItemHovered() || ImGui::IsAnyItemActive())
-        return;
+    if (ImGui::IsKeyPressed(ImGuiKey_Escape) || ImGui::IsMouseClicked(ImGuiMouseButton_Right) || ImGui::IsMouseClicked(ImGuiMouseButton_Middle))
+    {
+        m_SelectionBoxPotential = false;
+        m_SelectionBoxActive = false;
+    }
 
     ImVec2 mousePos = ImGui::GetIO().MousePos;
     bool isMouseInViewport = mousePos.x >= displayPos.x && mousePos.x <= (displayPos.x + displaySize.x) &&
@@ -1251,34 +1257,54 @@ void Viewport::HandleSelection(Engine* engine, ImVec2& displayPos, ImVec2& displ
             mousePos.y <= (displayPos.y + statsY + statsH);
     }
 
+    bool isBlockedByUI = isOverOrientationGizmo || isOverLeftToolbar || isOverRightToolbar || isOverStats;
+
     if (isMouseInViewport && ImGui::IsMouseClicked(ImGuiMouseButton_Left) &&
-        !ImGuizmo::IsUsing() && !ImGuizmo::IsOver() &&
-        !isOverOrientationGizmo && !isOverLeftToolbar && !isOverRightToolbar &&
-        !isOverStats)
+        !ImGuizmo::IsUsing() && !ImGuizmo::IsOver() && !isBlockedByUI &&
+        !ImGui::IsPopupOpen((const char*)nullptr, ImGuiPopupFlags_AnyPopupId))
     {
-        glm::vec2 mouseViewportPos = { mousePos.x - displayPos.x, mousePos.y - displayPos.y };
+        m_SelectionBoxPotential = true;
+        m_SelectionBoxActive = false;
+        m_SelectionBoxStart = mousePos;
+    }
 
-        auto& context = engine->GetRenderLayer().GetRenderContext();
-        float fboWidth = context.viewportWidth;
-        float fboHeight = context.viewportHeight;
-
-        float normX = std::clamp(mouseViewportPos.x / displaySize.x, 0.0f, 1.0f);
-        float normY = std::clamp(mouseViewportPos.y / displaySize.y, 0.0f, 1.0f);
-
-        uint32_t fboX = static_cast<uint32_t>(normX * (fboWidth - 1));
-        uint32_t fboY = static_cast<uint32_t>((1.0f - normY) * (fboHeight - 1));
-
-        uint32_t pickedID = engine->Selection.Pick(fboX, fboY);
-
-        ImGuiIO& io = ImGui::GetIO();
-        bool isMultiModifier = io.KeyCtrl || io.KeyShift;
-
-        if (pickedID != 0)
+    if (m_SelectionBoxPotential)
+    {
+        if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
         {
-            entt::entity entity = static_cast<entt::entity>(pickedID);
-
-            if (m_SelectRootEntity)
+            float dragDist = std::hypot(mousePos.x - m_SelectionBoxStart.x, mousePos.y - m_SelectionBoxStart.y);
+            if (!m_SelectionBoxActive && dragDist > 6.0f)
             {
+                m_SelectionBoxActive = true;
+            }
+
+            if (m_SelectionBoxActive)
+            {
+                ImVec2 boxMin = ImVec2(
+                    std::clamp(std::min(m_SelectionBoxStart.x, mousePos.x), displayPos.x, displayPos.x + displaySize.x),
+                    std::clamp(std::min(m_SelectionBoxStart.y, mousePos.y), displayPos.y, displayPos.y + displaySize.y)
+                );
+                ImVec2 boxMax = ImVec2(
+                    std::clamp(std::max(m_SelectionBoxStart.x, mousePos.x), displayPos.x, displayPos.x + displaySize.x),
+                    std::clamp(std::max(m_SelectionBoxStart.y, mousePos.y), displayPos.y, displayPos.y + displaySize.y)
+                );
+
+                ImVec4 acc = GetAccentColor();
+                ImU32 fillCol = ImGui::ColorConvertFloat4ToU32(ImVec4(acc.x, acc.y, acc.z, 0.18f));
+                ImU32 borderCol = ImGui::ColorConvertFloat4ToU32(ImVec4(acc.x, acc.y, acc.z, 0.85f));
+
+                ImDrawList* drawList = ImGui::GetWindowDrawList();
+                drawList->AddRectFilled(boxMin, boxMax, fillCol, 0.0f);
+                drawList->AddRect(boxMin, boxMax, borderCol, 0.0f, 0, 1.5f);
+            }
+        }
+        else if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+        {
+            ImGuiIO& io = ImGui::GetIO();
+            bool isMultiModifier = io.KeyCtrl || io.KeyShift;
+
+            auto resolveRootEntity = [&](entt::entity entity) -> entt::entity {
+                if (!m_SelectRootEntity) return entity;
                 auto& scene = engine->GetActiveScene();
                 entt::entity current = entity;
                 entt::entity rootCandidate = current;
@@ -1300,24 +1326,133 @@ void Viewport::HandleSelection(Engine* engine, ImVec2& displayPos, ImVec2& displ
                     current = parent;
                     rootCandidate = current;
                 }
-                entity = rootCandidate;
-            }
+                return rootCandidate;
+            };
 
-            if (isMultiModifier)
+            if (m_SelectionBoxActive)
             {
-                EditorSelection::Get().Toggle(entity);
+                ImVec2 boxMin = ImVec2(
+                    std::clamp(std::min(m_SelectionBoxStart.x, mousePos.x), displayPos.x, displayPos.x + displaySize.x),
+                    std::clamp(std::min(m_SelectionBoxStart.y, mousePos.y), displayPos.y, displayPos.y + displaySize.y)
+                );
+                ImVec2 boxMax = ImVec2(
+                    std::clamp(std::max(m_SelectionBoxStart.x, mousePos.x), displayPos.x, displayPos.x + displaySize.x),
+                    std::clamp(std::max(m_SelectionBoxStart.y, mousePos.y), displayPos.y, displayPos.y + displaySize.y)
+                );
+
+                auto& context = engine->GetRenderLayer().GetRenderContext();
+                float fboWidth = context.viewportWidth;
+                float fboHeight = context.viewportHeight;
+
+                float normMinX = std::clamp((boxMin.x - displayPos.x) / displaySize.x, 0.0f, 1.0f);
+                float normMaxX = std::clamp((boxMax.x - displayPos.x) / displaySize.x, 0.0f, 1.0f);
+                float normMinY = std::clamp((boxMin.y - displayPos.y) / displaySize.y, 0.0f, 1.0f);
+                float normMaxY = std::clamp((boxMax.y - displayPos.y) / displaySize.y, 0.0f, 1.0f);
+
+                uint32_t fboMinX = static_cast<uint32_t>(normMinX * (fboWidth - 1));
+                uint32_t fboMaxX = static_cast<uint32_t>(normMaxX * (fboWidth - 1));
+                uint32_t fboMinY = static_cast<uint32_t>((1.0f - normMaxY) * (fboHeight - 1));
+                uint32_t fboMaxY = static_cast<uint32_t>((1.0f - normMinY) * (fboHeight - 1));
+
+                uint32_t rectW = (fboMaxX >= fboMinX) ? (fboMaxX - fboMinX + 1) : 1;
+                uint32_t rectH = (fboMaxY >= fboMinY) ? (fboMaxY - fboMinY + 1) : 1;
+
+                auto pickedIDs = engine->Selection.PickRect(fboMinX, fboMinY, rectW, rectH);
+
+                std::unordered_set<entt::entity> resolvedSet;
+                auto& scene = engine->GetActiveScene();
+                auto& reg = scene.GetRegistry();
+
+                for (uint32_t id : pickedIDs)
+                {
+                    entt::entity e = static_cast<entt::entity>(id);
+                    if (reg.valid(e))
+                    {
+                        resolvedSet.insert(resolveRootEntity(e));
+                    }
+                }
+
+                if (auto* cam = engine->GetEditorCamera())
+                {
+                    glm::mat4 viewProj = cam->GetProjectionMatrix() * cam->GetViewMatrix();
+                    auto view = reg.view<TransformComponent>();
+                    for (auto e : view)
+                    {
+                        if (e == scene.GetRootEntity()) continue;
+                        auto& tc = view.get<TransformComponent>(e);
+                        glm::vec4 clip = viewProj * glm::vec4(tc.GetWorldPosition(), 1.0f);
+                        if (clip.w > 0.0001f)
+                        {
+                            glm::vec3 ndc = glm::vec3(clip) / clip.w;
+                            if (ndc.z >= -1.0f && ndc.z <= 1.0f)
+                            {
+                                float screenX = displayPos.x + (ndc.x * 0.5f + 0.5f) * displaySize.x;
+                                float screenY = displayPos.y + ((1.0f - (ndc.y * 0.5f + 0.5f))) * displaySize.y;
+                                if (screenX >= boxMin.x && screenX <= boxMax.x && screenY >= boxMin.y && screenY <= boxMax.y)
+                                {
+                                    resolvedSet.insert(resolveRootEntity(e));
+                                }
+                            }
+                        }
+                    }
+                }
+
+                std::vector<entt::entity> entitiesList(resolvedSet.begin(), resolvedSet.end());
+
+                if (isMultiModifier)
+                {
+                    for (auto e : entitiesList)
+                        EditorSelection::Get().Add(e);
+                }
+                else
+                {
+                    if (entitiesList.empty())
+                        EditorSelection::Get().Clear();
+                    else
+                        EditorSelection::Get().SetSelection(entitiesList, entitiesList.front());
+                }
             }
             else
             {
-                EditorSelection::Get().Select(entity);
+                glm::vec2 mouseViewportPos = { mousePos.x - displayPos.x, mousePos.y - displayPos.y };
+
+                auto& context = engine->GetRenderLayer().GetRenderContext();
+                float fboWidth = context.viewportWidth;
+                float fboHeight = context.viewportHeight;
+
+                float normX = std::clamp(mouseViewportPos.x / displaySize.x, 0.0f, 1.0f);
+                float normY = std::clamp(mouseViewportPos.y / displaySize.y, 0.0f, 1.0f);
+
+                uint32_t fboX = static_cast<uint32_t>(normX * (fboWidth - 1));
+                uint32_t fboY = static_cast<uint32_t>((1.0f - normY) * (fboHeight - 1));
+
+                uint32_t pickedID = engine->Selection.Pick(fboX, fboY);
+
+                if (pickedID != 0)
+                {
+                    entt::entity entity = static_cast<entt::entity>(pickedID);
+                    entity = resolveRootEntity(entity);
+
+                    if (isMultiModifier)
+                    {
+                        EditorSelection::Get().Toggle(entity);
+                    }
+                    else
+                    {
+                        EditorSelection::Get().Select(entity);
+                    }
+                }
+                else
+                {
+                    if (!isMultiModifier)
+                    {
+                        EditorSelection::Get().Clear();
+                    }
+                }
             }
-        }
-        else
-        {
-            if (!isMultiModifier)
-            {
-                EditorSelection::Get().Clear();
-            }
+
+            m_SelectionBoxPotential = false;
+            m_SelectionBoxActive = false;
         }
     }
 }
@@ -1462,6 +1597,8 @@ void Viewport::Draw(Engine* engine, bool orbitDragActive)
         {
             m_WasGizmoUsing = false;
             m_InitialTransforms.clear();
+            m_SelectionBoxPotential = false;
+            m_SelectionBoxActive = false;
         }
         else
         {

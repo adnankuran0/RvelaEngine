@@ -85,6 +85,10 @@ private:
 	glm::vec3 m_InitialGizmoPos{ 0.0f };
 	glm::quat m_InitialGizmoRot{ 1.0f, 0.0f, 0.0f, 0.0f };
 	glm::vec3 m_InitialGizmoScale{ 1.0f };
+	bool m_SelectionBoxPotential = false;
+	bool m_SelectionBoxActive = false;
+	ImVec2 m_SelectionBoxStart{ 0.0f, 0.0f };
+
 	bool m_PendingContextMenu = false;
 	ImVec2 m_ContextMenuMousePos{ 0.0f, 0.0f };
 	glm::vec3 m_ContextSpawnPos{ 0.0f };

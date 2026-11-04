@@ -309,6 +309,7 @@ GLuint Skybox::LoadHDRTexture(const Path& hdrPath)
     {
         data = stbi_loadf(hdrPath.GetAbsoluteStr().c_str(), &width, &height, &nrComponents, 0);
     }
+    stbi_set_flip_vertically_on_load(false);
     if (!data)
     {
         LOG_ERROR("Failed to load HDR texture at path: {}", hdrPath.GetAbsoluteStr());

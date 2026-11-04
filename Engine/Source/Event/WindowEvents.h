@@ -31,7 +31,8 @@ private:
 class FileDroppedEvent : public Event 
 {
 public:
-    explicit FileDroppedEvent(int pathCount, const char* paths[]) noexcept {
+    explicit FileDroppedEvent(int pathCount, const char* paths[], float screenX = -1.0f, float screenY = -1.0f) noexcept
+        : m_ScreenX(screenX), m_ScreenY(screenY) {
         m_Paths.reserve(pathCount);
         for (int i = 0; i < pathCount; i++)
             m_Paths.emplace_back(paths[i]);
@@ -43,9 +44,13 @@ public:
 
     const std::vector<std::filesystem::path>& GetPaths() const noexcept { return m_Paths; }
     size_t GetPathCount() const noexcept { return m_Paths.size(); }
+    float GetScreenX() const noexcept { return m_ScreenX; }
+    float GetScreenY() const noexcept { return m_ScreenY; }
 
 private:
     std::vector<std::filesystem::path> m_Paths;
+    float m_ScreenX = -1.0f;
+    float m_ScreenY = -1.0f;
     static constexpr const char* EVENT_NAME = "FileDropped";
 };
 

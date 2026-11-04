@@ -106,12 +106,20 @@ bool Engine::OpenProject(const std::string& projectFilePath)
 			}
 			else
 			{
-				m_SceneManager.SetActiveScene(m_SceneManager.CreateScene("EmptyScene"));
+				auto emptyScene = m_SceneManager.CreateScene("EmptyScene");
+				Path defaultHdr = ENGINE_PATH("Textures/skybox/environment.hdr");
+				if (defaultHdr.Exists())
+					emptyScene->GetEnvironment().GetSkybox().InitHDR(defaultHdr);
+				m_SceneManager.SetActiveScene(std::move(emptyScene));
 			}
 		}
 		else
 		{
-			m_SceneManager.SetActiveScene(m_SceneManager.CreateScene("EmptyScene"));
+			auto emptyScene = m_SceneManager.CreateScene("EmptyScene");
+			Path defaultHdr = ENGINE_PATH("Textures/skybox/environment.hdr");
+			if (defaultHdr.Exists())
+				emptyScene->GetEnvironment().GetSkybox().InitHDR(defaultHdr);
+			m_SceneManager.SetActiveScene(std::move(emptyScene));
 		}
 
 		std::string title = "Rvela Engine - [" + activeProj->name + "] - " + activeSceneName;

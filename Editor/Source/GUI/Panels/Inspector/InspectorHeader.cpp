@@ -26,7 +26,26 @@ bool InspectorHeader::Draw(Scene& scene, entt::entity selectedEntity)
 		std::strncpy(buffer, tag.tag.c_str(), sizeof(buffer));
 		buffer[sizeof(buffer) - 1] = '\0';
 
-		ImGui::Checkbox("##EntityEnabled", &tag.isActive);
+		bool prevActive = tag.isActive;
+		if (ImGui::Checkbox("##EntityEnabled", &tag.isActive))
+		{
+			bool newActive = tag.isActive;
+			tag.isActive = prevActive;
+			if (EditorSelection::Get().IsSelected(selectedEntity) && EditorSelection::Get().GetCount() > 1)
+			{
+				for (auto selEntity : EditorSelection::Get().GetSelectedEntities())
+				{
+					if (selEntity != entt::null && registry.valid(selEntity))
+					{
+						scene.SetEntityActive(selEntity, newActive);
+					}
+				}
+			}
+			else
+			{
+				scene.SetEntityActive(selectedEntity, newActive);
+			}
+		}
 		ImGui::SameLine();
 
 		ImGui::SetNextItemWidth(-1.0f);

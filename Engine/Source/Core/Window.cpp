@@ -220,7 +220,15 @@ void Window::WindowFocusCallback(GLFWwindow* window, int focused) noexcept
 
 void Window::FileDropCallback(GLFWwindow* window, int pathCount, const char* paths[]) noexcept
 {
-    EventManager::PushEvent(new FileDroppedEvent(pathCount, paths));
+#if defined(_WIN32)
+    POINT pt;
+    ::GetCursorPos(&pt);
+    EventManager::PushEvent(new FileDroppedEvent(pathCount, paths, static_cast<float>(pt.x), static_cast<float>(pt.y)));
+#else
+    double xpos = 0.0, ypos = 0.0;
+    glfwGetCursorPos(window, &xpos, &ypos);
+    EventManager::PushEvent(new FileDroppedEvent(pathCount, paths, static_cast<float>(xpos), static_cast<float>(ypos)));
+#endif
 }
 
 void Window::CharCallback(GLFWwindow* window, unsigned int codepoint) noexcept

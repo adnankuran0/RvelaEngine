@@ -74,6 +74,7 @@ json Environment::Serialize()
 
     j["HDR"] = m_Skybox.GetHDRUUID().IsValid() ? m_Skybox.GetHDRUUID().ToString() : "";
     j["HDRPath"] = m_Skybox.GetPath().GetVirtualStr();
+    j["HDROrigin"] = static_cast<int>(m_Skybox.GetPath().GetOrigin());
 
     return j;
 }
@@ -239,7 +240,26 @@ void Environment::Deserialize(const json& j)
         std::string pathStr = j["HDRPath"].get<std::string>();
         if (!pathStr.empty())
         {
-            m_Skybox.InitHDR(Path::FromVirtual(pathStr));
+            PathOrigin origin = PathOrigin::Project;
+            if (j.contains("HDROrigin"))
+                origin = static_cast<PathOrigin>(j["HDROrigin"].get<int>());
+
+            Path p;
+            if (origin == PathOrigin::EngineResource)
+                p = Path::FromEngineResource(pathStr);
+            else if (origin == PathOrigin::EditorResource)
+                p = Path::FromEditorResource(pathStr);
+            else
+                p = Path::FromVirtual(pathStr);
+
+            if (!p.Exists())
+            {
+                Path engineFallback = Path::FromEngineResource(pathStr);
+                if (engineFallback.Exists())
+                    p = engineFallback;
+            }
+
+            m_Skybox.InitHDR(p);
         }
     }
 }

@@ -327,6 +327,7 @@ bool TextureImporter::Import(
         stbi_set_flip_vertically_on_load(settings.flipY ? 1 : 0);
         int w, h, channels;
         float* pixels = stbi_loadf(sourcePath.string().c_str(), &w, &h, &channels, 0);
+        stbi_set_flip_vertically_on_load(0);
         if (!pixels)
         {
             LOG_ERROR("stb_image failed to load HDR: {}", sourcePath.string());
@@ -379,6 +380,7 @@ bool TextureImporter::Import(
     stbi_set_flip_vertically_on_load(settings.flipY ? 1 : 0);
     int w, h, channels;
     uint8_t* pixels = stbi_load(sourcePath.string().c_str(), &w, &h, &channels, 0);
+    stbi_set_flip_vertically_on_load(0);
     if (!pixels)
     {
         LOG_ERROR("stb_image failed: {}", sourcePath.string());

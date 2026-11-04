@@ -52,6 +52,11 @@ void EditorUtils::CreateScene(Engine& engine)
     EditorSelection::Get().Clear();
     auto& sm = engine.GetSceneManager();
     sm.SetActiveScene(sm.CreateScene("NewScene"));
+    Path defaultHdr = ENGINE_PATH("Textures/skybox/environment.hdr");
+    if (defaultHdr.Exists())
+    {
+        sm.GetActiveScene().GetEnvironment().GetSkybox().InitHDR(defaultHdr);
+    }
     sm.GetActiveScene().SetDirty(false);
 }
 

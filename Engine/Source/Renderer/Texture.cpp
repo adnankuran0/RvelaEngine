@@ -75,6 +75,7 @@ void Texture::GenerateFromImage(const std::string& path)
 {
     m_Path = path;
 
+    stbi_set_flip_vertically_on_load(0);
     unsigned char* data = stbi_load(path.c_str(), &m_Width, &m_Height, &m_NrChannels, 0);
 
     if (data)
