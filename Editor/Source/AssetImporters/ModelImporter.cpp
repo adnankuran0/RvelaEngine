@@ -1,6 +1,7 @@
 #include "rvelapch.h"
 #include "ModelImporter.h"
 #include "PrefabImporter.h"
+#include "Scene/SceneSerializer.h"
 #include "Asset/AssetRegistry.h"
 #include "Asset/Types/MeshAsset.h"
 #include "Asset/Types/MaterialAsset.h"
@@ -218,6 +219,37 @@ ModelImportResult ModelImporter::ImportModel(
     ExtractMeshes(scene, sourcePath, registry, result, settings);
     MergeAndSaveSubAssets(scene, sourcePath, registry, result);
 
+    struct InstanceReloadInfo
+    {
+        entt::entity handle;
+        json overrides;
+    };
+    std::vector<InstanceReloadInfo> instancesToReload;
+
+    auto prefabPath = sourcePath;
+    prefabPath.replace_extension(".rprefab");
+    AssetUUID existingPrefabUUID = AssetUUID::Invalid();
+    if (std::filesystem::exists(prefabPath))
+    {
+        existingPrefabUUID = registry.GetOrCreateMeta(prefabPath).uuid;
+    }
+
+    if (Engine::Get() && existingPrefabUUID.IsValid())
+    {
+        Scene& activeScene = Engine::Get()->GetActiveScene();
+        auto pView = activeScene.GetRegistry().view<PrefabComponent>();
+        for (auto e : pView)
+        {
+            if (pView.get<PrefabComponent>(e).GetPrefabID() == existingPrefabUUID)
+            {
+                json ov = SceneSerializer::ComputePrefabOverrides(activeScene, e);
+                if (ov.empty() && pView.get<PrefabComponent>(e).HasOverrides())
+                    ov = pView.get<PrefabComponent>(e).GetOverrides();
+                instancesToReload.push_back({ e, std::move(ov) });
+            }
+        }
+    }
+
     if (settings.generatePrefab)
         result.prefabUUID = ConstructPrefab(scene, sourcePath, registry, result, settings);
 
@@ -234,18 +266,12 @@ ModelImportResult ModelImporter::ImportModel(
 
         if (result.prefabUUID.IsValid())
         {
-            std::vector<entt::entity> prefabInstances;
-            auto pView = activeScene.GetRegistry().view<PrefabComponent>();
-            for (auto e : pView)
+            for (auto& info : instancesToReload)
             {
-                if (pView.get<PrefabComponent>(e).GetPrefabID() == result.prefabUUID)
+                if (activeScene.GetRegistry().valid(info.handle))
                 {
-                    prefabInstances.push_back(e);
+                    PrefabImporter::ReloadPrefab(activeScene, info.handle, &info.overrides);
                 }
-            }
-            for (auto inst : prefabInstances)
-            {
-                PrefabImporter::RevertPrefab(activeScene, inst, true);
             }
         }
 
@@ -1310,7 +1336,7 @@ AssetUUID ModelImporter::ConstructPrefab(
 
     AssetMeta meta = registry.GetOrCreateMeta(prefabPath);
 
-    Ref<PrefabAsset> prefab = PrefabImporter::CreatePrefabAsset(
+    Ref<PrefabAsset> prefab = PrefabImporter::CreateOrUpdatePrefabAsset(
         prefabPath, meta.uuid, prefabScene, rootEntity);
 
     if (!prefab) return AssetUUID::Invalid();

@@ -20,16 +20,23 @@ public:
         Scene& scene,
         entt::entity rootEntity);
 
+    static Ref<PrefabAsset> CreateOrUpdatePrefabAsset(
+        const std::filesystem::path& path,
+        const AssetUUID& uuid,
+        Scene& scene,
+        entt::entity rootEntity);
+
     static bool ApplyPrefab(Scene& scene, entt::entity rootEntity);
     static bool RevertPrefab(Scene& scene, entt::entity rootEntity, bool preserveTag = false);
+    static bool ReloadPrefab(Scene& scene, entt::entity rootEntity, const nlohmann::json* precomputedOverrides = nullptr);
 
-private:
     static void SerializeEntityRecursively(
         entt::entity e,
         entt::entity rootEntity,
         Scene& scene,
         nlohmann::json& outEntities);
 
+private:
     static unsigned int CountEntitiesRecursively(Scene& scene, entt::entity e);
 };
 

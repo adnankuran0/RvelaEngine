@@ -19,7 +19,7 @@
         "Import Settings": true,
         "Inspector": true,
         "Material Editor": true,
-        "Profiler": true,
+        "Profiler": false,
         "Project Settings": false,
         "Scene Hierarchy": true,
         "Viewport": true

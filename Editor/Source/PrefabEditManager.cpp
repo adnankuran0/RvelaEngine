@@ -199,7 +199,7 @@ bool PrefabEditManager::SaveCurrentPrefab(Engine& engine)
         }
         for (auto inst : instances)
         {
-            PrefabImporter::RevertPrefab(*m_SavedMainScene, inst, true);
+            PrefabImporter::ReloadPrefab(*m_SavedMainScene, inst);
         }
     }
 

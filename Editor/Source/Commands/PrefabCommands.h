@@ -324,7 +324,7 @@ private:
         {
             if (m_Scene->GetRegistry().valid(inst))
             {
-                PrefabImporter::RevertPrefab(*m_Scene, inst, true);
+                PrefabImporter::ReloadPrefab(*m_Scene, inst);
             }
         }
 

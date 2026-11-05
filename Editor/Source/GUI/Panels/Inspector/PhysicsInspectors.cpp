@@ -165,10 +165,12 @@ void PhysicsInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 	{
 		if (UI::BeginPropertyTable("CharacterBodyTable"))
 		{
-			float maxSlope = cb.maxSlopeAngle * (180.0f / 3.14159265f);
 			UI::PropertyLabel("Max Slope Angle");
-			if (ImGui::SliderFloat("##MaxSlope", &maxSlope, 0.0f, 89.0f, "%.1f deg"))
-				cb.maxSlopeAngle = maxSlope * (3.14159265f / 180.0f);
+			if (ImGui::SliderFloat("##MaxSlope", &cb.maxSlopeAngle, 0.0f, 89.0f, "%.1f deg"))
+			{
+				if (cb.character)
+					cb.character->SetMaxSlopeAngle(JPH::DegreesToRadians(cb.maxSlopeAngle));
+			}
 
 			UI::EndPropertyTable();
 		}

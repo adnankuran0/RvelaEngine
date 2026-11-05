@@ -128,7 +128,7 @@ void CharacterContactListener::OnContactSolve(
     JPH::Vec3Arg inCharacterVelocity,
     JPH::Vec3& ioNewCharacterVelocity)
 {
-    // use if not allowed sliding
-    //if (inCharacterVelocity.IsNearZero() && !inCharacter->IsSlopeTooSteep(inContactNormal))
-        //ioNewCharacterVelocity = JPH::Vec3::sZero();
+    // Don't allow character to slide down a slope when not moving
+    if (inCharacterVelocity.IsNearZero() && !inCharacter->IsSlopeTooSteep(inContactNormal))
+        ioNewCharacterVelocity = JPH::Vec3::sZero();
 }

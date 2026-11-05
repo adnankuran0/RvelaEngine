@@ -480,7 +480,16 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID, const glm::vec3& position
         try {
             prefabJson["Entities"] = prefabJson["Entities"].patch(overrides);
         } catch (const json::exception& e) {
-            LOG_WARN("[Scene::Instantiate] Failed to patch prefab with overrides: {}", e.what());
+            LOG_WARN("[Scene::Instantiate] Full patch failed ({}), applying operations individually...", e.what());
+            for (const auto& op : overrides)
+            {
+                try {
+                    json singlePatch = json::array({ op });
+                    prefabJson["Entities"] = prefabJson["Entities"].patch(singlePatch);
+                } catch (const json::exception& opErr) {
+                    LOG_WARN("[Scene::Instantiate] Failed override op {}: {}", op.value("path", ""), opErr.what());
+                }
+            }
         }
     }
 
