@@ -11,6 +11,15 @@
 
 using namespace rv;
 
+void ShadowPass::InvalidateCache()
+{
+    m_CachedDirectionalShadow = {};
+    for (auto& s : m_CachedPointShadows)
+        s = {};
+    for (auto& s : m_CachedSpotShadows)
+        s = {};
+}
+
 void ShadowPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
     InitDirectionalShadowMap();
@@ -97,7 +106,6 @@ void ShadowPass::InitPointShadowMap()
             LOG_ERROR("Point shadow framebuffer layer {} not complete!", layer);
         }
     }
-
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -150,6 +158,33 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
     auto& skeletalCommands = frame.skeletalOpaqueCommands;
 
     if (!ctx.directionalLight || !ctx.directionalLight->castShadows) return;
+
+    bool isDirty = true;
+    if (ctx.directionalLight->staticShadow)
+    {
+        if (m_CachedDirectionalShadow.valid &&
+            !ctx.directionalLight->shadowDirty &&
+            m_CachedDirectionalShadow.lightID == ctx.directionalLight->lightID &&
+            m_CachedDirectionalShadow.direction == ctx.directionalLight->direction &&
+            m_CachedDirectionalShadow.shadowBias == ctx.directionalLight->shadowBias &&
+            m_CachedDirectionalShadow.normalBias == ctx.directionalLight->normalBias &&
+            m_CachedDirectionalShadow.reverseCullFace == ctx.directionalLight->reverseCullFace)
+        {
+            bool cascadesMatch = true;
+            for (int i = 0; i < NUM_SHADOW_CASCADES; ++i)
+            {
+                if (m_CachedDirectionalShadow.cascadeMatrices[i] != ctx.directionalLight->cascadeMatrices[i])
+                {
+                    cascadesMatch = false;
+                    break;
+                }
+            }
+            if (cascadesMatch)
+                isDirty = false;
+        }
+    }
+
+    if (!isDirty) return;
 
     glBindFramebuffer(GL_FRAMEBUFFER, dirShadowFBO);
     glViewport(0, 0, m_CurrentShadowResolution, m_CurrentShadowResolution);
@@ -322,7 +357,7 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
             }
         }
 
-        if (!skeletalCommands.empty())
+        if (!ctx.directionalLight->staticShadow && !skeletalCommands.empty())
         {
             Shader* lastBound = nullptr;
 
@@ -385,6 +420,22 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
         }
     }
 
+    if (ctx.directionalLight->staticShadow)
+    {
+        m_CachedDirectionalShadow.valid = true;
+        m_CachedDirectionalShadow.lightID = ctx.directionalLight->lightID;
+        m_CachedDirectionalShadow.direction = ctx.directionalLight->direction;
+        m_CachedDirectionalShadow.shadowBias = ctx.directionalLight->shadowBias;
+        m_CachedDirectionalShadow.normalBias = ctx.directionalLight->normalBias;
+        m_CachedDirectionalShadow.reverseCullFace = ctx.directionalLight->reverseCullFace;
+        for (int i = 0; i < NUM_SHADOW_CASCADES; ++i)
+            m_CachedDirectionalShadow.cascadeMatrices[i] = ctx.directionalLight->cascadeMatrices[i];
+    }
+    else
+    {
+        m_CachedDirectionalShadow = {};
+    }
+
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glDisable(GL_POLYGON_OFFSET_FILL);
@@ -395,6 +446,30 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
 {
     auto& commands = frame.opaqueCommands;
     auto& skeletalCommands = frame.skeletalOpaqueCommands;
+
+    bool anyNeedsRender = false;
+    for (const auto& light : ctx.pointLights)
+    {
+        if (!light.castShadows || light.shadowIndex < 0 || light.shadowIndex >= MaxPointLights)
+            continue;
+        if (!light.staticShadow)
+        {
+            anyNeedsRender = true;
+            break;
+        }
+        const auto& cached = m_CachedPointShadows[light.shadowIndex];
+        if (!cached.valid || light.shadowDirty ||
+            cached.lightID != light.lightID ||
+            cached.position != light.position ||
+            cached.radius != light.radius ||
+            cached.shadowBias != light.shadowBias ||
+            cached.reverseCullFace != light.reverseCullFace)
+        {
+            anyNeedsRender = true;
+            break;
+        }
+    }
+    if (!anyNeedsRender) return;
 
     glBindFramebuffer(GL_FRAMEBUFFER, pointFBO);
     glViewport(0, 0, POINT_SHADOW_WIDTH, POINT_SHADOW_HEIGHT);
@@ -494,6 +569,26 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
     for (auto& light : ctx.pointLights)
     {
         if (!light.castShadows) continue;
+        int shadowIdx = light.shadowIndex;
+        if (shadowIdx < 0 || shadowIdx >= MaxPointLights) continue;
+
+        bool isDirty = true;
+        if (light.staticShadow)
+        {
+            const auto& cached = m_CachedPointShadows[shadowIdx];
+            if (cached.valid &&
+                !light.shadowDirty &&
+                cached.lightID == light.lightID &&
+                cached.position == light.position &&
+                cached.radius == light.radius &&
+                cached.shadowBias == light.shadowBias &&
+                cached.reverseCullFace == light.reverseCullFace)
+            {
+                isDirty = false;
+            }
+        }
+
+        if (!isDirty) continue;
 
         glm::vec3 lightPos = light.position;
 
@@ -552,11 +647,20 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
                         BindCustomUniforms(*currentShader, material->GetInstance(), *customAsset);
                     }
 
-                    CullMode mode = (hasCustom && customAsset->renderModes.hasCullMode)
+                    CullMode effectiveCull = (hasCustom && customAsset->renderModes.hasCullMode)
                         ? customAsset->renderModes.cullMode
                         : material->GetCullMode();
-                    if (mode == CullMode::Disabled) glDisable(GL_CULL_FACE);
-                    else { glEnable(GL_CULL_FACE); glCullFace(mode == CullMode::Back ? GL_BACK : GL_FRONT); }
+
+                    if (effectiveCull == CullMode::Disabled) {
+                        glDisable(GL_CULL_FACE);
+                    }
+                    else {
+                        glEnable(GL_CULL_FACE);
+                        if (light.reverseCullFace)
+                            glCullFace(effectiveCull == CullMode::Back ? GL_FRONT : GL_BACK);
+                        else
+                            glCullFace(effectiveCull == CullMode::Back ? GL_BACK : GL_FRONT);
+                    }
 
                     currentShader->setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
                     bool useAlb = BindMaterial(*currentShader, material);
@@ -575,7 +679,7 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
                 }
             }
 
-            if (!skeletalCommands.empty())
+            if (!light.staticShadow && !skeletalCommands.empty())
             {
                 Shader* lastBound = nullptr;
 
@@ -609,11 +713,20 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
                         BindCustomUniforms(*currentShader, material->GetInstance(), *customAsset);
                     }
 
-                    CullMode mode = (hasCustom && customAsset->renderModes.hasCullMode)
+                    CullMode effectiveCull = (hasCustom && customAsset->renderModes.hasCullMode)
                         ? customAsset->renderModes.cullMode
                         : material->GetCullMode();
-                    if (mode == CullMode::Disabled) glDisable(GL_CULL_FACE);
-                    else { glEnable(GL_CULL_FACE); glCullFace(mode == CullMode::Back ? GL_BACK : GL_FRONT); }
+
+                    if (effectiveCull == CullMode::Disabled) {
+                        glDisable(GL_CULL_FACE);
+                    }
+                    else {
+                        glEnable(GL_CULL_FACE);
+                        if (light.reverseCullFace)
+                            glCullFace(effectiveCull == CullMode::Back ? GL_FRONT : GL_BACK);
+                        else
+                            glCullFace(effectiveCull == CullMode::Back ? GL_BACK : GL_FRONT);
+                    }
 
                     bool useAlb = BindMaterial(*currentShader, material);
 
@@ -643,6 +756,22 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
                 }
             }
         }
+
+        if (light.staticShadow)
+        {
+            m_CachedPointShadows[shadowIdx] = {
+                true,
+                light.lightID,
+                light.position,
+                light.radius,
+                light.shadowBias,
+                light.reverseCullFace
+            };
+        }
+        else
+        {
+            m_CachedPointShadows[shadowIdx] = {};
+        }
     }
 
     glDisable(GL_POLYGON_OFFSET_FILL);
@@ -658,14 +787,33 @@ void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& fram
     auto& commands = frame.opaqueCommands;
     auto& skeletalCommands = frame.skeletalOpaqueCommands;
 
-    bool hasShadowCasters = false;
-    for (const auto& light : ctx.spotLights) {
-        if (light.castShadows && light.shadowIndex >= 0) {
-            hasShadowCasters = true;
+    bool anyNeedsRender = false;
+    for (const auto& light : ctx.spotLights)
+    {
+        if (!light.castShadows || light.shadowIndex < 0 || light.shadowIndex >= MaxSpotLights)
+            continue;
+        if (!light.staticShadow)
+        {
+            anyNeedsRender = true;
+            break;
+        }
+        const auto& cached = m_CachedSpotShadows[light.shadowIndex];
+        if (!cached.valid || light.shadowDirty ||
+            cached.lightID != light.lightID ||
+            cached.position != light.position ||
+            cached.direction != light.direction ||
+            cached.radius != light.radius ||
+            cached.innerCutoff != light.innerCutoff ||
+            cached.outerCutoff != light.outerCutoff ||
+            cached.shadowBias != light.shadowBias ||
+            cached.reverseCullFace != light.reverseCullFace ||
+            cached.lightSpaceMatrix != light.lightSpaceMatrix)
+        {
+            anyNeedsRender = true;
             break;
         }
     }
-    if (!hasShadowCasters) return;
+    if (!anyNeedsRender) return;
 
     glBindFramebuffer(GL_FRAMEBUFFER, spotFBO);
     glViewport(0, 0, SPOT_SHADOW_WIDTH, SPOT_SHADOW_HEIGHT);
@@ -767,6 +915,29 @@ void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& fram
         if (!light.castShadows || light.shadowIndex < 0 || light.shadowIndex >= MaxSpotLights)
             continue;
 
+        int shadowIdx = light.shadowIndex;
+        bool isDirty = true;
+        if (light.staticShadow)
+        {
+            const auto& cached = m_CachedSpotShadows[shadowIdx];
+            if (cached.valid &&
+                !light.shadowDirty &&
+                cached.lightID == light.lightID &&
+                cached.position == light.position &&
+                cached.direction == light.direction &&
+                cached.radius == light.radius &&
+                cached.innerCutoff == light.innerCutoff &&
+                cached.outerCutoff == light.outerCutoff &&
+                cached.shadowBias == light.shadowBias &&
+                cached.reverseCullFace == light.reverseCullFace &&
+                cached.lightSpaceMatrix == light.lightSpaceMatrix)
+            {
+                isDirty = false;
+            }
+        }
+
+        if (!isDirty) continue;
+
         glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, o_SpotShadowMap, 0, light.shadowIndex);
         glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -839,7 +1010,7 @@ void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& fram
             }
         }
 
-        if (!skeletalCommands.empty())
+        if (!light.staticShadow && !skeletalCommands.empty())
         {
             Shader* lastBound = nullptr;
 
@@ -900,6 +1071,26 @@ void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& fram
                 if (useAlb) glBindSampler(0, 0);
             }
         }
+
+        if (light.staticShadow)
+        {
+            m_CachedSpotShadows[shadowIdx] = {
+                true,
+                light.lightID,
+                light.position,
+                light.direction,
+                light.radius,
+                light.innerCutoff,
+                light.outerCutoff,
+                light.shadowBias,
+                light.reverseCullFace,
+                light.lightSpaceMatrix
+            };
+        }
+        else
+        {
+            m_CachedSpotShadows[shadowIdx] = {};
+        }
     }
 
     glDisable(GL_POLYGON_OFFSET_FILL);
@@ -912,6 +1103,7 @@ void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& fram
 void ShadowPass::RecreateDirectionalShadowMap(uint32_t resolution, RenderFrame& frame)
 {
     m_CurrentShadowResolution = resolution;
+    m_CachedDirectionalShadow = {};
 
     if (o_DirectionalShadowMap != 0)
         glDeleteTextures(1, &o_DirectionalShadowMap);
@@ -924,6 +1116,12 @@ void ShadowPass::RecreateDirectionalShadowMap(uint32_t resolution, RenderFrame& 
 
 void ShadowPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
+    if (ctx.scene != m_LastScene)
+    {
+        InvalidateCache();
+        m_LastScene = ctx.scene;
+    }
+
     if (ProjectManager::IsProjectLoaded())
     {
         uint32_t targetRes = ProjectManager::GetActiveProject()->GetSettings().shadowResolution;

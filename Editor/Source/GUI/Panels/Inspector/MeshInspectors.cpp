@@ -397,7 +397,11 @@ void MeshInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 			UI::PropertyLabel("Cast Shadows");
 			bool isCastShadow = meshRenderer.IsCastShadow();
 			if (ImGui::Checkbox("##CastShadow", &isCastShadow))
+			{
 				meshRenderer.SetCastShadow(isCastShadow);
+				if (Scene* scene = InspectorContext::GetScene())
+					scene->SetDirty(true);
+			}
 
 			UI::EndPropertyTable();
 		}
@@ -405,12 +409,16 @@ void MeshInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 
 	UI::DrawComponent<SkeletalMeshRendererComponent>("Skeletal Mesh Renderer", registry, selectedEntity, [](SkeletalMeshRendererComponent& skeletalMeshRenderer)
 	{
-		if (UI::BeginPropertyTable("MeshRendererTable"))
+		if (UI::BeginPropertyTable("SkeletalMeshRendererTable"))
 		{
 			UI::PropertyLabel("Cast Shadows");
 			bool isCastShadow = skeletalMeshRenderer.IsCastShadow();
 			if (ImGui::Checkbox("##CastShadow", &isCastShadow))
+			{
 				skeletalMeshRenderer.SetCastShadow(isCastShadow);
+				if (Scene* scene = InspectorContext::GetScene())
+					scene->SetDirty(true);
+			}
 
 			UI::EndPropertyTable();
 		}

@@ -154,6 +154,7 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             else if (type == "PointLight") return e.HasComponent<PointLightComponent>();
             else if (type == "SpotLight") return e.HasComponent<SpotLightComponent>();
             else if (type == "MeshRenderer") return e.HasComponent<MeshRendererComponent>();
+            else if (type == "SkeletalMeshRenderer") return e.HasComponent<SkeletalMeshRendererComponent>();
             else if (type == "Material") return e.HasComponent<MaterialComponent>();
             else if (type == "Rigidbody") return e.HasComponent<RigidbodyComponent>();
             else if (type == "PhysicsConstraint") return e.HasComponent<PhysicsConstraintComponent>();
@@ -200,6 +201,9 @@ void LuaBindings::RegisterCoreTypes(sol::state& lua)
             }
             else if (type == "MeshRenderer") {
                 return sol::make_object(lua, ComponentHandle<MeshRendererComponent>{ e });
+            }
+            else if (type == "SkeletalMeshRenderer") {
+                return sol::make_object(lua, ComponentHandle<SkeletalMeshRendererComponent>{ e });
             }
             else if (type == "Material") {
                 return sol::make_object(lua, ComponentHandle<MaterialComponent>{ e });

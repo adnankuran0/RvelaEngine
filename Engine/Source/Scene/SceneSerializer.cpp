@@ -175,6 +175,36 @@ void SceneSerializer::DeserializeScene(Scene& scene, const json& j)
                 prefabInstances.insert(instance.GetHandle());
                 loadedEntities.push_back(instance.GetHandle());
             }
+            else
+            {
+                LOG_ERROR("[SceneSerializer::DeserializeScene] Prefab '{}' failed to instantiate! Creating fallback placeholder entity to preserve scene data.", prefabUUID.ToString());
+                Entity fallback = scene.CreateEntityRaw();
+                entt::entity handle = fallback.GetHandle();
+
+                if (entityJson.contains("UUID"))
+                {
+                    auto& uuidComp = scene.GetComponent<UUIDComponent>(handle);
+                    uuidComp.Deserialize(entityJson["UUID"]);
+                    uuidToEntity[uuidComp.uuid] = handle;
+                    scene.GetUUIDEntityMap()[uuidComp.uuid] = handle;
+                }
+
+                if (entityJson.contains("Tag"))
+                    scene.AddComponent<TagComponent>(handle).Deserialize(entityJson["Tag"]);
+                else
+                    scene.AddComponent<TagComponent>(handle, "Missing Prefab");
+
+                if (entityJson.contains("Transform"))
+                    scene.GetComponent<TransformComponent>(handle).Deserialize(entityJson["Transform"]);
+
+                scene.AddComponent<PrefabComponent>(handle, prefabUUID, overrides);
+
+                scene.GetComponent<SceneTreeComponent>(handle).parentUUID =
+                    entityJson.value("ParentUUID", (EntityUUID)0);
+
+                prefabInstances.insert(handle);
+                loadedEntities.push_back(handle);
+            }
             continue;
         }
 
@@ -332,6 +362,9 @@ json SceneSerializer::SerializeEntity(Scene& scene, entt::entity e, bool seriali
     if (scene.HasComponent<MeshComponent>(e))
         j["Mesh"] = scene.GetComponent<MeshComponent>(e).Serialize();
 
+    if (scene.HasComponent<MeshRendererComponent>(e))
+        j["MeshRendererComponent"] = scene.GetComponent<MeshRendererComponent>(e).Serialize();
+
     if (scene.HasComponent<PointLightComponent>(e))
         j["PointLight"] = scene.GetComponent<PointLightComponent>(e).Serialize();
 
@@ -408,6 +441,9 @@ json SceneSerializer::SerializeEntity(Scene& scene, entt::entity e, bool seriali
     if (scene.HasComponent<SkeletalMeshComponent>(e))
         j["SkeletalMeshComponent"] = scene.GetComponent<SkeletalMeshComponent>(e).Serialize();
 
+    if (scene.HasComponent<SkeletalMeshRendererComponent>(e))
+        j["SkeletalMeshRendererComponent"] = scene.GetComponent<SkeletalMeshRendererComponent>(e).Serialize();
+
     if (scene.HasComponent<SkeletonComponent>(e))
         j["SkeletonComponent"] = scene.GetComponent<SkeletonComponent>(e).Serialize();
 
@@ -475,7 +511,33 @@ void SceneSerializer::DeserializeEntityComponents(Scene& scene, entt::entity han
     {
         auto& comp = scene.AddComponent<MeshComponent>(handle);
         comp.Deserialize(entityJson["Mesh"]);
-        scene.AddComponent<MeshRendererComponent>(handle, comp.GetMesh());
+        if (!scene.HasComponent<MeshRendererComponent>(handle))
+            scene.AddComponent<MeshRendererComponent>(handle, comp.GetMesh());
+        else
+            scene.GetComponent<MeshRendererComponent>(handle).RecreateFromMesh(comp.GetMesh());
+    }
+
+    if (entityJson.contains("MeshRendererComponent"))
+    {
+        if (!scene.HasComponent<MeshRendererComponent>(handle))
+        {
+            if (scene.HasComponent<MeshComponent>(handle))
+                scene.AddComponent<MeshRendererComponent>(handle, scene.GetComponent<MeshComponent>(handle).GetMesh());
+            else
+                scene.AddComponent<MeshRendererComponent>(handle);
+        }
+        scene.GetComponent<MeshRendererComponent>(handle).Deserialize(entityJson["MeshRendererComponent"]);
+    }
+    else if (entityJson.contains("MeshRenderer"))
+    {
+        if (!scene.HasComponent<MeshRendererComponent>(handle))
+        {
+            if (scene.HasComponent<MeshComponent>(handle))
+                scene.AddComponent<MeshRendererComponent>(handle, scene.GetComponent<MeshComponent>(handle).GetMesh());
+            else
+                scene.AddComponent<MeshRendererComponent>(handle);
+        }
+        scene.GetComponent<MeshRendererComponent>(handle).Deserialize(entityJson["MeshRenderer"]);
     }
 
     if (entityJson.contains("PointLight"))
@@ -567,7 +629,33 @@ void SceneSerializer::DeserializeEntityComponents(Scene& scene, entt::entity han
     {
         auto& comp = scene.AddComponent<SkeletalMeshComponent>(handle);
         comp.Deserialize(entityJson["SkeletalMeshComponent"]);
-        scene.AddComponent<SkeletalMeshRendererComponent>(handle, comp.GetMesh());
+        if (!scene.HasComponent<SkeletalMeshRendererComponent>(handle))
+            scene.AddComponent<SkeletalMeshRendererComponent>(handle, comp.GetMesh());
+        else
+            scene.GetComponent<SkeletalMeshRendererComponent>(handle).RecreateFromMesh(comp.GetMesh());
+    }
+
+    if (entityJson.contains("SkeletalMeshRendererComponent"))
+    {
+        if (!scene.HasComponent<SkeletalMeshRendererComponent>(handle))
+        {
+            if (scene.HasComponent<SkeletalMeshComponent>(handle))
+                scene.AddComponent<SkeletalMeshRendererComponent>(handle, scene.GetComponent<SkeletalMeshComponent>(handle).GetMesh());
+            else
+                scene.AddComponent<SkeletalMeshRendererComponent>(handle);
+        }
+        scene.GetComponent<SkeletalMeshRendererComponent>(handle).Deserialize(entityJson["SkeletalMeshRendererComponent"]);
+    }
+    else if (entityJson.contains("SkeletalMeshRenderer"))
+    {
+        if (!scene.HasComponent<SkeletalMeshRendererComponent>(handle))
+        {
+            if (scene.HasComponent<SkeletalMeshComponent>(handle))
+                scene.AddComponent<SkeletalMeshRendererComponent>(handle, scene.GetComponent<SkeletalMeshComponent>(handle).GetMesh());
+            else
+                scene.AddComponent<SkeletalMeshRendererComponent>(handle);
+        }
+        scene.GetComponent<SkeletalMeshRendererComponent>(handle).Deserialize(entityJson["SkeletalMeshRenderer"]);
     }
 
     if (entityJson.contains("SkeletonComponent"))

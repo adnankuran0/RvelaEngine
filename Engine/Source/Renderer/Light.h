@@ -20,6 +20,9 @@ struct PointLight {
     float blurRadius;
     float shadowBias;
     float normalBias;
+    bool staticShadow = false;
+    bool shadowDirty = false;
+    uint32_t lightID = 0;
 };
 
 struct SpotLight {
@@ -37,6 +40,9 @@ struct SpotLight {
     float shadowBias;
     float normalBias;
     glm::mat4 lightSpaceMatrix;
+    bool staticShadow = false;
+    bool shadowDirty = false;
+    uint32_t lightID = 0;
 };
 
 struct DirectionalLight {
@@ -52,7 +58,9 @@ struct DirectionalLight {
     float blurRadius;
     float shadowBias;
     float normalBias;
+    bool staticShadow = false;
+    bool shadowDirty = false;
+    uint32_t lightID = 0;
 };
 
 }
-

@@ -20,6 +20,8 @@ public:
     bool castShadows = true;
     bool contactShadows = true;
     bool reverseCullFace = false;
+    bool staticShadow = false;
+    bool shadowDirty = true;
 
     json Serialize() const;
     void Deserialize(const json& j);

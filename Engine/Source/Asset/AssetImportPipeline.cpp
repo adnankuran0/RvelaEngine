@@ -74,7 +74,14 @@ bool AssetImportPipeline::ImportAsset(const std::filesystem::path& sourcePath, A
     updatedMeta.lastWriteTime = meta.lastWriteTime;
     updatedMeta.importerVersion = importer->GetImporterVersion(sourcePath);
     registry.SaveMeta(sourcePath, updatedMeta);
-    registry.RegisterPath(updatedMeta.uuid, cachePath);
+    if (importer->GetImporterID() == "ModelImporter")
+    {
+        registry.RegisterPath(updatedMeta.uuid, sourcePath);
+    }
+    else
+    {
+        registry.RegisterPath(updatedMeta.uuid, cachePath);
+    }
 
     TextureCache::Get().Remove(updatedMeta.uuid);
     MeshCache::Get().Remove(updatedMeta.uuid);

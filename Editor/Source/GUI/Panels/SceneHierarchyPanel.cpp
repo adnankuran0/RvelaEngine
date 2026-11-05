@@ -1237,6 +1237,14 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                 if (const ImGuiPayload* assetPayload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
                 {
                     std::string pathStr((const char*)assetPayload->Data);
+                    if (!pathStr.ends_with(".rprefab"))
+                    {
+                        std::filesystem::path p(pathStr);
+                        auto candidate = p;
+                        candidate.replace_extension(".rprefab");
+                        if (std::filesystem::exists(candidate))
+                            pathStr = candidate.string();
+                    }
                     if (pathStr.ends_with(".rprefab"))
                     {
                         AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
@@ -1361,6 +1369,14 @@ void SceneHierarchyPanel::Draw(Engine* engine)
         if (const ImGuiPayload* assetPayload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
         {
             std::string pathStr((const char*)assetPayload->Data);
+            if (!pathStr.ends_with(".rprefab"))
+            {
+                std::filesystem::path p(pathStr);
+                auto candidate = p;
+                candidate.replace_extension(".rprefab");
+                if (std::filesystem::exists(candidate))
+                    pathStr = candidate.string();
+            }
             if (pathStr.ends_with(".rprefab"))
             {
                 AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);

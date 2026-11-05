@@ -14,6 +14,7 @@ json DirectionalLightComponent::Serialize() const
     j["shadowBias"] = shadowBias;
     j["normalBias"] = normalBias;
     j["blurRadius"] = blurRadius;
+    j["staticShadow"] = staticShadow;
     return j;
 }
 
@@ -28,4 +29,6 @@ void DirectionalLightComponent::Deserialize(const json& j)
     if (j.contains("shadowBias")) shadowBias = j["shadowBias"];
     if (j.contains("normalBias")) normalBias = j["normalBias"];
     if (j.contains("blurRadius")) blurRadius = j["blurRadius"];
+    if (j.contains("staticShadow")) staticShadow = j["staticShadow"];
+    shadowDirty = true;
 }

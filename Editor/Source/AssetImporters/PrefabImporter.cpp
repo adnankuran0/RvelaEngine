@@ -23,6 +23,12 @@ Ref<PrefabAsset> PrefabImporter::CreatePrefabAsset(
     Scene& scene,
     entt::entity rootEntity)
 {
+    if (path.extension() != ".rprefab")
+    {
+        LOG_ERROR("[PrefabImporter::CreatePrefabAsset] Refusing to overwrite non-prefab file '{}' with prefab JSON!", path.string());
+        return nullptr;
+    }
+
     json prefabJson;
     prefabJson["Entities"] = json::array();
 
@@ -65,6 +71,12 @@ Ref<PrefabAsset> PrefabImporter::CreateOrUpdatePrefabAsset(
     Scene& scene,
     entt::entity rootEntity)
 {
+    if (path.extension() != ".rprefab")
+    {
+        LOG_ERROR("[PrefabImporter::CreateOrUpdatePrefabAsset] Refusing to overwrite non-prefab file '{}' with prefab JSON!", path.string());
+        return nullptr;
+    }
+
     if (!std::filesystem::exists(path))
     {
         return CreatePrefabAsset(path, uuid, scene, rootEntity);
@@ -155,10 +167,30 @@ Ref<PrefabAsset> PrefabImporter::CreateOrUpdatePrefabAsset(
             else
                 existingEnt.erase("Mesh");
 
+            if (newEnt.contains("MeshRendererComponent"))
+            {
+                if (!existingEnt.contains("MeshRendererComponent"))
+                    existingEnt["MeshRendererComponent"] = newEnt["MeshRendererComponent"];
+            }
+            else if (!newEnt.contains("Mesh"))
+            {
+                existingEnt.erase("MeshRendererComponent");
+            }
+
             if (newEnt.contains("SkeletalMeshComponent"))
                 existingEnt["SkeletalMeshComponent"] = newEnt["SkeletalMeshComponent"];
             else
                 existingEnt.erase("SkeletalMeshComponent");
+
+            if (newEnt.contains("SkeletalMeshRendererComponent"))
+            {
+                if (!existingEnt.contains("SkeletalMeshRendererComponent"))
+                    existingEnt["SkeletalMeshRendererComponent"] = newEnt["SkeletalMeshRendererComponent"];
+            }
+            else if (!newEnt.contains("SkeletalMeshComponent"))
+            {
+                existingEnt.erase("SkeletalMeshRendererComponent");
+            }
 
             if (newEnt.contains("SkeletonComponent"))
                 existingEnt["SkeletonComponent"] = newEnt["SkeletonComponent"];
@@ -246,6 +278,35 @@ bool PrefabImporter::ApplyPrefab(Scene& scene, entt::entity rootEntity)
         return false;
     }
 
+    if (prefabPath.extension() != ".rprefab")
+    {
+        auto candidate = prefabPath;
+        candidate.replace_extension(".rprefab");
+        if (std::filesystem::exists(candidate))
+        {
+            AssetMeta candidateMeta = reg.GetOrCreateMeta(candidate);
+            if (candidateMeta.uuid.IsValid())
+            {
+                LOG_WARN("[PrefabImporter::ApplyPrefab] Entity had model UUID '{}' instead of prefab UUID. Correcting to '{}' ({})",
+                    prefabUUID.ToString(), candidateMeta.uuid.ToString(), candidate.string());
+                prefabUUID = candidateMeta.uuid;
+                prefabPath = candidate;
+                scene.GetComponent<PrefabComponent>(rootEntity).SetPrefabID(prefabUUID);
+                reg.RegisterPath(prefabUUID, prefabPath);
+            }
+            else
+            {
+                LOG_ERROR("[PrefabImporter::ApplyPrefab] Candidate prefab has invalid meta: {}", candidate.string());
+                return false;
+            }
+        }
+        else
+        {
+            LOG_ERROR("[PrefabImporter::ApplyPrefab] Refusing to apply prefab: target path '{}' is not a .rprefab file!", prefabPath.string());
+            return false;
+        }
+    }
+
     Ref<PrefabAsset> prefab = CreatePrefabAsset(prefabPath, prefabUUID, scene, rootEntity);
     if (!prefab)
     {
@@ -256,7 +317,12 @@ bool PrefabImporter::ApplyPrefab(Scene& scene, entt::entity rootEntity)
     // Invalidate cached asset so any future loads get the fresh file from disk
     AssetManager::Get().Unload(prefabUUID);
 
-    // Propagate changes to all other instances of this prefab in the active scene, preserving their overrides
+    if (scene.HasComponent<PrefabComponent>(rootEntity))
+    {
+        scene.GetComponent<PrefabComponent>(rootEntity).ClearOverrides();
+    }
+
+    // Propagate changes to all other instances of this prefab in the active scene
     std::vector<entt::entity> otherInstances;
     auto view = scene.GetRegistry().view<PrefabComponent>();
     for (auto e : view)
@@ -269,7 +335,7 @@ bool PrefabImporter::ApplyPrefab(Scene& scene, entt::entity rootEntity)
 
     for (auto other : otherInstances)
     {
-        ReloadPrefab(scene, other);
+        RevertPrefab(scene, other, true);
     }
 
     EditorSelection::Get().Validate(scene.GetRegistry());
@@ -291,9 +357,31 @@ bool PrefabImporter::RevertPrefab(Scene& scene, entt::entity rootEntity, bool pr
 
     AssetRegistry& reg = AssetManager::Get().GetRegistry();
     std::filesystem::path prefabPath = reg.GetPath(prefabUUID);
+    if (prefabPath.extension() != ".rprefab")
+    {
+        auto candidate = prefabPath;
+        candidate.replace_extension(".rprefab");
+        if (std::filesystem::exists(candidate))
+        {
+            AssetMeta candidateMeta = reg.GetOrCreateMeta(candidate);
+            if (candidateMeta.uuid.IsValid())
+            {
+                prefabUUID = candidateMeta.uuid;
+                scene.GetComponent<PrefabComponent>(rootEntity).SetPrefabID(prefabUUID);
+                reg.RegisterPath(prefabUUID, candidate);
+            }
+        }
+    }
 
     // Unload existing cached prefab asset so it reloads fresh from disk
     AssetManager::Get().Unload(prefabUUID);
+
+    Ref<PrefabAsset> prefab = AssetManager::Get().GetAsset<PrefabAsset>(prefabUUID);
+    if (!prefab || !prefab->IsValid())
+    {
+        LOG_ERROR("[PrefabImporter::RevertPrefab] Prefab asset not found or invalid: {}", prefabUUID.ToString());
+        return false;
+    }
 
     // Preserve root transform and parent
     glm::vec3 pos(0.0f);
@@ -378,7 +466,32 @@ bool PrefabImporter::ReloadPrefab(Scene& scene, entt::entity rootEntity, const j
         }
     }
 
+    AssetRegistry& reg = AssetManager::Get().GetRegistry();
+    std::filesystem::path prefabPath = reg.GetPath(prefabUUID);
+    if (prefabPath.extension() != ".rprefab")
+    {
+        auto candidate = prefabPath;
+        candidate.replace_extension(".rprefab");
+        if (std::filesystem::exists(candidate))
+        {
+            AssetMeta candidateMeta = reg.GetOrCreateMeta(candidate);
+            if (candidateMeta.uuid.IsValid())
+            {
+                prefabUUID = candidateMeta.uuid;
+                scene.GetComponent<PrefabComponent>(rootEntity).SetPrefabID(prefabUUID);
+                reg.RegisterPath(prefabUUID, candidate);
+            }
+        }
+    }
+
     AssetManager::Get().Unload(prefabUUID);
+
+    Ref<PrefabAsset> prefab = AssetManager::Get().GetAsset<PrefabAsset>(prefabUUID);
+    if (!prefab || !prefab->IsValid())
+    {
+        LOG_ERROR("[PrefabImporter::ReloadPrefab] Prefab asset not found or invalid: {}", prefabUUID.ToString());
+        return false;
+    }
 
     glm::vec3 pos(0.0f);
     glm::quat rot(1.0f, 0.0f, 0.0f, 0.0f);

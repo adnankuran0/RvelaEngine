@@ -454,7 +454,26 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID)
 Entity Scene::Instantiate(const AssetUUID& prefabUUID, const glm::vec3& position, const glm::quat& rotation, entt::entity parent, const json& overrides)
 {
     SetDirty(true);
-    Ref<PrefabAsset> prefab = AssetManager::Get().GetAsset<PrefabAsset>(prefabUUID);
+    AssetUUID actualPrefabUUID = prefabUUID;
+    AssetRegistry& reg = AssetManager::Get().GetRegistry();
+    std::filesystem::path path = reg.GetPath(prefabUUID);
+    if (!path.empty() && path.extension() != ".rprefab")
+    {
+        auto candidate = path;
+        candidate.replace_extension(".rprefab");
+        if (std::filesystem::exists(candidate))
+        {
+            AssetMeta candidateMeta = reg.GetOrCreateMeta(candidate);
+            if (candidateMeta.uuid.IsValid())
+            {
+                LOG_WARN("[Scene::Instantiate] Prefab UUID '{}' mapped to model file '{}'. Resolving to companion prefab '{}' ({})",
+                    prefabUUID.ToString(), path.string(), candidateMeta.uuid.ToString(), candidate.string());
+                actualPrefabUUID = candidateMeta.uuid;
+            }
+        }
+    }
+
+    Ref<PrefabAsset> prefab = AssetManager::Get().GetAsset<PrefabAsset>(actualPrefabUUID);
     if (!prefab || !prefab->IsValid())
     {
         LOG_ERROR("[Scene::Instantiate] Prefab not found: {}", prefabUUID.ToString());
@@ -545,7 +564,7 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID, const glm::vec3& position
         tc.SetRotation(rotation);
         tc.SetDirty();
 
-        auto& pc = AddComponent<PrefabComponent>(rootEntity.GetHandle(), prefabUUID);
+        auto& pc = AddComponent<PrefabComponent>(rootEntity.GetHandle(), actualPrefabUUID);
         if (overrides.is_array() && !overrides.empty())
         {
             pc.SetOverrides(overrides);

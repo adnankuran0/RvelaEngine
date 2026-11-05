@@ -4,8 +4,11 @@
 #include "Asset/Types/MeshAsset.h"
 #include "Core/Ref.h"
 #include <memory>
+#include <nlohmann/json.hpp>
 
 namespace rv {
+
+using json = nlohmann::json;
 
 struct alignas(16) MeshRendererComponent 
 {
@@ -43,6 +46,9 @@ public:
 
     inline bool IsCastShadow() const noexcept { return castShadow; }
     inline void SetCastShadow(bool isCastsShadow) noexcept { castShadow = isCastsShadow; }
+
+    json Serialize() const;
+    void Deserialize(const json& j);
 
 private:
     bool castShadow = true;

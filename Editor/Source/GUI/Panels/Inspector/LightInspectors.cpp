@@ -58,24 +58,39 @@ void LightInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 			ImGui::DragFloat("##Intensity", &pointLight.intensity, 0.1f, 0.0f, 100.0f, "%.2f");
 
 			UI::PropertyLabel("Radius");
-			ImGui::SliderFloat("##Radius", &pointLight.radius, 0.1f, 50.0f, "%.2f");
+			if (ImGui::SliderFloat("##Radius", &pointLight.radius, 0.1f, 50.0f, "%.2f"))
+				pointLight.shadowDirty = true;
 
 			UI::PropertyLabel("Falloff");
 			ImGui::SliderFloat("##Falloff", &pointLight.falloff, 0.0f, 10.0f, "%.2f");
 
 			UI::PropertyLabel("Cast Shadows");
-			ImGui::Checkbox("##CastShadows", &pointLight.castShadows);
+			if (ImGui::Checkbox("##CastShadows", &pointLight.castShadows))
+				pointLight.shadowDirty = true;
 
 			if (pointLight.castShadows)
 			{
+				UI::PropertyLabel("Static Shadow");
+				if (ImGui::Checkbox("##StaticShadow", &pointLight.staticShadow))
+					pointLight.shadowDirty = true;
+
+				if (pointLight.staticShadow)
+				{
+					UI::PropertyLabel("Update Shadow");
+					if (ImGui::Button("Bake##PointShadow"))
+						pointLight.shadowDirty = true;
+				}
+
 				UI::PropertyLabel("Shadow Bias");
-				ImGui::SliderFloat("##ShadowBias", &pointLight.shadowBias, 0.0f, 0.1f, "%.4f");
+				if (ImGui::SliderFloat("##ShadowBias", &pointLight.shadowBias, 0.0f, 0.1f, "%.4f"))
+					pointLight.shadowDirty = true;
 
 				UI::PropertyLabel("Blur Radius");
 				ImGui::SliderFloat("##BlurRadius", &pointLight.blurRadius, 0.0f, 0.1f, "%.4f");
 
 				UI::PropertyLabel("Reverse Cull Face");
-				ImGui::Checkbox("##ReverseCullFace", &pointLight.reverseCullFace);
+				if (ImGui::Checkbox("##ReverseCullFace", &pointLight.reverseCullFace))
+					pointLight.shadowDirty = true;
 			}
 
 			UI::EndPropertyTable();
@@ -95,21 +110,36 @@ void LightInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 			ImGui::DragFloat("##DirIntensity", &dirLight.intensity, 0.05f, 0.0f, 50.0f, "%.2f");
 
 			UI::PropertyLabel("Cast Shadows");
-			ImGui::Checkbox("##DirCastShadows", &dirLight.castShadows);
+			if (ImGui::Checkbox("##DirCastShadows", &dirLight.castShadows))
+				dirLight.shadowDirty = true;
 
 			if (dirLight.castShadows)
 			{
+				UI::PropertyLabel("Static Shadow");
+				if (ImGui::Checkbox("##DirStaticShadow", &dirLight.staticShadow))
+					dirLight.shadowDirty = true;
+
+				if (dirLight.staticShadow)
+				{
+					UI::PropertyLabel("Update Shadow");
+					if (ImGui::Button("Bake##DirShadow"))
+						dirLight.shadowDirty = true;
+				}
+
 				UI::PropertyLabel("Shadow Bias");
-				ImGui::SliderFloat("##DirShadowBias", &dirLight.shadowBias, 0.0f, 0.02f, "%.4f");
+				if (ImGui::SliderFloat("##DirShadowBias", &dirLight.shadowBias, 0.0f, 0.02f, "%.4f"))
+					dirLight.shadowDirty = true;
 
 				UI::PropertyLabel("Normal Bias");
-				ImGui::SliderFloat("##DirNormalBias", &dirLight.normalBias, 0.0f, 0.05f, "%.4f");
+				if (ImGui::SliderFloat("##DirNormalBias", &dirLight.normalBias, 0.0f, 0.05f, "%.4f"))
+					dirLight.shadowDirty = true;
 
 				UI::PropertyLabel("Blur Radius");
 				ImGui::SliderFloat("##DirBlurRadius", &dirLight.blurRadius, 0.0f, 3.0f, "%.3f");
 
 				UI::PropertyLabel("Reverse Cull Face");
-				ImGui::Checkbox("##DirReverseCullFace", &dirLight.reverseCullFace);
+				if (ImGui::Checkbox("##DirReverseCullFace", &dirLight.reverseCullFace))
+					dirLight.shadowDirty = true;
 
 				UI::PropertyLabel("Contact Shadows");
 				ImGui::Checkbox("##DirContactShadows", &dirLight.contactShadows);
@@ -132,7 +162,8 @@ void LightInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 			ImGui::DragFloat("##SpotIntensity", &spotLight.intensity, 0.1f, 0.0f, 100.0f, "%.2f");
 
 			UI::PropertyLabel("Radius");
-			ImGui::SliderFloat("##SpotRadius", &spotLight.radius, 0.1f, 100.0f, "%.2f");
+			if (ImGui::SliderFloat("##SpotRadius", &spotLight.radius, 0.1f, 100.0f, "%.2f"))
+				spotLight.shadowDirty = true;
 
 			UI::PropertyLabel("Inner Angle");
 			if (ImGui::SliderFloat("##InnerAngle", &spotLight.innerAngle, 0.1f, 89.0f, "%.1f deg"))
@@ -140,6 +171,7 @@ void LightInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 				if (spotLight.innerAngle > spotLight.outerAngle)
 					spotLight.outerAngle = spotLight.innerAngle;
 				spotLight.UpdateCutoffs();
+				spotLight.shadowDirty = true;
 			}
 
 			UI::PropertyLabel("Outer Angle");
@@ -148,21 +180,36 @@ void LightInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 				if (spotLight.outerAngle < spotLight.innerAngle)
 					spotLight.innerAngle = spotLight.outerAngle;
 				spotLight.UpdateCutoffs();
+				spotLight.shadowDirty = true;
 			}
 
 			UI::PropertyLabel("Cast Shadows");
-			ImGui::Checkbox("##SpotCastShadows", &spotLight.castShadows);
+			if (ImGui::Checkbox("##SpotCastShadows", &spotLight.castShadows))
+				spotLight.shadowDirty = true;
 
 			if (spotLight.castShadows)
 			{
+				UI::PropertyLabel("Static Shadow");
+				if (ImGui::Checkbox("##SpotStaticShadow", &spotLight.staticShadow))
+					spotLight.shadowDirty = true;
+
+				if (spotLight.staticShadow)
+				{
+					UI::PropertyLabel("Update Shadow");
+					if (ImGui::Button("Bake##SpotShadow"))
+						spotLight.shadowDirty = true;
+				}
+
 				UI::PropertyLabel("Shadow Bias");
-				ImGui::SliderFloat("##SpotShadowBias", &spotLight.shadowBias, 0.0f, 0.05f, "%.4f");
+				if (ImGui::SliderFloat("##SpotShadowBias", &spotLight.shadowBias, 0.0f, 0.05f, "%.4f"))
+					spotLight.shadowDirty = true;
 
 				UI::PropertyLabel("Blur Radius");
 				ImGui::SliderFloat("##SpotBlurRadius", &spotLight.blurRadius, 0.0f, 3.0f, "%.3f");
 
 				UI::PropertyLabel("Reverse Cull Face");
-				ImGui::Checkbox("##SpotReverseCullFace", &spotLight.reverseCullFace);
+				if (ImGui::Checkbox("##SpotReverseCullFace", &spotLight.reverseCullFace))
+					spotLight.shadowDirty = true;
 			}
 
 			UI::EndPropertyTable();

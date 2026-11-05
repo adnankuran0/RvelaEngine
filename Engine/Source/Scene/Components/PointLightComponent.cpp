@@ -14,6 +14,7 @@ json PointLightComponent::Serialize() const
     j["reverseCullFace"] = reverseCullFace;
     j["shadowBias"] = shadowBias;
     j["blurRadius"] = blurRadius;
+    j["staticShadow"] = staticShadow;
     return j;
 }
 
@@ -28,4 +29,6 @@ void PointLightComponent::Deserialize(const json& j)
     if (j.contains("reverseCullFace")) reverseCullFace = j.at("reverseCullFace").get<bool>();
     if (j.contains("shadowBias")) shadowBias = j.at("shadowBias").get<float>();
     if (j.contains("blurRadius")) blurRadius = j.at("blurRadius").get<float>();
+    if (j.contains("staticShadow")) staticShadow = j.at("staticShadow").get<bool>();
+    shadowDirty = true;
 }

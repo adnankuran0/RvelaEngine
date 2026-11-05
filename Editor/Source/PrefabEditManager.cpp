@@ -53,7 +53,29 @@ bool PrefabEditManager::OpenPrefab(Engine& engine, const AssetUUID& prefabUUID)
         return false;
     }
 
-    m_CurrentPrefabUUID = prefabUUID;
+    AssetUUID targetUUID = prefabUUID;
+    if (path.extension() != ".rprefab")
+    {
+        auto candidate = path;
+        candidate.replace_extension(".rprefab");
+        if (std::filesystem::exists(candidate))
+        {
+            path = candidate;
+            AssetMeta meta = reg.GetOrCreateMeta(path);
+            if (meta.uuid.IsValid())
+            {
+                targetUUID = meta.uuid;
+                reg.RegisterPath(targetUUID, path);
+            }
+        }
+        else
+        {
+            LOG_ERROR("[PrefabEditManager] Refusing to open non-prefab file '{}' as prefab!", path.string());
+            return false;
+        }
+    }
+
+    m_CurrentPrefabUUID = targetUUID;
     m_PrefabPath = path;
     m_PrefabName = path.stem().string();
 
@@ -169,6 +191,12 @@ bool PrefabEditManager::SaveCurrentPrefab(Engine& engine)
     if (!m_IsInPrefabMode || !m_CurrentPrefabUUID.IsValid() || m_PrefabRootEntity == entt::null)
         return false;
 
+    if (m_PrefabPath.extension() != ".rprefab")
+    {
+        LOG_ERROR("[PrefabEditManager] Refusing to save prefab to non-prefab path: {}", m_PrefabPath.string());
+        return false;
+    }
+
     Scene& activeScene = engine.GetActiveScene();
     if (!activeScene.GetRegistry().valid(m_PrefabRootEntity))
     {
@@ -199,7 +227,7 @@ bool PrefabEditManager::SaveCurrentPrefab(Engine& engine)
         }
         for (auto inst : instances)
         {
-            PrefabImporter::ReloadPrefab(*m_SavedMainScene, inst);
+            PrefabImporter::RevertPrefab(*m_SavedMainScene, inst, true);
         }
     }
 

@@ -15,6 +15,7 @@
 #include "Scene/Components/ParticleEmitterComponent.h"
 #include "Scene/Components/AudioEmitterComponent.h"
 #include "Scene/Components/MeshRendererComponent.h"
+#include "Scene/Components/SkeletalMeshRendererComponent.h"
 #include "Scene/Components/ColliderComponents.h"
 
 namespace rv::Animation {
@@ -69,6 +70,18 @@ namespace rv::Animation {
                 [](entt::registry& reg, entt::entity e) { return reg.any_of<PointLightComponent>(e); },
                 [](entt::registry& reg, entt::entity e, bool val) { reg.get<PointLightComponent>(e).castShadows = val; },
                 [](entt::registry& reg, entt::entity e) { return reg.get<PointLightComponent>(e).castShadows; }
+            );
+
+            RegisterBool("MeshRendererComponent.castShadows",
+                [](entt::registry& reg, entt::entity e) { return reg.any_of<MeshRendererComponent>(e); },
+                [](entt::registry& reg, entt::entity e, bool val) { reg.get<MeshRendererComponent>(e).SetCastShadow(val); },
+                [](entt::registry& reg, entt::entity e) { return reg.get<MeshRendererComponent>(e).IsCastShadow(); }
+            );
+
+            RegisterBool("SkeletalMeshRendererComponent.castShadows",
+                [](entt::registry& reg, entt::entity e) { return reg.any_of<SkeletalMeshRendererComponent>(e); },
+                [](entt::registry& reg, entt::entity e, bool val) { reg.get<SkeletalMeshRendererComponent>(e).SetCastShadow(val); },
+                [](entt::registry& reg, entt::entity e) { return reg.get<SkeletalMeshRendererComponent>(e).IsCastShadow(); }
             );
 
             RegisterFloat("CameraComponent.FOV",

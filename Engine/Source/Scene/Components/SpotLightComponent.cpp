@@ -17,6 +17,7 @@ json SpotLightComponent::Serialize() const
     j["shadowBias"] = shadowBias;
     j["blurRadius"] = blurRadius;
     j["reverseCullFace"] = reverseCullFace;
+    j["staticShadow"] = staticShadow;
     return j;
 }
 
@@ -53,4 +54,6 @@ void SpotLightComponent::Deserialize(const json& j)
     shadowBias = src.value("shadowBias", 0.005f);
     blurRadius = src.value("blurRadius", 1.0f);
     reverseCullFace = src.value("reverseCullFace", false);
+    staticShadow = src.value("staticShadow", false);
+    shadowDirty = true;
 }

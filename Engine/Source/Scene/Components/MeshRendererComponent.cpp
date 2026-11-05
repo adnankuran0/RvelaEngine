@@ -26,3 +26,18 @@ void MeshRendererComponent::RecreateFromMesh(Ref<MeshAsset> mesh)
         localAABB.Reset();
     }
 }
+
+json MeshRendererComponent::Serialize() const
+{
+    json j;
+    j["castShadows"] = castShadow;
+    return j;
+}
+
+void MeshRendererComponent::Deserialize(const json& j)
+{
+    if (j.contains("castShadows"))
+        castShadow = j["castShadows"].get<bool>();
+    else if (j.contains("castShadow"))
+        castShadow = j["castShadow"].get<bool>();
+}

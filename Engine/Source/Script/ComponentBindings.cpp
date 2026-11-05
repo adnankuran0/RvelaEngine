@@ -11,6 +11,7 @@ using DirectionalLightHandle = ComponentHandle<DirectionalLightComponent>;
 using PointLightHandle = ComponentHandle<PointLightComponent>;
 using SpotLightHandle = ComponentHandle<SpotLightComponent>;
 using MeshRendererHandle = ComponentHandle<MeshRendererComponent>;
+using SkeletalMeshRendererHandle = ComponentHandle<SkeletalMeshRendererComponent>;
 using MaterialHandle = ComponentHandle<MaterialComponent>;
 using ParticleEmitterHandle = ComponentHandle<ParticleEmitterComponent>;
 
@@ -83,6 +84,14 @@ void LuaBindings::RegisterComponents(sol::state& lua)
         "reverseCullFace", sol::property(
             [](DirectionalLightHandle& h) { return h.Get() ? h.Get()->reverseCullFace : false; },
             [](DirectionalLightHandle& h, bool v) { if (auto* c = h.Get()) c->reverseCullFace = v; }
+        ),
+        "staticShadow", sol::property(
+            [](DirectionalLightHandle& h) { return h.Get() ? h.Get()->staticShadow : false; },
+            [](DirectionalLightHandle& h, bool v) { if (auto* c = h.Get()) { c->staticShadow = v; c->shadowDirty = true; } }
+        ),
+        "shadowDirty", sol::property(
+            [](DirectionalLightHandle& h) { return h.Get() ? h.Get()->shadowDirty : false; },
+            [](DirectionalLightHandle& h, bool v) { if (auto* c = h.Get()) c->shadowDirty = v; }
         )
     );
 
@@ -119,6 +128,14 @@ void LuaBindings::RegisterComponents(sol::state& lua)
         "blurRadius", sol::property(
             [](PointLightHandle& h) { return h.Get() ? h.Get()->blurRadius : 0.0f; },
             [](PointLightHandle& h, float v) { if (auto* c = h.Get()) c->blurRadius = v; }
+        ),
+        "staticShadow", sol::property(
+            [](PointLightHandle& h) { return h.Get() ? h.Get()->staticShadow : false; },
+            [](PointLightHandle& h, bool v) { if (auto* c = h.Get()) { c->staticShadow = v; c->shadowDirty = true; } }
+        ),
+        "shadowDirty", sol::property(
+            [](PointLightHandle& h) { return h.Get() ? h.Get()->shadowDirty : false; },
+            [](PointLightHandle& h, bool v) { if (auto* c = h.Get()) c->shadowDirty = v; }
         )
     );
 
@@ -169,6 +186,14 @@ void LuaBindings::RegisterComponents(sol::state& lua)
         "blurRadius", sol::property(
             [](SpotLightHandle& h) { return h.Get() ? h.Get()->blurRadius : 0.0f; },
             [](SpotLightHandle& h, float v) { if (auto* c = h.Get()) c->blurRadius = v; }
+        ),
+        "staticShadow", sol::property(
+            [](SpotLightHandle& h) { return h.Get() ? h.Get()->staticShadow : false; },
+            [](SpotLightHandle& h, bool v) { if (auto* c = h.Get()) { c->staticShadow = v; c->shadowDirty = true; } }
+        ),
+        "shadowDirty", sol::property(
+            [](SpotLightHandle& h) { return h.Get() ? h.Get()->shadowDirty : false; },
+            [](SpotLightHandle& h, bool v) { if (auto* c = h.Get()) c->shadowDirty = v; }
         )
     );
 
@@ -177,6 +202,14 @@ void LuaBindings::RegisterComponents(sol::state& lua)
         "castShadow", sol::property(
             [](MeshRendererHandle& h) { return h.Get() ? h.Get()->IsCastShadow() : false; },
             [](MeshRendererHandle& h, bool v) { if (auto* c = h.Get()) c->SetCastShadow(v); }
+        )
+    );
+
+    lua.new_usertype<SkeletalMeshRendererHandle>("SkeletalMeshRendererComponent",
+        "IsValid", &SkeletalMeshRendererHandle::IsValid,
+        "castShadow", sol::property(
+            [](SkeletalMeshRendererHandle& h) { return h.Get() ? h.Get()->IsCastShadow() : false; },
+            [](SkeletalMeshRendererHandle& h, bool v) { if (auto* c = h.Get()) c->SetCastShadow(v); }
         )
     );
 

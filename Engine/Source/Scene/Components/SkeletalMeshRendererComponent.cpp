@@ -26,3 +26,18 @@ void SkeletalMeshRendererComponent::RecreateFromMesh(Ref<SkeletalMeshAsset> mesh
         localAABB.Reset();
     }
 }
+
+json SkeletalMeshRendererComponent::Serialize() const
+{
+    json j;
+    j["castShadows"] = castShadow;
+    return j;
+}
+
+void SkeletalMeshRendererComponent::Deserialize(const json& j)
+{
+    if (j.contains("castShadows"))
+        castShadow = j["castShadows"].get<bool>();
+    else if (j.contains("castShadow"))
+        castShadow = j["castShadow"].get<bool>();
+}

@@ -244,8 +244,20 @@ public:
 
         AssetRegistry& reg = AssetManager::Get().GetRegistry();
         m_PrefabPath = reg.GetPath(m_PrefabUUID);
+        if (m_PrefabPath.extension() != ".rprefab")
+        {
+            auto candidate = m_PrefabPath;
+            candidate.replace_extension(".rprefab");
+            if (std::filesystem::exists(candidate))
+            {
+                m_PrefabPath = candidate;
+                AssetMeta meta = reg.GetOrCreateMeta(candidate);
+                if (meta.uuid.IsValid())
+                    m_PrefabUUID = meta.uuid;
+            }
+        }
 
-        if (std::filesystem::exists(m_PrefabPath))
+        if (m_PrefabPath.extension() == ".rprefab" && std::filesystem::exists(m_PrefabPath))
         {
             std::ifstream file(m_PrefabPath);
             if (file)
@@ -261,7 +273,7 @@ public:
 
     void CaptureNewContent()
     {
-        if (std::filesystem::exists(m_PrefabPath))
+        if (m_PrefabPath.extension() == ".rprefab" && std::filesystem::exists(m_PrefabPath))
         {
             std::ifstream file(m_PrefabPath);
             if (file)
@@ -298,7 +310,7 @@ public:
 private:
     void ApplyFileContent(const std::string& content)
     {
-        if (m_PrefabPath.empty() || content.empty() || !m_Scene) return;
+        if (m_PrefabPath.empty() || content.empty() || !m_Scene || m_PrefabPath.extension() != ".rprefab") return;
 
         {
             std::ofstream file(m_PrefabPath);
@@ -324,7 +336,7 @@ private:
         {
             if (m_Scene->GetRegistry().valid(inst))
             {
-                PrefabImporter::ReloadPrefab(*m_Scene, inst);
+                PrefabImporter::RevertPrefab(*m_Scene, inst, true);
             }
         }
 

@@ -187,21 +187,22 @@ AssetUUID EditorUtils::ReadUUIDFromMeta(const std::string& assetPath)
             return directUUID;
     }
 
-    auto& reg = AssetManager::Get().GetRegistry();
-    AssetUUID regUUID = reg.GetUUID(p);
-    if (regUUID.IsValid())
-        return regUUID;
-
     auto metaPath = AssetMeta::GetMetaPath(p);
     if (std::filesystem::exists(metaPath))
     {
         AssetMeta meta;
         if (meta.LoadFromFile(metaPath) && meta.uuid.IsValid())
         {
+            auto& reg = AssetManager::Get().GetRegistry();
             reg.RegisterPath(meta.uuid, p);
             return meta.uuid;
         }
     }
+
+    auto& reg = AssetManager::Get().GetRegistry();
+    AssetUUID regUUID = reg.GetUUID(p);
+    if (regUUID.IsValid())
+        return regUUID;
 
     if (std::filesystem::exists(p) && std::filesystem::is_regular_file(p))
     {

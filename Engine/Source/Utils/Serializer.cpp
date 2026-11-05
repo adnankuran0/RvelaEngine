@@ -180,9 +180,8 @@ void SerializeBin_MeshRendererComp(const MeshRendererComponent& comp, std::vecto
 }
 void DeserializeBin_MeshRendererComp(const std::byte*& cursor, MeshRendererComponent& comp)
 {
-	uint8_t castShadow, doubleSided;
+	uint8_t castShadow;
 	ReadFromBuffer(cursor, castShadow);
-	ReadFromBuffer(cursor, doubleSided);
 
 	comp.SetCastShadow(castShadow != 0);
 }

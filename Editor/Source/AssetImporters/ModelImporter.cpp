@@ -176,9 +176,7 @@ std::filesystem::path ModelImporter::GetCachePath(
     const AssetMeta& meta,
     const std::filesystem::path& cacheRoot) const
 {
-    auto prefabPath = sourcePath;
-    prefabPath.replace_extension(".rprefab");
-    return prefabPath;
+    return sourcePath;
 }
 
 bool ModelImporter::Import(const std::filesystem::path& sourcePath,
@@ -1335,6 +1333,13 @@ AssetUUID ModelImporter::ConstructPrefab(
     prefabPath.replace_extension(".rprefab");
 
     AssetMeta meta = registry.GetOrCreateMeta(prefabPath);
+    AssetUUID modelUUID = registry.GetUUID(modelPath);
+    if (meta.uuid == modelUUID || meta.importerID != "PrefabImporter")
+    {
+        meta.uuid = AssetUUID{};
+        meta.subAssets.clear();
+        meta.importerSettingsJson = "{}";
+    }
 
     Ref<PrefabAsset> prefab = PrefabImporter::CreateOrUpdatePrefabAsset(
         prefabPath, meta.uuid, prefabScene, rootEntity);
@@ -1355,6 +1360,7 @@ AssetUUID ModelImporter::ConstructPrefab(
         meta.dependencies.push_back(result.animLibUUID);
 
     registry.SaveMeta(prefabPath, meta);
+    registry.RegisterPath(meta.uuid, prefabPath);
     return meta.uuid;
 }
 

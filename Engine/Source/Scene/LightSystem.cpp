@@ -59,6 +59,10 @@ std::vector<PointLight> LightSystem::CollectPointLights() noexcept {
 		data.normalBias = light.shadowBias * 0.1f;
 		data.reverseCullFace = light.reverseCullFace;
 		data.blurRadius = light.blurRadius;
+		data.staticShadow = light.staticShadow;
+		data.shadowDirty = light.shadowDirty;
+		data.lightID = static_cast<uint32_t>(e);
+		light.shadowDirty = false;
 		lights.push_back(data);
 	}
 	return lights;
@@ -92,6 +96,10 @@ std::vector<SpotLight> LightSystem::CollectSpotLights() noexcept {
 		data.normalBias = light.shadowBias * 0.1f;
 		data.reverseCullFace = light.reverseCullFace;
 		data.blurRadius = light.blurRadius;
+		data.staticShadow = light.staticShadow;
+		data.shadowDirty = light.shadowDirty;
+		data.lightID = static_cast<uint32_t>(e);
+		light.shadowDirty = false;
 
 		float fovDeg = std::min(170.0f, std::max(1.0f, light.outerAngle * 2.0f));
 		glm::mat4 lightProj = glm::perspective(glm::radians(fovDeg), 1.0f, 0.1f, std::max(0.5f, light.radius));
@@ -125,6 +133,10 @@ std::optional<DirectionalLight> LightSystem::CollectDirectionalLight(Camera* cam
 		data.contactShadows = light.contactShadows;
 		data.reverseCullFace = light.reverseCullFace;
 		data.blurRadius = light.blurRadius;
+		data.staticShadow = light.staticShadow;
+		data.shadowDirty = light.shadowDirty;
+		data.lightID = static_cast<uint32_t>(e);
+		light.shadowDirty = false;
 
 		float nearClip = camera ? camera->NearClip : 0.1f;
 		float farClip = camera ? camera->FarClip : 1000.0f;

@@ -109,6 +109,33 @@ void AssetRegistry::Scan(const std::filesystem::path& assetDir)
             }
         }
 
+        if (m_UUIDToPath.contains(meta.uuid))
+        {
+            auto existingPath = m_UUIDToPath[meta.uuid];
+            if (existingPath != path)
+            {
+                bool isTrueDuplicate = true;
+                auto it = m_PathToUUID.find(existingPath.string());
+                if (it == m_PathToUUID.end())
+                    it = m_PathToUUID.find(existingPath.generic_string());
+                if (it != m_PathToUUID.end() && it->second != meta.uuid)
+                {
+                    isTrueDuplicate = false;
+                }
+
+                if (isTrueDuplicate)
+                {
+                    LOG_WARN("[AssetRegistry::Scan] Duplicate UUID {} detected for '{}' and '{}'!",
+                        meta.uuid.ToString(), existingPath.string(), path.string());
+                    if (path.extension() == ".rprefab" && existingPath.extension() != ".rprefab")
+                    {
+                        meta.uuid = AssetUUID{};
+                        meta.SaveToFile(metaPath);
+                    }
+                }
+            }
+        }
+
         m_UUIDToPath[meta.uuid] = path;
         m_PathToUUID[path.string()] = meta.uuid;
         m_PathToUUID[path.generic_string()] = meta.uuid;
@@ -127,6 +154,30 @@ void AssetRegistry::Scan(const std::filesystem::path& assetDir)
                 auto cachePath = GetCacheDir() / (sub.uuid.ToString() + subExt);
                 m_UUIDToPath[sub.uuid] = cachePath;
                 m_PathToUUID[cachePath.string()] = sub.uuid;
+                m_PathToUUID[cachePath.generic_string()] = sub.uuid;
+            }
+            else if (sub.type == "Material")
+            {
+                auto candidate = path.parent_path() / (path.stem().string() + "_" + sub.name + ".rmat");
+                if (!std::filesystem::exists(candidate))
+                    candidate = path.parent_path() / (path.stem().string() + "_Mat" + std::to_string(sub.index) + ".rmat");
+                if (!std::filesystem::exists(candidate))
+                    candidate = path.parent_path() / (sub.name + ".rmat");
+
+                if (std::filesystem::exists(candidate))
+                {
+                    m_UUIDToPath[sub.uuid] = candidate;
+                    m_PathToUUID[candidate.string()] = sub.uuid;
+                    m_PathToUUID[candidate.generic_string()] = sub.uuid;
+
+                    auto matMetaPath = AssetMeta::GetMetaPath(candidate);
+                    if (std::filesystem::exists(matMetaPath))
+                    {
+                        AssetMeta matMeta;
+                        if (matMeta.LoadFromFile(matMetaPath))
+                            m_Metas[sub.uuid] = matMeta;
+                    }
+                }
             }
             else if (!m_UUIDToPath.contains(sub.uuid))
             {
@@ -303,6 +354,21 @@ AssetMeta AssetRegistry::GetOrCreateMeta(const std::filesystem::path& path)
                     m_PathToUUID[cachePath.string()] = sub.uuid;
                     m_PathToUUID[cachePath.generic_string()] = sub.uuid;
                 }
+                else if (sub.type == "Material")
+                {
+                    auto candidate = normalPath.parent_path() / (normalPath.stem().string() + "_" + sub.name + ".rmat");
+                    if (!std::filesystem::exists(candidate))
+                        candidate = normalPath.parent_path() / (normalPath.stem().string() + "_Mat" + std::to_string(sub.index) + ".rmat");
+                    if (!std::filesystem::exists(candidate))
+                        candidate = normalPath.parent_path() / (sub.name + ".rmat");
+
+                    if (std::filesystem::exists(candidate))
+                    {
+                        m_UUIDToPath[sub.uuid] = candidate;
+                        m_PathToUUID[candidate.string()] = sub.uuid;
+                        m_PathToUUID[candidate.generic_string()] = sub.uuid;
+                    }
+                }
                 else if (!m_UUIDToPath.contains(sub.uuid))
                 {
                     m_UUIDToPath[sub.uuid] = normalPath;
@@ -352,6 +418,21 @@ void AssetRegistry::SaveMeta(const std::filesystem::path& path, const AssetMeta&
             m_UUIDToPath[sub.uuid] = cachePath;
             m_PathToUUID[cachePath.string()] = sub.uuid;
             m_PathToUUID[cachePath.generic_string()] = sub.uuid;
+        }
+        else if (sub.type == "Material")
+        {
+            auto candidate = normalPath.parent_path() / (normalPath.stem().string() + "_" + sub.name + ".rmat");
+            if (!std::filesystem::exists(candidate))
+                candidate = normalPath.parent_path() / (normalPath.stem().string() + "_Mat" + std::to_string(sub.index) + ".rmat");
+            if (!std::filesystem::exists(candidate))
+                candidate = normalPath.parent_path() / (sub.name + ".rmat");
+
+            if (std::filesystem::exists(candidate))
+            {
+                m_UUIDToPath[sub.uuid] = candidate;
+                m_PathToUUID[candidate.string()] = sub.uuid;
+                m_PathToUUID[candidate.generic_string()] = sub.uuid;
+            }
         }
         else if (!m_UUIDToPath.contains(sub.uuid))
         {
@@ -530,6 +611,18 @@ bool AssetRegistry::ScanFromVFS()
                     m_UUIDToPath[sub.uuid] = cachePath;
                     m_PathToUUID[cachePath.string()] = sub.uuid;
                     m_PathToUUID[cachePath.generic_string()] = sub.uuid;
+                }
+                else if (sub.type == "Material")
+                {
+                    auto candidate = path.parent_path() / (path.stem().string() + "_" + sub.name + ".rmat");
+                    if (m_PathToUUID.contains(candidate.string()) || m_PathToUUID.contains(candidate.generic_string()))
+                    {
+                        m_UUIDToPath[sub.uuid] = candidate;
+                    }
+                    else if (!m_UUIDToPath.contains(sub.uuid))
+                    {
+                        m_UUIDToPath[sub.uuid] = candidate;
+                    }
                 }
                 else if (!m_UUIDToPath.contains(sub.uuid))
                 {
