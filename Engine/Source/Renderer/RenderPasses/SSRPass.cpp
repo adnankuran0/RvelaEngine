@@ -17,10 +17,11 @@ void SSRPass::Init(const RenderContext& ctx, RenderFrame& frame)
     glGenTextures(1, &o_SsrTexture);
     glBindTexture(GL_TEXTURE_2D, o_SsrTexture);
 
-    int w = (int)(ctx.viewportWidth / 2.0f);
-    int h = (int)(ctx.viewportHeight / 2.0f);
+    m_HalfResolution = ctx.environment ? ctx.environment->SSR_HalfResolution : true;
+    uint32_t w = m_HalfResolution ? std::max(1u, ctx.viewportWidth / 2) : std::max(1u, ctx.viewportWidth);
+    uint32_t h = m_HalfResolution ? std::max(1u, ctx.viewportHeight / 2) : std::max(1u, ctx.viewportHeight);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, w, h, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, (GLsizei)w, (GLsizei)h, 0, GL_RGBA, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -30,16 +31,16 @@ void SSRPass::Init(const RenderContext& ctx, RenderFrame& frame)
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         LOG_WARN("SSR framebuffer not complete!");
 
-    m_CurrentWidth = std::max(1u, ctx.viewportWidth / 2);
-    m_CurrentHeight = std::max(1u, ctx.viewportHeight / 2);
+    m_CurrentWidth = w;
+    m_CurrentHeight = h;
 
     frame.registry.Register("SSRTexture", { RenderResourceType::Texture, o_SsrTexture });
 }
 
 void SSRPass::OnResize(uint32_t width, uint32_t height, RenderFrame& frame)
 {
-    uint32_t w = std::max(1u, width / 2);
-    uint32_t h = std::max(1u, height / 2);
+    uint32_t w = m_HalfResolution ? std::max(1u, width / 2) : std::max(1u, width);
+    uint32_t h = m_HalfResolution ? std::max(1u, height / 2) : std::max(1u, height);
 
     if (w == m_CurrentWidth && h == m_CurrentHeight)
         return;
@@ -50,7 +51,7 @@ void SSRPass::OnResize(uint32_t width, uint32_t height, RenderFrame& frame)
     if (o_SsrTexture != 0)
     {
         glBindTexture(GL_TEXTURE_2D, o_SsrTexture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, w, h, 0, GL_RGBA, GL_FLOAT, NULL);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, (GLsizei)w, (GLsizei)h, 0, GL_RGBA, GL_FLOAT, NULL);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
@@ -66,6 +67,26 @@ SSRPass::~SSRPass()
 void SSRPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
     if (!ctx.environment->SSR) return;
+
+    bool halfRes = ctx.environment->SSR_HalfResolution;
+    if (halfRes != m_HalfResolution)
+    {
+        m_HalfResolution = halfRes;
+    }
+    uint32_t targetWidth = m_HalfResolution ? std::max(1u, ctx.viewportWidth / 2) : std::max(1u, ctx.viewportWidth);
+    uint32_t targetHeight = m_HalfResolution ? std::max(1u, ctx.viewportHeight / 2) : std::max(1u, ctx.viewportHeight);
+
+    if (m_CurrentWidth != targetWidth || m_CurrentHeight != targetHeight)
+    {
+        m_CurrentWidth = targetWidth;
+        m_CurrentHeight = targetHeight;
+        if (o_SsrTexture != 0)
+        {
+            glBindTexture(GL_TEXTURE_2D, o_SsrTexture);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, (GLsizei)targetWidth, (GLsizei)targetHeight, 0, GL_RGBA, GL_FLOAT, NULL);
+            glBindTexture(GL_TEXTURE_2D, 0);
+        }
+    }
 
     auto& env = *ctx.environment;
 
@@ -89,7 +110,7 @@ void SSRPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     Shader& ssrShader = ShaderManager::Get("SSR");
     glDisable(GL_DEPTH_TEST);
     glBindFramebuffer(GL_FRAMEBUFFER, ssrFBO);
-    glViewport(0, 0, ctx.viewportWidth / 2, ctx.viewportHeight / 2);
+    glViewport(0, 0, (GLsizei)targetWidth, (GLsizei)targetHeight);
     glClear(GL_COLOR_BUFFER_BIT);
 
     ssrShader.use();

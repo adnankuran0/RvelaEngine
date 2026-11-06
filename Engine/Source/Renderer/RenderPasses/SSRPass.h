@@ -16,6 +16,7 @@ public:
 private:
     uint32_t m_CurrentWidth = 0;
     uint32_t m_CurrentHeight = 0;
+    bool m_HalfResolution = true;
     GLuint o_SsrTexture = 0;
     GLuint ssrFBO = 0;
 };

@@ -118,9 +118,13 @@ void EnvironmentPanel::Draw(Engine* engine)
     if (ImGui::CollapsingHeader("SSAO"))
     {
         ImGui::Checkbox("Use SSAO", &env.SSAO);
-        ImGui::SliderFloat("Intensity##SSAO", &env.SSAO_Intensity, 0.0f, 10.0f);
-        ImGui::SliderFloat("Radius##SSAO", &env.SSAO_Radius, 0.0f, 10.0f);
-        ImGui::SliderFloat("Bias##SSAO", &env.SSAO_Bias, 0.0f, 0.1f);
+        if (env.SSAO)
+        {
+            ImGui::Checkbox("Half Resolution##SSAO", &env.SSAO_HalfResolution);
+            ImGui::SliderFloat("Intensity##SSAO", &env.SSAO_Intensity, 0.0f, 10.0f);
+            ImGui::SliderFloat("Radius##SSAO", &env.SSAO_Radius, 0.0f, 10.0f);
+            ImGui::SliderFloat("Bias##SSAO", &env.SSAO_Bias, 0.0f, 0.1f);
+        }
     }
 
     if (ImGui::CollapsingHeader("Contact Shadows"))
@@ -128,6 +132,7 @@ void EnvironmentPanel::Draw(Engine* engine)
         ImGui::Checkbox("Use Contact Shadows", &env.ContactShadows);
         if (env.ContactShadows)
         {
+            ImGui::Checkbox("Half Resolution##ContactShadows", &env.ContactShadows_HalfResolution);
             ImGui::SliderFloat("Distance##ContactShadows", &env.ContactShadows_Distance, 0.01f, 2.0f, "%.2f m");
             ImGui::SliderFloat("Thickness##ContactShadows", &env.ContactShadows_Thickness, 0.001f, 0.5f, "%.3f m");
             ImGui::SliderFloat("Bias##ContactShadows", &env.ContactShadows_Bias, 0.0001f, 0.05f, "%.4f");
@@ -141,6 +146,7 @@ void EnvironmentPanel::Draw(Engine* engine)
         ImGui::Checkbox("Use SSR", &env.SSR);
         if (env.SSR)
         {
+            ImGui::Checkbox("Half Resolution##SSR", &env.SSR_HalfResolution);
             ImGui::SliderInt("Max Steps", &env.SSR_MaxSteps, 8, 64);
             ImGui::SliderFloat("Max Distance", &env.SSR_MaxDistance, 1.0f, 60.0f, "%.1f m");
             ImGui::SliderFloat("Thickness", &env.SSR_Thickness, 0.05f, 2.0f, "%.2f m");
@@ -154,6 +160,7 @@ void EnvironmentPanel::Draw(Engine* engine)
         ImGui::Checkbox("Use SSGI", &env.SSGI);
         if (env.SSGI)
         {
+            ImGui::Checkbox("Half Resolution##SSGI", &env.SSGI_HalfResolution);
             ImGui::SliderFloat("Intensity##SSGI", &env.SSGI_Intensity, 0.0f, 3.0f, "%.2f");
             ImGui::SliderFloat("Radius##SSGI", &env.SSGI_Radius, 0.5f, 10.0f, "%.1f m");
             ImGui::SliderInt("Steps##SSGI", &env.SSGI_Steps, 4, 32);

@@ -37,7 +37,7 @@ void LightingPass::Init(const RenderContext& ctx, RenderFrame& frame)
         { FramebufferTextureFormat::RGBA16F }
     };
     screenDesc.hasDepth = true;
-    screenDesc.depthAttachment = { FramebufferTextureFormat::Depth24Stencil8 };
+    screenDesc.depthAttachment = { FramebufferTextureFormat::Depth32F };
 
     m_ScreenFramebuffer = Framebuffer(screenDesc);
 
@@ -95,16 +95,43 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         resourceRegistry.Register("ScreenBuffer", { RenderResourceType::Framebuffer, m_ScreenFramebuffer.GetID() });
     }
 
-    m_ScreenFramebuffer.BindViewport();
+    auto* gbufferRes = resourceRegistry.Get("GBuffer");
+    bool useDepthPrepass = (targetSamples == 1) && !ctx.wireframe && (gbufferRes && gbufferRes->id != 0);
 
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-    glDepthMask(GL_TRUE);
-    glDisable(GL_BLEND);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    if (useDepthPrepass)
+    {
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, gbufferRes->id);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_ScreenFramebuffer.GetID());
+        glBlitFramebuffer(
+            0, 0, ctx.viewportWidth, ctx.viewportHeight,
+            0, 0, ctx.viewportWidth, ctx.viewportHeight,
+            GL_DEPTH_BUFFER_BIT, GL_NEAREST
+        );
+
+        m_ScreenFramebuffer.BindViewport();
+
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LEQUAL);
+        glDepthMask(GL_FALSE);
+        glDisable(GL_BLEND);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
+    else
+    {
+        m_ScreenFramebuffer.BindViewport();
+
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
+        glDepthMask(GL_TRUE);
+        glDisable(GL_BLEND);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    }
 
     constexpr int DIR_SHADOW_MAP_SLOT = 6;
     constexpr int POINT_SHADOW_MAP_SLOT = 7;
@@ -451,7 +478,7 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
                 if (customShaderAsset->renderModes.depthTestDisabled)
                     glEnable(GL_DEPTH_TEST);
                 if (customShaderAsset->renderModes.depthDrawDisabled)
-                    glDepthMask(GL_TRUE);
+                    glDepthMask(useDepthPrepass ? GL_FALSE : GL_TRUE);
                 if (customShaderAsset->renderModes.hasBlendMode)
                     glDisable(GL_BLEND);
                 if (customShaderAsset->renderModes.hasCullMode)
@@ -550,7 +577,7 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
                 if (customShaderAsset->renderModes.depthTestDisabled)
                     glEnable(GL_DEPTH_TEST);
                 if (customShaderAsset->renderModes.depthDrawDisabled)
-                    glDepthMask(GL_TRUE);
+                    glDepthMask(useDepthPrepass ? GL_FALSE : GL_TRUE);
                 if (customShaderAsset->renderModes.hasBlendMode)
                     glDisable(GL_BLEND);
                 if (customShaderAsset->renderModes.hasCullMode)
@@ -560,6 +587,9 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             CleanupMaterialSamplers();
         }
     }
+
+    glDepthMask(GL_TRUE);
+    glDepthFunc(GL_LESS);
 
     if (ctx.wireframe)
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

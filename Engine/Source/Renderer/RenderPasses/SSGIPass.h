@@ -16,6 +16,7 @@ public:
 
 private:
     Framebuffer m_SSGIFBO;
+    bool m_HalfResolution = true;
 };
 
 }

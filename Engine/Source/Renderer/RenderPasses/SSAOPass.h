@@ -14,6 +14,7 @@ public:
 private:
     Framebuffer m_Framebuffer;
     GLuint noiseTexture = 0;
+    bool m_HalfResolution = true;
     void GenerateNoiseTexture();
 };
 }

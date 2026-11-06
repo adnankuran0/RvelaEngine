@@ -10,8 +10,9 @@ using namespace rv;
 
 void ContactShadowPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
-    uint32_t w = std::max(1u, ctx.viewportWidth);
-    uint32_t h = std::max(1u, ctx.viewportHeight);
+    m_HalfResolution = ctx.environment ? ctx.environment->ContactShadows_HalfResolution : true;
+    uint32_t w = m_HalfResolution ? std::max(1u, ctx.viewportWidth / 2) : std::max(1u, ctx.viewportWidth);
+    uint32_t h = m_HalfResolution ? std::max(1u, ctx.viewportHeight / 2) : std::max(1u, ctx.viewportHeight);
 
     FramebufferDesc desc;
     desc.width = w;
@@ -30,8 +31,8 @@ void ContactShadowPass::Init(const RenderContext& ctx, RenderFrame& frame)
 
 void ContactShadowPass::OnResize(uint32_t width, uint32_t height, RenderFrame& frame)
 {
-    uint32_t w = std::max(1u, width);
-    uint32_t h = std::max(1u, height);
+    uint32_t w = m_HalfResolution ? std::max(1u, width / 2) : std::max(1u, width);
+    uint32_t h = m_HalfResolution ? std::max(1u, height / 2) : std::max(1u, height);
 
     if (m_BlurFramebuffer.GetWidth() == w && m_BlurFramebuffer.GetHeight() == h)
         return;
@@ -45,12 +46,22 @@ void ContactShadowPass::OnResize(uint32_t width, uint32_t height, RenderFrame& f
 
 void ContactShadowPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
-    if (m_BlurFramebuffer.GetWidth() != ctx.viewportWidth || m_BlurFramebuffer.GetHeight() != ctx.viewportHeight)
-    {
-        OnResize(ctx.viewportWidth, ctx.viewportHeight, frame);
-    }
-
     auto& env = *ctx.environment;
+    bool halfRes = env.ContactShadows_HalfResolution;
+    if (halfRes != m_HalfResolution)
+    {
+        m_HalfResolution = halfRes;
+    }
+    uint32_t targetWidth = m_HalfResolution ? std::max(1u, ctx.viewportWidth / 2) : std::max(1u, ctx.viewportWidth);
+    uint32_t targetHeight = m_HalfResolution ? std::max(1u, ctx.viewportHeight / 2) : std::max(1u, ctx.viewportHeight);
+
+    if (m_BlurFramebuffer.GetWidth() != targetWidth || m_BlurFramebuffer.GetHeight() != targetHeight)
+    {
+        m_RawFramebuffer.Resize(targetWidth, targetHeight);
+        m_BlurFramebuffer.Resize(targetWidth, targetHeight);
+        frame.registry.Register("ContactShadowTexture", { RenderResourceType::Texture, m_BlurFramebuffer.GetColorAttachment(0) });
+        frame.registry.Register("RawContactShadowTexture", { RenderResourceType::Texture, m_RawFramebuffer.GetColorAttachment(0) });
+    }
     bool enabled = env.ContactShadows && ctx.directionalLight.has_value() && ctx.directionalLight->castShadows && ctx.directionalLight->contactShadows;
 
     if (!enabled)
@@ -112,7 +123,7 @@ void ContactShadowPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     blurShader.setInt("u_ContactShadowTexture", 0);
     blurShader.setInt("gDepth", 1);
     blurShader.setInt("gNormal", 2);
-    blurShader.setVec2("u_TexelSize", glm::vec2(1.0f / static_cast<float>(ctx.viewportWidth), 1.0f / static_cast<float>(ctx.viewportHeight)));
+    blurShader.setVec2("u_TexelSize", glm::vec2(1.0f / static_cast<float>(targetWidth), 1.0f / static_cast<float>(targetHeight)));
 
     Renderer::DrawFullScreenQuad();
 

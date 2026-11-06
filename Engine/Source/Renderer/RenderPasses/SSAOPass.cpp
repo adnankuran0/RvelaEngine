@@ -12,9 +12,13 @@ constexpr int NOISE_SIZE = 16;
 
 void SSAOPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
+    m_HalfResolution = ctx.environment ? ctx.environment->SSAO_HalfResolution : true;
+    uint32_t targetWidth = m_HalfResolution ? std::max(1u, ctx.viewportWidth / 2) : std::max(1u, ctx.viewportWidth);
+    uint32_t targetHeight = m_HalfResolution ? std::max(1u, ctx.viewportHeight / 2) : std::max(1u, ctx.viewportHeight);
+
     FramebufferDesc desc;
-    desc.width = ctx.viewportWidth / 2;
-    desc.height = ctx.viewportHeight / 2;
+    desc.width = targetWidth;
+    desc.height = targetHeight;
     desc.colorAttachments = {
         { FramebufferTextureFormat::R16F, FramebufferFilterMode::Linear }
     };
@@ -29,8 +33,8 @@ void SSAOPass::Init(const RenderContext& ctx, RenderFrame& frame)
 
 void SSAOPass::OnResize(uint32_t width, uint32_t height, RenderFrame& frame)
 {
-    uint32_t targetWidth = std::max(1u, width / 2);
-    uint32_t targetHeight = std::max(1u, height / 2);
+    uint32_t targetWidth = m_HalfResolution ? std::max(1u, width / 2) : std::max(1u, width);
+    uint32_t targetHeight = m_HalfResolution ? std::max(1u, height / 2) : std::max(1u, height);
 
     if (m_Framebuffer.GetWidth() == targetWidth && m_Framebuffer.GetHeight() == targetHeight)
         return;
@@ -47,6 +51,20 @@ SSAOPass::~SSAOPass()
 void SSAOPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
     if (!ctx.environment->SSAO) return;
+
+    bool halfRes = ctx.environment->SSAO_HalfResolution;
+    if (halfRes != m_HalfResolution)
+    {
+        m_HalfResolution = halfRes;
+    }
+    uint32_t targetWidth = m_HalfResolution ? std::max(1u, ctx.viewportWidth / 2) : std::max(1u, ctx.viewportWidth);
+    uint32_t targetHeight = m_HalfResolution ? std::max(1u, ctx.viewportHeight / 2) : std::max(1u, ctx.viewportHeight);
+
+    if (m_Framebuffer.GetWidth() != targetWidth || m_Framebuffer.GetHeight() != targetHeight)
+    {
+        m_Framebuffer.Resize(targetWidth, targetHeight);
+        frame.registry.Register("SSAOTexture", { RenderResourceType::Texture, m_Framebuffer.GetColorAttachment(0) });
+    }
 
     auto i_Normal = frame.registry.Get("NormalTexture")->id;
     auto i_Depth = frame.registry.Get("DepthTexture")->id;

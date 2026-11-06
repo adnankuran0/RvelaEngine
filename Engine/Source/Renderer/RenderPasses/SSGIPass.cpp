@@ -10,9 +10,13 @@ using namespace rv;
 
 void SSGIPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
+    m_HalfResolution = ctx.environment ? ctx.environment->SSGI_HalfResolution : true;
+    uint32_t targetWidth = m_HalfResolution ? std::max(1u, ctx.viewportWidth / 2) : std::max(1u, ctx.viewportWidth);
+    uint32_t targetHeight = m_HalfResolution ? std::max(1u, ctx.viewportHeight / 2) : std::max(1u, ctx.viewportHeight);
+
     FramebufferDesc desc;
-    desc.width = std::max(1u, ctx.viewportWidth / 2);
-    desc.height = std::max(1u, ctx.viewportHeight / 2);
+    desc.width = targetWidth;
+    desc.height = targetHeight;
     desc.colorAttachments = {
         { FramebufferTextureFormat::RGB16F, FramebufferFilterMode::Linear, FramebufferWrapMode::ClampToEdge }
     };
@@ -25,8 +29,8 @@ void SSGIPass::Init(const RenderContext& ctx, RenderFrame& frame)
 
 void SSGIPass::OnResize(uint32_t width, uint32_t height, RenderFrame& frame)
 {
-    uint32_t targetWidth = std::max(1u, width / 2);
-    uint32_t targetHeight = std::max(1u, height / 2);
+    uint32_t targetWidth = m_HalfResolution ? std::max(1u, width / 2) : std::max(1u, width);
+    uint32_t targetHeight = m_HalfResolution ? std::max(1u, height / 2) : std::max(1u, height);
 
     if (m_SSGIFBO.GetWidth() == targetWidth && m_SSGIFBO.GetHeight() == targetHeight)
         return;
@@ -42,6 +46,20 @@ SSGIPass::~SSGIPass()
 void SSGIPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
     if (!ctx.environment->SSGI) return;
+
+    bool halfRes = ctx.environment->SSGI_HalfResolution;
+    if (halfRes != m_HalfResolution)
+    {
+        m_HalfResolution = halfRes;
+    }
+    uint32_t targetWidth = m_HalfResolution ? std::max(1u, ctx.viewportWidth / 2) : std::max(1u, ctx.viewportWidth);
+    uint32_t targetHeight = m_HalfResolution ? std::max(1u, ctx.viewportHeight / 2) : std::max(1u, ctx.viewportHeight);
+
+    if (m_SSGIFBO.GetWidth() != targetWidth || m_SSGIFBO.GetHeight() != targetHeight)
+    {
+        m_SSGIFBO.Resize(targetWidth, targetHeight);
+        frame.registry.Register("SSGITexture", { RenderResourceType::Texture, m_SSGIFBO.GetColorAttachment(0) });
+    }
 
     auto& env = *ctx.environment;
 
@@ -103,7 +121,7 @@ void SSGIPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     blendShader.setInt("u_SSGITexture", 0);
     blendShader.setInt("gDepth", 1);
     blendShader.setInt("gNormal", 2);
-    blendShader.setVec2("u_TexelSize", glm::vec2(1.0f / (ctx.viewportWidth / 2.0f), 1.0f / (ctx.viewportHeight / 2.0f)));
+    blendShader.setVec2("u_TexelSize", glm::vec2(1.0f / static_cast<float>(targetWidth), 1.0f / static_cast<float>(targetHeight)));
 
     Renderer::DrawFullScreenQuad();
 

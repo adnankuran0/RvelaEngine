@@ -18,11 +18,13 @@ json Environment::Serialize()
     j["Lighting_AmbientIntensity"] = Lighting_AmbientIntensity;
 
     j["SSAO"] = SSAO;
+    j["SSAO_HalfResolution"] = SSAO_HalfResolution;
     j["SSAO_Radius"] = SSAO_Radius;
     j["SSAO_Bias"] = SSAO_Bias;
     j["SSAO_Intensity"] = SSAO_Intensity;
 
     j["ContactShadows"] = ContactShadows;
+    j["ContactShadows_HalfResolution"] = ContactShadows_HalfResolution;
     j["ContactShadows_Distance"] = ContactShadows_Distance;
     j["ContactShadows_Thickness"] = ContactShadows_Thickness;
     j["ContactShadows_Bias"] = ContactShadows_Bias;
@@ -30,6 +32,7 @@ json Environment::Serialize()
     j["ContactShadows_Steps"] = ContactShadows_Steps;
 
     j["SSR"] = SSR;
+    j["SSR_HalfResolution"] = SSR_HalfResolution;
     j["SSR_MaxSteps"] = SSR_MaxSteps;
     j["SSR_MaxDistance"] = SSR_MaxDistance;
     j["SSR_Thickness"] = SSR_Thickness;
@@ -37,6 +40,7 @@ json Environment::Serialize()
     j["SSR_MaxRoughness"] = SSR_MaxRoughness;
 
     j["SSGI"] = SSGI;
+    j["SSGI_HalfResolution"] = SSGI_HalfResolution;
     j["SSGI_Intensity"] = SSGI_Intensity;
     j["SSGI_Radius"] = SSGI_Radius;
     j["SSGI_Steps"] = SSGI_Steps;
@@ -98,6 +102,8 @@ void Environment::Deserialize(const json& j)
 
     if (j.contains("SSAO"))
         SSAO = j["SSAO"];
+    if (j.contains("SSAO_HalfResolution"))
+        SSAO_HalfResolution = j["SSAO_HalfResolution"];
 
     if (j.contains("SSAO_Radius"))
         SSAO_Radius = j["SSAO_Radius"];
@@ -110,6 +116,8 @@ void Environment::Deserialize(const json& j)
 
     if (j.contains("ContactShadows"))
         ContactShadows = j["ContactShadows"];
+    if (j.contains("ContactShadows_HalfResolution"))
+        ContactShadows_HalfResolution = j["ContactShadows_HalfResolution"];
     if (j.contains("ContactShadows_Distance"))
         ContactShadows_Distance = j["ContactShadows_Distance"];
     if (j.contains("ContactShadows_Thickness"))
@@ -123,6 +131,8 @@ void Environment::Deserialize(const json& j)
 
     if (j.contains("SSR"))
         SSR = j["SSR"];
+    if (j.contains("SSR_HalfResolution"))
+        SSR_HalfResolution = j["SSR_HalfResolution"];
     if (j.contains("SSR_MaxSteps"))
         SSR_MaxSteps = j["SSR_MaxSteps"];
     if (j.contains("SSR_MaxDistance"))
@@ -136,6 +146,8 @@ void Environment::Deserialize(const json& j)
 
     if (j.contains("SSGI"))
         SSGI = j["SSGI"];
+    if (j.contains("SSGI_HalfResolution"))
+        SSGI_HalfResolution = j["SSGI_HalfResolution"];
     if (j.contains("SSGI_Intensity"))
         SSGI_Intensity = j["SSGI_Intensity"];
     if (j.contains("SSGI_Radius"))

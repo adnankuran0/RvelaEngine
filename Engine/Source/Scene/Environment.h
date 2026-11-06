@@ -13,11 +13,13 @@ public:
 	float Lighting_AmbientIntensity = 0.5f;
 
 	bool SSAO = true;
+	bool SSAO_HalfResolution = true;
 	float SSAO_Radius = 1.0f;
 	float SSAO_Bias = 0.025f;
 	float SSAO_Intensity = 1.0f;
 
 	bool ContactShadows = true;
+	bool ContactShadows_HalfResolution = true;
 	float ContactShadows_Distance = 0.3f;
 	float ContactShadows_Thickness = 0.05f;
 	float ContactShadows_Bias = 0.005f;
@@ -25,6 +27,7 @@ public:
 	int ContactShadows_Steps = 16;
 
 	bool SSR = true;
+	bool SSR_HalfResolution = true;
 	int SSR_MaxSteps = 64;
 	float SSR_MaxDistance = 10.0f;
 	float SSR_Thickness = 0.15f;
@@ -32,6 +35,7 @@ public:
 	float SSR_MaxRoughness = 0.6f;
 
 	bool SSGI = true;
+	bool SSGI_HalfResolution = true;
 	float SSGI_Intensity = 1.0f;
 	float SSGI_Radius = 3.0f;
 	int SSGI_Steps = 16;
@@ -75,11 +79,13 @@ public:
 		Lighting_AmbientIntensity = other.Lighting_AmbientIntensity;
 
 		SSAO = other.SSAO;
+		SSAO_HalfResolution = other.SSAO_HalfResolution;
 		SSAO_Radius = other.SSAO_Radius;
 		SSAO_Bias = other.SSAO_Bias;
 		SSAO_Intensity = other.SSAO_Intensity;
 
 		ContactShadows = other.ContactShadows;
+		ContactShadows_HalfResolution = other.ContactShadows_HalfResolution;
 		ContactShadows_Distance = other.ContactShadows_Distance;
 		ContactShadows_Thickness = other.ContactShadows_Thickness;
 		ContactShadows_Bias = other.ContactShadows_Bias;
@@ -87,6 +93,7 @@ public:
 		ContactShadows_Steps = other.ContactShadows_Steps;
 
 		SSR = other.SSR;
+		SSR_HalfResolution = other.SSR_HalfResolution;
 		SSR_MaxSteps = other.SSR_MaxSteps;
 		SSR_MaxDistance = other.SSR_MaxDistance;
 		SSR_Thickness = other.SSR_Thickness;
@@ -94,6 +101,7 @@ public:
 		SSR_MaxRoughness = other.SSR_MaxRoughness;
 
 		SSGI = other.SSGI;
+		SSGI_HalfResolution = other.SSGI_HalfResolution;
 		SSGI_Intensity = other.SSGI_Intensity;
 		SSGI_Radius = other.SSGI_Radius;
 		SSGI_Steps = other.SSGI_Steps;

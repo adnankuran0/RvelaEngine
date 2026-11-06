@@ -19,6 +19,7 @@ public:
 private:
     Framebuffer m_RawFramebuffer;
     Framebuffer m_BlurFramebuffer;
+    bool m_HalfResolution = true;
 };
 
 }
