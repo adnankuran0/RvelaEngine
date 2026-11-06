@@ -14,7 +14,7 @@ public:
     float radius = 5.0f;
     float falloff = 2.0f;
     bool castShadows = false;
-    bool reverseCullFace = true;
+    bool reverseCullFace = false;
     float shadowBias = 0.1f;
     float blurRadius = 0.03f;
     bool staticShadow = false;

@@ -118,6 +118,10 @@ void EditorLayer::OnAttach()
 
 void EditorLayer::OnDetach()
 {
+    if (!m_CurrentScenePath.empty())
+    {
+        EditorSettings::Get().SaveCameraForScene(m_CurrentScenePath, m_EditorCamera);
+    }
     for (EditorPanel* panel : m_DockPanels)
     {
         EditorSettings::Get().Panels[panel->GetName()] = panel->IsOpen();
@@ -133,8 +137,58 @@ void EditorLayer::OnDetach()
 
 void EditorLayer::OnUpdate()
 {
-    if (m_Engine->GetActiveScene().GetState() == SceneState::EDIT)
+    SceneState currentSceneState = m_Engine->GetActiveScene().GetState();
+    if (m_PrevSceneState == SceneState::EDIT && currentSceneState == SceneState::PLAY)
+    {
+        m_PlayModeSavedCamera.position = m_EditorCamera.Position;
+        m_PlayModeSavedCamera.targetPosition = m_EditorCamera.targetPosition;
+        m_PlayModeSavedCamera.orbitTarget = m_EditorCamera.orbitTarget;
+        m_PlayModeSavedCamera.orbitDistance = m_EditorCamera.orbitDistance;
+        m_PlayModeSavedCamera.yaw = m_EditorCamera.Yaw;
+        m_PlayModeSavedCamera.pitch = m_EditorCamera.Pitch;
+        m_PlayModeSavedCamera.front = m_EditorCamera.Front;
+        m_PlayModeSavedCamera.up = m_EditorCamera.Up;
+        m_PlayModeSavedCamera.right = m_EditorCamera.Right;
+        m_HasPlayModeSavedCamera = true;
+    }
+    else if (m_PrevSceneState != SceneState::EDIT && currentSceneState == SceneState::EDIT)
+    {
+        if (m_HasPlayModeSavedCamera)
+        {
+            m_EditorCamera.Position = m_PlayModeSavedCamera.position;
+            m_EditorCamera.targetPosition = m_PlayModeSavedCamera.targetPosition;
+            m_EditorCamera.orbitTarget = m_PlayModeSavedCamera.orbitTarget;
+            m_EditorCamera.orbitDistance = m_PlayModeSavedCamera.orbitDistance;
+            m_EditorCamera.Yaw = m_PlayModeSavedCamera.yaw;
+            m_EditorCamera.Pitch = m_PlayModeSavedCamera.pitch;
+            m_EditorCamera.Front = m_PlayModeSavedCamera.front;
+            m_EditorCamera.Up = m_PlayModeSavedCamera.up;
+            m_EditorCamera.Right = m_PlayModeSavedCamera.right;
+            m_EditorCamera.ResetMotion();
+            m_EditorCamera.UpdateFrustum();
+            m_HasPlayModeSavedCamera = false;
+        }
+    }
+    m_PrevSceneState = currentSceneState;
+
+    if (currentSceneState == SceneState::EDIT)
+    {
         m_EditorCamera.Update(m_EditorCameraNavigation);
+
+        std::string currentScenePath = m_Engine->GetActiveScene().GetPath();
+        if (currentScenePath != m_CurrentScenePath)
+        {
+            if (!m_CurrentScenePath.empty())
+            {
+                EditorSettings::Get().SaveCameraForScene(m_CurrentScenePath, m_EditorCamera);
+            }
+            m_CurrentScenePath = currentScenePath;
+            if (!m_CurrentScenePath.empty())
+            {
+                EditorSettings::Get().LoadCameraForScene(m_CurrentScenePath, m_EditorCamera);
+            }
+        }
+    }
 
     auto& reg = m_Engine->GetActiveScene().GetRegistry();
     EditorSelection::Get().Validate(reg);

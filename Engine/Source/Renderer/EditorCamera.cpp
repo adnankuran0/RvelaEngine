@@ -15,6 +15,10 @@ EditorCamera::EditorCamera(glm::vec3 position,
     int height)
     : targetPosition(position)
 {
+    Position = position;
+    Up = up;
+    this->width = width;
+    this->height = height;
     UpdateCameraVectors();
     orbitTarget = targetPosition + Front * orbitDistance;
 }
@@ -25,9 +29,13 @@ EditorCamera::EditorCamera(float posX, float posY, float posZ,
     int width, int height)
     : 
     Yaw(yaw),
-    Pitch(pitch),
-    targetPosition(Position)
+    Pitch(pitch)
 {
+    Position = glm::vec3(posX, posY, posZ);
+    targetPosition = Position;
+    Up = glm::vec3(upX, upY, upZ);
+    this->width = width;
+    this->height = height;
     UpdateCameraVectors();
     orbitTarget = targetPosition + Front * orbitDistance;
 }

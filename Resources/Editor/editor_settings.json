@@ -5,10 +5,28 @@
         "mouseSensitivity": 0.07500000298023224,
         "movementSpeed": 6.0,
         "nearClip": 0.10000000149011612,
+        "orbitDistance": 5.0,
+        "orbitTarget": [
+            16.683469772338867,
+            -0.6496367454528809,
+            -9.440760612487793
+        ],
         "orthoSize": 3.5,
+        "pitch": -50.02529525756836,
+        "position": [
+            16.683469772338867,
+            1.3503628969192505,
+            -4.440753936767578
+        ],
         "positionSmoothness": 25.0,
         "projection": 0,
-        "sprintSpeed": 5.0
+        "sprintSpeed": 5.0,
+        "targetPosition": [
+            16.683469772338867,
+            1.3503628969192505,
+            -4.440753936767578
+        ],
+        "yaw": -83.17451477050781
     },
     "panels": {
         "Animator": true,
@@ -19,10 +37,32 @@
         "Import Settings": true,
         "Inspector": true,
         "Material Editor": true,
-        "Profiler": false,
+        "Profiler": true,
         "Project Settings": false,
         "Scene Hierarchy": true,
         "Viewport": true
+    },
+    "sceneCameras": {
+        "C:\\Users\\adnan\\Desktop\\Manifest\\Assets\\Scenes\\Main.rscene": {
+            "orbitDistance": 5.0,
+            "orbitTarget": [
+                16.683469772338867,
+                -0.6496367454528809,
+                -9.440760612487793
+            ],
+            "pitch": -50.02529525756836,
+            "position": [
+                16.683469772338867,
+                1.3503628969192505,
+                -4.440753936767578
+            ],
+            "targetPosition": [
+                16.683469772338867,
+                1.3503628969192505,
+                -4.440753936767578
+            ],
+            "yaw": -83.17451477050781
+        }
     },
     "theme": 2,
     "viewport": {

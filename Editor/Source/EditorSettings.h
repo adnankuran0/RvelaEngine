@@ -20,6 +20,13 @@ struct EditorCameraSettings
     float SprintSpeed = 5.0f;
     float MouseSensitivity = 0.075f;
     float PositionSmoothness = 25.0f;
+
+    glm::vec3 Position{ 0.0f, 2.0f, 5.0f };
+    glm::vec3 TargetPosition{ 0.0f, 2.0f, 5.0f };
+    glm::vec3 OrbitTarget{ 0.0f, 0.0f, 0.0f };
+    float OrbitDistance = 5.0f;
+    float Yaw = -90.0f;
+    float Pitch = 0.0f;
 };
 
 struct ViewportGizmoSettings
@@ -49,10 +56,14 @@ public:
     void ApplyToCamera(EditorCamera& camera) const;
     void UpdateFromCamera(const EditorCamera& camera);
 
+    void SaveCameraForScene(const std::string& scenePath, const EditorCamera& camera);
+    bool LoadCameraForScene(const std::string& scenePath, EditorCamera& camera);
+
     void ApplyToViewport(Viewport& viewport) const;
     void UpdateFromViewport(const Viewport& viewport);
 
     EditorCameraSettings Camera;
+    std::unordered_map<std::string, EditorCameraSettings> SceneCameraSettings;
     ViewportGizmoSettings ViewportSettings;
     int Theme = 0;
     std::unordered_map<std::string, bool> Panels;

@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include <filesystem>
 #include "EditorSelection.h"
+#include "EditorSettings.h"
 #include "Commands/CommandHistory.h"
 #include "Commands/TransformCommand.h"
 #include "Renderer/EditorCamera.h"
@@ -93,6 +94,11 @@ bool EditorUtils::SaveScene(Engine& engine)
     if (!activeScene.GetPath().empty())
     {
         engine.GetSceneManager().SaveScene(activeScene.GetPath());
+        if (auto* cam = engine.GetEditorCamera())
+        {
+            EditorSettings::Get().SaveCameraForScene(activeScene.GetPath(), *cam);
+            EditorSettings::Get().Save();
+        }
         activeScene.SetDirty(false);
         return true;
     }
@@ -136,6 +142,11 @@ bool EditorUtils::SaveSceneAs(Engine& engine)
                 Scene& scene = engine.GetActiveScene();
                 scene.SetName(chosen.stem().string());
                 engine.GetSceneManager().SaveScene(file);
+                if (auto* cam = engine.GetEditorCamera())
+                {
+                    EditorSettings::Get().SaveCameraForScene(file, *cam);
+                    EditorSettings::Get().Save();
+                }
                 scene.SetDirty(false);
             }
         },

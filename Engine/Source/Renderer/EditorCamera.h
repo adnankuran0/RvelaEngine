@@ -31,11 +31,11 @@ public:
     void Focus(const glm::vec3& focusPoint, float distance = 5.0f);
     void SetOrbitTarget(const glm::vec3& focusPoint);
     void SetDirection(const glm::vec3& direction, const glm::vec3* focusPoint = nullptr);
+    void UpdateCameraVectors();
 
 private:
     void ProcessKeyboard();
     void ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch = true);
-    void UpdateCameraVectors();
 
 public:
     float Yaw{ -90.0f };

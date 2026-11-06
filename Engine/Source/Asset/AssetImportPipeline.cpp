@@ -222,6 +222,26 @@ bool AssetImportPipeline::NeedsReimport(const std::filesystem::path& sourcePath,
             return true;
     }
 
+    if (importer->GetImporterID() == "ModelImporter")
+    {
+        auto prefabPath = sourcePath;
+        prefabPath.replace_extension(".rprefab");
+        try
+        {
+            auto j = nlohmann::json::parse(meta.importerSettingsJson);
+            if (j.value("generatePrefab", true))
+            {
+                if (!std::filesystem::exists(prefabPath))
+                    return true;
+            }
+        }
+        catch (...)
+        {
+            if (!std::filesystem::exists(prefabPath))
+                return true;
+        }
+    }
+
     return false;
 }
 

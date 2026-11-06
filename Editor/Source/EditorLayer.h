@@ -21,6 +21,7 @@
 #include "GUI/Panels/MaterialEditorPanel.h"
 #include "GUI/Panels/ProfilerPanel.h"
 #include <Renderer/RenderPipeline.h>
+#include "Scene/Scene.h"
 
 namespace rv {
 
@@ -86,6 +87,24 @@ private:
     int  m_SavedX = 100, m_SavedY = 100;
     int  m_SavedW = 1600, m_SavedH = 900;
     std::string m_LastWindowTitle;
+
+    SceneState m_PrevSceneState = SceneState::EDIT;
+    std::string m_CurrentScenePath;
+
+    struct SavedPlayCameraState
+    {
+        glm::vec3 position{ 0.0f, 2.0f, 5.0f };
+        glm::vec3 targetPosition{ 0.0f, 2.0f, 5.0f };
+        glm::vec3 orbitTarget{ 0.0f, 0.0f, 0.0f };
+        float orbitDistance{ 5.0f };
+        float yaw{ -90.0f };
+        float pitch{ 0.0f };
+        glm::vec3 front{ 0.0f, 0.0f, -1.0f };
+        glm::vec3 up{ 0.0f, 1.0f, 0.0f };
+        glm::vec3 right{ 1.0f, 0.0f, 0.0f };
+    };
+    SavedPlayCameraState m_PlayModeSavedCamera;
+    bool m_HasPlayModeSavedCamera = false;
 };
 
 }

@@ -31,6 +31,8 @@
 #include "Scene/Components/UIComponents.h"
 #include "Scene/Components/ColliderComponents.h"
 #include "Scene/Components/RigidbodyComponent.h"
+#include "Scene/Components/MeshComponent.h"
+#include "Math/RvelaMath.h"
 #include "Physics/PhysicsSystem.h"
 #include "Physics/PhysicsWorld.h"
 #include "Style.h"
@@ -1661,47 +1663,13 @@ void Viewport::Draw(Engine* engine, bool orbitDragActive)
                     AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
                     if (uuid.IsValid())
                     {
-                        glm::vec3 spawnPos(0.0f);
-                        if (auto* cam = engine->GetEditorCamera())
-                        {
-                            spawnPos = cam->Position + cam->Front * 5.0f;
-                            ImVec2 mousePos = ImGui::GetIO().MousePos;
-                            if (displaySize.x > 0.0f && displaySize.y > 0.0f)
-                            {
-                                float mouseX = mousePos.x - displayPos.x;
-                                float mouseY = mousePos.y - displayPos.y;
-                                if (mouseX >= 0.0f && mouseX <= displaySize.x && mouseY >= 0.0f && mouseY <= displaySize.y)
-                                {
-                                    float ndcX = (2.0f * mouseX) / displaySize.x - 1.0f;
-                                    float ndcY = 1.0f - (2.0f * mouseY) / displaySize.y;
-                                    glm::mat4 invVP = glm::inverse(cam->GetProjectionMatrix() * cam->GetViewMatrix());
-                                    glm::vec4 nearPoint = invVP * glm::vec4(ndcX, ndcY, -1.0f, 1.0f);
-                                    glm::vec4 farPoint = invVP * glm::vec4(ndcX, ndcY, 1.0f, 1.0f);
-                                    if (nearPoint.w != 0.0f && farPoint.w != 0.0f)
-                                    {
-                                        glm::vec3 rayOrigin = glm::vec3(nearPoint) / nearPoint.w;
-                                        glm::vec3 rayEnd = glm::vec3(farPoint) / farPoint.w;
-                                        glm::vec3 rayDir = glm::normalize(rayEnd - rayOrigin);
-                                        if (std::abs(rayDir.y) > 0.001f)
-                                        {
-                                            float t = -rayOrigin.y / rayDir.y;
-                                            if (t > 0.0f && t < 100.0f)
-                                                spawnPos = rayOrigin + rayDir * t;
-                                            else
-                                                spawnPos = rayOrigin + rayDir * 5.0f;
-                                        }
-                                        else
-                                        {
-                                            spawnPos = rayOrigin + rayDir * 5.0f;
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        glm::vec3 spawnPos = CalculateSpawnPosition(engine, ImGui::GetIO().MousePos, displayPos, displaySize);
                         Entity inst = engine->GetActiveScene().Instantiate(uuid, spawnPos);
                         if (inst.GetHandle() != entt::null)
                         {
+                            CommandHistory::Get().Execute(std::make_unique<CreateEntityCommand>(&engine->GetActiveScene(), inst.GetHandle()));
                             EditorSelection::Get().Select(inst.GetHandle());
+                            engine->GetActiveScene().SetDirty(true);
                         }
                     }
                     else
@@ -1777,10 +1745,8 @@ glm::vec3 Viewport::CalculateSpawnPosition(Engine* engine, const ImVec2& mousePo
     if (displaySize.x <= 0.0f || displaySize.y <= 0.0f)
         return spawnPos;
 
-    float mouseX = mousePos.x - displayPos.x;
-    float mouseY = mousePos.y - displayPos.y;
-    if (mouseX < 0.0f || mouseX > displaySize.x || mouseY < 0.0f || mouseY > displaySize.y)
-        return spawnPos;
+    float mouseX = std::clamp(mousePos.x - displayPos.x, 0.0f, displaySize.x);
+    float mouseY = std::clamp(mousePos.y - displayPos.y, 0.0f, displaySize.y);
 
     float ndcX = (2.0f * mouseX) / displaySize.x - 1.0f;
     float ndcY = 1.0f - (2.0f * mouseY) / displaySize.y;
@@ -1819,7 +1785,54 @@ glm::vec3 Viewport::CalculateSpawnPosition(Engine* engine, const ImVec2& mousePo
         entt::entity pickedEntity = static_cast<entt::entity>(pickedID);
         if (scene.GetRegistry().valid(pickedEntity) && scene.HasComponent<TransformComponent>(pickedEntity))
         {
-            glm::vec3 entityPos = scene.GetComponent<TransformComponent>(pickedEntity).GetWorldPosition();
+            const auto& tc = scene.GetComponent<TransformComponent>(pickedEntity);
+            glm::mat4 worldMat = tc.GetWorldMatrix();
+
+            if (scene.HasComponent<MeshComponent>(pickedEntity))
+            {
+                auto& mc = scene.GetComponent<MeshComponent>(pickedEntity);
+                auto mesh = mc.GetMesh();
+                if (mesh && mesh->IsValid())
+                {
+                    glm::mat4 invWorld = glm::inverse(worldMat);
+                    glm::vec3 localRayOrigin = glm::vec3(invWorld * glm::vec4(rayOrigin, 1.0f));
+                    glm::vec3 localRayDir = glm::normalize(glm::vec3(invWorld * glm::vec4(rayDir, 0.0f)));
+
+                    auto verts = mesh->GetVertices();
+                    auto indices = mesh->GetIndices();
+                    float closestT = std::numeric_limits<float>::max();
+                    glm::vec3 localHitNormal(0.0f, 1.0f, 0.0f);
+                    bool hitAny = false;
+
+                    for (size_t i = 0; i + 2 < indices.size(); i += 3)
+                    {
+                        const auto& v0 = verts[indices[i]].position;
+                        const auto& v1 = verts[indices[i + 1]].position;
+                        const auto& v2 = verts[indices[i + 2]].position;
+                        float t = 0.0f;
+                        if (rv::math::RayIntersectsTriangle(localRayOrigin, localRayDir, v0, v1, v2, t))
+                        {
+                            if (t > 0.0f && t < closestT)
+                            {
+                                closestT = t;
+                                hitAny = true;
+                                localHitNormal = glm::normalize(glm::cross(v1 - v0, v2 - v0));
+                            }
+                        }
+                    }
+
+                    if (hitAny)
+                    {
+                        glm::vec3 localHitPos = localRayOrigin + localRayDir * closestT;
+                        glm::vec3 worldHitPos = glm::vec3(worldMat * glm::vec4(localHitPos, 1.0f));
+                        glm::vec3 worldNormal = glm::normalize(glm::mat3(glm::transpose(invWorld)) * localHitNormal);
+                        m_ContextSpawnNormal = worldNormal;
+                        return worldHitPos;
+                    }
+                }
+            }
+
+            glm::vec3 entityPos = tc.GetWorldPosition();
             glm::vec3 planeNormal = -cam->Front;
             float denom = glm::dot(rayDir, planeNormal);
             if (std::abs(denom) > 1e-4f)
