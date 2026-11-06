@@ -2,6 +2,7 @@
 #include "Asset/AssetUUID.h"
 #include "Asset/Types/TextureAsset.h"
 #include "Asset/AssetManager.h"
+#include "Renderer/AABB.h"
 #include "glm/glm.hpp"
 #include "json.hpp"
 
@@ -26,6 +27,9 @@ struct DecalComponent
     bool distanceFade = false;
     float fadeStart = 40.0f;
     float fadeEnd = 50.0f;
+
+    AABB localAABB = AABB(glm::vec3(-0.5f), glm::vec3(0.5f));
+    AABB worldAABB;
 
     Ref<TextureAsset> GetTexture() const
     {

@@ -2,6 +2,7 @@
 #include "TransformSystem.h"
 #include "Scene/Scene.h"
 #include "Scene/Components/SkeletalMeshComponent.h"
+#include "Scene/Components/DecalComponent.h"
 
 using namespace rv;
 
@@ -83,6 +84,11 @@ void TransformSystem::UpdateNodeRecursive(entt::entity e, const glm::mat4& paren
     if (isDirty && m_Scene.HasComponent<MeshRendererComponent>(e)) {
         auto& meshRenderer = m_Scene.GetComponent<MeshRendererComponent>(e);
         meshRenderer.worldAABB = meshRenderer.localAABB.CalculateWorldAABB(worldMatrix);
+    }
+
+    if (isDirty && m_Scene.HasComponent<DecalComponent>(e)) {
+        auto& decal = m_Scene.GetComponent<DecalComponent>(e);
+        decal.worldAABB = decal.localAABB.CalculateWorldAABB(worldMatrix);
     }
 
     if (m_Scene.HasComponent<SkeletalMeshRendererComponent>(e)) {

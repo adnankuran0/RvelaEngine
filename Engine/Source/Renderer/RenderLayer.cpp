@@ -315,13 +315,22 @@ void RenderLayer::CollectRenderCommands(Scene* scene)
 			continue;
 
 		const auto& transform = scene->GetComponent<TransformComponent>(entity);
-		const auto& decal = scene->GetComponent<DecalComponent>(entity);
+		auto& decal = scene->GetComponent<DecalComponent>(entity);
+
+		if (!decal.worldAABB.IsValid())
+		{
+			decal.worldAABB = decal.localAABB.CalculateWorldAABB(transform.GetWorldMatrix());
+		}
+
+		if (camera && !camera->Intersects(decal.worldAABB))
+			continue;
 
 		DecalRenderCommand cmd;
 		cmd.entityID = entity;
 		cmd.transform = &transform;
 		cmd.decal = &decal;
 		cmd.distanceToCamera = glm::length2(camPos - transform.GetWorldPosition());
+		cmd.worldAABB = decal.worldAABB;
 
 		m_RenderPipeline->m_RenderFrame.decalCommands.push_back(cmd);
 	}

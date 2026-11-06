@@ -15,6 +15,7 @@ struct DecalRenderCommand
     const TransformComponent* transform = nullptr;
     const DecalComponent* decal = nullptr;
     float distanceToCamera = 0.0f;
+    AABB worldAABB;
 };
 
 struct ParticleRenderCommand {

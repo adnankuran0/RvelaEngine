@@ -34,6 +34,7 @@ public:
     glm::mat4 CalculateBillboardTransform(const glm::vec3& worldPos, const glm::vec3& camPos, const glm::mat4& viewMat);
 
 private:
+    void DrawSelectionAABB(const RenderContext& ctx, RenderFrame& frame);
     void DrawCameraFrustum(const RenderContext& ctx, RenderFrame& frame);
     void DrawDirectionalLightArrow(const RenderContext& ctx, RenderFrame& frame);
     void DrawSpotLightCone(const RenderContext& ctx, RenderFrame& frame);

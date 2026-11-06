@@ -9,6 +9,7 @@
 #include "Renderer/ShaderManager.h"
 #include "Render/IconLibrary.h"
 #include "EditorSelection.h"
+#include <unordered_set>
 
 using namespace rv;
 
@@ -44,6 +45,8 @@ void GizmoPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
     if (ctx.scene->GetState() != SceneState::EDIT)
         return;
+
+    DrawSelectionAABB(ctx, frame);
 
     if (!s_Enabled)
         return;
@@ -496,6 +499,182 @@ void GizmoPass::DrawDecalGizmo(const RenderContext& ctx, RenderFrame& frame)
 
     glm::mat4 editorViewProj = ctx.camera->GetProjectionMatrix() * ctx.camera->GetViewMatrix();
     DebugRenderer::Get().EndFrame(editorViewProj);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void GizmoPass::DrawSelectionAABB(const RenderContext& ctx, RenderFrame& frame)
+{
+    const auto& selected = EditorSelection::Get().GetSelectedEntities();
+    if (selected.empty() || !ctx.camera || !ctx.scene)
+        return;
+
+    auto* finalFboRes = frame.registry.Get("FinalFramebuffer");
+    auto* depthTexRes = frame.registry.Get("DepthTexture");
+    if (!finalFboRes || !depthTexRes)
+        return;
+
+    auto& reg = ctx.scene->GetRegistry();
+
+    bool isMultiSelection = (selected.size() > 1);
+    bool isCompoundSelection = false;
+
+    if (selected.size() == 1)
+    {
+        entt::entity single = selected[0];
+        if (reg.valid(single))
+        {
+            if (reg.all_of<SceneTreeComponent>(single))
+            {
+                const auto& stc = reg.get<SceneTreeComponent>(single);
+                if (!stc.children.empty())
+                {
+                    isCompoundSelection = true;
+                }
+            }
+            if (reg.all_of<PrefabComponent>(single))
+            {
+                isCompoundSelection = true;
+            }
+        }
+    }
+
+    if (!isMultiSelection && !isCompoundSelection)
+        return;
+
+    AABB collectiveAABB;
+    std::unordered_set<entt::entity> visited;
+    int boundsFound = 0;
+
+    auto CollectBoundsRecursive = [&](auto self, entt::entity e) -> void {
+        if (e == entt::null || !reg.valid(e))
+            return;
+        if (!visited.insert(e).second)
+            return;
+
+        if (reg.all_of<MeshRendererComponent>(e))
+        {
+            const auto& mr = reg.get<MeshRendererComponent>(e);
+            AABB aabb = mr.worldAABB;
+            if (!aabb.IsValid() && mr.localAABB.IsValid() && reg.all_of<TransformComponent>(e))
+            {
+                aabb = mr.localAABB.CalculateWorldAABB(reg.get<TransformComponent>(e).GetWorldMatrix());
+            }
+
+            if (aabb.IsValid())
+            {
+                collectiveAABB.Expand(aabb.min);
+                collectiveAABB.Expand(aabb.max);
+                boundsFound++;
+            }
+        }
+
+        if (reg.all_of<SkeletalMeshRendererComponent>(e))
+        {
+            const auto& smr = reg.get<SkeletalMeshRendererComponent>(e);
+            AABB aabb = smr.worldAABB;
+            if (!aabb.IsValid() && smr.localAABB.IsValid() && reg.all_of<TransformComponent>(e))
+            {
+                aabb = smr.localAABB.CalculateWorldAABB(reg.get<TransformComponent>(e).GetWorldMatrix());
+            }
+
+            if (aabb.IsValid())
+            {
+                collectiveAABB.Expand(aabb.min);
+                collectiveAABB.Expand(aabb.max);
+                boundsFound++;
+            }
+        }
+
+        if (reg.all_of<DecalComponent>(e))
+        {
+            const auto& dec = reg.get<DecalComponent>(e);
+            AABB aabb = dec.worldAABB;
+            if (!aabb.IsValid() && dec.localAABB.IsValid() && reg.all_of<TransformComponent>(e))
+            {
+                aabb = dec.localAABB.CalculateWorldAABB(reg.get<TransformComponent>(e).GetWorldMatrix());
+            }
+
+            if (aabb.IsValid())
+            {
+                collectiveAABB.Expand(aabb.min);
+                collectiveAABB.Expand(aabb.max);
+                boundsFound++;
+            }
+        }
+
+        if (reg.all_of<SceneTreeComponent>(e))
+        {
+            const auto& stc = reg.get<SceneTreeComponent>(e);
+            for (auto child : stc.children)
+            {
+                self(self, child);
+            }
+        }
+    };
+
+    for (auto e : selected)
+    {
+        CollectBoundsRecursive(CollectBoundsRecursive, e);
+    }
+
+    if (boundsFound == 0)
+    {
+        for (auto e : selected)
+        {
+            if (reg.valid(e) && reg.all_of<TransformComponent>(e))
+            {
+                glm::vec3 pos = reg.get<TransformComponent>(e).GetWorldPosition();
+                collectiveAABB.Expand(pos - glm::vec3(0.3f));
+                collectiveAABB.Expand(pos + glm::vec3(0.3f));
+                boundsFound++;
+            }
+        }
+    }
+
+    if (!collectiveAABB.IsValid())
+        return;
+
+    if (selected.size() == 1 && boundsFound <= 1)
+        return;
+
+    glm::vec3 bMin = collectiveAABB.min;
+    glm::vec3 bMax = collectiveAABB.max;
+
+    constexpr float minSize = 0.05f;
+    if (bMax.x - bMin.x < minSize) { bMin.x -= minSize * 0.5f; bMax.x += minSize * 0.5f; }
+    if (bMax.y - bMin.y < minSize) { bMin.y -= minSize * 0.5f; bMax.y += minSize * 0.5f; }
+    if (bMax.z - bMin.z < minSize) { bMin.z -= minSize * 0.5f; bMax.z += minSize * 0.5f; }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, finalFboRes->id);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexRes->id, 0);
+    glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
+
+    auto DrawAABBLines = [&](const glm::vec4& edgeColor) {
+        DebugRenderer::Get().DrawBox(bMin, bMax, edgeColor);
+    };
+
+    glm::mat4 editorViewProj = ctx.camera->GetProjectionMatrix() * ctx.camera->GetViewMatrix();
+
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    DebugRenderer::Get().BeginFrame();
+    DrawAABBLines(glm::vec4(1.0f, 0.65f, 0.10f, 0.22f));
+    DebugRenderer::Get().EndFrame(editorViewProj);
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+    glDepthMask(GL_FALSE);
+
+    DebugRenderer::Get().BeginFrame();
+    DrawAABBLines(glm::vec4(1.0f, 0.68f, 0.12f, 0.95f));
+    DebugRenderer::Get().EndFrame(editorViewProj);
+
+    glDepthMask(GL_TRUE);
+    glDisable(GL_BLEND);
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

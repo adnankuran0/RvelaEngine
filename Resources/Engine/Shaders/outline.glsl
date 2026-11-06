@@ -16,20 +16,33 @@ uniform sampler2D u_MaskTex;
 
 void main() {
     ivec2 coord = ivec2(gl_FragCoord.xy);
-    float center = texelFetch(u_MaskTex, coord, 0).r;
+    vec2 center = texelFetch(u_MaskTex, coord, 0).rg;
     
-    if (center > 0.5) discard;
+    if (center.g > 0.5 || center.r > 0.5) discard;
     
-    ivec2 offsets[4] = ivec2[](
-        ivec2(2, 0), ivec2(-2, 0), ivec2(0, 2), ivec2(0, -2)
+    ivec2 offsets[8] = ivec2[](
+        ivec2(2, 0), ivec2(-2, 0), ivec2(0, 2), ivec2(0, -2),
+        ivec2(1, 1), ivec2(-1, 1), ivec2(1, -1), ivec2(-1, -1)
     );
     
-    for (int i = 0; i < 4; i++) {
-        if (texelFetch(u_MaskTex, coord + offsets[i], 0).r > 0.5) {
-            FragColor = vec4(1.0, 0.7, 0.1, 1.0);
-            return;
+    bool isVisible = false;
+    bool isOccluded = false;
+
+    for (int i = 0; i < 8; i++) {
+        vec2 val = texelFetch(u_MaskTex, coord + offsets[i], 0).rg;
+        if (val.r > 0.5) {
+            isVisible = true;
+            break;
+        } else if (val.g > 0.5) {
+            isOccluded = true;
         }
     }
-    
-    discard;
+
+    if (isVisible) {
+        FragColor = vec4(1.0, 0.7, 0.1, 1.0);
+    } else if (isOccluded) {
+        FragColor = vec4(1.0, 0.7, 0.1, 0.32);
+    } else {
+        discard;
+    }
 }

@@ -268,6 +268,9 @@ void RenderPipeline::Execute(const RenderContext& ctx)
 	}
 	for (const auto& cmd : m_RenderFrame.decalCommands)
 	{
+		if (ctx.camera && cmd.worldAABB.IsValid() && !ctx.camera->Intersects(cmd.worldAABB))
+			continue;
+
 		m_Stats.drawCalls++;
 		m_Stats.decalCount++;
 		m_Stats.triangles += 12;

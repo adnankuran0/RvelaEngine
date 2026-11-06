@@ -7,6 +7,7 @@
 #include "Scene/Scene.h"
 #include "Renderer/ShaderManager.h"
 #include "Renderer/TextureCache.h"
+#include <unordered_set>
 
 using namespace rv;
 
@@ -16,8 +17,8 @@ void SelectedEntityMaskPass::Init(const RenderContext& ctx, RenderFrame& frame) 
 
     glGenTextures(1, &o_MaskTexture);
     glBindTexture(GL_TEXTURE_2D, o_MaskTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, ctx.viewportWidth, ctx.viewportHeight,
-        0, GL_RED, GL_UNSIGNED_BYTE, nullptr);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RG8, ctx.viewportWidth, ctx.viewportHeight,
+        0, GL_RG, GL_UNSIGNED_BYTE, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, o_MaskTexture, 0);
@@ -47,8 +48,8 @@ void SelectedEntityMaskPass::OnResize(uint32_t width, uint32_t height, RenderFra
 
     if (o_MaskTexture != 0) {
         glBindTexture(GL_TEXTURE_2D, o_MaskTexture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, width, height,
-            0, GL_RED, GL_UNSIGNED_BYTE, nullptr);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RG8, width, height,
+            0, GL_RG, GL_UNSIGNED_BYTE, nullptr);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
@@ -57,13 +58,8 @@ void SelectedEntityMaskPass::OnResize(uint32_t width, uint32_t height, RenderFra
 }
 
 void SelectedEntityMaskPass::Execute(const RenderContext& ctx, RenderFrame& frame) {
-    if (m_SelectedEntities.empty() || ctx.scene->GetState() != SceneState::EDIT)
+    if (ctx.scene->GetState() != SceneState::EDIT)
         return;
-
-    auto& opaqueCommands = frame.opaqueCommands;
-    auto& transparentCommands = frame.transparentCommands;
-    auto& skeletalOpaqueCommands = frame.skeletalOpaqueCommands;
-    auto& skeletalTransparentCommands = frame.skeletalTransparentCommands;
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_Framebuffer);
     glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
@@ -71,7 +67,16 @@ void SelectedEntityMaskPass::Execute(const RenderContext& ctx, RenderFrame& fram
     GLfloat clearColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
     glClearBufferfv(GL_COLOR, 0, clearColor);
 
-    glDisable(GL_DEPTH_TEST);
+    if (m_SelectedEntities.empty()) {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        return;
+    }
+
+    auto& opaqueCommands = frame.opaqueCommands;
+    auto& transparentCommands = frame.transparentCommands;
+    auto& skeletalOpaqueCommands = frame.skeletalOpaqueCommands;
+    auto& skeletalTransparentCommands = frame.skeletalTransparentCommands;
+
     glDepthMask(GL_FALSE);
 
     auto ApplyCullMode = [](CullMode mode) {
@@ -82,7 +87,7 @@ void SelectedEntityMaskPass::Execute(const RenderContext& ctx, RenderFrame& fram
             glEnable(GL_CULL_FACE);
             glCullFace(mode == CullMode::Back ? GL_BACK : GL_FRONT);
         }
-        };
+    };
 
     auto BindMaterial = [](Shader& shader, MaterialComponent* material) {
         shader.setInt("transparencyMode", static_cast<int>(material->GetTransparencyMode()));
@@ -103,84 +108,148 @@ void SelectedEntityMaskPass::Execute(const RenderContext& ctx, RenderFrame& fram
             glBindTextureUnit(0, 0);
         }
         return useAlb;
-        };
+    };
 
-    {
-        Shader& shader = ShaderManager::Get("Mask");
-        shader.use();
-        shader.setVec4("u_Color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-
-        auto RenderMaskList = [&](const auto& commands) {
-            for (auto& command : commands) {
-                if (std::find(m_SelectedEntities.begin(), m_SelectedEntities.end(), command.entityID) == m_SelectedEntities.end())
-                    continue;
-
-                auto& material = command.material;
-                ApplyCullMode(material->GetCullMode());
-
-                glm::mat4 model = command.transform->GetWorldMatrix();
-                shader.setMat4("model", model);
-                shader.setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
-
-                bool useAlb = BindMaterial(shader, material);
-
-                command.mesh->Bind();
-                glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
-
-                if (useAlb) glBindSampler(0, 0);
+    std::unordered_set<entt::entity> allSelected;
+    auto CollectEntitiesRecursive = [&](auto self, entt::entity e) -> void {
+        if (e == entt::null || !ctx.scene->GetRegistry().valid(e)) return;
+        if (!allSelected.insert(e).second) return;
+        if (ctx.scene->HasComponent<SceneTreeComponent>(e)) {
+            const auto& stc = ctx.scene->GetComponent<SceneTreeComponent>(e);
+            for (auto child : stc.children) {
+                self(self, child);
             }
-            };
-
-        RenderMaskList(opaqueCommands);
-        RenderMaskList(transparentCommands);
+        }
+    };
+    for (auto e : m_SelectedEntities) {
+        CollectEntitiesRecursive(CollectEntitiesRecursive, e);
     }
 
-    if (!skeletalOpaqueCommands.empty() || !skeletalTransparentCommands.empty())
-    {
-        Shader& skeletalShader = ShaderManager::Get("Mask_Skeletal");
-        skeletalShader.use();
-        skeletalShader.setVec4("u_Color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    // If multiple meshes are selected show only the collective AABB
+    int totalMeshes = 0;
+    auto& reg = ctx.scene->GetRegistry();
+    for (auto e : allSelected) {
+        if (reg.all_of<MeshRendererComponent>(e) || reg.all_of<SkeletalMeshRendererComponent>(e)) {
+            totalMeshes++;
+        }
+    }
 
-        GLint boneLoc = glGetUniformLocation(skeletalShader.ID, "u_BoneMatrices");
+    if (totalMeshes > 1 || m_SelectedEntities.size() > 1) {
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glEnable(GL_DEPTH_TEST);
+        glDepthMask(GL_TRUE);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        return;
+    }
 
-        auto RenderSkeletalMaskList = [&](const auto& commands) {
-            for (auto& command : commands) {
-                if (std::find(m_SelectedEntities.begin(), m_SelectedEntities.end(), command.entityID) == m_SelectedEntities.end())
-                    continue;
-                if (!command.mesh || command.mesh->indexCount == 0) continue;
+    auto RenderSelectedMeshes = [&]() {
+        {
+            Shader& shader = ShaderManager::Get("Mask");
+            shader.use();
+            shader.setVec4("u_Color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
-                auto& material = command.material;
-                ApplyCullMode(material->GetCullMode());
+            auto RenderMaskList = [&](const auto& commands) {
+                for (auto& command : commands) {
+                    if (allSelected.find(command.entityID) == allSelected.end())
+                        continue;
 
-                glm::mat4 model = command.transform->GetWorldMatrix();
-                skeletalShader.setMat4("model", model);
+                    auto& material = command.material;
+                    ApplyCullMode(material->GetCullMode());
 
-                if (boneLoc != -1 && command.skeleton && !command.skeleton->skinningPalette.empty())
-                {
-                    glUniformMatrix4fv(
-                        boneLoc,
-                        static_cast<GLsizei>(command.skeleton->skinningPalette.size()),
-                        GL_FALSE,
-                        glm::value_ptr(command.skeleton->skinningPalette[0])
-                    );
+                    glm::mat4 model = command.transform->GetWorldMatrix();
+                    shader.setMat4("model", model);
+                    shader.setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
+
+                    bool useAlb = BindMaterial(shader, material);
+
+                    command.mesh->Bind();
+                    glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+
+                    if (useAlb) glBindSampler(0, 0);
                 }
-
-                bool useAlb = BindMaterial(skeletalShader, material);
-
-                command.mesh->Bind();
-                glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
-
-                if (useAlb) glBindSampler(0, 0);
-            }
             };
 
-        RenderSkeletalMaskList(skeletalOpaqueCommands);
-        RenderSkeletalMaskList(skeletalTransparentCommands);
+            RenderMaskList(opaqueCommands);
+            RenderMaskList(transparentCommands);
+        }
+
+        if (!skeletalOpaqueCommands.empty() || !skeletalTransparentCommands.empty())
+        {
+            Shader& skeletalShader = ShaderManager::Get("Mask_Skeletal");
+            skeletalShader.use();
+            skeletalShader.setVec4("u_Color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+
+            GLint boneLoc = glGetUniformLocation(skeletalShader.ID, "u_BoneMatrices");
+
+            auto RenderSkeletalMaskList = [&](const auto& commands) {
+                for (auto& command : commands) {
+                    if (allSelected.find(command.entityID) == allSelected.end())
+                        continue;
+                    if (!command.mesh || command.mesh->indexCount == 0) continue;
+
+                    auto& material = command.material;
+                    ApplyCullMode(material->GetCullMode());
+
+                    glm::mat4 model = command.transform->GetWorldMatrix();
+                    skeletalShader.setMat4("model", model);
+
+                    if (boneLoc != -1 && command.skeleton && !command.skeleton->skinningPalette.empty())
+                    {
+                        glUniformMatrix4fv(
+                            boneLoc,
+                            static_cast<GLsizei>(command.skeleton->skinningPalette.size()),
+                            GL_FALSE,
+                            glm::value_ptr(command.skeleton->skinningPalette[0])
+                        );
+                    }
+
+                    bool useAlb = BindMaterial(skeletalShader, material);
+
+                    command.mesh->Bind();
+                    glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+
+                    if (useAlb) glBindSampler(0, 0);
+                }
+            };
+
+            RenderSkeletalMaskList(skeletalOpaqueCommands);
+            RenderSkeletalMaskList(skeletalTransparentCommands);
+        }
+    };
+
+    auto* depthTexRes = frame.registry.Get("DepthTexture");
+    if (depthTexRes)
+    {
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexRes->id, 0);
+    }
+
+    if (depthTexRes)
+    {
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LEQUAL);
+        glDepthMask(GL_FALSE);
+    }
+    else
+    {
+        glDisable(GL_DEPTH_TEST);
+    }
+    glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_FALSE);
+    RenderSelectedMeshes();
+
+    glDisable(GL_DEPTH_TEST);
+    glColorMask(GL_FALSE, GL_TRUE, GL_FALSE, GL_FALSE);
+    RenderSelectedMeshes();
+
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    if (depthTexRes)
+    {
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0);
     }
 
     if (ctx.scene)
     {
-        for (auto entity : m_SelectedEntities)
+        for (auto entity : allSelected)
         {
             if (entity != entt::null && ctx.scene->HasComponent<RectTransformComponent>(entity))
             {

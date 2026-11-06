@@ -158,6 +158,9 @@ void DecalPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     for (const auto& cmd : frame.decalCommands)
     {
+        if (ctx.camera && cmd.worldAABB.IsValid() && !ctx.camera->Intersects(cmd.worldAABB))
+            continue;
+
         if (cmd.decal->distanceFade)
         {
             float maxDistSq = cmd.decal->fadeEnd * cmd.decal->fadeEnd;
