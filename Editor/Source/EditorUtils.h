@@ -3,6 +3,7 @@
 #include "Scene/Entity.h"
 #include <vector>
 #include <string>
+#include <filesystem>
 
 namespace rv {
 
@@ -17,6 +18,9 @@ public:
 	static bool SaveScene(Engine& engine);
 	static bool SaveSceneAs(Engine& engine);
 	static void OpenVSCodeWorkspace();
+	static std::filesystem::path FindRuntimeExecutable();
+	static bool LaunchRuntime(const std::filesystem::path& projectPath, std::string* outError = nullptr);
+	static bool LaunchActiveProject(Engine& engine, std::string* outError = nullptr);
 	static AssetUUID ReadUUIDFromMeta(const std::string& assetPath);
 	static std::string GetAssetFileName(const AssetUUID& uuid);
 	static void ClearAssetFileNameCache();

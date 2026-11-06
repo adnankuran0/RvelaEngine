@@ -8,6 +8,15 @@
 #include "Utils/ProjectManager.h"
 #include <cstdlib>
 #include <filesystem>
+#if defined(_WIN32)
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#endif
 #include "EditorSelection.h"
 #include "EditorSettings.h"
 #include "Commands/CommandHistory.h"
@@ -45,6 +54,155 @@ void EditorUtils::OpenVSCodeWorkspace()
 
     const std::string command = "code \"" + scriptsDir.string() + "\"";
     std::system(command.c_str());
+}
+
+std::filesystem::path EditorUtils::FindRuntimeExecutable()
+{
+    std::filesystem::path exeDir = rv::Path::GetExecutableDirectory();
+    std::error_code ec;
+
+    std::vector<std::filesystem::path> candidates = {
+        exeDir.parent_path() / "RvelaRuntime" / "RvelaRuntime.exe",
+        exeDir / "RvelaRuntime.exe",
+        exeDir.parent_path() / "RvelaRuntime.exe",
+        exeDir.parent_path().parent_path() / "Release" / "RvelaRuntime" / "RvelaRuntime.exe",
+        exeDir.parent_path().parent_path() / "Dist" / "RvelaRuntime" / "RvelaRuntime.exe",
+        exeDir.parent_path().parent_path() / "Debug" / "RvelaRuntime" / "RvelaRuntime.exe",
+    };
+
+#if defined(RVELA_ROOT_DIR)
+    std::filesystem::path rootDir(RVELA_ROOT_DIR);
+    candidates.push_back(rootDir / "Binaries" / "windows-x86_64" / "Release" / "RvelaRuntime" / "RvelaRuntime.exe");
+    candidates.push_back(rootDir / "Binaries" / "windows-x86_64" / "Dist" / "RvelaRuntime" / "RvelaRuntime.exe");
+    candidates.push_back(rootDir / "Binaries" / "windows-x86_64" / "Debug" / "RvelaRuntime" / "RvelaRuntime.exe");
+    candidates.push_back(rootDir / "Binaries" / "Release" / "RvelaRuntime" / "RvelaRuntime.exe");
+    candidates.push_back(rootDir / "Binaries" / "Dist" / "RvelaRuntime" / "RvelaRuntime.exe");
+    candidates.push_back(rootDir / "Binaries" / "Debug" / "RvelaRuntime" / "RvelaRuntime.exe");
+#endif
+
+    for (const auto& path : candidates)
+    {
+        if (std::filesystem::exists(path, ec) && std::filesystem::is_regular_file(path, ec))
+        {
+            return path;
+        }
+    }
+
+    return "";
+}
+
+bool EditorUtils::LaunchRuntime(const std::filesystem::path& projectPath, std::string* outError)
+{
+    std::filesystem::path runtimeExe = FindRuntimeExecutable();
+    if (runtimeExe.empty())
+    {
+        if (outError)
+            *outError = "RvelaRuntime.exe not found! Please build the RvelaRuntime project before running.";
+        return false;
+    }
+
+    if (!std::filesystem::exists(projectPath))
+    {
+        if (outError)
+            *outError = "Project file does not exist: " + projectPath.string();
+        return false;
+    }
+
+#if defined(_WIN32)
+    std::string cmd = "\"" + runtimeExe.string() + "\" \"" + projectPath.string() + "\"";
+    std::vector<char> cmdBuf(cmd.begin(), cmd.end());
+    cmdBuf.push_back('\0');
+
+    STARTUPINFOA si;
+    ZeroMemory(&si, sizeof(si));
+    si.cb = sizeof(si);
+
+    PROCESS_INFORMATION pi;
+    ZeroMemory(&pi, sizeof(pi));
+
+    std::filesystem::path workingDir = projectPath.parent_path();
+    std::string workingDirStr = workingDir.string();
+
+    BOOL success = CreateProcessA(
+        nullptr,
+        cmdBuf.data(),
+        nullptr,
+        nullptr,
+        FALSE,
+        0,
+        nullptr,
+        workingDirStr.empty() ? nullptr : workingDirStr.c_str(),
+        &si,
+        &pi
+    );
+
+    if (!success)
+    {
+        if (outError)
+            *outError = "Failed to launch process. Windows error code: " + std::to_string(GetLastError());
+        return false;
+    }
+
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
+    return true;
+#else
+    std::string cmd = "\"" + runtimeExe.string() + "\" \"" + projectPath.string() + "\" &";
+    int res = std::system(cmd.c_str());
+    if (res != 0)
+    {
+        if (outError)
+            *outError = "Failed to launch runtime.";
+        return false;
+    }
+    return true;
+#endif
+}
+
+bool EditorUtils::LaunchActiveProject(Engine& engine, std::string* outError)
+{
+    if (!ProjectManager::IsProjectLoaded())
+    {
+        if (outError)
+            *outError = "No active project is currently loaded.";
+        return false;
+    }
+
+    auto activeProj = ProjectManager::GetActiveProject();
+    if (!activeProj)
+    {
+        if (outError)
+            *outError = "Active project is invalid.";
+        return false;
+    }
+
+    
+    SaveScene(engine);
+    ProjectManager::SaveActiveProject();
+
+    std::filesystem::path projFolder = activeProj->projectFolderPath;
+    std::filesystem::path projFile = projFolder / (activeProj->name + ".rproj");
+    if (!std::filesystem::exists(projFile))
+    {
+        std::error_code ec;
+        for (const auto& entry : std::filesystem::directory_iterator(projFolder, ec))
+        {
+            if (entry.path().extension() == ".rproj")
+            {
+                projFile = entry.path();
+                break;
+            }
+        }
+    }
+
+    if (!std::filesystem::exists(projFile))
+    {
+        if (outError)
+            *outError = "Could not find .rproj file in: " + projFolder.string();
+        return false;
+    }
+
+    return LaunchRuntime(projFile, outError);
 }
 
 void EditorUtils::CreateScene(Engine& engine)

@@ -147,6 +147,44 @@ void SceneSerializer::DeserializeScene(Scene& scene, const json& j)
                 rot = tempTC.GetRotation();
             }
 
+            AssetRegistry& reg = AssetManager::Get().GetRegistry();
+            if (!reg.Exists(prefabUUID))
+            {
+                AssetUUID healedUUID = AssetUUID::Invalid();
+
+                if (entityJson.contains("Tag") && entityJson["Tag"].contains("tag"))
+                {
+                    std::string tag = entityJson["Tag"]["tag"].get<std::string>();
+                    healedUUID = reg.FindPrefabByName(tag);
+                }
+
+                if (!healedUUID.IsValid())
+                {
+                    for (const auto& ov : overrides)
+                    {
+                        if (ov.contains("value") && ov["value"].is_string())
+                        {
+                            std::string valStr = ov["value"].get<std::string>();
+                            if (valStr.length() == 36 && valStr[8] == '-')
+                            {
+                                AssetUUID subUUID = AssetUUID::FromString(valStr);
+                                healedUUID = reg.FindPrefabByDependency(subUUID);
+                                if (healedUUID.IsValid())
+                                    break;
+                            }
+                        }
+                    }
+                }
+
+                if (healedUUID.IsValid())
+                {
+                    LOG_WARN("[SceneSerializer::DeserializeScene] Auto-healed broken prefab reference '{}' -> Resolved to '{}' ({})",
+                        prefabUUID.ToString(), healedUUID.ToString(), reg.GetPath(healedUUID).string());
+                    prefabUUID = healedUUID;
+                    scene.SetDirty(true);
+                }
+            }
+
             Entity instance = scene.Instantiate(prefabUUID, pos, rot, entt::null, overrides);
 
             if (instance.GetHandle() != entt::null)

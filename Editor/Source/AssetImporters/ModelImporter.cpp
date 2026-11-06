@@ -1334,12 +1334,13 @@ AssetUUID ModelImporter::ConstructPrefab(
 
     AssetMeta meta = registry.GetOrCreateMeta(prefabPath);
     AssetUUID modelUUID = registry.GetUUID(modelPath);
-    if (meta.uuid == modelUUID || meta.importerID != "PrefabImporter")
+    if (!meta.uuid.IsValid() || meta.uuid == modelUUID)
     {
         meta.uuid = AssetUUID{};
         meta.subAssets.clear();
         meta.importerSettingsJson = "{}";
     }
+    meta.importerID = "PrefabImporter";
 
     Ref<PrefabAsset> prefab = PrefabImporter::CreateOrUpdatePrefabAsset(
         prefabPath, meta.uuid, prefabScene, rootEntity);

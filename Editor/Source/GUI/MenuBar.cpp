@@ -186,44 +186,7 @@ static bool UpdateExecutableIcon(const std::filesystem::path& exePath, const std
 
 static std::filesystem::path FindRuntimeExecutable()
 {
-    std::filesystem::path exeDir = rv::Path::GetExecutableDirectory();
-    std::error_code ec;
-
-    std::vector<std::filesystem::path> candidates = {
-        // 1. Sibling folder in same build architecture/configuration (e.g. Binaries/windows-x86_64/Release/RvelaRuntime/RvelaRuntime.exe)
-        exeDir.parent_path() / "RvelaRuntime" / "RvelaRuntime.exe",
-
-        // 2. Same directory as editor
-        exeDir / "RvelaRuntime.exe",
-
-        // 3. Parent directory
-        exeDir.parent_path() / "RvelaRuntime.exe",
-
-        // 4. Check Release / Dist / Debug siblings
-        exeDir.parent_path().parent_path() / "Release" / "RvelaRuntime" / "RvelaRuntime.exe",
-        exeDir.parent_path().parent_path() / "Dist" / "RvelaRuntime" / "RvelaRuntime.exe",
-        exeDir.parent_path().parent_path() / "Debug" / "RvelaRuntime" / "RvelaRuntime.exe",
-    };
-
-#if defined(RVELA_ROOT_DIR)
-    std::filesystem::path rootDir(RVELA_ROOT_DIR);
-    candidates.push_back(rootDir / "Binaries" / "windows-x86_64" / "Release" / "RvelaRuntime" / "RvelaRuntime.exe");
-    candidates.push_back(rootDir / "Binaries" / "windows-x86_64" / "Dist" / "RvelaRuntime" / "RvelaRuntime.exe");
-    candidates.push_back(rootDir / "Binaries" / "windows-x86_64" / "Debug" / "RvelaRuntime" / "RvelaRuntime.exe");
-    candidates.push_back(rootDir / "Binaries" / "Release" / "RvelaRuntime" / "RvelaRuntime.exe");
-    candidates.push_back(rootDir / "Binaries" / "Dist" / "RvelaRuntime" / "RvelaRuntime.exe");
-    candidates.push_back(rootDir / "Binaries" / "Debug" / "RvelaRuntime" / "RvelaRuntime.exe");
-#endif
-
-    for (const auto& path : candidates)
-    {
-        if (std::filesystem::exists(path, ec) && std::filesystem::is_regular_file(path, ec))
-        {
-            return path;
-        }
-    }
-
-    return "";
+    return rv::EditorUtils::FindRuntimeExecutable();
 }
 
 }
@@ -277,6 +240,15 @@ void MenuBar::Draw(Engine* engine, AssetImportPipeline& assetImporter, const Edi
             if (ImGui::MenuItem("Save Project"))
             {
                 ProjectManager::SaveActiveProject();
+            }
+
+            if (ImGui::MenuItem("Run in Runtime", "Ctrl+F5", false, ProjectManager::IsProjectLoaded()))
+            {
+                std::string err;
+                if (!EditorUtils::LaunchActiveProject(*engine, &err))
+                {
+                    LOG_ERROR("Failed to launch runtime: {}", err);
+                }
             }
 
             if (ImGui::MenuItem("Export project", nullptr, false, ProjectManager::IsProjectLoaded() && !s_ExportState.isExporting))

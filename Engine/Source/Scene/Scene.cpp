@@ -472,6 +472,28 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID, const glm::vec3& position
             }
         }
     }
+    else if (path.empty())
+    {
+        for (const auto& ov : overrides)
+        {
+            if (ov.contains("value") && ov["value"].is_string())
+            {
+                std::string valStr = ov["value"].get<std::string>();
+                if (valStr.length() == 36 && valStr[8] == '-')
+                {
+                    AssetUUID subUUID = AssetUUID::FromString(valStr);
+                    AssetUUID healed = reg.FindPrefabByDependency(subUUID);
+                    if (healed.IsValid())
+                    {
+                        LOG_WARN("[Scene::Instantiate] Auto-healed broken prefab reference '{}' -> Resolved to '{}' ({})",
+                            prefabUUID.ToString(), healed.ToString(), reg.GetPath(healed).string());
+                        actualPrefabUUID = healed;
+                        break;
+                    }
+                }
+            }
+        }
+    }
 
     Ref<PrefabAsset> prefab = AssetManager::Get().GetAsset<PrefabAsset>(actualPrefabUUID);
     if (!prefab || !prefab->IsValid())
@@ -496,17 +518,53 @@ Entity Scene::Instantiate(const AssetUUID& prefabUUID, const glm::vec3& position
 
     if (overrides.is_array() && !overrides.empty())
     {
-        try {
-            prefabJson["Entities"] = prefabJson["Entities"].patch(overrides);
-        } catch (const json::exception& e) {
-            LOG_WARN("[Scene::Instantiate] Full patch failed ({}), applying operations individually...", e.what());
-            for (const auto& op : overrides)
-            {
-                try {
-                    json singlePatch = json::array({ op });
-                    prefabJson["Entities"] = prefabJson["Entities"].patch(singlePatch);
-                } catch (const json::exception& opErr) {
-                    LOG_WARN("[Scene::Instantiate] Failed override op {}: {}", op.value("path", ""), opErr.what());
+        json sanitizedOverrides = json::array();
+        for (const auto& op : overrides)
+        {
+            if (!op.is_object()) continue;
+            std::string opType = op.value("op", "");
+            std::string opPath = op.value("path", "");
+            if (opType.empty() || opPath.empty()) continue;
+
+            try {
+                json::json_pointer ptr(opPath);
+                if (opType == "remove")
+                {
+                    if (!prefabJson["Entities"].contains(ptr))
+                    {
+                        continue;
+                    }
+                }
+                else if (opType == "replace")
+                {
+                    if (!prefabJson["Entities"].contains(ptr))
+                    {
+                        json opCopy = op;
+                        opCopy["op"] = "add";
+                        sanitizedOverrides.push_back(opCopy);
+                        continue;
+                    }
+                }
+            } catch (...) {
+            }
+
+            sanitizedOverrides.push_back(op);
+        }
+
+        if (!sanitizedOverrides.empty())
+        {
+            try {
+                prefabJson["Entities"] = prefabJson["Entities"].patch(sanitizedOverrides);
+            } catch (const json::exception& e) {
+                LOG_WARN("[Scene::Instantiate] Full patch failed ({}), applying operations individually...", e.what());
+                for (const auto& op : sanitizedOverrides)
+                {
+                    try {
+                        json singlePatch = json::array({ op });
+                        prefabJson["Entities"] = prefabJson["Entities"].patch(singlePatch);
+                    } catch (const json::exception& opErr) {
+                        LOG_WARN("[Scene::Instantiate] Failed override op {}: {}", op.value("path", ""), opErr.what());
+                    }
                 }
             }
         }

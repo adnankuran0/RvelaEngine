@@ -66,7 +66,7 @@ void AssetRegistry::Scan(const std::filesystem::path& assetDir)
             {
                 AssetMeta meta;
                 meta.uuid = AssetUUID{};
-                meta.importerID = "";
+                meta.importerID = (path.extension() == ".rprefab") ? "PrefabImporter" : "";
                 std::error_code lwtEc;
                 auto lastWrite = std::filesystem::last_write_time(path, lwtEc);
                 if (!lwtEc)
@@ -379,7 +379,7 @@ AssetMeta AssetRegistry::GetOrCreateMeta(const std::filesystem::path& path)
     }
 
     AssetMeta meta;
-    meta.uuid = AssetUUID{}; // generates a new UUID
+    meta.uuid = AssetUUID{};
     meta.importerID = "";
     meta.lastWriteTime = 0;
 
@@ -521,6 +521,84 @@ std::vector<AssetUUID> AssetRegistry::GetDependencies(const AssetUUID& uuid) con
     if (it == m_Metas.end())
         return {};
     return it->second.dependencies;
+}
+
+AssetUUID AssetRegistry::FindPrefabByName(const std::string& name) const
+{
+    if (name.empty()) return AssetUUID::Invalid();
+
+    std::string cleanName = name;
+    auto clonePos = cleanName.find("(Clone)");
+    if (clonePos != std::string::npos)
+        cleanName = cleanName.substr(0, clonePos);
+
+    while (!cleanName.empty() && (std::isdigit(cleanName.back()) || cleanName.back() == ' '))
+        cleanName.pop_back();
+
+    if (cleanName.empty())
+        cleanName = name;
+
+    for (const auto& [uuid, path] : m_UUIDToPath)
+    {
+        if (path.extension() == ".rprefab")
+        {
+            std::string stem = path.stem().string();
+            if (stem == cleanName || stem == name)
+                return uuid;
+        }
+    }
+
+    for (const auto& [uuid, path] : m_UUIDToPath)
+    {
+        if (path.extension() == ".rprefab")
+        {
+            std::string stem = path.stem().string();
+            if (_stricmp(stem.c_str(), cleanName.c_str()) == 0 || _stricmp(stem.c_str(), name.c_str()) == 0)
+                return uuid;
+        }
+    }
+
+    for (const auto& [uuid, path] : m_UUIDToPath)
+    {
+        if (path.extension() == ".rprefab")
+        {
+            std::string stem = path.stem().string();
+            if (cleanName.starts_with(stem) || stem.starts_with(cleanName))
+                return uuid;
+        }
+    }
+
+    return AssetUUID::Invalid();
+}
+
+AssetUUID AssetRegistry::FindPrefabByDependency(const AssetUUID& subAssetUUID) const
+{
+    if (!subAssetUUID.IsValid()) return AssetUUID::Invalid();
+
+    for (const auto& [uuid, meta] : m_Metas)
+    {
+        auto it = m_UUIDToPath.find(uuid);
+        if (it != m_UUIDToPath.end() && it->second.extension() == ".rprefab")
+        {
+            for (const auto& dep : meta.dependencies)
+            {
+                if (dep == subAssetUUID)
+                    return uuid;
+            }
+        }
+    }
+
+    auto pathIt = m_UUIDToPath.find(subAssetUUID);
+    if (pathIt != m_UUIDToPath.end())
+    {
+        auto p = pathIt->second;
+        p.replace_extension(".rprefab");
+        auto prefUUID = GetUUID(p);
+        if (prefUUID.IsValid())
+            return prefUUID;
+    }
+
+    return AssetUUID::Invalid();
 }
 
 void AssetRegistry::RegisterPath(const AssetUUID& uuid, const std::filesystem::path& path)

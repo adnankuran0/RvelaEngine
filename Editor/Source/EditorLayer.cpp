@@ -565,6 +565,14 @@ void EditorLayer::HandleShortcuts()
 
     if (isCtrl)
     {
+        if (Input::IsKeyJustPressed(KeyCode::F5))
+        {
+            std::string err;
+            if (!EditorUtils::LaunchActiveProject(*m_Engine, &err))
+            {
+                LOG_ERROR("Failed to launch runtime: {}", err);
+            }
+        }
         if (isAlt)
         {
             if (isEditMode && Input::IsKeyJustPressed(KeyCode::M))
@@ -716,6 +724,25 @@ void EditorLayer::HandleShortcuts()
         if (isEditMode && Input::IsKeyJustPressed(KeyCode::PageDown))
         {
             EditorUtils::SnapSelectedToFloor(*m_Engine, false);
+        }
+
+        if (Input::IsKeyJustPressed(KeyCode::F5))
+        {
+            auto& sm = m_Engine->GetSceneManager();
+            if (m_Engine->GetActiveScene().GetState() == SceneState::PLAY)
+                sm.StopScene();
+            else
+                sm.PlayScene();
+        }
+        if (Input::IsKeyJustPressed(KeyCode::F6))
+        {
+            m_Engine->GetSceneManager().PauseScene();
+        }
+        if (Input::IsKeyJustPressed(KeyCode::F7))
+        {
+            m_Engine->GetSceneManager().StopScene();
+            EditorSelection::Get().Clear();
+            CommandHistory::Get().SetCurrentScene(&m_Engine->GetActiveScene());
         }
     }
 

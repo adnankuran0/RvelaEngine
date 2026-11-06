@@ -23,6 +23,8 @@ public:
     std::filesystem::path GetCacheDir() const { return m_AssetDir / ".cache"; }
     AssetUUID GetUUID(const std::filesystem::path& path) const;
     std::vector<AssetUUID> GetDependencies(const AssetUUID& uuid) const;
+    AssetUUID FindPrefabByName(const std::string& name) const;
+    AssetUUID FindPrefabByDependency(const AssetUUID& subAssetUUID) const;
     void RegisterPath(const AssetUUID& uuid, const std::filesystem::path& path);
     void RegisterSubAsset(const AssetUUID& uuid,
         const std::filesystem::path& cachePath,

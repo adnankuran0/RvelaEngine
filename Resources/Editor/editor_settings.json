@@ -3,7 +3,7 @@
         "farClip": 80.0,
         "fov": 75.0,
         "mouseSensitivity": 0.07500000298023224,
-        "movementSpeed": 4.0,
+        "movementSpeed": 3.0,
         "nearClip": 0.10000000149011612,
         "orbitDistance": 5.0,
         "orbitTarget": [
@@ -84,7 +84,7 @@
             "yaw": -417.384033203125
         }
     },
-    "theme": 2,
+    "theme": 1,
     "viewport": {
         "drawBoundingBoxes": false,
         "drawColliders": false,
