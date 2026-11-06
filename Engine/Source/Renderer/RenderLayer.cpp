@@ -4,8 +4,52 @@
 #include "Light.h"
 #include "glm/gtx/norm.hpp"
 #include "Asset/Types/ShaderAsset.h"
+#include "Scene/Components/VisibilityRangeComponent.h"
+#include <algorithm>
 
 using namespace rv;
+
+static bool EvaluateVisibilityRange(const VisibilityRangeComponent* vis, float dist, float& outFade)
+{
+	outFade = 1.0f;
+	if (!vis)
+		return true;
+
+	// End check
+	if (vis->end > 0.0f)
+	{
+		if (dist > vis->end)
+			return false;
+
+		if (vis->fade && vis->endMargin > 0.0f)
+		{
+			float fadeStart = std::max(0.0f, vis->end - vis->endMargin);
+			if (dist > fadeStart)
+			{
+				outFade = std::clamp((vis->end - dist) / vis->endMargin, 0.0f, 1.0f);
+			}
+		}
+	}
+
+	// Begin check
+	if (vis->begin > 0.0f)
+	{
+		float minVisibleDist = vis->begin;
+		if (vis->fade && vis->beginMargin > 0.0f)
+			minVisibleDist = std::max(0.0f, vis->begin - vis->beginMargin);
+
+		if (dist < minVisibleDist)
+			return false;
+
+		if (vis->fade && vis->beginMargin > 0.0f && dist < vis->begin)
+		{
+			float beginFade = std::clamp((dist - (vis->begin - vis->beginMargin)) / vis->beginMargin, 0.0f, 1.0f);
+			outFade = std::min(outFade, beginFade);
+		}
+	}
+
+	return true;
+}
 
 static const SkeletonComponent* FindSkeletonInHierarchy(Scene* scene, entt::entity entity)
 {
@@ -24,6 +68,33 @@ static const SkeletonComponent* FindSkeletonInHierarchy(Scene* scene, entt::enti
 		current = tree.parent;
 		if (reg.all_of<SkeletonComponent>(current))
 			return &reg.get<SkeletonComponent>(current);
+	}
+
+	return nullptr;
+}
+
+static const VisibilityRangeComponent* FindVisibilityRangeInHierarchy(Scene* scene, entt::entity entity, glm::vec3& inOutPivotPos)
+{
+	auto& reg = scene->GetRegistry();
+
+	if (reg.all_of<VisibilityRangeComponent>(entity))
+		return &reg.get<VisibilityRangeComponent>(entity);
+
+	entt::entity current = entity;
+	while (reg.valid(current) && reg.all_of<SceneTreeComponent>(current))
+	{
+		const auto& tree = reg.get<SceneTreeComponent>(current);
+		if (tree.parent == entt::null || !reg.valid(tree.parent))
+			break;
+
+		current = tree.parent;
+		if (reg.all_of<VisibilityRangeComponent>(current))
+		{
+			if (reg.all_of<TransformComponent>(current))
+				inOutPivotPos = glm::vec3(reg.get<TransformComponent>(current).GetWorldMatrix()[3]);
+
+			return &reg.get<VisibilityRangeComponent>(current);
+		}
 	}
 
 	return nullptr;
@@ -170,6 +241,14 @@ void RenderLayer::CollectRenderCommands(Scene* scene)
 		glm::vec3 objPos = glm::vec3(transform.GetWorldMatrix()[3]);
 		cmd.distanceToCamera = glm::length2(camPos - objPos);
 
+		glm::vec3 visPivotPos = objPos;
+		if (const auto* vis = FindVisibilityRangeInHierarchy(scene, entity, visPivotPos))
+		{
+			float linearDist = glm::distance(camPos, visPivotPos);
+			if (!EvaluateVisibilityRange(vis, linearDist, cmd.visibilityFade))
+				continue;
+		}
+
 		if (isTransparent)
 		{
 			m_RenderPipeline->m_RenderFrame.transparentCommands.push_back(cmd);
@@ -246,6 +325,14 @@ void RenderLayer::CollectRenderCommands(Scene* scene)
 
 		glm::vec3 objPos = glm::vec3(transform.GetWorldMatrix()[3]);
 		cmd.distanceToCamera = glm::length2(camPos - objPos);
+
+		glm::vec3 visPivotPos = objPos;
+		if (const auto* vis = FindVisibilityRangeInHierarchy(scene, entity, visPivotPos))
+		{
+			float linearDist = glm::distance(camPos, visPivotPos);
+			if (!EvaluateVisibilityRange(vis, linearDist, cmd.visibilityFade))
+				continue;
+		}
 
 		if (isSkeletalTransparent)
 		{

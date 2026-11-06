@@ -64,6 +64,8 @@ void main()
 
 #shader fragment
 #version 460 core 
+#include "Common/Dither.glsl"
+
 in vec4 FragPos;
 in vec2 TexCoords;
 
@@ -72,12 +74,16 @@ uniform bool useAlbedoMap;
 uniform vec4 albedoColor;
 uniform int transparencyMode;
 uniform float alphaCutoff;
+uniform float u_VisibilityFade = 1.0;
 
 uniform vec3 lightPos;
 uniform float far_plane;
 
 void main()
 {
+    if (u_VisibilityFade < 1.0 && GetDitherThreshold(gl_FragCoord.xy) > u_VisibilityFade)
+        discard;
+
     if (transparencyMode == 1)
         discard;
 

@@ -295,6 +295,7 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
             glm::mat4 model = command.transform->GetWorldMatrix();
             targetShader->setMat4("model", model);
+            targetShader->setFloat("u_VisibilityFade", command.visibilityFade);
 
             if (!needsGBuffer)
             {
@@ -351,6 +352,7 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
             glm::mat4 model = command.transform->GetWorldMatrix();
             targetShader->setMat4("model", model);
+            targetShader->setFloat("u_VisibilityFade", command.visibilityFade);
 
             GLint boneLoc = glGetUniformLocation(targetShader->ID, "u_BoneMatrices");
             if (boneLoc != -1 && command.skeleton && !command.skeleton->skinningPalette.empty())

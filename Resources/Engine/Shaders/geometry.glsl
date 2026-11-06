@@ -121,6 +121,9 @@ void main()
 
 #include "Common/Camera.glsl"
 #include "Common/Parallax.glsl"
+#include "Common/Dither.glsl"
+
+uniform float u_VisibilityFade = 1.0;
 
 in vec3 FragPos;
 in vec3 Normal;
@@ -246,6 +249,9 @@ vec3 getNormalFromMap(vec2 texCoords, vec3 N, vec3 T, vec3 B)
 
 void main()
 {
+    if (u_VisibilityFade < 1.0 && GetDitherThreshold(gl_FragCoord.xy) > u_VisibilityFade)
+        discard;
+
     if (transparencyMode == 1)
         discard;
 

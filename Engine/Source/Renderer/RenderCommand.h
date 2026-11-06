@@ -37,6 +37,7 @@ struct SkeletalRenderCommand
     const SkeletonComponent* skeleton = nullptr;
     MaterialComponent* material = nullptr;
     float distanceToCamera = 0.0f;
+    float visibilityFade = 1.0f;
 };
 
 struct RenderCommand
@@ -47,6 +48,7 @@ public:
     const MeshRendererComponent* mesh = nullptr;
     MaterialComponent* material = nullptr;
     float distanceToCamera = 0.0f;
+    float visibilityFade = 1.0f;
 };
 
 }

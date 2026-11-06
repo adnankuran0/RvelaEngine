@@ -4,6 +4,7 @@
 #include "ImGui/imgui.h"
 #include "EditorUtils.h"
 #include "Scene/Entity.h"
+#include "Scene/Components/VisibilityRangeComponent.h"
 #include <filesystem>
 #include <vector>
 #include <string>
@@ -416,6 +417,56 @@ void MeshInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 			if (ImGui::Checkbox("##CastShadow", &isCastShadow))
 			{
 				skeletalMeshRenderer.SetCastShadow(isCastShadow);
+				if (Scene* scene = InspectorContext::GetScene())
+					scene->SetDirty(true);
+			}
+
+			UI::EndPropertyTable();
+		}
+	});
+
+	UI::DrawComponent<VisibilityRangeComponent>("Visibility Range", registry, selectedEntity, [](VisibilityRangeComponent& visRange)
+	{
+		if (UI::BeginPropertyTable("VisibilityRangeTable"))
+		{
+			bool changed = false;
+
+			UI::PropertyLabel("Begin");
+			if (ImGui::DragFloat("##VisBegin", &visRange.begin, 0.1f, 0.0f, 10000.0f, "%.2f m"))
+			{
+				if (visRange.begin < 0.0f) visRange.begin = 0.0f;
+				changed = true;
+			}
+
+			UI::PropertyLabel("Begin Margin");
+			if (ImGui::DragFloat("##VisBeginMargin", &visRange.beginMargin, 0.1f, 0.0f, 1000.0f, "%.2f m"))
+			{
+				if (visRange.beginMargin < 0.0f) visRange.beginMargin = 0.0f;
+				changed = true;
+			}
+
+			UI::PropertyLabel("End");
+			if (ImGui::DragFloat("##VisEnd", &visRange.end, 0.1f, 0.0f, 10000.0f, "%.2f m"))
+			{
+				if (visRange.end < 0.0f) visRange.end = 0.0f;
+				changed = true;
+			}
+
+			UI::PropertyLabel("End Margin");
+			if (ImGui::DragFloat("##VisEndMargin", &visRange.endMargin, 0.1f, 0.0f, 1000.0f, "%.2f m"))
+			{
+				if (visRange.endMargin < 0.0f) visRange.endMargin = 0.0f;
+				changed = true;
+			}
+
+			UI::PropertyLabel("Fade");
+			if (ImGui::Checkbox("##VisFade", &visRange.fade))
+			{
+				changed = true;
+			}
+
+			if (changed)
+			{
 				if (Scene* scene = InspectorContext::GetScene())
 					scene->SetDirty(true);
 			}

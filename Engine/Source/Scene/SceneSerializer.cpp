@@ -6,6 +6,7 @@
 #include "Asset/Types/PrefabAsset.h"
 #include "Asset/AssetManager.h"
 #include "Components/AutoloadComponent.h"
+#include "Components/VisibilityRangeComponent.h"
 
 using namespace rv;
 
@@ -403,6 +404,9 @@ json SceneSerializer::SerializeEntity(Scene& scene, entt::entity e, bool seriali
     if (scene.HasComponent<MeshRendererComponent>(e))
         j["MeshRendererComponent"] = scene.GetComponent<MeshRendererComponent>(e).Serialize();
 
+    if (scene.HasComponent<VisibilityRangeComponent>(e))
+        j["VisibilityRangeComponent"] = scene.GetComponent<VisibilityRangeComponent>(e).Serialize();
+
     if (scene.HasComponent<PointLightComponent>(e))
         j["PointLight"] = scene.GetComponent<PointLightComponent>(e).Serialize();
 
@@ -576,6 +580,13 @@ void SceneSerializer::DeserializeEntityComponents(Scene& scene, entt::entity han
                 scene.AddComponent<MeshRendererComponent>(handle);
         }
         scene.GetComponent<MeshRendererComponent>(handle).Deserialize(entityJson["MeshRenderer"]);
+    }
+
+    if (entityJson.contains("VisibilityRangeComponent"))
+    {
+        if (!scene.HasComponent<VisibilityRangeComponent>(handle))
+            scene.AddComponent<VisibilityRangeComponent>(handle);
+        scene.GetComponent<VisibilityRangeComponent>(handle).Deserialize(entityJson["VisibilityRangeComponent"]);
     }
 
     if (entityJson.contains("PointLight"))

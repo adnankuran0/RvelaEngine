@@ -4,6 +4,7 @@
 #include "Scene/Entity.h"
 #include "Scene/Components/SkeletonComponent.h"
 #include "Scene/Components/CameraComponent.h"
+#include "Scene/Components/VisibilityRangeComponent.h"
 #include "GUI/Style.h"
 #include "Scene/Components/NavMeshSurfaceComponent.h"
 #include "Scene/Components/NavMeshAgentComponent.h"
@@ -168,6 +169,7 @@ void AddComponentPopup::Draw(Scene& scene, entt::entity selectedEntity)
 				DrawComponentMenuItem<MeshRendererComponent>("Mesh Renderer", "Rendering", "", registry, selectedEntity);
 				DrawComponentMenuItem<MaterialComponent>("Material", "Rendering", "", registry, selectedEntity);
 				DrawComponentMenuItem<DecalComponent>("Decal", "Rendering", "", registry, selectedEntity);
+				DrawComponentMenuItem<VisibilityRangeComponent>("Visibility Range", "Rendering", "", registry, selectedEntity);
 				ImGui::Separator();
 				DrawComponentMenuItem<SkeletalMeshComponent>("Skeletal Mesh", "Rendering", "", registry, selectedEntity);
 				DrawComponentMenuItem<SkeletalMeshRendererComponent>("Skeletal Mesh Renderer", "Rendering", "", registry, selectedEntity);
@@ -254,6 +256,7 @@ void AddComponentPopup::Draw(Scene& scene, entt::entity selectedEntity)
 			RV_FILTER_ITEM(MeshRendererComponent, "Mesh Renderer", "Rendering");
 			RV_FILTER_ITEM(MaterialComponent, "Material", "Rendering");
 			RV_FILTER_ITEM(DecalComponent, "Decal", "Rendering");
+			RV_FILTER_ITEM(VisibilityRangeComponent, "Visibility Range", "Rendering");
 			RV_FILTER_ITEM(SkeletalMeshComponent, "Skeletal Mesh", "Rendering");
 			RV_FILTER_ITEM(SkeletalMeshRendererComponent, "Skeletal Mesh Renderer", "Rendering");
 

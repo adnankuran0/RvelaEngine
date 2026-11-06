@@ -346,6 +346,7 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
                 currentShader->setMat4("model", command.transform->GetWorldMatrix());
                 glm::mat3 normalMatrix = command.transform->GetNormalMatrix();
                 currentShader->setMat3("normalMatrix", normalMatrix);
+                currentShader->setFloat("u_VisibilityFade", command.visibilityFade);
                 currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
                 currentShader->setVec2("UVScale", material->GetUVScale());
                 currentShader->setVec2("UVOffset", material->GetUVOffset());
@@ -396,6 +397,7 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
                 currentShader->setMat4("model", command.transform->GetWorldMatrix());
                 glm::mat3 normalMatrix = command.transform->GetNormalMatrix();
                 currentShader->setMat3("normalMatrix", normalMatrix);
+                currentShader->setFloat("u_VisibilityFade", command.visibilityFade);
                 currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
                 currentShader->setVec2("UVScale", material->GetUVScale());
                 currentShader->setVec2("UVOffset", material->GetUVOffset());
@@ -668,6 +670,7 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
                     currentShader->setMat4("model", command.transform->GetWorldMatrix());
                     glm::mat3 normalMatrix = command.transform->GetNormalMatrix();
                     currentShader->setMat3("normalMatrix", normalMatrix);
+                currentShader->setFloat("u_VisibilityFade", command.visibilityFade);
                     currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
                     currentShader->setVec2("UVScale", material->GetUVScale());
                     currentShader->setVec2("UVOffset", material->GetUVOffset());
@@ -733,6 +736,7 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
                     currentShader->setMat4("model", command.transform->GetWorldMatrix());
                     glm::mat3 normalMatrix = command.transform->GetNormalMatrix();
                     currentShader->setMat3("normalMatrix", normalMatrix);
+                currentShader->setFloat("u_VisibilityFade", command.visibilityFade);
                     currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
                     currentShader->setVec2("UVScale", material->GetUVScale());
                     currentShader->setVec2("UVOffset", material->GetUVOffset());
@@ -999,6 +1003,7 @@ void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& fram
                 currentShader->setMat4("model", command.transform->GetWorldMatrix());
                 glm::mat3 normalMatrix = command.transform->GetNormalMatrix();
                 currentShader->setMat3("normalMatrix", normalMatrix);
+                currentShader->setFloat("u_VisibilityFade", command.visibilityFade);
                 currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
                 currentShader->setVec2("UVScale", material->GetUVScale());
                 currentShader->setVec2("UVOffset", material->GetUVOffset());
@@ -1049,6 +1054,7 @@ void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& fram
                 currentShader->setMat4("model", command.transform->GetWorldMatrix());
                 glm::mat3 normalMatrix = command.transform->GetNormalMatrix();
                 currentShader->setMat3("normalMatrix", normalMatrix);
+                currentShader->setFloat("u_VisibilityFade", command.visibilityFade);
                 currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
                 currentShader->setVec2("UVScale", material->GetUVScale());
                 currentShader->setVec2("UVOffset", material->GetUVOffset());
