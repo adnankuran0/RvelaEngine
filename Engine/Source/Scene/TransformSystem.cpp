@@ -13,7 +13,7 @@ void TransformSystem::Update()
     if (m_Scene.GetState() == SceneState::PLAY)
         InterpolatePhysicsBodies();
 
-    UpdateNodeRecursive(m_Scene.GetRootEntity(), glm::mat4(1.0f), true);
+    UpdateNodeRecursive(m_Scene.GetRootEntity(), glm::mat4(1.0f), false);
 }
 
 void rv::TransformSystem::InterpolatePhysicsBodies()
