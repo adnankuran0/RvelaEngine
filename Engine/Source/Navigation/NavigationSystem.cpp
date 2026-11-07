@@ -46,11 +46,9 @@ NavMeshSurfaceComponent* NavigationSystem::GetActiveSurface()
     auto view = m_Scene.GetRegistry().view<NavMeshSurfaceComponent>();
     for (auto entity : view)
     {
-        if (m_Scene.HasComponent<TagComponent>(entity))
-        {
-            if (!m_Scene.GetComponent<TagComponent>(entity).isActive)
-                continue;
-        }
+        if (!m_Scene.IsEntityActive(entity))
+            continue;
+
         return &view.get<NavMeshSurfaceComponent>(entity);
     }
     return nullptr;
@@ -102,7 +100,7 @@ void NavigationSystem::Update(float dt)
     auto agentView = m_Scene.GetRegistry().view<TransformComponent, NavMeshAgentComponent>();
     for (auto entity : agentView)
     {
-        if (m_Scene.HasComponent<TagComponent>(entity) && !m_Scene.GetComponent<TagComponent>(entity).isActive)
+        if (!m_Scene.IsEntityActive(entity))
             continue;
 
         auto& transform = agentView.get<TransformComponent>(entity);

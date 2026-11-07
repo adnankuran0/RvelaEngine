@@ -36,10 +36,13 @@ JPH::ShapeRefC ShapeBuilder::BuildShape(entt::registry& registry, entt::entity e
 		if (curr == entt::null || !registry.valid(curr))
 			return;
 
-		if (auto* tag = registry.try_get<TagComponent>(curr))
+		if (curr != e)
 		{
-			if (!tag->isActive)
-				return;
+			if (auto* tree = registry.try_get<SceneTreeComponent>(curr))
+			{
+				if (!tree->isEffectiveActive)
+					return;
+			}
 		}
 
 		auto& currTransform = registry.get<TransformComponent>(curr);

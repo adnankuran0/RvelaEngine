@@ -8,6 +8,7 @@ std::string SceneTreeComponent::Serialize() const
     json j;
     j["parentUUID"] = parentUUID;
     j["childrenUUIDs"] = childrenUUIDs;
+    j["isSelfActive"] = isSelfActive;
 
     return j.dump(4);
 }
@@ -20,4 +21,5 @@ void SceneTreeComponent::Deserialize(const json& j)
     {
         childrenUUIDs.push_back(id.get<EntityUUID>());
     }
+    isSelfActive = j.value("isSelfActive", true);
 }

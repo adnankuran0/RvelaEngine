@@ -13,11 +13,12 @@
                 "intensity": 7.699999809265137,
                 "normalBias": 0.00800000037997961,
                 "reverseCullFace": false,
-                "shadowBias": 0.0003000000142492354
+                "shadowBias": 0.0003000000142492354,
+                "staticShadow": false
             },
+            "IsActive": true,
             "ParentUUID": 0,
             "Tag": {
-                "isActive": true,
                 "tag": "DirectionalLight"
             },
             "Transform": {
@@ -79,6 +80,7 @@
                     0.0
                 ]
             },
+            "IsActive": true,
             "Material": {
                 "material": ""
             },
@@ -100,7 +102,6 @@
                 "scriptAssetUUID": "b3326755-edfb-4522-ada1-080110d5fba5"
             },
             "Tag": {
-                "isActive": true,
                 "tag": "Character"
             },
             "Transform": {
@@ -124,13 +125,13 @@
             "UUID": 27
         },
         {
+            "IsActive": true,
             "ParentUUID": 27,
             "ScriptComponent": {
                 "propertyValues": {},
                 "scriptAssetUUID": "bc183720-0ea6-40c0-adb4-6438019b61d8"
             },
             "Tag": {
-                "isActive": true,
                 "tag": "CameraHolder"
             },
             "Transform": {
@@ -161,13 +162,13 @@
                 "nearClip": 0.10000000149011612,
                 "projectionType": 0
             },
+            "IsActive": true,
             "ParentUUID": 28,
             "ScriptComponent": {
                 "propertyValues": {},
                 "scriptAssetUUID": "bafc3142-3be3-4e45-a482-e6a0a7c30d00"
             },
             "Tag": {
-                "isActive": true,
                 "tag": "Camera"
             },
             "Transform": {
@@ -197,12 +198,12 @@
                 "libraryUUID": "64e761cb-f722-4192-962e-3f7865e79c84",
                 "playbackSpeed": 1.0
             },
+            "IsActive": true,
             "ParentUUID": 29,
             "SkeletonComponent": {
                 "skeleton": "24446ef4-6e1d-44a3-bd3d-52fa55884da5"
             },
             "Tag": {
-                "isActive": true,
                 "tag": "arms_rig"
             },
             "Transform": {
@@ -226,6 +227,7 @@
             "UUID": 10655293225911428349
         },
         {
+            "IsActive": true,
             "Material": {
                 "material": "0c838948-6309-4a6d-8adf-c4a3138cfc10"
             },
@@ -233,8 +235,10 @@
             "SkeletalMeshComponent": {
                 "skeletalMesh": "36029c80-1ece-4cad-82a1-28273260beda"
             },
+            "SkeletalMeshRendererComponent": {
+                "castShadows": true
+            },
             "Tag": {
-                "isActive": true,
                 "tag": "ArmsMesh"
             },
             "Transform": {
@@ -258,6 +262,7 @@
             "UUID": 3793135824877590733
         },
         {
+            "IsActive": true,
             "Material": {
                 "material": "",
                 "overrides": {
@@ -275,9 +280,11 @@
             "Mesh": {
                 "mesh": "b6c7f2a2-cce2-4b68-be50-19a8f552e727"
             },
+            "MeshRendererComponent": {
+                "castShadows": true
+            },
             "ParentUUID": 0,
             "Tag": {
-                "isActive": true,
                 "tag": "Sphere"
             },
             "Transform": {
@@ -301,6 +308,7 @@
             "UUID": 44
         },
         {
+            "IsActive": true,
             "Material": {
                 "material": "",
                 "overrides": {
@@ -320,9 +328,11 @@
             "Mesh": {
                 "mesh": "b6c7f2a2-cce2-4b68-be50-19a8f552e727"
             },
+            "MeshRendererComponent": {
+                "castShadows": true
+            },
             "ParentUUID": 0,
             "Tag": {
-                "isActive": true,
                 "tag": "Sphere"
             },
             "Transform": {
@@ -358,6 +368,7 @@
                     0.5
                 ]
             },
+            "IsActive": true,
             "Material": {
                 "material": "1d3e6ca6-0cc0-4c85-ae73-36db93d0aee4",
                 "overrides": {
@@ -366,6 +377,9 @@
             },
             "Mesh": {
                 "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
+            },
+            "MeshRendererComponent": {
+                "castShadows": true
             },
             "ParentUUID": 0,
             "RigidbodyComponent": {
@@ -392,7 +406,6 @@
                 "useCCD": false
             },
             "Tag": {
-                "isActive": true,
                 "tag": "Cube"
             },
             "Transform": {
@@ -428,6 +441,7 @@
                     0.5
                 ]
             },
+            "IsActive": true,
             "Material": {
                 "material": "117abcf2-653c-4baa-b1ef-78ccd02c4fa6",
                 "overrides": {
@@ -456,6 +470,9 @@
             "Mesh": {
                 "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
             },
+            "MeshRendererComponent": {
+                "castShadows": true
+            },
             "ParentUUID": 0,
             "RigidbodyComponent": {
                 "allowSleep": 1,
@@ -481,7 +498,6 @@
                 "useCCD": false
             },
             "Tag": {
-                "isActive": true,
                 "tag": "Block"
             },
             "Transform": {
@@ -517,6 +533,7 @@
                     0.5
                 ]
             },
+            "IsActive": true,
             "Material": {
                 "material": "117abcf2-653c-4baa-b1ef-78ccd02c4fa6",
                 "overrides": {
@@ -527,6 +544,9 @@
             },
             "Mesh": {
                 "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
+            },
+            "MeshRendererComponent": {
+                "castShadows": true
             },
             "ParentUUID": 0,
             "RigidbodyComponent": {
@@ -553,7 +573,6 @@
                 "useCCD": false
             },
             "Tag": {
-                "isActive": true,
                 "tag": "Cube"
             },
             "Transform": {
@@ -589,6 +608,7 @@
                     0.5
                 ]
             },
+            "IsActive": true,
             "Material": {
                 "material": "",
                 "overrides": {
@@ -606,6 +626,9 @@
             },
             "Mesh": {
                 "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
+            },
+            "MeshRendererComponent": {
+                "castShadows": true
             },
             "ParentUUID": 0,
             "RigidbodyComponent": {
@@ -632,7 +655,6 @@
                 "useCCD": false
             },
             "Tag": {
-                "isActive": true,
                 "tag": "Cube"
             },
             "Transform": {
@@ -656,10 +678,24 @@
             "UUID": 2939111112539600747
         },
         {
+            "IsActive": true,
+            "Overrides": [
+                {
+                    "op": "add",
+                    "path": "/0/IsActive",
+                    "value": true
+                },
+                {
+                    "op": "add",
+                    "path": "/0/MeshRendererComponent",
+                    "value": {
+                        "castShadows": true
+                    }
+                }
+            ],
             "ParentUUID": 0,
             "Prefab": "a1b0801d-324b-4f2d-a3e5-c8d6d516f323",
             "Tag": {
-                "isActive": true,
                 "tag": "utility_box_02"
             },
             "Transform": {
@@ -680,9 +716,10 @@
                     0.9999991655349731
                 ]
             },
-            "UUID": 1648759687933774455
+            "UUID": 10696155916747550156
         },
         {
+            "IsActive": true,
             "Material": {
                 "material": "",
                 "overrides": {
@@ -696,6 +733,9 @@
             },
             "Mesh": {
                 "mesh": "1d2596bb-18d3-41a6-9848-a8a584870ce3"
+            },
+            "MeshRendererComponent": {
+                "castShadows": true
             },
             "ParentUUID": 0,
             "ParticleEmitterComponent": {
@@ -752,7 +792,6 @@
                 ]
             },
             "Tag": {
-                "isActive": true,
                 "tag": "Smoke"
             },
             "Transform": {
@@ -776,6 +815,7 @@
             "UUID": 18068732707788013940
         },
         {
+            "IsActive": true,
             "Material": {
                 "material": "",
                 "overrides": {
@@ -790,9 +830,11 @@
             "Mesh": {
                 "mesh": "1d2596bb-18d3-41a6-9848-a8a584870ce3"
             },
+            "MeshRendererComponent": {
+                "castShadows": true
+            },
             "ParentUUID": 0,
             "Tag": {
-                "isActive": true,
                 "tag": "Quad"
             },
             "Transform": {
@@ -816,6 +858,7 @@
             "UUID": 30
         },
         {
+            "IsActive": true,
             "Material": {
                 "material": "",
                 "overrides": {
@@ -829,9 +872,11 @@
             "Mesh": {
                 "mesh": "1d2596bb-18d3-41a6-9848-a8a584870ce3"
             },
+            "MeshRendererComponent": {
+                "castShadows": true
+            },
             "ParentUUID": 0,
             "Tag": {
-                "isActive": true,
                 "tag": "Quad"
             },
             "Transform": {
@@ -861,12 +906,12 @@
                 "libraryUUID": "064411d0-68f6-4198-89cb-511ef790210c",
                 "playbackSpeed": 1.0
             },
+            "IsActive": true,
             "ParentUUID": 0,
             "SkeletonComponent": {
                 "skeleton": "07f6acb2-5ad3-4147-8551-458883c8bfc9"
             },
             "Tag": {
-                "isActive": true,
                 "tag": "UAL1_Standard"
             },
             "Transform": {
@@ -890,9 +935,9 @@
             "UUID": 6256066378453909279
         },
         {
+            "IsActive": true,
             "ParentUUID": 6256066378453909279,
             "Tag": {
-                "isActive": true,
                 "tag": "Mannequin"
             },
             "Transform": {
@@ -916,6 +961,7 @@
             "UUID": 13463360906094987695
         },
         {
+            "IsActive": true,
             "Material": {
                 "material": "731201d1-4fef-460f-925d-82ad78443def"
             },
@@ -923,8 +969,10 @@
             "SkeletalMeshComponent": {
                 "skeletalMesh": "788ce859-dc53-4b71-b7ee-0018b5e05dd9"
             },
+            "SkeletalMeshRendererComponent": {
+                "castShadows": true
+            },
             "Tag": {
-                "isActive": true,
                 "tag": "Mannequin_0"
             },
             "Transform": {
@@ -948,6 +996,7 @@
             "UUID": 14298709902201157915
         },
         {
+            "IsActive": true,
             "Material": {
                 "material": "72374bff-5961-4ab6-b03b-bccedc430430"
             },
@@ -955,8 +1004,10 @@
             "SkeletalMeshComponent": {
                 "skeletalMesh": "7cb0f2f3-a7fa-47bc-8b14-f76e6a5bc77b"
             },
+            "SkeletalMeshRendererComponent": {
+                "castShadows": true
+            },
             "Tag": {
-                "isActive": true,
                 "tag": "Mannequin_1"
             },
             "Transform": {
@@ -992,6 +1043,7 @@
                     0.5
                 ]
             },
+            "IsActive": true,
             "Material": {
                 "material": "",
                 "overrides": {
@@ -1010,6 +1062,9 @@
             },
             "Mesh": {
                 "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
+            },
+            "MeshRendererComponent": {
+                "castShadows": true
             },
             "ParentUUID": 0,
             "RigidbodyComponent": {
@@ -1036,7 +1091,6 @@
                 "useCCD": false
             },
             "Tag": {
-                "isActive": true,
                 "tag": "Cube 1"
             },
             "Transform": {
@@ -1072,6 +1126,7 @@
                     0.5
                 ]
             },
+            "IsActive": true,
             "Material": {
                 "material": "",
                 "overrides": {
@@ -1089,6 +1144,9 @@
             },
             "Mesh": {
                 "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
+            },
+            "MeshRendererComponent": {
+                "castShadows": true
             },
             "ParentUUID": 0,
             "RigidbodyComponent": {
@@ -1115,7 +1173,6 @@
                 "useCCD": false
             },
             "Tag": {
-                "isActive": true,
                 "tag": "Cube 2"
             },
             "Transform": {
@@ -1151,6 +1208,7 @@
                     0.5
                 ]
             },
+            "IsActive": true,
             "Material": {
                 "material": "",
                 "overrides": {
@@ -1168,6 +1226,9 @@
             },
             "Mesh": {
                 "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
+            },
+            "MeshRendererComponent": {
+                "castShadows": true
             },
             "ParentUUID": 0,
             "RigidbodyComponent": {
@@ -1194,7 +1255,6 @@
                 "useCCD": false
             },
             "Tag": {
-                "isActive": true,
                 "tag": "Cube 3"
             },
             "Transform": {
@@ -1230,6 +1290,7 @@
                     0.5
                 ]
             },
+            "IsActive": true,
             "Material": {
                 "material": "1d3e6ca6-0cc0-4c85-ae73-36db93d0aee4",
                 "overrides": {
@@ -1238,6 +1299,9 @@
             },
             "Mesh": {
                 "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
+            },
+            "MeshRendererComponent": {
+                "castShadows": true
             },
             "ParentUUID": 0,
             "RigidbodyComponent": {
@@ -1264,7 +1328,6 @@
                 "useCCD": false
             },
             "Tag": {
-                "isActive": true,
                 "tag": "Cube 4"
             },
             "Transform": {
@@ -1300,6 +1363,7 @@
                     0.5
                 ]
             },
+            "IsActive": true,
             "Material": {
                 "material": "117abcf2-653c-4baa-b1ef-78ccd02c4fa6",
                 "overrides": {
@@ -1309,6 +1373,9 @@
             },
             "Mesh": {
                 "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
+            },
+            "MeshRendererComponent": {
+                "castShadows": true
             },
             "ParentUUID": 0,
             "RigidbodyComponent": {
@@ -1335,7 +1402,6 @@
                 "useCCD": false
             },
             "Tag": {
-                "isActive": true,
                 "tag": "Cube 5"
             },
             "Transform": {
@@ -1359,7 +1425,13 @@
             "UUID": 9270657603229051392
         },
         {
+            "IsActive": true,
             "Overrides": [
+                {
+                    "op": "add",
+                    "path": "/0/PointLight/staticShadow",
+                    "value": false
+                },
                 {
                     "op": "add",
                     "path": "/0/AudioEmitterComponent",
@@ -1379,12 +1451,23 @@
                         "spatial": true,
                         "volume": 1.0
                     }
+                },
+                {
+                    "op": "add",
+                    "path": "/0/IsActive",
+                    "value": true
+                },
+                {
+                    "op": "add",
+                    "path": "/0/MeshRendererComponent",
+                    "value": {
+                        "castShadows": true
+                    }
                 }
             ],
             "ParentUUID": 0,
             "Prefab": "3c17201c-5ca4-489d-bed4-6df228fefad9",
             "Tag": {
-                "isActive": true,
                 "tag": "Fire"
             },
             "Transform": {
@@ -1405,9 +1488,10 @@
                     1.0
                 ]
             },
-            "UUID": 9880911789270652822
+            "UUID": 14964998261204456366
         },
         {
+            "IsActive": true,
             "ParentUUID": 0,
             "ScriptComponent": {
                 "propertyValues": {
@@ -1417,7 +1501,6 @@
                 "scriptAssetUUID": "fd27841d-643b-409f-a65f-0d75bc0868e0"
             },
             "Tag": {
-                "isActive": true,
                 "tag": "PropertyTester"
             },
             "Transform": {
@@ -1441,6 +1524,7 @@
             "UUID": 99901
         },
         {
+            "IsActive": true,
             "ParentUUID": 0,
             "RectTransformComponent": {
                 "anchorMax": [
@@ -1475,7 +1559,6 @@
                 "scriptAssetUUID": "105c4c3d-07b4-4397-b966-4786c5138e57"
             },
             "Tag": {
-                "isActive": true,
                 "tag": "ChangeSceneButton"
             },
             "Transform": {
@@ -1552,6 +1635,7 @@
             "UUID": 4693669855968168650
         },
         {
+            "IsActive": true,
             "Material": {
                 "material": "",
                 "overrides": {
@@ -1571,9 +1655,11 @@
             "Mesh": {
                 "mesh": "1d2596bb-18d3-41a6-9848-a8a584870ce3"
             },
+            "MeshRendererComponent": {
+                "castShadows": true
+            },
             "ParentUUID": 0,
             "Tag": {
-                "isActive": true,
                 "tag": "Quad"
             },
             "Transform": {
@@ -1597,6 +1683,7 @@
             "UUID": 4023841527513290583
         },
         {
+            "IsActive": true,
             "Material": {
                 "material": "",
                 "overrides": {
@@ -1606,6 +1693,9 @@
             },
             "Mesh": {
                 "mesh": "b6c7f2a2-cce2-4b68-be50-19a8f552e727"
+            },
+            "MeshRendererComponent": {
+                "castShadows": true
             },
             "NavMeshObstacleComponent": {
                 "affectNavMesh": true,
@@ -1644,7 +1734,6 @@
                 "radius": 0.5
             },
             "Tag": {
-                "isActive": true,
                 "tag": "Sphere"
             },
             "Transform": {
@@ -1668,22 +1757,24 @@
             "UUID": 70
         },
         {
+            "IsActive": true,
             "Overrides": [
                 {
-                    "op": "replace",
-                    "path": "/0/AudioEmitterComponent/maxDistance",
-                    "value": 40.0
+                    "op": "add",
+                    "path": "/0/IsActive",
+                    "value": true
                 },
                 {
-                    "op": "replace",
-                    "path": "/0/AudioEmitterComponent/rolloff",
-                    "value": 2.0
+                    "op": "add",
+                    "path": "/0/MeshRendererComponent",
+                    "value": {
+                        "castShadows": true
+                    }
                 }
             ],
             "ParentUUID": 0,
             "Prefab": "1c0b2d11-6b85-4e49-94d9-b4a4030d598d",
             "Tag": {
-                "isActive": true,
                 "tag": "WallParticle"
             },
             "Transform": {
@@ -1704,7 +1795,7 @@
                     1.0
                 ]
             },
-            "UUID": 17184392564882127910
+            "UUID": 9959133662969923687
         },
         {
             "BoxColliderComponent": {
@@ -1719,11 +1810,15 @@
                     0.5
                 ]
             },
+            "IsActive": true,
             "Material": {
                 "material": "b0784c11-b6f4-4d9a-bfbc-dbf570c9d21f"
             },
             "Mesh": {
                 "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
+            },
+            "MeshRendererComponent": {
+                "castShadows": true
             },
             "ParentUUID": 0,
             "RigidbodyComponent": {
@@ -1750,7 +1845,6 @@
                 "useCCD": false
             },
             "Tag": {
-                "isActive": true,
                 "tag": "Cube"
             },
             "Transform": {
@@ -1786,11 +1880,15 @@
                     0.5
                 ]
             },
+            "IsActive": true,
             "Material": {
                 "material": ""
             },
             "Mesh": {
                 "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
+            },
+            "MeshRendererComponent": {
+                "castShadows": true
             },
             "ParentUUID": 0,
             "RigidbodyComponent": {
@@ -1817,7 +1915,6 @@
                 "useCCD": false
             },
             "Tag": {
-                "isActive": true,
                 "tag": "Cube"
             },
             "Transform": {
@@ -1853,6 +1950,7 @@
                     0.5
                 ]
             },
+            "IsActive": true,
             "Material": {
                 "material": "1d3e6ca6-0cc0-4c85-ae73-36db93d0aee4",
                 "overrides": {
@@ -1861,6 +1959,9 @@
             },
             "Mesh": {
                 "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
+            },
+            "MeshRendererComponent": {
+                "castShadows": true
             },
             "ParentUUID": 0,
             "RigidbodyComponent": {
@@ -1887,7 +1988,6 @@
                 "useCCD": false
             },
             "Tag": {
-                "isActive": true,
                 "tag": "Cube 6"
             },
             "Transform": {
@@ -1923,6 +2023,7 @@
                     0.5
                 ]
             },
+            "IsActive": true,
             "Material": {
                 "material": "117abcf2-653c-4baa-b1ef-78ccd02c4fa6",
                 "overrides": {
@@ -1933,6 +2034,9 @@
             },
             "Mesh": {
                 "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
+            },
+            "MeshRendererComponent": {
+                "castShadows": true
             },
             "ParentUUID": 0,
             "RigidbodyComponent": {
@@ -1959,7 +2063,6 @@
                 "useCCD": false
             },
             "Tag": {
-                "isActive": true,
                 "tag": "Cube 7"
             },
             "Transform": {
@@ -1995,6 +2098,7 @@
                     0.5
                 ]
             },
+            "IsActive": true,
             "Material": {
                 "material": "1d3e6ca6-0cc0-4c85-ae73-36db93d0aee4",
                 "overrides": {
@@ -2003,6 +2107,9 @@
             },
             "Mesh": {
                 "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
+            },
+            "MeshRendererComponent": {
+                "castShadows": true
             },
             "ParentUUID": 0,
             "RigidbodyComponent": {
@@ -2029,7 +2136,6 @@
                 "useCCD": false
             },
             "Tag": {
-                "isActive": true,
                 "tag": "Cube 8"
             },
             "Transform": {
@@ -2065,6 +2171,7 @@
                     0.5
                 ]
             },
+            "IsActive": true,
             "Material": {
                 "material": "117abcf2-653c-4baa-b1ef-78ccd02c4fa6",
                 "overrides": {
@@ -2075,6 +2182,9 @@
             },
             "Mesh": {
                 "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
+            },
+            "MeshRendererComponent": {
+                "castShadows": true
             },
             "ParentUUID": 0,
             "RigidbodyComponent": {
@@ -2101,7 +2211,6 @@
                 "useCCD": false
             },
             "Tag": {
-                "isActive": true,
                 "tag": "Cube 9"
             },
             "Transform": {
@@ -2137,6 +2246,7 @@
                     0.5
                 ]
             },
+            "IsActive": true,
             "Material": {
                 "material": "1d3e6ca6-0cc0-4c85-ae73-36db93d0aee4",
                 "overrides": {
@@ -2145,6 +2255,9 @@
             },
             "Mesh": {
                 "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
+            },
+            "MeshRendererComponent": {
+                "castShadows": true
             },
             "ParentUUID": 0,
             "RigidbodyComponent": {
@@ -2171,7 +2284,6 @@
                 "useCCD": false
             },
             "Tag": {
-                "isActive": true,
                 "tag": "Cube 10"
             },
             "Transform": {
@@ -2207,6 +2319,7 @@
                     0.5
                 ]
             },
+            "IsActive": true,
             "Material": {
                 "material": "117abcf2-653c-4baa-b1ef-78ccd02c4fa6",
                 "overrides": {
@@ -2217,6 +2330,9 @@
             },
             "Mesh": {
                 "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
+            },
+            "MeshRendererComponent": {
+                "castShadows": true
             },
             "ParentUUID": 0,
             "RigidbodyComponent": {
@@ -2243,7 +2359,6 @@
                 "useCCD": false
             },
             "Tag": {
-                "isActive": true,
                 "tag": "Cube 11"
             },
             "Transform": {
@@ -2267,6 +2382,7 @@
             "UUID": 16773436819392039289
         },
         {
+            "IsActive": true,
             "NavMeshSurfaceComponent": {
                 "agentHeight": 2.0,
                 "agentMaxClimb": 0.25,
@@ -2293,7 +2409,6 @@
             },
             "ParentUUID": 0,
             "Tag": {
-                "isActive": true,
                 "tag": "NavMeshSurface"
             },
             "Transform": {
@@ -2329,11 +2444,15 @@
                     0.5
                 ]
             },
+            "IsActive": true,
             "Material": {
                 "material": ""
             },
             "Mesh": {
                 "mesh": "55dee74b-34c1-4aac-80c9-627b95a8cf58"
+            },
+            "MeshRendererComponent": {
+                "castShadows": true
             },
             "NavMeshAgentComponent": {
                 "acceleration": 8.0,
@@ -2358,7 +2477,6 @@
                 "scriptAssetUUID": "8757ba77-ff9b-4a5d-92c7-70692b8aef00"
             },
             "Tag": {
-                "isActive": true,
                 "tag": "FollowerCube"
             },
             "Transform": {
@@ -2382,11 +2500,15 @@
             "UUID": 666024611405253007
         },
         {
+            "IsActive": true,
             "Material": {
                 "material": ""
             },
             "Mesh": {
                 "mesh": "b6c7f2a2-cce2-4b68-be50-19a8f552e727"
+            },
+            "MeshRendererComponent": {
+                "castShadows": true
             },
             "NavMeshObstacleComponent": {
                 "affectNavMesh": true,
@@ -2425,7 +2547,6 @@
                 "radius": 0.5
             },
             "Tag": {
-                "isActive": true,
                 "tag": "Sphere"
             },
             "Transform": {
@@ -2457,6 +2578,7 @@
         "ContactShadows": false,
         "ContactShadows_Bias": 9.999999747378752e-05,
         "ContactShadows_Distance": 0.4699999988079071,
+        "ContactShadows_HalfResolution": true,
         "ContactShadows_Intensity": 1.3899999856948853,
         "ContactShadows_Steps": 16,
         "ContactShadows_Thickness": 0.03700000047683716,
@@ -2471,6 +2593,7 @@
         "Fog_Mode": 1,
         "Fog_Start": 5.0,
         "HDR": "9336556f-443f-4c5f-a210-2c30fa69828f",
+        "HDROrigin": 0,
         "HDRPath": "Assets\\.cache\\9336556f-443f-4c5f-a210-2c30fa69828f.rtex",
         "Lighting_AmbientColor": [
             1.0,
@@ -2499,14 +2622,17 @@
         "PostProcess_VignetteSmoothness": 0.5,
         "SSAO": true,
         "SSAO_Bias": 0.024000000208616257,
+        "SSAO_HalfResolution": true,
         "SSAO_Intensity": 1.0,
         "SSAO_Radius": 1.0,
         "SSGI": false,
+        "SSGI_HalfResolution": true,
         "SSGI_Intensity": 0.5,
         "SSGI_Radius": 3.0,
         "SSGI_Steps": 32,
         "SSR": true,
         "SSR_EdgeFade": 0.15000000596046448,
+        "SSR_HalfResolution": true,
         "SSR_MaxDistance": 25.0,
         "SSR_MaxRoughness": 0.6000000238418579,
         "SSR_MaxSteps": 64,

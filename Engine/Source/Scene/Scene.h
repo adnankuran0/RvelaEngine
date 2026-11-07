@@ -118,6 +118,7 @@ public:
     bool IsEntityActive(entt::entity entity);
     bool IsEntitySelfActive(entt::entity entity);
     void SetEntityActive(entt::entity entity, bool active);
+    void PropagateActiveState(entt::entity entity, bool parentEffectiveActive);
 
     void Update();
     void FixedUpdate();

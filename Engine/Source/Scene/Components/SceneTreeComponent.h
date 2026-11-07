@@ -14,6 +14,8 @@ public:
     std::vector<entt::entity> children;
     EntityUUID parentUUID = 0;
     entt::entity parent = entt::null;
+    bool isSelfActive = true;
+    bool isEffectiveActive = true;
 
     std::string Serialize() const;
     void Deserialize(const json& j);

@@ -142,7 +142,7 @@ bool NavMeshSurfaceComponent::Bake(Scene& scene)
     auto meshView = scene.GetRegistry().view<TransformComponent, MeshComponent>();
     for (auto entity : meshView)
     {
-        if (scene.HasComponent<TagComponent>(entity) && !scene.GetComponent<TagComponent>(entity).isActive)
+        if (!scene.IsEntityActive(entity))
             continue;
 
         bool isObstacle = false;
@@ -197,7 +197,7 @@ bool NavMeshSurfaceComponent::Bake(Scene& scene)
     auto obsBoxView = scene.GetRegistry().view<TransformComponent, BoxColliderComponent, NavMeshObstacleComponent>(entt::exclude<MeshComponent>);
     for (auto entity : obsBoxView)
     {
-        if (scene.HasComponent<TagComponent>(entity) && !scene.GetComponent<TagComponent>(entity).isActive)
+        if (!scene.IsEntityActive(entity))
             continue;
 
         const auto& obs = scene.GetComponent<NavMeshObstacleComponent>(entity);

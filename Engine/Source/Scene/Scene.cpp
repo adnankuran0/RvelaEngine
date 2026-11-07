@@ -360,8 +360,8 @@ bool Scene::IsEntitySelfActive(entt::entity entity)
     if (entity == entt::null || !m_Registry.valid(entity))
         return false;
 
-    if (auto* tag = m_Registry.try_get<TagComponent>(entity))
-        return tag->isActive;
+    if (const auto* tree = m_Registry.try_get<SceneTreeComponent>(entity))
+        return tree->isSelfActive;
 
     return true;
 }
@@ -371,25 +371,35 @@ bool Scene::IsEntityActive(entt::entity entity)
     if (entity == entt::null || !m_Registry.valid(entity))
         return false;
 
-    entt::entity curr = entity;
-    while (curr != entt::null && m_Registry.valid(curr))
-    {
-        if (curr == m_RootEntity)
-            break;
-
-        if (auto* tag = m_Registry.try_get<TagComponent>(curr))
-        {
-            if (!tag->isActive)
-                return false;
-        }
-
-        if (!HasComponent<SceneTreeComponent>(curr))
-            break;
-
-        curr = GetComponent<SceneTreeComponent>(curr).parent;
-    }
+    if (const auto* tree = m_Registry.try_get<SceneTreeComponent>(entity))
+        return tree->isEffectiveActive;
 
     return true;
+}
+
+void Scene::PropagateActiveState(entt::entity entity, bool parentEffectiveActive)
+{
+    if (entity == entt::null || !m_Registry.valid(entity))
+        return;
+
+    auto* tree = m_Registry.try_get<SceneTreeComponent>(entity);
+    if (!tree)
+        return;
+
+    bool oldEffective = tree->isEffectiveActive;
+    bool newEffective = (entity == m_RootEntity) ? true : (parentEffectiveActive && tree->isSelfActive);
+    tree->isEffectiveActive = newEffective;
+
+    if (oldEffective != newEffective)
+    {
+        m_ScriptSystem.OnEntityActivationChanged(entity, newEffective);
+    }
+
+    for (entt::entity child : tree->children)
+    {
+        if (m_Registry.valid(child))
+            PropagateActiveState(child, newEffective);
+    }
 }
 
 void Scene::SetEntityActive(entt::entity entity, bool active)
@@ -397,34 +407,21 @@ void Scene::SetEntityActive(entt::entity entity, bool active)
     if (entity == entt::null || !m_Registry.valid(entity))
         return;
 
-    auto* tag = m_Registry.try_get<TagComponent>(entity);
-    if (!tag || tag->isActive == active)
+    auto* tree = m_Registry.try_get<SceneTreeComponent>(entity);
+    if (!tree || tree->isSelfActive == active)
         return;
 
-    std::vector<std::pair<entt::entity, bool>> affected;
-    std::function<void(entt::entity)> collect = [&](entt::entity current)
-    {
-        if (!m_Registry.valid(current))
-            return;
-
-        affected.emplace_back(current, IsEntityActive(current));
-        if (auto* tree = m_Registry.try_get<SceneTreeComponent>(current))
-        {
-            for (entt::entity child : tree->children)
-                collect(child);
-        }
-    };
-    collect(entity);
-
-    tag->isActive = active;
+    tree->isSelfActive = active;
     SetDirty(true);
 
-    for (const auto& [affectedEntity, wasActive] : affected)
+    bool parentEffectiveActive = true;
+    if (tree->parent != entt::null && tree->parent != m_RootEntity && m_Registry.valid(tree->parent))
     {
-        const bool isActive = IsEntityActive(affectedEntity);
-        if (wasActive != isActive)
-            m_ScriptSystem.OnEntityActivationChanged(affectedEntity, isActive);
+        if (auto* parentTree = m_Registry.try_get<SceneTreeComponent>(tree->parent))
+            parentEffectiveActive = parentTree->isEffectiveActive;
     }
+
+    PropagateActiveState(entity, parentEffectiveActive);
 }
 
 
@@ -432,18 +429,35 @@ void Scene::SetParent(entt::entity child, entt::entity parent)
 {
     SetDirty(true);
     m_TransformSystem.SetParent(child, parent);
+
+    bool parentEffectiveActive = true;
+    if (parent != entt::null && parent != m_RootEntity && m_Registry.valid(parent))
+    {
+        if (auto* parentTree = m_Registry.try_get<SceneTreeComponent>(parent))
+            parentEffectiveActive = parentTree->isEffectiveActive;
+    }
+    PropagateActiveState(child, parentEffectiveActive);
 }
 
 void Scene::SetParentKeepLocal(entt::entity child, entt::entity parent)
 {
     SetDirty(true);
     m_TransformSystem.SetParentKeepLocal(child, parent);
+
+    bool parentEffectiveActive = true;
+    if (parent != entt::null && parent != m_RootEntity && m_Registry.valid(parent))
+    {
+        if (auto* parentTree = m_Registry.try_get<SceneTreeComponent>(parent))
+            parentEffectiveActive = parentTree->isEffectiveActive;
+    }
+    PropagateActiveState(child, parentEffectiveActive);
 }
 
 void Scene::RemoveParent(entt::entity child)
 {
     SetDirty(true);
     m_TransformSystem.RemoveParent(child);
+    PropagateActiveState(child, true);
 }
 
 Entity Scene::Instantiate(const AssetUUID& prefabUUID)

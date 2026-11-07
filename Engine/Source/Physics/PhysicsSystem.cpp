@@ -257,6 +257,8 @@ void PhysicsSystem::RebuildDirtyShapes()
 	auto rbView = m_Scene.GetRegistry().view<RigidbodyComponent>();
 	for (auto e : rbView)
 	{
+		if (!m_Scene.IsEntityActive(e)) continue;
+
 		auto& rb = m_Scene.GetRegistry().get<RigidbodyComponent>(e);
 		if (rb.RuntimeBodyID.IsInvalid()) continue;
 
@@ -277,6 +279,8 @@ void PhysicsSystem::RebuildDirtyShapes()
 	auto cbView = m_Scene.GetRegistry().view<CharacterBodyComponent>();
 	for (auto e : cbView)
 	{
+		if (!m_Scene.IsEntityActive(e)) continue;
+
 		auto& cb = m_Scene.GetRegistry().get<CharacterBodyComponent>(e);
 		if (!cb.character) continue;
 
@@ -794,11 +798,8 @@ bool PhysicsSystem::CheckAndUpdateHierarchyTransformsDirty(entt::entity root, bo
 		if (curr == entt::null || !reg.valid(curr))
 			return;
 
-		if (auto* tag = reg.try_get<TagComponent>(curr))
-		{
-			if (!tag->isActive)
-				return;
-		}
+		if (curr != root && !m_Scene.IsEntityActive(curr))
+			return;
 
 		if (HasAnyCollider(reg, curr))
 		{

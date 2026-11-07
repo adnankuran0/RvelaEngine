@@ -234,6 +234,8 @@ void SerializeBin_SceneTreeComp(const SceneTreeComponent& comp, std::vector<std:
 	std::vector<std::byte> tempOut;
 
 	WriteToBuffer(tempOut, comp.parentUUID);
+	uint8_t selfActive = comp.isSelfActive ? 1 : 0;
+	WriteToBuffer(tempOut, selfActive);
 
 	size_t payloadSize = tempOut.size();
 
@@ -246,6 +248,9 @@ void SerializeBin_SceneTreeComp(const SceneTreeComponent& comp, std::vector<std:
 void DeserializeBin_SceneTreeComp(const std::byte*& cursor, SceneTreeComponent& comp)
 {
 	ReadFromBuffer(cursor, comp.parentUUID);
+	uint8_t selfActive = 1;
+	ReadFromBuffer(cursor, selfActive);
+	comp.isSelfActive = (selfActive != 0);
 }
 
 void SerializeBin_SpotLightComp(const SpotLightComponent& comp, std::ostream& out)
@@ -261,8 +266,6 @@ void SerializeBin_TagComp(const TagComponent& comp, std::vector<std::byte>& out)
 	WriteToBuffer(tempOut, len);
 	WriteBytesToBuffer(tempOut, comp.tag.data(), len);
 
-	uint8_t active = comp.isActive ? 1 : 0;
-	WriteToBuffer(tempOut, active);
 
 	size_t payloadSize = tempOut.size();
 
@@ -280,9 +283,6 @@ void DeserializeBin_TagComp(const std::byte*& cursor, TagComponent& comp)
 	comp.tag.resize(len);
 	ReadBytesFromBuffer(cursor, comp.tag.data(), len);
 
-	uint8_t active = 1;
-	ReadFromBuffer(cursor, active);
-	comp.isActive = (active != 0);
 }
 
 void SerializeBin_TransformComp(const TransformComponent& comp, std::vector<std::byte>& out)

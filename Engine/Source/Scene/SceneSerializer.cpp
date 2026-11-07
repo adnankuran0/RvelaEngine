@@ -286,6 +286,7 @@ void SceneSerializer::DeserializeScene(Scene& scene, const json& j)
             scene.SetParentKeepLocal(entity, rootHandle);
         }
     }
+    scene.PropagateActiveState(rootHandle, true);
     scene.SetDirty(false);
 }
 
@@ -367,10 +368,12 @@ json SceneSerializer::SerializeEntity(Scene& scene, entt::entity e, bool seriali
 
         if (scene.HasComponent<SceneTreeComponent>(e))
         {
-            entt::entity parent = scene.GetComponent<SceneTreeComponent>(e).parent;
+            auto& tree = scene.GetComponent<SceneTreeComponent>(e);
+            entt::entity parent = tree.parent;
             j["ParentUUID"] = (parent != entt::null && parent != scene.GetRootEntity())
                 ? scene.GetComponent<UUIDComponent>(parent).uuid
                 : 0;
+            j["IsActive"] = tree.isSelfActive;
         }
 
         json diff = ComputePrefabOverrides(scene, e);
@@ -466,6 +469,7 @@ json SceneSerializer::SerializeEntity(Scene& scene, entt::entity e, bool seriali
         j["ParentUUID"] = (parent != entt::null && parent != scene.GetRootEntity())
             ? scene.GetComponent<UUIDComponent>(parent).uuid
             : 0;
+        j["IsActive"] = tree.isSelfActive;
     }
 
     if (scene.HasComponent<AudioEmitterComponent>(e))
@@ -657,6 +661,11 @@ void SceneSerializer::DeserializeEntityComponents(Scene& scene, entt::entity han
 
     if (entityJson.contains("ParentUUID"))
         scene.GetComponent<SceneTreeComponent>(handle).parentUUID = entityJson["ParentUUID"];
+
+    if (entityJson.contains("IsActive"))
+        scene.GetComponent<SceneTreeComponent>(handle).isSelfActive = entityJson["IsActive"].get<bool>();
+    else if (entityJson.contains("Tag") && entityJson["Tag"].is_object() && entityJson["Tag"].contains("isActive"))
+        scene.GetComponent<SceneTreeComponent>(handle).isSelfActive = entityJson["Tag"]["isActive"].get<bool>();
 
     if (entityJson.contains("AudioEmitterComponent"))
     {
