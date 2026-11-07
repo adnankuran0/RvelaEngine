@@ -51,6 +51,8 @@ void Renderer::Init(GLFWwindow* window)
     ShaderManager::Add(Shader("SSGIBlend", ENGINE_PATH("Shaders\\ssgiBlend.glsl")));
     ShaderManager::Add(Shader("SSR", ENGINE_PATH("Shaders\\ssr.glsl")));
     ShaderManager::Add(Shader("SSRBlend", ENGINE_PATH("Shaders\\ssrBlend.glsl")));
+    ShaderManager::Add(Shader("VolumetricFog", ENGINE_PATH("Shaders\\volumetricFog.glsl")));
+    ShaderManager::Add(Shader("VolumetricFogBlend", ENGINE_PATH("Shaders\\volumetricFogBlend.glsl")));
     ShaderManager::Add(Shader("MotionBlur", ENGINE_PATH("Shaders\\motionBlur.glsl")));
     ShaderManager::Add(Shader("AutoExposure", ENGINE_PATH("Shaders\\autoExposure.glsl")));
     ShaderManager::Add(Shader("Composite", ENGINE_PATH("Shaders\\composite.glsl")));

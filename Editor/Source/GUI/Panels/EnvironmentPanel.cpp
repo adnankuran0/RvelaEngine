@@ -1,5 +1,6 @@
 #include "EnvironmentPanel.h"
 #include "Core/Engine.h"
+#include "Core/Log.h"
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_internal.h"
 #include "glm/glm.hpp"
@@ -113,6 +114,27 @@ void EnvironmentPanel::Draw(Engine* engine)
             ImGui::ColorEdit3("Ambient Color", glm::value_ptr(env.Lighting_AmbientColor));
             ImGui::SliderFloat("Ambient Intensity", &env.Lighting_AmbientIntensity, 0.0f, 5.0f, "%.1f");
         }
+
+        ImGui::Spacing();
+        ImGui::TextDisabled("Static Shadows");
+        ImGui::Separator();
+
+        uint32_t staticLightCount = EditorUtils::GetStaticShadowLightCount(engine->GetActiveScene());
+        std::string bakeBtnLabel = "Bake Static Shadows (" + std::to_string(staticLightCount) + ")";
+
+        if (staticLightCount == 0)
+        {
+            ImGui::BeginDisabled();
+        }
+
+        if (ImGui::Button(bakeBtnLabel.c_str(), ImVec2(-FLT_MIN, 26.0f)))
+        {
+            uint32_t baked = EditorUtils::BakeStaticShadows(engine->GetActiveScene());
+            LOG_INFO("Rebaked static shadows for {} lights", baked);
+        }
+
+        if (staticLightCount == 0)
+            ImGui::EndDisabled();
     }
 
     if (ImGui::CollapsingHeader("SSAO"))
@@ -206,6 +228,25 @@ void EnvironmentPanel::Draw(Engine* engine)
                 ImGui::DragFloat("Density", &env.Fog_Density, 0.001f, 0.0001f, 0.2f, "%.4f");
                 ImGui::DragFloat("Start Distance", &env.Fog_Start, 0.5f, 0.0f, 200.0f, "%.1f m");
             }
+        }
+    }
+
+    if (ImGui::CollapsingHeader("Volumetric Fog"))
+    {
+        ImGui::Checkbox("Enable Volumetric Fog", &env.VolumetricFog);
+        if (env.VolumetricFog)
+        {
+            ImGui::Checkbox("Half Resolution##VolumetricFog", &env.VolumetricFog_HalfResolution);
+            ImGui::SliderInt("Steps##VolumetricFog", &env.VolumetricFog_Steps, 8, 64);
+            ImGui::SliderFloat("Density##VolumetricFog", &env.VolumetricFog_Density, 0.0001f, 0.2f, "%.4f");
+            ImGui::SliderFloat("Extinction##VolumetricFog", &env.VolumetricFog_Extinction, 0.0001f, 0.2f, "%.4f");
+            ImGui::SliderFloat("Anisotropy (g)##VolumetricFog", &env.VolumetricFog_Anisotropy, -0.9f, 0.9f, "%.2f");
+            ImGui::DragFloat("Max Distance##VolumetricFog", &env.VolumetricFog_MaxDistance, 0.5f, 1.0f, 300.0f, "%.1f m");
+            ImGui::DragFloat("Height Falloff##VolumetricFog", &env.VolumetricFog_HeightFalloff, 0.001f, 0.0f, 1.0f, "%.3f");
+            ImGui::DragFloat("Base Height##VolumetricFog", &env.VolumetricFog_BaseHeight, 0.1f, -100.0f, 100.0f, "%.1f m");
+            ImGui::SliderFloat("Light Intensity##VolumetricFog", &env.VolumetricFog_Intensity, 0.0f, 5.0f, "%.2f");
+            ImGui::SliderFloat("Ambient Intensity##VolumetricFog", &env.VolumetricFog_AmbientIntensity, 0.0f, 1.0f, "%.2f");
+            ImGui::ColorEdit3("Color##VolumetricFog", glm::value_ptr(env.VolumetricFog_Color));
         }
     }
 

@@ -422,7 +422,7 @@ void Viewport::DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySi
 
     const float cubeSize = 96.0f;
     const float margin = 10.0f;
-    const ImVec2 rightToolbarSize = ImVec2(196.0f, 32.0f);
+    const ImVec2 rightToolbarSize = ImVec2(206.0f, 32.0f);
     const ImVec2 rightToolbarPos = ImVec2(displayPos.x + displaySize.x - margin - cubeSize - 8.0f - rightToolbarSize.x, displayPos.y + margin);
 
     drawList->AddRectFilled(rightToolbarPos, ImVec2(rightToolbarPos.x + rightToolbarSize.x, rightToolbarPos.y + rightToolbarSize.y),
@@ -530,30 +530,40 @@ void Viewport::DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySi
     ImGui::SetCursorScreenPos(ImVec2(rightToolbarPos.x + 4.0f, rightToolbarPos.y + 4.0f));
 
     DebugBufferMode curDebugMode = engine->GetRenderLayer().GetDebugBufferMode();
+    bool isWireframeActive = engine->GetRenderLayer().GetWireframe();
     const char* bufBtnLabel = "Display";
     float bufBtnWidth = 56.0f;
-    switch (curDebugMode)
+
+    if (isWireframeActive && curDebugMode == DebugBufferMode::None)
     {
-    case DebugBufferMode::Normal: bufBtnLabel = "Normal"; bufBtnWidth = 58.0f; break;
-    case DebugBufferMode::Depth: bufBtnLabel = "Depth"; bufBtnWidth = 52.0f; break;
-    case DebugBufferMode::Roughness: bufBtnLabel = "Roughness"; bufBtnWidth = 72.0f; break;
-    case DebugBufferMode::Metallic: bufBtnLabel = "Metallic"; bufBtnWidth = 62.0f; break;
-    case DebugBufferMode::SSAO: bufBtnLabel = "SSAO"; bufBtnWidth = 50.0f; break;
-    case DebugBufferMode::SSGI: bufBtnLabel = "SSGI"; bufBtnWidth = 48.0f; break;
-    case DebugBufferMode::SSR: bufBtnLabel = "SSR"; bufBtnWidth = 46.0f; break;
-    case DebugBufferMode::DirectionalShadow: bufBtnLabel = "Shadow"; bufBtnWidth = 60.0f; break;
-    case DebugBufferMode::SpotShadow: bufBtnLabel = "SpotShad"; bufBtnWidth = 66.0f; break;
-    case DebugBufferMode::Bloom: bufBtnLabel = "Bloom"; bufBtnWidth = 52.0f; break;
-    case DebugBufferMode::BrightPass: bufBtnLabel = "Bright"; bufBtnWidth = 54.0f; break;
-    case DebugBufferMode::EntityID: bufBtnLabel = "EntityID"; bufBtnWidth = 62.0f; break;
-    case DebugBufferMode::ScreenColor: bufBtnLabel = "Screen"; bufBtnWidth = 56.0f; break;
-    case DebugBufferMode::ContactShadows: bufBtnLabel = "ContactShad"; bufBtnWidth = 84.0f; break;
-    case DebugBufferMode::PointShadow: bufBtnLabel = "PointShad"; bufBtnWidth = 74.0f; break;
-    case DebugBufferMode::MotionBlur: bufBtnLabel = "MotionBlur"; bufBtnWidth = 80.0f; break;
-    default: break;
+        bufBtnLabel = "Wireframe";
+        bufBtnWidth = 72.0f;
+    }
+    else
+    {
+        switch (curDebugMode)
+        {
+        case DebugBufferMode::Normal: bufBtnLabel = "Normal"; bufBtnWidth = 58.0f; break;
+        case DebugBufferMode::Depth: bufBtnLabel = "Depth"; bufBtnWidth = 52.0f; break;
+        case DebugBufferMode::Roughness: bufBtnLabel = "Roughness"; bufBtnWidth = 72.0f; break;
+        case DebugBufferMode::Metallic: bufBtnLabel = "Metallic"; bufBtnWidth = 62.0f; break;
+        case DebugBufferMode::SSAO: bufBtnLabel = "SSAO"; bufBtnWidth = 50.0f; break;
+        case DebugBufferMode::SSGI: bufBtnLabel = "SSGI"; bufBtnWidth = 48.0f; break;
+        case DebugBufferMode::SSR: bufBtnLabel = "SSR"; bufBtnWidth = 46.0f; break;
+        case DebugBufferMode::DirectionalShadow: bufBtnLabel = "Shadow"; bufBtnWidth = 60.0f; break;
+        case DebugBufferMode::SpotShadow: bufBtnLabel = "SpotShad"; bufBtnWidth = 66.0f; break;
+        case DebugBufferMode::Bloom: bufBtnLabel = "Bloom"; bufBtnWidth = 52.0f; break;
+        case DebugBufferMode::BrightPass: bufBtnLabel = "Bright"; bufBtnWidth = 54.0f; break;
+        case DebugBufferMode::EntityID: bufBtnLabel = "EntityID"; bufBtnWidth = 62.0f; break;
+        case DebugBufferMode::ScreenColor: bufBtnLabel = "Screen"; bufBtnWidth = 56.0f; break;
+        case DebugBufferMode::ContactShadows: bufBtnLabel = "ContactShad"; bufBtnWidth = 84.0f; break;
+        case DebugBufferMode::PointShadow: bufBtnLabel = "PointShad"; bufBtnWidth = 74.0f; break;
+        case DebugBufferMode::MotionBlur: bufBtnLabel = "MotionBlur"; bufBtnWidth = 80.0f; break;
+        default: break;
+        }
     }
 
-    bool isDebugActive = (curDebugMode != DebugBufferMode::None);
+    bool isDebugActive = (curDebugMode != DebugBufferMode::None) || isWireframeActive;
     if (ModeButton(bufBtnLabel, isDebugActive, ImVec2(bufBtnWidth, 24.0f)))
         ImGui::OpenPopup("BufferSettingsPopup");
 
@@ -576,12 +586,14 @@ void Viewport::DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySi
     if (ImGui::BeginPopup("BufferSettingsPopup"))
     {
         DebugBufferMode curMode = engine->GetRenderLayer().GetDebugBufferMode();
+        bool isWireframe = engine->GetRenderLayer().GetWireframe();
 
         auto ModeItem = [&](const char* label, DebugBufferMode targetMode) {
-            bool isSelected = (curMode == targetMode);
+            bool isSelected = (curMode == targetMode && !isWireframe);
             if (ImGui::Selectable(label, isSelected))
             {
                 engine->GetRenderLayer().SetDebugBufferMode(targetMode);
+                engine->GetRenderLayer().SetWireframe(false);
             }
         };
         
@@ -589,6 +601,15 @@ void Viewport::DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySi
         ImGui::Spacing();
 
         ModeItem("Default", DebugBufferMode::None);
+        if (ImGui::Selectable("Wireframe", isWireframe))
+        {
+            bool newWireframe = !isWireframe;
+            engine->GetRenderLayer().SetWireframe(newWireframe);
+            if (newWireframe)
+            {
+                engine->GetRenderLayer().SetDebugBufferMode(DebugBufferMode::None);
+            }
+        }
         ImGui::Spacing();
 
         ImGui::TextDisabled("Geometry Buffers");
@@ -767,15 +788,6 @@ void Viewport::DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySi
     {
         bool overlaysChanged = false;
 
-        ImGui::TextDisabled("Render Mode");
-        ImGui::Separator();
-        bool wireframePopup = engine->GetRenderLayer().GetWireframe();
-        if (ImGui::Checkbox("Wireframe Mode", &wireframePopup))
-        {
-            engine->GetRenderLayer().SetWireframe(wireframePopup);
-        }
-
-        ImGui::Spacing();
         ImGui::TextDisabled("Visual Overlays");
         ImGui::Separator();
         bool drawGizmos = m_DrawGizmos;
@@ -797,7 +809,6 @@ void Viewport::DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySi
         ImGui::TextDisabled("Statistics");
         ImGui::Separator();
         if (ImGui::Checkbox("Show Statistics", &m_ShowStatistics)) overlaysChanged = true;
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Toggle performance and scene statistics overlay");
 
         if (overlaysChanged)
         {
@@ -1244,7 +1255,7 @@ void Viewport::HandleSelection(Engine* engine, ImVec2& displayPos, ImVec2& displ
         mousePos.y >= (displayPos.y + 10.0f) &&
         mousePos.y <= (displayPos.y + 10.0f + leftToolbarHeight);
 
-    const float rightToolbarWidth = 196.0f;
+    const float rightToolbarWidth = 206.0f;
     const float rightToolbarHeight = 32.0f;
     float rightToolbarX = displayPos.x + displaySize.x - margin - gizmoSize - 8.0f - rightToolbarWidth;
     bool isOverRightToolbar = mousePos.x >= rightToolbarX &&
@@ -1704,7 +1715,7 @@ void Viewport::Draw(Engine* engine, bool orbitDragActive)
                 m_ContextMenuMousePos.y >= (displayPos.y + 10.0f) &&
                 m_ContextMenuMousePos.y <= (displayPos.y + 10.0f + leftToolbarHeight);
 
-            const float rightToolbarWidth = 196.0f;
+            const float rightToolbarWidth = 206.0f;
             const float rightToolbarHeight = 32.0f;
             float rightToolbarX = displayPos.x + displaySize.x - margin - gizmoSize - 8.0f - rightToolbarWidth;
             bool isOverRightToolbar = m_ContextMenuMousePos.x >= rightToolbarX &&

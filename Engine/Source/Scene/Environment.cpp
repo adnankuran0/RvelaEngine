@@ -79,6 +79,19 @@ json Environment::Serialize()
     j["Fog_End"] = Fog_End;
     j["Fog_Mode"] = Fog_Mode;
 
+    j["VolumetricFog"] = VolumetricFog;
+    j["VolumetricFog_HalfResolution"] = VolumetricFog_HalfResolution;
+    j["VolumetricFog_Steps"] = VolumetricFog_Steps;
+    j["VolumetricFog_Density"] = VolumetricFog_Density;
+    j["VolumetricFog_Extinction"] = VolumetricFog_Extinction;
+    j["VolumetricFog_Anisotropy"] = VolumetricFog_Anisotropy;
+    j["VolumetricFog_MaxDistance"] = VolumetricFog_MaxDistance;
+    j["VolumetricFog_HeightFalloff"] = VolumetricFog_HeightFalloff;
+    j["VolumetricFog_BaseHeight"] = VolumetricFog_BaseHeight;
+    j["VolumetricFog_Intensity"] = VolumetricFog_Intensity;
+    j["VolumetricFog_AmbientIntensity"] = VolumetricFog_AmbientIntensity;
+    j["VolumetricFog_Color"] = { VolumetricFog_Color.r, VolumetricFog_Color.g, VolumetricFog_Color.b };
+
     j["HDR"] = m_Skybox.GetHDRUUID().IsValid() ? m_Skybox.GetHDRUUID().ToString() : "";
     j["HDRPath"] = m_Skybox.GetPath().GetVirtualStr();
     j["HDROrigin"] = static_cast<int>(m_Skybox.GetPath().GetOrigin());
@@ -252,6 +265,45 @@ void Environment::Deserialize(const json& j)
 
     if (j.contains("Fog_Mode"))
         Fog_Mode = j["Fog_Mode"];
+
+    if (j.contains("VolumetricFog"))
+        VolumetricFog = j["VolumetricFog"];
+
+    if (j.contains("VolumetricFog_HalfResolution"))
+        VolumetricFog_HalfResolution = j["VolumetricFog_HalfResolution"];
+
+    if (j.contains("VolumetricFog_Steps"))
+        VolumetricFog_Steps = j["VolumetricFog_Steps"];
+
+    if (j.contains("VolumetricFog_Density"))
+        VolumetricFog_Density = j["VolumetricFog_Density"];
+
+    if (j.contains("VolumetricFog_Extinction"))
+        VolumetricFog_Extinction = j["VolumetricFog_Extinction"];
+
+    if (j.contains("VolumetricFog_Anisotropy"))
+        VolumetricFog_Anisotropy = j["VolumetricFog_Anisotropy"];
+
+    if (j.contains("VolumetricFog_MaxDistance"))
+        VolumetricFog_MaxDistance = j["VolumetricFog_MaxDistance"];
+
+    if (j.contains("VolumetricFog_HeightFalloff"))
+        VolumetricFog_HeightFalloff = j["VolumetricFog_HeightFalloff"];
+
+    if (j.contains("VolumetricFog_BaseHeight"))
+        VolumetricFog_BaseHeight = j["VolumetricFog_BaseHeight"];
+
+    if (j.contains("VolumetricFog_Intensity"))
+        VolumetricFog_Intensity = j["VolumetricFog_Intensity"];
+
+    if (j.contains("VolumetricFog_AmbientIntensity"))
+        VolumetricFog_AmbientIntensity = j["VolumetricFog_AmbientIntensity"];
+
+    if (j.contains("VolumetricFog_Color"))
+    {
+        auto& fc = j["VolumetricFog_Color"];
+        VolumetricFog_Color = glm::vec3(fc[0], fc[1], fc[2]);
+    }
 
     if (j.contains("HDR") && !j["HDR"].get<std::string>().empty())
     {

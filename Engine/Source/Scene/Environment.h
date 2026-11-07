@@ -80,6 +80,19 @@ public:
 	float Fog_End = 80.0f;
 	int Fog_Mode = 1; // 0: Linear, 1: Exponential, 2: Exponential Squared
 
+	bool VolumetricFog = false;
+	bool VolumetricFog_HalfResolution = true;
+	int VolumetricFog_Steps = 24;
+	float VolumetricFog_Density = 0.02f;
+	float VolumetricFog_Extinction = 0.015f;
+	float VolumetricFog_Anisotropy = 0.65f;
+	float VolumetricFog_MaxDistance = 60.0f;
+	float VolumetricFog_HeightFalloff = 0.05f;
+	float VolumetricFog_BaseHeight = 0.0f;
+	float VolumetricFog_Intensity = 1.0f;
+	float VolumetricFog_AmbientIntensity = 0.15f;
+	glm::vec3 VolumetricFog_Color = glm::vec3(1.0f, 1.0f, 1.0f);
+
 	void CopySettingsFrom(const Environment& other)
 	{
 		Lighting_IBL = other.Lighting_IBL;
@@ -149,6 +162,19 @@ public:
 		Fog_Start = other.Fog_Start;
 		Fog_End = other.Fog_End;
 		Fog_Mode = other.Fog_Mode;
+
+		VolumetricFog = other.VolumetricFog;
+		VolumetricFog_HalfResolution = other.VolumetricFog_HalfResolution;
+		VolumetricFog_Steps = other.VolumetricFog_Steps;
+		VolumetricFog_Density = other.VolumetricFog_Density;
+		VolumetricFog_Extinction = other.VolumetricFog_Extinction;
+		VolumetricFog_Anisotropy = other.VolumetricFog_Anisotropy;
+		VolumetricFog_MaxDistance = other.VolumetricFog_MaxDistance;
+		VolumetricFog_HeightFalloff = other.VolumetricFog_HeightFalloff;
+		VolumetricFog_BaseHeight = other.VolumetricFog_BaseHeight;
+		VolumetricFog_Intensity = other.VolumetricFog_Intensity;
+		VolumetricFog_AmbientIntensity = other.VolumetricFog_AmbientIntensity;
+		VolumetricFog_Color = other.VolumetricFog_Color;
 	}
 
 	Environment& operator=(const Environment& other)

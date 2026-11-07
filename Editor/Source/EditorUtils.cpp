@@ -35,6 +35,9 @@
 #include "Scene/Components/MaterialComponent.h"
 #include "Scene/Components/RigidbodyComponent.h"
 #include "Scene/Components/TagComponent.h"
+#include "Scene/Components/DirectionalLightComponent.h"
+#include "Scene/Components/PointLightComponent.h"
+#include "Scene/Components/SpotLightComponent.h"
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/norm.hpp>
 #include <glm/gtc/constants.hpp>
@@ -1152,4 +1155,71 @@ Entity EditorUtils::LoadPrimitive(Scene& scene, const std::string& primitiveMesh
 
     scene.SetParent(root.GetHandle(), scene.GetRootEntity());
     return root;
+}
+
+uint32_t EditorUtils::BakeStaticShadows(Scene& scene)
+{
+    uint32_t count = 0;
+    auto& reg = scene.GetRegistry();
+
+    for (auto e : reg.view<DirectionalLightComponent>())
+    {
+        auto& l = reg.get<DirectionalLightComponent>(e);
+        if (l.castShadows && l.staticShadow)
+        {
+            l.shadowDirty = true;
+            count++;
+        }
+    }
+
+    for (auto e : reg.view<PointLightComponent>())
+    {
+        auto& l = reg.get<PointLightComponent>(e);
+        if (l.castShadows && l.staticShadow)
+        {
+            l.shadowDirty = true;
+            count++;
+        }
+    }
+
+    for (auto e : reg.view<SpotLightComponent>())
+    {
+        auto& l = reg.get<SpotLightComponent>(e);
+        if (l.castShadows && l.staticShadow)
+        {
+            l.shadowDirty = true;
+            count++;
+        }
+    }
+
+    return count;
+}
+
+uint32_t EditorUtils::GetStaticShadowLightCount(Scene& scene)
+{
+    uint32_t count = 0;
+    auto& reg = scene.GetRegistry();
+
+    for (auto e : reg.view<DirectionalLightComponent>())
+    {
+        auto& l = reg.get<DirectionalLightComponent>(e);
+        if (l.castShadows && l.staticShadow)
+            count++;
+    }
+
+    for (auto e : reg.view<PointLightComponent>())
+    {
+        auto& l = reg.get<PointLightComponent>(e);
+        if (l.castShadows && l.staticShadow)
+            count++;
+    }
+
+    for (auto e : reg.view<SpotLightComponent>())
+    {
+        auto& l = reg.get<SpotLightComponent>(e);
+        if (l.castShadows && l.staticShadow)
+            count++;
+    }
+
+    return count;
 }

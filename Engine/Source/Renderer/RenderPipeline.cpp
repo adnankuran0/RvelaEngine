@@ -21,6 +21,7 @@
 #include "Renderer/RenderPasses/SSRPass.h"
 #include "Renderer/RenderPasses/DebugPass.h"
 #include "Renderer/RenderPasses/TransparentPass.h"
+#include "Renderer/RenderPasses/VolumetricFogPass.h"
 #include "Renderer/RenderPasses/ParticlePass.h"
 #include "Renderer/RenderPasses/DecalPass.h"
 #include "Renderer/RenderPasses/DebugBufferPass.h"
@@ -44,6 +45,7 @@ RenderPipeline::RenderPipeline()
 	PushRenderPass(std::make_unique<MaterialOutlinePass>());
 	PushRenderPass(std::make_unique<ParticlePass>());
 	PushRenderPass(std::make_unique<TransparentPass>());
+	PushRenderPass(std::make_unique<VolumetricFogPass>());
 	PushRenderPass(std::make_unique<BrightPass>());
 	PushRenderPass(std::make_unique<BloomPass>());
 	PushRenderPass(std::make_unique<MotionBlurPass>());

@@ -29,6 +29,9 @@ public:
 	static bool HasTransformSelection(Engine& engine);
 	static Entity LoadPrimitive(Scene& scene, const std::string& primitiveMeshName);
 
+	static uint32_t BakeStaticShadows(Scene& scene);
+	static uint32_t GetStaticShadowLightCount(Scene& scene);
+
 	struct MeshAssetInfo
 	{
 		AssetUUID uuid;
