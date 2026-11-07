@@ -1,6 +1,7 @@
 #pragma once
 #include "Asset/Asset.h"
 #include "Asset/AssetUUID.h"
+#include "Core/Ref.h"
 #include "Renderer/Sampler.h"
 #include <glm/glm.hpp>
 #include "Renderer/RenderTypes.h"
@@ -8,6 +9,9 @@
 #include <unordered_map>
 
 namespace rv {
+
+class TextureAsset;
+class ShaderAsset;
 
 class MaterialAsset : public Asset
 {
@@ -17,6 +21,7 @@ public:
     MaterialAsset& operator=(const MaterialAsset& other)
     {
         if (this == &other) return *this;
+        InvalidateTextureCache();
         customShaderUUID = other.customShaderUUID;
         customUniforms = other.customUniforms;
         albedoTextureUUID = other.albedoTextureUUID;
@@ -119,8 +124,37 @@ public:
 
     bool IsValid() const { return true; }
 
+    void InvalidateTextureCache() const
+    {
+        m_ResolvedAlbedoTex = nullptr;
+        m_ResolvedNormalTex = nullptr;
+        m_ResolvedMetallicTex = nullptr;
+        m_ResolvedRoughnessTex = nullptr;
+        m_ResolvedAOTex = nullptr;
+        m_ResolvedHeightTex = nullptr;
+        m_ResolvedARMTex = nullptr;
+        m_ResolvedCustomShader = nullptr;
+    }
+
+    Ref<TextureAsset> GetAlbedoTexture() const;
+    Ref<TextureAsset> GetNormalTexture() const;
+    Ref<TextureAsset> GetMetallicTexture() const;
+    Ref<TextureAsset> GetRoughnessTexture() const;
+    Ref<TextureAsset> GetAOTexture() const;
+    Ref<TextureAsset> GetHeightTexture() const;
+    Ref<TextureAsset> GetARMTexture() const;
+    Ref<ShaderAsset> GetCustomShaderAsset() const;
+
 private:
     friend class MaterialLoader;
+    mutable Ref<TextureAsset> m_ResolvedAlbedoTex;
+    mutable Ref<TextureAsset> m_ResolvedNormalTex;
+    mutable Ref<TextureAsset> m_ResolvedMetallicTex;
+    mutable Ref<TextureAsset> m_ResolvedRoughnessTex;
+    mutable Ref<TextureAsset> m_ResolvedAOTex;
+    mutable Ref<TextureAsset> m_ResolvedHeightTex;
+    mutable Ref<TextureAsset> m_ResolvedARMTex;
+    mutable Ref<ShaderAsset> m_ResolvedCustomShader;
 };
 
 }

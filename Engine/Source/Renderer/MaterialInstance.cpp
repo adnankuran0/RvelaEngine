@@ -1,24 +1,106 @@
 #include "rvelapch.h"
 #include "MaterialInstance.h"
 #include "Asset/AssetManager.h"
+#include "Asset/Types/TextureAsset.h"
+#include "Asset/Types/ShaderAsset.h"
 
 using namespace rv;
 using json = nlohmann::json;
+
+Ref<TextureAsset> MaterialAsset::GetAlbedoTexture() const
+{
+    if (!useAlbedoMap || !albedoTextureUUID.IsValid()) return nullptr;
+    if (!m_ResolvedAlbedoTex || m_ResolvedAlbedoTex->GetUUID() != albedoTextureUUID)
+        m_ResolvedAlbedoTex = AssetManager::Get().GetAsset<TextureAsset>(albedoTextureUUID);
+    return m_ResolvedAlbedoTex;
+}
+
+Ref<TextureAsset> MaterialAsset::GetNormalTexture() const
+{
+    if (!useNormalMap || !normalTextureUUID.IsValid()) return nullptr;
+    if (!m_ResolvedNormalTex || m_ResolvedNormalTex->GetUUID() != normalTextureUUID)
+        m_ResolvedNormalTex = AssetManager::Get().GetAsset<TextureAsset>(normalTextureUUID);
+    return m_ResolvedNormalTex;
+}
+
+Ref<TextureAsset> MaterialAsset::GetMetallicTexture() const
+{
+    if (!useMetallicMap || !metallicTextureUUID.IsValid()) return nullptr;
+    if (!m_ResolvedMetallicTex || m_ResolvedMetallicTex->GetUUID() != metallicTextureUUID)
+        m_ResolvedMetallicTex = AssetManager::Get().GetAsset<TextureAsset>(metallicTextureUUID);
+    return m_ResolvedMetallicTex;
+}
+
+Ref<TextureAsset> MaterialAsset::GetRoughnessTexture() const
+{
+    if (!useRoughnessMap || !roughnessTextureUUID.IsValid()) return nullptr;
+    if (!m_ResolvedRoughnessTex || m_ResolvedRoughnessTex->GetUUID() != roughnessTextureUUID)
+        m_ResolvedRoughnessTex = AssetManager::Get().GetAsset<TextureAsset>(roughnessTextureUUID);
+    return m_ResolvedRoughnessTex;
+}
+
+Ref<TextureAsset> MaterialAsset::GetAOTexture() const
+{
+    if (!useAOMap || !aoTextureUUID.IsValid()) return nullptr;
+    if (!m_ResolvedAOTex || m_ResolvedAOTex->GetUUID() != aoTextureUUID)
+        m_ResolvedAOTex = AssetManager::Get().GetAsset<TextureAsset>(aoTextureUUID);
+    return m_ResolvedAOTex;
+}
+
+Ref<TextureAsset> MaterialAsset::GetHeightTexture() const
+{
+    if (!useHeightMap || !heightTextureUUID.IsValid()) return nullptr;
+    if (!m_ResolvedHeightTex || m_ResolvedHeightTex->GetUUID() != heightTextureUUID)
+        m_ResolvedHeightTex = AssetManager::Get().GetAsset<TextureAsset>(heightTextureUUID);
+    return m_ResolvedHeightTex;
+}
+
+Ref<TextureAsset> MaterialAsset::GetARMTexture() const
+{
+    if (!useARMMap || !armTextureUUID.IsValid()) return nullptr;
+    if (!m_ResolvedARMTex || m_ResolvedARMTex->GetUUID() != armTextureUUID)
+        m_ResolvedARMTex = AssetManager::Get().GetAsset<TextureAsset>(armTextureUUID);
+    return m_ResolvedARMTex;
+}
+
+Ref<ShaderAsset> MaterialAsset::GetCustomShaderAsset() const
+{
+    if (!customShaderUUID.IsValid()) return nullptr;
+    if (!m_ResolvedCustomShader || m_ResolvedCustomShader->GetUUID() != customShaderUUID)
+        m_ResolvedCustomShader = AssetManager::Get().GetAsset<ShaderAsset>(customShaderUUID);
+    return m_ResolvedCustomShader;
+}
+
+MaterialOverrideData& MaterialInstance::EnsureOverrides()
+{
+    if (!m_Overrides)
+        m_Overrides = std::make_unique<MaterialOverrideData>();
+    return *m_Overrides;
+}
+
+void MaterialInstance::SetOverride(MatField f)
+{
+    EnsureOverrides().overrideMask.set(static_cast<size_t>(f));
+}
+
+void MaterialInstance::ClearOverride(MatField f)
+{
+    if (m_Overrides)
+    {
+        m_Overrides->overrideMask.reset(static_cast<size_t>(f));
+        if (m_Overrides->overrideMask.none() && (!m_Overrides->customUniformOverrides || m_Overrides->customUniformOverrides->empty()))
+        {
+            m_Overrides.reset();
+        }
+    }
+}
 
 MaterialInstance MaterialInstance::CreateFromAsset(const Ref<MaterialAsset>& asset)
 {
     MaterialInstance inst;
     if (!asset) return inst;
     inst.m_SourceAsset = asset;
-    inst.m_TextureFilter = asset->samplerDesc.filter;
-    inst.m_TextureWrap = asset->samplerDesc.repeat;
-    inst.m_TextureAnisotropy = asset->samplerDesc.aniso;
     inst.m_Sampler.Init(asset->samplerDesc);
-    inst.m_HasOutline = asset->hasOutline;
-    inst.m_OutlineColor = asset->outlineColor;
-    inst.m_OutlineWidth = asset->outlineWidth;
-    inst.m_OutlineFixedSize = asset->outlineFixedSize;
-    inst.m_OutlineXRay = asset->outlineXRay;
     inst.RebuildCache();
     return inst;
 }
@@ -26,97 +108,100 @@ MaterialInstance MaterialInstance::CreateFromAsset(const Ref<MaterialAsset>& ass
 json MaterialInstance::SerializeOverrides() const
 {
     json j;
+    if (!m_Overrides) return j;
+
+    const auto& o = *m_Overrides;
 
     if (IsOverridden(MatField::AlbedoColor))
-        j["albedoColor"] = { m_AlbedoColor.r, m_AlbedoColor.g, m_AlbedoColor.b, m_AlbedoColor.a };
+        j["albedoColor"] = { o.albedoColor.r, o.albedoColor.g, o.albedoColor.b, o.albedoColor.a };
     if (IsOverridden(MatField::EmissiveColor))
-        j["emissiveColor"] = { m_EmissiveColor.r, m_EmissiveColor.g, m_EmissiveColor.b };
+        j["emissiveColor"] = { o.emissiveColor.r, o.emissiveColor.g, o.emissiveColor.b };
     if (IsOverridden(MatField::EmissiveIntensity))
-        j["emissiveIntensity"] = m_EmissiveIntensity;
+        j["emissiveIntensity"] = o.emissiveIntensity;
     if (IsOverridden(MatField::Metallic))
-        j["metallic"] = m_Metallic;
+        j["metallic"] = o.metallic;
     if (IsOverridden(MatField::Specular))
-        j["specular"] = m_Specular;
+        j["specular"] = o.specular;
     if (IsOverridden(MatField::Roughness))
-        j["roughness"] = m_Roughness;
+        j["roughness"] = o.roughness;
     if (IsOverridden(MatField::AO))
-        j["ao"] = m_AO;
+        j["ao"] = o.ao;
     if (IsOverridden(MatField::NormalScale))
-        j["normalScale"] = m_NormalScale;
+        j["normalScale"] = o.normalScale;
     if (IsOverridden(MatField::HeightScale))
-        j["heightScale"] = m_HeightScale;
+        j["heightScale"] = o.heightScale;
     if (IsOverridden(MatField::InvertHeight))
-        j["invertHeight"] = m_InvertHeight;
+        j["invertHeight"] = o.invertHeight;
     if (IsOverridden(MatField::UVScale))
-        j["UVScale"] = { m_UVScale.x, m_UVScale.y };
+        j["UVScale"] = { o.UVScale.x, o.UVScale.y };
     if (IsOverridden(MatField::UVOffset))
-        j["UVOffset"] = { m_UVOffset.x, m_UVOffset.y };
+        j["UVOffset"] = { o.UVOffset.x, o.UVOffset.y };
 
     if (IsOverridden(MatField::TransparencyMode))
-        j["transparencyMode"] = static_cast<int>(m_TransparencyMode);
+        j["transparencyMode"] = static_cast<int>(o.transparencyMode);
     if (IsOverridden(MatField::BlendMode))
-        j["blendMode"] = static_cast<int>(m_BlendMode);
+        j["blendMode"] = static_cast<int>(o.blendMode);
     if (IsOverridden(MatField::CullMode))
-        j["cullMode"] = static_cast<int>(m_CullMode);
+        j["cullMode"] = static_cast<int>(o.cullMode);
     if (IsOverridden(MatField::AlphaCutoff))
-        j["alphaCutoff"] = m_AlphaCutoff;
+        j["alphaCutoff"] = o.alphaCutoff;
 
     if (IsOverridden(MatField::BillboardMode))
-        j["billboardMode"] = static_cast<int>(m_BillboardMode);
+        j["billboardMode"] = static_cast<int>(o.billboardMode);
 
     if (IsOverridden(MatField::ShadingMode))
-        j["shadingMode"] = static_cast<int>(m_ShadingMode);
+        j["shadingMode"] = static_cast<int>(o.shadingMode);
     if (IsOverridden(MatField::ReceiveShadows))
-        j["receiveShadows"] = m_ReceiveShadows;
+        j["receiveShadows"] = o.receiveShadows;
     if (IsOverridden(MatField::UseTriplanar))
-        j["useTriplanar"] = m_UseTriplanar;
+        j["useTriplanar"] = o.useTriplanar;
     if (IsOverridden(MatField::UseWorldTriplanar))
-        j["useWorldTriplanar"] = m_UseWorldTriplanar;
+        j["useWorldTriplanar"] = o.useWorldTriplanar;
     if (IsOverridden(MatField::TriplanarSharpness))
-        j["triplanarSharpness"] = m_TriplanarSharpness;
+        j["triplanarSharpness"] = o.triplanarSharpness;
 
     if (IsOverridden(MatField::HasOutline))
-        j["hasOutline"] = m_HasOutline;
+        j["hasOutline"] = o.hasOutline;
     if (IsOverridden(MatField::OutlineColor))
-        j["outlineColor"] = { m_OutlineColor.r, m_OutlineColor.g, m_OutlineColor.b, m_OutlineColor.a };
+        j["outlineColor"] = { o.outlineColor.r, o.outlineColor.g, o.outlineColor.b, o.outlineColor.a };
     if (IsOverridden(MatField::OutlineWidth))
-        j["outlineWidth"] = m_OutlineWidth;
+        j["outlineWidth"] = o.outlineWidth;
     if (IsOverridden(MatField::OutlineFixedSize))
-        j["outlineFixedSize"] = m_OutlineFixedSize;
+        j["outlineFixedSize"] = o.outlineFixedSize;
     if (IsOverridden(MatField::OutlineXRay))
-        j["outlineXRay"] = m_OutlineXRay;
+        j["outlineXRay"] = o.outlineXRay;
 
     if (IsOverridden(MatField::AlbedoTex))
-        j["albedoTex"] = m_AlbedoTex ? m_AlbedoTex->GetUUID().ToString() : "";
+        j["albedoTex"] = o.albedoTex ? o.albedoTex->GetUUID().ToString() : "";
     if (IsOverridden(MatField::NormalTex))
-        j["normalTex"] = m_NormalTex ? m_NormalTex->GetUUID().ToString() : "";
+        j["normalTex"] = o.normalTex ? o.normalTex->GetUUID().ToString() : "";
     if (IsOverridden(MatField::MetallicTex))
-        j["metallicTex"] = m_MetallicTex ? m_MetallicTex->GetUUID().ToString() : "";
+        j["metallicTex"] = o.metallicTex ? o.metallicTex->GetUUID().ToString() : "";
     if (IsOverridden(MatField::RoughnessTex))
-        j["roughnessTex"] = m_RoughnessTex ? m_RoughnessTex->GetUUID().ToString() : "";
+        j["roughnessTex"] = o.roughnessTex ? o.roughnessTex->GetUUID().ToString() : "";
     if (IsOverridden(MatField::AOTex))
-        j["aoTex"] = m_AOTex ? m_AOTex->GetUUID().ToString() : "";
+        j["aoTex"] = o.aoTex ? o.aoTex->GetUUID().ToString() : "";
     if (IsOverridden(MatField::HeightTex))
-        j["heightTex"] = m_HeightTex ? m_HeightTex->GetUUID().ToString() : "";
+        j["heightTex"] = o.heightTex ? o.heightTex->GetUUID().ToString() : "";
     if (IsOverridden(MatField::ARMTex))
-        j["armTex"] = m_ARMTex ? m_ARMTex->GetUUID().ToString() : "";
+        j["armTex"] = o.armTex ? o.armTex->GetUUID().ToString() : "";
     if (IsOverridden(MatField::UseARMMap))
-        j["useARMMap"] = m_UseARMMap;
+        j["useARMMap"] = o.useARMMap;
 
     if (IsOverridden(MatField::CustomShader))
-        j["customShader"] = m_CustomShaderUUID.ToString();
+        j["customShader"] = o.customShaderUUID.ToString();
 
     if (IsOverridden(MatField::TextureFilterMode))
-        j["textureFilter"] = static_cast<int>(m_TextureFilter);
+        j["textureFilter"] = static_cast<int>(o.textureFilter);
     if (IsOverridden(MatField::TextureWrapMode))
-        j["textureWrap"] = static_cast<int>(m_TextureWrap);
+        j["textureWrap"] = static_cast<int>(o.textureWrap);
     if (IsOverridden(MatField::TextureAnisotropyMode))
-        j["textureAnisotropy"] = static_cast<int>(m_TextureAnisotropy);
+        j["textureAnisotropy"] = static_cast<int>(o.textureAnisotropy);
 
-    if (!m_CustomUniformOverrides.empty())
+    if (o.customUniformOverrides && !o.customUniformOverrides->empty())
     {
         json uJson = json::object();
-        for (const auto& [name, val] : m_CustomUniformOverrides)
+        for (const auto& [name, val] : *o.customUniformOverrides)
         {
             json item;
             item["type"] = static_cast<int>(val.type);
@@ -142,186 +227,154 @@ json MaterialInstance::SerializeOverrides() const
 
 void MaterialInstance::DeserializeOverrides(const json& j)
 {
+    if (j.empty() || !j.is_object()) return;
     auto& mgr = AssetManager::Get();
 
     if (j.contains("albedoColor")) {
         auto& col = j["albedoColor"];
-        m_AlbedoColor = { col[0], col[1], col[2], col.size() > 3 ? col[3].get<float>() : 1.0f };
-        SetOverride(MatField::AlbedoColor);
+        SetAlbedoColor({ col[0], col[1], col[2], col.size() > 3 ? col[3].get<float>() : 1.0f });
     }
     if (j.contains("emissiveColor"))
     {
-        m_EmissiveColor = { j["emissiveColor"][0], j["emissiveColor"][1], j["emissiveColor"][2] };
-        SetOverride(MatField::EmissiveColor);
+        SetEmissiveColor({ j["emissiveColor"][0], j["emissiveColor"][1], j["emissiveColor"][2] });
     }
     if (j.contains("emissiveIntensity"))
     {
-        m_EmissiveIntensity = j["emissiveIntensity"];
-        SetOverride(MatField::EmissiveIntensity);
+        SetEmissiveIntensity(j["emissiveIntensity"]);
     }
     if (j.contains("metallic"))
     {
-        m_Metallic = j["metallic"];
-        SetOverride(MatField::Metallic);
+        SetMetallic(j["metallic"]);
     }
     if (j.contains("specular"))
     {
-        m_Specular = j["specular"];
-        SetOverride(MatField::Specular);
+        SetSpecular(j["specular"]);
     }
     if (j.contains("roughness"))
     {
-        m_Roughness = j["roughness"];
-        SetOverride(MatField::Roughness);
+        SetRoughness(j["roughness"]);
     }
     if (j.contains("ao"))
     {
-        m_AO = j["ao"];
-        SetOverride(MatField::AO);
+        SetAO(j["ao"]);
     }
     if (j.contains("normalScale"))
     {
-        m_NormalScale = j["normalScale"];
-        SetOverride(MatField::NormalScale);
+        SetNormalScale(j["normalScale"]);
     }
     if (j.contains("heightScale"))
     {
-        m_HeightScale = j["heightScale"];
-        SetOverride(MatField::HeightScale);
+        SetHeightScale(j["heightScale"]);
     }
     if (j.contains("invertHeight"))
     {
-        m_InvertHeight = j["invertHeight"].get<bool>();
-        SetOverride(MatField::InvertHeight);
+        SetInvertHeight(j["invertHeight"].get<bool>());
     }
     if (j.contains("UVScale"))
     {
         auto& uv = j["UVScale"];
-        m_UVScale = { uv[0], uv[1] };
-        SetOverride(MatField::UVScale);
+        SetUVScale({ uv[0], uv[1] });
     }
     if (j.contains("UVOffset"))
     {
         auto& uv = j["UVOffset"];
-        m_UVOffset = { uv[0], uv[1] };
-        SetOverride(MatField::UVOffset);
+        SetUVOffset({ uv[0], uv[1] });
     }
 
     if (j.contains("useTriplanar"))
     {
-        m_UseTriplanar = j["useTriplanar"].get<bool>();
-        SetOverride(MatField::UseTriplanar);
+        SetUseTriplanar(j["useTriplanar"].get<bool>());
     }
     if (j.contains("useWorldTriplanar"))
     {
-        m_UseWorldTriplanar = j["useWorldTriplanar"].get<bool>();
-        SetOverride(MatField::UseWorldTriplanar);
+        SetUseWorldTriplanar(j["useWorldTriplanar"].get<bool>());
     }
     if (j.contains("triplanarSharpness"))
     {
-        m_TriplanarSharpness = j["triplanarSharpness"].get<float>();
-        SetOverride(MatField::TriplanarSharpness);
+        SetTriplanarSharpness(j["triplanarSharpness"].get<float>());
     }
 
     if (j.contains("transparencyMode"))
     {
-        m_TransparencyMode = static_cast<TransparencyMode>(j["transparencyMode"].get<int>());
-        SetOverride(MatField::TransparencyMode);
+        SetTransparencyMode(static_cast<TransparencyMode>(j["transparencyMode"].get<int>()));
     }
     if (j.contains("blendMode"))
     {
-        m_BlendMode = static_cast<BlendMode>(j["blendMode"].get<int>());
-        SetOverride(MatField::BlendMode);
+        SetBlendMode(static_cast<BlendMode>(j["blendMode"].get<int>()));
     }
     if (j.contains("cullMode"))
     {
-        m_CullMode = static_cast<CullMode>(j["cullMode"].get<int>());
-        SetOverride(MatField::CullMode);
+        SetCullMode(static_cast<CullMode>(j["cullMode"].get<int>()));
     }
     if (j.contains("alphaCutoff"))
     {
-        m_AlphaCutoff = j["alphaCutoff"].get<float>();
-        SetOverride(MatField::AlphaCutoff);
+        SetAlphaCutoff(j["alphaCutoff"].get<float>());
     }
 
     if (j.contains("billboardMode"))
     {
-        m_BillboardMode = static_cast<BillboardMode>(j["billboardMode"].get<int>());
-        SetOverride(MatField::BillboardMode);
+        SetBillboardMode(static_cast<BillboardMode>(j["billboardMode"].get<int>()));
     }
 
     if (j.contains("shadingMode")) {
-        m_ShadingMode = static_cast<ShadingMode>(j["shadingMode"].get<int>());
-        SetOverride(MatField::ShadingMode);
+        SetShadingMode(static_cast<ShadingMode>(j["shadingMode"].get<int>()));
     }
     if (j.contains("receiveShadows")) {
-        m_ReceiveShadows = j["receiveShadows"].get<bool>();
-        SetOverride(MatField::ReceiveShadows);
+        SetReceiveShadows(j["receiveShadows"].get<bool>());
     }
 
     if (j.contains("hasOutline"))
     {
-        m_HasOutline = j["hasOutline"].get<bool>();
-        SetOverride(MatField::HasOutline);
+        SetHasOutline(j["hasOutline"].get<bool>());
     }
     if (j.contains("outlineColor"))
     {
         auto& c = j["outlineColor"];
-        m_OutlineColor = { c[0], c[1], c[2], c.size() > 3 ? c[3].get<float>() : 1.0f };
-        SetOverride(MatField::OutlineColor);
+        SetOutlineColor({ c[0], c[1], c[2], c.size() > 3 ? c[3].get<float>() : 1.0f });
     }
     if (j.contains("outlineWidth"))
     {
-        m_OutlineWidth = j["outlineWidth"].get<float>();
-        SetOverride(MatField::OutlineWidth);
+        SetOutlineWidth(j["outlineWidth"].get<float>());
     }
     if (j.contains("outlineFixedSize"))
     {
-        m_OutlineFixedSize = j["outlineFixedSize"].get<bool>();
-        SetOverride(MatField::OutlineFixedSize);
+        SetOutlineFixedSize(j["outlineFixedSize"].get<bool>());
     }
     if (j.contains("outlineXRay"))
     {
-        m_OutlineXRay = j["outlineXRay"].get<bool>();
-        SetOverride(MatField::OutlineXRay);
+        SetOutlineXRay(j["outlineXRay"].get<bool>());
     }
 
-    auto loadTex = [&](const char* key, Ref<TextureAsset>& target, bool& useFlag, MatField field)
+    auto loadTex = [&](const char* key, auto setterFn)
+    {
+        if (!j.contains(key)) return;
+        std::string uuidStr = j[key].get<std::string>();
+        if (!uuidStr.empty())
         {
-            if (!j.contains(key)) return;
-            std::string uuidStr = j[key].get<std::string>();
-            if (!uuidStr.empty())
-            {
-                auto uuid = AssetUUID::FromString(uuidStr);
-                target = mgr.GetAsset<TextureAsset>(uuid);
-                useFlag = static_cast<bool>(target);
-            }
-            else
-            {
-                target = nullptr;
-                useFlag = false;
-            }
-            SetOverride(field);
-        };
+            auto uuid = AssetUUID::FromString(uuidStr);
+            setterFn(mgr.GetAsset<TextureAsset>(uuid));
+        }
+        else
+        {
+            setterFn(Ref<TextureAsset>(nullptr));
+        }
+    };
 
-    loadTex("albedoTex", m_AlbedoTex, m_UseAlbedoMap, MatField::AlbedoTex);
-    loadTex("normalTex", m_NormalTex, m_UseNormalMap, MatField::NormalTex);
-    loadTex("metallicTex", m_MetallicTex, m_UseMetallicMap, MatField::MetallicTex);
-    loadTex("roughnessTex", m_RoughnessTex, m_UseRoughnessMap, MatField::RoughnessTex);
-    loadTex("aoTex", m_AOTex, m_UseAOMap, MatField::AOTex);
-    loadTex("heightTex", m_HeightTex, m_UseHeightMap, MatField::HeightTex);
-    loadTex("armTex", m_ARMTex, m_UseARMMap, MatField::ARMTex);
+    loadTex("albedoTex", [&](Ref<TextureAsset> tex) { SetAlbedoTexture(tex); });
+    loadTex("normalTex", [&](Ref<TextureAsset> tex) { SetNormalTexture(tex); });
+    loadTex("metallicTex", [&](Ref<TextureAsset> tex) { SetMetallicTexture(tex); });
+    loadTex("roughnessTex", [&](Ref<TextureAsset> tex) { SetRoughnessTexture(tex); });
+    loadTex("aoTex", [&](Ref<TextureAsset> tex) { SetAOTexture(tex); });
+    loadTex("heightTex", [&](Ref<TextureAsset> tex) { SetHeightTexture(tex); });
+    loadTex("armTex", [&](Ref<TextureAsset> tex) { SetARMTexture(tex); });
     if (j.contains("useARMMap"))
     {
-        m_UseARMMap = j["useARMMap"].get<bool>();
-        SetOverride(MatField::UseARMMap);
+        SetUseARMMap(j["useARMMap"].get<bool>());
     }
 
     if (j.contains("customShader"))
     {
-        m_CustomShaderUUID = AssetUUID::FromString(j["customShader"].get<std::string>());
-        m_CustomShader = m_CustomShaderUUID.IsValid() ? mgr.GetAsset<ShaderAsset>(m_CustomShaderUUID) : nullptr;
-        SetOverride(MatField::CustomShader);
+        SetCustomShader(AssetUUID::FromString(j["customShader"].get<std::string>()));
     }
 
     if (j.contains("textureFilter"))
@@ -333,7 +386,6 @@ void MaterialInstance::DeserializeOverrides(const json& j)
 
     if (j.contains("customUniformOverrides") && j["customUniformOverrides"].is_object())
     {
-        m_CustomUniformOverrides.clear();
         for (auto& [name, item] : j["customUniformOverrides"].items())
         {
             CustomUniformValue val;
@@ -351,38 +403,33 @@ void MaterialInstance::DeserializeOverrides(const json& j)
             case ShaderUniformType::Color4: val.vec4Val = glm::vec4(v[0].get<float>(), v[1].get<float>(), v[2].get<float>(), v[3].get<float>()); break;
             case ShaderUniformType::Texture2D: val.textureUUID = AssetUUID::FromString(v.get<std::string>()); break;
             }
-            m_CustomUniformOverrides[name] = val;
+            SetCustomUniform(name, val);
         }
     }
 }
 
 void MaterialInstance::SetCustomShader(const AssetUUID& uuid)
 {
-    m_CustomShaderUUID = uuid;
-    m_CustomShader = uuid.IsValid() ? AssetManager::Get().GetAsset<ShaderAsset>(uuid) : nullptr;
+    auto& o = EnsureOverrides();
+    o.customShaderUUID = uuid;
+    o.customShader = uuid.IsValid() ? AssetManager::Get().GetAsset<ShaderAsset>(uuid) : nullptr;
     SetOverride(MatField::CustomShader);
 }
 
 void MaterialInstance::ClearCustomShader()
 {
-    m_CustomShaderUUID = AssetUUID::Invalid();
-    m_CustomShader = nullptr;
+    if (m_Overrides)
+    {
+        m_Overrides->customShaderUUID = AssetUUID::Invalid();
+        m_Overrides->customShader = nullptr;
+    }
     ClearOverride(MatField::CustomShader);
 }
 
 void MaterialInstance::RebuildCache()
 {
     if (!m_SourceAsset) return;
-    auto& mgr = AssetManager::Get();
-    m_CachedAlbedoTex = m_SourceAsset->useAlbedoMap ? mgr.GetAsset<TextureAsset>(m_SourceAsset->albedoTextureUUID) : nullptr;
-    m_CachedNormalTex = m_SourceAsset->useNormalMap ? mgr.GetAsset<TextureAsset>(m_SourceAsset->normalTextureUUID) : nullptr;
-    m_CachedMetallicTex = m_SourceAsset->useMetallicMap ? mgr.GetAsset<TextureAsset>(m_SourceAsset->metallicTextureUUID) : nullptr;
-    m_CachedRoughnessTex = m_SourceAsset->useRoughnessMap ? mgr.GetAsset<TextureAsset>(m_SourceAsset->roughnessTextureUUID) : nullptr;
-    m_CachedAOTex = m_SourceAsset->useAOMap ? mgr.GetAsset<TextureAsset>(m_SourceAsset->aoTextureUUID) : nullptr;
-    m_CachedHeightTex = m_SourceAsset->useHeightMap ? mgr.GetAsset<TextureAsset>(m_SourceAsset->heightTextureUUID) : nullptr;
-    m_CachedARMTex = m_SourceAsset->useARMMap ? mgr.GetAsset<TextureAsset>(m_SourceAsset->armTextureUUID) : nullptr;
-    m_CachedCustomShader = m_SourceAsset->customShaderUUID.IsValid() ? mgr.GetAsset<ShaderAsset>(m_SourceAsset->customShaderUUID) : nullptr;
-    m_CachedCustomUniforms = m_SourceAsset->customUniforms;
+    m_SourceAsset->InvalidateTextureCache();
 
     m_Sampler.GetDesc().filter = GetTextureFilter();
     m_Sampler.GetDesc().repeat = GetTextureWrap();
@@ -395,15 +442,20 @@ void MaterialInstance::RebuildCache()
 
 CustomUniformValue MaterialInstance::GetCustomUniform(const std::string& name) const
 {
-    auto itOver = m_CustomUniformOverrides.find(name);
-    if (itOver != m_CustomUniformOverrides.end())
-        return itOver->second;
+    if (m_Overrides && m_Overrides->customUniformOverrides)
+    {
+        auto itOver = m_Overrides->customUniformOverrides->find(name);
+        if (itOver != m_Overrides->customUniformOverrides->end())
+            return itOver->second;
+    }
 
-    auto itCached = m_CachedCustomUniforms.find(name);
-    if (itCached != m_CachedCustomUniforms.end())
-        return itCached->second;
+    if (m_SourceAsset)
+    {
+        auto itCached = m_SourceAsset->customUniforms.find(name);
+        if (itCached != m_SourceAsset->customUniforms.end())
+            return itCached->second;
+    }
 
-    // Check defaults from shader definition
     auto shaderAsset = GetCustomShaderAsset();
     if (shaderAsset)
     {
@@ -428,15 +480,38 @@ CustomUniformValue MaterialInstance::GetCustomUniform(const std::string& name) c
 
 void MaterialInstance::SetCustomUniform(const std::string& name, const CustomUniformValue& val)
 {
-    m_CustomUniformOverrides[name] = val;
+    auto& o = EnsureOverrides();
+    if (!o.customUniformOverrides)
+        o.customUniformOverrides = std::make_unique<std::unordered_map<std::string, CustomUniformValue>>();
+    (*o.customUniformOverrides)[name] = val;
 }
 
 void MaterialInstance::ClearCustomUniform(const std::string& name)
 {
-    m_CustomUniformOverrides.erase(name);
+    if (m_Overrides && m_Overrides->customUniformOverrides)
+    {
+        m_Overrides->customUniformOverrides->erase(name);
+        if (m_Overrides->customUniformOverrides->empty())
+        {
+            m_Overrides->customUniformOverrides.reset();
+            if (m_Overrides->overrideMask.none())
+                m_Overrides.reset();
+        }
+    }
 }
 
 bool MaterialInstance::IsCustomUniformOverridden(const std::string& name) const
 {
-    return m_CustomUniformOverrides.find(name) != m_CustomUniformOverrides.end();
+    if (!m_Overrides || !m_Overrides->customUniformOverrides) return false;
+    return m_Overrides->customUniformOverrides->find(name) != m_Overrides->customUniformOverrides->end();
+}
+
+void MaterialInstance::ClearAllCustomUniformOverrides()
+{
+    if (m_Overrides && m_Overrides->customUniformOverrides)
+    {
+        m_Overrides->customUniformOverrides.reset();
+        if (m_Overrides->overrideMask.none())
+            m_Overrides.reset();
+    }
 }
