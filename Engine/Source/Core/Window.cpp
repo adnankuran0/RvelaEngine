@@ -314,6 +314,14 @@ void Window::Restore()
     if (m_Window) glfwRestoreWindow(m_Window);
 }
 
+void Window::Close()
+{
+    if (m_Window)
+    {
+        glfwSetWindowShouldClose(m_Window, GLFW_TRUE);
+    }
+}
+
 void Window::Shutdown()
 {
     ResetCursor();
@@ -734,5 +742,10 @@ void Window::ResetCursor()
         glfwDestroyCursor(m_CustomCursor);
         m_CustomCursor = nullptr;
     }
+}
+
+void Window::SwapBuffers()
+{
+    glfwSwapBuffers(m_Window);
 }
 

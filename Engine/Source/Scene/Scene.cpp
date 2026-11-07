@@ -15,6 +15,7 @@
 #include "Renderer/RenderLayer.h"
 #include "Components/AutoloadComponent.h"
 #include "Components/ScriptComponent.h"
+#include "Input/Input.h"
 
 using namespace rv;
 
@@ -71,7 +72,6 @@ void Scene::SetState(SceneState newState)
     m_State = newState;
 }
 
-#include "Input/Input.h"
 
 void Scene::InstantiateAutoloads()
 {
@@ -193,6 +193,8 @@ void Scene::OnUpdate(float dt)
             vpH = static_cast<float>(rCtx.viewportHeight);
         }
     }
+
+    // TODO: this is ... hmmmmmmmmmm
     glm::vec2 mousePos = inputEnabled ? Input::GetViewportMousePosition(vpW, vpH) : glm::vec2(-10000.0f);
     bool pressed = inputEnabled && Input::IsMouseButtonJustPressed(MouseCode::ButtonLeft);
     bool held = inputEnabled && Input::IsMouseButtonPressed(MouseCode::ButtonLeft);

@@ -77,6 +77,7 @@ public:
 	bool IsMaximized() const;
 	void Maximize();
 	void Restore();
+	void Close();
 	void Shutdown();
 
 	void SetVSync(bool vsync);
@@ -94,6 +95,8 @@ public:
 	bool SetCursorIconFromMemory(const uint8_t* data, size_t size, int hotX = 0, int hotY = 0);
 	void SetStandardCursor(CursorShape shape);
 	void ResetCursor();
+
+	void SwapBuffers();
 	
 private:
 	GLFWwindow* m_Window{};

@@ -267,7 +267,7 @@ void Engine::Render()
 	
 	{
 		RV_PROFILE_CPU("Swap Buffers");
-		glfwSwapBuffers(GetWindow().GetGLFWWindow());
+		m_Window.SwapBuffers();
 	}
 	
 	GLenum err;
@@ -288,10 +288,7 @@ void Engine::Shutdown()
 void Engine::Quit() noexcept
 {
 	m_IsRunning = false;
-	if (m_Window.GetGLFWWindow())
-	{
-		glfwSetWindowShouldClose(m_Window.GetGLFWWindow(), GLFW_TRUE);
-	}
+	m_Window.Close();
 }
 
 void Engine::InitResourcePaths()

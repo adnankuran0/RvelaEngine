@@ -2,19 +2,22 @@
 #include "../RenderPass.h"
 #include "Renderer/Framebuffer.h"
 #include <Renderer/RenderFrame.h>
+
 namespace rv {
+
 class SSAOPass : public RenderPass
 {
 public:
-	const char* GetName() const override { return "SSAOPass"; }
-    ~SSAOPass();
+    const char* GetName() const override { return "SSAOPass"; }
+    ~SSAOPass() override = default;
     void Init(const RenderContext& ctx, RenderFrame& frame) override;
     void Execute(const RenderContext& ctx, RenderFrame& frame) override;
     void OnResize(uint32_t width, uint32_t height, RenderFrame& frame) override;
+
 private:
-    Framebuffer m_Framebuffer;
-    GLuint noiseTexture = 0;
+    Framebuffer m_RawFramebuffer;
+    Framebuffer m_BlurFramebuffer;
     bool m_HalfResolution = true;
-    void GenerateNoiseTexture();
 };
+
 }

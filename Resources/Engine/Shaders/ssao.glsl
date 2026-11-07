@@ -22,15 +22,32 @@ in vec2 TexCoords;
 
 layout(binding = 0) uniform sampler2D gNormal;
 layout(binding = 1) uniform sampler2D gDepth;
-layout(binding = 2) uniform sampler2D texNoise;
 
 uniform float radius = 1.0;      
 uniform float bias = 0.025;
 uniform float intensity = 1.0;
+uniform vec2 u_TargetResolution;
 
-float InterleavedGradientNoise(vec2 screenPos)
+const float PI = 3.14159265358979323846;
+const float HALF_PI = 1.57079632679489661923;
+
+// Fast polynomial inverse cosine approximation (XeGTAO / Lagarde)
+float FastACos(float inX)
 {
-    return fract(52.9829189 * fract(0.06711056 * screenPos.x + 0.00583715 * screenPos.y));
+    float x = abs(inX);
+    float res = -0.156583 * x + HALF_PI;
+    res *= sqrt(max(0.0, 1.0 - x));
+    return (inX >= 0.0) ? res : PI - res;
+}
+
+float Bayer2x2(vec2 screenPos)
+{
+    ivec2 p = ivec2(screenPos) % 2;
+    const float bayer[4] = float[4](
+        0.0 / 4.0, 2.0 / 4.0,
+        3.0 / 4.0, 1.0 / 4.0
+    );
+    return bayer[p.x + p.y * 2];
 }
 
 void main()
@@ -43,59 +60,151 @@ void main()
     }
 
     vec3 fragPos = ReconstructViewPos(TexCoords, depth, invProjection);
-    vec3 normal = normalize(texture(gNormal, TexCoords).rgb);
+    vec3 viewDir = -normalize(fragPos);
 
-    float pixelRadius = clamp(radius * projection[1][1] * windowSize.y * 0.25 / max(-fragPos.z, 0.1), 2.0, windowSize.y * 0.25);
-
-    float ign = InterleavedGradientNoise(gl_FragCoord.xy);
-    float baseAngle = ign * 6.2831853;
-
-    const int DIRECTION_COUNT = 8;
-    const int STEP_COUNT = 4;
-    float occlusion = 0.0;
-    float totalWeight = 0.0;
-
-    for (int dirIdx = 0; dirIdx < DIRECTION_COUNT; ++dirIdx)
+    vec3 dX = dFdx(fragPos);
+    vec3 dY = dFdy(fragPos);
+    vec3 geomNormal = cross(dX, dY);
+    float gLenSq = dot(geomNormal, geomNormal);
+    if (gLenSq > 1e-8)
     {
-        float angle = baseAngle + float(dirIdx) * (6.2831853 / float(DIRECTION_COUNT));
-        vec2 dir = vec2(cos(angle), sin(angle));
+        geomNormal = normalize(geomNormal);
+        if (dot(geomNormal, viewDir) < 0.0)
+            geomNormal = -geomNormal;
+    }
+    else
+    {
+        geomNormal = normalize(texture(gNormal, TexCoords).rgb);
+    }
 
-        for (int stepIdx = 1; stepIdx <= STEP_COUNT; ++stepIdx)
+    float maxScreenRadius = 0.25;
+    float radiusUV = (radius * projection[1][1]) / (2.0 * max(-fragPos.z, 0.1));
+    radiusUV = clamp(radiusUV, 8.0 / u_TargetResolution.y, maxScreenRadius);
+
+    float minStepUV = 3.5 / u_TargetResolution.y;
+
+    vec2 aspectScale = vec2(1.0 / (windowSize.x / windowSize.y), 1.0);
+
+    float bayerVal = Bayer2x2(gl_FragCoord.xy);
+    float stepJitter = (bayerVal - 0.5) * 0.5;
+
+    const int NUM_SLICES = 3;
+    const int NUM_STEPS = 3;
+
+    float sliceDither = (bayerVal - 0.5) * (PI / float(NUM_SLICES));
+
+    float effectiveBias = max(bias, 0.04);
+
+    float totalVisibility = 0.0;
+
+    for (int s = 0; s < NUM_SLICES; ++s)
+    {
+        float sliceAngle = float(s) * (PI / float(NUM_SLICES)) + sliceDither;
+        vec2 dir2D = vec2(cos(sliceAngle), sin(sliceAngle));
+        vec2 dirUV = dir2D * aspectScale;
+
+        vec3 sliceDir = vec3(dir2D, 0.0);
+
+        vec3 orthoDir = sliceDir - dot(sliceDir, viewDir) * viewDir;
+        vec3 axisVec = normalize(cross(orthoDir, viewDir));
+        vec3 projNormal = geomNormal - axisVec * dot(geomNormal, axisVec);
+        float projNormalLen = length(projNormal);
+
+        if (projNormalLen < 0.001)
         {
-            float stepFraction = (float(stepIdx) + ign) / (float(STEP_COUNT) + 1.0);
-            float stepPixels = pixelRadius * stepFraction;
-            vec2 sampleUV = TexCoords + dir * (stepPixels / windowSize);
-
-            if (sampleUV.x < 0.0 || sampleUV.x > 1.0 || sampleUV.y < 0.0 || sampleUV.y > 1.0)
-                continue;
-
-            float sampleDepth = texture(gDepth, sampleUV).r;
-            if (sampleDepth >= 0.999999)
-                continue;
-
-            vec3 samplePos = ReconstructViewPos(sampleUV, sampleDepth, invProjection);
-            vec3 delta = samplePos - fragPos;
-            float dist = length(delta);
-
-            if (dist > radius || dist < 0.01)
-                continue;
-
-            float nDotD = dot(normal, delta / dist);
-
-            if (nDotD > bias)
-            {
-                float distFade = 1.0 - (dist / radius);
-                occlusion += (nDotD - bias) * distFade * distFade;
-            }
-            totalWeight += 1.0;
+            totalVisibility += 1.0;
+            continue;
         }
+
+        projNormal /= projNormalLen;
+
+        float signNorm = sign(dot(orthoDir, projNormal));
+        float cosNorm = clamp(dot(projNormal, viewDir), 0.0, 1.0);
+        float n = signNorm * FastACos(cosNorm);
+
+        float lowHorizonCos0 = cos(n + HALF_PI);
+        float lowHorizonCos1 = cos(n - HALF_PI);
+
+        float horizonCos0 = lowHorizonCos0;
+        float horizonCos1 = lowHorizonCos1;
+
+        for (int step = 0; step < NUM_STEPS; ++step)
+        {
+            float stepFrac = (float(step) + 0.5 + stepJitter) / float(NUM_STEPS);
+            float sDist = minStepUV + (radiusUV - minStepUV) * (stepFrac * stepFrac);
+
+            vec2 sampleOffset = sDist * dirUV;
+
+            vec2 sampleUV0 = TexCoords + sampleOffset;
+            if (sampleUV0.x >= 0.0 && sampleUV0.x <= 1.0 && sampleUV0.y >= 0.0 && sampleUV0.y <= 1.0)
+            {
+                float sampleDepth0 = texture(gDepth, sampleUV0).r;
+                if (sampleDepth0 < 0.999999)
+                {
+                    vec3 samplePos0 = ReconstructViewPos(sampleUV0, sampleDepth0, invProjection);
+                    vec3 delta0 = samplePos0 - fragPos;
+                    float dist0 = length(delta0);
+                    if (dist0 > 0.01 && dist0 <= radius)
+                    {
+                        float nDotD0 = dot(geomNormal, delta0) / dist0;
+                        if (nDotD0 > effectiveBias)
+                        {
+                            vec3 horizonVec0 = delta0 / dist0;
+                            float shc0 = dot(horizonVec0, viewDir);
+                            float distFactor0 = dist0 / radius;
+                            float weight0 = clamp(1.0 - distFactor0 * distFactor0, 0.0, 1.0);
+                            weight0 *= weight0;
+                            shc0 = mix(lowHorizonCos0, shc0, weight0);
+                            horizonCos0 = max(horizonCos0, shc0);
+                        }
+                    }
+                }
+            }
+
+            vec2 sampleUV1 = TexCoords - sampleOffset;
+            if (sampleUV1.x >= 0.0 && sampleUV1.x <= 1.0 && sampleUV1.y >= 0.0 && sampleUV1.y <= 1.0)
+            {
+                float sampleDepth1 = texture(gDepth, sampleUV1).r;
+                if (sampleDepth1 < 0.999999)
+                {
+                    vec3 samplePos1 = ReconstructViewPos(sampleUV1, sampleDepth1, invProjection);
+                    vec3 delta1 = samplePos1 - fragPos;
+                    float dist1 = length(delta1);
+                    if (dist1 > 0.01 && dist1 <= radius)
+                    {
+                        float nDotD1 = dot(geomNormal, delta1) / dist1;
+                        if (nDotD1 > effectiveBias)
+                        {
+                            vec3 horizonVec1 = delta1 / dist1;
+                            float shc1 = dot(horizonVec1, viewDir);
+                            float distFactor1 = dist1 / radius;
+                            float weight1 = clamp(1.0 - distFactor1 * distFactor1, 0.0, 1.0);
+                            weight1 *= weight1;
+                            shc1 = mix(lowHorizonCos1, shc1, weight1);
+                            horizonCos1 = max(horizonCos1, shc1);
+                        }
+                    }
+                }
+            }
+        }
+
+        float h0 = -FastACos(clamp(horizonCos1, -1.0, 1.0));
+        float h1 =  FastACos(clamp(horizonCos0, -1.0, 1.0));
+
+        // Analytical closedform GTAO arc integration (Jimenez et al.)
+        float iarc0 = (cosNorm + 2.0 * h0 * sin(n) - cos(2.0 * h0 - n)) * 0.25;
+        float iarc1 = (cosNorm + 2.0 * h1 * sin(n) - cos(2.0 * h1 - n)) * 0.25;
+
+        float unoccludedArc = cosNorm + n * sin(n);
+        float sliceVisibility = clamp((iarc0 + iarc1) / max(unoccludedArc, 0.001), 0.0, 1.0);
+
+        totalVisibility += sliceVisibility;
     }
 
-    float ao = 1.0;
-    if (totalWeight > 0.0)
-    {
-        ao = clamp(1.0 - (occlusion / totalWeight) * intensity * 2.0, 0.0, 1.0);
-    }
+    totalVisibility /= float(NUM_SLICES);
+    float ao = clamp(totalVisibility, 0.0, 1.0);
+
+    ao = pow(ao, intensity);
 
     FragColor = ao;
 }
