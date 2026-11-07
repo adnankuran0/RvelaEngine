@@ -220,6 +220,7 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
             targetTc.SetScale(lScale);
             targetTc.SetRotation(lRot);
             targetTc.SetWorldMatrix(targetWorld);
+            targetTc.SetDirty(true);
         };
 
         glm::vec3 curGizmoPos, curGizmoScale, sk;
@@ -296,6 +297,8 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
                 }
             }
         }
+
+        scene.GetTransformSystem().Update();
     }
     else
     {
@@ -332,6 +335,7 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
             }
 
             activeScene.SetDirty(true);
+            activeScene.GetTransformSystem().Update();
         }
         m_WasGizmoUsing = false;
         m_InitialTransforms.clear();
@@ -787,6 +791,7 @@ void Viewport::DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySi
         if (ImGui::Checkbox("Infinite Grid", &debugSettings.drawInfiniteGrid)) overlaysChanged = true;
         if (ImGui::Checkbox("Draw Colliders", &debugSettings.drawColliders)) overlaysChanged = true;
         if (ImGui::Checkbox("Draw Bounding Boxes", &debugSettings.drawBoundingBoxes)) overlaysChanged = true;
+        if (ImGui::Checkbox("Draw LOD Levels", &debugSettings.drawLODLevels)) overlaysChanged = true;
 
         ImGui::Spacing();
         ImGui::TextDisabled("Statistics");

@@ -352,7 +352,7 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
                 currentShader->setVec2("UVOffset", material->GetUVOffset());
 
                 command.mesh->Bind();
-                glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+                glDrawElements(GL_TRIANGLES, command.indexCount, GL_UNSIGNED_INT, (const void*)(uintptr_t)(command.indexOffset * sizeof(unsigned int)));
 
                 if (useAlb) glBindSampler(0, 0);
             }
@@ -676,7 +676,7 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
                     currentShader->setVec2("UVOffset", material->GetUVOffset());
 
                     command.mesh->Bind();
-                    glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+                    glDrawElements(GL_TRIANGLES, command.indexCount, GL_UNSIGNED_INT, (const void*)(uintptr_t)(command.indexOffset * sizeof(unsigned int)));
 
                     if (useAlb) glBindSampler(0, 0);
                 }
@@ -1009,7 +1009,7 @@ void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& fram
                 currentShader->setVec2("UVOffset", material->GetUVOffset());
 
                 command.mesh->Bind();
-                glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+                glDrawElements(GL_TRIANGLES, command.indexCount, GL_UNSIGNED_INT, (const void*)(uintptr_t)(command.indexOffset * sizeof(unsigned int)));
 
                 if (useAlb) glBindSampler(0, 0);
             }

@@ -39,6 +39,7 @@ struct ViewportGizmoSettings
     bool DrawColliders = false;
     bool DrawBoundingBoxes = false;
     bool DrawInfiniteGrid = true;
+    bool DrawLODLevels = false;
     bool SelectRootEntity = true;
     bool DrawTransformGizmo = true;
     bool DrawSceneGizmos = true;

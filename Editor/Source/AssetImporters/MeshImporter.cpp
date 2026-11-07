@@ -59,7 +59,11 @@ bool MeshImporter::Import(
     aiVector3D max = mesh->mAABB.mMax;
     AABB aabb(glm::vec3(min.x, min.y, min.z), glm::vec3(max.x, max.y, max.z));
 
-    return WriteMeshCache(outCachePath, mesh->mName.C_Str(), vertices, indices, aabb);
+    std::vector<MeshLODHeader> lodHeaders;
+    std::vector<unsigned int> allIndices;
+    GenerateLODs(vertices, indices, lodHeaders, allIndices);
+
+    return WriteMeshCache(outCachePath, mesh->mName.C_Str(), vertices, allIndices, lodHeaders, aabb);
 }
 
 bool MeshImporter::ImportFromScene(
@@ -131,7 +135,11 @@ bool MeshImporter::ImportFromScene(
         aiVector3D mn = mesh->mAABB.mMin, mx = mesh->mAABB.mMax;
         AABB aabb(glm::vec3(mn.x, mn.y, mn.z), glm::vec3(mx.x, mx.y, mx.z));
 
-        if (!WriteMeshCache(cachePath, meshName, vertices, indices, aabb))
+        std::vector<MeshLODHeader> lodHeaders;
+        std::vector<unsigned int> allIndices;
+        GenerateLODs(vertices, indices, lodHeaders, allIndices);
+
+        if (!WriteMeshCache(cachePath, meshName, vertices, allIndices, lodHeaders, aabb))
         {
             LOG_ERROR("Failed to write cache for mesh {}", i);
             outMeshMap.erase(i);
@@ -145,11 +153,122 @@ bool MeshImporter::ImportFromScene(
     return true;
 }
 
+void MeshImporter::GenerateLODs(
+    const std::vector<Vertex>& vertices,
+    const std::vector<unsigned int>& baseIndices,
+    std::vector<MeshLODHeader>& outLODHeaders,
+    std::vector<unsigned int>& outAllIndices)
+{
+    outLODHeaders.clear();
+    outAllIndices.clear();
+
+    if (vertices.empty() || baseIndices.empty())
+        return;
+
+    MeshLODHeader lod0;
+    lod0.indexOffset = 0;
+    lod0.indexCount = static_cast<uint32_t>(baseIndices.size());
+    lod0.screenRatio = 0.50f;
+    lod0.lodError = 0.0f;
+    outLODHeaders.push_back(lod0);
+
+    outAllIndices.insert(outAllIndices.end(), baseIndices.begin(), baseIndices.end());
+
+    size_t baseTriangles = baseIndices.size() / 3;
+    // Dont simplify very small  meshes
+    if (baseTriangles < 64)
+        return;
+
+    struct LODTarget {
+        float ratio;
+        float targetError;
+        float screenRatio;
+    };
+
+    const LODTarget targets[] = {
+        { 0.50f, 0.015f, 0.25f }, // LOD 1
+        { 0.25f, 0.035f, 0.12f }, // LOD 2
+        { 0.125f, 0.060f, 0.05f } // LOD 3
+    };
+
+    const float* vertexPositions = reinterpret_cast<const float*>(&vertices[0].position);
+    size_t vertexCount = vertices.size();
+    size_t vertexStride = sizeof(Vertex);
+
+    uint32_t currentOffset = static_cast<uint32_t>(baseIndices.size());
+    size_t lastIndexCount = baseIndices.size();
+
+    for (const auto& target : targets)
+    {
+        size_t targetIndexCount = static_cast<size_t>(baseIndices.size() * target.ratio);
+        targetIndexCount = (targetIndexCount / 3) * 3;
+        if (targetIndexCount < 12)
+            break;
+
+        std::vector<unsigned int> simplifiedIndices(baseIndices.size());
+        float resultError = 0.0f;
+
+        size_t simplifiedIndexCount = meshopt_simplify(
+            simplifiedIndices.data(),
+            baseIndices.data(),
+            baseIndices.size(),
+            vertexPositions,
+            vertexCount,
+            vertexStride,
+            targetIndexCount,
+            target.targetError,
+            0,
+            &resultError
+        );
+
+        if (simplifiedIndexCount == 0 || simplifiedIndexCount > lastIndexCount * 0.85f)
+        {
+            if (target.ratio <= 0.15f)
+            {
+                simplifiedIndexCount = meshopt_simplifySloppy(
+                    simplifiedIndices.data(),
+                    baseIndices.data(),
+                    baseIndices.size(),
+                    vertexPositions,
+                    vertexCount,
+                    vertexStride,
+                    targetIndexCount,
+                    target.targetError * 1.5f,
+                    &resultError
+                );
+            }
+            if (simplifiedIndexCount == 0 || simplifiedIndexCount > lastIndexCount * 0.85f)
+                break;
+        }
+
+        simplifiedIndices.resize(simplifiedIndexCount);
+
+        meshopt_optimizeVertexCache(
+            simplifiedIndices.data(),
+            simplifiedIndices.data(),
+            simplifiedIndexCount,
+            vertexCount
+        );
+
+        MeshLODHeader lodHeader;
+        lodHeader.indexOffset = currentOffset;
+        lodHeader.indexCount = static_cast<uint32_t>(simplifiedIndexCount);
+        lodHeader.screenRatio = target.screenRatio;
+        lodHeader.lodError = resultError;
+        outLODHeaders.push_back(lodHeader);
+
+        outAllIndices.insert(outAllIndices.end(), simplifiedIndices.begin(), simplifiedIndices.end());
+        currentOffset += static_cast<uint32_t>(simplifiedIndexCount);
+        lastIndexCount = simplifiedIndexCount;
+    }
+}
+
 bool MeshImporter::WriteMeshCache(
     const std::filesystem::path& outPath,
     const std::string& meshName,
     const std::vector<Vertex>& vertices,
-    const std::vector<unsigned int>& indices,
+    const std::vector<unsigned int>& allIndices,
+    const std::vector<MeshLODHeader>& lodHeaders,
     const AABB& aabb)
 {
     std::filesystem::create_directories(outPath.parent_path());
@@ -162,8 +281,11 @@ bool MeshImporter::WriteMeshCache(
     }
 
     MeshCacheHeader header{};
+    header.magic = MAGIC_MESH;
+    header.version = MESH_CACHE_VERSION;
     header.vertexCount = static_cast<uint32_t>(vertices.size());
-    header.indexCount = static_cast<uint32_t>(indices.size());
+    header.indexCount = static_cast<uint32_t>(allIndices.size());
+    header.lodCount = static_cast<uint16_t>(lodHeaders.size());
 
     file.write(reinterpret_cast<const char*>(&header), sizeof(header));
     file.write(reinterpret_cast<const char*>(&aabb), sizeof(AABB));
@@ -172,10 +294,16 @@ bool MeshImporter::WriteMeshCache(
     file.write(reinterpret_cast<const char*>(&nameLen), sizeof(nameLen));
     file.write(meshName.data(), nameLen);
 
+    if (!lodHeaders.empty())
+    {
+        file.write(reinterpret_cast<const char*>(lodHeaders.data()),
+            lodHeaders.size() * sizeof(MeshLODHeader));
+    }
+
     file.write(reinterpret_cast<const char*>(vertices.data()),
         vertices.size() * sizeof(Vertex));
-    file.write(reinterpret_cast<const char*>(indices.data()),
-        indices.size() * sizeof(unsigned int));
+    file.write(reinterpret_cast<const char*>(allIndices.data()),
+        allIndices.size() * sizeof(unsigned int));
 
     return file.good();
 }

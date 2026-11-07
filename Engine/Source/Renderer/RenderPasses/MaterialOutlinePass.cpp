@@ -163,7 +163,7 @@ void MaterialOutlinePass::Execute(const RenderContext& ctx, RenderFrame& frame)
                 bool useAlb = BindMaterial(shader, mat);
 
                 cmd.mesh->Bind();
-                glDrawElements(GL_TRIANGLES, cmd.mesh->indexCount, GL_UNSIGNED_INT, 0);
+                glDrawElements(GL_TRIANGLES, cmd.indexCount, GL_UNSIGNED_INT, (const void*)(uintptr_t)(cmd.indexOffset * sizeof(unsigned int)));
 
                 if (useAlb) glBindSampler(0, 0);
             }

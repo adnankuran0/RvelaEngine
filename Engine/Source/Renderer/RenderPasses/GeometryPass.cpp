@@ -312,7 +312,7 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             if (!needsGBuffer)
             {
                 command.mesh->Bind();
-                glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+                glDrawElements(GL_TRIANGLES, command.indexCount, GL_UNSIGNED_INT, (const void*)(uintptr_t)(command.indexOffset * sizeof(unsigned int)));
                 continue;
             }
 
@@ -331,7 +331,7 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             }
 
             command.mesh->Bind();
-            glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+            glDrawElements(GL_TRIANGLES, command.indexCount, GL_UNSIGNED_INT, (const void*)(uintptr_t)(command.indexOffset * sizeof(unsigned int)));
 
             CleanupSamplers();
         }
@@ -483,7 +483,7 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
                 }
 
                 command.mesh->Bind();
-                glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+                glDrawElements(GL_TRIANGLES, command.indexCount, GL_UNSIGNED_INT, (const void*)(uintptr_t)(command.indexOffset * sizeof(unsigned int)));
 
                 if (useAlb) glBindSampler(0, 0);
             }

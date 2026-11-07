@@ -12,6 +12,7 @@ public:
     void Execute(const RenderContext& ctx, RenderFrame& frame) override;
 private:
     void DrawAABBs(const RenderContext& ctx);
+    void DrawLODLevels(const RenderContext& ctx);
 };
 
 }

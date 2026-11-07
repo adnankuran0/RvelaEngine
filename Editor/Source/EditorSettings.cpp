@@ -93,6 +93,7 @@ void EditorSettings::Load()
             if (v.contains("snapScale")) ViewportSettings.SnapScale = v["snapScale"].get<float>();
             if (v.contains("drawColliders")) ViewportSettings.DrawColliders = v["drawColliders"].get<bool>();
             if (v.contains("drawBoundingBoxes")) ViewportSettings.DrawBoundingBoxes = v["drawBoundingBoxes"].get<bool>();
+            if (v.contains("drawLODLevels")) ViewportSettings.DrawLODLevels = v["drawLODLevels"].get<bool>();
             if (v.contains("drawInfiniteGrid")) ViewportSettings.DrawInfiniteGrid = v["drawInfiniteGrid"].get<bool>();
             if (v.contains("selectRootEntity")) ViewportSettings.SelectRootEntity = v["selectRootEntity"].get<bool>();
             if (v.contains("drawTransformGizmo")) ViewportSettings.DrawTransformGizmo = v["drawTransformGizmo"].get<bool>();
@@ -167,6 +168,7 @@ void EditorSettings::Save()
         { "snapScale", ViewportSettings.SnapScale },
         { "drawColliders", ViewportSettings.DrawColliders },
         { "drawBoundingBoxes", ViewportSettings.DrawBoundingBoxes },
+        { "drawLODLevels", ViewportSettings.DrawLODLevels },
         { "drawInfiniteGrid", ViewportSettings.DrawInfiniteGrid },
         { "selectRootEntity", ViewportSettings.SelectRootEntity },
         { "drawTransformGizmo", ViewportSettings.DrawTransformGizmo },
@@ -263,6 +265,7 @@ void EditorSettings::ApplyToViewport(Viewport& viewport) const
     auto& debugSettings = DebugRenderer::Get().GetSettings();
     debugSettings.drawColliders = ViewportSettings.DrawColliders;
     debugSettings.drawBoundingBoxes = ViewportSettings.DrawBoundingBoxes;
+    debugSettings.drawLODLevels = ViewportSettings.DrawLODLevels;
     debugSettings.drawInfiniteGrid = ViewportSettings.DrawInfiniteGrid;
     viewport.SetSelectRootEntity(ViewportSettings.SelectRootEntity);
     viewport.SetDrawGizmos(ViewportSettings.DrawTransformGizmo);
@@ -281,6 +284,7 @@ void EditorSettings::UpdateFromViewport(const Viewport& viewport)
     const auto& debugSettings = DebugRenderer::Get().GetSettings();
     ViewportSettings.DrawColliders = debugSettings.drawColliders;
     ViewportSettings.DrawBoundingBoxes = debugSettings.drawBoundingBoxes;
+    ViewportSettings.DrawLODLevels = debugSettings.drawLODLevels;
     ViewportSettings.DrawInfiniteGrid = debugSettings.drawInfiniteGrid;
     ViewportSettings.SelectRootEntity = viewport.GetSelectRootEntity();
     ViewportSettings.DrawTransformGizmo = viewport.GetDrawGizmos();

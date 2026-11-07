@@ -2,6 +2,7 @@
 #include "Asset/IAssetImporter.h"
 #include <unordered_map>
 #include "Asset/Types/MeshAsset.h"
+#include "Asset/CacheTypes/MeshCacheHeader.h"
 
 struct aiScene;
 struct aiMesh;
@@ -44,11 +45,18 @@ private:
     std::vector<Vertex>       ProcessVertices(aiMesh* mesh);
     std::vector<unsigned int> ProcessIndices(aiMesh* mesh);
 
+    void GenerateLODs(
+        const std::vector<Vertex>& vertices,
+        const std::vector<unsigned int>& baseIndices,
+        std::vector<MeshLODHeader>& outLODHeaders,
+        std::vector<unsigned int>& outAllIndices);
+
     bool WriteMeshCache(
         const std::filesystem::path& outPath,
         const std::string& meshName,
         const std::vector<Vertex>& vertices,
-        const std::vector<unsigned int>& indices,
+        const std::vector<unsigned int>& allIndices,
+        const std::vector<MeshLODHeader>& lodHeaders,
         const AABB& aabb);
 
     void OptimizeMesh(std::vector<Vertex>& outVertices, std::vector<unsigned int>& outIndices);

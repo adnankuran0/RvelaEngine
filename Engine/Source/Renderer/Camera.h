@@ -40,6 +40,7 @@ public:
     float OrthoSize{ 10.0f };
     float NearClip{ 0.1f };
     float FarClip{ 1000.0f };
+    float LODBias{ 1.0f };
     int width{ 1920 };
     int height{ 1080 };
     Projection ProjectionType = Projection::Perspective;

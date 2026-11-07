@@ -28,8 +28,32 @@ std::shared_ptr<GPUMesh> MeshCache::GetOrCreate(const Ref<MeshAsset>& asset)
     std::vector<float> packedVertices;
     PackVertices(asset->GetVertices(), packedVertices);
 
-    gpuMesh->indexCount = (unsigned int)asset->GetIndices().size();
+    gpuMesh->indexCount = asset->GetIndexCount(0);
     gpuMesh->localAABB = asset->GetAABB();
+
+    gpuMesh->lods.clear();
+    if (asset->GetLODCount() > 0)
+    {
+        gpuMesh->lods.reserve(asset->GetLODCount());
+        for (const auto& l : asset->GetLODs())
+        {
+            GPULOD glod;
+            glod.indexOffset = l.indexOffset;
+            glod.indexCount = l.indexCount;
+            glod.screenRatio = l.screenRatio;
+            glod.lodError = l.lodError;
+            gpuMesh->lods.push_back(glod);
+        }
+    }
+    else
+    {
+        GPULOD glod;
+        glod.indexOffset = 0;
+        glod.indexCount = gpuMesh->indexCount;
+        glod.screenRatio = 0.5f;
+        glod.lodError = 0.0f;
+        gpuMesh->lods.push_back(glod);
+    }
 
     gpuMesh->VAO.Init();
     gpuMesh->VAO.Bind();
@@ -46,7 +70,7 @@ std::shared_ptr<GPUMesh> MeshCache::GetOrCreate(const Ref<MeshAsset>& asset)
 
     gpuMesh->VAO.SetBufferLayout(gpuMesh->layout);
 
-    gpuMesh->EBO.Init(asset->GetIndices().data(), asset->GetIndices().size() * sizeof(unsigned int));
+    gpuMesh->EBO.Init(asset->GetAllIndices().data(), asset->GetAllIndices().size() * sizeof(unsigned int));
     gpuMesh->EBO.Bind();
 
     gpuMesh->VAO.Unbind();
@@ -83,6 +107,14 @@ std::shared_ptr<GPUMesh> MeshCache::GetOrCreate(const Ref<SkeletalMeshAsset>& as
     auto vertices = asset->GetVertices();
     gpuMesh->indexCount = (unsigned int)asset->GetIndices().size();
     gpuMesh->localAABB = asset->GetAABB();
+
+    gpuMesh->lods.clear();
+    GPULOD glod;
+    glod.indexOffset = 0;
+    glod.indexCount = gpuMesh->indexCount;
+    glod.screenRatio = 0.5f;
+    glod.lodError = 0.0f;
+    gpuMesh->lods.push_back(glod);
 
     gpuMesh->VAO.Init();
     gpuMesh->VAO.Bind();

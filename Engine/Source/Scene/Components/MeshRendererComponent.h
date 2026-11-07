@@ -18,6 +18,10 @@ public:
     unsigned int indexCount = 0;
     std::shared_ptr<GPUMesh> gpuMesh = nullptr;
 
+    bool enableAutoLOD = true;
+    float lodBias = 1.0f;
+    uint32_t currentLOD = 0; // LOD choosen by camera
+
     MeshRendererComponent() = default;
     MeshRendererComponent(const MeshRendererComponent&) = default;
     MeshRendererComponent& operator=(const MeshRendererComponent&) = default;
@@ -36,6 +40,7 @@ public:
     {
         gpuMesh = nullptr;
         indexCount = 0;
+        currentLOD = 0;
     }
 
     inline void Bind() const noexcept
@@ -46,6 +51,14 @@ public:
 
     inline bool IsCastShadow() const noexcept { return castShadow; }
     inline void SetCastShadow(bool isCastsShadow) noexcept { castShadow = isCastsShadow; }
+
+    inline bool IsAutoLODEnabled() const noexcept { return enableAutoLOD; }
+    inline void SetAutoLODEnabled(bool enable) noexcept { enableAutoLOD = enable; }
+
+    inline float GetLODBias() const noexcept { return lodBias; }
+    inline void SetLODBias(float bias) noexcept { lodBias = bias; }
+
+    inline uint32_t GetCurrentLOD() const noexcept { return currentLOD; }
 
     json Serialize() const;
     void Deserialize(const json& j);

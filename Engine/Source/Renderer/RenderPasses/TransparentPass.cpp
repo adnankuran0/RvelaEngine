@@ -402,7 +402,7 @@ void TransparentPass::Execute(const RenderContext& ctx, RenderFrame& frame)
                 currentShader->setVec2("UVOffset", material->GetUVOffset());
 
                 command.mesh->Bind();
-                glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+                glDrawElements(GL_TRIANGLES, command.indexCount, GL_UNSIGNED_INT, (const void*)(uintptr_t)(command.indexOffset * sizeof(unsigned int)));
 
                 if (hasCustomShader)
                 {

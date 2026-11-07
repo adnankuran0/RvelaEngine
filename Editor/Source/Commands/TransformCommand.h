@@ -89,6 +89,7 @@ private:
         }
 
         m_Scene->SetDirty(true);
+        m_Scene->GetTransformSystem().Update();
     }
 
     Scene* m_Scene = nullptr;

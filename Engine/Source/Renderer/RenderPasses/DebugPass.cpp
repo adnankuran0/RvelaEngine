@@ -110,6 +110,9 @@ void DebugPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     if (DebugRenderer::Get().GetSettings().drawBoundingBoxes)
         DrawAABBs(ctx);
 
+    if (DebugRenderer::Get().GetSettings().drawLODLevels)
+        DrawLODLevels(ctx);
+
     if (ctx.scene->GetState() == SceneState::EDIT && DebugRenderer::Get().GetSettings().drawInfiniteGrid)
         DrawInfiniteGrid(ctx);
 
@@ -171,5 +174,33 @@ void DebugPass::DrawAABBs(const RenderContext& ctx)
 
         auto& comp = reg.get<SkeletalMeshRendererComponent>(e);
         DebugRenderer::Get().DrawBox(comp.worldAABB.min, comp.worldAABB.max, { 0.0f, 1.0f, 1.0f, 1.0f });
+    }
+}
+
+
+void DebugPass::DrawLODLevels(const RenderContext& ctx)
+{
+    auto& reg = ctx.scene->GetRegistry();
+
+    const glm::vec4 lodColors[] = {
+        glm::vec4(0.1f, 0.95f, 0.1f, 1.0f),  // LOD 0
+        glm::vec4(0.1f, 0.75f, 1.0f, 1.0f),  // LOD 1
+        glm::vec4(1.0f, 0.85f, 0.1f, 1.0f),  // LOD 2
+        glm::vec4(1.0f, 0.2f,  0.2f, 1.0f)   // LOD 3+
+    };
+
+    auto meshView = reg.view<MeshRendererComponent>();
+    for (auto e : meshView)
+    {
+        if (!ctx.scene->IsEntityActive(e))
+            continue;
+
+        auto& comp = reg.get<MeshRendererComponent>(e);
+        if (!comp.worldAABB.IsValid())
+            continue;
+
+        uint32_t lodIdx = comp.currentLOD;
+        glm::vec4 color = (lodIdx < 4) ? lodColors[lodIdx] : lodColors[3];
+        DebugRenderer::Get().DrawBox(comp.worldAABB.min, comp.worldAABB.max, color);
     }
 }

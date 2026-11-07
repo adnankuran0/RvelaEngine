@@ -7,7 +7,7 @@ struct DebugSettings
 	bool drawColliders = false;
 	bool drawBoundingBoxes = false;
 	bool drawInfiniteGrid = true;
-
+	bool drawLODLevels = false;
 };
 
 }

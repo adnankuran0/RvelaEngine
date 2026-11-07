@@ -29,10 +29,10 @@ Ref<Asset> MeshLoader::LoadFromMemory(const uint8_t* data, size_t size, const As
         return nullptr;
     }
 
-    if (header.version != MESH_CACHE_VERSION)
+    if (header.version != MESH_CACHE_VERSION && header.version != MESH_CACHE_VERSION_1)
     {
-        LOG_ERROR("MeshLoader::LoadFromMemory: Version mismatch (got {}, expected {})",
-            header.version, MESH_CACHE_VERSION);
+        LOG_ERROR("MeshLoader::LoadFromMemory: Version mismatch (got {}, expected {} or {})",
+            header.version, MESH_CACHE_VERSION, MESH_CACHE_VERSION_1);
         return nullptr;
     }
 
@@ -69,6 +69,40 @@ Ref<Asset> MeshLoader::LoadFromMemory(const uint8_t* data, size_t size, const As
         offset += nameLen;
     }
 
+    std::vector<MeshLODInfo> lods;
+    if (header.version >= MESH_CACHE_VERSION)
+    {
+        uint16_t lodCount = header.lodCount > 0 ? header.lodCount : 1;
+        const size_t lodHeadersBytes = lodCount * sizeof(MeshLODHeader);
+        if (offset + lodHeadersBytes > size)
+        {
+            LOG_ERROR("MeshLoader::LoadFromMemory: Incomplete LOD headers");
+            return nullptr;
+        }
+
+        std::vector<MeshLODHeader> lodHeaders(lodCount);
+        std::memcpy(lodHeaders.data(), data + offset, lodHeadersBytes);
+        offset += lodHeadersBytes;
+
+        lods.resize(lodCount);
+        for (size_t i = 0; i < lodCount; ++i)
+        {
+            lods[i].indexOffset = lodHeaders[i].indexOffset;
+            lods[i].indexCount = lodHeaders[i].indexCount;
+            lods[i].screenRatio = lodHeaders[i].screenRatio;
+            lods[i].lodError = lodHeaders[i].lodError;
+        }
+    }
+    else
+    {
+        MeshLODInfo lod0;
+        lod0.indexOffset = 0;
+        lod0.indexCount = header.indexCount;
+        lod0.screenRatio = 0.5f;
+        lod0.lodError = 0.0f;
+        lods.push_back(lod0);
+    }
+
     const size_t verticesBytes = header.vertexCount * sizeof(Vertex);
     const size_t indicesBytes = header.indexCount * sizeof(unsigned int);
 
@@ -91,6 +125,7 @@ Ref<Asset> MeshLoader::LoadFromMemory(const uint8_t* data, size_t size, const As
     asset->m_MeshName = std::move(meshName);
     asset->m_Vertices = std::move(vertices);
     asset->m_Indices = std::move(indices);
+    asset->m_LODs = std::move(lods);
 
     return asset;
 }

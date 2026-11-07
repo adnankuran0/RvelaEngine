@@ -241,6 +241,73 @@ void RenderLayer::CollectRenderCommands(Scene* scene)
 		glm::vec3 objPos = glm::vec3(transform.GetWorldMatrix()[3]);
 		cmd.distanceToCamera = glm::length2(camPos - objPos);
 
+		//Calculate LOD based on screen size ratio
+		uint32_t chosenLOD = 0;
+		uint32_t chosenIndexOffset = 0;
+		uint32_t chosenIndexCount = meshRenderer.indexCount;
+
+		if (meshRenderer.gpuMesh && !meshRenderer.gpuMesh->lods.empty())
+		{
+			const auto& lods = meshRenderer.gpuMesh->lods;
+			if (meshRenderer.enableAutoLOD && lods.size() > 1)
+			{
+				glm::vec3 meshCenter = meshRenderer.worldAABB.IsValid()
+					? meshRenderer.worldAABB.Center()
+					: objPos;
+				float linearDist = glm::distance(camPos, meshCenter);
+				linearDist = std::max(linearDist, 0.001f);
+
+				float radius = meshRenderer.worldAABB.IsValid()
+					? glm::length(meshRenderer.worldAABB.Size()) * 0.5f
+					: 1.0f;
+				radius = std::max(radius, 0.001f);
+
+				float projFactor = 1.0f;
+				if (camera->ProjectionType == Camera::Projection::Perspective)
+				{
+					float fovRad = glm::radians(camera->FOV);
+					projFactor = 1.0f / (2.0f * std::tan(fovRad * 0.5f));
+				}
+				else
+				{
+					projFactor = 1.0f / std::max(camera->OrthoSize, 0.001f);
+				}
+
+				float combinedBias = std::max(camera->LODBias * meshRenderer.lodBias, 0.001f);
+
+				float screenRatio = 0.0f;
+				if (camera->ProjectionType == Camera::Projection::Perspective)
+				{
+					screenRatio = (2.0f * radius / linearDist) * projFactor * combinedBias;
+				}
+				else
+				{
+					screenRatio = (2.0f * radius) * projFactor * combinedBias;
+				}
+
+				chosenLOD = 0;
+				for (size_t i = 1; i < lods.size(); ++i)
+				{
+					if (screenRatio < lods[i].screenRatio)
+					{
+						chosenLOD = static_cast<uint32_t>(i);
+					}
+					else
+					{
+						break;
+					}
+				}
+			}
+
+			meshRenderer.currentLOD = chosenLOD;
+			chosenIndexOffset = lods[chosenLOD].indexOffset;
+			chosenIndexCount = lods[chosenLOD].indexCount;
+		}
+
+		cmd.lodIndex = chosenLOD;
+		cmd.indexOffset = chosenIndexOffset;
+		cmd.indexCount = chosenIndexCount;
+
 		glm::vec3 visPivotPos = objPos;
 		if (const auto* vis = FindVisibilityRangeInHierarchy(scene, entity, visPivotPos))
 		{

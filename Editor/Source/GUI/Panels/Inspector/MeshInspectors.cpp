@@ -95,7 +95,6 @@ void MeshInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 					EditorUtils::ClearAssetFileNameCache();
 				});
 			}
-			if (ImGui::IsItemHovered()) ImGui::SetTooltip("Clear Mesh");
 		}
 
 		if (s_OpenDroppedModelPopup)
@@ -251,7 +250,6 @@ void MeshInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 					EditorUtils::ClearAssetFileNameCache();
 				});
 			}
-			if (ImGui::IsItemHovered()) ImGui::SetTooltip("Clear Skeletal Mesh");
 		}
 
 		if (s_OpenDroppedSkelModelPopup)
@@ -402,6 +400,46 @@ void MeshInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 				meshRenderer.SetCastShadow(isCastShadow);
 				if (Scene* scene = InspectorContext::GetScene())
 					scene->SetDirty(true);
+			}
+
+			UI::PropertyLabel("Enable Auto LOD");
+			bool autoLOD = meshRenderer.IsAutoLODEnabled();
+			if (ImGui::Checkbox("##EnableAutoLOD", &autoLOD))
+			{
+				meshRenderer.SetAutoLODEnabled(autoLOD);
+				if (Scene* scene = InspectorContext::GetScene())
+					scene->SetDirty(true);
+			}
+
+			if (meshRenderer.IsAutoLODEnabled())
+			{
+				UI::PropertyLabel("LOD Bias");
+				float bias = meshRenderer.GetLODBias();
+				if (ImGui::SliderFloat("##LODBias", &bias, 0.1f, 5.0f, "%.2f"))
+				{
+					meshRenderer.SetLODBias(bias);
+					if (Scene* scene = InspectorContext::GetScene())
+						scene->SetDirty(true);
+				}
+			}
+
+			if (meshRenderer.gpuMesh && !meshRenderer.gpuMesh->lods.empty())
+			{
+				size_t lodCount = meshRenderer.gpuMesh->lods.size();
+				UI::PropertyLabel("LOD Levels");
+				ImGui::Text("%zu level%s", lodCount, lodCount > 1 ? "s" : "");
+
+				UI::PropertyLabel("Active LOD");
+				uint32_t cur = meshRenderer.GetCurrentLOD();
+				const ImVec4 lodColors[] = {
+					ImVec4(0.1f, 0.95f, 0.1f, 1.0f),
+					ImVec4(0.1f, 0.75f, 1.0f, 1.0f),
+					ImVec4(1.0f, 0.85f, 0.1f, 1.0f),
+					ImVec4(1.0f, 0.2f,  0.2f, 1.0f)
+				};
+				ImVec4 color = (cur < 4) ? lodColors[cur] : lodColors[3];
+				uint32_t triCount = (cur < lodCount) ? (meshRenderer.gpuMesh->lods[cur].indexCount / 3) : (meshRenderer.indexCount / 3);
+				ImGui::TextColored(color, "LOD %u  (%u tris)", cur, triCount);
 			}
 
 			UI::EndPropertyTable();

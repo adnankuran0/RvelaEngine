@@ -49,6 +49,9 @@ public:
     MaterialComponent* material = nullptr;
     float distanceToCamera = 0.0f;
     float visibilityFade = 1.0f;
+    uint32_t lodIndex = 0;
+    uint32_t indexCount = 0;
+    uint32_t indexOffset = 0;
 };
 
 }

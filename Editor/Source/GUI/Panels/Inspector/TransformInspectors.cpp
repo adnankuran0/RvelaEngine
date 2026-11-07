@@ -9,7 +9,7 @@ void TransformInspectors::DrawTransform(Scene& scene, entt::entity selectedEntit
 {
 	entt::registry& registry = scene.GetRegistry();
 
-	UI::DrawComponent<TransformComponent>("Transform", registry, selectedEntity, [](TransformComponent& transform)
+	UI::DrawComponent<TransformComponent>("Transform", registry, selectedEntity, [&scene](TransformComponent& transform)
 	{
 		if (UI::BeginPropertyTable("TransformTable"))
 		{
@@ -24,18 +24,21 @@ void TransformInspectors::DrawTransform(Scene& scene, entt::entity selectedEntit
 			{
 				transform.SetPosition(pos);
 				transform.SetDirty();
+				scene.GetTransformSystem().Update();
 			}
 
 			if (UI::DrawTransformRow("Rotation", euler, 0.0f, 0.1f, -360.0f, 360.0f))
 			{
 				transform.SetEulerRotation(euler);
 				transform.SetDirty();
+				scene.GetTransformSystem().Update();
 			}
 
 			if (UI::DrawTransformRow("Scale", scale, 1.0f, 0.05f, 0.001f, 10000.0f, true, &isScaleRatioLocked))
 			{
 				transform.SetScale(scale);
 				transform.SetDirty();
+				scene.GetTransformSystem().Update();
 			}
 
 			if (isScaleRatioLocked != oldLocked)

@@ -202,6 +202,17 @@ void LuaBindings::RegisterComponents(sol::state& lua)
         "castShadow", sol::property(
             [](MeshRendererHandle& h) { return h.Get() ? h.Get()->IsCastShadow() : false; },
             [](MeshRendererHandle& h, bool v) { if (auto* c = h.Get()) c->SetCastShadow(v); }
+        ),
+        "enableAutoLOD", sol::property(
+            [](MeshRendererHandle& h) { return h.Get() ? h.Get()->IsAutoLODEnabled() : false; },
+            [](MeshRendererHandle& h, bool v) { if (auto* c = h.Get()) c->SetAutoLODEnabled(v); }
+        ),
+        "lodBias", sol::property(
+            [](MeshRendererHandle& h) { return h.Get() ? h.Get()->GetLODBias() : 1.0f; },
+            [](MeshRendererHandle& h, float v) { if (auto* c = h.Get()) c->SetLODBias(v); }
+        ),
+        "currentLOD", sol::property(
+            [](MeshRendererHandle& h) { return h.Get() ? h.Get()->GetCurrentLOD() : 0u; }
         )
     );
 
