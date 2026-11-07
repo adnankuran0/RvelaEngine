@@ -1,22 +1,28 @@
 #include "rvelapch.h"
 #include "Core/Engine.h"
 #include "Input.h"
+#include "Event/EventManager.h"
+#include "Event/MouseEvents.h"
 
 using namespace rv;
 
-// Cache for the last known mouse position to avoid redundant GLFW calls
+glm::vec2 Input::s_CurrentMousePosition = { 0.0f, 0.0f };
 glm::vec2 Input::s_LastMousePosition = { 0.0f, 0.0f };
 glm::vec2 Input::s_MouseDelta = { 0.0f, 0.0f };
+glm::vec2 Input::s_AccumulatedMouseDelta = { 0.0f, 0.0f };
 glm::vec2 Input::s_CurrentScrollDelta = { 0.0f, 0.0f };
 glm::vec2 Input::s_AccumulatedScrollDelta = { 0.0f, 0.0f };
 std::vector<uint32_t> Input::s_TypedCharacters;
 bool Input::s_FirstMouse = true;
+bool Input::s_MouseMovedThisFrame = false;
 bool Input::s_GameplayInputEnabled = true;
 Input::MouseMode Input::s_RequestedMouseMode = Input::MouseMode::VISIBLE;
 Input::MouseMode Input::s_ActiveMouseMode = Input::MouseMode::VISIBLE;
-// Cache previosly pressed keys and buttons
-std::unordered_map<KeyCode, bool> Input::s_PreviousKeyState;
-std::unordered_map<MouseCode, bool> Input::s_PreviousMouseButtonState;
+
+std::array<bool, 512> Input::s_CurrentKeyState = {};
+std::array<bool, 512> Input::s_PreviousKeyState = {};
+std::array<bool, 16> Input::s_CurrentMouseButtonState = {};
+std::array<bool, 16> Input::s_PreviousMouseButtonState = {};
 
 void Input::BeginFrame() noexcept
 {
@@ -24,29 +30,75 @@ void Input::BeginFrame() noexcept
     s_AccumulatedScrollDelta = { 0.0f, 0.0f };
     s_TypedCharacters.clear();
 
-    GLFWwindow* window = Engine::Get() ? Engine::Get()->GetWindow().GetGLFWWindow() : nullptr;
-    if (window && s_GameplayInputEnabled)
+    if (s_FirstMouse)
     {
-        double xPos, yPos;
-        glfwGetCursorPos(window, &xPos, &yPos);
-        glm::vec2 currentPos = { static_cast<float>(xPos), static_cast<float>(yPos) };
-
-        if (s_FirstMouse)
+        GLFWwindow* window = Engine::Get() ? Engine::Get()->GetWindow().GetGLFWWindow() : nullptr;
+        if (window)
         {
-            s_LastMousePosition = currentPos;
+            double xPos = 0.0, yPos = 0.0;
+            glfwGetCursorPos(window, &xPos, &yPos);
+            s_CurrentMousePosition = { static_cast<float>(xPos), static_cast<float>(yPos) };
+            s_LastMousePosition = s_CurrentMousePosition;
+            s_AccumulatedMouseDelta = { 0.0f, 0.0f };
             s_MouseDelta = { 0.0f, 0.0f };
             s_FirstMouse = false;
-        }
-        else
-        {
-            s_MouseDelta = currentPos - s_LastMousePosition;
-            s_LastMousePosition = currentPos;
         }
     }
     else
     {
-        s_MouseDelta = { 0.0f, 0.0f };
+        s_MouseDelta = s_GameplayInputEnabled ? s_AccumulatedMouseDelta : glm::vec2(0.0f);
+        s_AccumulatedMouseDelta = { 0.0f, 0.0f };
+        s_LastMousePosition = s_CurrentMousePosition;
     }
+
+    if (s_MouseMovedThisFrame)
+    {
+        EventManager::Push<MouseMovedEvent>(s_CurrentMousePosition.x, s_CurrentMousePosition.y);
+        s_MouseMovedThisFrame = false;
+    }
+}
+
+void Input::OnMouseMoved(float xpos, float ypos) noexcept
+{
+    glm::vec2 currentPos = { xpos, ypos };
+    if (s_FirstMouse)
+    {
+        s_CurrentMousePosition = currentPos;
+        s_LastMousePosition = currentPos;
+        s_AccumulatedMouseDelta = { 0.0f, 0.0f };
+        s_MouseDelta = { 0.0f, 0.0f };
+        s_FirstMouse = false;
+    }
+    else
+    {
+        s_AccumulatedMouseDelta += (currentPos - s_CurrentMousePosition);
+        s_CurrentMousePosition = currentPos;
+    }
+    s_MouseMovedThisFrame = true;
+}
+
+void Input::OnKeyPressed(int key) noexcept
+{
+    if (key >= 0 && key < 512)
+        s_CurrentKeyState[key] = true;
+}
+
+void Input::OnKeyReleased(int key) noexcept
+{
+    if (key >= 0 && key < 512)
+        s_CurrentKeyState[key] = false;
+}
+
+void Input::OnMouseButtonPressed(int button) noexcept
+{
+    if (button >= 0 && button < 16)
+        s_CurrentMouseButtonState[button] = true;
+}
+
+void Input::OnMouseButtonReleased(int button) noexcept
+{
+    if (button >= 0 && button < 16)
+        s_CurrentMouseButtonState[button] = false;
 }
 
 void Input::OnMouseScrolled(float xOffset, float yOffset) noexcept
@@ -99,61 +151,42 @@ float Input::GetMouseScrollY() noexcept
 
 void Input::Update() noexcept
 {
-    for (int key = GLFW_KEY_SPACE; key <= GLFW_KEY_LAST; ++key) {
-        KeyCode code = static_cast<KeyCode>(key);
-        s_PreviousKeyState[code] = IsKeyPressed(code);
-    }
-
-    for (int button = GLFW_MOUSE_BUTTON_1; button <= GLFW_MOUSE_BUTTON_LAST; ++button) {
-        MouseCode code = static_cast<MouseCode>(button);
-        s_PreviousMouseButtonState[code] = IsMouseButtonPressed(code);
-    }
+    s_PreviousKeyState = s_CurrentKeyState;
+    s_PreviousMouseButtonState = s_CurrentMouseButtonState;
 }
 
 bool Input::IsKeyPressed(KeyCode key) noexcept {
-    GLFWwindow* window = Engine::Get() ? Engine::Get()->GetWindow().GetGLFWWindow() : nullptr;
-    if (!window) {
-        return false;
-    }
-
-    return glfwGetKey(window, static_cast<int>(key)) == GLFW_PRESS;
+    int k = static_cast<int>(key);
+    return (k >= 0 && k < 512) ? s_CurrentKeyState[k] : false;
 }
 
 bool Input::IsKeyJustPressed(KeyCode key) noexcept
 {
-    bool isPressed = IsKeyPressed(key);
-    bool wasPressed = s_PreviousKeyState[key];
-    return isPressed && !wasPressed;
+    int k = static_cast<int>(key);
+    return (k >= 0 && k < 512) ? (s_CurrentKeyState[k] && !s_PreviousKeyState[k]) : false;
 }
 
 bool Input::IsKeyJustReleased(KeyCode key) noexcept
 {
-    bool isPressed = IsKeyPressed(key);
-    bool wasPressed = s_PreviousKeyState[key];
-    return !isPressed && wasPressed;
+    int k = static_cast<int>(key);
+    return (k >= 0 && k < 512) ? (!s_CurrentKeyState[k] && s_PreviousKeyState[k]) : false;
 }
 
 bool Input::IsMouseButtonPressed(MouseCode button) noexcept {
-    auto* window = Engine::Get() ? Engine::Get()->GetWindow().GetGLFWWindow() : nullptr;
-    if (!window) {
-        return false;
-    }
-
-    return glfwGetMouseButton(window, static_cast<int>(button)) == GLFW_PRESS;
+    int b = static_cast<int>(button);
+    return (b >= 0 && b < 16) ? s_CurrentMouseButtonState[b] : false;
 }
 
 bool Input::IsMouseButtonJustPressed(MouseCode button) noexcept
 {
-    bool isPressed = IsMouseButtonPressed(button);
-    bool wasPressed = s_PreviousMouseButtonState[button];
-    return isPressed && !wasPressed;
+    int b = static_cast<int>(button);
+    return (b >= 0 && b < 16) ? (s_CurrentMouseButtonState[b] && !s_PreviousMouseButtonState[b]) : false;
 }
 
 bool Input::IsMouseButtonJustReleased(MouseCode button) noexcept
 {
-    bool isPressed = IsMouseButtonPressed(button);
-    bool wasPressed = s_PreviousMouseButtonState[button];
-    return !isPressed && wasPressed;
+    int b = static_cast<int>(button);
+    return (b >= 0 && b < 16) ? (!s_CurrentMouseButtonState[b] && s_PreviousMouseButtonState[b]) : false;
 }
 
 void rv::Input::SetMouseMode(MouseMode mode) noexcept
@@ -210,13 +243,17 @@ void Input::ApplyMouseMode(MouseMode mode) noexcept
 
 void Input::OnFocusChanged(bool focused) noexcept
 {
-    s_PreviousKeyState.clear();
-    s_PreviousMouseButtonState.clear();
+    s_CurrentKeyState.fill(false);
+    s_PreviousKeyState.fill(false);
+    s_CurrentMouseButtonState.fill(false);
+    s_PreviousMouseButtonState.fill(false);
     s_MouseDelta = { 0.0f, 0.0f };
+    s_AccumulatedMouseDelta = { 0.0f, 0.0f };
     s_CurrentScrollDelta = { 0.0f, 0.0f };
     s_AccumulatedScrollDelta = { 0.0f, 0.0f };
     s_TypedCharacters.clear();
     s_FirstMouse = true;
+    s_MouseMovedThisFrame = false;
 
     if (!focused)
     {
@@ -245,18 +282,11 @@ glm::vec2 Input::GetViewportMousePosition(float viewportWidth, float viewportHei
         return s_ViewportMousePos;
     }
 
-    auto* window = Engine::Get() ? Engine::Get()->GetWindow().GetGLFWWindow() : nullptr;
-    if (!window) {
-        return { 0.0f, 0.0f };
-    }
-
-    double xPos, yPos;
-    glfwGetCursorPos(window, &xPos, &yPos);
-    WindowSize winSize = Engine::Get()->GetWindow().GetSize();
+    WindowSize winSize = Engine::Get() ? Engine::Get()->GetWindow().GetSize() : WindowSize{ 0, 0 };
     float winW = winSize.width > 0 ? (float)winSize.width : viewportWidth;
     float winH = winSize.height > 0 ? (float)winSize.height : viewportHeight;
 
-    return glm::vec2((float)xPos / winW * viewportWidth, (float)yPos / winH * viewportHeight);
+    return glm::vec2(s_CurrentMousePosition.x / winW * viewportWidth, s_CurrentMousePosition.y / winH * viewportHeight);
 }
 
 static bool s_IsMouseOverUI = false;
@@ -274,14 +304,5 @@ bool Input::IsMouseOverUI() noexcept
 glm::vec2 Input::GetMousePosition() noexcept {
 	if (!s_GameplayInputEnabled)
 		return s_LastMousePosition;
-
-    auto* window = Engine::Get() ? Engine::Get()->GetWindow().GetGLFWWindow() : nullptr;
-    if (!window) {
-        return { 0.0f, 0.0f };
-    }
-
-    double xPos, yPos;
-    glfwGetCursorPos(window, &xPos, &yPos);
-    s_LastMousePosition = { static_cast<float>(xPos), static_cast<float>(yPos) };
-    return s_LastMousePosition;
+    return s_CurrentMousePosition;
 }

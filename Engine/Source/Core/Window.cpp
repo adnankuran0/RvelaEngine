@@ -168,54 +168,64 @@ Window Window::Create(const std::string& title, int width, int height, bool maxi
 
 void Window::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) noexcept
 {
-    if (action == GLFW_PRESS) 
+    if (key >= 0 && key < 512)
     {
-        KeyCode keyCode = static_cast<KeyCode>(key);
-        EventManager::PushEvent(new KeyPressedEvent(keyCode));
-    }
-    else if (action == GLFW_RELEASE) 
-    {
-        KeyCode keyCode = static_cast<KeyCode>(key);
-        EventManager::PushEvent(new KeyReleasedEvent(keyCode));
+        if (action == GLFW_PRESS) 
+        {
+            KeyCode keyCode = static_cast<KeyCode>(key);
+            Input::OnKeyPressed(key);
+            EventManager::Push<KeyPressedEvent>(keyCode);
+        }
+        else if (action == GLFW_RELEASE) 
+        {
+            KeyCode keyCode = static_cast<KeyCode>(key);
+            Input::OnKeyReleased(key);
+            EventManager::Push<KeyReleasedEvent>(keyCode);
+        }
     }
 }
 
 void Window::MouseButtonCallback(GLFWwindow* window, int button, int action, int mods) noexcept 
 {
-    if (action == GLFW_PRESS) 
+    if (button >= 0 && button < 16)
     {
-        MouseCode mouseCode = static_cast<MouseCode>(button);
-        EventManager::PushEvent(new MouseButtonPressedEvent(mouseCode));
-    }
-    else if (action == GLFW_RELEASE) 
-    {
-        MouseCode mouseCode = static_cast<MouseCode>(button);
-        EventManager::PushEvent(new MouseButtonReleasedEvent(mouseCode));
+        if (action == GLFW_PRESS) 
+        {
+            MouseCode mouseCode = static_cast<MouseCode>(button);
+            Input::OnMouseButtonPressed(button);
+            EventManager::Push<MouseButtonPressedEvent>(mouseCode);
+        }
+        else if (action == GLFW_RELEASE) 
+        {
+            MouseCode mouseCode = static_cast<MouseCode>(button);
+            Input::OnMouseButtonReleased(button);
+            EventManager::Push<MouseButtonReleasedEvent>(mouseCode);
+        }
     }
 }
 
 void Window::MouseMovedCallback(GLFWwindow* window, double xpos, double ypos) noexcept 
 {
-    EventManager::PushEvent(new MouseMovedEvent(static_cast<float>(xpos), static_cast<float>(ypos)));
+    Input::OnMouseMoved(static_cast<float>(xpos), static_cast<float>(ypos));
 }
 
 void Window::MouseScrolledCallback(GLFWwindow* window, double xoffset, double yoffset) noexcept 
 {
     Input::OnMouseScrolled(static_cast<float>(xoffset), static_cast<float>(yoffset));
-    EventManager::PushEvent(new MouseScrolledEvent(static_cast<float>(xoffset), static_cast<float>(yoffset)));
+    EventManager::Push<MouseScrolledEvent>(static_cast<float>(xoffset), static_cast<float>(yoffset));
 }
 
 void Window::FramebufferSizeCallback(GLFWwindow* window, int width, int height) noexcept 
 {
     glViewport(0, 0, width, height);
-    EventManager::PushEvent(new WindowResizedEvent(width, height));
+    EventManager::Push<WindowResizedEvent>(width, height);
 }
 
 void Window::WindowFocusCallback(GLFWwindow* window, int focused) noexcept
 {
     const bool isFocused = (focused == GLFW_TRUE);
     Input::OnFocusChanged(isFocused);
-    EventManager::PushEvent(new WindowFocusEvent(isFocused));
+    EventManager::Push<WindowFocusEvent>(isFocused);
 }
 
 void Window::FileDropCallback(GLFWwindow* window, int pathCount, const char* paths[]) noexcept
@@ -223,11 +233,11 @@ void Window::FileDropCallback(GLFWwindow* window, int pathCount, const char* pat
 #if defined(_WIN32)
     POINT pt;
     ::GetCursorPos(&pt);
-    EventManager::PushEvent(new FileDroppedEvent(pathCount, paths, static_cast<float>(pt.x), static_cast<float>(pt.y)));
+    EventManager::Push<FileDroppedEvent>(pathCount, paths, static_cast<float>(pt.x), static_cast<float>(pt.y));
 #else
     double xpos = 0.0, ypos = 0.0;
     glfwGetCursorPos(window, &xpos, &ypos);
-    EventManager::PushEvent(new FileDroppedEvent(pathCount, paths, static_cast<float>(xpos), static_cast<float>(ypos)));
+    EventManager::Push<FileDroppedEvent>(pathCount, paths, static_cast<float>(xpos), static_cast<float>(ypos));
 #endif
 }
 
