@@ -185,7 +185,8 @@ bool ImportSettingsPanel::DrawAssetSettingsUI(
             "Normal Map (OpenGL)",
             "Roughness / Metallic / Mask",
             "Uncompressed",
-            "Sprite"
+            "Sprite",
+            "LUT"
         };
         static int currentPreset = 0;
         ImGui::TextUnformatted("Preset:");
@@ -253,6 +254,15 @@ bool ImportSettingsPanel::DrawAssetSettingsUI(
                 s.flipY = true;
                 s.invertGreenChannel = false;
                 break;
+            case 7: // Color Grading (LUT)
+                s.textureType = TextureImportType::LUT;
+                s.sRGB = false;
+                s.generateMips = false;
+                s.compress = false;
+                s.compressionFormat = TextureCompressionFormat::Uncompressed;
+                s.flipY = false;
+                s.invertGreenChannel = false;
+                break;
             default:
                 break;
             }
@@ -262,7 +272,7 @@ bool ImportSettingsPanel::DrawAssetSettingsUI(
 
         if (ImGui::CollapsingHeader("Color Space", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            const char* typeItems[] = { "Auto", "Albedo", "Normal Map", "Grayscale", "HDR" };
+            const char* typeItems[] = { "Auto", "Albedo", "Normal Map", "Grayscale", "HDR", "Color Grading (LUT)" };
             int typeIdx = static_cast<int>(s.textureType);
             ImGui::TextUnformatted("Import As:");
             ImGui::SetNextItemWidth(-FLT_MIN);
@@ -270,7 +280,14 @@ bool ImportSettingsPanel::DrawAssetSettingsUI(
             {
                 s.textureType = static_cast<TextureImportType>(typeIdx);
                 if (s.textureType == TextureImportType::Color) s.sRGB = true;
-                else if (s.textureType == TextureImportType::NormalMap || s.textureType == TextureImportType::GrayscaleMask) s.sRGB = false;
+                else if (s.textureType == TextureImportType::NormalMap || s.textureType == TextureImportType::GrayscaleMask || s.textureType == TextureImportType::LUT) s.sRGB = false;
+                if (s.textureType == TextureImportType::LUT)
+                {
+                    s.generateMips = false;
+                    s.compress = false;
+                    s.compressionFormat = TextureCompressionFormat::Uncompressed;
+                    s.flipY = false;
+                }
                 s_SettingsDirty = true;
                 currentPreset = 0;
             }

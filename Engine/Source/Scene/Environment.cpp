@@ -68,6 +68,9 @@ json Environment::Serialize()
     j["PostProcess_VignetteIntensity"] = PostProcess_VignetteIntensity;
     j["PostProcess_VignetteSmoothness"] = PostProcess_VignetteSmoothness;
     j["PostProcess_ChromaticStrength"] = PostProcess_ChromaticStrength;
+    j["PostProcess_LUTEnabled"] = PostProcess_LUTEnabled;
+    j["PostProcess_LUTIntensity"] = PostProcess_LUTIntensity;
+    j["PostProcess_LUTUUID"] = PostProcess_LUTUUID.IsValid() ? PostProcess_LUTUUID.ToString() : "";
 
     j["Fog_Enabled"] = Fog_Enabled;
     j["Fog_Color"] = { Fog_Color.r, Fog_Color.g, Fog_Color.b };
@@ -217,6 +220,17 @@ void Environment::Deserialize(const json& j)
 
     if (j.contains("PostProcess_ChromaticStrength"))
         PostProcess_ChromaticStrength = j["PostProcess_ChromaticStrength"];
+
+    if (j.contains("PostProcess_LUTEnabled"))
+        PostProcess_LUTEnabled = j["PostProcess_LUTEnabled"];
+
+    if (j.contains("PostProcess_LUTIntensity"))
+        PostProcess_LUTIntensity = j["PostProcess_LUTIntensity"];
+
+    if (j.contains("PostProcess_LUTUUID") && !j["PostProcess_LUTUUID"].get<std::string>().empty())
+    {
+        PostProcess_LUTUUID = AssetUUID::FromString(j["PostProcess_LUTUUID"].get<std::string>());
+    }
 
     if (j.contains("Fog_Enabled"))
         Fog_Enabled = j["Fog_Enabled"];

@@ -11,7 +11,8 @@ enum class TextureImportType : int
     Color,
     NormalMap,
     GrayscaleMask,
-    HDR
+    HDR,
+    LUT
 };
 
 enum class TextureCompressionFormat : int

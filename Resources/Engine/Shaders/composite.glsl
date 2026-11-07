@@ -25,6 +25,7 @@ layout(binding = 0) uniform sampler2D screenTexture;
 layout(binding = 1) uniform sampler2D bloomTexture;
 layout(binding = 2) uniform sampler2D ssrTexture;
 layout(binding = 3) uniform sampler2D depthTexture;
+layout(binding = 4) uniform sampler2D lutTexture;
 
 layout(std430, binding = 0) readonly buffer AutoExposureBuffer {
     float b_Exposure;
@@ -42,6 +43,9 @@ uniform float saturation;
 uniform float chromaticStrength;
 uniform float vignetteIntensity;
 uniform float vignetteSmoothness;
+
+uniform bool u_LUTEnabled;
+uniform float u_LUTIntensity;
 
 uniform bool u_FogEnabled;
 uniform vec3 u_FogColor;
@@ -98,6 +102,12 @@ void main()
     mapped = LinearToSRGB(mapped);
 
     mapped = AdjustColor(mapped, brightness, contrast, saturation);
+
+    if (u_LUTEnabled)
+    {
+        vec3 lutColor = SampleLUT(lutTexture, mapped);
+        mapped = mix(mapped, lutColor, clamp(u_LUTIntensity, 0.0, 1.0));
+    }
 
     mapped *= Vignette(TexCoords, vignetteIntensity, vignetteSmoothness);
 

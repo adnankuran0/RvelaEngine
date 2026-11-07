@@ -5,6 +5,9 @@
 #include "Renderer/ShaderManager.h"
 #include "Scene/Environment.h"
 #include "Renderer/Renderer.h"
+#include "Renderer/TextureCache.h"
+#include "Asset/AssetManager.h"
+#include "Asset/Types/TextureAsset.h"
 #include "Utils/ProjectManager.h"
 #include <algorithm>
 
@@ -144,8 +147,9 @@ void CompositePass::Execute(const RenderContext& ctx, RenderFrame& frame)
     compositeShader.setInt("bloomTexture", 1);
     compositeShader.setInt("ssrTexture", 2);
     compositeShader.setInt("depthTexture", 3);
+    compositeShader.setInt("lutTexture", 4);
 
-    for (int s = 0; s < 4; ++s)
+    for (int s = 0; s < 5; ++s)
         glBindSampler(s, 0);
 
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_AutoExposureSSBO);
@@ -155,9 +159,35 @@ void CompositePass::Execute(const RenderContext& ctx, RenderFrame& frame)
     glBindTextureUnit(2, i_SsrTexture);
     glBindTextureUnit(3, i_DepthTexture);
 
+    bool useLUT = env.PostProcess_LUTEnabled && env.PostProcess_LUTUUID.IsValid();
+    GLuint lutTexID = 0;
+    if (useLUT)
+    {
+        auto texAsset = AssetManager::Get().GetAsset<TextureAsset>(env.PostProcess_LUTUUID);
+        if (texAsset && texAsset->IsValid())
+        {
+            auto& tex = TextureCache::Get().GetOrCreate(texAsset);
+            lutTexID = tex.GetID();
+            glTextureParameteri(lutTexID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTextureParameteri(lutTexID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glTextureParameteri(lutTexID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTextureParameteri(lutTexID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        }
+        else
+        {
+            useLUT = false;
+        }
+    }
+    compositeShader.setBool("u_LUTEnabled", useLUT);
+    compositeShader.setFloat("u_LUTIntensity", env.PostProcess_LUTIntensity);
+
+    if (lutTexID == 0)
+        lutTexID = TextureCache::Get().GetWhiteTexture().GetID();
+    glBindTextureUnit(4, lutTexID);
+
     Renderer::DrawFullScreenQuad();
 
-    for (int s = 0; s < 4; ++s)
+    for (int s = 0; s < 5; ++s)
         glBindTextureUnit(s, 0);
 
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);

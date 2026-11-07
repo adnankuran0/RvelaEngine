@@ -1,5 +1,6 @@
 #pragma once
 #include "Renderer/Skybox.h"
+#include "Asset/AssetUUID.h"
 #include "nlohmann/json.hpp"
 
 namespace rv {
@@ -63,6 +64,14 @@ public:
 	float PostProcess_VignetteIntensity = 0.25f;
 	float PostProcess_VignetteSmoothness = 0.5f;
 	float PostProcess_ChromaticStrength = 0.01f;
+
+	bool PostProcess_LUTEnabled = false;
+	float PostProcess_LUTIntensity = 1.0f;
+	AssetUUID PostProcess_LUTUUID = AssetUUID::Invalid();
+
+	void SetLUT(const AssetUUID& uuid) { PostProcess_LUTUUID = uuid; }
+	void ClearLUT() { PostProcess_LUTUUID = AssetUUID::Invalid(); }
+	const AssetUUID& GetLUTUUID() const { return PostProcess_LUTUUID; }
 
 	bool Fog_Enabled = true;
 	glm::vec3 Fog_Color = glm::vec3(0.65f, 0.75f, 0.85f);
@@ -129,6 +138,10 @@ public:
 		PostProcess_VignetteIntensity = other.PostProcess_VignetteIntensity;
 		PostProcess_VignetteSmoothness = other.PostProcess_VignetteSmoothness;
 		PostProcess_ChromaticStrength = other.PostProcess_ChromaticStrength;
+
+		PostProcess_LUTEnabled = other.PostProcess_LUTEnabled;
+		PostProcess_LUTIntensity = other.PostProcess_LUTIntensity;
+		PostProcess_LUTUUID = other.PostProcess_LUTUUID;
 
 		Fog_Enabled = other.Fog_Enabled;
 		Fog_Color = other.Fog_Color;

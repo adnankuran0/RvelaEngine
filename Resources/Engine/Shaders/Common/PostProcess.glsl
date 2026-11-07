@@ -44,4 +44,47 @@ vec3 AdjustColor(vec3 color, float brightness, float contrast, float saturation)
     return max(color, vec3(0.0));
 }
 
+vec3 SampleLUT(sampler2D lutTex, vec3 color)
+{
+    color = clamp(color, 0.0, 1.0);
+    vec2 size = vec2(textureSize(lutTex, 0));
+    float lutSize = min(size.x, size.y);
+    if (lutSize < 2.0)
+        return color;
+
+    float blue = color.b * (lutSize - 1.0);
+    float slice0 = floor(blue);
+    float slice1 = min(slice0 + 1.0, lutSize - 1.0);
+    float fractB = blue - slice0;
+
+    vec2 uv0, uv1;
+    if (size.x >= size.y)
+    {
+        float invWidth = 1.0 / size.x;
+        float invHeight = 1.0 / size.y;
+
+        uv0.x = (slice0 * lutSize + 0.5 + color.r * (lutSize - 1.0)) * invWidth;
+        uv0.y = (0.5 + color.g * (lutSize - 1.0)) * invHeight;
+
+        uv1.x = (slice1 * lutSize + 0.5 + color.r * (lutSize - 1.0)) * invWidth;
+        uv1.y = uv0.y;
+    }
+    else
+    {
+        float invWidth = 1.0 / size.x;
+        float invHeight = 1.0 / size.y;
+
+        uv0.x = (0.5 + color.r * (lutSize - 1.0)) * invWidth;
+        uv0.y = (slice0 * lutSize + 0.5 + color.g * (lutSize - 1.0)) * invHeight;
+
+        uv1.x = uv0.x;
+        uv1.y = (slice1 * lutSize + 0.5 + color.g * (lutSize - 1.0)) * invHeight;
+    }
+
+    vec3 col0 = textureLod(lutTex, uv0, 0.0).rgb;
+    vec3 col1 = textureLod(lutTex, uv1, 0.0).rgb;
+
+    return mix(col0, col1, fractB);
+}
+
 #endif

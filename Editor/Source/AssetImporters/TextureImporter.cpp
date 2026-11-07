@@ -309,6 +309,22 @@ uint32_t TextureImporter::GetImporterVersion(const std::filesystem::path& source
     return extension == ".hdr" ? 2u : 0u;
 }
 
+static bool IsLUTFilename(const std::filesystem::path& path)
+{
+    std::string stem = path.filename().stem().string();
+    std::string lower;
+    lower.reserve(stem.size());
+    for (char c : stem) lower.push_back((char)::tolower((unsigned char)c));
+
+    if (lower == "lut") return true;
+    if (lower.rfind("lut_", 0) == 0 || lower.rfind("lut-", 0) == 0) return true;
+    if (lower.size() >= 4 && lower.compare(lower.size() - 4, 4, "_lut") == 0) return true;
+    if (lower.size() >= 4 && lower.compare(lower.size() - 4, 4, "-lut") == 0) return true;
+    if (lower.find("_lut_") != std::string::npos || lower.find("-lut-") != std::string::npos ||
+        lower.find("_lut-") != std::string::npos || lower.find("-lut_") != std::string::npos) return true;
+    return false;
+}
+
 bool TextureImporter::Import(
     const std::filesystem::path& sourcePath,
     const std::filesystem::path& outCachePath,
@@ -319,6 +335,17 @@ bool TextureImporter::Import(
     std::string filename = sourcePath.filename().string();
     std::string lowerFilename = filename;
     std::transform(lowerFilename.begin(), lowerFilename.end(), lowerFilename.begin(), ::tolower);
+
+    bool isLUT = (settings.textureType == TextureImportType::LUT) ||
+                 (settings.textureType == TextureImportType::Auto && IsLUTFilename(sourcePath));
+
+    if (isLUT)
+    {
+        settings.flipY = false;
+        settings.compress = false;
+        settings.generateMips = false;
+        settings.sRGB = false;
+    }
 
     std::string ext = sourcePath.extension().string();
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
@@ -433,13 +460,15 @@ bool TextureImporter::Import(
     {
         isSRGB = settings.sRGB;
     }
-    else if (settings.textureType == TextureImportType::NormalMap || settings.textureType == TextureImportType::GrayscaleMask)
+    else if (settings.textureType == TextureImportType::NormalMap || 
+             settings.textureType == TextureImportType::GrayscaleMask ||
+             settings.textureType == TextureImportType::LUT)
     {
         isSRGB = false;
     }
     else // Auto
     {
-        if (isNormal || isSingleChannel)
+        if (isNormal || isSingleChannel || isLUT)
             isSRGB = false;
         else
             isSRGB = settings.sRGB;

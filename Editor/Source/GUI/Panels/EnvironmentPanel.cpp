@@ -234,6 +234,66 @@ void EnvironmentPanel::Draw(Engine* engine)
         ImGui::SliderFloat("Chromatic Aberration", &env.PostProcess_ChromaticStrength, 0.001f, 0.1f);
         ImGui::SliderFloat("Vignette Intensity", &env.PostProcess_VignetteIntensity, 0.0f, 1.0f);
         ImGui::SliderFloat("Vignette Smoothness", &env.PostProcess_VignetteSmoothness, 0.1f, 1.0f);
+
+        ImGui::Separator();
+        ImGui::TextUnformatted("Color Grading");
+        ImGui::Checkbox("Enable LUT", &env.PostProcess_LUTEnabled);
+        if (env.PostProcess_LUTEnabled)
+        {
+            ImGui::SliderFloat("LUT Contribution", &env.PostProcess_LUTIntensity, 0.0f, 1.0f, "%.2f");
+
+            std::string lutDisplayName = "LUT Texture";
+            if (env.PostProcess_LUTUUID.IsValid())
+            {
+                std::string fileName = EditorUtils::GetAssetFileName(env.PostProcess_LUTUUID);
+                if (!fileName.empty())
+                    lutDisplayName = "LUT: " + fileName;
+                else
+                    lutDisplayName = "LUT: " + env.PostProcess_LUTUUID.ToString().substr(0, 8);
+            }
+
+            bool hasLUT = env.PostProcess_LUTUUID.IsValid();
+            float clearBtnWidth = 24.0f;
+            float slotWidth = hasLUT ? (ImGui::GetContentRegionAvail().x - clearBtnWidth - 6.0f) : -FLT_MIN;
+
+            ImGui::Button(lutDisplayName.c_str(), ImVec2(slotWidth, 24.0f));
+            if (ImGui::BeginDragDropTarget())
+            {
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
+                {
+                    std::string pathStr((const char*)payload->Data);
+                    AssetUUID uuid = AssetUUID::Invalid();
+
+                    if (pathStr.ends_with(".rtex"))
+                    {
+                        uuid = AssetUUID::FromString(std::filesystem::path(pathStr).stem().string());
+                    }
+                    else
+                    {
+                        uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
+                        if (!uuid.IsValid())
+                            uuid = AssetManager::Get().GetRegistry().GetUUID(pathStr);
+                    }
+
+                    if (uuid.IsValid())
+                    {
+                        env.PostProcess_LUTUUID = uuid;
+                        engine->GetActiveScene().SetDirty(true);
+                    }
+                }
+                ImGui::EndDragDropTarget();
+            }
+
+            if (hasLUT)
+            {
+                ImGui::SameLine();
+                if (ImGui::Button("X##lutClear", ImVec2(clearBtnWidth, 24.0f)))
+                {
+                    env.ClearLUT();
+                    engine->GetActiveScene().SetDirty(true);
+                }
+            }
+        }
     }
 
     if ((ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) || ImGui::IsWindowHovered(ImGuiHoveredFlags_RootAndChildWindows)) && GImGui && GImGui->ActiveIdHasBeenEditedThisFrame)
