@@ -7,6 +7,7 @@
 #include "Renderer/TextureCache.h"
 #include "Asset/AssetManager.h"
 #include "Core/Time.h"
+#include "Scene/Scene.h"
 #include "Scene/Environment.h"
 #include <glm/gtc/type_ptr.hpp>
 
@@ -21,6 +22,7 @@ void GeometryPass::Init(const RenderContext& ctx, RenderFrame& frame)
         { FramebufferTextureFormat::RGB16F, FramebufferFilterMode::Nearest }, // Normal
         { FramebufferTextureFormat::R8,     FramebufferFilterMode::Nearest }, // Roughness
         { FramebufferTextureFormat::R8,     FramebufferFilterMode::Nearest }, // Metallic
+        { FramebufferTextureFormat::R32UI,  FramebufferFilterMode::Nearest }, // EntityID
     };
     desc.hasDepth = true;
     desc.depthAttachment = { FramebufferTextureFormat::Depth32F };
@@ -31,7 +33,9 @@ void GeometryPass::Init(const RenderContext& ctx, RenderFrame& frame)
     frame.registry.Register("NormalTexture", { RenderResourceType::Texture, m_GBuffer.GetColorAttachment(0) });
     frame.registry.Register("RoughnessTexture", { RenderResourceType::Texture, m_GBuffer.GetColorAttachment(1) });
     frame.registry.Register("MetallicTexture", { RenderResourceType::Texture, m_GBuffer.GetColorAttachment(2) });
+    frame.registry.Register("EntityTexture", { RenderResourceType::Texture, m_GBuffer.GetColorAttachment(3) });
     frame.registry.Register("GBuffer", { RenderResourceType::Framebuffer, m_GBuffer.GetID() });
+    frame.registry.Register("EntityBuffer", { RenderResourceType::Framebuffer, m_GBuffer.GetID() });
 }
 
 void GeometryPass::OnResize(uint32_t width, uint32_t height, RenderFrame& frame)
@@ -44,20 +48,27 @@ void GeometryPass::OnResize(uint32_t width, uint32_t height, RenderFrame& frame)
     frame.registry.Register("NormalTexture", { RenderResourceType::Texture, m_GBuffer.GetColorAttachment(0) });
     frame.registry.Register("RoughnessTexture", { RenderResourceType::Texture, m_GBuffer.GetColorAttachment(1) });
     frame.registry.Register("MetallicTexture", { RenderResourceType::Texture, m_GBuffer.GetColorAttachment(2) });
+    frame.registry.Register("EntityTexture", { RenderResourceType::Texture, m_GBuffer.GetColorAttachment(3) });
     frame.registry.Register("GBuffer", { RenderResourceType::Framebuffer, m_GBuffer.GetID() });
+    frame.registry.Register("EntityBuffer", { RenderResourceType::Framebuffer, m_GBuffer.GetID() });
 }
 
 void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
     auto& staticCommands = frame.opaqueCommands;
     auto& skeletalCommands = frame.skeletalOpaqueCommands;
+    auto& transparentCommands = frame.transparentCommands;
+    auto& skeletalTransparentCommands = frame.skeletalTransparentCommands;
     auto& resourceRegistry = frame.registry;
 
     m_GBuffer.BindViewport();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    GLuint clearEntityID = 0;
+    glClearBufferuiv(GL_COLOR, 3, &clearEntityID);
 
-    bool needsGBuffer = false;
-    if (ctx.environment)
+    bool isEditMode = (ctx.profile != RenderProfile::RUNTIME && ctx.scene && ctx.scene->GetState() == SceneState::EDIT);
+    bool needsGBuffer = isEditMode;
+    if (!needsGBuffer && ctx.environment)
     {
         needsGBuffer = ctx.environment->SSAO || 
                        ctx.environment->SSR || 
@@ -296,6 +307,7 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             glm::mat4 model = command.transform->GetWorldMatrix();
             targetShader->setMat4("model", model);
             targetShader->setFloat("u_VisibilityFade", command.visibilityFade);
+            targetShader->setUInt("u_EntityID", static_cast<uint32_t>(command.entityID));
 
             if (!needsGBuffer)
             {
@@ -353,6 +365,7 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
             glm::mat4 model = command.transform->GetWorldMatrix();
             targetShader->setMat4("model", model);
             targetShader->setFloat("u_VisibilityFade", command.visibilityFade);
+            targetShader->setUInt("u_EntityID", static_cast<uint32_t>(command.entityID));
 
             GLint boneLoc = glGetUniformLocation(targetShader->ID, "u_BoneMatrices");
             if (boneLoc != -1 && command.skeleton && !command.skeleton->skinningPalette.empty())
@@ -392,6 +405,164 @@ void GeometryPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
             CleanupSamplers();
         }
+    }
+
+    if (isEditMode && (!transparentCommands.empty() || !skeletalTransparentCommands.empty()))
+    {
+        GLenum pickBuffer = GL_COLOR_ATTACHMENT3;
+        glDrawBuffers(1, &pickBuffer);
+
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
+        glDepthMask(GL_FALSE);
+        glDisable(GL_BLEND);
+
+        auto BindMaterialPicking = [](Shader& shader, MaterialComponent* material) {
+            shader.setInt("transparencyMode", static_cast<int>(material->GetTransparencyMode()));
+            shader.setFloat("alphaCutoff", material->GetAlphaCutoff());
+            shader.setVec4("albedoColor", material->GetAlbedoColor());
+            shader.setVec2("UVScale", material->GetUVScale());
+            shader.setVec2("UVOffset", material->GetUVOffset());
+
+            bool useAlb = material->IsUsingAlbedoMap() && material->GetAlbedoTexture();
+            shader.setBool("useAlbedoMap", useAlb);
+            if (useAlb) {
+                shader.setInt("albedoMap", 0);
+                TextureCache::Get().GetOrCreate(material->GetAlbedoTexture()).Bind(0);
+                material->GetSampler().Bind(0);
+            }
+            else {
+                glBindSampler(0, 0);
+                glBindTextureUnit(0, 0);
+            }
+            return useAlb;
+        };
+
+        if (!transparentCommands.empty())
+        {
+            Shader& defaultShader = ShaderManager::Get("EntityBuffer");
+            Shader* activeShader = nullptr;
+
+            for (const auto& command : transparentCommands)
+            {
+                if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
+                if (!ctx.camera->Intersects(command.mesh->worldAABB)) continue;
+
+                auto& material = command.material;
+                auto customShaderAsset = material->GetInstance().GetCustomShaderAsset();
+                bool hasCustom = (customShaderAsset && customShaderAsset->IsValid() && customShaderAsset->entityBufferShader);
+
+                Shader* targetShader = hasCustom ? customShaderAsset->entityBufferShader.get() : &defaultShader;
+                if (activeShader != targetShader)
+                {
+                    targetShader->use();
+                    activeShader = targetShader;
+                }
+
+                if (hasCustom && customShaderAsset->renderModes.hasCullMode)
+                    ApplyCullMode(customShaderAsset->renderModes.cullMode);
+                else
+                    ApplyCullMode(material->GetCullMode());
+
+                glm::mat4 model = command.transform->GetWorldMatrix();
+                targetShader->setMat4("model", model);
+                targetShader->setUInt("u_EntityID", static_cast<uint32_t>(command.entityID));
+
+                bool useAlb = false;
+                if (hasCustom)
+                {
+                    targetShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
+                    targetShader->setVec2("UVScale", material->GetUVScale());
+                    targetShader->setVec2("UVOffset", material->GetUVOffset());
+                    BindCustomShaderUniforms(*targetShader, material->GetInstance(), *customShaderAsset);
+                }
+                else
+                {
+                    targetShader->setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
+                    useAlb = BindMaterialPicking(*targetShader, material);
+                }
+
+                command.mesh->Bind();
+                glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+
+                if (useAlb) glBindSampler(0, 0);
+            }
+        }
+
+        if (!skeletalTransparentCommands.empty())
+        {
+            Shader& defaultSkeletalShader = ShaderManager::Get("EntityBuffer_Skeletal");
+            Shader* activeShader = nullptr;
+
+            for (const auto& command : skeletalTransparentCommands)
+            {
+                if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
+                if (command.mesh->worldAABB.IsValid() && !ctx.camera->Intersects(command.mesh->worldAABB)) continue;
+
+                auto& material = command.material;
+                auto customShaderAsset = material->GetInstance().GetCustomShaderAsset();
+                bool hasCustom = (customShaderAsset && customShaderAsset->IsValid() && customShaderAsset->skeletalEntityBufferShader);
+
+                Shader* targetShader = hasCustom ? customShaderAsset->skeletalEntityBufferShader.get() : &defaultSkeletalShader;
+                if (activeShader != targetShader)
+                {
+                    targetShader->use();
+                    activeShader = targetShader;
+                }
+
+                if (hasCustom && customShaderAsset->renderModes.hasCullMode)
+                    ApplyCullMode(customShaderAsset->renderModes.cullMode);
+                else
+                    ApplyCullMode(material->GetCullMode());
+
+                glm::mat4 model = command.transform->GetWorldMatrix();
+                targetShader->setMat4("model", model);
+                targetShader->setUInt("u_EntityID", static_cast<uint32_t>(command.entityID));
+
+                GLint boneLoc = glGetUniformLocation(targetShader->ID, "u_BoneMatrices");
+                if (boneLoc != -1 && command.skeleton && !command.skeleton->skinningPalette.empty())
+                {
+                    GLsizei uploadCount = static_cast<GLsizei>(std::min(command.skeleton->skinningPalette.size(), MAX_BONES));
+                    glUniformMatrix4fv(
+                        boneLoc,
+                        uploadCount,
+                        GL_FALSE,
+                        glm::value_ptr(command.skeleton->skinningPalette[0])
+                    );
+                }
+
+                bool useAlb = false;
+                if (hasCustom)
+                {
+                    targetShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
+                    targetShader->setVec2("UVScale", material->GetUVScale());
+                    targetShader->setVec2("UVOffset", material->GetUVOffset());
+                    BindCustomShaderUniforms(*targetShader, material->GetInstance(), *customShaderAsset);
+                }
+                else
+                {
+                    useAlb = BindMaterialPicking(*targetShader, material);
+                }
+
+                command.mesh->Bind();
+                glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
+
+                if (useAlb) glBindSampler(0, 0);
+            }
+        }
+
+        glDepthMask(GL_TRUE);
+        GLenum allBuffers[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+        glDrawBuffers(4, allBuffers);
+    }
+
+    if (ctx.scene)
+    {
+        GLenum drawBuffer = GL_COLOR_ATTACHMENT3;
+        glDrawBuffers(1, &drawBuffer);
+        ctx.scene->GetUISystem().RenderEntityIDs(ctx.scene, static_cast<float>(ctx.viewportWidth), static_cast<float>(ctx.viewportHeight));
+        GLenum allBuffers[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+        glDrawBuffers(4, allBuffers);
     }
 
     if (!needsGBuffer)

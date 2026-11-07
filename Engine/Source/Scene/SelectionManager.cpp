@@ -15,7 +15,7 @@ uint32_t SelectionManager::Pick(uint32_t x, uint32_t y)
 
     GLuint id = 0;
     glBindFramebuffer(GL_FRAMEBUFFER, m_RenderLayer->GetEntityBuffer()); 
-    glReadBuffer(GL_COLOR_ATTACHMENT0);
+    glReadBuffer(GL_COLOR_ATTACHMENT3);
 
     glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_UNSIGNED_INT, &id); 
 
@@ -36,7 +36,7 @@ void SelectionManager::PickRect(uint32_t x, uint32_t y, uint32_t w, uint32_t h, 
     if (y + h > context.viewportHeight) h = context.viewportHeight - y;
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_RenderLayer->GetEntityBuffer());
-    glReadBuffer(GL_COLOR_ATTACHMENT0);
+    glReadBuffer(GL_COLOR_ATTACHMENT3);
 
     glReadPixels(x, y, w, h, GL_RED_INTEGER, GL_UNSIGNED_INT, outBuffer);
 
@@ -66,5 +66,3 @@ std::vector<uint32_t> SelectionManager::PickRect(uint32_t x, uint32_t y, uint32_
 
     return std::vector<uint32_t>(uniqueIDs.begin(), uniqueIDs.end());
 }
-
-

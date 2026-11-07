@@ -153,6 +153,10 @@ void GizmoPass::DrawEditorIconsVisual(const RenderContext& ctx, RenderFrame& fra
 void GizmoPass::DrawEditorIconsPicking(const RenderContext& ctx, RenderFrame& frame)
 {
     auto* entityBufferRes = frame.registry.Get("EntityBuffer");
+    if (entityBufferRes) {
+        GLenum pickBuffer = GL_COLOR_ATTACHMENT3;
+        glNamedFramebufferDrawBuffers(entityBufferRes->id, 1, &pickBuffer);
+    }
     if (!entityBufferRes) return;
 
     glBindFramebuffer(GL_FRAMEBUFFER, entityBufferRes->id);
@@ -200,6 +204,9 @@ void GizmoPass::DrawEditorIconsPicking(const RenderContext& ctx, RenderFrame& fr
 
     glBindTextureUnit(0, 0);
     glBindVertexArray(0);
+
+    GLenum allBuffers[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+    glNamedFramebufferDrawBuffers(entityBufferRes->id, 4, allBuffers);
 
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);

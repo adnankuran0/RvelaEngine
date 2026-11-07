@@ -135,6 +135,9 @@ void main()
 layout(location = 0) out vec3 gNormal;
 layout(location = 1) out float gRoughness;
 layout(location = 2) out float gMetallic;
+layout(location = 3) out uint gEntityID;
+
+uniform uint u_EntityID;
 
 in vec3 FragPos;
 in vec3 Normal;
@@ -230,4 +233,5 @@ void main()
     gNormal = normalize(mat3(view) * finalWorldNormal);
     gRoughness = clamp(ROUGHNESS, 0.0, 1.0);
     gMetallic = clamp(METALLIC, 0.0, 1.0);
+    gEntityID = u_EntityID;
 }

@@ -138,6 +138,9 @@ in vec3 LocalNormal;
 layout(location = 0) out vec3 gNormal;
 layout(location = 1) out float gRoughness;
 layout(location = 2) out float gMetallic;
+layout(location = 3) out uint gEntityID;
+
+uniform uint u_EntityID;
 
 layout(binding = 0) uniform sampler2D albedoMap;
 layout(binding = 1) uniform sampler2D roughnessMap;
@@ -370,4 +373,6 @@ void main()
         gRoughness = useRoughnessMap ? textureGrad(roughnessMap, mappedTexCoords, ddx, ddy).r : roughness;
         gMetallic = useMetallicMap ? textureGrad(metallicMap, mappedTexCoords, ddx, ddy).r : metallic;
     }
+
+    gEntityID = u_EntityID;
 }
