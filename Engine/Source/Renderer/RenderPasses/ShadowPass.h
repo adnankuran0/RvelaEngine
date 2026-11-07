@@ -68,7 +68,6 @@ private:
         float shadowBias = 0.0f;
         float normalBias = 0.0f;
         bool reverseCullFace = false;
-        std::array<bool, NUM_SHADOW_CASCADES> cascadeValid{ false, false, false, false };
         glm::mat4 cascadeMatrices[NUM_SHADOW_CASCADES]{};
     };
 

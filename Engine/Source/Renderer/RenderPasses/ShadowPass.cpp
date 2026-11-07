@@ -159,41 +159,32 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
 
     if (!ctx.directionalLight || !ctx.directionalLight->castShadows) return;
 
-    bool lightPropsChanged = !m_CachedDirectionalShadow.valid ||
-        ctx.directionalLight->shadowDirty ||
-        m_CachedDirectionalShadow.lightID != ctx.directionalLight->lightID ||
-        m_CachedDirectionalShadow.direction != ctx.directionalLight->direction ||
-        m_CachedDirectionalShadow.shadowBias != ctx.directionalLight->shadowBias ||
-        m_CachedDirectionalShadow.normalBias != ctx.directionalLight->normalBias ||
-        m_CachedDirectionalShadow.reverseCullFace != ctx.directionalLight->reverseCullFace;
-
-    if (lightPropsChanged)
+    bool isDirty = true;
+    if (ctx.directionalLight->staticShadow)
     {
-        for (auto& v : m_CachedDirectionalShadow.cascadeValid)
-            v = false;
-    }
-
-    std::array<bool, NUM_SHADOW_CASCADES> cascadeNeedsRender{};
-    bool anyNeedsRender = false;
-
-    for (int cascade = 0; cascade < NUM_SHADOW_CASCADES; ++cascade)
-    {
-        bool cascadeChanged = !m_CachedDirectionalShadow.cascadeValid[cascade] ||
-            (m_CachedDirectionalShadow.cascadeMatrices[cascade] != ctx.directionalLight->cascadeMatrices[cascade]);
-
-        if (cascadeChanged)
+        if (m_CachedDirectionalShadow.valid &&
+            !ctx.directionalLight->shadowDirty &&
+            m_CachedDirectionalShadow.lightID == ctx.directionalLight->lightID &&
+            m_CachedDirectionalShadow.direction == ctx.directionalLight->direction &&
+            m_CachedDirectionalShadow.shadowBias == ctx.directionalLight->shadowBias &&
+            m_CachedDirectionalShadow.normalBias == ctx.directionalLight->normalBias &&
+            m_CachedDirectionalShadow.reverseCullFace == ctx.directionalLight->reverseCullFace)
         {
-            cascadeNeedsRender[cascade] = true;
-            anyNeedsRender = true;
-        }
-        else if (!ctx.directionalLight->staticShadow && !skeletalCommands.empty())
-        {
-            cascadeNeedsRender[cascade] = true;
-            anyNeedsRender = true;
+            bool cascadesMatch = true;
+            for (int i = 0; i < NUM_SHADOW_CASCADES; ++i)
+            {
+                if (m_CachedDirectionalShadow.cascadeMatrices[i] != ctx.directionalLight->cascadeMatrices[i])
+                {
+                    cascadesMatch = false;
+                    break;
+                }
+            }
+            if (cascadesMatch)
+                isDirty = false;
         }
     }
 
-    if (!anyNeedsRender) return;
+    if (!isDirty) return;
 
     glBindFramebuffer(GL_FRAMEBUFFER, dirShadowFBO);
     glViewport(0, 0, m_CurrentShadowResolution, m_CurrentShadowResolution);
@@ -221,7 +212,7 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
         }
     };
 
-    auto BindShadowMaterial = [](Shader& shader, MaterialComponent* material, int& lastTransparencyMode, bool& lastUseAlbedo) -> bool {
+    auto BindShadowMaterial = [](Shader& shader, MaterialComponent* material, int& lastTransparencyMode) -> bool {
         auto transMode = material->GetTransparencyMode();
         bool isMasked = (transMode == TransparencyMode::AlphaScissor || transMode == TransparencyMode::DepthPrepass);
         int tModeInt = static_cast<int>(transMode);
@@ -240,11 +231,7 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
             shader.setVec2("UVOffset", material->GetUVOffset());
 
             bool useAlb = material->IsUsingAlbedoMap() && material->GetAlbedoTexture();
-            if (useAlb != lastUseAlbedo)
-            {
-                shader.setBool("useAlbedoMap", useAlb);
-                lastUseAlbedo = useAlb;
-            }
+            shader.setBool("useAlbedoMap", useAlb);
             if (useAlb)
             {
                 shader.setInt("albedoMap", 0);
@@ -253,10 +240,9 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
                 return true;
             }
         }
-        else if (lastUseAlbedo)
+        else
         {
             shader.setBool("useAlbedoMap", false);
-            lastUseAlbedo = false;
         }
 
         return false;
@@ -339,16 +325,10 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
 
     for (int cascade = 0; cascade < NUM_SHADOW_CASCADES; ++cascade)
     {
-        if (!cascadeNeedsRender[cascade])
-            continue;
-
         glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, o_DirectionalShadowMap, 0, cascade);
         glClear(GL_DEPTH_BUFFER_BIT);
 
         const glm::mat4& cascadeMatrix = ctx.directionalLight->cascadeMatrices[cascade];
-
-        Frustum cascadeFrustum;
-        cascadeFrustum.Update(cascadeMatrix);
 
         if (!commands.empty())
         {
@@ -357,24 +337,12 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
             ApplyCull(lastCull);
             int lastBillboard = 0;
             int lastTransparencyMode = -1;
-            bool lastUseAlbedo = false;
             float lastVisFade = -1.0f;
             const MeshRendererComponent* lastBoundMesh = nullptr;
 
             for (auto& command : commands) {
                 if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
                 if (!command.mesh->IsCastShadow()) continue;
-
-                if (cascade > 0 && command.mesh->worldAABB.IsValid())
-                {
-                    glm::vec3 boxSize = command.mesh->worldAABB.max - command.mesh->worldAABB.min;
-                    float maxDimension = std::max(boxSize.x, std::max(boxSize.y, boxSize.z));
-                    if (cascade == 1 && maxDimension < 0.08f) continue;
-                    if (cascade == 2 && maxDimension < 0.25f) continue;
-                    if (cascade == 3 && maxDimension < 0.50f) continue;
-                }
-
-                if (command.mesh->worldAABB.IsValid() && !cascadeFrustum.Intersects(command.mesh->worldAABB)) continue;
 
                 auto& material = command.material;
                 if (material->GetTransparencyMode() == TransparencyMode::Alpha) continue;
@@ -402,7 +370,6 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
                     lastBound = currentShader;
                     lastBillboard = 0;
                     lastTransparencyMode = -1;
-                    lastUseAlbedo = false;
                     lastVisFade = -1.0f;
                 }
 
@@ -430,7 +397,7 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
                     lastBillboard = bbMode;
                 }
 
-                bool boundTexture = BindShadowMaterial(*currentShader, material, lastTransparencyMode, lastUseAlbedo);
+                bool boundTexture = BindShadowMaterial(*currentShader, material, lastTransparencyMode);
 
                 if (!hasCustom)
                 {
@@ -469,24 +436,12 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
             CullMode lastCull = CullMode::Back;
             ApplyCull(lastCull);
             int lastTransparencyMode = -1;
-            bool lastUseAlbedo = false;
             float lastVisFade = -1.0f;
             const SkeletalMeshRendererComponent* lastBoundSkel = nullptr;
 
             for (auto& command : skeletalCommands) {
                 if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
                 if (!command.mesh->IsCastShadow()) continue;
-
-                if (cascade > 0 && command.mesh->worldAABB.IsValid())
-                {
-                    glm::vec3 boxSize = command.mesh->worldAABB.max - command.mesh->worldAABB.min;
-                    float maxDimension = std::max(boxSize.x, std::max(boxSize.y, boxSize.z));
-                    if (cascade == 1 && maxDimension < 0.08f) continue;
-                    if (cascade == 2 && maxDimension < 0.25f) continue;
-                    if (cascade == 3 && maxDimension < 0.50f) continue;
-                }
-
-                if (command.mesh->worldAABB.IsValid() && !cascadeFrustum.Intersects(command.mesh->worldAABB)) continue;
 
                 auto& material = command.material;
                 if (material->GetTransparencyMode() == TransparencyMode::Alpha) continue;
@@ -512,7 +467,6 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
                     }
                     lastBound = currentShader;
                     lastTransparencyMode = -1;
-                    lastUseAlbedo = false;
                     lastVisFade = -1.0f;
                 }
 
@@ -530,7 +484,7 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
                     lastCull = effectiveCull;
                 }
 
-                bool boundTexture = BindShadowMaterial(*currentShader, material, lastTransparencyMode, lastUseAlbedo);
+                bool boundTexture = BindShadowMaterial(*currentShader, material, lastTransparencyMode);
 
                 if (!hasCustom)
                 {
@@ -574,9 +528,6 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
                 }
             }
         }
-
-        m_CachedDirectionalShadow.cascadeValid[cascade] = true;
-        m_CachedDirectionalShadow.cascadeMatrices[cascade] = cascadeMatrix;
     }
 
     m_CachedDirectionalShadow.valid = true;
@@ -585,6 +536,10 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
     m_CachedDirectionalShadow.shadowBias = ctx.directionalLight->shadowBias;
     m_CachedDirectionalShadow.normalBias = ctx.directionalLight->normalBias;
     m_CachedDirectionalShadow.reverseCullFace = ctx.directionalLight->reverseCullFace;
+    for (int i = 0; i < NUM_SHADOW_CASCADES; ++i)
+    {
+        m_CachedDirectionalShadow.cascadeMatrices[i] = ctx.directionalLight->cascadeMatrices[i];
+    }
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);

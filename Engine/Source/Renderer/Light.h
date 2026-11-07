@@ -6,8 +6,6 @@
 
 namespace rv {
 
-inline constexpr int NUM_SHADOW_CASCADES = 4;
-
 struct PointLight {
     glm::vec3 position;
     glm::vec3 color;

@@ -4,6 +4,8 @@
 
 namespace rv {
 
+inline constexpr int NUM_SHADOW_CASCADES = 4;
+
 using json = nlohmann::json;
 
 struct DirectionalLightComponent 
@@ -22,6 +24,11 @@ public:
     bool reverseCullFace = false;
     bool staticShadow = false;
     bool shadowDirty = true;
+
+    bool hasBakedShadow = false;
+    glm::vec3 bakedLightDir{ 0.0f };
+    glm::mat4 bakedCascadeMatrices[NUM_SHADOW_CASCADES]{};
+    float bakedCascadeSplits[NUM_SHADOW_CASCADES]{};
 
     json Serialize() const;
     void Deserialize(const json& j);

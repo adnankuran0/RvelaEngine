@@ -18,11 +18,6 @@ public:
 
 private:
 	Scene& m_Scene;
-	uint32_t m_FrameCounter = 0;
-	bool m_HasCachedCascades = false;
-	uint32_t m_CachedDirLightID = 0;
-	glm::vec3 m_CachedDirLightDir{ 0.0f };
-	std::array<glm::mat4, NUM_SHADOW_CASCADES> m_CachedCascadeMatrices{};
 };
 
 }
