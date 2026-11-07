@@ -51,6 +51,26 @@ float GetFogDensity(vec3 pos)
     return u_FogDensity * factor;
 }
 
+float SampleFogShadow(sampler2DArray shadowMap, vec3 worldPos, float viewDepth)
+{
+    int cascadeIndex = NUM_CASCADES - 1;
+    for (int i = 0; i < NUM_CASCADES - 1; ++i) {
+        if (viewDepth < cascadeSplits[i]) {
+            cascadeIndex = i;
+            break;
+        }
+    }
+
+    vec4 fragPosLightSpace = cascadeMatrices[cascadeIndex] * vec4(worldPos, 1.0);
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w * 0.5 + 0.5;
+
+    if (projCoords.z > 1.0 || any(lessThan(projCoords.xy, vec2(0.0))) || any(greaterThan(projCoords.xy, vec2(1.0))))
+        return 0.0;
+
+    float d = texture(shadowMap, vec3(projCoords.xy, float(cascadeIndex))).r;
+    return (projCoords.z - 0.0015 > d) ? 1.0 : 0.0;
+}
+
 void main()
 {
     float depth = texture(gDepth, TexCoords).r;
@@ -73,7 +93,9 @@ void main()
         return;
     }
 
-    int steps = clamp(u_StepCount, 4, 64);
+    int maxSteps = clamp(u_StepCount, 4, 64);
+    float distRatio = clamp(rayLength / max(u_MaxDistance * 0.5, 12.0), 0.35, 1.0);
+    int steps = clamp(int(float(maxSteps) * distRatio), 6, maxSteps);
     float stepSize = rayLength / float(steps);
 
     float dither = GetDitherThreshold(gl_FragCoord.xy);
@@ -102,7 +124,7 @@ void main()
             if (hasDirectionalLight == 1 && directionalLight.direction.w > 0.5)
             {
                 float sampleViewDepth = -((view * vec4(samplePos, 1.0)).z);
-                shadow = calculateDirectionalShadow(u_DirectionalShadowMap, samplePos, vec3(0.0), -lightDir, sampleViewDepth, 0.001, 0.0, 0.0);
+                shadow = SampleFogShadow(u_DirectionalShadowMap, samplePos, sampleViewDepth);
             }
 
             float lightVisibility = 1.0 - shadow;

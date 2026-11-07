@@ -159,32 +159,41 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
 
     if (!ctx.directionalLight || !ctx.directionalLight->castShadows) return;
 
-    bool isDirty = true;
-    if (ctx.directionalLight->staticShadow)
+    bool lightPropsChanged = !m_CachedDirectionalShadow.valid ||
+        ctx.directionalLight->shadowDirty ||
+        m_CachedDirectionalShadow.lightID != ctx.directionalLight->lightID ||
+        m_CachedDirectionalShadow.direction != ctx.directionalLight->direction ||
+        m_CachedDirectionalShadow.shadowBias != ctx.directionalLight->shadowBias ||
+        m_CachedDirectionalShadow.normalBias != ctx.directionalLight->normalBias ||
+        m_CachedDirectionalShadow.reverseCullFace != ctx.directionalLight->reverseCullFace;
+
+    if (lightPropsChanged)
     {
-        if (m_CachedDirectionalShadow.valid &&
-            !ctx.directionalLight->shadowDirty &&
-            m_CachedDirectionalShadow.lightID == ctx.directionalLight->lightID &&
-            m_CachedDirectionalShadow.direction == ctx.directionalLight->direction &&
-            m_CachedDirectionalShadow.shadowBias == ctx.directionalLight->shadowBias &&
-            m_CachedDirectionalShadow.normalBias == ctx.directionalLight->normalBias &&
-            m_CachedDirectionalShadow.reverseCullFace == ctx.directionalLight->reverseCullFace)
+        for (auto& v : m_CachedDirectionalShadow.cascadeValid)
+            v = false;
+    }
+
+    std::array<bool, NUM_SHADOW_CASCADES> cascadeNeedsRender{};
+    bool anyNeedsRender = false;
+
+    for (int cascade = 0; cascade < NUM_SHADOW_CASCADES; ++cascade)
+    {
+        bool cascadeChanged = !m_CachedDirectionalShadow.cascadeValid[cascade] ||
+            (m_CachedDirectionalShadow.cascadeMatrices[cascade] != ctx.directionalLight->cascadeMatrices[cascade]);
+
+        if (cascadeChanged)
         {
-            bool cascadesMatch = true;
-            for (int i = 0; i < NUM_SHADOW_CASCADES; ++i)
-            {
-                if (m_CachedDirectionalShadow.cascadeMatrices[i] != ctx.directionalLight->cascadeMatrices[i])
-                {
-                    cascadesMatch = false;
-                    break;
-                }
-            }
-            if (cascadesMatch)
-                isDirty = false;
+            cascadeNeedsRender[cascade] = true;
+            anyNeedsRender = true;
+        }
+        else if (!ctx.directionalLight->staticShadow && !skeletalCommands.empty())
+        {
+            cascadeNeedsRender[cascade] = true;
+            anyNeedsRender = true;
         }
     }
 
-    if (!isDirty) return;
+    if (!anyNeedsRender) return;
 
     glBindFramebuffer(GL_FRAMEBUFFER, dirShadowFBO);
     glViewport(0, 0, m_CurrentShadowResolution, m_CurrentShadowResolution);
@@ -212,25 +221,45 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
         }
     };
 
-    auto BindMaterial = [](Shader& shader, MaterialComponent* material) {
-        shader.setInt("transparencyMode", static_cast<int>(material->GetTransparencyMode()));
-        shader.setFloat("alphaCutoff", material->GetAlphaCutoff());
-        shader.setVec4("albedoColor", material->GetAlbedoColor());
-        shader.setVec2("UVScale", material->GetUVScale());
-        shader.setVec2("UVOffset", material->GetUVOffset());
+    auto BindShadowMaterial = [](Shader& shader, MaterialComponent* material, int& lastTransparencyMode, bool& lastUseAlbedo) -> bool {
+        auto transMode = material->GetTransparencyMode();
+        bool isMasked = (transMode == TransparencyMode::AlphaScissor || transMode == TransparencyMode::DepthPrepass);
+        int tModeInt = static_cast<int>(transMode);
 
-        bool useAlb = material->IsUsingAlbedoMap() && material->GetAlbedoTexture();
-        shader.setBool("useAlbedoMap", useAlb);
-        if (useAlb) {
-            shader.setInt("albedoMap", 0);
-            TextureCache::Get().GetOrCreate(material->GetAlbedoTexture()).Bind(0);
-            material->GetSampler().Bind(0);
+        if (tModeInt != lastTransparencyMode)
+        {
+            shader.setInt("transparencyMode", tModeInt);
+            lastTransparencyMode = tModeInt;
         }
-        else {
-            glBindSampler(0, 0);
-            glBindTextureUnit(0, 0);
+
+        if (isMasked)
+        {
+            shader.setFloat("alphaCutoff", material->GetAlphaCutoff());
+            shader.setVec4("albedoColor", material->GetAlbedoColor());
+            shader.setVec2("UVScale", material->GetUVScale());
+            shader.setVec2("UVOffset", material->GetUVOffset());
+
+            bool useAlb = material->IsUsingAlbedoMap() && material->GetAlbedoTexture();
+            if (useAlb != lastUseAlbedo)
+            {
+                shader.setBool("useAlbedoMap", useAlb);
+                lastUseAlbedo = useAlb;
+            }
+            if (useAlb)
+            {
+                shader.setInt("albedoMap", 0);
+                TextureCache::Get().GetOrCreate(material->GetAlbedoTexture()).Bind(0);
+                material->GetSampler().Bind(0);
+                return true;
+            }
         }
-        return useAlb;
+        else if (lastUseAlbedo)
+        {
+            shader.setBool("useAlbedoMap", false);
+            lastUseAlbedo = false;
+        }
+
+        return false;
     };
 
     auto BindCustomUniforms = [](Shader& shader, const MaterialInstance& inst, const ShaderAsset& shaderAsset) {
@@ -295,22 +324,57 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
 
     Shader& shadowShader = ShaderManager::Get("DirectionalShadow");
     Shader& skeletalShadowShader = ShaderManager::Get("DirectionalShadow_Skeletal");
+    float currentTime = static_cast<float>(Time::GetCurrentTime());
+
+    GLint locLightSpace = shadowShader.GetUniformLocation("lightSpaceMatrix");
+    GLint locModel = shadowShader.GetUniformLocation("model");
+    GLint locVisFade = shadowShader.GetUniformLocation("u_VisibilityFade");
+    GLint locTime = shadowShader.GetUniformLocation("u_Time");
+    GLint locBillboard = shadowShader.GetUniformLocation("billboardMode");
+
+    GLint locSkelLightSpace = skeletalShadowShader.GetUniformLocation("lightSpaceMatrix");
+    GLint locSkelModel = skeletalShadowShader.GetUniformLocation("model");
+    GLint locSkelVisFade = skeletalShadowShader.GetUniformLocation("u_VisibilityFade");
+    GLint locSkelTime = skeletalShadowShader.GetUniformLocation("u_Time");
 
     for (int cascade = 0; cascade < NUM_SHADOW_CASCADES; ++cascade)
     {
+        if (!cascadeNeedsRender[cascade])
+            continue;
+
         glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, o_DirectionalShadowMap, 0, cascade);
         glClear(GL_DEPTH_BUFFER_BIT);
 
         const glm::mat4& cascadeMatrix = ctx.directionalLight->cascadeMatrices[cascade];
 
+        Frustum cascadeFrustum;
+        cascadeFrustum.Update(cascadeMatrix);
+
         if (!commands.empty())
         {
             Shader* lastBound = nullptr;
+            CullMode lastCull = CullMode::Back;
+            ApplyCull(lastCull);
+            int lastBillboard = 0;
+            int lastTransparencyMode = -1;
+            bool lastUseAlbedo = false;
+            float lastVisFade = -1.0f;
+            const MeshRendererComponent* lastBoundMesh = nullptr;
 
             for (auto& command : commands) {
                 if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
                 if (!command.mesh->IsCastShadow()) continue;
-                if (command.mesh->worldAABB.IsValid() && !ctx.camera->Intersects(cascadeMatrix, command.mesh->worldAABB)) continue;
+
+                if (cascade > 0 && command.mesh->worldAABB.IsValid())
+                {
+                    glm::vec3 boxSize = command.mesh->worldAABB.max - command.mesh->worldAABB.min;
+                    float maxDimension = std::max(boxSize.x, std::max(boxSize.y, boxSize.z));
+                    if (cascade == 1 && maxDimension < 0.08f) continue;
+                    if (cascade == 2 && maxDimension < 0.25f) continue;
+                    if (cascade == 3 && maxDimension < 0.50f) continue;
+                }
+
+                if (command.mesh->worldAABB.IsValid() && !cascadeFrustum.Intersects(command.mesh->worldAABB)) continue;
 
                 auto& material = command.material;
                 if (material->GetTransparencyMode() == TransparencyMode::Alpha) continue;
@@ -324,10 +388,22 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
                 if (currentShader != lastBound)
                 {
                     currentShader->use();
-                    currentShader->setMat4("lightSpaceMatrix", cascadeMatrix);
                     if (!hasCustom)
-                        currentShader->setInt("billboardMode", 0);
+                    {
+                        if (locLightSpace != -1) glUniformMatrix4fv(locLightSpace, 1, GL_FALSE, glm::value_ptr(cascadeMatrix));
+                        if (locTime != -1) glUniform1f(locTime, currentTime);
+                        if (locBillboard != -1) glUniform1i(locBillboard, 0);
+                    }
+                    else
+                    {
+                        currentShader->setMat4("lightSpaceMatrix", cascadeMatrix);
+                        currentShader->setFloat("u_Time", currentTime);
+                    }
                     lastBound = currentShader;
+                    lastBillboard = 0;
+                    lastTransparencyMode = -1;
+                    lastUseAlbedo = false;
+                    lastVisFade = -1.0f;
                 }
 
                 if (hasCustom)
@@ -338,33 +414,79 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
                 CullMode effectiveCull = (hasCustom && customAsset->renderModes.hasCullMode)
                     ? customAsset->renderModes.cullMode
                     : material->GetCullMode();
-                ApplyCull(effectiveCull);
+                if (effectiveCull != lastCull)
+                {
+                    ApplyCull(effectiveCull);
+                    lastCull = effectiveCull;
+                }
 
-                currentShader->setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
-                bool useAlb = BindMaterial(*currentShader, material);
+                int bbMode = static_cast<int>(material->GetBillboardMode());
+                if (bbMode != lastBillboard)
+                {
+                    if (!hasCustom && locBillboard != -1)
+                        glUniform1i(locBillboard, bbMode);
+                    else
+                        currentShader->setInt("billboardMode", bbMode);
+                    lastBillboard = bbMode;
+                }
 
-                currentShader->setMat4("model", command.transform->GetWorldMatrix());
-                glm::mat3 normalMatrix = command.transform->GetNormalMatrix();
-                currentShader->setMat3("normalMatrix", normalMatrix);
-                currentShader->setFloat("u_VisibilityFade", command.visibilityFade);
-                currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
-                currentShader->setVec2("UVScale", material->GetUVScale());
-                currentShader->setVec2("UVOffset", material->GetUVOffset());
+                bool boundTexture = BindShadowMaterial(*currentShader, material, lastTransparencyMode, lastUseAlbedo);
 
-                command.mesh->Bind();
+                if (!hasCustom)
+                {
+                    if (locModel != -1)
+                        glUniformMatrix4fv(locModel, 1, GL_FALSE, glm::value_ptr(command.transform->GetWorldMatrix()));
+                    if (command.visibilityFade != lastVisFade)
+                    {
+                        if (locVisFade != -1) glUniform1f(locVisFade, command.visibilityFade);
+                        lastVisFade = command.visibilityFade;
+                    }
+                }
+                else
+                {
+                    currentShader->setMat4("model", command.transform->GetWorldMatrix());
+                    currentShader->setFloat("u_VisibilityFade", command.visibilityFade);
+                }
+
+                if (command.mesh != lastBoundMesh)
+                {
+                    command.mesh->Bind();
+                    lastBoundMesh = command.mesh;
+                }
+
                 glDrawElements(GL_TRIANGLES, command.indexCount, GL_UNSIGNED_INT, (const void*)(uintptr_t)(command.indexOffset * sizeof(unsigned int)));
 
-                if (useAlb) glBindSampler(0, 0);
+                if (boundTexture)
+                {
+                    glBindSampler(0, 0);
+                }
             }
         }
 
         if (!ctx.directionalLight->staticShadow && !skeletalCommands.empty())
         {
             Shader* lastBound = nullptr;
+            CullMode lastCull = CullMode::Back;
+            ApplyCull(lastCull);
+            int lastTransparencyMode = -1;
+            bool lastUseAlbedo = false;
+            float lastVisFade = -1.0f;
+            const SkeletalMeshRendererComponent* lastBoundSkel = nullptr;
 
             for (auto& command : skeletalCommands) {
                 if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
                 if (!command.mesh->IsCastShadow()) continue;
+
+                if (cascade > 0 && command.mesh->worldAABB.IsValid())
+                {
+                    glm::vec3 boxSize = command.mesh->worldAABB.max - command.mesh->worldAABB.min;
+                    float maxDimension = std::max(boxSize.x, std::max(boxSize.y, boxSize.z));
+                    if (cascade == 1 && maxDimension < 0.08f) continue;
+                    if (cascade == 2 && maxDimension < 0.25f) continue;
+                    if (cascade == 3 && maxDimension < 0.50f) continue;
+                }
+
+                if (command.mesh->worldAABB.IsValid() && !cascadeFrustum.Intersects(command.mesh->worldAABB)) continue;
 
                 auto& material = command.material;
                 if (material->GetTransparencyMode() == TransparencyMode::Alpha) continue;
@@ -378,8 +500,20 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
                 if (currentShader != lastBound)
                 {
                     currentShader->use();
-                    currentShader->setMat4("lightSpaceMatrix", cascadeMatrix);
+                    if (!hasCustom)
+                    {
+                        if (locSkelLightSpace != -1) glUniformMatrix4fv(locSkelLightSpace, 1, GL_FALSE, glm::value_ptr(cascadeMatrix));
+                        if (locSkelTime != -1) glUniform1f(locSkelTime, currentTime);
+                    }
+                    else
+                    {
+                        currentShader->setMat4("lightSpaceMatrix", cascadeMatrix);
+                        currentShader->setFloat("u_Time", currentTime);
+                    }
                     lastBound = currentShader;
+                    lastTransparencyMode = -1;
+                    lastUseAlbedo = false;
+                    lastVisFade = -1.0f;
                 }
 
                 if (hasCustom)
@@ -390,17 +524,29 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
                 CullMode effectiveCull = (hasCustom && customAsset->renderModes.hasCullMode)
                     ? customAsset->renderModes.cullMode
                     : material->GetCullMode();
-                ApplyCull(effectiveCull);
+                if (effectiveCull != lastCull)
+                {
+                    ApplyCull(effectiveCull);
+                    lastCull = effectiveCull;
+                }
 
-                bool useAlb = BindMaterial(*currentShader, material);
+                bool boundTexture = BindShadowMaterial(*currentShader, material, lastTransparencyMode, lastUseAlbedo);
 
-                currentShader->setMat4("model", command.transform->GetWorldMatrix());
-                glm::mat3 normalMatrix = command.transform->GetNormalMatrix();
-                currentShader->setMat3("normalMatrix", normalMatrix);
-                currentShader->setFloat("u_VisibilityFade", command.visibilityFade);
-                currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
-                currentShader->setVec2("UVScale", material->GetUVScale());
-                currentShader->setVec2("UVOffset", material->GetUVOffset());
+                if (!hasCustom)
+                {
+                    if (locSkelModel != -1)
+                        glUniformMatrix4fv(locSkelModel, 1, GL_FALSE, glm::value_ptr(command.transform->GetWorldMatrix()));
+                    if (command.visibilityFade != lastVisFade)
+                    {
+                        if (locSkelVisFade != -1) glUniform1f(locSkelVisFade, command.visibilityFade);
+                        lastVisFade = command.visibilityFade;
+                    }
+                }
+                else
+                {
+                    currentShader->setMat4("model", command.transform->GetWorldMatrix());
+                    currentShader->setFloat("u_VisibilityFade", command.visibilityFade);
+                }
 
                 GLint boneLoc = glGetUniformLocation(currentShader->ID, "u_BoneMatrices");
                 if (boneLoc != -1 && command.skeleton && !command.skeleton->skinningPalette.empty())
@@ -414,29 +560,31 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
                     );
                 }
 
-                command.mesh->Bind();
+                if (command.mesh != lastBoundSkel)
+                {
+                    command.mesh->Bind();
+                    lastBoundSkel = command.mesh;
+                }
+
                 glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
 
-                if (useAlb) glBindSampler(0, 0);
+                if (boundTexture)
+                {
+                    glBindSampler(0, 0);
+                }
             }
         }
+
+        m_CachedDirectionalShadow.cascadeValid[cascade] = true;
+        m_CachedDirectionalShadow.cascadeMatrices[cascade] = cascadeMatrix;
     }
 
-    if (ctx.directionalLight->staticShadow)
-    {
-        m_CachedDirectionalShadow.valid = true;
-        m_CachedDirectionalShadow.lightID = ctx.directionalLight->lightID;
-        m_CachedDirectionalShadow.direction = ctx.directionalLight->direction;
-        m_CachedDirectionalShadow.shadowBias = ctx.directionalLight->shadowBias;
-        m_CachedDirectionalShadow.normalBias = ctx.directionalLight->normalBias;
-        m_CachedDirectionalShadow.reverseCullFace = ctx.directionalLight->reverseCullFace;
-        for (int i = 0; i < NUM_SHADOW_CASCADES; ++i)
-            m_CachedDirectionalShadow.cascadeMatrices[i] = ctx.directionalLight->cascadeMatrices[i];
-    }
-    else
-    {
-        m_CachedDirectionalShadow = {};
-    }
+    m_CachedDirectionalShadow.valid = true;
+    m_CachedDirectionalShadow.lightID = ctx.directionalLight->lightID;
+    m_CachedDirectionalShadow.direction = ctx.directionalLight->direction;
+    m_CachedDirectionalShadow.shadowBias = ctx.directionalLight->shadowBias;
+    m_CachedDirectionalShadow.normalBias = ctx.directionalLight->normalBias;
+    m_CachedDirectionalShadow.reverseCullFace = ctx.directionalLight->reverseCullFace;
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -544,29 +692,60 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
         }
     };
 
+    auto BindShadowMaterial = [](Shader& shader, MaterialComponent* material, int& lastTransparencyMode, bool& lastUseAlbedo) -> bool {
+        auto transMode = material->GetTransparencyMode();
+        bool isMasked = (transMode == TransparencyMode::AlphaScissor || transMode == TransparencyMode::DepthPrepass);
+        int tModeInt = static_cast<int>(transMode);
+
+        if (tModeInt != lastTransparencyMode)
+        {
+            shader.setInt("transparencyMode", tModeInt);
+            lastTransparencyMode = tModeInt;
+        }
+
+        if (isMasked)
+        {
+            shader.setFloat("alphaCutoff", material->GetAlphaCutoff());
+            shader.setVec4("albedoColor", material->GetAlbedoColor());
+            shader.setVec2("UVScale", material->GetUVScale());
+            shader.setVec2("UVOffset", material->GetUVOffset());
+
+            bool useAlb = material->IsUsingAlbedoMap() && material->GetAlbedoTexture();
+            if (useAlb != lastUseAlbedo)
+            {
+                shader.setBool("useAlbedoMap", useAlb);
+                lastUseAlbedo = useAlb;
+            }
+            if (useAlb)
+            {
+                shader.setInt("albedoMap", 0);
+                TextureCache::Get().GetOrCreate(material->GetAlbedoTexture()).Bind(0);
+                material->GetSampler().Bind(0);
+                return true;
+            }
+        }
+        else if (lastUseAlbedo)
+        {
+            shader.setBool("useAlbedoMap", false);
+            lastUseAlbedo = false;
+        }
+
+        return false;
+    };
+
     Shader& pointShadowShader = ShaderManager::Get("PointShadow");
     Shader& skeletalPointShadowShader = ShaderManager::Get("PointShadow_Skeletal");
+    float currentTime = static_cast<float>(Time::GetCurrentTime());
 
-    auto BindMaterial = [](Shader& shader, MaterialComponent* material) {
-        shader.setInt("transparencyMode", static_cast<int>(material->GetTransparencyMode()));
-        shader.setFloat("alphaCutoff", material->GetAlphaCutoff());
-        shader.setVec4("albedoColor", material->GetAlbedoColor());
-        shader.setVec2("UVScale", material->GetUVScale());
-        shader.setVec2("UVOffset", material->GetUVOffset());
-
-        bool useAlb = material->IsUsingAlbedoMap() && material->GetAlbedoTexture();
-        shader.setBool("useAlbedoMap", useAlb);
-        if (useAlb) {
-            shader.setInt("albedoMap", 0);
-            TextureCache::Get().GetOrCreate(material->GetAlbedoTexture()).Bind(0);
-            material->GetSampler().Bind(0);
-        }
-        else {
-            glBindSampler(0, 0);
-            glBindTextureUnit(0, 0);
-        }
-        return useAlb;
-    };
+    GLint locPtShadowMatrix = pointShadowShader.GetUniformLocation("shadowMatrix");
+    GLint locPtLightPos = pointShadowShader.GetUniformLocation("lightPos");
+    GLint locPtFarPlane = pointShadowShader.GetUniformLocation("far_plane");
+    GLint locPtBaseLayer = pointShadowShader.GetUniformLocation("baseLayer");
+    GLint locPtCurrentFace = pointShadowShader.GetUniformLocation("currentFace");
+    GLint locPtModel = pointShadowShader.GetUniformLocation("model");
+    GLint locPtVisFade = pointShadowShader.GetUniformLocation("u_VisibilityFade");
+    GLint locPtTime = pointShadowShader.GetUniformLocation("u_Time");
+    GLint locPtBillboard = pointShadowShader.GetUniformLocation("billboardMode");
 
     for (auto& light : ctx.pointLights)
     {
@@ -612,15 +791,24 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
             glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, o_PointShadowMap, 0, baseLayer + face);
             glClear(GL_DEPTH_BUFFER_BIT);
 
+            Frustum faceFrustum;
+            faceFrustum.Update(shadowTransforms[face]);
+
             if (!commands.empty())
             {
                 Shader* lastBound = nullptr;
+                CullMode lastCull = CullMode::Back;
+                int lastBillboard = 0;
+                int lastTransparencyMode = -1;
+                bool lastUseAlbedo = false;
+                float lastVisFade = -1.0f;
+                const MeshRendererComponent* lastBoundMesh = nullptr;
 
                 for (auto& command : commands)
                 {
                     if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
                     if (!command.mesh->IsCastShadow()) continue;
-                    if (command.mesh->worldAABB.IsValid() && !ctx.camera->Intersects(shadowTransforms[face], command.mesh->worldAABB)) continue;
+                    if (command.mesh->worldAABB.IsValid() && !faceFrustum.Intersects(command.mesh->worldAABB)) continue;
 
                     auto& material = command.material;
                     if (material->GetTransparencyMode() == TransparencyMode::Alpha) continue;
@@ -634,14 +822,30 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
                     if (currentShader != lastBound)
                     {
                         currentShader->use();
-                        currentShader->setFloat("far_plane", far_plane);
-                        currentShader->setVec3("lightPos", lightPos);
-                        currentShader->setInt("baseLayer", baseLayer);
-                        currentShader->setInt("currentFace", face);
-                        currentShader->setMat4("shadowMatrix", shadowTransforms[face]);
                         if (!hasCustom)
-                            currentShader->setInt("billboardMode", 0);
+                        {
+                            if (locPtFarPlane != -1) glUniform1f(locPtFarPlane, far_plane);
+                            if (locPtLightPos != -1) glUniform3fv(locPtLightPos, 1, glm::value_ptr(lightPos));
+                            if (locPtBaseLayer != -1) glUniform1i(locPtBaseLayer, baseLayer);
+                            if (locPtCurrentFace != -1) glUniform1i(locPtCurrentFace, face);
+                            if (locPtShadowMatrix != -1) glUniformMatrix4fv(locPtShadowMatrix, 1, GL_FALSE, glm::value_ptr(shadowTransforms[face]));
+                            if (locPtTime != -1) glUniform1f(locPtTime, currentTime);
+                            if (locPtBillboard != -1) glUniform1i(locPtBillboard, 0);
+                        }
+                        else
+                        {
+                            currentShader->setFloat("far_plane", far_plane);
+                            currentShader->setVec3("lightPos", lightPos);
+                            currentShader->setInt("baseLayer", baseLayer);
+                            currentShader->setInt("currentFace", face);
+                            currentShader->setMat4("shadowMatrix", shadowTransforms[face]);
+                            currentShader->setFloat("u_Time", currentTime);
+                        }
                         lastBound = currentShader;
+                        lastBillboard = 0;
+                        lastTransparencyMode = -1;
+                        lastUseAlbedo = false;
+                        lastVisFade = -1.0f;
                     }
 
                     if (hasCustom)
@@ -653,43 +857,77 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
                         ? customAsset->renderModes.cullMode
                         : material->GetCullMode();
 
-                    if (effectiveCull == CullMode::Disabled) {
-                        glDisable(GL_CULL_FACE);
+                    if (effectiveCull != lastCull)
+                    {
+                        if (effectiveCull == CullMode::Disabled) {
+                            glDisable(GL_CULL_FACE);
+                        }
+                        else {
+                            glEnable(GL_CULL_FACE);
+                            if (light.reverseCullFace)
+                                glCullFace(effectiveCull == CullMode::Back ? GL_FRONT : GL_BACK);
+                            else
+                                glCullFace(effectiveCull == CullMode::Back ? GL_BACK : GL_FRONT);
+                        }
+                        lastCull = effectiveCull;
                     }
-                    else {
-                        glEnable(GL_CULL_FACE);
-                        if (light.reverseCullFace)
-                            glCullFace(effectiveCull == CullMode::Back ? GL_FRONT : GL_BACK);
+
+                    int bbMode = static_cast<int>(material->GetBillboardMode());
+                    if (bbMode != lastBillboard)
+                    {
+                        if (!hasCustom && locPtBillboard != -1)
+                            glUniform1i(locPtBillboard, bbMode);
                         else
-                            glCullFace(effectiveCull == CullMode::Back ? GL_BACK : GL_FRONT);
+                            currentShader->setInt("billboardMode", bbMode);
+                        lastBillboard = bbMode;
                     }
 
-                    currentShader->setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
-                    bool useAlb = BindMaterial(*currentShader, material);
+                    bool boundTexture = BindShadowMaterial(*currentShader, material, lastTransparencyMode, lastUseAlbedo);
 
-                    currentShader->setMat4("model", command.transform->GetWorldMatrix());
-                    glm::mat3 normalMatrix = command.transform->GetNormalMatrix();
-                    currentShader->setMat3("normalMatrix", normalMatrix);
-                currentShader->setFloat("u_VisibilityFade", command.visibilityFade);
-                    currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
-                    currentShader->setVec2("UVScale", material->GetUVScale());
-                    currentShader->setVec2("UVOffset", material->GetUVOffset());
+                    if (!hasCustom)
+                    {
+                        if (locPtModel != -1)
+                            glUniformMatrix4fv(locPtModel, 1, GL_FALSE, glm::value_ptr(command.transform->GetWorldMatrix()));
+                        if (command.visibilityFade != lastVisFade)
+                        {
+                            if (locPtVisFade != -1) glUniform1f(locPtVisFade, command.visibilityFade);
+                            lastVisFade = command.visibilityFade;
+                        }
+                    }
+                    else
+                    {
+                        currentShader->setMat4("model", command.transform->GetWorldMatrix());
+                        currentShader->setFloat("u_VisibilityFade", command.visibilityFade);
+                    }
 
-                    command.mesh->Bind();
+                    if (command.mesh != lastBoundMesh)
+                    {
+                        command.mesh->Bind();
+                        lastBoundMesh = command.mesh;
+                    }
+
                     glDrawElements(GL_TRIANGLES, command.indexCount, GL_UNSIGNED_INT, (const void*)(uintptr_t)(command.indexOffset * sizeof(unsigned int)));
 
-                    if (useAlb) glBindSampler(0, 0);
+                    if (boundTexture)
+                    {
+                        glBindSampler(0, 0);
+                    }
                 }
             }
 
             if (!light.staticShadow && !skeletalCommands.empty())
             {
                 Shader* lastBound = nullptr;
+                CullMode lastCull = CullMode::Back;
+                int lastTransparencyMode = -1;
+                bool lastUseAlbedo = false;
+                const SkeletalMeshRendererComponent* lastBoundSkel = nullptr;
 
                 for (auto& command : skeletalCommands)
                 {
                     if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
                     if (!command.mesh->IsCastShadow()) continue;
+                    if (command.mesh->worldAABB.IsValid() && !faceFrustum.Intersects(command.mesh->worldAABB)) continue;
 
                     auto& material = command.material;
                     if (material->GetTransparencyMode() == TransparencyMode::Alpha) continue;
@@ -708,7 +946,10 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
                         currentShader->setInt("baseLayer", baseLayer);
                         currentShader->setInt("currentFace", face);
                         currentShader->setMat4("shadowMatrix", shadowTransforms[face]);
+                        currentShader->setFloat("u_Time", currentTime);
                         lastBound = currentShader;
+                        lastTransparencyMode = -1;
+                        lastUseAlbedo = false;
                     }
 
                     if (hasCustom)
@@ -720,26 +961,25 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
                         ? customAsset->renderModes.cullMode
                         : material->GetCullMode();
 
-                    if (effectiveCull == CullMode::Disabled) {
-                        glDisable(GL_CULL_FACE);
-                    }
-                    else {
-                        glEnable(GL_CULL_FACE);
-                        if (light.reverseCullFace)
-                            glCullFace(effectiveCull == CullMode::Back ? GL_FRONT : GL_BACK);
-                        else
-                            glCullFace(effectiveCull == CullMode::Back ? GL_BACK : GL_FRONT);
+                    if (effectiveCull != lastCull)
+                    {
+                        if (effectiveCull == CullMode::Disabled) {
+                            glDisable(GL_CULL_FACE);
+                        }
+                        else {
+                            glEnable(GL_CULL_FACE);
+                            if (light.reverseCullFace)
+                                glCullFace(effectiveCull == CullMode::Back ? GL_FRONT : GL_BACK);
+                            else
+                                glCullFace(effectiveCull == CullMode::Back ? GL_BACK : GL_FRONT);
+                        }
+                        lastCull = effectiveCull;
                     }
 
-                    bool useAlb = BindMaterial(*currentShader, material);
+                    bool boundTexture = BindShadowMaterial(*currentShader, material, lastTransparencyMode, lastUseAlbedo);
 
                     currentShader->setMat4("model", command.transform->GetWorldMatrix());
-                    glm::mat3 normalMatrix = command.transform->GetNormalMatrix();
-                    currentShader->setMat3("normalMatrix", normalMatrix);
-                currentShader->setFloat("u_VisibilityFade", command.visibilityFade);
-                    currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
-                    currentShader->setVec2("UVScale", material->GetUVScale());
-                    currentShader->setVec2("UVOffset", material->GetUVOffset());
+                    currentShader->setFloat("u_VisibilityFade", command.visibilityFade);
 
                     GLint boneLoc = glGetUniformLocation(currentShader->ID, "u_BoneMatrices");
                     if (boneLoc != -1 && command.skeleton && !command.skeleton->skinningPalette.empty())
@@ -753,10 +993,18 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
                         );
                     }
 
-                    command.mesh->Bind();
+                    if (command.mesh != lastBoundSkel)
+                    {
+                        command.mesh->Bind();
+                        lastBoundSkel = command.mesh;
+                    }
+
                     glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
 
-                    if (useAlb) glBindSampler(0, 0);
+                    if (boundTexture)
+                    {
+                        glBindSampler(0, 0);
+                    }
                 }
             }
         }
@@ -830,25 +1078,45 @@ void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& fram
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(1.5f, 4.0f);
 
-    auto BindMaterial = [](Shader& shader, MaterialComponent* material) {
-        shader.setInt("transparencyMode", static_cast<int>(material->GetTransparencyMode()));
-        shader.setFloat("alphaCutoff", material->GetAlphaCutoff());
-        shader.setVec4("albedoColor", material->GetAlbedoColor());
-        shader.setVec2("UVScale", material->GetUVScale());
-        shader.setVec2("UVOffset", material->GetUVOffset());
+    auto BindShadowMaterial = [](Shader& shader, MaterialComponent* material, int& lastTransparencyMode, bool& lastUseAlbedo) -> bool {
+        auto transMode = material->GetTransparencyMode();
+        bool isMasked = (transMode == TransparencyMode::AlphaScissor || transMode == TransparencyMode::DepthPrepass);
+        int tModeInt = static_cast<int>(transMode);
 
-        bool useAlb = material->IsUsingAlbedoMap() && material->GetAlbedoTexture();
-        shader.setBool("useAlbedoMap", useAlb);
-        if (useAlb) {
-            shader.setInt("albedoMap", 0);
-            TextureCache::Get().GetOrCreate(material->GetAlbedoTexture()).Bind(0);
-            material->GetSampler().Bind(0);
+        if (tModeInt != lastTransparencyMode)
+        {
+            shader.setInt("transparencyMode", tModeInt);
+            lastTransparencyMode = tModeInt;
         }
-        else {
-            glBindSampler(0, 0);
-            glBindTextureUnit(0, 0);
+
+        if (isMasked)
+        {
+            shader.setFloat("alphaCutoff", material->GetAlphaCutoff());
+            shader.setVec4("albedoColor", material->GetAlbedoColor());
+            shader.setVec2("UVScale", material->GetUVScale());
+            shader.setVec2("UVOffset", material->GetUVOffset());
+
+            bool useAlb = material->IsUsingAlbedoMap() && material->GetAlbedoTexture();
+            if (useAlb != lastUseAlbedo)
+            {
+                shader.setBool("useAlbedoMap", useAlb);
+                lastUseAlbedo = useAlb;
+            }
+            if (useAlb)
+            {
+                shader.setInt("albedoMap", 0);
+                TextureCache::Get().GetOrCreate(material->GetAlbedoTexture()).Bind(0);
+                material->GetSampler().Bind(0);
+                return true;
+            }
         }
-        return useAlb;
+        else if (lastUseAlbedo)
+        {
+            shader.setBool("useAlbedoMap", false);
+            lastUseAlbedo = false;
+        }
+
+        return false;
     };
 
     auto BindCustomUniforms = [](Shader& shader, const MaterialInstance& inst, const ShaderAsset& shaderAsset) {
@@ -913,6 +1181,13 @@ void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& fram
 
     Shader& shadowShader = ShaderManager::Get("DirectionalShadow");
     Shader& skeletalShadowShader = ShaderManager::Get("DirectionalShadow_Skeletal");
+    float currentTime = static_cast<float>(Time::GetCurrentTime());
+
+    GLint locSpotLightSpace = shadowShader.GetUniformLocation("lightSpaceMatrix");
+    GLint locSpotModel = shadowShader.GetUniformLocation("model");
+    GLint locSpotVisFade = shadowShader.GetUniformLocation("u_VisibilityFade");
+    GLint locSpotTime = shadowShader.GetUniformLocation("u_Time");
+    GLint locSpotBillboard = shadowShader.GetUniformLocation("billboardMode");
 
     for (const auto& light : ctx.spotLights)
     {
@@ -954,20 +1229,31 @@ void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& fram
                 glEnable(GL_CULL_FACE);
                 if (reverseCull)
                     glCullFace(mode == CullMode::Back ? GL_FRONT : GL_BACK);
-                else
-                    glCullFace(mode == CullMode::Back ? GL_BACK : GL_FRONT);
+            else
+                glCullFace(mode == CullMode::Back ? GL_BACK : GL_FRONT);
             }
         };
 
         const glm::mat4& lightSpace = light.lightSpaceMatrix;
 
+        Frustum spotFrustum;
+        spotFrustum.Update(lightSpace);
+
         if (!commands.empty())
         {
             Shader* lastBound = nullptr;
+            CullMode lastCull = CullMode::Back;
+            ApplyCull(lastCull);
+            int lastBillboard = 0;
+            int lastTransparencyMode = -1;
+            bool lastUseAlbedo = false;
+            float lastVisFade = -1.0f;
+            const MeshRendererComponent* lastBoundMesh = nullptr;
 
             for (auto& command : commands) {
                 if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
                 if (!command.mesh->IsCastShadow()) continue;
+                if (command.mesh->worldAABB.IsValid() && !spotFrustum.Intersects(command.mesh->worldAABB)) continue;
 
                 auto& material = command.material;
                 if (material->GetTransparencyMode() == TransparencyMode::Alpha) continue;
@@ -981,10 +1267,22 @@ void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& fram
                 if (currentShader != lastBound)
                 {
                     currentShader->use();
-                    currentShader->setMat4("lightSpaceMatrix", lightSpace);
                     if (!hasCustom)
-                        currentShader->setInt("billboardMode", 0);
+                    {
+                        if (locSpotLightSpace != -1) glUniformMatrix4fv(locSpotLightSpace, 1, GL_FALSE, glm::value_ptr(lightSpace));
+                        if (locSpotTime != -1) glUniform1f(locSpotTime, currentTime);
+                        if (locSpotBillboard != -1) glUniform1i(locSpotBillboard, 0);
+                    }
+                    else
+                    {
+                        currentShader->setMat4("lightSpaceMatrix", lightSpace);
+                        currentShader->setFloat("u_Time", currentTime);
+                    }
                     lastBound = currentShader;
+                    lastBillboard = 0;
+                    lastTransparencyMode = -1;
+                    lastUseAlbedo = false;
+                    lastVisFade = -1.0f;
                 }
 
                 if (hasCustom)
@@ -995,33 +1293,68 @@ void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& fram
                 CullMode effectiveCull = (hasCustom && customAsset->renderModes.hasCullMode)
                     ? customAsset->renderModes.cullMode
                     : material->GetCullMode();
-                ApplyCull(effectiveCull);
+                if (effectiveCull != lastCull)
+                {
+                    ApplyCull(effectiveCull);
+                    lastCull = effectiveCull;
+                }
 
-                currentShader->setInt("billboardMode", static_cast<int>(material->GetBillboardMode()));
-                bool useAlb = BindMaterial(*currentShader, material);
+                int bbMode = static_cast<int>(material->GetBillboardMode());
+                if (bbMode != lastBillboard)
+                {
+                    if (!hasCustom && locSpotBillboard != -1)
+                        glUniform1i(locSpotBillboard, bbMode);
+                    else
+                        currentShader->setInt("billboardMode", bbMode);
+                    lastBillboard = bbMode;
+                }
 
-                currentShader->setMat4("model", command.transform->GetWorldMatrix());
-                glm::mat3 normalMatrix = command.transform->GetNormalMatrix();
-                currentShader->setMat3("normalMatrix", normalMatrix);
-                currentShader->setFloat("u_VisibilityFade", command.visibilityFade);
-                currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
-                currentShader->setVec2("UVScale", material->GetUVScale());
-                currentShader->setVec2("UVOffset", material->GetUVOffset());
+                bool boundTexture = BindShadowMaterial(*currentShader, material, lastTransparencyMode, lastUseAlbedo);
 
-                command.mesh->Bind();
+                if (!hasCustom)
+                {
+                    if (locSpotModel != -1)
+                        glUniformMatrix4fv(locSpotModel, 1, GL_FALSE, glm::value_ptr(command.transform->GetWorldMatrix()));
+                    if (command.visibilityFade != lastVisFade)
+                    {
+                        if (locSpotVisFade != -1) glUniform1f(locSpotVisFade, command.visibilityFade);
+                        lastVisFade = command.visibilityFade;
+                    }
+                }
+                else
+                {
+                    currentShader->setMat4("model", command.transform->GetWorldMatrix());
+                    currentShader->setFloat("u_VisibilityFade", command.visibilityFade);
+                }
+
+                if (command.mesh != lastBoundMesh)
+                {
+                    command.mesh->Bind();
+                    lastBoundMesh = command.mesh;
+                }
+
                 glDrawElements(GL_TRIANGLES, command.indexCount, GL_UNSIGNED_INT, (const void*)(uintptr_t)(command.indexOffset * sizeof(unsigned int)));
 
-                if (useAlb) glBindSampler(0, 0);
+                if (boundTexture)
+                {
+                    glBindSampler(0, 0);
+                }
             }
         }
 
         if (!light.staticShadow && !skeletalCommands.empty())
         {
             Shader* lastBound = nullptr;
+            CullMode lastCull = CullMode::Back;
+            ApplyCull(lastCull);
+            int lastTransparencyMode = -1;
+            bool lastUseAlbedo = false;
+            const SkeletalMeshRendererComponent* lastBoundSkel = nullptr;
 
             for (auto& command : skeletalCommands) {
                 if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
                 if (!command.mesh->IsCastShadow()) continue;
+                if (command.mesh->worldAABB.IsValid() && !spotFrustum.Intersects(command.mesh->worldAABB)) continue;
 
                 auto& material = command.material;
                 if (material->GetTransparencyMode() == TransparencyMode::Alpha) continue;
@@ -1036,7 +1369,10 @@ void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& fram
                 {
                     currentShader->use();
                     currentShader->setMat4("lightSpaceMatrix", lightSpace);
+                    currentShader->setFloat("u_Time", currentTime);
                     lastBound = currentShader;
+                    lastTransparencyMode = -1;
+                    lastUseAlbedo = false;
                 }
 
                 if (hasCustom)
@@ -1047,17 +1383,16 @@ void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& fram
                 CullMode effectiveCull = (hasCustom && customAsset->renderModes.hasCullMode)
                     ? customAsset->renderModes.cullMode
                     : material->GetCullMode();
-                ApplyCull(effectiveCull);
+                if (effectiveCull != lastCull)
+                {
+                    ApplyCull(effectiveCull);
+                    lastCull = effectiveCull;
+                }
 
-                bool useAlb = BindMaterial(*currentShader, material);
+                bool boundTexture = BindShadowMaterial(*currentShader, material, lastTransparencyMode, lastUseAlbedo);
 
                 currentShader->setMat4("model", command.transform->GetWorldMatrix());
-                glm::mat3 normalMatrix = command.transform->GetNormalMatrix();
-                currentShader->setMat3("normalMatrix", normalMatrix);
                 currentShader->setFloat("u_VisibilityFade", command.visibilityFade);
-                currentShader->setFloat("u_Time", static_cast<float>(Time::GetCurrentTime()));
-                currentShader->setVec2("UVScale", material->GetUVScale());
-                currentShader->setVec2("UVOffset", material->GetUVOffset());
 
                 GLint boneLoc = glGetUniformLocation(currentShader->ID, "u_BoneMatrices");
                 if (boneLoc != -1 && command.skeleton && !command.skeleton->skinningPalette.empty())
@@ -1071,10 +1406,18 @@ void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& fram
                     );
                 }
 
-                command.mesh->Bind();
+                if (command.mesh != lastBoundSkel)
+                {
+                    command.mesh->Bind();
+                    lastBoundSkel = command.mesh;
+                }
+
                 glDrawElements(GL_TRIANGLES, command.mesh->indexCount, GL_UNSIGNED_INT, 0);
 
-                if (useAlb) glBindSampler(0, 0);
+                if (boundTexture)
+                {
+                    glBindSampler(0, 0);
+                }
             }
         }
 

@@ -156,8 +156,31 @@ std::optional<DirectionalLight> LightSystem::CollectDirectionalLight(Camera* cam
 		if (std::abs(glm::dot(up, lightDir)) > 0.99f)
 			up = glm::vec3(0.0f, 0.0f, 1.0f);
 
+		++m_FrameCounter;
+		bool forceAll = !m_HasCachedCascades ||
+			m_CachedDirLightID != data.lightID ||
+			m_CachedDirLightDir != lightDir ||
+			data.shadowDirty;
+
+		if (forceAll)
+		{
+			m_HasCachedCascades = true;
+			m_CachedDirLightID = data.lightID;
+			m_CachedDirLightDir = lightDir;
+		}
+
 		for (int i = 0; i < NUM_SHADOW_CASCADES; ++i)
 		{
+			// Cascades 0 and 1: update every frame
+			// Cascade 2: update on even frames
+			// Cascade 3: update on odd frames
+			bool shouldUpdate = forceAll || (i < 2) || (i == 2 && (m_FrameCounter % 2 == 0)) || (i == 3 && (m_FrameCounter % 2 != 0));
+			if (!shouldUpdate)
+			{
+				data.cascadeMatrices[i] = m_CachedCascadeMatrices[i];
+				continue;
+			}
+
 			float prevSplit = (i == 0) ? nearClip : data.cascadeSplits[i - 1];
 			float currSplit = data.cascadeSplits[i];
 
@@ -225,6 +248,7 @@ std::optional<DirectionalLight> LightSystem::CollectDirectionalLight(Camera* cam
 			glm::mat4 lightProj = glm::ortho(minX, maxX, minY, maxY, zNear, zFar);
 
 			data.cascadeMatrices[i] = lightProj * lightView;
+			m_CachedCascadeMatrices[i] = data.cascadeMatrices[i];
 		}
 
 		data.lightSpace = data.cascadeMatrices[0];
