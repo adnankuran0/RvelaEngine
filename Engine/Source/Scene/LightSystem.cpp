@@ -6,6 +6,9 @@
 #include "Asset/AssetManager.h"
 #include "Asset/Types/TextureAsset.h"
 #include "Renderer/TextureCache.h"
+#include "Renderer/AABB.h"
+#include "Scene/Components/MeshRendererComponent.h"
+#include "Scene/Components/SkeletalMeshRendererComponent.h"
 #include <limits>
 #include <cmath>
 
@@ -142,14 +145,82 @@ std::optional<DirectionalLight> LightSystem::CollectDirectionalLight(Camera* cam
 			data.shadowDirty ||
 			light.bakedLightDir != data.direction;
 
-		if (data.staticShadow && !shouldBake)
+		if (data.staticShadow)
 		{
+			if (!shouldBake)
+			{
+				for (int i = 0; i < NUM_SHADOW_CASCADES; ++i)
+				{
+					data.cascadeMatrices[i] = light.bakedCascadeMatrices[i];
+					data.cascadeSplits[i] = light.bakedCascadeSplits[i];
+				}
+				data.lightSpace = data.cascadeMatrices[0];
+				return data;
+			}
+
+			// Scene-wide orthographic shadow bounds
+			AABB sceneAABB;
+			auto meshView = m_Scene.GetRegistry().view<MeshRendererComponent>();
+			for (auto entity : meshView)
+			{
+				const auto& mr = meshView.get<MeshRendererComponent>(entity);
+				if (mr.IsCastShadow() && mr.worldAABB.IsValid())
+				{
+					sceneAABB.Expand(mr.worldAABB.min);
+					sceneAABB.Expand(mr.worldAABB.max);
+				}
+			}
+
+			auto skelView = m_Scene.GetRegistry().view<SkeletalMeshRendererComponent>();
+			for (auto entity : skelView)
+			{
+				const auto& smr = skelView.get<SkeletalMeshRendererComponent>(entity);
+				if (smr.IsCastShadow() && smr.worldAABB.IsValid())
+				{
+					sceneAABB.Expand(smr.worldAABB.min);
+					sceneAABB.Expand(smr.worldAABB.max);
+				}
+			}
+
+			glm::vec3 center(0.0f);
+			float radius = 50.0f;
+			if (sceneAABB.IsValid())
+			{
+				center = sceneAABB.Center();
+				glm::vec3 size = sceneAABB.Size();
+				radius = glm::length(size) * 0.5f + 10.0f;
+			}
+			radius = std::max(radius, 15.0f);
+
+			glm::vec3 lightDir = data.direction;
+			glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+			if (std::abs(glm::dot(up, lightDir)) > 0.99f)
+				up = glm::vec3(0.0f, 0.0f, 1.0f);
+
+			float eyeDistance = radius * 2.0f + 50.0f;
+			glm::vec3 lightEye = center - lightDir * eyeDistance;
+			glm::mat4 lightView = glm::lookAt(lightEye, center, up);
+
+			float minX = -radius;
+			float maxX =  radius;
+			float minY = -radius;
+			float maxY =  radius;
+			float zNear = 0.1f;
+			float zFar = eyeDistance + radius + 100.0f;
+
+			glm::mat4 lightProj = glm::ortho(minX, maxX, minY, maxY, zNear, zFar);
+			glm::mat4 sceneLightSpace = lightProj * lightView;
+
+			light.hasBakedShadow = true;
+			light.bakedLightDir = data.direction;
 			for (int i = 0; i < NUM_SHADOW_CASCADES; ++i)
 			{
-				data.cascadeMatrices[i] = light.bakedCascadeMatrices[i];
-				data.cascadeSplits[i] = light.bakedCascadeSplits[i];
+				data.cascadeMatrices[i] = sceneLightSpace;
+				data.cascadeSplits[i] = 100000.0f;
+				light.bakedCascadeMatrices[i] = sceneLightSpace;
+				light.bakedCascadeSplits[i] = 100000.0f;
 			}
-			data.lightSpace = data.cascadeMatrices[0];
+			data.lightSpace = sceneLightSpace;
 			return data;
 		}
 
@@ -244,16 +315,7 @@ std::optional<DirectionalLight> LightSystem::CollectDirectionalLight(Camera* cam
 
 		data.lightSpace = data.cascadeMatrices[0];
 
-		if (data.staticShadow)
-		{
-			light.hasBakedShadow = true;
-			light.bakedLightDir = data.direction;
-			for (int i = 0; i < NUM_SHADOW_CASCADES; ++i)
-			{
-				light.bakedCascadeMatrices[i] = data.cascadeMatrices[i];
-				light.bakedCascadeSplits[i] = data.cascadeSplits[i];
-			}
-		}
+
 
 		return data;
 	}

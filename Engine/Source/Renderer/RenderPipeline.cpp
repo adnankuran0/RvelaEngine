@@ -147,7 +147,7 @@ void RenderPipeline::UpdateUBOs(const RenderContext& ctx)
 			dir.cascadeSplits[0],
 			dir.cascadeSplits[1],
 			dir.cascadeSplits[2],
-			dir.cascadeSplits[3]
+			dir.cascadeSplits[2]
 		);
 	}
 	else

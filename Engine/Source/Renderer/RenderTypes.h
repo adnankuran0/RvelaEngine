@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include "Scene/Components/DirectionalLightComponent.h"
 
 namespace rv {
 
@@ -106,7 +107,7 @@ struct LightUBOData {
     DirectionalLightUBOData dirLight;
     PointLightUBOData pointLights[MaxPointLights];
     SpotLightUBOData spotLights[MaxSpotLights];
-    glm::mat4 cascadeMatrices[4];
+    glm::mat4 cascadeMatrices[NUM_SHADOW_CASCADES];
     glm::vec4 cascadeSplits;
     int pointLightCount;
     int spotLightCount;

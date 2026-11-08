@@ -308,6 +308,25 @@ void RenderLayer::CollectRenderCommands(Scene* scene)
 		cmd.indexOffset = chosenIndexOffset;
 		cmd.indexCount = chosenIndexCount;
 
+		if (!isTransparent && meshRenderer.IsCastShadow())
+		{
+			RenderCommand shadowCmd = cmd;
+			if (meshRenderer.gpuMesh && !meshRenderer.gpuMesh->lods.empty())
+			{
+				shadowCmd.lodIndex = 0;
+				shadowCmd.indexOffset = meshRenderer.gpuMesh->lods[0].indexOffset;
+				shadowCmd.indexCount = meshRenderer.gpuMesh->lods[0].indexCount;
+			}
+			else
+			{
+				shadowCmd.lodIndex = 0;
+				shadowCmd.indexOffset = 0;
+				shadowCmd.indexCount = meshRenderer.indexCount;
+			}
+			shadowCmd.visibilityFade = 1.0f;
+			m_RenderPipeline->m_RenderFrame.shadowOpaqueCommands.push_back(shadowCmd);
+		}
+
 		glm::vec3 visPivotPos = objPos;
 		if (const auto* vis = FindVisibilityRangeInHierarchy(scene, entity, visPivotPos))
 		{
@@ -392,6 +411,13 @@ void RenderLayer::CollectRenderCommands(Scene* scene)
 
 		glm::vec3 objPos = glm::vec3(transform.GetWorldMatrix()[3]);
 		cmd.distanceToCamera = glm::length2(camPos - objPos);
+
+		if (!isSkeletalTransparent && skelRenderer.IsCastShadow())
+		{
+			SkeletalRenderCommand shadowCmd = cmd;
+			shadowCmd.visibilityFade = 1.0f;
+			m_RenderPipeline->m_RenderFrame.shadowSkeletalOpaqueCommands.push_back(shadowCmd);
+		}
 
 		glm::vec3 visPivotPos = objPos;
 		if (const auto* vis = FindVisibilityRangeInHierarchy(scene, entity, visPivotPos))

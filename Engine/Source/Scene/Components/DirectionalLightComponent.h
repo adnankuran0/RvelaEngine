@@ -4,7 +4,7 @@
 
 namespace rv {
 
-inline constexpr int NUM_SHADOW_CASCADES = 4;
+inline constexpr int NUM_SHADOW_CASCADES = 3;
 
 using json = nlohmann::json;
 

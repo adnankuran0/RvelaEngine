@@ -154,8 +154,8 @@ void ShadowPass::InitSpotShadowMap()
 
 void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFrame& frame)
 {
-    auto& commands = frame.opaqueCommands;
-    auto& skeletalCommands = frame.skeletalOpaqueCommands;
+    auto& commands = frame.shadowOpaqueCommands;
+    auto& skeletalCommands = frame.shadowSkeletalOpaqueCommands;
 
     if (!ctx.directionalLight || !ctx.directionalLight->castShadows) return;
 
@@ -329,6 +329,8 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
         glClear(GL_DEPTH_BUFFER_BIT);
 
         const glm::mat4& cascadeMatrix = ctx.directionalLight->cascadeMatrices[cascade];
+        Frustum cascadeFrustum;
+        cascadeFrustum.Update(cascadeMatrix);
 
         if (!commands.empty())
         {
@@ -343,6 +345,7 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
             for (auto& command : commands) {
                 if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
                 if (!command.mesh->IsCastShadow()) continue;
+                if (command.mesh->worldAABB.IsValid() && !cascadeFrustum.Intersects(command.mesh->worldAABB)) continue;
 
                 auto& material = command.material;
                 if (material->GetTransparencyMode() == TransparencyMode::Alpha) continue;
@@ -442,6 +445,7 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
             for (auto& command : skeletalCommands) {
                 if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
                 if (!command.mesh->IsCastShadow()) continue;
+                if (command.mesh->worldAABB.IsValid() && !cascadeFrustum.Intersects(command.mesh->worldAABB)) continue;
 
                 auto& material = command.material;
                 if (material->GetTransparencyMode() == TransparencyMode::Alpha) continue;
@@ -549,8 +553,8 @@ void ShadowPass::RenderDirectionalShadowMap(const RenderContext& ctx, RenderFram
 
 void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& frame)
 {
-    auto& commands = frame.opaqueCommands;
-    auto& skeletalCommands = frame.skeletalOpaqueCommands;
+    auto& commands = frame.shadowOpaqueCommands;
+    auto& skeletalCommands = frame.shadowSkeletalOpaqueCommands;
 
     bool anyNeedsRender = false;
     for (const auto& light : ctx.pointLights)
@@ -727,6 +731,7 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
         if (!isDirty) continue;
 
         glm::vec3 lightPos = light.position;
+        float lightRadiusSq = light.radius * light.radius;
 
         float near_plane = 0.05f;
         float far_plane = light.radius;
@@ -763,7 +768,13 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
                 {
                     if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
                     if (!command.mesh->IsCastShadow()) continue;
-                    if (command.mesh->worldAABB.IsValid() && !faceFrustum.Intersects(command.mesh->worldAABB)) continue;
+                    if (command.mesh->worldAABB.IsValid())
+                    {
+                        glm::vec3 closest = glm::clamp(lightPos, command.mesh->worldAABB.min, command.mesh->worldAABB.max);
+                        glm::vec3 d = lightPos - closest;
+                        if (glm::dot(d, d) > lightRadiusSq) continue;
+                        if (!faceFrustum.Intersects(command.mesh->worldAABB)) continue;
+                    }
 
                     auto& material = command.material;
                     if (material->GetTransparencyMode() == TransparencyMode::Alpha) continue;
@@ -882,7 +893,13 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
                 {
                     if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
                     if (!command.mesh->IsCastShadow()) continue;
-                    if (command.mesh->worldAABB.IsValid() && !faceFrustum.Intersects(command.mesh->worldAABB)) continue;
+                    if (command.mesh->worldAABB.IsValid())
+                    {
+                        glm::vec3 closest = glm::clamp(lightPos, command.mesh->worldAABB.min, command.mesh->worldAABB.max);
+                        glm::vec3 d = lightPos - closest;
+                        if (glm::dot(d, d) > lightRadiusSq) continue;
+                        if (!faceFrustum.Intersects(command.mesh->worldAABB)) continue;
+                    }
 
                     auto& material = command.material;
                     if (material->GetTransparencyMode() == TransparencyMode::Alpha) continue;
@@ -991,8 +1008,8 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
 void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& frame)
 {
     if (ctx.spotLights.empty()) return;
-    auto& commands = frame.opaqueCommands;
-    auto& skeletalCommands = frame.skeletalOpaqueCommands;
+    auto& commands = frame.shadowOpaqueCommands;
+    auto& skeletalCommands = frame.shadowSkeletalOpaqueCommands;
 
     bool anyNeedsRender = false;
     for (const auto& light : ctx.spotLights)
@@ -1208,7 +1225,13 @@ void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& fram
             for (auto& command : commands) {
                 if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
                 if (!command.mesh->IsCastShadow()) continue;
-                if (command.mesh->worldAABB.IsValid() && !spotFrustum.Intersects(command.mesh->worldAABB)) continue;
+                if (command.mesh->worldAABB.IsValid())
+                {
+                    glm::vec3 closest = glm::clamp(light.position, command.mesh->worldAABB.min, command.mesh->worldAABB.max);
+                    glm::vec3 d = light.position - closest;
+                    if (glm::dot(d, d) > light.radius * light.radius) continue;
+                    if (!spotFrustum.Intersects(command.mesh->worldAABB)) continue;
+                }
 
                 auto& material = command.material;
                 if (material->GetTransparencyMode() == TransparencyMode::Alpha) continue;
@@ -1309,7 +1332,13 @@ void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& fram
             for (auto& command : skeletalCommands) {
                 if (!command.mesh || command.mesh->indexCount == 0 || !command.mesh->gpuMesh) continue;
                 if (!command.mesh->IsCastShadow()) continue;
-                if (command.mesh->worldAABB.IsValid() && !spotFrustum.Intersects(command.mesh->worldAABB)) continue;
+                if (command.mesh->worldAABB.IsValid())
+                {
+                    glm::vec3 closest = glm::clamp(light.position, command.mesh->worldAABB.min, command.mesh->worldAABB.max);
+                    glm::vec3 d = light.position - closest;
+                    if (glm::dot(d, d) > light.radius * light.radius) continue;
+                    if (!spotFrustum.Intersects(command.mesh->worldAABB)) continue;
+                }
 
                 auto& material = command.material;
                 if (material->GetTransparencyMode() == TransparencyMode::Alpha) continue;

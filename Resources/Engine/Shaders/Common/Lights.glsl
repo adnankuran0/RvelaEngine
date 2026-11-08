@@ -3,7 +3,7 @@
 
 #define MAX_POINT_LIGHTS 20
 #define MAX_SPOT_LIGHTS 8
-#define NUM_CASCADES 4
+#define NUM_CASCADES 3
 
 struct PointLight {
     vec4 position;       // xyz: pos, w: falloff
