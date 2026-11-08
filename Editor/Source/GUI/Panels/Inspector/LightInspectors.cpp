@@ -2,6 +2,9 @@
 #include "InspectorUIUtils.h"
 #include "ImGui/imgui.h"
 #include "Scene/Entity.h"
+#include "Scene/Components/ReflectionProbeComponent.h"
+#include "Renderer/ReflectionProbeManager.h"
+#include <glm/gtc/type_ptr.hpp>
 
 namespace rv {
 
@@ -213,6 +216,54 @@ void LightInspectors::Draw(Scene& scene, entt::entity selectedEntity)
 			}
 
 			UI::EndPropertyTable();
+		}
+	});
+
+	UI::DrawComponent<ReflectionProbeComponent>("Reflection Probe", registry, selectedEntity, [&](ReflectionProbeComponent& probe)
+	{
+		if (UI::BeginPropertyTable("ReflectionProbeTable"))
+		{
+			UI::PropertyLabel("Extents");
+			if (ImGui::DragFloat3("##Extents", glm::value_ptr(probe.extents), 0.1f, 0.1f, 1000.0f))
+				probe.isDirty = true;
+
+			UI::PropertyLabel("Origin Offset");
+			if (ImGui::DragFloat3("##OriginOffset", glm::value_ptr(probe.originOffset), 0.05f))
+				probe.isDirty = true;
+
+			UI::PropertyLabel("Box Projection");
+			ImGui::Checkbox("##BoxProjection", &probe.boxProjection);
+
+			UI::PropertyLabel("Interior");
+			if (ImGui::Checkbox("##Interior", &probe.interior))
+				probe.isDirty = true;
+
+			UI::PropertyLabel("Blend Distance");
+			ImGui::SliderFloat("##BlendDistance", &probe.blendDistance, 0.0f, 10.0f, "%.2f");
+
+			UI::PropertyLabel("Intensity");
+			ImGui::SliderFloat("##Intensity", &probe.intensity, 0.0f, 5.0f, "%.2f");
+
+			UI::PropertyLabel("Priority");
+			ImGui::DragInt("##Priority", &probe.priority, 1, 0, 100);
+
+			UI::PropertyLabel("Resolution");
+			const char* resOptions[] = { "128", "256", "512" };
+			int currentResIdx = (probe.resolution == 128) ? 0 : ((probe.resolution == 512) ? 2 : 1);
+			if (ImGui::Combo("##Resolution", &currentResIdx, resOptions, 3))
+			{
+				probe.resolution = (currentResIdx == 0) ? 128 : ((currentResIdx == 2) ? 512 : 256);
+				probe.isDirty = true;
+			}
+
+			UI::EndPropertyTable();
+		}
+
+		ImGui::Spacing();
+		if (ImGui::Button("Bake Probe", ImVec2(-1, 28)))
+		{
+			probe.isDirty = true;
+			ReflectionProbeManager::Get().BakeProbe(scene, selectedEntity, probe);
 		}
 	});
 }

@@ -181,6 +181,7 @@ void AddComponentPopup::Draw(Scene& scene, entt::entity selectedEntity)
 				DrawComponentMenuItem<DirectionalLightComponent>("Directional Light", "Lighting", "", registry, selectedEntity);
 				DrawComponentMenuItem<PointLightComponent>("Point Light", "Lighting", "", registry, selectedEntity);
 				DrawComponentMenuItem<SpotLightComponent>("Spot Light", "Lighting", "", registry, selectedEntity);
+				DrawComponentMenuItem<ReflectionProbeComponent>("Reflection Probe", "Lighting", "", registry, selectedEntity);
 				ImGui::EndMenu();
 			}
 
@@ -264,6 +265,7 @@ void AddComponentPopup::Draw(Scene& scene, entt::entity selectedEntity)
 			RV_FILTER_ITEM(DirectionalLightComponent, "Directional Light", "Lighting");
 			RV_FILTER_ITEM(PointLightComponent, "Point Light", "Lighting");
 			RV_FILTER_ITEM(SpotLightComponent, "Spot Light", "Lighting");
+			RV_FILTER_ITEM(ReflectionProbeComponent, "Reflection Probe", "Lighting");
 
 			// Audio
 			RV_FILTER_ITEM(AudioEmitterComponent, "Audio Emitter", "Audio");

@@ -55,6 +55,7 @@ void GizmoPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     DrawDirectionalLightArrow(ctx, frame);
     DrawSpotLightCone(ctx, frame);
     DrawDecalGizmo(ctx, frame);
+    DrawReflectionProbeGizmo(ctx, frame);
 
     DrawEditorIconsVisual(ctx, frame);
     DrawEditorIconsPicking(ctx, frame);
@@ -69,6 +70,7 @@ GizmoInfo GizmoPass::GetEntityPrimaryIcon(entt::registry& reg, entt::entity e)
     if (reg.all_of<SpotLightComponent>(e)) return { IconLibrary::Get().GetIcon(EditorIcon::SpotLight).GetID(), GizmoPriority::Light };
     if (reg.all_of<AudioEmitterComponent>(e)) return { IconLibrary::Get().GetIcon(EditorIcon::AudioEmitter).GetID(), GizmoPriority::Audio };
     if (reg.all_of<DecalComponent>(e)) return { IconLibrary::Get().GetIcon(EditorIcon::Texture).GetID(), GizmoPriority::Decal };
+    if (reg.all_of<ReflectionProbeComponent>(e)) return { IconLibrary::Get().GetIcon(EditorIcon::Probe).GetID(), GizmoPriority::Light };
 
     return { 0, GizmoPriority::None };
 }
@@ -502,6 +504,69 @@ void GizmoPass::DrawDecalGizmo(const RenderContext& ctx, RenderFrame& frame)
         DebugRenderer::Get().DrawLine(arrowEnd, base - right * headRad, arrowColor);
         DebugRenderer::Get().DrawLine(arrowEnd, base + up * headRad, arrowColor);
         DebugRenderer::Get().DrawLine(arrowEnd, base - up * headRad, arrowColor);
+    }
+
+    glm::mat4 editorViewProj = ctx.camera->GetProjectionMatrix() * ctx.camera->GetViewMatrix();
+    DebugRenderer::Get().EndFrame(editorViewProj);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void GizmoPass::DrawReflectionProbeGizmo(const RenderContext& ctx, RenderFrame& frame)
+{
+    auto* finalFboRes = frame.registry.Get("FinalFramebuffer");
+    auto* depthTexRes = frame.registry.Get("DepthTexture");
+    if (!finalFboRes || !depthTexRes) return;
+
+    auto& registry = ctx.scene->GetRegistry();
+    auto probeView = registry.view<TransformComponent, ReflectionProbeComponent>();
+    if (probeView.begin() == probeView.end()) return;
+
+    entt::entity selectedEntity = EditorSelection::Get().GetPrimary();
+
+    glBindFramebuffer(GL_FRAMEBUFFER, finalFboRes->id);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTexRes->id, 0);
+    glViewport(0, 0, ctx.viewportWidth, ctx.viewportHeight);
+
+    DebugRenderer::Get().BeginFrame();
+
+    for (auto e : probeView)
+    {
+        if (ctx.scene && !ctx.scene->IsEntityActive(e))
+            continue;
+
+        bool isSelected = (e == selectedEntity || EditorSelection::Get().IsSelected(e));
+
+        auto& tc = registry.get<TransformComponent>(e);
+        auto& probe = registry.get<ReflectionProbeComponent>(e);
+
+        const glm::vec4 outerBoxColor = isSelected
+            ? glm::vec4(1.0f, 0.85f, 0.15f, 1.0f)
+            : glm::vec4(0.85f, 0.8f, 0.35f, 0.45f);
+
+        glm::vec3 center = tc.GetWorldPosition();
+        glm::vec3 extents = probe.extents * tc.GetWorldScale();
+
+        DebugRenderer::Get().DrawBox(center - extents, center + extents, outerBoxColor);
+
+        if (isSelected)
+        {
+            if (probe.blendDistance > 0.001f)
+            {
+                glm::vec3 innerExtents = glm::max(extents - glm::vec3(probe.blendDistance), glm::vec3(0.01f));
+                const glm::vec4 innerColor = glm::vec4(0.3f, 0.85f, 1.0f, 0.65f);
+                DebugRenderer::Get().DrawBox(center - innerExtents, center + innerExtents, innerColor);
+            }
+
+            if (glm::length(probe.originOffset) > 0.001f)
+            {
+                glm::vec3 worldCapturePos = center + probe.originOffset;
+                const glm::vec4 originColor = glm::vec4(1.0f, 0.4f, 0.1f, 1.0f);
+                DebugRenderer::Get().DrawLine(center, worldCapturePos, originColor);
+                DebugRenderer::Get().DrawBox(worldCapturePos - glm::vec3(0.08f), worldCapturePos + glm::vec3(0.08f), originColor);
+            }
+        }
     }
 
     glm::mat4 editorViewProj = ctx.camera->GetProjectionMatrix() * ctx.camera->GetViewMatrix();

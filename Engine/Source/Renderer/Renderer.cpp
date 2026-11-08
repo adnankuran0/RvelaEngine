@@ -5,6 +5,7 @@
 #include "Input/Input.h"
 #include "Utils/FileUtils.h"
 #include "ShaderManager.h"
+#include "ReflectionProbeManager.h"
 
 using namespace rv;
 
@@ -72,6 +73,8 @@ void Renderer::Init(GLFWwindow* window)
     ShaderManager::Add(Shader("Gizmo", ENGINE_PATH("Shaders\\gizmo.glsl")));
     ShaderManager::Add(Shader("UI", ENGINE_PATH("Shaders\\ui.glsl")));
     ShaderManager::Add(Shader("DebugBuffer", ENGINE_PATH("Shaders\\debugBuffer.glsl")));
+    ShaderManager::Add(Shader("ProbeCapture", ENGINE_PATH("Shaders\\probeCapture.glsl")));
+    ReflectionProbeManager::Get().Init();
 
     m_ScreenQuad.Init();
 }
@@ -96,7 +99,7 @@ void Renderer::EndFrame()
 
 void Renderer::Shutdown()
 {
-   
+    ReflectionProbeManager::Get().Shutdown();
 }
 
 void Renderer::DrawFullScreenQuad()

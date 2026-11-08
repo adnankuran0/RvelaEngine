@@ -7,6 +7,8 @@
 #include "EditorUtils.h"
 #include "Asset/AssetManager.h"
 #include "Asset/AssetRegistry.h"
+#include "Scene/Components/ReflectionProbeComponent.h"
+#include "Renderer/ReflectionProbeManager.h"
 #include <filesystem>
 
 using namespace rv;
@@ -134,6 +136,43 @@ void EnvironmentPanel::Draw(Engine* engine)
         }
 
         if (staticLightCount == 0)
+            ImGui::EndDisabled();
+
+        ImGui::Spacing();
+        ImGui::TextDisabled("Reflection Probes");
+        ImGui::Separator();
+
+        auto& scene = engine->GetActiveScene();
+        auto& reg = scene.GetRegistry();
+        auto probeView = reg.view<TransformComponent, ReflectionProbeComponent>();
+        uint32_t activeProbeCount = 0;
+        for (auto e : probeView)
+        {
+            if (scene.IsEntityActive(e))
+                activeProbeCount++;
+        }
+
+        std::string bakeProbesLabel = "Bake All Reflection Probes (" + std::to_string(activeProbeCount) + ")";
+
+        if (activeProbeCount == 0)
+        {
+            ImGui::BeginDisabled();
+        }
+
+        if (ImGui::Button(bakeProbesLabel.c_str(), ImVec2(-FLT_MIN, 26.0f)))
+        {
+            for (auto e : probeView)
+            {
+                if (scene.IsEntityActive(e))
+                {
+                    reg.get<ReflectionProbeComponent>(e).isDirty = true;
+                }
+            }
+            ReflectionProbeManager::Get().BakeAllDirtyProbes(scene);
+            LOG_INFO("Rebaked all active reflection probes ({})", activeProbeCount);
+        }
+
+        if (activeProbeCount == 0)
             ImGui::EndDisabled();
     }
 

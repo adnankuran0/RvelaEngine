@@ -121,6 +121,7 @@ in vec3 LocalNormal;
 #include "Common/PBR.glsl"
 #include "Common/Shadows.glsl"
 #include "Common/Parallax.glsl"
+#include "Common/ReflectionProbe.glsl"
 
 layout(binding = 0) uniform sampler2D albedoMap;
 layout(binding = 1) uniform sampler2D normalMap;
@@ -561,24 +562,27 @@ void main()
     }
 
     vec3 ambient = vec3(0.0);
+    vec3 R = normalize(reflect(-V, Nmap));
+    float NdotV = max(dot(Nmap, V), 0.0);
+    vec3 F = fresnelSchlickRoughness(NdotV, F0, roughness);
+    vec3 kS = F;
+    vec3 kD = (vec3(1.0) - kS) * (1.0 - metallic);
+    vec2 brdf = texture(brdfLUT, vec2(NdotV, roughness)).rg;
+
     if (useIBL) {
-        vec3 R = normalize(reflect(-V, Nmap));
-        float NdotV = max(dot(Nmap, V), 0.0);
-        vec3 F = fresnelSchlickRoughness(NdotV, F0, roughness);
-        vec3 kS = F;
-        vec3 kD = (vec3(1.0) - kS) * (1.0 - metallic); 
-
         vec3 irradiance = texture(irradianceMap, Nmap).rgb;
-        vec3 diffuse = irradiance * albedo;
+        float lod = roughness * 7.0;
+        vec3 skyboxPrefiltered = textureLod(prefilterMap, R, lod).rgb;
 
-        float lod = roughness * 8.0;
-        vec3 prefilteredColor = textureLod(prefilterMap, R, lod).rgb;
-        vec2 brdf = texture(brdfLUT, vec2(NdotV, roughness)).rg;
-        
+        vec3 prefilteredColor = EvaluateReflectionProbes(FragPos, Nmap, V, roughness, skyboxPrefiltered);
+        vec3 diffuse = irradiance * albedo;
         vec3 specular = prefilteredColor * (F * brdf.x + brdf.y) * specularIntensity;
         ambient = (kD * diffuse + specular) * ao * iblIntensity;
     } else {
-        ambient = ambientColor * ambientIntensity * albedo * ao;
+        vec3 diffuse = ambientColor * ambientIntensity * albedo;
+        vec3 prefilteredColor = EvaluateReflectionProbes(FragPos, Nmap, V, roughness, vec3(0.0));
+        vec3 specular = prefilteredColor * (F * brdf.x + brdf.y) * specularIntensity;
+        ambient = (kD * diffuse + specular) * ao;
     }
     
     FragColor = vec4(ambient + Lo + emmisiveColor * emmisiveIntensity, alpha);

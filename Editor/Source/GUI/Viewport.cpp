@@ -28,6 +28,7 @@
 #include "Scene/Components/AudioEmitterComponent.h"
 #include "Scene/Components/ParticleEmitterComponent.h"
 #include "Scene/Components/DecalComponent.h"
+#include "Scene/Components/ReflectionProbeComponent.h"
 #include "Scene/Components/UIComponents.h"
 #include "Scene/Components/ColliderComponents.h"
 #include "Scene/Components/RigidbodyComponent.h"
@@ -1994,6 +1995,13 @@ void Viewport::DrawContextMenu(Engine* engine, const ImVec2& displayPos, const I
                 tc.SetEulerRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
                 scene.AddComponent<SpotLightComponent>(light);
                 registerCreated(light);
+            }
+            if (ImGui::MenuItem("Reflection Probe"))
+            {
+                entt::entity probeEnt = scene.CreateEntity("Reflection Probe");
+                scene.GetComponent<TransformComponent>(probeEnt).SetPosition(m_ContextSpawnPos);
+                scene.AddComponent<ReflectionProbeComponent>(probeEnt);
+                registerCreated(probeEnt);
             }
             ImGui::EndMenu();
         }

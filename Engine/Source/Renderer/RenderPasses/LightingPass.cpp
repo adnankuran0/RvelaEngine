@@ -8,6 +8,7 @@
 #include "Scene/Environment.h"
 #include "Renderer/ShaderManager.h"
 #include "Renderer/TextureCache.h"
+#include "Renderer/ReflectionProbeManager.h"
 #include "Utils/ProjectManager.h"
 #include "Core/Time.h"
 #include <glm/gtc/type_ptr.hpp>
@@ -175,6 +176,10 @@ void LightingPass::Execute(const RenderContext& ctx, RenderFrame& frame)
         shader.setBool("useContactShadows", useContactShadows);
         shader.setInt("contactShadowTexture", CONTACT_SHADOW_SLOT);
         glBindTextureUnit(CONTACT_SHADOW_SLOT, i_ContactShadow);
+
+        constexpr int REFLECTION_PROBE_SLOT = 28;
+        shader.setInt("reflectionProbeArray", REFLECTION_PROBE_SLOT);
+        glBindTextureUnit(REFLECTION_PROBE_SLOT, ReflectionProbeManager::Get().GetCubeArrayTexture());
 
         auto* screenRes = resourceRegistry.Get("ScreenTexture");
         if (screenRes && screenRes->id != 0)

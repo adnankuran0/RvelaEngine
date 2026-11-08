@@ -13,6 +13,7 @@
 #include "Asset/AssetManager.h"
 #include <glm/gtx/matrix_decompose.hpp>
 #include "Renderer/RenderLayer.h"
+#include "Renderer/ReflectionProbeManager.h"
 #include "Components/AutoloadComponent.h"
 #include "Components/ScriptComponent.h"
 #include "Input/Input.h"
@@ -169,6 +170,7 @@ void Scene::OnStart()
         Engine::Get()->GetSceneManager().RestoreAutoloadStates(*this);
     }
     m_TransformSystem.Update();
+    ReflectionProbeManager::Get().BakeAllDirtyProbes(*this);
     m_PhysicsSystem.OnStart();
     m_ScriptSystem.OnStart();
     m_AudioSystem.OnStart();

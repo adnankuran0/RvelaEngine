@@ -1,5 +1,6 @@
 #include "rvelapch.h"
 #include "RenderPipeline.h"
+#include "ReflectionProbeManager.h"
 #include "Utils/GPUTimer.h"
 #include "Core/Profiler.h"
 #include "Core/Engine.h"
@@ -32,6 +33,7 @@ RenderPipeline::RenderPipeline()
 {
 	m_CameraUBO = std::make_unique<UniformBuffer>(sizeof(CameraUBOData), 0);
 	m_LightUBO = std::make_unique<UniformBuffer>(sizeof(LightUBOData), 1);
+	m_ReflectionProbeUBO = std::make_unique<UniformBuffer>(sizeof(GPUReflectionProbeUBO), 2);
 
 	PushRenderPass(std::make_unique<GeometryPass>());
 	PushRenderPass(std::make_unique<ShadowPass>());
@@ -183,6 +185,13 @@ void RenderPipeline::UpdateUBOs(const RenderContext& ctx)
 	}
 
 	m_LightUBO->SetData(0, sizeof(LightUBOData), &lightData);
+
+	GPUReflectionProbeUBO probeUbo{};
+	if (ctx.scene)
+	{
+		ReflectionProbeManager::Get().PrepareProbes(*ctx.scene, probeUbo);
+	}
+	m_ReflectionProbeUBO->SetData(0, sizeof(GPUReflectionProbeUBO), &probeUbo);
 
 	// TODO: environment UBO
 

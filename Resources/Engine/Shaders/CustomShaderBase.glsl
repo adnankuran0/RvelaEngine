@@ -136,6 +136,7 @@ in vec3 LocalNormal;
 #include "Common/Constants.glsl"
 #include "Common/PBR.glsl"
 #include "Common/Shadows.glsl"
+#include "Common/ReflectionProbe.glsl"
 
 uniform mat4 model;
 uniform mat3 normalMatrix;
@@ -337,21 +338,26 @@ void main()
     }
 
     vec3 ambient = vec3(0.0);
+    vec3 R = normalize(reflect(-V, Nmap));
+    float NdotV = max(dot(Nmap, V), 0.0);
+    vec3 F = fresnelSchlickRoughness(NdotV, F0, roughness);
+    vec3 kS = F;
+    vec3 kD = (vec3(1.0) - kS) * (1.0 - METALLIC);
+    vec2 brdf = texture(brdfLUT, vec2(NdotV, roughness)).rg;
+
     if (useIBL) {
-        vec3 R = normalize(reflect(-V, Nmap));
-        float NdotV = max(dot(Nmap, V), 0.0);
-        vec3 F = fresnelSchlickRoughness(NdotV, F0, roughness);
-        vec3 kS = F;
-        vec3 kD = (vec3(1.0) - kS) * (1.0 - METALLIC);
         vec3 irradiance = texture(irradianceMap, Nmap).rgb;
+        const float MAX_REFLECTION_LOD = 7.0;
+        vec3 skyboxPrefiltered = textureLod(prefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;
+        vec3 prefilteredColor = EvaluateReflectionProbes(FragPos, Nmap, V, roughness, skyboxPrefiltered);
         vec3 diffuse = irradiance * ALBEDO;
-        const float MAX_REFLECTION_LOD = 4.0;
-        vec3 prefilteredColor = textureLod(prefilterMap, R, roughness * MAX_REFLECTION_LOD).rgb;
-        vec2 brdf = texture(brdfLUT, vec2(NdotV, roughness)).rg;
         vec3 spec = prefilteredColor * (F * brdf.x + brdf.y) * SPECULAR;
         ambient = (kD * diffuse + spec) * ao * iblIntensity;
     } else {
-        ambient = ambientColor * ambientIntensity * ALBEDO * ao;
+        vec3 diffuse = ambientColor * ambientIntensity * ALBEDO;
+        vec3 prefilteredColor = EvaluateReflectionProbes(FragPos, Nmap, V, roughness, vec3(0.0));
+        vec3 spec = prefilteredColor * (F * brdf.x + brdf.y) * SPECULAR;
+        ambient = (kD * diffuse + spec) * ao;
     }
 
     FragColor = vec4(ambient + Lo + EMISSION, ALPHA);

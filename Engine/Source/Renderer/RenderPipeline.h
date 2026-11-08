@@ -82,6 +82,7 @@ private:
 
 	std::unique_ptr<UniformBuffer> m_CameraUBO;
 	std::unique_ptr<UniformBuffer> m_LightUBO;
+	std::unique_ptr<UniformBuffer> m_ReflectionProbeUBO;
 
 	DebugBufferMode m_DebugBufferMode = DebugBufferMode::None;
 	int m_DebugBufferLayer = 0;

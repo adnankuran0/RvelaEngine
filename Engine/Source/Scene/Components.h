@@ -24,6 +24,7 @@
 #include "Scene/Components/SkeletonComponent.h"
 #include "Scene/Components/UIComponents.h"
 #include "Scene/Components/DecalComponent.h"
+#include "Scene/Components/ReflectionProbeComponent.h"
 #include "Scene/Components/PhysicsConstraintComponent.h"
 #include "Scene/Components/NavMeshSurfaceComponent.h"
 #include "Scene/Components/NavMeshAgentComponent.h"
@@ -68,6 +69,7 @@ enum class ComponentType
 	UISlider,
 	UIProgressBar,
 	Decal,
+	ReflectionProbe,
 	PhysicsConstraint,
 	NavMeshSurface,
 	NavMeshAgent,

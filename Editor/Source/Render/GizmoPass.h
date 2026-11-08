@@ -39,6 +39,7 @@ private:
     void DrawDirectionalLightArrow(const RenderContext& ctx, RenderFrame& frame);
     void DrawSpotLightCone(const RenderContext& ctx, RenderFrame& frame);
     void DrawDecalGizmo(const RenderContext& ctx, RenderFrame& frame);
+    void DrawReflectionProbeGizmo(const RenderContext& ctx, RenderFrame& frame);
 
 
     void DrawEditorIconsVisual(const RenderContext& ctx, RenderFrame& frame);

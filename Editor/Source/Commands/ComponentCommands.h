@@ -248,6 +248,7 @@ private:
         if (reg.any_of<AudioEmitterComponent>(target)) reg.remove<AudioEmitterComponent>(target);
         if (reg.any_of<ParticleEmitterComponent>(target)) reg.remove<ParticleEmitterComponent>(target);
         if (reg.any_of<DecalComponent>(target)) reg.remove<DecalComponent>(target);
+        if (reg.any_of<ReflectionProbeComponent>(target)) reg.remove<ReflectionProbeComponent>(target);
         if (reg.any_of<AnimatorComponent>(target)) reg.remove<AnimatorComponent>(target);
         if (reg.any_of<UICanvasComponent>(target)) reg.remove<UICanvasComponent>(target);
         if (reg.any_of<RectTransformComponent>(target)) reg.remove<RectTransformComponent>(target);

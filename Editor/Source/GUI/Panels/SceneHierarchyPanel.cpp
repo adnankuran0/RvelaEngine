@@ -257,6 +257,12 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                 scene.AddComponent<SpotLightComponent>(l);
                 registerCreatedEntity(l);
             }
+            if (ImGui::MenuItem("Reflection Probe"))
+            {
+                entt::entity l = scene.CreateEntity("Reflection Probe");
+                scene.AddComponent<ReflectionProbeComponent>(l);
+                registerCreatedEntity(l);
+            }
             ImGui::EndMenu();
         }
         if (ImGui::MenuItem("Particle Emitter"))
@@ -733,6 +739,12 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                             entt::entity light = scene.CreateEntity("SpotLight");
                             scene.GetComponent<TransformComponent>(light).SetEulerRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
                             scene.AddComponent<SpotLightComponent>(light);
+                            registerChild(light);
+                        }
+                        if (ImGui::MenuItem("Reflection Probe"))
+                        {
+                            entt::entity light = scene.CreateEntity("Reflection Probe");
+                            scene.AddComponent<ReflectionProbeComponent>(light);
                             registerChild(light);
                         }
                         ImGui::EndMenu();
@@ -1477,6 +1489,12 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                 entt::entity light = scene.CreateEntity("SpotLight");
                 scene.GetComponent<TransformComponent>(light).SetEulerRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
                 scene.AddComponent<SpotLightComponent>(light);
+                registerCreatedEntity(light);
+            }
+            if (ImGui::MenuItem("Reflection Probe"))
+            {
+                entt::entity light = scene.CreateEntity("Reflection Probe");
+                scene.AddComponent<ReflectionProbeComponent>(light);
                 registerCreatedEntity(light);
             }
             ImGui::EndMenu();
