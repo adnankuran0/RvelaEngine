@@ -268,8 +268,20 @@ local valid  = handle:IsValid()
 
 ### Raycasting & Shapecasting (`Physics`)
 ```lua
--- Raycast
-local hit = Physics.Raycast(origin, direction, maxDistance, hitInside, layerMask, excludeEntities)
+-- Raycast using table syntax:
+local hit = Physics.Raycast({
+    origin      = self.transform.worldPosition, -- required: Vec3
+    dir         = self.transform.forward,       -- required: Vec3
+    maxDistance = 50.0,                         -- optional (default: 1000.0)
+    hitInside   = false,                        -- optional (default: false)
+    ignore      = self.character,               -- optional: Entity or { Entity, Entity }
+    layerMask   = 0xFFFFFFFF                    -- optional: integer mask
+})
+
+-- Or using RaycastOptions instance:
+local opts = RaycastOptions.new(origin, dir, 50.0)
+opts.ignore = self.character
+local hit = Physics.Raycast(opts)
 if hit.hit then
     local hitEntity = hit.entity     -- Entity
     local hitPoint  = hit.point      -- Vec3
@@ -277,7 +289,12 @@ if hit.hit then
     local hitDist   = hit.distance   -- number
 end
 
-local allHits = Physics.RaycastAll(origin, dir, 100.0)
+local allHits = Physics.RaycastAll({
+    origin      = origin,
+    dir         = dir,
+    maxDistance = 100.0,
+    ignore      = self.character
+})
 
 -- Shape Casts
 local boxHit  = Physics.BoxCast(origin, halfExtent, rot, dir, maxDist)
@@ -396,6 +413,31 @@ emitter.rolloff          = 1.0
 -- Bus Control
 local sfxBus = Audio.GetBusID("SFX")
 Audio.SetBusVolume(sfxBus, 0.7)
+
+-- Audio Effects (Emitter)
+local filter = emitter:GetFilterEffect() -- Gets first filter if attached
+if not filter then
+    filter = emitter:AddEffect(AudioEffectType.Filter)
+end
+filter.type      = FilterType.LowPass -- LowPass, HighPass, BandPass, Notch
+filter.cutoff    = 2500.0            -- Cutoff frequency in Hz (20..20000)
+filter.resonance = 1.0               -- Q / Resonance (0.1..10.0)
+filter.enabled   = true
+
+-- Other effect methods:
+-- emitter:GetEffect(index)               -- 0-based index
+-- emitter:GetEffectByType(effectType)    -- AudioEffectType: Filter, Reverb, Delay, Distortion, Limiter, Equalizer
+-- emitter:GetEffects()                   -- 1-indexed Lua array of all effects
+-- emitter:RemoveEffect(index)            -- Remove by 0-based index
+-- emitter:ClearEffects()                 -- Remove all
+
+-- Bus Effects
+local busFilter = Audio.GetBusFilterEffect(sfxBus)
+if busFilter then
+    busFilter.cutoff = 1000.0
+end
+-- Audio.AddBusEffect(sfxBus, AudioEffectType.Filter)
+-- Audio.GetBusEffects(sfxBus)
 ```
 
 ---

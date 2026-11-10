@@ -838,27 +838,15 @@ function ConstraintHandle:SetDistanceRange(minDistance, maxDistance) end
 ---@class Physics
 Physics = {}
 
----Casts a ray into the physics world and returns the closest hit.
----@overload fun(options: RaycastOptions): RaycastResult
----@param origin Vec3 Ray starting position
----@param dir Vec3 Ray direction vector (should be normalized)
----@param maxDistance? number Maximum ray distance (default 1000)
----@param hitInside? boolean Whether to detect hits if starting inside a collider (default false)
----@param layerMask? integer 32-bit collision layer mask (default 0xFFFFFFFF)
----@param exclude? Entity|Entity[] Entity or array of entities to exclude/ignore
+---Casts a ray into the physics world using a RaycastOptions table and returns the closest hit.
+---@param options RaycastOptions Options table specifying origin, dir, maxDistance, hitInside, ignore, layerMask
 ---@return RaycastResult
-function Physics.Raycast(origin, dir, maxDistance, hitInside, layerMask, exclude) end
+function Physics.Raycast(options) end
 
 ---Casts a ray and returns all hits along the ray sorted from closest to farthest.
----@overload fun(options: RaycastOptions): RaycastResult[]
----@param origin Vec3 Ray starting position
----@param dir Vec3 Ray direction vector (should be normalized)
----@param maxDistance? number Maximum ray distance (default 1000)
----@param hitInside? boolean Whether to detect hits if starting inside a collider (default false)
----@param layerMask? integer 32-bit collision layer mask (default 0xFFFFFFFF)
----@param exclude? Entity|Entity[] Entity or array of entities to exclude/ignore
+---@param options RaycastOptions Options table specifying origin, dir, maxDistance, hitInside, ignore, layerMask
 ---@return RaycastResult[]
-function Physics.RaycastAll(origin, dir, maxDistance, hitInside, layerMask, exclude) end
+function Physics.RaycastAll(options) end
 
 ---Sweeps a sphere along a direction vector and returns the closest hit.
 ---@overload fun(options: SphereCastOptions): ShapeCastResult
@@ -1020,6 +1008,83 @@ AttenuationModel = {
 }
 _G.AttenuationModel = AttenuationModel
 
+---@enum AudioEffectType
+AudioEffectType = {
+    Reverb = 0,
+    Limiter = 1,
+    Distortion = 2,
+    Delay = 3,
+    Filter = 4,
+    Equalizer = 5,
+}
+_G.AudioEffectType = AudioEffectType
+
+---@enum DistortionType
+DistortionType = {
+    SoftClip = 0,
+    HardClip = 1,
+    Tanh = 2,
+    Foldback = 3,
+    Bitcrush = 4,
+}
+_G.DistortionType = DistortionType
+
+---@enum FilterType
+FilterType = {
+    LowPass = 0,
+    HighPass = 1,
+    BandPass = 2,
+    Notch = 3,
+}
+_G.FilterType = FilterType
+
+---@class AudioEffect
+---@field enabled boolean
+---@field GetType fun(self: AudioEffect): AudioEffectType
+
+---@class AudioFilterEffect : AudioEffect
+---@field type FilterType
+---@field filterType FilterType
+---@field cutoff number Cutoff frequency in Hz (20..20000)
+---@field cutoffFrequency number Cutoff frequency in Hz (20..20000)
+---@field resonance number Resonance / Q factor (0.1..10.0)
+---@field q number Resonance / Q factor (0.1..10.0)
+
+---@class AudioReverbEffect : AudioEffect
+---@field roomSize number [0..1]
+---@field damping number [0..1]
+---@field width number [0..1]
+---@field wet number [0..1]
+---@field dry number [0..1]
+---@field freeze boolean
+
+---@class AudioDelayEffect : AudioEffect
+---@field delayTime number Delay in seconds [0.01..2.0]
+---@field feedback number Feedback amount [0..0.95]
+---@field mix number Dry/Wet mix [0..1]
+---@field pingPong boolean
+
+---@class AudioDistortionEffect : AudioEffect
+---@field type DistortionType
+---@field distortionType DistortionType
+---@field drive number Drive multiplier
+---@field tone number Tone [0..1]
+---@field bits integer Bit depth [2..16]
+
+---@class AudioLimiterEffect : AudioEffect
+---@field thresholdDb number Threshold in dB
+---@field ceilingDb number Ceiling in dB
+---@field releaseMs number Release in ms
+---@field makeupGainDb number Makeup gain in dB
+---@field currentGainReduction number Read-only current gain reduction
+
+---@class AudioEqualizerEffect : AudioEffect
+---@field lowGainDb number Low gain [-24..24] dB
+---@field midGainDb number Mid gain [-24..24] dB
+---@field highGainDb number High gain [-24..24] dB
+---@field lowCutoff number Low cutoff frequency in Hz
+---@field highCutoff number High cutoff frequency in Hz
+
 ---@class Audio
 Audio = {}
 
@@ -1042,6 +1107,44 @@ function Audio.GetBusID(name) end
 ---@param busID integer
 ---@param parentID integer
 function Audio.SetParentBus(busID, parentID) end
+
+---Adds an effect to an audio bus.
+---@param busID integer
+---@param type AudioEffectType
+---@return AudioEffect?
+function Audio.AddBusEffect(busID, type) end
+
+---Gets an effect from an audio bus by 0-based index.
+---@param busID integer
+---@param index integer
+---@return AudioEffect?
+function Audio.GetBusEffect(busID, index) end
+
+---Gets the first effect of a specific type from an audio bus.
+---@param busID integer
+---@param type AudioEffectType
+---@return AudioEffect?
+function Audio.GetBusEffectByType(busID, type) end
+
+---Gets the filter effect on an audio bus if present.
+---@param busID integer
+---@return AudioFilterEffect?
+function Audio.GetBusFilterEffect(busID) end
+
+---Gets total number of effects on a bus.
+---@param busID integer
+---@return integer
+function Audio.GetBusEffectCount(busID) end
+
+---Gets all effects on a bus as a 1-indexed table.
+---@param busID integer
+---@return AudioEffect[]
+function Audio.GetBusEffects(busID) end
+
+---Removes an effect from an audio bus by 0-based index.
+---@param busID integer
+---@param index integer
+function Audio.RemoveBusEffect(busID, index) end
 
 _G.Audio = Audio
 
@@ -1367,6 +1470,32 @@ function AudioEmitterComponent:Seek(seconds) end
 function AudioEmitterComponent:GetPlaybackPosition() end
 ---@param handle AssetHandle
 function AudioEmitterComponent:SetClip(handle) end
+---Adds an effect to this emitter and returns it.
+---@param type AudioEffectType
+---@return AudioEffect?
+function AudioEmitterComponent:AddEffect(type) end
+---Gets an effect by 0-based index.
+---@param index integer
+---@return AudioEffect?
+function AudioEmitterComponent:GetEffect(index) end
+---Gets the first effect matching the specified type.
+---@param type AudioEffectType
+---@return AudioEffect?
+function AudioEmitterComponent:GetEffectByType(type) end
+---Gets the filter effect on this emitter if present.
+---@return AudioFilterEffect?
+function AudioEmitterComponent:GetFilterEffect() end
+---Gets the number of effects on this emitter.
+---@return integer
+function AudioEmitterComponent:GetEffectCount() end
+---Gets all effects on this emitter as a 1-indexed table.
+---@return AudioEffect[]
+function AudioEmitterComponent:GetEffects() end
+---Removes an effect by 0-based index.
+---@param index integer
+function AudioEmitterComponent:RemoveEffect(index) end
+---Removes all effects from this emitter.
+function AudioEmitterComponent:ClearEffects() end
 
 ---@class AnimatorComponent : ComponentHandle
 ---@field IsValid fun(self: ComponentHandle): boolean

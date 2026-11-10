@@ -161,38 +161,131 @@ static void ExtractIgnoredEntities(const sol::object& obj, std::vector<entt::ent
 	}
 }
 
-static RaycastOptions ParseRaycastOptions(sol::variadic_args va)
+static bool ExtractVec3FromObject(const sol::object& obj, glm::vec3& out)
 {
-	RaycastOptions opts;
-	if (va.size() == 0) return opts;
+	if (!obj.valid() || obj.is<sol::nil_t>()) return false;
+	if (obj.is<glm::vec3>())
+	{
+		out = obj.as<glm::vec3>();
+		return true;
+	}
+	if (obj.is<sol::table>())
+	{
+		sol::table t = obj.as<sol::table>();
+		auto x = t["x"];
+		auto y = t["y"];
+		auto z = t["z"];
+		if (x.valid() && y.valid() && z.valid() && x.get_type() == sol::type::number)
+		{
+			out.x = x.get<float>();
+			out.y = y.get<float>();
+			out.z = z.get<float>();
+			return true;
+		}
+	}
+	return false;
+}
 
+static bool ExtractFloatFromObject(const sol::object& obj, float& out)
+{
+	if (!obj.valid() || obj.is<sol::nil_t>()) return false;
+	if (obj.is<float>())
+	{
+		out = obj.as<float>();
+		return true;
+	}
+	if (obj.is<double>())
+	{
+		out = static_cast<float>(obj.as<double>());
+		return true;
+	}
+	if (obj.is<int>())
+	{
+		out = static_cast<float>(obj.as<int>());
+		return true;
+	}
+	return false;
+}
+
+static bool ParseRaycastOptions(sol::variadic_args va, RaycastOptions& opts)
+{
+	if (va.size() == 0)
+	{
+		LOG_ERROR("[Physics.Raycast] RaycastOptions table is required. Usage: Physics.Raycast({{ origin = Vec3, dir = Vec3, maxDistance = 50.0 }})");
+		return false;
+	}
+
+	size_t offset = 0;
 	sol::object first = va[0];
+
 	if (first.is<sol::table>())
 	{
 		sol::table t = first.as<sol::table>();
-		if (t["origin"].valid()) opts.origin = t["origin"];
-		if (t["direction"].valid()) opts.direction = t["direction"];
-		else if (t["dir"].valid()) opts.direction = t["dir"];
-
-		if (t["maxDistance"].valid()) opts.maxDistance = t["maxDistance"];
-		else if (t["maxDist"].valid()) opts.maxDistance = t["maxDist"];
-		else if (t["distance"].valid()) opts.maxDistance = t["distance"];
-
-		if (t["hitInside"].valid()) opts.hitInside = t["hitInside"];
-
-		if (t["exclude"].valid()) ExtractIgnoredEntities(t["exclude"], opts.ignoredEntities);
-		else if (t["ignore"].valid()) ExtractIgnoredEntities(t["ignore"], opts.ignoredEntities);
-		else if (t["ignoredEntities"].valid()) ExtractIgnoredEntities(t["ignoredEntities"], opts.ignoredEntities);
-		return opts;
+		if (t["Raycast"].valid() && t["Raycast"].get_type() == sol::type::function)
+		{
+			offset = 1;
+		}
 	}
 
-	if (va.size() >= 1 && va[0].is<glm::vec3>()) opts.origin = va[0].as<glm::vec3>();
-	if (va.size() >= 2 && va[1].is<glm::vec3>()) opts.direction = va[1].as<glm::vec3>();
-	if (va.size() >= 3 && va[2].is<float>()) opts.maxDistance = va[2].as<float>();
-	if (va.size() >= 4 && va[3].is<bool>()) opts.hitInside = va[3].as<bool>();
-	if (va.size() >= 5) ExtractIgnoredEntities(va[4], opts.ignoredEntities);
+	if (va.size() <= offset)
+	{
+		LOG_ERROR("[Physics.Raycast] RaycastOptions is required. Usage: Physics.Raycast(options) or Physics.Raycast({{ origin = Vec3, dir = Vec3 }})");
+		return false;
+	}
 
-	return opts;
+	if (va[offset].is<RaycastOptions>())
+	{
+		opts = va[offset].as<RaycastOptions>();
+		return true;
+	}
+	if (va[offset].is<RaycastOptions*>())
+	{
+		opts = *va[offset].as<RaycastOptions*>();
+		return true;
+	}
+
+	if (!va[offset].is<sol::table>())
+	{
+		LOG_ERROR("[Physics.Raycast] RaycastOptions instance or table expected. Usage: Physics.Raycast(options) or Physics.Raycast({{ origin = Vec3, dir = Vec3 }})");
+		return false;
+	}
+
+	sol::table t = va[offset].as<sol::table>();
+
+	bool hasOrigin = false;
+	if (t["origin"].valid() && t["origin"].get_type() != sol::type::nil) hasOrigin = ExtractVec3FromObject(t["origin"], opts.origin);
+	else if (t["start"].valid() && t["start"].get_type() != sol::type::nil) hasOrigin = ExtractVec3FromObject(t["start"], opts.origin);
+
+	if (!hasOrigin)
+	{
+		LOG_ERROR("[Physics.Raycast] Missing required field 'origin' or 'start'.");
+		return false;
+	}
+
+	bool hasDir = false;
+	if (t["dir"].valid() && t["dir"].get_type() != sol::type::nil) hasDir = ExtractVec3FromObject(t["dir"], opts.direction);
+	else if (t["direction"].valid() && t["direction"].get_type() != sol::type::nil) hasDir = ExtractVec3FromObject(t["direction"], opts.direction);
+
+	if (!hasDir)
+	{
+		LOG_ERROR("[Physics.Raycast] Missing required field 'dir' or 'direction'.");
+		return false;
+	}
+
+	if (t["maxDistance"].valid() && t["maxDistance"].get_type() != sol::type::nil) ExtractFloatFromObject(t["maxDistance"], opts.maxDistance);
+	else if (t["maxDist"].valid() && t["maxDist"].get_type() != sol::type::nil) ExtractFloatFromObject(t["maxDist"], opts.maxDistance);
+	else if (t["distance"].valid() && t["distance"].get_type() != sol::type::nil) ExtractFloatFromObject(t["distance"], opts.maxDistance);
+
+	if (t["hitInside"].valid() && t["hitInside"].is<bool>()) opts.hitInside = t["hitInside"].get<bool>();
+
+	if (t["ignore"].valid() && t["ignore"].get_type() != sol::type::nil) ExtractIgnoredEntities(t["ignore"], opts.ignoredEntities);
+	else if (t["exclude"].valid() && t["exclude"].get_type() != sol::type::nil) ExtractIgnoredEntities(t["exclude"], opts.ignoredEntities);
+	else if (t["ignoredEntities"].valid() && t["ignoredEntities"].get_type() != sol::type::nil) ExtractIgnoredEntities(t["ignoredEntities"], opts.ignoredEntities);
+
+	if (t["layerMask"].valid() && t["layerMask"].is<uint32_t>()) opts.layerMask = t["layerMask"].get<uint32_t>();
+	else if (t["mask"].valid() && t["mask"].is<uint32_t>()) opts.layerMask = t["mask"].get<uint32_t>();
+
+	return true;
 }
 
 static rv::RigidbodyComponent* GetRigidbodyFromObject(const sol::object& obj)
@@ -253,6 +346,33 @@ void rv::LuaBindings::RegisterPhysicsAPI(sol::state& lua)
 		)
 	);
 	lua["ShapeCastResult"] = lua["RaycastResult"];
+
+	lua.new_usertype<RaycastOptions>("RaycastOptions",
+		sol::constructors<
+			RaycastOptions(),
+			RaycastOptions(const glm::vec3&, const glm::vec3&),
+			RaycastOptions(const glm::vec3&, const glm::vec3&, float),
+			RaycastOptions(const glm::vec3&, const glm::vec3&, float, bool)
+		>(),
+		"origin", &RaycastOptions::origin,
+		"start", &RaycastOptions::origin,
+		"dir", &RaycastOptions::direction,
+		"direction", &RaycastOptions::direction,
+		"maxDistance", &RaycastOptions::maxDistance,
+		"maxDist", &RaycastOptions::maxDistance,
+		"distance", &RaycastOptions::maxDistance,
+		"hitInside", &RaycastOptions::hitInside,
+		"layerMask", &RaycastOptions::layerMask,
+		"mask", &RaycastOptions::layerMask,
+		"ignore", sol::property(
+			[](const RaycastOptions& o) -> const std::vector<entt::entity>& { return o.ignoredEntities; },
+			[](RaycastOptions& o, sol::object obj) { o.ignoredEntities.clear(); ExtractIgnoredEntities(obj, o.ignoredEntities); }
+		),
+		"exclude", sol::property(
+			[](const RaycastOptions& o) -> const std::vector<entt::entity>& { return o.ignoredEntities; },
+			[](RaycastOptions& o, sol::object obj) { o.ignoredEntities.clear(); ExtractIgnoredEntities(obj, o.ignoredEntities); }
+		)
+	);
 
 	lua.new_usertype<ConstraintHandle>("ConstraintHandle",
 		"id", &ConstraintHandle::id,
@@ -572,12 +692,16 @@ void rv::LuaBindings::RegisterPhysicsAPI(sol::state& lua)
 	auto physicsTable = lua.create_named_table("Physics");
 
 	physicsTable["Raycast"] = [=](sol::variadic_args va) -> RaycastResult {
-		RaycastOptions opts = ParseRaycastOptions(va);
+		RaycastOptions opts;
+		if (!ParseRaycastOptions(va, opts))
+			return RaycastResult{};
 		return GetPW().Raycast(opts);
 	};
 
 	physicsTable["RaycastAll"] = [=](sol::variadic_args va) -> std::vector<RaycastResult> {
-		RaycastOptions opts = ParseRaycastOptions(va);
+		RaycastOptions opts;
+		if (!ParseRaycastOptions(va, opts))
+			return std::vector<RaycastResult>{};
 		return GetPW().RaycastAll(opts);
 	};
 

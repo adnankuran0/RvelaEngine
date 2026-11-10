@@ -99,7 +99,12 @@ function TPSCamera:OnUpdate(dt)
             backDir = backDir:Normalized()
         end
 
-        local hit = Physics.Raycast(origin, backDir, self.desiredDistance, false)
+        local hit = Physics.Raycast({
+            origin      = origin,
+            dir         = backDir,
+            maxDistance = self.desiredDistance,
+            hitInside   = false
+        })
 
         local targetDistance = self.desiredDistance
         if hit.hit then

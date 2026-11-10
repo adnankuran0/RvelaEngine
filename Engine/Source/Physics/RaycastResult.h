@@ -26,6 +26,10 @@ struct RaycastOptions
 	bool hitInside = false;
 	std::vector<entt::entity> ignoredEntities;
 	uint32_t layerMask = 0xFFFFFFFF;
+
+	RaycastOptions() = default;
+	RaycastOptions(const glm::vec3& orig, const glm::vec3& dir, float maxDist = 1000.0f, bool hitIn = false)
+		: origin(orig), direction(dir), maxDistance(maxDist), hitInside(hitIn) {}
 };
 
 struct ShapeCastOptions

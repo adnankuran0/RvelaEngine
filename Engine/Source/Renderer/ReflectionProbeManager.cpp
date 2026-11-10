@@ -77,7 +77,6 @@ void ReflectionProbeManager::Init()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     m_Initialized = true;
-    LOG_INFO("ReflectionProbeManager initialized with {} slices ({}x{})", m_MaxProbes, m_Resolution, m_Resolution);
 }
 
 void ReflectionProbeManager::Shutdown()
@@ -139,8 +138,6 @@ void ReflectionProbeManager::BakeProbe(Scene& scene, entt::entity entity, Reflec
 
     auto& tc = registry.get<TransformComponent>(entity);
     glm::vec3 capturePos = tc.GetWorldPosition() + probe.originOffset;
-    LOG_INFO("Baking ReflectionProbe (entity #{}) at ({:.2f}, {:.2f}, {:.2f}) into cube index {}...",
-        static_cast<uint32_t>(entity), capturePos.x, capturePos.y, capturePos.z, probe.cubeIndex);
 
     GLint prevFBO = 0;
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &prevFBO);
@@ -374,8 +371,6 @@ void ReflectionProbeManager::BakeProbe(Scene& scene, entt::entity entity, Reflec
 
     float testPixel[4] = { 0.0f };
     glGetTextureSubImage(m_CubeArrayTexture, 0, m_Resolution / 2, m_Resolution / 2, baseLayer, 1, 1, 1, GL_RGBA, GL_FLOAT, sizeof(testPixel), testPixel);
-    LOG_INFO("ReflectionProbe successfully baked into cube index {}! Sample pixel RGBA: ({:.3f}, {:.3f}, {:.3f}, {:.3f})",
-        probe.cubeIndex, testPixel[0], testPixel[1], testPixel[2], testPixel[3]);
 }
 
 void ReflectionProbeManager::BakeAllDirtyProbes(Scene& scene)

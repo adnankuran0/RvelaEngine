@@ -7,6 +7,7 @@ static constexpr float kPi = 3.14159265358979323846f;
 
 inline float DenormalGuard(float val)
 {
+    if (!std::isfinite(val)) return 0.0f;
     return (std::abs(val) < 1e-15f) ? 0.0f : val;
 }
 
@@ -497,8 +498,8 @@ void AudioDelayEffect::Deserialize(const json& j)
 
 void AudioFilterEffect::Reset()
 {
-    m_LpL = 0.0f; m_BpL = 0.0f;
-    m_LpR = 0.0f; m_BpR = 0.0f;
+    m_S1L = 0.0f; m_S2L = 0.0f;
+    m_S1R = 0.0f; m_S2R = 0.0f;
 }
 
 void AudioFilterEffect::Process(const float* input, float* output, uint32_t frameCount, uint32_t channels, uint32_t sampleRate)
@@ -511,27 +512,47 @@ void AudioFilterEffect::Process(const float* input, float* output, uint32_t fram
 
     if (sampleRate == 0) sampleRate = 44100;
 
-    float clampedCutoff = std::clamp(cutoffFrequency, 20.0f, static_cast<float>(sampleRate) * 0.49f);
+    if (!std::isfinite(m_S1L) || !std::isfinite(m_S2L)) { m_S1L = 0.0f; m_S2L = 0.0f; }
+    if (!std::isfinite(m_S1R) || !std::isfinite(m_S2R)) { m_S1R = 0.0f; m_S2R = 0.0f; }
+
+    float maxCutoff = static_cast<float>(sampleRate) * 0.495f;
+    float clampedCutoff = std::clamp(cutoffFrequency, 20.0f, maxCutoff);
     float clampedQ = std::clamp(resonance, 0.1f, 10.0f);
 
-    float f = 2.0f * std::sin(kPi * clampedCutoff / static_cast<float>(sampleRate));
-    float q = 1.0f / clampedQ;
+    float g = std::tan(kPi * clampedCutoff / static_cast<float>(sampleRate));
+    float k = 1.0f / clampedQ;
+    float a1 = 1.0f / (1.0f + g * (g + k));
+    float a2 = g * a1;
+    float a3 = g * a2;
 
     for (uint32_t i = 0; i < frameCount; ++i)
     {
         float inL = input[i * channels];
         float inR = (channels > 1) ? input[i * channels + 1] : inL;
 
-        float hpL = inL - m_LpL - q * m_BpL;
-        m_BpL += f * hpL;
-        m_LpL += f * m_BpL;
+        // Left Channel
+        float v3L = inL - m_S2L;
+        float v1L = a1 * m_S1L + a2 * v3L; // bandpass
+        float v2L = m_S2L + a2 * m_S1L + a3 * v3L; // lowpass
+        float v0L = inL - k * v1L - v2L; // highpass
 
-        float hpR = inR - m_LpR - q * m_BpR;
-        m_BpR += f * hpR;
-        m_LpR += f * m_BpR;
+        m_S1L = 2.0f * v1L - m_S1L;
+        m_S2L = 2.0f * v2L - m_S2L;
 
-        m_LpL = DenormalGuard(m_LpL); m_BpL = DenormalGuard(m_BpL);
-        m_LpR = DenormalGuard(m_LpR); m_BpR = DenormalGuard(m_BpR);
+        m_S1L = DenormalGuard(m_S1L);
+        m_S2L = DenormalGuard(m_S2L);
+
+        // Right Channel
+        float v3R = inR - m_S2R;
+        float v1R = a1 * m_S1R + a2 * v3R;
+        float v2R = m_S2R + a2 * m_S1R + a3 * v3R;
+        float v0R = inR - k * v1R - v2R;
+
+        m_S1R = 2.0f * v1R - m_S1R;
+        m_S2R = 2.0f * v2R - m_S2R;
+
+        m_S1R = DenormalGuard(m_S1R);
+        m_S2R = DenormalGuard(m_S2R);
 
         float outL = 0.0f;
         float outR = 0.0f;
@@ -539,20 +560,20 @@ void AudioFilterEffect::Process(const float* input, float* output, uint32_t fram
         switch (type)
         {
         case FilterType::LowPass:
-            outL = m_LpL;
-            outR = m_LpR;
+            outL = v2L;
+            outR = v2R;
             break;
         case FilterType::HighPass:
-            outL = hpL;
-            outR = hpR;
+            outL = v0L;
+            outR = v0R;
             break;
         case FilterType::BandPass:
-            outL = m_BpL;
-            outR = m_BpR;
+            outL = v1L;
+            outR = v1R;
             break;
         case FilterType::Notch:
-            outL = hpL + m_LpL;
-            outR = hpR + m_LpR;
+            outL = v0L + v2L;
+            outR = v0R + v2R;
             break;
         }
 
@@ -598,20 +619,23 @@ void AudioEqualizerEffect::Process(const float* input, float* output, uint32_t f
 
     if (sampleRate == 0) sampleRate = 44100;
 
+    if (!std::isfinite(m_LowL) || !std::isfinite(m_MidL)) { m_LowL = 0.0f; m_MidL = 0.0f; }
+    if (!std::isfinite(m_LowR) || !std::isfinite(m_MidR)) { m_LowR = 0.0f; m_MidR = 0.0f; }
+
     float lowGainLin = std::pow(10.0f, lowGainDb / 20.0f);
     float midGainLin = std::pow(10.0f, midGainDb / 20.0f);
     float highGainLin = std::pow(10.0f, highGainDb / 20.0f);
 
-    float fLow = 2.0f * std::sin(kPi * std::clamp(lowCutoff, 20.0f, 1000.0f) / static_cast<float>(sampleRate));
-    float fHigh = 2.0f * std::sin(kPi * std::clamp(highCutoff, 1000.0f, static_cast<float>(sampleRate) * 0.45f) / static_cast<float>(sampleRate));
+    float alphaLow = 1.0f - std::exp(-2.0f * kPi * std::clamp(lowCutoff, 20.0f, 1000.0f) / static_cast<float>(sampleRate));
+    float alphaHigh = 1.0f - std::exp(-2.0f * kPi * std::clamp(highCutoff, 1000.0f, static_cast<float>(sampleRate) * 0.45f) / static_cast<float>(sampleRate));
 
     for (uint32_t i = 0; i < frameCount; ++i)
     {
         float inL = input[i * channels];
         float inR = (channels > 1) ? input[i * channels + 1] : inL;
 
-        m_LowL += fLow * (inL - m_LowL);
-        m_MidL += fHigh * (inL - m_MidL);
+        m_LowL += alphaLow * (inL - m_LowL);
+        m_MidL += alphaHigh * (inL - m_MidL);
         m_LowL = DenormalGuard(m_LowL);
         m_MidL = DenormalGuard(m_MidL);
 
@@ -619,8 +643,8 @@ void AudioEqualizerEffect::Process(const float* input, float* output, uint32_t f
         float bandMidL = m_MidL - m_LowL;
         float bandHighL = inL - m_MidL;
 
-        m_LowR += fLow * (inR - m_LowR);
-        m_MidR += fHigh * (inR - m_MidR);
+        m_LowR += alphaLow * (inR - m_LowR);
+        m_MidR += alphaHigh * (inR - m_MidR);
         m_LowR = DenormalGuard(m_LowR);
         m_MidR = DenormalGuard(m_MidR);
 

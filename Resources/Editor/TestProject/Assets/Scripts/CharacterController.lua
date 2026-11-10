@@ -179,7 +179,12 @@ function Player:CheckCeilingClearance()
     for i = 1, #offsets do
         local off = offsets[i]
         local origin = Vec3.new(worldPos.x + off.x, startY, worldPos.z + off.z)
-        local hit = Physics.Raycast(origin, upDir, rayDist, true)
+        local hit = Physics.Raycast({
+            origin      = origin,
+            dir         = upDir,
+            maxDistance = rayDist,
+            hitInside   = true
+        })
         if hit and hit.hit then
             -- Obstacle detected above head within standing height!
             return false

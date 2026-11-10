@@ -239,8 +239,8 @@ public:
     float resonance = 0.707f; // 0.1 to 10.0
 
 private:
-    float m_LpL = 0.0f, m_BpL = 0.0f;
-    float m_LpR = 0.0f, m_BpR = 0.0f;
+    float m_S1L = 0.0f, m_S2L = 0.0f;
+    float m_S1R = 0.0f, m_S2R = 0.0f;
 };
 
 class AudioEqualizerEffect : public AudioEffect
