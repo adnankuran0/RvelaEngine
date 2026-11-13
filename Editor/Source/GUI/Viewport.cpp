@@ -33,6 +33,15 @@
 #include "Scene/Components/ColliderComponents.h"
 #include "Scene/Components/RigidbodyComponent.h"
 #include "Scene/Components/MeshComponent.h"
+#include "Scene/Components/MaterialComponent.h"
+#include "Scene/Components/ScriptComponent.h"
+#include "Scene/Components/SkeletalMeshComponent.h"
+#include "Scene/Components/TagComponent.h"
+#include "Scene/SceneSerializer.h"
+#include "Commands/ComponentCommands.h"
+#include "Script/ScriptEngine.h"
+#include "Asset/AssetManager.h"
+#include "Asset/AssetMeta.h"
 #include "Math/RvelaMath.h"
 #include "Physics/PhysicsSystem.h"
 #include "Physics/PhysicsWorld.h"
@@ -1223,6 +1232,35 @@ void Viewport::DrawOrientationGizmo(Engine* engine, ImVec2& displayPos, ImVec2& 
     }
 }
 
+entt::entity Viewport::ResolveRootEntity(Engine* engine, entt::entity entity) const
+{
+    if (!m_SelectRootEntity || entity == entt::null)
+        return entity;
+
+    auto& scene = engine->GetActiveScene();
+    entt::entity current = entity;
+    entt::entity rootCandidate = current;
+
+    while (current != entt::null && current != scene.GetRootEntity())
+    {
+        if (scene.HasComponent<PrefabComponent>(current))
+        {
+            rootCandidate = current;
+            break;
+        }
+
+        entt::entity parent = scene.GetParent(current);
+        if (parent == entt::null || parent == scene.GetRootEntity())
+        {
+            rootCandidate = current;
+            break;
+        }
+        current = parent;
+        rootCandidate = current;
+    }
+    return rootCandidate;
+}
+
 void Viewport::HandleSelection(Engine* engine, ImVec2& displayPos, ImVec2& displaySize)
 {
     if (engine->GetActiveScene().GetState() != SceneState::EDIT)
@@ -1323,29 +1361,7 @@ void Viewport::HandleSelection(Engine* engine, ImVec2& displayPos, ImVec2& displ
             bool isMultiModifier = io.KeyCtrl || io.KeyShift;
 
             auto resolveRootEntity = [&](entt::entity entity) -> entt::entity {
-                if (!m_SelectRootEntity) return entity;
-                auto& scene = engine->GetActiveScene();
-                entt::entity current = entity;
-                entt::entity rootCandidate = current;
-
-                while (current != entt::null && current != scene.GetRootEntity())
-                {
-                    if (scene.HasComponent<PrefabComponent>(current))
-                    {
-                        rootCandidate = current;
-                        break;
-                    }
-
-                    entt::entity parent = scene.GetParent(current);
-                    if (parent == entt::null || parent == scene.GetRootEntity())
-                    {
-                        rootCandidate = current;
-                        break;
-                    }
-                    current = parent;
-                    rootCandidate = current;
-                }
-                return rootCandidate;
+                return ResolveRootEntity(engine, entity);
             };
 
             if (m_SelectionBoxActive)
@@ -1663,35 +1679,286 @@ void Viewport::Draw(Engine* engine, bool orbitDragActive)
 
         if (ImGui::BeginDragDropTargetCustom(ImGui::GetCurrentWindow()->Rect(), ImGui::GetID("ViewportDropTarget")))
         {
-            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_PATH", ImGuiDragDropFlags_AcceptBeforeDelivery | ImGuiDragDropFlags_AcceptNoDrawDefaultRect))
             {
-                std::string pathStr((const char*)payload->Data);
-                if (!pathStr.ends_with(".rprefab"))
+                if (payload->Data && payload->DataSize > 0)
                 {
-                    std::filesystem::path p(pathStr);
-                    auto candidate = p;
-                    candidate.replace_extension(".rprefab");
-                    if (std::filesystem::exists(candidate))
-                        pathStr = candidate.string();
-                }
+                    std::string pathStr((const char*)payload->Data);
 
-                if (pathStr.ends_with(".rprefab"))
-                {
-                    AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
-                    if (uuid.IsValid())
+                    bool isScript = pathStr.ends_with(".lua");
+                    bool isMaterial = pathStr.ends_with(".rmat") || pathStr.ends_with(".Material");
+                    if (!isMaterial && pathStr.find('#') != std::string::npos)
                     {
-                        glm::vec3 spawnPos = CalculateSpawnPosition(engine, ImGui::GetIO().MousePos, displayPos, displaySize);
-                        Entity inst = engine->GetActiveScene().Instantiate(uuid, spawnPos);
-                        if (inst.GetHandle() != entt::null)
+                        AssetUUID subUUID = EditorUtils::ReadUUIDFromMeta(pathStr);
+                        if (subUUID.IsValid())
                         {
-                            CommandHistory::Get().Execute(std::make_unique<CreateEntityCommand>(&engine->GetActiveScene(), inst.GetHandle()));
-                            EditorSelection::Get().Select(inst.GetHandle());
-                            engine->GetActiveScene().SetDirty(true);
+                            auto hashPos = pathStr.find('#');
+                            auto basePath = pathStr.substr(0, hashPos);
+                            auto metaPath = AssetMeta::GetMetaPath(basePath);
+                            AssetMeta meta;
+                            if (meta.LoadFromFile(metaPath))
+                            {
+                                for (const auto& sub : meta.subAssets)
+                                {
+                                    if (sub.uuid == subUUID && sub.type == "Material")
+                                    {
+                                        isMaterial = true;
+                                        break;
+                                    }
+                                }
+                            }
                         }
                     }
-                    else
+
+                    bool isPrefab = false;
+                    std::string prefabPath = pathStr;
+                    if (!isScript && !isMaterial)
                     {
-                        LOG_WARN("[Viewport] Failed to read UUID from meta for: {}", pathStr);
+                        if (!prefabPath.ends_with(".rprefab"))
+                        {
+                            std::filesystem::path p(prefabPath);
+                            auto candidate = p;
+                            candidate.replace_extension(".rprefab");
+                            if (std::filesystem::exists(candidate))
+                                prefabPath = candidate.string();
+                        }
+                        if (prefabPath.ends_with(".rprefab"))
+                        {
+                            isPrefab = true;
+                        }
+                    }
+
+                    ImVec2 mousePos = ImGui::GetIO().MousePos;
+                    entt::entity hoveredEntity = entt::null;
+                    if (displaySize.x > 0.0f && displaySize.y > 0.0f)
+                    {
+                        glm::vec2 mouseViewportPos = { mousePos.x - displayPos.x, mousePos.y - displayPos.y };
+                        if (mouseViewportPos.x >= 0.0f && mouseViewportPos.x <= displaySize.x &&
+                            mouseViewportPos.y >= 0.0f && mouseViewportPos.y <= displaySize.y)
+                        {
+                            auto& context = engine->GetRenderLayer().GetRenderContext();
+                            float fboWidth = context.viewportWidth;
+                            float fboHeight = context.viewportHeight;
+                            if (fboWidth > 0 && fboHeight > 0)
+                            {
+                                float normX = std::clamp(mouseViewportPos.x / displaySize.x, 0.0f, 1.0f);
+                                float normY = std::clamp(mouseViewportPos.y / displaySize.y, 0.0f, 1.0f);
+
+                                uint32_t fboX = static_cast<uint32_t>(normX * (fboWidth - 1));
+                                uint32_t fboY = static_cast<uint32_t>((1.0f - normY) * (fboHeight - 1));
+
+                                uint32_t pickedID = engine->Selection.Pick(fboX, fboY);
+                                if (pickedID != 0)
+                                {
+                                    entt::entity e = static_cast<entt::entity>(pickedID);
+                                    if (engine->GetActiveScene().GetRegistry().valid(e))
+                                    {
+                                        hoveredEntity = e;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    static entt::entity s_LastHoveredEntity = entt::null;
+                    if (hoveredEntity != entt::null)
+                    {
+                        s_LastHoveredEntity = hoveredEntity;
+                    }
+                    else if (payload->IsDelivery() && s_LastHoveredEntity != entt::null && engine->GetActiveScene().GetRegistry().valid(s_LastHoveredEntity))
+                    {
+                        hoveredEntity = s_LastHoveredEntity;
+                    }
+
+                    if (payload->IsDelivery())
+                    {
+                        s_LastHoveredEntity = entt::null;
+                        Scene& scene = engine->GetActiveScene();
+                        if (isMaterial)
+                        {
+                            if (hoveredEntity != entt::null)
+                            {
+                                entt::entity targetEntity = hoveredEntity;
+                                if (!scene.HasComponent<MeshComponent>(targetEntity) &&
+                                    !scene.HasComponent<SkeletalMeshComponent>(targetEntity) &&
+                                    !scene.HasComponent<MaterialComponent>(targetEntity))
+                                {
+                                    entt::entity root = ResolveRootEntity(engine, hoveredEntity);
+                                    if (scene.HasComponent<MeshComponent>(root) ||
+                                        scene.HasComponent<SkeletalMeshComponent>(root) ||
+                                        scene.HasComponent<MaterialComponent>(root))
+                                    {
+                                        targetEntity = root;
+                                    }
+                                }
+
+                                auto& assetRegistry = AssetManager::Get().GetRegistry();
+                                AssetUUID matUUID = EditorUtils::ReadUUIDFromMeta(pathStr);
+                                if (!matUUID.IsValid())
+                                    matUUID = assetRegistry.GetUUID(pathStr);
+                                if (!matUUID.IsValid())
+                                    matUUID = assetRegistry.GetOrCreateMeta(pathStr).uuid;
+
+                                if (matUUID.IsValid())
+                                {
+                                    json before = SceneSerializer::SerializeEntity(scene, targetEntity, false);
+                                    if (scene.HasComponent<MaterialComponent>(targetEntity))
+                                    {
+                                        scene.GetComponent<MaterialComponent>(targetEntity).SetMaterial(matUUID);
+                                    }
+                                    else
+                                    {
+                                        auto& matComp = scene.AddComponent<MaterialComponent>(targetEntity);
+                                        matComp.SetMaterial(matUUID);
+                                    }
+                                    json after = SceneSerializer::SerializeEntity(scene, targetEntity, false);
+
+                                    if (before != after)
+                                    {
+                                        CommandHistory::Get().Execute(std::make_unique<EntitySnapshotCommand>(
+                                            &scene, targetEntity, before, after, "Assign Material"));
+                                    }
+                                    scene.SetDirty(true);
+                                    EditorSelection::Get().Select(targetEntity);
+                                }
+                                else
+                                {
+                                    LOG_WARN("[Viewport] Failed to resolve UUID for material: {}", pathStr);
+                                }
+                            }
+                            else
+                            {
+                                LOG_WARN("[Viewport] No entity under cursor to assign material: {}", pathStr);
+                            }
+                        }
+                        else if (isScript)
+                        {
+                            if (hoveredEntity != entt::null)
+                            {
+                                entt::entity targetEntity = ResolveRootEntity(engine, hoveredEntity);
+
+                                auto& assetRegistry = AssetManager::Get().GetRegistry();
+                                AssetMeta scriptMeta = assetRegistry.GetOrCreateMeta(pathStr);
+                                AssetUUID scriptUUID = scriptMeta.uuid;
+                                if (!scriptUUID.IsValid())
+                                    scriptUUID = EditorUtils::ReadUUIDFromMeta(pathStr);
+                                if (!scriptUUID.IsValid())
+                                    scriptUUID = assetRegistry.GetUUID(pathStr);
+
+                                if (scriptUUID.IsValid())
+                                {
+                                    json before = SceneSerializer::SerializeEntity(scene, targetEntity, false);
+                                    if (scene.HasComponent<ScriptComponent>(targetEntity))
+                                    {
+                                        auto& scriptComp = scene.GetComponent<ScriptComponent>(targetEntity);
+                                        if (scriptComp.scriptAssetUUID != scriptUUID)
+                                        {
+                                            scriptComp.scriptAssetUUID = scriptUUID;
+                                            scriptComp.propertyValues = json::object();
+                                            ScriptEngine::InvalidateScriptPropertyDefs(scriptUUID);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        auto& scriptComp = scene.AddComponent<ScriptComponent>(targetEntity);
+                                        scriptComp.scriptAssetUUID = scriptUUID;
+                                        scriptComp.propertyValues = json::object();
+                                        ScriptEngine::InvalidateScriptPropertyDefs(scriptUUID);
+                                    }
+                                    json after = SceneSerializer::SerializeEntity(scene, targetEntity, false);
+
+                                    if (before != after)
+                                    {
+                                        CommandHistory::Get().Execute(std::make_unique<EntitySnapshotCommand>(
+                                            &scene, targetEntity, before, after, "Attach Script"));
+                                    }
+                                    scene.SetDirty(true);
+                                    EditorSelection::Get().Select(targetEntity);
+                                }
+                                else
+                                {
+                                    LOG_WARN("[Viewport] Failed to resolve UUID for script: {}", pathStr);
+                                }
+                            }
+                            else
+                            {
+                                LOG_WARN("[Viewport] No entity under cursor to attach script: {}", pathStr);
+                            }
+                        }
+                        else if (isPrefab)
+                        {
+                            AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(prefabPath);
+                            if (uuid.IsValid())
+                            {
+                                glm::vec3 spawnPos = CalculateSpawnPosition(engine, mousePos, displayPos, displaySize);
+                                Entity inst = scene.Instantiate(uuid, spawnPos);
+                                if (inst.GetHandle() != entt::null)
+                                {
+                                    CommandHistory::Get().Execute(std::make_unique<CreateEntityCommand>(&scene, inst.GetHandle()));
+                                    EditorSelection::Get().Select(inst.GetHandle());
+                                    scene.SetDirty(true);
+                                }
+                            }
+                            else
+                            {
+                                LOG_WARN("[Viewport] Failed to read UUID from meta for: {}", prefabPath);
+                            }
+                        }
+                    }
+                    else // Preview mode
+                    {
+                        std::filesystem::path p(pathStr);
+                        std::string assetName = p.filename().string();
+                        if (pathStr.find('#') != std::string::npos)
+                            assetName = pathStr.substr(pathStr.find('#') + 1);
+
+                        if (isMaterial)
+                        {
+                            if (hoveredEntity != entt::null)
+                            {
+                                entt::entity targetEntity = hoveredEntity;
+                                Scene& scene = engine->GetActiveScene();
+                                if (!scene.HasComponent<MeshComponent>(targetEntity) &&
+                                    !scene.HasComponent<SkeletalMeshComponent>(targetEntity) &&
+                                    !scene.HasComponent<MaterialComponent>(targetEntity))
+                                {
+                                    entt::entity root = ResolveRootEntity(engine, hoveredEntity);
+                                    if (scene.HasComponent<MeshComponent>(root) ||
+                                        scene.HasComponent<SkeletalMeshComponent>(root) ||
+                                        scene.HasComponent<MaterialComponent>(root))
+                                    {
+                                        targetEntity = root;
+                                    }
+                                }
+                                std::string entityName = scene.HasComponent<TagComponent>(targetEntity) ?
+                                    scene.GetComponent<TagComponent>(targetEntity).tag : "Entity";
+                                ImGui::SetTooltip("Assign Material '%s' to '%s'", assetName.c_str(), entityName.c_str());
+                            }
+                            else
+                            {
+                                ImGui::SetTooltip("Assign Material '%s' (hover over an object)", assetName.c_str());
+                            }
+                        }
+                        else if (isScript)
+                        {
+                            if (hoveredEntity != entt::null)
+                            {
+                                entt::entity targetEntity = ResolveRootEntity(engine, hoveredEntity);
+                                Scene& scene = engine->GetActiveScene();
+                                std::string entityName = scene.HasComponent<TagComponent>(targetEntity) ?
+                                    scene.GetComponent<TagComponent>(targetEntity).tag : "Entity";
+                                ImGui::SetTooltip("Attach Script '%s' to '%s'", assetName.c_str(), entityName.c_str());
+                            }
+                            else
+                            {
+                                ImGui::SetTooltip("Attach Script '%s' (hover over an object)", assetName.c_str());
+                            }
+                        }
+                        else if (isPrefab)
+                        {
+                            std::string prefabName = std::filesystem::path(prefabPath).stem().string();
+                            ImGui::SetTooltip("Instantiate Prefab '%s'", prefabName.c_str());
+                        }
                     }
                 }
             }

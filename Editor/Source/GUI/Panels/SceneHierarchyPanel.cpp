@@ -35,6 +35,11 @@
 #include "Scene/Components/SkeletalMeshComponent.h"
 #include "Scene/Components/SkeletalMeshRendererComponent.h"
 #include "Scene/Components/UIComponents.h"
+#include "Scene/Components/MaterialComponent.h"
+#include "Scene/SceneSerializer.h"
+#include "Commands/ComponentCommands.h"
+#include "Script/ScriptEngine.h"
+#include "Asset/AssetMeta.h"
 
 using namespace rv;
 
@@ -1249,22 +1254,119 @@ void SceneHierarchyPanel::Draw(Engine* engine)
                 if (const ImGuiPayload* assetPayload = ImGui::AcceptDragDropPayload("ASSET_PATH"))
                 {
                     std::string pathStr((const char*)assetPayload->Data);
-                    if (!pathStr.ends_with(".rprefab"))
+
+                    bool isScript = pathStr.ends_with(".lua");
+                    bool isMaterial = pathStr.ends_with(".rmat") || pathStr.ends_with(".Material");
+                    if (!isMaterial && pathStr.find('#') != std::string::npos)
                     {
-                        std::filesystem::path p(pathStr);
-                        auto candidate = p;
-                        candidate.replace_extension(".rprefab");
-                        if (std::filesystem::exists(candidate))
-                            pathStr = candidate.string();
-                    }
-                    if (pathStr.ends_with(".rprefab"))
-                    {
-                        AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
-                        if (uuid.IsValid())
+                        AssetUUID subUUID = EditorUtils::ReadUUIDFromMeta(pathStr);
+                        if (subUUID.IsValid())
                         {
-                            Entity inst = scene.Instantiate(uuid, glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), entity);
-                            if (inst.GetHandle() != entt::null)
-                                EditorSelection::Get().Select(inst.GetHandle());
+                            auto hashPos = pathStr.find('#');
+                            auto basePath = pathStr.substr(0, hashPos);
+                            auto metaPath = AssetMeta::GetMetaPath(basePath);
+                            AssetMeta meta;
+                            if (meta.LoadFromFile(metaPath))
+                            {
+                                for (const auto& sub : meta.subAssets)
+                                {
+                                    if (sub.uuid == subUUID && sub.type == "Material")
+                                    {
+                                        isMaterial = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (isMaterial)
+                    {
+                        AssetUUID matUUID = EditorUtils::ReadUUIDFromMeta(pathStr);
+                        if (!matUUID.IsValid())
+                            matUUID = AssetManager::Get().GetRegistry().GetUUID(pathStr);
+
+                        if (matUUID.IsValid())
+                        {
+                            json before = SceneSerializer::SerializeEntity(scene, entity, false);
+                            if (scene.HasComponent<MaterialComponent>(entity))
+                            {
+                                scene.GetComponent<MaterialComponent>(entity).SetMaterial(matUUID);
+                            }
+                            else
+                            {
+                                auto& matComp = scene.AddComponent<MaterialComponent>(entity);
+                                matComp.SetMaterial(matUUID);
+                            }
+                            json after = SceneSerializer::SerializeEntity(scene, entity, false);
+
+                            if (before != after)
+                            {
+                                CommandHistory::Get().Execute(std::make_unique<EntitySnapshotCommand>(
+                                    &scene, entity, before, after, "Assign Material"));
+                                scene.SetDirty(true);
+                            }
+                            EditorSelection::Get().Select(entity);
+                        }
+                    }
+                    else if (isScript)
+                    {
+                        auto& assetRegistry = AssetManager::Get().GetRegistry();
+                        AssetMeta scriptMeta = assetRegistry.GetOrCreateMeta(pathStr);
+                        AssetUUID scriptUUID = scriptMeta.uuid;
+                        if (!scriptUUID.IsValid())
+                            scriptUUID = EditorUtils::ReadUUIDFromMeta(pathStr);
+
+                        if (scriptUUID.IsValid())
+                        {
+                            json before = SceneSerializer::SerializeEntity(scene, entity, false);
+                            if (scene.HasComponent<ScriptComponent>(entity))
+                            {
+                                auto& scriptComp = scene.GetComponent<ScriptComponent>(entity);
+                                if (scriptComp.scriptAssetUUID != scriptUUID)
+                                {
+                                    scriptComp.scriptAssetUUID = scriptUUID;
+                                    scriptComp.propertyValues = json::object();
+                                    ScriptEngine::InvalidateScriptPropertyDefs(scriptUUID);
+                                }
+                            }
+                            else
+                            {
+                                auto& scriptComp = scene.AddComponent<ScriptComponent>(entity);
+                                scriptComp.scriptAssetUUID = scriptUUID;
+                                scriptComp.propertyValues = json::object();
+                                ScriptEngine::InvalidateScriptPropertyDefs(scriptUUID);
+                            }
+                            json after = SceneSerializer::SerializeEntity(scene, entity, false);
+
+                            if (before != after)
+                            {
+                                CommandHistory::Get().Execute(std::make_unique<EntitySnapshotCommand>(
+                                    &scene, entity, before, after, "Attach Script"));
+                                scene.SetDirty(true);
+                            }
+                            EditorSelection::Get().Select(entity);
+                        }
+                    }
+                    else
+                    {
+                        if (!pathStr.ends_with(".rprefab"))
+                        {
+                            std::filesystem::path p(pathStr);
+                            auto candidate = p;
+                            candidate.replace_extension(".rprefab");
+                            if (std::filesystem::exists(candidate))
+                                pathStr = candidate.string();
+                        }
+                        if (pathStr.ends_with(".rprefab"))
+                        {
+                            AssetUUID uuid = EditorUtils::ReadUUIDFromMeta(pathStr);
+                            if (uuid.IsValid())
+                            {
+                                Entity inst = scene.Instantiate(uuid, glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), entity);
+                                if (inst.GetHandle() != entt::null)
+                                    EditorSelection::Get().Select(inst.GetHandle());
+                            }
                         }
                     }
                 }

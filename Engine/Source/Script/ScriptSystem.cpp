@@ -719,7 +719,6 @@ void ScriptSystem::OnStart()
             }
             lua[ac.name] = Entity(entity, &m_Scene);
         }
-        LOG_INFO("[Autoload] Registered global Lua singleton: '{}'", ac.name);
     }
 
     m_IsReady = true;

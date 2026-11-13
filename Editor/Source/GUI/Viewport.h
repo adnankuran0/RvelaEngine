@@ -52,6 +52,7 @@ private:
 	void HandleSelection(Engine* engine, ImVec2& displayPos, ImVec2& displaySize);
 	void DrawContextMenu(Engine* engine, const ImVec2& displayPos, const ImVec2& displaySize);
 	glm::vec3 CalculateSpawnPosition(Engine* engine, const ImVec2& mousePos, const ImVec2& displayPos, const ImVec2& displaySize);
+	entt::entity ResolveRootEntity(Engine* engine, entt::entity entity) const;
 
 private:
 	float m_snapTranslate = 1.0f;

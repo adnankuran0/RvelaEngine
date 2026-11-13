@@ -58,10 +58,10 @@ void InspectorPanel::Draw(Engine* engine)
 	PhysicsInspectors::Draw(scene, selectedEntity);
 	MaterialInspectors::Draw(scene, selectedEntity);
 	TransformInspectors::DrawHierarchy(scene, selectedEntity);
-	ScriptInspectors::Draw(scene, selectedEntity);
 	MediaInspectors::Draw(scene, selectedEntity);
 	UIInspectors::Draw(scene, selectedEntity);
 	NavigationInspectors::Draw(scene, selectedEntity);
+	ScriptInspectors::Draw(scene, selectedEntity);
 
 	ImGui::Spacing();
 	ImGui::Separator();
