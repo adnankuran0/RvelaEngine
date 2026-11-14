@@ -1,0 +1,38 @@
+# Auto-detect text files and normalize line endings to LF
+* text=auto eol=lf
+
+# 3D, Textures & Media (Raw binary - never convert line endings)
+*.hdr binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.tga binary
+*.bmp binary
+*.dds binary
+*.ktx binary
+*.fbx binary
+*.glb binary
+*.bin binary
+*.obj binary
+*.wav binary
+*.mp3 binary
+*.ogg binary
+*.ttf binary
+*.otf binary
+
+# Compiled Engine Caches (if tracked)
+*.rmesh binary
+*.rskmesh binary
+*.rtex binary
+
+# Engine Text & Config Formats
+*.rmat text eol=lf
+*.rscene text eol=lf
+*.rproj text eol=lf
+*.rmeta text eol=lf
+*.rprefab text eol=lf
+*.gltf text eol=lf
+*.glsl text eol=lf
+*.vert text eol=lf
+*.frag text eol=lf
+*.comp text eol=lf

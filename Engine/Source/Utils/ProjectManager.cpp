@@ -54,6 +54,13 @@ bool ProjectManager::CreateProject(const std::string& name, const std::string& p
 			std::filesystem::copy_options::skip_existing, ec);
 	}
 
+	std::filesystem::path templateGitattributes = EDITOR_PATH("TemplateProject/.gitattributes").GetAbsolute();
+	if (std::filesystem::exists(templateGitattributes))
+	{
+		std::filesystem::copy_file(templateGitattributes, projectRoot / ".gitattributes",
+			std::filesystem::copy_options::skip_existing, ec);
+	}
+
 	auto project = std::make_shared<Project>(name, projectRoot.string());
 	ProjectSettings settings;
 	settings.name = name;
