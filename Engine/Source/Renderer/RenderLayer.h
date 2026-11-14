@@ -1,3 +1,4 @@
+#pragma once
 #include "Core/Layer.h"
 #include "RenderContext.h"
 #include "RenderPipeline.h"

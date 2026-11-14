@@ -34,6 +34,7 @@ struct ViewportGizmoSettings
     int GizmoMode = 0; // 0 World, 1 Local
     bool EnableSnap = false;
     float SnapTranslate = 1.0f;
+    float SnapTranslateUI = 10.0f;
     float SnapRotate = 15.0f;
     float SnapScale = 0.5f;
     bool DrawColliders = false;

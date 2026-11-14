@@ -20,7 +20,9 @@
 #include "PrefabEditManager.h"
 #include "Commands/CommandHistory.h"
 #include "Commands/TransformCommand.h"
+#include "Commands/RectTransformCommand.h"
 #include "Commands/EntityLifecycleCommands.h"
+#include "UI/UILayout.h"
 #include "Scene/Components/CameraComponent.h"
 #include "Scene/Components/DirectionalLightComponent.h"
 #include "Scene/Components/PointLightComponent.h"
@@ -66,16 +68,55 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
     entt::entity selectedEntity = EditorSelection::Get().GetPrimary();
     const auto& selectedEntities = EditorSelection::Get().GetSelectedEntities();
 
+    auto& scene = engine->GetActiveScene();
+    auto& reg = scene.GetRegistry();
+
+    bool hasTransform = selectedEntity != entt::null &&
+        reg.valid(selectedEntity) &&
+        (reg.any_of<TransformComponent>(selectedEntity) || reg.any_of<RectTransformComponent>(selectedEntity));
+
     bool canDrawGizmo = m_DrawGizmos &&
-        selectedEntity != entt::null &&
-        engine->GetActiveScene().GetRegistry().valid(selectedEntity) &&
-        engine->GetActiveScene().GetRegistry().any_of<TransformComponent>(selectedEntity) &&
-        engine->GetActiveScene().GetState() == SceneState::EDIT;
+        hasTransform &&
+        scene.GetState() == SceneState::EDIT;
     if (!canDrawGizmo)
     {
         m_WasGizmoUsing = false;
+        m_WasUIGizmo = false;
         m_InitialTransforms.clear();
+        m_InitialRectTransforms.clear();
         return;
+    }
+
+    bool isUI = false;
+    if (reg.any_of<RectTransformComponent>(selectedEntity))
+    {
+        isUI = true;
+        if (reg.any_of<UICanvasComponent>(selectedEntity))
+        {
+            const auto& canvas = reg.get<UICanvasComponent>(selectedEntity);
+            if (canvas.mode == CanvasMode::WorldSpace)
+                isUI = false;
+        }
+    }
+
+    if (isUI)
+    {
+        if (m_WasGizmoUsing && !m_WasUIGizmo)
+        {
+            m_WasGizmoUsing = false;
+            m_InitialTransforms.clear();
+        }
+        DrawUIGizmos(engine, displayPos, displaySize);
+        return;
+    }
+    else
+    {
+        if (m_WasGizmoUsing && m_WasUIGizmo)
+        {
+            m_WasGizmoUsing = false;
+            m_WasUIGizmo = false;
+            m_InitialRectTransforms.clear();
+        }
     }
 
     ImGuizmo::BeginFrame();
@@ -84,8 +125,6 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
     ImGuizmo::SetDrawlist();
     ImGuizmo::SetRect(displayPos.x, displayPos.y, displaySize.x, displaySize.y);
 
-    auto& scene = engine->GetActiveScene();
-    auto& reg = scene.GetRegistry();
     auto& tc = reg.get<TransformComponent>(selectedEntity);
 
     auto isAncestorSelected = [&](entt::entity candidate) -> bool {
@@ -348,7 +387,383 @@ void Viewport::DrawGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySiz
             activeScene.GetTransformSystem().Update();
         }
         m_WasGizmoUsing = false;
+        m_WasUIGizmo = false;
         m_InitialTransforms.clear();
+        m_InitialRectTransforms.clear();
+    }
+}
+
+void Viewport::DrawUIGizmos(Engine* engine, ImVec2& displayPos, ImVec2& displaySize)
+{
+    entt::entity selectedEntity = EditorSelection::Get().GetPrimary();
+    const auto& selectedEntities = EditorSelection::Get().GetSelectedEntities();
+
+    auto& scene = engine->GetActiveScene();
+    auto& reg = scene.GetRegistry();
+
+    float targetW = (engine && engine->GetRenderLayer().GetTargetWidth() > 0)
+        ? static_cast<float>(engine->GetRenderLayer().GetTargetWidth())
+        : displaySize.x;
+    float targetH = (engine && engine->GetRenderLayer().GetTargetHeight() > 0)
+        ? static_cast<float>(engine->GetRenderLayer().GetTargetHeight())
+        : displaySize.y;
+
+    if (targetW <= 0.0f) targetW = 1920.0f;
+    if (targetH <= 0.0f) targetH = 1080.0f;
+
+    UILayout::UpdateCanvasLayouts(&scene, targetW, targetH);
+
+    auto uiToScreen = [&](const glm::vec2& p) -> ImVec2 {
+        float normX = p.x / targetW;
+        float normY = 1.0f - (p.y / targetH);
+        return ImVec2(displayPos.x + normX * displaySize.x, displayPos.y + normY * displaySize.y);
+    };
+
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    for (auto e : selectedEntities)
+    {
+        if (e != entt::null && reg.valid(e) && reg.any_of<RectTransformComponent>(e))
+        {
+            const auto& r = reg.get<RectTransformComponent>(e);
+            float w = r.computedScreenRect.z - r.computedScreenRect.x;
+            float h = r.computedScreenRect.w - r.computedScreenRect.y;
+            float hw = w * 0.5f;
+            float hh = h * 0.5f;
+            glm::vec2 c((r.computedScreenRect.x + r.computedScreenRect.z) * 0.5f,
+                        (r.computedScreenRect.y + r.computedScreenRect.w) * 0.5f);
+
+            float rad = glm::radians(r.computedRotation);
+            float cosR = std::cos(rad);
+            float sinR = std::sin(rad);
+
+            glm::vec2 rel0 = { -hw, -hh };
+            glm::vec2 rel1 = {  hw, -hh };
+            glm::vec2 rel2 = {  hw,  hh };
+            glm::vec2 rel3 = { -hw,  hh };
+
+            glm::vec2 p0 = c + glm::vec2(rel0.x * cosR - rel0.y * sinR, rel0.x * sinR + rel0.y * cosR);
+            glm::vec2 p1 = c + glm::vec2(rel1.x * cosR - rel1.y * sinR, rel1.x * sinR + rel1.y * cosR);
+            glm::vec2 p2 = c + glm::vec2(rel2.x * cosR - rel2.y * sinR, rel2.x * sinR + rel2.y * cosR);
+            glm::vec2 p3 = c + glm::vec2(rel3.x * cosR - rel3.y * sinR, rel3.x * sinR + rel3.y * cosR);
+
+            ImVec2 s0 = uiToScreen(p0);
+            ImVec2 s1 = uiToScreen(p1);
+            ImVec2 s2 = uiToScreen(p2);
+            ImVec2 s3 = uiToScreen(p3);
+
+            ImU32 outlineColor = (e == selectedEntity) ? IM_COL32(50, 150, 255, 230) : IM_COL32(80, 180, 255, 140);
+            drawList->AddQuad(s0, s1, s2, s3, outlineColor, 1.5f);
+
+            const float handleSize = 3.5f;
+            auto drawHandle = [&](const ImVec2& pt) {
+                drawList->AddRectFilled(ImVec2(pt.x - handleSize, pt.y - handleSize),
+                                        ImVec2(pt.x + handleSize, pt.y + handleSize),
+                                        IM_COL32(255, 255, 255, 240), 1.0f);
+                drawList->AddRect(ImVec2(pt.x - handleSize, pt.y - handleSize),
+                                  ImVec2(pt.x + handleSize, pt.y + handleSize),
+                                  IM_COL32(40, 120, 220, 255), 1.0f);
+            };
+            drawHandle(s0);
+            drawHandle(s1);
+            drawHandle(s2);
+            drawHandle(s3);
+        }
+    }
+
+    auto isAncestorSelected = [&](entt::entity candidate) -> bool {
+        entt::entity cur = candidate;
+        while (cur != entt::null && reg.valid(cur) && scene.HasComponent<SceneTreeComponent>(cur))
+        {
+            entt::entity parent = scene.GetComponent<SceneTreeComponent>(cur).parent;
+            if (parent == entt::null || parent == scene.GetRootEntity()) break;
+            if (std::find(selectedEntities.begin(), selectedEntities.end(), parent) != selectedEntities.end())
+                return true;
+            cur = parent;
+        }
+        return false;
+    };
+
+    bool isMultiSelect = selectedEntities.size() > 1;
+    auto& primaryRect = reg.get<RectTransformComponent>(selectedEntity);
+
+    if (!m_WasGizmoUsing)
+    {
+        glm::vec2 gizmoCenter(0.0f);
+        if (isMultiSelect)
+        {
+            int validCount = 0;
+            for (auto e : selectedEntities)
+            {
+                if (e != entt::null && reg.valid(e) && reg.any_of<RectTransformComponent>(e) && !isAncestorSelected(e))
+                {
+                    const auto& r = reg.get<RectTransformComponent>(e);
+                    gizmoCenter += glm::vec2((r.computedScreenRect.x + r.computedScreenRect.z) * 0.5f,
+                                             (r.computedScreenRect.y + r.computedScreenRect.w) * 0.5f);
+                    validCount++;
+                }
+            }
+            if (validCount > 0)
+                gizmoCenter /= static_cast<float>(validCount);
+            else
+                gizmoCenter = glm::vec2((primaryRect.computedScreenRect.x + primaryRect.computedScreenRect.z) * 0.5f,
+                                        (primaryRect.computedScreenRect.y + primaryRect.computedScreenRect.w) * 0.5f);
+        }
+        else
+        {
+            gizmoCenter = glm::vec2((primaryRect.computedScreenRect.x + primaryRect.computedScreenRect.z) * 0.5f,
+                                    (primaryRect.computedScreenRect.y + primaryRect.computedScreenRect.w) * 0.5f);
+        }
+
+        glm::mat4 T = glm::translate(glm::mat4(1.0f), glm::vec3(gizmoCenter.x, gizmoCenter.y, 0.0f));
+        glm::mat4 R = glm::mat4(1.0f);
+        if (m_CurrentGizmoMode == ImGuizmo::LOCAL)
+            R = glm::rotate(glm::mat4(1.0f), glm::radians(primaryRect.computedRotation), glm::vec3(0.0f, 0.0f, 1.0f));
+        glm::mat4 S = glm::scale(glm::mat4(1.0f), glm::vec3(primaryRect.scale.x, primaryRect.scale.y, 1.0f));
+        m_ActiveGizmoMatrix = T * R * S;
+    }
+
+    ImGuizmo::BeginFrame();
+    ImGuizmo::SetOrthographic(true);
+    ImGuizmo::SetDrawlist();
+    ImGuizmo::SetRect(displayPos.x, displayPos.y, displaySize.x, displaySize.y);
+
+    glm::mat4 view = glm::mat4(1.0f);
+    glm::mat4 projection = glm::ortho(0.0f, targetW, 0.0f, targetH, -1000.0f, 1000.0f);
+
+    ImGuizmo::GetStyle().RotationLineThickness = 3.0f;
+    ImGuizmo::GetStyle().ScaleLineCircleSize = 5.0f;
+    ImGuizmo::GetStyle().ScaleLineThickness = 3.0f;
+    ImGuizmo::GetStyle().TranslationLineArrowSize = 5.0f;
+    ImGuizmo::GetStyle().TranslationLineThickness = 3.0f;
+
+    bool isCtrlDown = ImGui::GetIO().KeyCtrl || ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || ImGui::IsKeyDown(ImGuiKey_RightCtrl);
+    bool useSnap = m_EnableSnap ? !isCtrlDown : isCtrlDown;
+
+    float snapTranslate[3] = { m_snapTranslateUI, m_snapTranslateUI, m_snapTranslateUI };
+    float snapScale[3] = { m_snapScale, m_snapScale, m_snapScale };
+    float snapRotate[3] = { m_snapRotate, m_snapRotate, m_snapRotate };
+
+    ImGuizmo::OPERATION uiOp = static_cast<ImGuizmo::OPERATION>(0);
+    float* snapPtr = nullptr;
+    if (m_CurrentGizmoOperation == ImGuizmo::TRANSLATE)
+    {
+        uiOp = static_cast<ImGuizmo::OPERATION>(ImGuizmo::TRANSLATE_X | ImGuizmo::TRANSLATE_Y);
+        if (useSnap) snapPtr = snapTranslate;
+    }
+    else if (m_CurrentGizmoOperation == ImGuizmo::ROTATE)
+    {
+        uiOp = ImGuizmo::ROTATE_Z;
+        if (useSnap) snapPtr = snapRotate;
+    }
+    else if (m_CurrentGizmoOperation == ImGuizmo::SCALE)
+    {
+        uiOp = static_cast<ImGuizmo::OPERATION>(ImGuizmo::SCALE_X | ImGuizmo::SCALE_Y);
+        if (useSnap) snapPtr = snapScale;
+    }
+
+    glm::mat4 preManipulateMatrix = m_ActiveGizmoMatrix;
+
+    if (uiOp != 0)
+    {
+        ImGuizmo::Manipulate(
+            glm::value_ptr(view), glm::value_ptr(projection),
+            uiOp, m_CurrentGizmoMode,
+            glm::value_ptr(m_ActiveGizmoMatrix), nullptr,
+            snapPtr);
+    }
+
+    if (ImGuizmo::IsUsing())
+    {
+        if (!m_WasGizmoUsing)
+        {
+            m_InitialTransforms.clear();
+            m_InitialRectTransforms.clear();
+            m_InitialGizmoMatrix = preManipulateMatrix;
+            glm::vec3 sk; glm::vec4 p;
+            glm::decompose(m_InitialGizmoMatrix, m_InitialGizmoScale, m_InitialGizmoRot, m_InitialGizmoPos, sk, p);
+
+            for (auto e : selectedEntities)
+            {
+                if (e != entt::null && reg.valid(e) && reg.any_of<RectTransformComponent>(e))
+                {
+                    auto& r = reg.get<RectTransformComponent>(e);
+                    InitialRectTransform initR;
+                    initR.localPos = r.position;
+                    initR.size = r.size;
+                    initR.rotation = r.rotation;
+                    initR.scale = r.scale;
+                    initR.screenCenter = glm::vec2((r.computedScreenRect.x + r.computedScreenRect.z) * 0.5f,
+                                                   (r.computedScreenRect.y + r.computedScreenRect.w) * 0.5f);
+                    if (reg.any_of<UUIDComponent>(e))
+                        initR.uuid = reg.get<UUIDComponent>(e).uuid;
+                    m_InitialRectTransforms[e] = initR;
+                }
+            }
+            m_WasGizmoUsing = true;
+            m_WasUIGizmo = true;
+            engine->GetActiveScene().SetDirty(true);
+        }
+
+        glm::vec3 curGizmoPos, curGizmoScale, sk;
+        glm::quat curGizmoRot;
+        glm::vec4 persp;
+        glm::decompose(m_ActiveGizmoMatrix, curGizmoScale, curGizmoRot, curGizmoPos, sk, persp);
+
+        auto getParentRotation = [&](entt::entity target) -> float {
+            if (scene.HasComponent<SceneTreeComponent>(target))
+            {
+                entt::entity parent = scene.GetComponent<SceneTreeComponent>(target).parent;
+                if (parent != entt::null && reg.valid(parent) && parent != scene.GetRootEntity())
+                {
+                    if (reg.any_of<RectTransformComponent>(parent))
+                        return reg.get<RectTransformComponent>(parent).computedRotation;
+                }
+            }
+            return 0.0f;
+        };
+
+        if (m_CurrentGizmoOperation == ImGuizmo::TRANSLATE)
+        {
+            glm::vec2 deltaScreen = glm::vec2(curGizmoPos.x - m_InitialGizmoPos.x, curGizmoPos.y - m_InitialGizmoPos.y);
+            if (useSnap && m_snapTranslateUI > 0.001f)
+            {
+                deltaScreen.x = std::round(deltaScreen.x / m_snapTranslateUI) * m_snapTranslateUI;
+                deltaScreen.y = std::round(deltaScreen.y / m_snapTranslateUI) * m_snapTranslateUI;
+            }
+
+            for (auto e : selectedEntities)
+            {
+                if (isAncestorSelected(e)) continue;
+                auto it = m_InitialRectTransforms.find(e);
+                if (it == m_InitialRectTransforms.end()) continue;
+
+                float parentRot = getParentRotation(e);
+                glm::vec2 deltaLocal = (parentRot != 0.0f) ? UILayout::RotatePoint(deltaScreen, glm::vec2(0.0f), -parentRot) : deltaScreen;
+
+                auto& r = reg.get<RectTransformComponent>(e);
+                r.position = it->second.localPos + deltaLocal;
+            }
+        }
+        else if (m_CurrentGizmoOperation == ImGuizmo::ROTATE)
+        {
+            float curAngle = glm::degrees(std::atan2(m_ActiveGizmoMatrix[0][1], m_ActiveGizmoMatrix[0][0]));
+            float initAngle = glm::degrees(std::atan2(m_InitialGizmoMatrix[0][1], m_InitialGizmoMatrix[0][0]));
+            float deltaAngle = curAngle - initAngle;
+            if (useSnap && m_snapRotate > 0.001f)
+            {
+                deltaAngle = std::round(deltaAngle / m_snapRotate) * m_snapRotate;
+            }
+
+            for (auto e : selectedEntities)
+            {
+                if (isAncestorSelected(e)) continue;
+                auto it = m_InitialRectTransforms.find(e);
+                if (it == m_InitialRectTransforms.end()) continue;
+                const auto& initR = it->second;
+                auto& r = reg.get<RectTransformComponent>(e);
+
+                if (!isMultiSelect || m_CurrentGizmoMode == ImGuizmo::LOCAL)
+                {
+                    r.rotation = initR.rotation + deltaAngle;
+                }
+                else
+                {
+                    r.rotation = initR.rotation + deltaAngle;
+                    glm::vec2 groupCenter2D(m_InitialGizmoPos.x, m_InitialGizmoPos.y);
+                    glm::vec2 newCenter = UILayout::RotatePoint(initR.screenCenter, groupCenter2D, deltaAngle);
+                    glm::vec2 deltaScreen = newCenter - initR.screenCenter;
+
+                    float parentRot = getParentRotation(e);
+                    glm::vec2 deltaLocal = (parentRot != 0.0f) ? UILayout::RotatePoint(deltaScreen, glm::vec2(0.0f), -parentRot) : deltaScreen;
+                    r.position = initR.localPos + deltaLocal;
+                }
+            }
+        }
+        else if (m_CurrentGizmoOperation == ImGuizmo::SCALE)
+        {
+            glm::vec2 scaleFactor(1.0f);
+            if (std::abs(m_InitialGizmoScale.x) > 0.0001f) scaleFactor.x = curGizmoScale.x / m_InitialGizmoScale.x;
+            if (std::abs(m_InitialGizmoScale.y) > 0.0001f) scaleFactor.y = curGizmoScale.y / m_InitialGizmoScale.y;
+            if (useSnap && m_snapScale > 0.001f)
+            {
+                scaleFactor.x = std::round(scaleFactor.x / m_snapScale) * m_snapScale;
+                scaleFactor.y = std::round(scaleFactor.y / m_snapScale) * m_snapScale;
+            }
+
+            for (auto e : selectedEntities)
+            {
+                if (isAncestorSelected(e)) continue;
+                auto it = m_InitialRectTransforms.find(e);
+                if (it == m_InitialRectTransforms.end()) continue;
+                const auto& initR = it->second;
+                auto& r = reg.get<RectTransformComponent>(e);
+
+                if (!isMultiSelect || m_CurrentGizmoMode == ImGuizmo::LOCAL)
+                {
+                    r.scale = initR.scale * scaleFactor;
+                    r.scale.x = std::max(0.001f, r.scale.x);
+                    r.scale.y = std::max(0.001f, r.scale.y);
+                }
+                else
+                {
+                    r.scale = initR.scale * scaleFactor;
+                    r.scale.x = std::max(0.001f, r.scale.x);
+                    r.scale.y = std::max(0.001f, r.scale.y);
+
+                    glm::vec2 groupCenter2D(m_InitialGizmoPos.x, m_InitialGizmoPos.y);
+                    glm::vec2 offset = initR.screenCenter - groupCenter2D;
+                    glm::vec2 newCenter = groupCenter2D + offset * scaleFactor;
+                    glm::vec2 deltaScreen = newCenter - initR.screenCenter;
+
+                    float parentRot = getParentRotation(e);
+                    glm::vec2 deltaLocal = (parentRot != 0.0f) ? UILayout::RotatePoint(deltaScreen, glm::vec2(0.0f), -parentRot) : deltaScreen;
+                    r.position = initR.localPos + deltaLocal;
+                }
+            }
+        }
+
+        UILayout::UpdateCanvasLayouts(&scene, targetW, targetH);
+        scene.SetDirty(true);
+    }
+    else
+    {
+        if (m_WasGizmoUsing && m_WasUIGizmo)
+        {
+            Scene& activeScene = engine->GetActiveScene();
+            auto& currentReg = activeScene.GetRegistry();
+
+            std::vector<EntityRectTransformRecord> beforeRecords;
+            std::vector<EntityRectTransformRecord> afterRecords;
+
+            for (const auto& [entityHandle, initR] : m_InitialRectTransforms)
+            {
+                if (initR.uuid != 0 && currentReg.valid(entityHandle) && currentReg.any_of<RectTransformComponent>(entityHandle))
+                {
+                    auto& curR = currentReg.get<RectTransformComponent>(entityHandle);
+                    bool changed = (curR.position != initR.localPos) ||
+                                   (curR.size != initR.size) ||
+                                   (curR.rotation != initR.rotation) ||
+                                   (curR.scale != initR.scale);
+                    if (changed)
+                    {
+                        beforeRecords.push_back({ initR.uuid, entityHandle, initR.localPos, initR.size, initR.rotation, initR.scale });
+                        afterRecords.push_back({ initR.uuid, entityHandle, curR.position, curR.size, curR.rotation, curR.scale });
+                    }
+                }
+            }
+
+            if (!beforeRecords.empty())
+            {
+                auto cmd = std::make_unique<RectTransformCommand>(&activeScene, beforeRecords, afterRecords);
+                CommandHistory::Get().Execute(std::move(cmd));
+            }
+
+            activeScene.SetDirty(true);
+            UILayout::UpdateCanvasLayouts(&activeScene, targetW, targetH);
+        }
+        m_WasGizmoUsing = false;
+        m_WasUIGizmo = false;
+        m_InitialRectTransforms.clear();
     }
 }
 
@@ -720,6 +1135,9 @@ void Viewport::DrawToolbar(Engine* engine, ImVec2& displayPos, ImVec2& displaySi
         if (ImGui::DragFloat("Translate (m)", &m_snapTranslate, 0.05f, 0.01f, 100.0f, "%.2f")) snapChanged = true;
 
         ImGui::SetNextItemWidth(90);
+        if (ImGui::DragFloat("Translate UI (px)", &m_snapTranslateUI, 1.0f, 1.0f, 500.0f, "%.0f")) snapChanged = true;
+
+        ImGui::SetNextItemWidth(90);
         if (ImGui::DragFloat("Rotate (deg)", &m_snapRotate, 1.0f, 0.1f, 180.0f, "%.1f")) snapChanged = true;
 
         ImGui::SetNextItemWidth(90);
@@ -912,13 +1330,22 @@ void Viewport::DrawOverlayStats(Engine* engine, ImVec2& displayPos, ImVec2& disp
 {
     ImDrawList* drawList = ImGui::GetWindowDrawList();
 
-    bool isCtrlDown = ImGui::GetIO().KeyCtrl;
+    bool isCtrlDown = ImGui::GetIO().KeyCtrl || ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || ImGui::IsKeyDown(ImGuiKey_RightCtrl);
     bool isSnappingActive = m_EnableSnap ? !isCtrlDown : isCtrlDown;
     if (isSnappingActive)
     {
+        entt::entity selectedEntity = EditorSelection::Get().GetPrimary();
+        bool isUI = selectedEntity != entt::null &&
+                    engine->GetActiveScene().GetRegistry().valid(selectedEntity) &&
+                    engine->GetActiveScene().GetRegistry().any_of<RectTransformComponent>(selectedEntity);
+
         const char* label = "";
         float val = 0.0f;
-        if (m_CurrentGizmoOperation == ImGuizmo::TRANSLATE) { label = "Snap: %.2fm"; val = m_snapTranslate; }
+        if (m_CurrentGizmoOperation == ImGuizmo::TRANSLATE)
+        {
+            if (isUI) { label = "Snap: %.0fpx"; val = m_snapTranslateUI; }
+            else { label = "Snap: %.2fm"; val = m_snapTranslate; }
+        }
         else if (m_CurrentGizmoOperation == ImGuizmo::ROTATE) { label = "Snap: %.1f°"; val = m_snapRotate; }
         else if (m_CurrentGizmoOperation == ImGuizmo::SCALE) { label = "Snap: %.2f";  val = m_snapScale; }
 
@@ -1631,7 +2058,9 @@ void Viewport::Draw(Engine* engine, bool orbitDragActive)
         if (suppressViewportEditing)
         {
             m_WasGizmoUsing = false;
+            m_WasUIGizmo = false;
             m_InitialTransforms.clear();
+            m_InitialRectTransforms.clear();
             m_SelectionBoxPotential = false;
             m_SelectionBoxActive = false;
         }

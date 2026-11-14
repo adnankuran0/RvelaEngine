@@ -463,11 +463,12 @@ void ScriptSystem::EnsureScriptInitialized(ScriptComponent& sc, entt::entity ent
     if (sc.runtimeInitialized || sc.runtimeDestroying)
         return;
 
+    sc.runtimeInitialized = true;
+
     BindLuaScript(sc, entity);
     if (!sc.luaInstance.valid())
         return;
 
-    sc.runtimeInitialized = true;
     InvokeLifecycleCallback(sc, sc.OnCreate, "OnCreate");
 }
 
@@ -751,7 +752,7 @@ void ScriptSystem::OnUpdate(float dt)
 
         auto& sc = view.get<ScriptComponent>(entity);
 
-        if (!sc.luaInstance.valid())
+        if (!sc.runtimeInitialized)
         {
             OnEntityActivationChanged(entity, true);
         }
@@ -785,7 +786,7 @@ void ScriptSystem::OnFixedUpdate(float dt)
 
         auto& sc = view.get<ScriptComponent>(entity);
 
-        if (!sc.luaInstance.valid())
+        if (!sc.runtimeInitialized)
         {
             OnEntityActivationChanged(entity, true);
         }

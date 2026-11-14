@@ -89,6 +89,7 @@ void EditorSettings::Load()
             if (v.contains("gizmoMode")) ViewportSettings.GizmoMode = v["gizmoMode"].get<int>();
             if (v.contains("enableSnap")) ViewportSettings.EnableSnap = v["enableSnap"].get<bool>();
             if (v.contains("snapTranslate")) ViewportSettings.SnapTranslate = v["snapTranslate"].get<float>();
+            if (v.contains("snapTranslateUI")) ViewportSettings.SnapTranslateUI = v["snapTranslateUI"].get<float>();
             if (v.contains("snapRotate")) ViewportSettings.SnapRotate = v["snapRotate"].get<float>();
             if (v.contains("snapScale")) ViewportSettings.SnapScale = v["snapScale"].get<float>();
             if (v.contains("drawColliders")) ViewportSettings.DrawColliders = v["drawColliders"].get<bool>();
@@ -164,6 +165,7 @@ void EditorSettings::Save()
         { "gizmoMode", ViewportSettings.GizmoMode },
         { "enableSnap", ViewportSettings.EnableSnap },
         { "snapTranslate", ViewportSettings.SnapTranslate },
+        { "snapTranslateUI", ViewportSettings.SnapTranslateUI },
         { "snapRotate", ViewportSettings.SnapRotate },
         { "snapScale", ViewportSettings.SnapScale },
         { "drawColliders", ViewportSettings.DrawColliders },
@@ -259,6 +261,7 @@ void EditorSettings::ApplyToViewport(Viewport& viewport) const
     viewport.SetGizmoMode((ViewportSettings.GizmoMode == 1) ? ImGuizmo::LOCAL : ImGuizmo::WORLD);
     viewport.SetEnableSnap(ViewportSettings.EnableSnap);
     viewport.SetSnapTranslate(ViewportSettings.SnapTranslate);
+    viewport.SetSnapTranslateUI(ViewportSettings.SnapTranslateUI);
     viewport.SetSnapRotate(ViewportSettings.SnapRotate);
     viewport.SetSnapScale(ViewportSettings.SnapScale);
 
@@ -278,6 +281,7 @@ void EditorSettings::UpdateFromViewport(const Viewport& viewport)
     ViewportSettings.GizmoMode = (viewport.GetGizmoMode() == ImGuizmo::LOCAL) ? 1 : 0;
     ViewportSettings.EnableSnap = viewport.GetEnableSnap();
     ViewportSettings.SnapTranslate = viewport.GetSnapTranslate();
+    ViewportSettings.SnapTranslateUI = viewport.GetSnapTranslateUI();
     ViewportSettings.SnapRotate = viewport.GetSnapRotate();
     ViewportSettings.SnapScale = viewport.GetSnapScale();
 
