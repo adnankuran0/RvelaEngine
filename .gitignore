@@ -14,3 +14,4 @@ Makefile
 !Vendor/Binaries
 *.txt
 Vendor/recastnavigation/
+AGENTS.md

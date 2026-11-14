@@ -1,5 +1,6 @@
 #include "ProjectSelectorPanel.h"
 #include "Core/Engine.h"
+#include "EditorLayer.h"
 #include "Utils/ProjectManager.h"
 #include "GUI/Dialogs.h"
 #include "GUI/Style.h"
@@ -21,10 +22,18 @@ void ProjectSelectorPanel::Open()
     RefreshRecents();
 }
 
-bool ProjectSelectorPanel::Draw(Engine* engine)
+bool ProjectSelectorPanel::Draw(Engine* engine, EditorLayer* editorLayer)
 {
     if (!m_IsOpen)
         return false;
+
+    auto openProjectFn = [&](const std::string& path) -> bool {
+        if (editorLayer)
+            return editorLayer->OpenProject(path);
+        if (engine)
+            return engine->OpenProject(path);
+        return false;
+    };
 
     if (!m_RecentsLoaded)
     {
@@ -113,7 +122,7 @@ bool ProjectSelectorPanel::Draw(Engine* engine)
                                 {
                                     m_ErrorMessage = "Project file not found on disk: " + projPath;
                                 }
-                                else if (engine->OpenProject(projPath))
+                                else if (openProjectFn(projPath))
                                 {
                                     m_IsOpen = false;
                                     projectSelected = true;
@@ -162,7 +171,7 @@ bool ProjectSelectorPanel::Draw(Engine* engine)
                         {
                             m_ErrorMessage = "TemplateProject is read-only template and cannot be opened directly.";
                         }
-                        else if (engine->OpenProject(chosen))
+                        else if (openProjectFn(chosen))
                         {
                             m_IsOpen = false;
                             projectSelected = true;
@@ -229,7 +238,7 @@ bool ProjectSelectorPanel::Draw(Engine* engine)
                         if (ProjectManager::CreateProject(nameStr, pathStr))
                         {
                             std::filesystem::path projFile = std::filesystem::path(pathStr) / nameStr / (nameStr + ".rproj");
-                            if (engine->OpenProject(projFile.string()))
+                            if (openProjectFn(projFile.string()))
                             {
                                 m_IsOpen = false;
                                 projectSelected = true;

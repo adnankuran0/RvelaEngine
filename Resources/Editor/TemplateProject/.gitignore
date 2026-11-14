@@ -1,0 +1,40 @@
+# ====================================================================
+# Rvela Engine Project - .gitignore
+# ====================================================================
+
+# Asset Cache (Recompiled automatically from source assets on import)
+.cache/
+Assets/.cache/
+*/Assets/.cache/
+
+# Exported Game Packages & Standalone Builds
+*.rpak
+*.pak
+Build/
+Binaries/
+Export/
+Dist/
+
+# IDE & Editor temporary files
+.vs/
+*.user
+*.suo
+*.sln.docstates
+
+# VS Code workspace state
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Logs & Temporary files
+*.log
+*.tmp
+*.bak
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+._*

@@ -6,6 +6,7 @@
 namespace rv {
 
 class Engine;
+class EditorLayer;
 
 class ProjectSelectorPanel : public EditorPanel
 {
@@ -13,7 +14,7 @@ public:
     ProjectSelectorPanel() : EditorPanel("Project Selector", true) {}
     ~ProjectSelectorPanel() override = default;
 
-    bool Draw(Engine* engine);
+    bool Draw(Engine* engine, EditorLayer* editorLayer = nullptr);
 
     void Open() override;
     void RefreshRecents();

@@ -8,6 +8,7 @@
 #include "LayerStack.h"
 #include "Asset/AssetRegistry.h"
 
+
 namespace rv {
 
 class EditorCamera;
@@ -38,6 +39,8 @@ public:
 	ProjectManager& GetProjectManager() noexcept { return m_ProjectManager; }
 	SceneManager& GetSceneManager() noexcept { return m_SceneManager; }
 
+	bool LoadProject(const std::string& projectFilePath);
+	bool LoadStartScene();
 	bool OpenProject(const std::string& projectFilePath);
 
 	EditorCamera* GetEditorCamera() const noexcept { return m_EditorCamera; }

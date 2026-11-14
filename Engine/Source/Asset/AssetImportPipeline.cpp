@@ -126,11 +126,11 @@ void AssetImportPipeline::Reimport(const std::filesystem::path& sourcePath, Asse
     ImportAsset(sourcePath, registry, /*force=*/true);
 }
 
-bool AssetImportPipeline::CheckAndReimportModifiedAssets(AssetRegistry& registry)
+bool AssetImportPipeline::CheckAndReimportModifiedAssets(AssetRegistry& registry, bool forceCheck)
 {
     static auto s_LastCheckTime = std::chrono::steady_clock::now();
     auto now = std::chrono::steady_clock::now();
-    if (std::chrono::duration_cast<std::chrono::milliseconds>(now - s_LastCheckTime).count() < 1000)
+    if (!forceCheck && std::chrono::duration_cast<std::chrono::milliseconds>(now - s_LastCheckTime).count() < 1000)
         return false;
     s_LastCheckTime = now;
 
@@ -158,11 +158,14 @@ bool AssetImportPipeline::CheckAndReimportModifiedAssets(AssetRegistry& registry
         if (!importer) continue;
 
         static std::unordered_map<std::string, std::chrono::steady_clock::time_point> s_LastReimportAttempts;
-        auto attemptIt = s_LastReimportAttempts.find(path.string());
-        if (attemptIt != s_LastReimportAttempts.end())
+        if (!forceCheck)
         {
-            if (std::chrono::duration_cast<std::chrono::seconds>(now - attemptIt->second).count() < 5)
-                continue;
+            auto attemptIt = s_LastReimportAttempts.find(path.string());
+            if (attemptIt != s_LastReimportAttempts.end())
+            {
+                if (std::chrono::duration_cast<std::chrono::seconds>(now - attemptIt->second).count() < 5)
+                    continue;
+            }
         }
 
         AssetMeta meta = registry.GetOrCreateMeta(path);
@@ -176,7 +179,6 @@ bool AssetImportPipeline::CheckAndReimportModifiedAssets(AssetRegistry& registry
             }
 
             s_LastReimportAttempts[path.string()] = now;
-            LOG_INFO("[AssetImportPipeline] Auto-reimporting modified asset: {}", path.filename().string());
             if (ImportAsset(path, registry, /*force=*/true))
             {
                 anyReimported = true;

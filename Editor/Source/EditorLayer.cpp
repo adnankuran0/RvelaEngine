@@ -112,6 +112,14 @@ void EditorLayer::OnAttach()
     m_AssetImportPipeline.RegisterImporter(std::make_unique<ModelImporter>());
     m_AssetImportPipeline.RegisterImporter(std::make_unique<TextureImporter>());
 
+    if (ProjectManager::IsProjectLoaded())
+    {
+        if (m_AssetImportPipeline.CheckAndReimportModifiedAssets(AssetManager::Get().GetRegistry(), true))
+        {
+            AssetManager::Get().GetRegistry().Scan(ProjectManager::GetAssetDirectory());
+        }
+    }
+
     IconLibrary::Init();
 
 }
@@ -461,6 +469,26 @@ void EditorLayer::ResetLayout()
     Dockspace::ResetLayout();
 }
 
+bool EditorLayer::OpenProject(const std::string& projectFilePath)
+{
+    if (!m_Engine->LoadProject(projectFilePath))
+    {
+        return false;
+    }
+
+    if (m_AssetImportPipeline.CheckAndReimportModifiedAssets(AssetManager::Get().GetRegistry(), true))
+    {
+        AssetManager::Get().GetRegistry().Scan(ProjectManager::GetAssetDirectory());
+    }
+
+    if (!m_Engine->LoadStartScene())
+    {
+        return false;
+    }
+
+    return true;
+}
+
 void EditorLayer::Render()
 {
     UpdateWindowMode();
@@ -486,7 +514,7 @@ void EditorLayer::Render()
     bool projectSelected = false;
     if (m_ProjectSelectorPanel.IsOpen())
     {
-        projectSelected = m_ProjectSelectorPanel.Draw(m_Engine);
+        projectSelected = m_ProjectSelectorPanel.Draw(m_Engine, this);
         if (projectSelected)
         {
             EditorSelection::Get().Clear();

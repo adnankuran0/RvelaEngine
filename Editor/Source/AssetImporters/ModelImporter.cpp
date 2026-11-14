@@ -227,29 +227,23 @@ ModelImportResult ModelImporter::ImportModel(
     auto prefabPath = sourcePath;
     prefabPath.replace_extension(".rprefab");
     AssetUUID existingPrefabUUID = AssetUUID::Invalid();
-    if (std::filesystem::exists(prefabPath))
+    bool prefabExists = std::filesystem::exists(prefabPath);
+    if (prefabExists)
     {
         existingPrefabUUID = registry.GetOrCreateMeta(prefabPath).uuid;
     }
 
-    if (Engine::Get() && existingPrefabUUID.IsValid())
+    if (settings.generatePrefab)
     {
-        Scene& activeScene = Engine::Get()->GetActiveScene();
-        auto pView = activeScene.GetRegistry().view<PrefabComponent>();
-        for (auto e : pView)
+        if (!prefabExists)
         {
-            if (pView.get<PrefabComponent>(e).GetPrefabID() == existingPrefabUUID)
-            {
-                json ov = SceneSerializer::ComputePrefabOverrides(activeScene, e);
-                if (ov.empty() && pView.get<PrefabComponent>(e).HasOverrides())
-                    ov = pView.get<PrefabComponent>(e).GetOverrides();
-                instancesToReload.push_back({ e, std::move(ov) });
-            }
+            result.prefabUUID = ConstructPrefab(scene, sourcePath, registry, result, settings);
+        }
+        else
+        {
+            result.prefabUUID = existingPrefabUUID;
         }
     }
-
-    if (settings.generatePrefab)
-        result.prefabUUID = ConstructPrefab(scene, sourcePath, registry, result, settings);
 
     if (result.prefabUUID.IsValid())
         AssetManager::Get().Unload(result.prefabUUID);
@@ -849,11 +843,23 @@ void ModelImporter::ExtractMaterials(
         AssetUUID matUUID = assignedMatUUIDs[i];
 
         AssetMeta meta = registry.GetOrCreateMeta(matFilePath);
-        meta.uuid = matUUID;
+        if (meta.uuid.IsValid())
+            matUUID = meta.uuid;
+        else
+            meta.uuid = matUUID;
+
         meta.importerID = "MaterialLoader";
         registry.SaveMeta(matFilePath, meta);
 
-        auto asset = CreateRef<MaterialAsset>(meta.uuid);
+        result.materialUUIDs[i] = matUUID;
+
+        if (std::filesystem::exists(matFilePath))
+        {
+            AssetManager::Get().Unload(matUUID);
+            continue;
+        }
+
+        auto asset = CreateRef<MaterialAsset>(matUUID);
         ai_real value;
 
         // Albedo
@@ -1145,34 +1151,11 @@ void ModelImporter::ExtractMaterials(
         result.materialUUIDs[i] = meta.uuid;
     }
 
-    // Unload and clean up any unused materials
+    // Unload any unused materials
     for (const auto& sub : parentMeta.subAssets)
     {
         if (sub.type == "Material" && !claimedMatUUIDs.contains(sub.uuid))
         {
-            std::filesystem::path matPath;
-            if (registry.Exists(sub.uuid))
-                matPath = registry.GetPath(sub.uuid);
-            if (matPath.empty() || !std::filesystem::exists(matPath))
-            {
-                auto candidate = modelPath.parent_path() / (modelPath.stem().string() + "_" + sub.name + ".rmat");
-                if (std::filesystem::exists(candidate))
-                    matPath = candidate;
-                else
-                {
-                    candidate = modelPath.parent_path() / (sub.name + ".rmat");
-                    if (std::filesystem::exists(candidate))
-                        matPath = candidate;
-                }
-            }
-            if (!matPath.empty() && std::filesystem::exists(matPath))
-            {
-                std::error_code ec;
-                std::filesystem::remove(matPath, ec);
-                auto metaPath = std::filesystem::path(matPath.string() + ".rmeta");
-                if (std::filesystem::exists(metaPath))
-                    std::filesystem::remove(metaPath, ec);
-            }
             AssetManager::Get().Unload(sub.uuid);
         }
     }

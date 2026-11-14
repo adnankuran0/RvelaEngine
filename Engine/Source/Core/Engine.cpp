@@ -49,7 +49,7 @@ Engine::Engine(const WindowData& windowData)
 	Selection = SelectionManager(m_RenderLayer);
 }
 
-bool Engine::OpenProject(const std::string& projectFilePath)
+bool Engine::LoadProject(const std::string& projectFilePath)
 {
 	if (!m_ProjectManager.LoadProject(projectFilePath))
 	{
@@ -69,49 +69,46 @@ bool Engine::OpenProject(const std::string& projectFilePath)
 		m_AssetRegistry.Scan(ProjectManager::GetAssetDirectory());
 	}
 
+	return true;
+}
+
+bool Engine::LoadStartScene()
+{
 	auto activeProj = m_ProjectManager.GetActiveProject();
-	if (activeProj)
+	if (!activeProj)
+		return false;
+
+	const auto& settings = activeProj->GetSettings();
+	std::string activeSceneName = "EmptyScene";
+
+	if (!settings.startScene.empty())
 	{
-		const auto& settings = activeProj->GetSettings();
-		std::string activeSceneName = "EmptyScene";
-
-		if (!settings.startScene.empty())
+		bool sceneFound = false;
+		std::filesystem::path scenePath;
+		if (VFS::Get().IsMounted())
 		{
-			bool sceneFound = false;
-			std::filesystem::path scenePath;
-			if (VFS::Get().IsMounted())
+			if (VFS::Get().FileExists(settings.startScene))
 			{
-				if (VFS::Get().FileExists(settings.startScene))
-				{
-					scenePath = settings.startScene;
-					sceneFound = true;
-				}
-				else if (VFS::Get().FileExists("Assets/" + settings.startScene))
-				{
-					scenePath = "Assets/" + settings.startScene;
-					sceneFound = true;
-				}
+				scenePath = settings.startScene;
+				sceneFound = true;
 			}
-			if (!sceneFound)
+			else if (VFS::Get().FileExists("Assets/" + settings.startScene))
 			{
-				scenePath = ProjectManager::GetProjectPath() / settings.startScene;
-				sceneFound = std::filesystem::exists(scenePath);
+				scenePath = "Assets/" + settings.startScene;
+				sceneFound = true;
 			}
+		}
+		if (!sceneFound)
+		{
+			scenePath = ProjectManager::GetProjectPath() / settings.startScene;
+			sceneFound = std::filesystem::exists(scenePath);
+		}
 
-			if (sceneFound)
-			{
-				m_SceneManager.LoadScene(scenePath.string());
-				m_SceneManager.Update(); // Immediately apply pending scene load
-				activeSceneName = scenePath.stem().string();
-			}
-			else
-			{
-				auto emptyScene = m_SceneManager.CreateScene("EmptyScene");
-				Path defaultHdr = ENGINE_PATH("Textures/skybox/environment.hdr");
-				if (defaultHdr.Exists())
-					emptyScene->GetEnvironment().GetSkybox().InitHDR(defaultHdr);
-				m_SceneManager.SetActiveScene(std::move(emptyScene));
-			}
+		if (sceneFound)
+		{
+			m_SceneManager.LoadScene(scenePath.string());
+			m_SceneManager.Update(); // Immediately apply pending scene load
+			activeSceneName = scenePath.stem().string();
 		}
 		else
 		{
@@ -121,15 +118,31 @@ bool Engine::OpenProject(const std::string& projectFilePath)
 				emptyScene->GetEnvironment().GetSkybox().InitHDR(defaultHdr);
 			m_SceneManager.SetActiveScene(std::move(emptyScene));
 		}
-
-		std::string title = "Rvela Engine - [" + activeProj->name + "] - " + activeSceneName;
-		m_Window.SetTitle(title);
-
-		m_Window.SetVSync(settings.vsync);
-		Time::SetMaxFPS(settings.maxFPS);
+	}
+	else
+	{
+		auto emptyScene = m_SceneManager.CreateScene("EmptyScene");
+		Path defaultHdr = ENGINE_PATH("Textures/skybox/environment.hdr");
+		if (defaultHdr.Exists())
+			emptyScene->GetEnvironment().GetSkybox().InitHDR(defaultHdr);
+		m_SceneManager.SetActiveScene(std::move(emptyScene));
 	}
 
+	std::string title = "Rvela Engine - [" + activeProj->name + "] - " + activeSceneName;
+	m_Window.SetTitle(title);
+
+	m_Window.SetVSync(settings.vsync);
+	Time::SetMaxFPS(settings.maxFPS);
+
 	return true;
+}
+
+bool Engine::OpenProject(const std::string& projectFilePath)
+{
+	if (!LoadProject(projectFilePath))
+		return false;
+
+	return LoadStartScene();
 }
 
 Engine::~Engine()

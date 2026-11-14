@@ -45,6 +45,8 @@ public:
     EditorCamera& GetEditorCamera() { return m_EditorCamera; }
     void ResetLayout();
 
+    bool OpenProject(const std::string& projectFilePath);
+
 
 private:
     void UpdateWindowMode();

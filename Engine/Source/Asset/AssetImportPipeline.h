@@ -16,7 +16,7 @@ public:
     void ReimportAll(AssetRegistry& db);
     void Reimport(const std::filesystem::path& sourcePath, AssetRegistry& registry);
     bool NeedsReimport(const std::filesystem::path& sourcePath, const AssetMeta& meta) const;
-    bool CheckAndReimportModifiedAssets(AssetRegistry& registry);
+    bool CheckAndReimportModifiedAssets(AssetRegistry& registry, bool forceCheck = false);
 
 private:
     IAssetImporter* FindImporter(const std::string& ext) const;

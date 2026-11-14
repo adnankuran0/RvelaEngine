@@ -460,11 +460,18 @@ void RenderLayer::CollectRenderCommands(Scene* scene)
 			MeshRendererComponent& meshRendererComp = scene->GetComponent<MeshRendererComponent>(batch.entity);
 			MaterialComponent& matComp = scene->GetComponent<MaterialComponent>(batch.entity);
 
-			if (meshComp.IsDirty())
+			auto mesh = meshComp.GetMesh();
+			if (!mesh || !mesh->IsValid())
+				continue;
+
+			if (meshComp.IsDirty() || meshRendererComp.indexCount == 0)
 			{
-				scene->GetComponent<MeshRendererComponent>(batch.entity).RecreateFromMesh(meshComp.GetMesh());
+				meshRendererComp.RecreateFromMesh(mesh);
 				meshComp.SetDirty(false);
 			}
+
+			if (meshRendererComp.indexCount == 0 || !meshRendererComp.gpuMesh)
+				continue;
 
 			ParticleRenderCommand cmd;
 			cmd.mesh = &meshRendererComp;
@@ -473,7 +480,7 @@ void RenderLayer::CollectRenderCommands(Scene* scene)
 			cmd.instanceCount = batch.instanceCount;
 			cmd.localCoords = batch.localCoords;
 			cmd.worldPosition = batch.worldPosition;
-			cmd.indexCount = meshComp.GetMesh()->GetIndexCount();
+			cmd.indexCount = meshRendererComp.indexCount;
 			cmd.distanceToCamera = glm::length2(camPos - batch.worldPosition);
 
 			m_RenderPipeline->m_RenderFrame.particleCommands.push_back(cmd);

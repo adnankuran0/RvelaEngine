@@ -98,6 +98,7 @@
         "showStatistics": true,
         "snapRotate": 15.0,
         "snapScale": 0.5,
-        "snapTranslate": 1.0
+        "snapTranslate": 1.0,
+        "snapTranslateUI": 10.0
     }
 }

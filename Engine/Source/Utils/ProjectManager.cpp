@@ -47,6 +47,13 @@ bool ProjectManager::CreateProject(const std::string& name, const std::string& p
 			std::filesystem::copy_options::recursive | std::filesystem::copy_options::skip_existing, ec);
 	}
 
+	std::filesystem::path templateGitignore = EDITOR_PATH("TemplateProject/.gitignore").GetAbsolute();
+	if (std::filesystem::exists(templateGitignore))
+	{
+		std::filesystem::copy_file(templateGitignore, projectRoot / ".gitignore",
+			std::filesystem::copy_options::skip_existing, ec);
+	}
+
 	auto project = std::make_shared<Project>(name, projectRoot.string());
 	ProjectSettings settings;
 	settings.name = name;
