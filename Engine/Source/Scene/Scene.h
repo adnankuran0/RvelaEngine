@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <entt/entt.h>
 #include "Math/RvelaMath.h"
 #include "Utils/ISerializable.h"
@@ -51,6 +52,11 @@ public:
             return;
         m_IsDirty = dirty;
     }
+
+    uint64_t GetInstanceId() const noexcept { return m_SceneInstanceId; }
+    uint32_t BakeStaticShadows();
+    uint32_t BakeAllReflectionProbes();
+    void BakeEnvironment();
 
     void OnStart();
     void InstantiateAutoloads();
@@ -204,6 +210,9 @@ private:
     NavigationSystem m_NavigationSystem;
 
     Environment m_Environment;
+
+    static inline std::atomic<uint64_t> s_NextSceneInstanceId{ 1 };
+    uint64_t m_SceneInstanceId = s_NextSceneInstanceId++;
 };
 
 }

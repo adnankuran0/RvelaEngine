@@ -75,6 +75,7 @@ private:
     std::array<CachedSpotShadowState, MaxSpotLights> m_CachedSpotShadows{};
     CachedDirectionalShadowState m_CachedDirectionalShadow{};
     const void* m_LastScene = nullptr;
+    uint64_t m_LastSceneInstanceId = 0;
 };
 
 }

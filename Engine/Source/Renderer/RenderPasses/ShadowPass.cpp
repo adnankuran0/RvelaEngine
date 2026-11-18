@@ -8,6 +8,7 @@
 #include "Utils/ProjectManager.h"
 #include "Core/Time.h"
 #include "Asset/Types/ShaderAsset.h"
+#include "Scene/Scene.h"
 
 using namespace rv;
 
@@ -1449,10 +1450,12 @@ void ShadowPass::RecreateDirectionalShadowMap(uint32_t resolution, RenderFrame& 
 
 void ShadowPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
-    if (ctx.scene != m_LastScene)
+    uint64_t sceneId = ctx.scene ? ctx.scene->GetInstanceId() : 0;
+    if (ctx.scene != m_LastScene || sceneId != m_LastSceneInstanceId)
     {
         InvalidateCache();
         m_LastScene = ctx.scene;
+        m_LastSceneInstanceId = sceneId;
     }
 
     if (ProjectManager::IsProjectLoaded())

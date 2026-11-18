@@ -161,15 +161,8 @@ void EnvironmentPanel::Draw(Engine* engine)
 
         if (ImGui::Button(bakeProbesLabel.c_str(), ImVec2(-FLT_MIN, 26.0f)))
         {
-            for (auto e : probeView)
-            {
-                if (scene.IsEntityActive(e))
-                {
-                    reg.get<ReflectionProbeComponent>(e).isDirty = true;
-                }
-            }
-            ReflectionProbeManager::Get().BakeAllDirtyProbes(scene);
-            LOG_INFO("Rebaked all active reflection probes ({})", activeProbeCount);
+            uint32_t baked = EditorUtils::BakeAllReflectionProbes(scene);
+            LOG_INFO("Rebaked all active reflection probes ({})", baked);
         }
 
         if (activeProbeCount == 0)

@@ -92,6 +92,7 @@ private:
 
     SceneState m_PrevSceneState = SceneState::EDIT;
     std::string m_CurrentScenePath;
+    uint64_t m_LastActiveSceneInstanceId = 0;
 
     struct SavedPlayCameraState
     {

@@ -130,7 +130,7 @@ PakBuildResult PakWriter::BuildPak(const PakBuildOptions& options)
     }
 
     static const std::unordered_set<std::string> s_RawModelExtensions = {
-        ".fbx", ".obj", ".gltf", ".glb", ".blend", ".dae", ".3ds", ".stl", ".ply"
+        ".fbx", ".obj", ".gltf", ".glb", ".blend", ".dae", ".3ds", ".stl", ".ply", ".bin"
     };
 
     static const std::unordered_set<std::string> s_RawTextureExtensions = {
@@ -167,6 +167,19 @@ PakBuildResult PakWriter::BuildPak(const PakBuildOptions& options)
             auto relPath = std::filesystem::relative(entry.path(), options.projectPath, ec);
             std::string archivePath = SafePathToString(relPath);
             std::replace(archivePath.begin(), archivePath.end(), '\\', '/');
+
+            std::string archivePathLower = archivePath;
+            std::transform(archivePathLower.begin(), archivePathLower.end(), archivePathLower.begin(), [](unsigned char c) {
+                return static_cast<char>(std::tolower(c));
+            });
+
+            if (archivePathLower.find("/scripts/api/") != std::string::npos ||
+                archivePathLower.starts_with("assets/scripts/api/") ||
+                archivePathLower.find("/scripts/.vscode/") != std::string::npos ||
+                archivePathLower.starts_with("assets/scripts/.vscode/"))
+            {
+                continue;
+            }
 
             uint32_t compLevel = ShouldStoreUncompressed(extLower)
                 ? MZ_NO_COMPRESSION

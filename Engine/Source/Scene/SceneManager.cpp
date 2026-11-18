@@ -215,6 +215,10 @@ void SceneManager::StopScene()
             m_SceneSerializer.DeserializeScene(*restoredScene, m_SceneSnapshot);
             restoredScene->SetDirty(m_SnapshotIsDirty);
             SetActiveScene(std::move(restoredScene));
+            if (m_CurrentScene)
+            {
+                m_CurrentScene->GetTransformSystem().Update();
+            }
 
             m_HasSnapshot = false;
             m_SceneSnapshot.clear();
@@ -642,6 +646,10 @@ void SceneManager::ActivateSceneInternal(std::unique_ptr<Scene> scenePtr)
     }
 
     SetActiveScene(std::move(scenePtr));
+    if (m_CurrentScene)
+    {
+        m_CurrentScene->GetTransformSystem().Update();
+    }
     AssetManager::Get().UnloadUnusedAssets();
     if (previousState == SceneState::PLAY)
     {

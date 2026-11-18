@@ -145,7 +145,13 @@ void EditorLayer::OnDetach()
 
 void EditorLayer::OnUpdate()
 {
-    SceneState currentSceneState = m_Engine->GetActiveScene().GetState();
+    auto& activeScene = m_Engine->GetActiveScene();
+    SceneState currentSceneState = activeScene.GetState();
+    uint64_t currentSceneInstanceId = activeScene.GetInstanceId();
+
+    bool sceneChanged = (currentSceneInstanceId != m_LastActiveSceneInstanceId);
+    bool stoppedPlay = (m_PrevSceneState != SceneState::EDIT && currentSceneState == SceneState::EDIT);
+
     if (m_PrevSceneState == SceneState::EDIT && currentSceneState == SceneState::PLAY)
     {
         m_PlayModeSavedCamera.position = m_EditorCamera.Position;
@@ -159,7 +165,7 @@ void EditorLayer::OnUpdate()
         m_PlayModeSavedCamera.right = m_EditorCamera.Right;
         m_HasPlayModeSavedCamera = true;
     }
-    else if (m_PrevSceneState != SceneState::EDIT && currentSceneState == SceneState::EDIT)
+    else if (stoppedPlay)
     {
         if (m_HasPlayModeSavedCamera)
         {
@@ -178,12 +184,21 @@ void EditorLayer::OnUpdate()
         }
     }
     m_PrevSceneState = currentSceneState;
+    m_LastActiveSceneInstanceId = currentSceneInstanceId;
+
+    if (ProjectManager::IsProjectLoaded() && currentSceneState == SceneState::EDIT && !activeScene.isLoading)
+    {
+        if (sceneChanged || stoppedPlay)
+        {
+            EditorUtils::BakeAllEnvironment(activeScene);
+        }
+    }
 
     if (currentSceneState == SceneState::EDIT)
     {
         m_EditorCamera.Update(m_EditorCameraNavigation);
 
-        std::string currentScenePath = m_Engine->GetActiveScene().GetPath();
+        std::string currentScenePath = activeScene.GetPath();
         if (currentScenePath != m_CurrentScenePath)
         {
             if (!m_CurrentScenePath.empty())

@@ -1159,40 +1159,17 @@ Entity EditorUtils::LoadPrimitive(Scene& scene, const std::string& primitiveMesh
 
 uint32_t EditorUtils::BakeStaticShadows(Scene& scene)
 {
-    uint32_t count = 0;
-    auto& reg = scene.GetRegistry();
+    return scene.BakeStaticShadows();
+}
 
-    for (auto e : reg.view<DirectionalLightComponent>())
-    {
-        auto& l = reg.get<DirectionalLightComponent>(e);
-        if (l.castShadows && l.staticShadow)
-        {
-            l.shadowDirty = true;
-            count++;
-        }
-    }
+uint32_t EditorUtils::BakeAllReflectionProbes(Scene& scene)
+{
+    return scene.BakeAllReflectionProbes();
+}
 
-    for (auto e : reg.view<PointLightComponent>())
-    {
-        auto& l = reg.get<PointLightComponent>(e);
-        if (l.castShadows && l.staticShadow)
-        {
-            l.shadowDirty = true;
-            count++;
-        }
-    }
-
-    for (auto e : reg.view<SpotLightComponent>())
-    {
-        auto& l = reg.get<SpotLightComponent>(e);
-        if (l.castShadows && l.staticShadow)
-        {
-            l.shadowDirty = true;
-            count++;
-        }
-    }
-
-    return count;
+void EditorUtils::BakeAllEnvironment(Scene& scene)
+{
+    scene.BakeEnvironment();
 }
 
 uint32_t EditorUtils::GetStaticShadowLightCount(Scene& scene)

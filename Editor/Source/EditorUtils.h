@@ -31,6 +31,8 @@ public:
 
 	static uint32_t BakeStaticShadows(Scene& scene);
 	static uint32_t GetStaticShadowLightCount(Scene& scene);
+	static uint32_t BakeAllReflectionProbes(Scene& scene);
+	static void BakeAllEnvironment(Scene& scene);
 
 	struct MeshAssetInfo
 	{

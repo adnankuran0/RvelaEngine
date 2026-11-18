@@ -14,6 +14,7 @@
 #include <glm/gtx/matrix_decompose.hpp>
 #include "Renderer/RenderLayer.h"
 #include "Renderer/ReflectionProbeManager.h"
+#include "Components.h"
 #include "Components/AutoloadComponent.h"
 #include "Components/ScriptComponent.h"
 #include "Input/Input.h"
@@ -170,7 +171,7 @@ void Scene::OnStart()
         Engine::Get()->GetSceneManager().RestoreAutoloadStates(*this);
     }
     m_TransformSystem.Update();
-    ReflectionProbeManager::Get().BakeAllDirtyProbes(*this);
+    BakeEnvironment();
     m_PhysicsSystem.OnStart();
     m_ScriptSystem.OnStart();
     m_AudioSystem.OnStart();
@@ -724,4 +725,77 @@ Entity Scene::DuplicateEntity(entt::entity entityHandle)
 Entity Scene::DuplicateEntity(Entity entity)
 {
     return DuplicateEntity(entity.GetHandle());
+}
+
+uint32_t Scene::BakeAllReflectionProbes()
+{
+    m_TransformSystem.Update();
+    auto probeView = m_Registry.view<TransformComponent, ReflectionProbeComponent>();
+    uint32_t activeProbeCount = 0;
+    for (auto e : probeView)
+    {
+        if (IsEntityActive(e))
+        {
+            m_Registry.get<ReflectionProbeComponent>(e).isDirty = true;
+            activeProbeCount++;
+        }
+    }
+
+    if (activeProbeCount > 0)
+    {
+        ReflectionProbeManager::Get().BakeAllDirtyProbes(*this);
+        LOG_INFO("[Scene] Baked all active reflection probes ({})", activeProbeCount);
+    }
+    return activeProbeCount;
+}
+
+uint32_t Scene::BakeStaticShadows()
+{
+    m_TransformSystem.Update();
+    uint32_t count = 0;
+
+    for (auto e : m_Registry.view<DirectionalLightComponent>())
+    {
+        auto& l = m_Registry.get<DirectionalLightComponent>(e);
+        if (l.castShadows && l.staticShadow)
+        {
+            l.shadowDirty = true;
+            l.hasBakedShadow = false;
+            count++;
+        }
+    }
+
+    for (auto e : m_Registry.view<PointLightComponent>())
+    {
+        auto& l = m_Registry.get<PointLightComponent>(e);
+        if (l.castShadows && l.staticShadow)
+        {
+            l.shadowDirty = true;
+            count++;
+        }
+    }
+
+    for (auto e : m_Registry.view<SpotLightComponent>())
+    {
+        auto& l = m_Registry.get<SpotLightComponent>(e);
+        if (l.castShadows && l.staticShadow)
+        {
+            l.shadowDirty = true;
+            count++;
+        }
+    }
+
+    if (count > 0)
+    {
+        LOG_INFO("[Scene] Baked static shadows for {} lights", count);
+    }
+
+    return count;
+}
+
+void Scene::BakeEnvironment()
+{
+    m_TransformSystem.Update();
+    BakeStaticShadows();
+    BakeAllReflectionProbes();
 }
