@@ -329,90 +329,155 @@ void ProjectSettingsPanel::Draw(Engine* engine)
             }
         }
 
-        ImGui::Spacing();
-        ImGui::Separator();
-        ImGui::TextColored(GetAccentColor(), "Rendering & Quality");
-        ImGui::Spacing();
-
-        const char* msaaOptions[] = { "Off (1x)", "2x MSAA", "4x MSAA", "8x MSAA" };
-        int currentMsaa = 0;
-        if (settings.msaaSamples == 2) currentMsaa = 1;
-        else if (settings.msaaSamples == 4) currentMsaa = 2;
-        else if (settings.msaaSamples == 8) currentMsaa = 3;
-
-        if (ImGui::Combo("MSAA", &currentMsaa, msaaOptions, IM_ARRAYSIZE(msaaOptions)))
-        {
-            if (currentMsaa == 0) settings.msaaSamples = 1;
-            else if (currentMsaa == 1) settings.msaaSamples = 2;
-            else if (currentMsaa == 2) settings.msaaSamples = 4;
-            else if (currentMsaa == 3) settings.msaaSamples = 8;
-        }
-
-        ImGui::Checkbox("FXAA", &settings.fxaaEnabled);
-
-        const char* shadowResOptions[] = { "Low (1024x1024)", "Medium (2048x2048)", "High (4096x4096)" };
-        int currentShadow = 1;
-        if (settings.shadowResolution == 1024) currentShadow = 0;
-        else if (settings.shadowResolution == 4096) currentShadow = 2;
-
-        if (ImGui::Combo("Shadow Resolution", &currentShadow, shadowResOptions, IM_ARRAYSIZE(shadowResOptions)))
-        {
-            if (currentShadow == 0) settings.shadowResolution = 1024;
-            else if (currentShadow == 1) settings.shadowResolution = 2048;
-            else if (currentShadow == 2) settings.shadowResolution = 4096;
-            ProjectManager::SaveActiveProject();
-        }
-
-        ImGui::Spacing();
-        ImGui::Separator();
-        ImGui::TextColored(GetAccentColor(), "Textures & Sampling");
-        ImGui::Spacing();
-
-        const char* defaultFilters[] = {
-            "Nearest",
-            "Linear",
-            "Nearest Mipmap",
-            "Linear Mipmap"
-        };
-        int currentDefFilter = static_cast<int>(settings.defaultTextureFilter) - 1;
-        if (currentDefFilter < 0 || currentDefFilter >= 4) currentDefFilter = 3;
-        if (ImGui::Combo("Default Texture Filter", &currentDefFilter, defaultFilters, IM_ARRAYSIZE(defaultFilters)))
-        {
-            settings.defaultTextureFilter = static_cast<TextureFilter>(currentDefFilter + 1);
-            ProjectManager::SaveActiveProject();
-        }
-
-        const char* defaultWraps[] = {
-            "Repeat",
-            "Mirror Repeat",
-            "Clamp to Edge",
-            "Clamp to Border",
-            "Mirror Clamp to Edge"
-        };
-        int currentDefWrap = static_cast<int>(settings.defaultTextureWrap) - 1;
-        if (currentDefWrap < 0 || currentDefWrap >= 5) currentDefWrap = 0;
-        if (ImGui::Combo("Default Texture Repeat", &currentDefWrap, defaultWraps, IM_ARRAYSIZE(defaultWraps)))
-        {
-            settings.defaultTextureWrap = static_cast<TextureWrap>(currentDefWrap + 1);
-            ProjectManager::SaveActiveProject();
-        }
-
-        const char* defaultAnisoLevels[] = {
-            "Disabled",
-            "2x",
-            "4x",
-            "8x",
-            "16x"
-        };
-        int currentDefAniso = static_cast<int>(settings.defaultAnisotropy) - 1;
-        if (currentDefAniso < 0 || currentDefAniso >= 5) currentDefAniso = 3;
-        if (ImGui::Combo("Default Anisotropy", &currentDefAniso, defaultAnisoLevels, IM_ARRAYSIZE(defaultAnisoLevels)))
-        {
-            settings.defaultAnisotropy = static_cast<TextureAnisotropy>(currentDefAniso + 1);
-            ProjectManager::SaveActiveProject();
-        }
-
         ImGui::EndTabItem();
+        }
+
+        if (ImGui::BeginTabItem("Rendering"))
+        {
+            ImGui::Spacing();
+            ImGui::TextColored(GetAccentColor(), "Shadow Quality");
+            ImGui::Separator();
+            ImGui::Spacing();
+
+            const char* dirShadowResOptions[] = { "Low (1024x1024)", "Medium (2048x2048)", "High (4096x4096)" };
+            int currentDirShadow = 1;
+            if (settings.shadowResolution == 1024) currentDirShadow = 0;
+            else if (settings.shadowResolution == 4096) currentDirShadow = 2;
+
+            if (ImGui::Combo("Directional Shadow Resolution", &currentDirShadow, dirShadowResOptions, IM_ARRAYSIZE(dirShadowResOptions)))
+            {
+                if (currentDirShadow == 0) settings.shadowResolution = 1024;
+                else if (currentDirShadow == 1) settings.shadowResolution = 2048;
+                else if (currentDirShadow == 2) settings.shadowResolution = 4096;
+                ProjectManager::SaveActiveProject();
+            }
+
+            const char* pointShadowResOptions[] = { "Low (256x256)", "Medium (512x512)", "High (1024x1024)", "Ultra (2048x2048)" };
+            int currentPointShadow = 1;
+            if (settings.pointShadowResolution == 256) currentPointShadow = 0;
+            else if (settings.pointShadowResolution == 512) currentPointShadow = 1;
+            else if (settings.pointShadowResolution == 1024) currentPointShadow = 2;
+            else if (settings.pointShadowResolution == 2048) currentPointShadow = 3;
+
+            if (ImGui::Combo("Point Light Shadow Resolution", &currentPointShadow, pointShadowResOptions, IM_ARRAYSIZE(pointShadowResOptions)))
+            {
+                if (currentPointShadow == 0) settings.pointShadowResolution = 256;
+                else if (currentPointShadow == 1) settings.pointShadowResolution = 512;
+                else if (currentPointShadow == 2) settings.pointShadowResolution = 1024;
+                else if (currentPointShadow == 3) settings.pointShadowResolution = 2048;
+                ProjectManager::SaveActiveProject();
+            }
+
+            const char* spotShadowResOptions[] = { "Low (512x512)", "Medium (1024x1024)", "High (2048x2048)", "Ultra (4096x4096)" };
+            int currentSpotShadow = 1;
+            if (settings.spotShadowResolution == 512) currentSpotShadow = 0;
+            else if (settings.spotShadowResolution == 1024) currentSpotShadow = 1;
+            else if (settings.spotShadowResolution == 2048) currentSpotShadow = 2;
+            else if (settings.spotShadowResolution == 4096) currentSpotShadow = 3;
+
+            if (ImGui::Combo("Spot Light Shadow Resolution", &currentSpotShadow, spotShadowResOptions, IM_ARRAYSIZE(spotShadowResOptions)))
+            {
+                if (currentSpotShadow == 0) settings.spotShadowResolution = 512;
+                else if (currentSpotShadow == 1) settings.spotShadowResolution = 1024;
+                else if (currentSpotShadow == 2) settings.spotShadowResolution = 2048;
+                else if (currentSpotShadow == 3) settings.spotShadowResolution = 4096;
+                ProjectManager::SaveActiveProject();
+            }
+
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::TextColored(GetAccentColor(), "Screen-Space Effects Quality");
+            ImGui::Spacing();
+
+            if (ImGui::CollapsingHeader("Ambient Occlusion (SSAO)", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                ImGui::Checkbox("Half Resolution##SSAO", &settings.ssaoHalfResolution);
+                ImGui::SliderInt("Slice Count##SSAO", &settings.ssaoSliceCount, 1, 6);
+                ImGui::SliderInt("Step Count##SSAO", &settings.ssaoStepCount, 1, 8);
+            }
+
+            if (ImGui::CollapsingHeader("Contact Shadows", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                ImGui::Checkbox("Half Resolution##ContactShadows", &settings.contactShadowsHalfResolution);
+                ImGui::SliderInt("Ray Steps##ContactShadows", &settings.contactShadowsSteps, 4, 64);
+            }
+
+            if (ImGui::CollapsingHeader("Screen-Space Reflections (SSR)", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                ImGui::Checkbox("Half Resolution##SSR", &settings.ssrHalfResolution);
+                ImGui::SliderInt("Max Ray Steps##SSR", &settings.ssrMaxSteps, 8, 128);
+            }
+
+            if (ImGui::CollapsingHeader("Screen-Space Global Illumination (SSGI)", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                ImGui::Checkbox("Half Resolution##SSGI", &settings.ssgiHalfResolution);
+                ImGui::SliderInt("Ray Steps##SSGI", &settings.ssgiSteps, 4, 64);
+            }
+
+            if (ImGui::CollapsingHeader("Volumetric Fog", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                ImGui::Checkbox("Half Resolution##VolumetricFog", &settings.volumetricFogHalfResolution);
+                ImGui::SliderInt("Raymarch Steps##VolumetricFog", &settings.volumetricFogSteps, 8, 128);
+            }
+
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::TextColored(GetAccentColor(), "Post-Processing & Anti-Aliasing");
+            ImGui::Spacing();
+
+            ImGui::Checkbox("FXAA", &settings.fxaaEnabled);
+            ImGui::SliderInt("Motion Blur Samples", &settings.motionBlurSamples, 4, 32);
+
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::TextColored(GetAccentColor(), "Textures & Sampling");
+            ImGui::Spacing();
+
+            const char* defaultFilters[] = {
+                "Nearest",
+                "Linear",
+                "Nearest Mipmap",
+                "Linear Mipmap"
+            };
+            int currentDefFilter = static_cast<int>(settings.defaultTextureFilter) - 1;
+            if (currentDefFilter < 0 || currentDefFilter >= 4) currentDefFilter = 3;
+            if (ImGui::Combo("Default Texture Filter", &currentDefFilter, defaultFilters, IM_ARRAYSIZE(defaultFilters)))
+            {
+                settings.defaultTextureFilter = static_cast<TextureFilter>(currentDefFilter + 1);
+                ProjectManager::SaveActiveProject();
+            }
+
+            const char* defaultWraps[] = {
+                "Repeat",
+                "Mirror Repeat",
+                "Clamp to Edge",
+                "Clamp to Border",
+                "Mirror Clamp to Edge"
+            };
+            int currentDefWrap = static_cast<int>(settings.defaultTextureWrap) - 1;
+            if (currentDefWrap < 0 || currentDefWrap >= 5) currentDefWrap = 0;
+            if (ImGui::Combo("Default Texture Repeat", &currentDefWrap, defaultWraps, IM_ARRAYSIZE(defaultWraps)))
+            {
+                settings.defaultTextureWrap = static_cast<TextureWrap>(currentDefWrap + 1);
+                ProjectManager::SaveActiveProject();
+            }
+
+            const char* defaultAnisoLevels[] = {
+                "Disabled",
+                "2x",
+                "4x",
+                "8x",
+                "16x"
+            };
+            int currentDefAniso = static_cast<int>(settings.defaultAnisotropy) - 1;
+            if (currentDefAniso < 0 || currentDefAniso >= 5) currentDefAniso = 3;
+            if (ImGui::Combo("Default Anisotropy", &currentDefAniso, defaultAnisoLevels, IM_ARRAYSIZE(defaultAnisoLevels)))
+            {
+                settings.defaultAnisotropy = static_cast<TextureAnisotropy>(currentDefAniso + 1);
+                ProjectManager::SaveActiveProject();
+            }
+
+            ImGui::EndTabItem();
         }
 
         if (ImGui::BeginTabItem("Globals"))
@@ -578,11 +643,57 @@ void ProjectSettingsPanel::Draw(Engine* engine)
             ImGui::EndTabItem();
         }
 
-        if (ImGui::BeginTabItem("Physics Layers"))
+        if (ImGui::BeginTabItem("Physics"))
         {
             ImGui::Spacing();
-            ImGui::TextColored(GetAccentColor(), "Physics 3D Layer Names");
+            ImGui::TextColored(GetAccentColor(), "General Physics");
             ImGui::Separator();
+            ImGui::Spacing();
+
+            float grav[3] = { settings.physicsGravity.x, settings.physicsGravity.y, settings.physicsGravity.z };
+            if (ImGui::DragFloat3("Gravity (m/s^2)", grav, 0.1f, -100.0f, 100.0f, "%.2f"))
+            {
+                settings.physicsGravity = glm::vec3(grav[0], grav[1], grav[2]);
+            }
+
+            if (ImGui::SliderInt("Physics Tick Rate", &settings.physicsTicksPerSecond, 15, 240, "%d Hz"))
+            {
+                settings.physicsTicksPerSecond = std::clamp(settings.physicsTicksPerSecond, 15, 240);
+                Time::SetFixedDeltaTime(1.0f / static_cast<float>(settings.physicsTicksPerSecond));
+            }
+            ImGui::SameLine();
+            ImGui::TextDisabled("(%.2f ms / %.4f s)", (1000.0f / static_cast<float>(std::max(1, settings.physicsTicksPerSecond))), (1.0f / static_cast<float>(std::max(1, settings.physicsTicksPerSecond))));
+
+            ImGui::SliderInt("Sub-steps", &settings.physicsSubSteps, 1, 16);
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("Number of sub-steps per physics tick for more accurate collision resolution.");
+
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::TextColored(GetAccentColor(), "Simulation Limits");
+            ImGui::Spacing();
+
+            int maxBodies = static_cast<int>(settings.physicsMaxBodies);
+            if (ImGui::DragInt("Max Bodies", &maxBodies, 64, 256, 65536))
+            {
+                settings.physicsMaxBodies = static_cast<uint32_t>(std::max(64, maxBodies));
+            }
+
+            int maxPairs = static_cast<int>(settings.physicsMaxBodyPairs);
+            if (ImGui::DragInt("Max Body Pairs", &maxPairs, 64, 256, 65536))
+            {
+                settings.physicsMaxBodyPairs = static_cast<uint32_t>(std::max(64, maxPairs));
+            }
+
+            int maxContacts = static_cast<int>(settings.physicsMaxContactConstraints);
+            if (ImGui::DragInt("Max Contact Constraints", &maxContacts, 64, 256, 65536))
+            {
+                settings.physicsMaxContactConstraints = static_cast<uint32_t>(std::max(64, maxContacts));
+            }
+
+            ImGui::Spacing();
+            ImGui::Separator();
+            ImGui::TextColored(GetAccentColor(), "Physics 3D Layer Names");
             ImGui::Spacing();
 
             ImGui::Columns(2, "LayerColumns", false);

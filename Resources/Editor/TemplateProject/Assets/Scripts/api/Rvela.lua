@@ -506,6 +506,10 @@ function Time.GetDeltaTime() end
 ---@return number
 function Time.GetFixedDeltaTime() end
 
+---Sets the fixed delta time in seconds used for physics updates.
+---@param fixedDt number
+function Time.SetFixedDeltaTime(fixedDt) end
+
 ---Returns the current time scale factor.
 ---@return number
 function Time.GetTimeScale() end
@@ -635,6 +639,562 @@ function Application.Quit() end
 function Application.Exit() end
 
 _G.Application = Application
+
+
+-------------------------------------------------------------------------------
+-- ENUMS (WINDOW & DISPLAY & TEXTURES)
+-------------------------------------------------------------------------------
+
+---@enum WindowMode
+WindowMode = {
+    Windowed = 0,
+    Minimized = 1,
+    Maximized = 2,
+    Fullscreen = 3,
+}
+_G.WindowMode = WindowMode
+
+---@enum StretchMode
+StretchMode = {
+    Disabled = 0,
+    CanvasItems = 1,
+    Viewport = 2,
+}
+_G.StretchMode = StretchMode
+
+---@enum StretchAspect
+StretchAspect = {
+    Ignore = 0,
+    Keep = 1,
+    KeepWidth = 2,
+    KeepHeight = 3,
+    Expand = 4,
+}
+_G.StretchAspect = StretchAspect
+
+---@enum ScalingFilter
+ScalingFilter = {
+    Linear = 0,
+    Nearest = 1,
+}
+_G.ScalingFilter = ScalingFilter
+
+---@enum TextureFilter
+TextureFilter = {
+    Nearest = 1,
+    Linear = 2,
+    NearestMipmap = 3,
+    LinearMipmap = 4,
+}
+_G.TextureFilter = TextureFilter
+
+---@enum TextureWrap
+TextureWrap = {
+    Repeat = 1,
+    MirrorRepeat = 2,
+    ClampToEdge = 3,
+    ClampToBorder = 4,
+    MirrorClampToEdge = 5,
+}
+_G.TextureWrap = TextureWrap
+
+---@enum TextureAnisotropy
+TextureAnisotropy = {
+    Disabled = 1,
+    Aniso2x = 2,
+    Aniso4x = 3,
+    Aniso8x = 4,
+    Aniso16x = 5,
+}
+_G.TextureAnisotropy = TextureAnisotropy
+
+---@enum CursorShape
+CursorShape = {
+    Arrow = 0,
+    IBeam = 1,
+    Crosshair = 2,
+    Hand = 3,
+    HResize = 4,
+    VResize = 5,
+}
+_G.CursorShape = CursorShape
+
+-------------------------------------------------------------------------------
+-- WINDOW
+-------------------------------------------------------------------------------
+
+---@class Window
+Window = {}
+
+---Sets the window title.
+---@param title string
+function Window.SetTitle(title) end
+
+---Returns the window title.
+---@return string
+function Window.GetTitle() end
+
+---Sets the window resolution in pixels.
+---@param width integer
+---@param height integer
+function Window.SetSize(width, height) end
+
+---Returns the window width in pixels.
+---@return integer
+function Window.GetWidth() end
+
+---Returns the window height in pixels.
+---@return integer
+function Window.GetHeight() end
+
+---Returns the window size as a Vec2.
+---@return Vec2
+function Window.GetSize() end
+
+---Centers the window on the current monitor.
+function Window.Center() end
+
+---Enables or disables vertical synchronization.
+---@param vsync boolean
+function Window.SetVSync(vsync) end
+
+---Returns whether VSync is enabled.
+---@return boolean
+function Window.IsVSync() end
+
+---Sets the window mode.
+---@param mode WindowMode|integer
+function Window.SetWindowMode(mode) end
+
+---Sets the window to fullscreen or windowed mode.
+---@param fullscreen boolean
+function Window.SetFullscreen(fullscreen) end
+
+---Maximizes or restores the window.
+---@param max boolean
+function Window.SetMaximized(max) end
+
+---Returns whether the window is maximized.
+---@return boolean
+function Window.IsMaximized() end
+
+---Sets whether the window is borderless.
+---@param borderless boolean
+function Window.SetBorderless(borderless) end
+
+---Sets whether the window is resizable.
+---@param resizable boolean
+function Window.SetResizable(resizable) end
+
+---Sets the window icon from an image path.
+---@param path string
+---@return boolean success
+function Window.SetIcon(path) end
+
+---Resets the window icon to the default icon.
+function Window.ResetIcon() end
+
+---Sets a custom cursor icon with an optional hotspot offset.
+---@param path string
+---@param hotX? integer
+---@param hotY? integer
+---@return boolean success
+function Window.SetCursorIcon(path, hotX, hotY) end
+
+---Alias for SetCursorIcon.
+---@param path string
+---@param hotX? integer
+---@param hotY? integer
+---@return boolean success
+function Window.SetCustomCursor(path, hotX, hotY) end
+
+---Resets the cursor to the system default cursor.
+function Window.ResetCursor() end
+
+---Sets the cursor to a standard system shape.
+---@param shape CursorShape|integer
+function Window.SetStandardCursor(shape) end
+
+_G.Window = Window
+
+-------------------------------------------------------------------------------
+-- PROJECT SETTINGS
+-------------------------------------------------------------------------------
+
+---@class ProjectSettings
+ProjectSettings = {}
+
+---Returns the project name.
+---@return string
+function ProjectSettings.GetName() end
+
+---Sets the project name.
+---@param name string
+function ProjectSettings.SetName(name) end
+
+---Returns the path of the startup scene.
+---@return string
+function ProjectSettings.GetStartScene() end
+
+---Sets the path of the startup scene.
+---@param scenePath string
+function ProjectSettings.SetStartScene(scenePath) end
+
+---Returns the absolute directory path of the active project.
+---@return string
+function ProjectSettings.GetProjectPath() end
+
+---Returns the absolute directory path of the project's Assets folder.
+---@return string
+function ProjectSettings.GetAssetDirectory() end
+
+---Saves project settings to the project file (.rproj).
+---@return boolean success
+function ProjectSettings.Save() end
+
+---Returns the base viewport width.
+---@return integer
+function ProjectSettings.GetViewportWidth() end
+
+---Returns the base viewport height.
+---@return integer
+function ProjectSettings.GetViewportHeight() end
+
+---Returns the base viewport resolution as a Vec2.
+---@return Vec2
+function ProjectSettings.GetViewportSize() end
+
+---Sets the base viewport resolution.
+---@overload fun(width: integer, height: integer)
+---@overload fun(size: Vec2)
+---@param width integer|Vec2
+---@param height? integer
+function ProjectSettings.SetViewportSize(width, height) end
+
+---Returns the default window width.
+---@return integer
+function ProjectSettings.GetWindowWidth() end
+
+---Returns the default window height.
+---@return integer
+function ProjectSettings.GetWindowHeight() end
+
+---Returns the window size as a Vec2.
+---@return Vec2
+function ProjectSettings.GetWindowSize() end
+
+---Sets the window size and resizes the current window.
+---@overload fun(width: integer, height: integer)
+---@overload fun(size: Vec2)
+---@param width integer|Vec2
+---@param height? integer
+function ProjectSettings.SetWindowSize(width, height) end
+
+---Returns the current window mode.
+---@return WindowMode|integer
+function ProjectSettings.GetWindowMode() end
+
+---Sets the window mode.
+---@param mode WindowMode|integer
+function ProjectSettings.SetWindowMode(mode) end
+
+---Returns whether the window is resizable.
+---@return boolean
+function ProjectSettings.IsResizable() end
+
+---Sets whether the window is resizable.
+---@param resizable boolean
+function ProjectSettings.SetResizable(resizable) end
+
+---Returns whether the window is borderless.
+---@return boolean
+function ProjectSettings.IsBorderless() end
+
+---Sets whether the window is borderless.
+---@param borderless boolean
+function ProjectSettings.SetBorderless(borderless) end
+
+---Returns whether VSync is enabled.
+---@return boolean
+function ProjectSettings.GetVSync() end
+
+---Sets VSync on or off.
+---@param vsync boolean
+function ProjectSettings.SetVSync(vsync) end
+
+---Returns the target maximum FPS limit (0 = uncapped).
+---@return integer
+function ProjectSettings.GetMaxFPS() end
+
+---Sets the target maximum FPS limit (0 = uncapped).
+---@param maxFPS integer
+function ProjectSettings.SetMaxFPS(maxFPS) end
+
+---Returns the stretch mode used for viewport scaling.
+---@return StretchMode|integer
+function ProjectSettings.GetStretchMode() end
+
+---Sets the stretch mode used for viewport scaling.
+---@param mode StretchMode|integer
+function ProjectSettings.SetStretchMode(mode) end
+
+---Returns the stretch aspect mode.
+---@return StretchAspect|integer
+function ProjectSettings.GetStretchAspect() end
+
+---Sets the stretch aspect mode.
+---@param aspect StretchAspect|integer
+function ProjectSettings.SetStretchAspect(aspect) end
+
+---Returns the scaling filter (Linear or Nearest).
+---@return ScalingFilter|integer
+function ProjectSettings.GetScalingFilter() end
+
+---Sets the scaling filter (Linear or Nearest).
+---@param filter ScalingFilter|integer
+function ProjectSettings.SetScalingFilter(filter) end
+
+---Returns the directional shadow map resolution (e.g. 1024, 2048, 4096).
+---@return integer
+function ProjectSettings.GetShadowResolution() end
+
+---Sets the directional shadow map resolution.
+---@param resolution integer
+function ProjectSettings.SetShadowResolution(resolution) end
+
+---Returns the point light shadow map resolution (e.g. 256, 512, 1024, 2048).
+---@return integer
+function ProjectSettings.GetPointShadowResolution() end
+
+---Sets the point light shadow map resolution.
+---@param resolution integer
+function ProjectSettings.SetPointShadowResolution(resolution) end
+
+---Returns the spot light shadow map resolution (e.g. 512, 1024, 2048, 4096).
+---@return integer
+function ProjectSettings.GetSpotShadowResolution() end
+
+---Sets the spot light shadow map resolution.
+---@param resolution integer
+function ProjectSettings.SetSpotShadowResolution(resolution) end
+
+---Returns whether FXAA (Fast Approximate Anti-Aliasing) is enabled.
+---@return boolean
+function ProjectSettings.IsFXAAEnabled() end
+
+---Enables or disables FXAA.
+---@param enabled boolean
+function ProjectSettings.SetFXAAEnabled(enabled) end
+
+---Returns whether SSAO operates at half resolution.
+---@return boolean
+function ProjectSettings.IsSSAOHalfResolution() end
+
+---Sets whether SSAO operates at half resolution.
+---@param halfRes boolean
+function ProjectSettings.SetSSAOHalfResolution(halfRes) end
+
+---Returns the number of directional slices for SSAO.
+---@return integer
+function ProjectSettings.GetSSAOSliceCount() end
+
+---Sets the number of directional slices for SSAO (1..6).
+---@param slices integer
+function ProjectSettings.SetSSAOSliceCount(slices) end
+
+---Returns the number of steps per slice for SSAO.
+---@return integer
+function ProjectSettings.GetSSAOStepCount() end
+
+---Sets the number of steps per slice for SSAO (1..8).
+---@param steps integer
+function ProjectSettings.SetSSAOStepCount(steps) end
+
+---Returns whether contact shadows operate at half resolution.
+---@return boolean
+function ProjectSettings.IsContactShadowsHalfResolution() end
+
+---Sets whether contact shadows operate at half resolution.
+---@param halfRes boolean
+function ProjectSettings.SetContactShadowsHalfResolution(halfRes) end
+
+---Returns the number of ray steps for contact shadows.
+---@return integer
+function ProjectSettings.GetContactShadowsSteps() end
+
+---Sets the number of ray steps for contact shadows (4..64).
+---@param steps integer
+function ProjectSettings.SetContactShadowsSteps(steps) end
+
+---Returns whether Screen Space Reflections (SSR) operate at half resolution.
+---@return boolean
+function ProjectSettings.IsSSRHalfResolution() end
+
+---Sets whether Screen Space Reflections (SSR) operate at half resolution.
+---@param halfRes boolean
+function ProjectSettings.SetSSRHalfResolution(halfRes) end
+
+---Returns the maximum raymarching steps for Screen Space Reflections.
+---@return integer
+function ProjectSettings.GetSSRMaxSteps() end
+
+---Sets the maximum raymarching steps for Screen Space Reflections (8..128).
+---@param steps integer
+function ProjectSettings.SetSSRMaxSteps(steps) end
+
+---Returns whether Screen Space Global Illumination (SSGI) operates at half resolution.
+---@return boolean
+function ProjectSettings.IsSSGIHalfResolution() end
+
+---Sets whether Screen Space Global Illumination (SSGI) operates at half resolution.
+---@param halfRes boolean
+function ProjectSettings.SetSSGIHalfResolution(halfRes) end
+
+---Returns the ray steps for SSGI.
+---@return integer
+function ProjectSettings.GetSSGISteps() end
+
+---Sets the ray steps for SSGI (4..64).
+---@param steps integer
+function ProjectSettings.SetSSGISteps(steps) end
+
+---Returns whether volumetric fog operates at half resolution.
+---@return boolean
+function ProjectSettings.IsVolumetricFogHalfResolution() end
+
+---Sets whether volumetric fog operates at half resolution.
+---@param halfRes boolean
+function ProjectSettings.SetVolumetricFogHalfResolution(halfRes) end
+
+---Returns the raymarch step count for volumetric fog.
+---@return integer
+function ProjectSettings.GetVolumetricFogSteps() end
+
+---Sets the raymarch step count for volumetric fog (8..128).
+---@param steps integer
+function ProjectSettings.SetVolumetricFogSteps(steps) end
+
+---Returns the sample count for motion blur.
+---@return integer
+function ProjectSettings.GetMotionBlurSamples() end
+
+---Sets the sample count for motion blur (4..32).
+---@param samples integer
+function ProjectSettings.SetMotionBlurSamples(samples) end
+
+---Returns the default texture filter mode.
+---@return TextureFilter|integer
+function ProjectSettings.GetDefaultTextureFilter() end
+
+---Sets the default texture filter mode.
+---@param filter TextureFilter|integer
+function ProjectSettings.SetDefaultTextureFilter(filter) end
+
+---Returns the default texture wrap mode.
+---@return TextureWrap|integer
+function ProjectSettings.GetDefaultTextureWrap() end
+
+---Sets the default texture wrap mode.
+---@param wrap TextureWrap|integer
+function ProjectSettings.SetDefaultTextureWrap(wrap) end
+
+---Returns the default anisotropic filtering level.
+---@return TextureAnisotropy|integer
+function ProjectSettings.GetDefaultAnisotropy() end
+
+---Sets the default anisotropic filtering level.
+---@param aniso TextureAnisotropy|integer
+function ProjectSettings.SetDefaultAnisotropy(aniso) end
+
+---Returns the global 3D physics gravity vector.
+---@return Vec3
+function ProjectSettings.GetGravity() end
+
+---Sets the global 3D physics gravity vector.
+---@overload fun(gravity: Vec3)
+---@overload fun(x: number, y: number, z: number)
+---@param gravity Vec3|number
+---@param y? number
+---@param z? number
+function ProjectSettings.SetGravity(gravity, y, z) end
+
+---Returns the physics simulation tick rate in Hz.
+---@return integer
+function ProjectSettings.GetPhysicsTickRate() end
+
+---Sets the physics simulation tick rate in Hz (15..240). Also updates fixed delta time.
+---@param hz integer
+function ProjectSettings.SetPhysicsTickRate(hz) end
+
+---Returns the fixed physics delta time in seconds (1.0 / tickRate).
+---@return number
+function ProjectSettings.GetFixedTimestep() end
+
+---Returns the number of collision sub-steps per physics tick.
+---@return integer
+function ProjectSettings.GetPhysicsSubSteps() end
+
+---Sets the number of collision sub-steps per physics tick (1..16).
+---@param steps integer
+function ProjectSettings.SetPhysicsSubSteps(steps) end
+
+---Returns the maximum number of physics bodies.
+---@return integer
+function ProjectSettings.GetPhysicsMaxBodies() end
+
+---Sets the maximum number of physics bodies.
+---@param maxBodies integer
+function ProjectSettings.SetPhysicsMaxBodies(maxBodies) end
+
+---Returns the maximum number of physics body pairs.
+---@return integer
+function ProjectSettings.GetPhysicsMaxBodyPairs() end
+
+---Sets the maximum number of physics body pairs.
+---@param maxPairs integer
+function ProjectSettings.SetPhysicsMaxBodyPairs(maxPairs) end
+
+---Returns the maximum number of contact constraints.
+---@return integer
+function ProjectSettings.GetPhysicsMaxContactConstraints() end
+
+---Sets the maximum number of contact constraints.
+---@param maxContacts integer
+function ProjectSettings.SetPhysicsMaxContactConstraints(maxContacts) end
+
+---Returns the name of a 3D physics layer (1-based index).
+---@param layer integer 1-based layer index (1..32)
+---@return string
+function ProjectSettings.GetPhysicsLayerName(layer) end
+
+---Sets the name of a 3D physics layer (1-based index).
+---@param layer integer 1-based layer index (1..32)
+---@param name string
+function ProjectSettings.SetPhysicsLayerName(layer, name) end
+
+---Calculates the collision bitmask for the given layer names or indices.
+---@param ... string|integer Layer names or layer numbers
+---@return integer mask
+function ProjectSettings.GetPhysicsLayerMask(...) end
+
+---Gets a project setting value by path (Godot style).
+---@param settingPath string
+---@return any
+function ProjectSettings.Get(settingPath) end
+
+---Sets a project setting value by path (Godot style).
+---@param settingPath string
+---@param value any
+---@return boolean success
+function ProjectSettings.Set(settingPath, value) end
+
+---Returns whether the given setting path exists in ProjectSettings.
+---@param settingPath string
+---@return boolean
+function ProjectSettings.Has(settingPath) end
+
+_G.ProjectSettings = ProjectSettings
+_G.Project = ProjectSettings
 
 
 -------------------------------------------------------------------------------

@@ -3,6 +3,7 @@
 #include <vector>
 #include <array>
 #include <cstdint>
+#include <glm/glm.hpp>
 #include "Renderer/Sampler.h"
 
 namespace rv {
@@ -78,13 +79,49 @@ struct ProjectSettings
 
 	uint32_t msaaSamples = 1;
 	bool fxaaEnabled = true;
-	uint32_t shadowResolution = 2048;
+
+	// Shadows Quality
+	uint32_t shadowResolution = 2048; // Directional shadow map resolution
+	uint32_t pointShadowResolution = 512;
+	uint32_t spotShadowResolution = 1024;
+
+	// SSAO Quality
+	bool ssaoHalfResolution = true;
+	int ssaoSliceCount = 3;
+	int ssaoStepCount = 3;
+
+	// Contact Shadows Quality
+	bool contactShadowsHalfResolution = true;
+	int contactShadowsSteps = 16;
+
+	// SSR Quality
+	bool ssrHalfResolution = true;
+	int ssrMaxSteps = 64;
+
+	// SSGI Quality
+	bool ssgiHalfResolution = true;
+	int ssgiSteps = 16;
+
+	// Volumetric Fog Quality
+	bool volumetricFogHalfResolution = true;
+	int volumetricFogSteps = 24;
+
+	// Motion Blur Quality
+	int motionBlurSamples = 16;
 
 	TextureFilter defaultTextureFilter = TextureFilter::LinearMipmap;
 	TextureWrap defaultTextureWrap = TextureWrap::Repeat;
 	TextureAnisotropy defaultAnisotropy = TextureAnisotropy::Aniso8x;
 
 	std::vector<AutoloadEntry> autoloads;
+
+	// Physics Settings
+	glm::vec3 physicsGravity = glm::vec3(0.0f, -9.81f, 0.0f);
+	int physicsTicksPerSecond = 60;
+	int physicsSubSteps = 1;
+	uint32_t physicsMaxBodies = 1024;
+	uint32_t physicsMaxBodyPairs = 1024;
+	uint32_t physicsMaxContactConstraints = 1024;
 
 	std::array<std::string, 32> physicsLayerNames = {
 		"Default", "", "", "", "", "", "", "",

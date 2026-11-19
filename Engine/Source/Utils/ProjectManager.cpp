@@ -1,6 +1,7 @@
 #include "rvelapch.h"
 #include "ProjectManager.h"
 #include "Core/VFS.h"
+#include "Core/Time.h"
 #include "Utils/Serializer.h"
 #include "Utils/FileUtils.h"
 #include "json.hpp"
@@ -121,6 +122,7 @@ bool ProjectManager::LoadProject(const std::string& projectFilePath)
 	project->projectFolderPath = resolvedFolder;
 	m_ActiveProject = project;
 	m_ProjectFolderPath = resolvedFolder;
+	Time::SetFixedDeltaTime(1.0f / static_cast<float>(std::max(1, project->GetSettings().physicsTicksPerSecond)));
 	SaveActiveProject();
 
 	AddRecentProject(projectFilePath);

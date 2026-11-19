@@ -26,6 +26,7 @@
 #include <glm/gtx/component_wise.hpp>
 #include "ShapeBuilder.h"
 #include "UserData.h"
+#include "Utils/ProjectManager.h"
 
 #include "Renderer/DebugRenderer.h"
 
@@ -38,8 +39,21 @@ PhysicsSystem::PhysicsSystem(Scene& scene) :
 	m_TempAllocator(10 * 1024 * 1024),
 	m_JobSystem(JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers, std::thread::hardware_concurrency() - 1)
 {
-	m_PhysicsSystem.Init(cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, 
+	glm::vec3 gravity(0.0f, -9.81f, 0.0f);
+	if (ProjectManager::IsProjectLoaded())
+	{
+		const auto& s = ProjectManager::GetActiveProject()->GetSettings();
+		m_MaxBodies = s.physicsMaxBodies;
+		m_MaxBodyPairs = s.physicsMaxBodyPairs;
+		m_MaxContactConstraints = s.physicsMaxContactConstraints;
+		m_CollisionSteps = std::max(1, s.physicsSubSteps);
+		gravity = s.physicsGravity;
+	}
+
+	m_PhysicsSystem.Init(m_MaxBodies, m_NumBodyMutexes, m_MaxBodyPairs, m_MaxContactConstraints, 
 		m_BroadPhaseLayerInterface, m_ObjectVsBroadPhaseLayerFilter, m_ObjectVsObjectLayerFilter);
+
+	m_PhysicsSystem.SetGravity(JPH::Vec3(gravity.x, gravity.y, gravity.z));
 
 	m_PhysicsSystem.SetBodyActivationListener(&m_BodyActivationListener);
 	m_PhysicsSystem.SetContactListener(&m_ContactListener);
@@ -64,7 +78,19 @@ void PhysicsSystem::Step(float dt)
 
 	UpdateCharacters(dt);
 
-	m_PhysicsSystem.Update(dt, cCollisionSteps, &m_TempAllocator, &m_JobSystem);
+	int collisionSteps = m_CollisionSteps;
+	if (ProjectManager::IsProjectLoaded())
+	{
+		const auto& s = ProjectManager::GetActiveProject()->GetSettings();
+		collisionSteps = std::max(1, s.physicsSubSteps);
+		JPH::Vec3 joltGrav(s.physicsGravity.x, s.physicsGravity.y, s.physicsGravity.z);
+		if (m_PhysicsSystem.GetGravity() != joltGrav)
+		{
+			m_PhysicsSystem.SetGravity(joltGrav);
+		}
+	}
+
+	m_PhysicsSystem.Update(dt, collisionSteps, &m_TempAllocator, &m_JobSystem);
 
 	SyncTransforms();
 

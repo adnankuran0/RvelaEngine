@@ -6,6 +6,7 @@
 #include "Renderer/Renderer.h"
 #include "Renderer/Camera.h"
 #include "Core/Time.h"
+#include "Utils/ProjectManager.h"
 
 using namespace rv;
 
@@ -90,10 +91,14 @@ void MotionBlurPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     glm::mat4 invViewProj = glm::inverse(currentViewProj);
 
+    int samples = env.MotionBlur_Samples;
+    if (ProjectManager::IsProjectLoaded())
+        samples = ProjectManager::GetActiveProject()->GetSettings().motionBlurSamples;
+
     mbShader.setMat4("u_InvViewProj", invViewProj);
     mbShader.setMat4("u_PrevViewProj", ctx.camera->prevViewProj);
     mbShader.setFloat("u_Intensity", env.MotionBlur_Intensity);
-    mbShader.setInt("u_Samples", env.MotionBlur_Samples);
+    mbShader.setInt("u_Samples", samples);
     mbShader.setFloat("u_MaxVelocity", env.MotionBlur_MaxVelocity);
 
     mbShader.setInt("u_ScreenTexture", 0);

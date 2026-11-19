@@ -5,12 +5,18 @@
 #include "Renderer/Renderer.h"
 #include "Renderer/ShaderManager.h"
 #include "Scene/Environment.h"
+#include "Utils/ProjectManager.h"
 
 using namespace rv;
 
 void VolumetricFogPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
-    m_HalfResolution = ctx.environment ? ctx.environment->VolumetricFog_HalfResolution : true;
+    m_HalfResolution = true;
+    if (ProjectManager::IsProjectLoaded())
+        m_HalfResolution = ProjectManager::GetActiveProject()->GetSettings().volumetricFogHalfResolution;
+    else if (ctx.environment)
+        m_HalfResolution = ctx.environment->VolumetricFog_HalfResolution;
+
     uint32_t w = m_HalfResolution ? std::max(1u, ctx.viewportWidth / 2) : std::max(1u, ctx.viewportWidth);
     uint32_t h = m_HalfResolution ? std::max(1u, ctx.viewportHeight / 2) : std::max(1u, ctx.viewportHeight);
 
@@ -43,7 +49,19 @@ void VolumetricFogPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     if (!ctx.environment || !ctx.environment->VolumetricFog)
         return;
 
-    bool halfRes = ctx.environment->VolumetricFog_HalfResolution;
+    bool halfRes = m_HalfResolution;
+    int stepCount = ctx.environment->VolumetricFog_Steps;
+    if (ProjectManager::IsProjectLoaded())
+    {
+        const auto& s = ProjectManager::GetActiveProject()->GetSettings();
+        halfRes = s.volumetricFogHalfResolution;
+        stepCount = s.volumetricFogSteps;
+    }
+    else if (ctx.environment)
+    {
+        halfRes = ctx.environment->VolumetricFog_HalfResolution;
+    }
+
     if (halfRes != m_HalfResolution)
     {
         m_HalfResolution = halfRes;
@@ -98,7 +116,7 @@ void VolumetricFogPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     fogShader.setFloat("u_Intensity", env.VolumetricFog_Intensity);
     fogShader.setFloat("u_AmbientIntensity", env.VolumetricFog_AmbientIntensity);
     fogShader.setVec3("u_FogColor", env.VolumetricFog_Color);
-    fogShader.setInt("u_StepCount", env.VolumetricFog_Steps);
+    fogShader.setInt("u_StepCount", stepCount);
 
     Renderer::DrawFullScreenQuad();
 

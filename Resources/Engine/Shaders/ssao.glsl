@@ -27,6 +27,8 @@ uniform float radius = 1.0;
 uniform float bias = 0.025;
 uniform float intensity = 1.0;
 uniform vec2 u_TargetResolution;
+uniform int u_SliceCount = 3;
+uniform int u_StepCount = 3;
 
 const float PI = 3.14159265358979323846;
 const float HALF_PI = 1.57079632679489661923;
@@ -88,18 +90,15 @@ void main()
     float bayerVal = Bayer2x2(gl_FragCoord.xy);
     float stepJitter = (bayerVal - 0.5) * 0.5;
 
-    const int NUM_SLICES = 3;
-    const int NUM_STEPS = 3;
-
-    float sliceDither = (bayerVal - 0.5) * (PI / float(NUM_SLICES));
+    float sliceDither = (bayerVal - 0.5) * (PI / float(u_SliceCount));
 
     float effectiveBias = max(bias, 0.04);
 
     float totalVisibility = 0.0;
 
-    for (int s = 0; s < NUM_SLICES; ++s)
+    for (int s = 0; s < u_SliceCount; ++s)
     {
-        float sliceAngle = float(s) * (PI / float(NUM_SLICES)) + sliceDither;
+        float sliceAngle = float(s) * (PI / float(u_SliceCount)) + sliceDither;
         vec2 dir2D = vec2(cos(sliceAngle), sin(sliceAngle));
         vec2 dirUV = dir2D * aspectScale;
 
@@ -128,9 +127,9 @@ void main()
         float horizonCos0 = lowHorizonCos0;
         float horizonCos1 = lowHorizonCos1;
 
-        for (int step = 0; step < NUM_STEPS; ++step)
+        for (int step = 0; step < u_StepCount; ++step)
         {
-            float stepFrac = (float(step) + 0.5 + stepJitter) / float(NUM_STEPS);
+            float stepFrac = (float(step) + 0.5 + stepJitter) / float(u_StepCount);
             float sDist = minStepUV + (radiusUV - minStepUV) * (stepFrac * stepFrac);
 
             vec2 sampleOffset = sDist * dirUV;
@@ -201,7 +200,7 @@ void main()
         totalVisibility += sliceVisibility;
     }
 
-    totalVisibility /= float(NUM_SLICES);
+    totalVisibility /= float(max(1, u_SliceCount));
     float ao = clamp(totalVisibility, 0.0, 1.0);
 
     ao = pow(ao, intensity);

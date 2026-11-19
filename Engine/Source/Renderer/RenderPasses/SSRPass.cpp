@@ -6,6 +6,7 @@
 #include "Scene/Environment.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/ShaderManager.h"
+#include "Utils/ProjectManager.h"
 
 using namespace rv;
 
@@ -17,7 +18,12 @@ void SSRPass::Init(const RenderContext& ctx, RenderFrame& frame)
     glGenTextures(1, &o_SsrTexture);
     glBindTexture(GL_TEXTURE_2D, o_SsrTexture);
 
-    m_HalfResolution = ctx.environment ? ctx.environment->SSR_HalfResolution : true;
+    m_HalfResolution = true;
+    if (ProjectManager::IsProjectLoaded())
+        m_HalfResolution = ProjectManager::GetActiveProject()->GetSettings().ssrHalfResolution;
+    else if (ctx.environment)
+        m_HalfResolution = ctx.environment->SSR_HalfResolution;
+
     uint32_t w = m_HalfResolution ? std::max(1u, ctx.viewportWidth / 2) : std::max(1u, ctx.viewportWidth);
     uint32_t h = m_HalfResolution ? std::max(1u, ctx.viewportHeight / 2) : std::max(1u, ctx.viewportHeight);
 
@@ -68,7 +74,19 @@ void SSRPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
     if (!ctx.environment->SSR) return;
 
-    bool halfRes = ctx.environment->SSR_HalfResolution;
+    bool halfRes = m_HalfResolution;
+    int maxSteps = ctx.environment->SSR_MaxSteps;
+    if (ProjectManager::IsProjectLoaded())
+    {
+        const auto& s = ProjectManager::GetActiveProject()->GetSettings();
+        halfRes = s.ssrHalfResolution;
+        maxSteps = s.ssrMaxSteps;
+    }
+    else if (ctx.environment)
+    {
+        halfRes = ctx.environment->SSR_HalfResolution;
+    }
+
     if (halfRes != m_HalfResolution)
     {
         m_HalfResolution = halfRes;
@@ -129,7 +147,7 @@ void SSRPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     ssrShader.setInt("uScreenTexture", 4);
     ssrShader.setInt("uSkybox", 5);
 
-    ssrShader.setInt("uMaxSteps", env.SSR_MaxSteps);
+    ssrShader.setInt("uMaxSteps", maxSteps);
     ssrShader.setFloat("uMaxDistance", env.SSR_MaxDistance);
     ssrShader.setFloat("uThickness", env.SSR_Thickness);
     ssrShader.setFloat("uEdgeFade", env.SSR_EdgeFade);

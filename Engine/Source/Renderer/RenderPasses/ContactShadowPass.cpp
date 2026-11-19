@@ -5,12 +5,18 @@
 #include "Scene/Environment.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/ShaderManager.h"
+#include "Utils/ProjectManager.h"
 
 using namespace rv;
 
 void ContactShadowPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
-    m_HalfResolution = ctx.environment ? ctx.environment->ContactShadows_HalfResolution : true;
+    m_HalfResolution = true;
+    if (ProjectManager::IsProjectLoaded())
+        m_HalfResolution = ProjectManager::GetActiveProject()->GetSettings().contactShadowsHalfResolution;
+    else if (ctx.environment)
+        m_HalfResolution = ctx.environment->ContactShadows_HalfResolution;
+
     uint32_t w = m_HalfResolution ? std::max(1u, ctx.viewportWidth / 2) : std::max(1u, ctx.viewportWidth);
     uint32_t h = m_HalfResolution ? std::max(1u, ctx.viewportHeight / 2) : std::max(1u, ctx.viewportHeight);
 
@@ -47,7 +53,19 @@ void ContactShadowPass::OnResize(uint32_t width, uint32_t height, RenderFrame& f
 void ContactShadowPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
     auto& env = *ctx.environment;
-    bool halfRes = env.ContactShadows_HalfResolution;
+    bool halfRes = m_HalfResolution;
+    int steps = env.ContactShadows_Steps;
+    if (ProjectManager::IsProjectLoaded())
+    {
+        const auto& s = ProjectManager::GetActiveProject()->GetSettings();
+        halfRes = s.contactShadowsHalfResolution;
+        steps = s.contactShadowsSteps;
+    }
+    else
+    {
+        halfRes = env.ContactShadows_HalfResolution;
+    }
+
     if (halfRes != m_HalfResolution)
     {
         m_HalfResolution = halfRes;
@@ -103,7 +121,7 @@ void ContactShadowPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     contactShader.setFloat("u_Thickness", env.ContactShadows_Thickness);
     contactShader.setFloat("u_Bias", env.ContactShadows_Bias);
     contactShader.setFloat("u_Intensity", env.ContactShadows_Intensity);
-    contactShader.setInt("u_Steps", env.ContactShadows_Steps);
+    contactShader.setInt("u_Steps", steps);
 
     Renderer::DrawFullScreenQuad();
 

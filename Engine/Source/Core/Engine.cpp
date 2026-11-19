@@ -133,6 +133,7 @@ bool Engine::LoadStartScene()
 
 	m_Window.SetVSync(settings.vsync);
 	Time::SetMaxFPS(settings.maxFPS);
+	Time::SetFixedDeltaTime(1.0f / static_cast<float>(std::max(1, settings.physicsTicksPerSecond)));
 
 	return true;
 }

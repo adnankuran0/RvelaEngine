@@ -17,6 +17,12 @@ public:
         return fixedDeltaTime;
     }
 
+    inline static void SetFixedDeltaTime(float dt) noexcept
+    {
+        if (dt > 0.0f)
+            fixedDeltaTime = dt;
+    }
+
     inline static bool ShouldRunFixedUpdate() noexcept
     {
         return fixedTimeAccumulator >= fixedDeltaTime;

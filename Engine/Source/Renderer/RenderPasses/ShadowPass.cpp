@@ -84,8 +84,8 @@ void ShadowPass::InitPointShadowMap()
         GL_TEXTURE_CUBE_MAP_ARRAY,
         0,
         GL_DEPTH_COMPONENT24,
-        POINT_SHADOW_WIDTH,
-        POINT_SHADOW_HEIGHT,
+        m_CurrentPointShadowResolution,
+        m_CurrentPointShadowResolution,
         6 * MaxPointLights,
         0,
         GL_DEPTH_COMPONENT,
@@ -122,8 +122,8 @@ void ShadowPass::InitSpotShadowMap()
         GL_TEXTURE_2D_ARRAY,
         0,
         GL_DEPTH_COMPONENT24,
-        SPOT_SHADOW_WIDTH,
-        SPOT_SHADOW_HEIGHT,
+        m_CurrentSpotShadowResolution,
+        m_CurrentSpotShadowResolution,
         MaxSpotLights,
         0,
         GL_DEPTH_COMPONENT,
@@ -582,7 +582,7 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
     if (!anyNeedsRender) return;
 
     glBindFramebuffer(GL_FRAMEBUFFER, pointFBO);
-    glViewport(0, 0, POINT_SHADOW_WIDTH, POINT_SHADOW_HEIGHT);
+    glViewport(0, 0, m_CurrentPointShadowResolution, m_CurrentPointShadowResolution);
 
     glDepthMask(GL_TRUE);
     glEnable(GL_DEPTH_TEST);
@@ -736,7 +736,7 @@ void ShadowPass::RenderPointShadowMap(const RenderContext& ctx, RenderFrame& fra
 
         float near_plane = 0.05f;
         float far_plane = light.radius;
-        glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)POINT_SHADOW_WIDTH / (float)POINT_SHADOW_HEIGHT, near_plane, far_plane);
+        glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), 1.0f, near_plane, far_plane);
         std::array<glm::mat4, 6> shadowTransforms;
         shadowTransforms[0] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
         shadowTransforms[1] = shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
@@ -1041,7 +1041,7 @@ void ShadowPass::RenderSpotShadowMap(const RenderContext& ctx, RenderFrame& fram
     if (!anyNeedsRender) return;
 
     glBindFramebuffer(GL_FRAMEBUFFER, spotFBO);
-    glViewport(0, 0, SPOT_SHADOW_WIDTH, SPOT_SHADOW_HEIGHT);
+    glViewport(0, 0, m_CurrentSpotShadowResolution, m_CurrentSpotShadowResolution);
 
     glDepthMask(GL_TRUE);
     glEnable(GL_DEPTH_TEST);
@@ -1448,6 +1448,36 @@ void ShadowPass::RecreateDirectionalShadowMap(uint32_t resolution, RenderFrame& 
     frame.registry.Register("DirectionalShadowMap", { RenderResourceType::Texture, o_DirectionalShadowMap });
 }
 
+void ShadowPass::RecreatePointShadowMap(uint32_t resolution, RenderFrame& frame)
+{
+    m_CurrentPointShadowResolution = resolution;
+    for (auto& cached : m_CachedPointShadows)
+        cached = {};
+
+    if (o_PointShadowMap != 0)
+        glDeleteTextures(1, &o_PointShadowMap);
+    if (pointFBO != 0)
+        glDeleteFramebuffers(1, &pointFBO);
+
+    InitPointShadowMap();
+    frame.registry.Register("PointShadowMap", { RenderResourceType::Texture, o_PointShadowMap });
+}
+
+void ShadowPass::RecreateSpotShadowMap(uint32_t resolution, RenderFrame& frame)
+{
+    m_CurrentSpotShadowResolution = resolution;
+    for (auto& cached : m_CachedSpotShadows)
+        cached = {};
+
+    if (o_SpotShadowMap != 0)
+        glDeleteTextures(1, &o_SpotShadowMap);
+    if (spotFBO != 0)
+        glDeleteFramebuffers(1, &spotFBO);
+
+    InitSpotShadowMap();
+    frame.registry.Register("SpotShadowMap", { RenderResourceType::Texture, o_SpotShadowMap });
+}
+
 void ShadowPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
     uint64_t sceneId = ctx.scene ? ctx.scene->GetInstanceId() : 0;
@@ -1460,10 +1490,23 @@ void ShadowPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     if (ProjectManager::IsProjectLoaded())
     {
-        uint32_t targetRes = ProjectManager::GetActiveProject()->GetSettings().shadowResolution;
+        const auto& s = ProjectManager::GetActiveProject()->GetSettings();
+        uint32_t targetRes = s.shadowResolution;
         if (targetRes > 0 && targetRes != m_CurrentShadowResolution)
         {
             RecreateDirectionalShadowMap(targetRes, frame);
+        }
+
+        uint32_t targetPointRes = s.pointShadowResolution;
+        if (targetPointRes > 0 && targetPointRes != m_CurrentPointShadowResolution)
+        {
+            RecreatePointShadowMap(targetPointRes, frame);
+        }
+
+        uint32_t targetSpotRes = s.spotShadowResolution;
+        if (targetSpotRes > 0 && targetSpotRes != m_CurrentSpotShadowResolution)
+        {
+            RecreateSpotShadowMap(targetSpotRes, frame);
         }
     }
 

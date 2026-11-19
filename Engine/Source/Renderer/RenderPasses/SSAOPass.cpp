@@ -5,12 +5,18 @@
 #include "Scene/Environment.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/ShaderManager.h"
+#include "Utils/ProjectManager.h"
 
 using namespace rv;
 
 void SSAOPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
-    m_HalfResolution = ctx.environment ? ctx.environment->SSAO_HalfResolution : true;
+    m_HalfResolution = true;
+    if (ProjectManager::IsProjectLoaded())
+        m_HalfResolution = ProjectManager::GetActiveProject()->GetSettings().ssaoHalfResolution;
+    else if (ctx.environment)
+        m_HalfResolution = ctx.environment->SSAO_HalfResolution;
+
     uint32_t targetWidth = m_HalfResolution ? std::max(1u, ctx.viewportWidth / 2) : std::max(1u, ctx.viewportWidth);
     uint32_t targetHeight = m_HalfResolution ? std::max(1u, ctx.viewportHeight / 2) : std::max(1u, ctx.viewportHeight);
 
@@ -48,7 +54,21 @@ void SSAOPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
     if (!ctx.environment || !ctx.environment->SSAO) return;
 
-    bool halfRes = ctx.environment->SSAO_HalfResolution;
+    bool halfRes = m_HalfResolution;
+    int sliceCount = 3;
+    int stepCount = 3;
+    if (ProjectManager::IsProjectLoaded())
+    {
+        const auto& s = ProjectManager::GetActiveProject()->GetSettings();
+        halfRes = s.ssaoHalfResolution;
+        sliceCount = s.ssaoSliceCount;
+        stepCount = s.ssaoStepCount;
+    }
+    else if (ctx.environment)
+    {
+        halfRes = ctx.environment->SSAO_HalfResolution;
+    }
+
     if (halfRes != m_HalfResolution)
     {
         m_HalfResolution = halfRes;
@@ -85,6 +105,8 @@ void SSAOPass::Execute(const RenderContext& ctx, RenderFrame& frame)
     ssaoShader.setFloat("bias", env.SSAO_Bias);
     ssaoShader.setFloat("intensity", env.SSAO_Intensity);
     ssaoShader.setVec2("u_TargetResolution", glm::vec2(static_cast<float>(targetWidth), static_cast<float>(targetHeight)));
+    ssaoShader.setInt("u_SliceCount", sliceCount);
+    ssaoShader.setInt("u_StepCount", stepCount);
 
     glBindTextureUnit(0, i_Normal);
     glBindTextureUnit(1, i_Depth);

@@ -41,6 +41,26 @@ std::string Project::Serialize() const
 	s["msaaSamples"] = m_Settings.msaaSamples;
 	s["fxaaEnabled"] = m_Settings.fxaaEnabled;
 	s["shadowResolution"] = m_Settings.shadowResolution;
+	s["pointShadowResolution"] = m_Settings.pointShadowResolution;
+	s["spotShadowResolution"] = m_Settings.spotShadowResolution;
+
+	s["ssaoHalfResolution"] = m_Settings.ssaoHalfResolution;
+	s["ssaoSliceCount"] = m_Settings.ssaoSliceCount;
+	s["ssaoStepCount"] = m_Settings.ssaoStepCount;
+
+	s["contactShadowsHalfResolution"] = m_Settings.contactShadowsHalfResolution;
+	s["contactShadowsSteps"] = m_Settings.contactShadowsSteps;
+
+	s["ssrHalfResolution"] = m_Settings.ssrHalfResolution;
+	s["ssrMaxSteps"] = m_Settings.ssrMaxSteps;
+
+	s["ssgiHalfResolution"] = m_Settings.ssgiHalfResolution;
+	s["ssgiSteps"] = m_Settings.ssgiSteps;
+
+	s["volumetricFogHalfResolution"] = m_Settings.volumetricFogHalfResolution;
+	s["volumetricFogSteps"] = m_Settings.volumetricFogSteps;
+
+	s["motionBlurSamples"] = m_Settings.motionBlurSamples;
 
 	s["defaultTextureFilter"] = static_cast<int>(m_Settings.defaultTextureFilter);
 	s["defaultTextureWrap"] = static_cast<int>(m_Settings.defaultTextureWrap);
@@ -56,6 +76,13 @@ std::string Project::Serialize() const
 		autoArr.push_back(item);
 	}
 	s["autoloads"] = autoArr;
+
+	s["physicsGravity"] = { m_Settings.physicsGravity.x, m_Settings.physicsGravity.y, m_Settings.physicsGravity.z };
+	s["physicsTicksPerSecond"] = m_Settings.physicsTicksPerSecond;
+	s["physicsSubSteps"] = m_Settings.physicsSubSteps;
+	s["physicsMaxBodies"] = m_Settings.physicsMaxBodies;
+	s["physicsMaxBodyPairs"] = m_Settings.physicsMaxBodyPairs;
+	s["physicsMaxContactConstraints"] = m_Settings.physicsMaxContactConstraints;
 
 	json layerArr = json::array();
 	for (const auto& lName : m_Settings.physicsLayerNames)
@@ -97,6 +124,27 @@ void Project::Deserialize(const std::string& jsonStr)
 	m_Settings.msaaSamples = 1;
 	m_Settings.fxaaEnabled = true;
 	m_Settings.shadowResolution = 2048;
+	m_Settings.pointShadowResolution = 512;
+	m_Settings.spotShadowResolution = 1024;
+	m_Settings.ssaoHalfResolution = true;
+	m_Settings.ssaoSliceCount = 3;
+	m_Settings.ssaoStepCount = 3;
+	m_Settings.contactShadowsHalfResolution = true;
+	m_Settings.contactShadowsSteps = 16;
+	m_Settings.ssrHalfResolution = true;
+	m_Settings.ssrMaxSteps = 64;
+	m_Settings.ssgiHalfResolution = true;
+	m_Settings.ssgiSteps = 16;
+	m_Settings.volumetricFogHalfResolution = true;
+	m_Settings.volumetricFogSteps = 24;
+	m_Settings.motionBlurSamples = 16;
+
+	m_Settings.physicsGravity = glm::vec3(0.0f, -9.81f, 0.0f);
+	m_Settings.physicsTicksPerSecond = 60;
+	m_Settings.physicsSubSteps = 1;
+	m_Settings.physicsMaxBodies = 1024;
+	m_Settings.physicsMaxBodyPairs = 1024;
+	m_Settings.physicsMaxContactConstraints = 1024;
 
 	if (j.contains("settings") && j["settings"].is_object())
 	{
@@ -136,6 +184,26 @@ void Project::Deserialize(const std::string& jsonStr)
 		m_Settings.msaaSamples = s.value("msaaSamples", 1u);
 		m_Settings.fxaaEnabled = s.value("fxaaEnabled", true);
 		m_Settings.shadowResolution = s.value("shadowResolution", 2048u);
+		m_Settings.pointShadowResolution = s.value("pointShadowResolution", 512u);
+		m_Settings.spotShadowResolution = s.value("spotShadowResolution", 1024u);
+
+		m_Settings.ssaoHalfResolution = s.value("ssaoHalfResolution", true);
+		m_Settings.ssaoSliceCount = s.value("ssaoSliceCount", 3);
+		m_Settings.ssaoStepCount = s.value("ssaoStepCount", 3);
+
+		m_Settings.contactShadowsHalfResolution = s.value("contactShadowsHalfResolution", true);
+		m_Settings.contactShadowsSteps = s.value("contactShadowsSteps", 16);
+
+		m_Settings.ssrHalfResolution = s.value("ssrHalfResolution", true);
+		m_Settings.ssrMaxSteps = s.value("ssrMaxSteps", 64);
+
+		m_Settings.ssgiHalfResolution = s.value("ssgiHalfResolution", true);
+		m_Settings.ssgiSteps = s.value("ssgiSteps", 16);
+
+		m_Settings.volumetricFogHalfResolution = s.value("volumetricFogHalfResolution", true);
+		m_Settings.volumetricFogSteps = s.value("volumetricFogSteps", 24);
+
+		m_Settings.motionBlurSamples = s.value("motionBlurSamples", 16);
 
 		m_Settings.defaultTextureFilter = static_cast<TextureFilter>(s.value("defaultTextureFilter", static_cast<int>(TextureFilter::LinearMipmap)));
 		m_Settings.defaultTextureWrap = static_cast<TextureWrap>(s.value("defaultTextureWrap", static_cast<int>(TextureWrap::Repeat)));
@@ -154,6 +222,16 @@ void Project::Deserialize(const std::string& jsonStr)
 					m_Settings.autoloads.push_back(entry);
 			}
 		}
+
+		if (s.contains("physicsGravity") && s["physicsGravity"].is_array() && s["physicsGravity"].size() >= 3)
+		{
+			m_Settings.physicsGravity = glm::vec3(s["physicsGravity"][0], s["physicsGravity"][1], s["physicsGravity"][2]);
+		}
+		m_Settings.physicsTicksPerSecond = s.value("physicsTicksPerSecond", 60);
+		m_Settings.physicsSubSteps = s.value("physicsSubSteps", 1);
+		m_Settings.physicsMaxBodies = s.value("physicsMaxBodies", 1024u);
+		m_Settings.physicsMaxBodyPairs = s.value("physicsMaxBodyPairs", 1024u);
+		m_Settings.physicsMaxContactConstraints = s.value("physicsMaxContactConstraints", 1024u);
 
 		for (size_t i = 0; i < m_Settings.physicsLayerNames.size(); ++i)
 			m_Settings.physicsLayerNames[i] = (i == 0) ? "Default" : "";

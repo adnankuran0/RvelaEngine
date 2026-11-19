@@ -35,9 +35,11 @@ private:
     GLuint o_SpotShadowMap = 0;
 
     uint32_t m_CurrentShadowResolution = 2048;
-    const unsigned int POINT_SHADOW_WIDTH = 512, POINT_SHADOW_HEIGHT = 512;
-    const unsigned int SPOT_SHADOW_WIDTH = 1024, SPOT_SHADOW_HEIGHT = 1024;
+    uint32_t m_CurrentPointShadowResolution = 512;
+    uint32_t m_CurrentSpotShadowResolution = 1024;
     void RecreateDirectionalShadowMap(uint32_t resolution, RenderFrame& frame);
+    void RecreatePointShadowMap(uint32_t resolution, RenderFrame& frame);
+    void RecreateSpotShadowMap(uint32_t resolution, RenderFrame& frame);
 
     struct CachedPointShadowState {
         bool valid = false;

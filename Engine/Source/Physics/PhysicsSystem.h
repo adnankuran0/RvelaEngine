@@ -89,11 +89,11 @@ private:
 
 	void DebugDraw();
 private:
-	const unsigned int cMaxBodies = 1024;
-	const unsigned int cNumBodyMutexes = 0;
-	const unsigned int cMaxBodyPairs = 1024;
-	const unsigned int cMaxContactConstraints = 1024;
-	const int cCollisionSteps = 1;
+	unsigned int m_MaxBodies = 1024;
+	unsigned int m_NumBodyMutexes = 0;
+	unsigned int m_MaxBodyPairs = 1024;
+	unsigned int m_MaxContactConstraints = 1024;
+	int m_CollisionSteps = 1;
 
 	Scene& m_Scene;
 

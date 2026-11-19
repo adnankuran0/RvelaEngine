@@ -5,12 +5,18 @@
 #include "Scene/Environment.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/ShaderManager.h"
+#include "Utils/ProjectManager.h"
 
 using namespace rv;
 
 void SSGIPass::Init(const RenderContext& ctx, RenderFrame& frame)
 {
-    m_HalfResolution = ctx.environment ? ctx.environment->SSGI_HalfResolution : true;
+    m_HalfResolution = true;
+    if (ProjectManager::IsProjectLoaded())
+        m_HalfResolution = ProjectManager::GetActiveProject()->GetSettings().ssgiHalfResolution;
+    else if (ctx.environment)
+        m_HalfResolution = ctx.environment->SSGI_HalfResolution;
+
     uint32_t targetWidth = m_HalfResolution ? std::max(1u, ctx.viewportWidth / 2) : std::max(1u, ctx.viewportWidth);
     uint32_t targetHeight = m_HalfResolution ? std::max(1u, ctx.viewportHeight / 2) : std::max(1u, ctx.viewportHeight);
 
@@ -47,7 +53,19 @@ void SSGIPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 {
     if (!ctx.environment->SSGI) return;
 
-    bool halfRes = ctx.environment->SSGI_HalfResolution;
+    bool halfRes = m_HalfResolution;
+    int steps = ctx.environment->SSGI_Steps;
+    if (ProjectManager::IsProjectLoaded())
+    {
+        const auto& s = ProjectManager::GetActiveProject()->GetSettings();
+        halfRes = s.ssgiHalfResolution;
+        steps = s.ssgiSteps;
+    }
+    else if (ctx.environment)
+    {
+        halfRes = ctx.environment->SSGI_HalfResolution;
+    }
+
     if (halfRes != m_HalfResolution)
     {
         m_HalfResolution = halfRes;
@@ -96,7 +114,7 @@ void SSGIPass::Execute(const RenderContext& ctx, RenderFrame& frame)
 
     ssgiShader.setFloat("u_Radius", env.SSGI_Radius);
     ssgiShader.setFloat("u_Intensity", env.SSGI_Intensity);
-    ssgiShader.setInt("u_Steps", env.SSGI_Steps);
+    ssgiShader.setInt("u_Steps", steps);
     ssgiShader.setFloat("u_Thickness", 0.5f);
 
     Renderer::DrawFullScreenQuad();
